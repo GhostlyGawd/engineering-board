@@ -1,0 +1,52 @@
+{
+  "description": "Engineering board automation — loads board state at session start, validates entries on write, primes intake context on debugging prompts, and enforces routing before session end.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-session-start.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-validate-entry.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-prompt-guard.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before stopping, review this session for unrouted findings. Check: did any confirmed bugs, regressions, unexpected behaviors, or significant observations surface? Look at the conversation for phrases like 'broken', 'failed', 'unexpected', 'error', 'wrong output', 'noticed', 'observed'. Then check if corresponding board entries were created (look for recent Write tool calls to docs/board/). If confirmed findings exist that were NOT routed to docs/board/, return decision 'block' with reason listing each unrouted finding and instructing to run board-intake for each. If all findings were routed, or no noteworthy findings surfaced, return decision 'approve'."
+          }
+        ]
+      }
+    ]
+  }
+}
