@@ -2,7 +2,6 @@
   "name": "engineering-board",
   "owner": {
     "name": "Acadia",
-    "email": "rhen@acadia.io",
     "url": "https://github.com/GhostlyGawd"
   },
   "plugins": [
@@ -10,14 +9,7 @@
       "name": "engineering-board",
       "source": "./",
       "description": "Autonomous engineering board management — converts a docs/boards/ markdown system into event-driven behavior. Routes findings in real-time, validates entries on write, warns on in_progress state at session start, and enforces routing before session end.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Acadia",
-        "email": "rhen@acadia.io"
-      },
-      "homepage": "https://github.com/GhostlyGawd/engineering-board",
-      "license": "MIT",
-      "keywords": ["engineering-board", "workflow", "automation", "hooks", "skills"]
+      "version": "0.2.0"
     }
   ]
 }
