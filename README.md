@@ -14,6 +14,7 @@ A Claude Code plugin that converts a markdown-based engineering board (`docs/boa
 
 | Type | Name | Purpose |
 |------|------|---------|
+| Command | `/board-init <project-name>` | Scaffolds the `docs/boards/` layout for a project |
 | Agent | `board-manager` | Routes findings, resolves questions, runs triage |
 | Skill | `board-intake` | Protocol for creating new board entries |
 | Skill | `board-triage` | Protocol for prioritizing open items |
@@ -23,9 +24,25 @@ A Claude Code plugin that converts a markdown-based engineering board (`docs/boa
 | Hook | `UserPromptSubmit` | Primes routing context on debugging prompts |
 | Hook | `Stop` | Catches unrouted findings before session ends |
 
-## Requirements
+## Quick start
 
-This plugin is opinionated about your repo layout. Before installing, your project should have either:
+After installing, run this once per project that should have a board:
+
+```
+/board-init <project-name> [affects-prefix]
+```
+
+Examples:
+- `/board-init navigator` — creates a board for project `navigator`, routing entries with `affects: navigator/...`
+- `/board-init platform "platform/, services/, infra/"` — creates a board with multiple affects-prefixes
+
+`/board-init` is idempotent — running it twice does not duplicate files or router rows. It creates `docs/boards/BOARD-ROUTER.md` (or appends to it), `docs/boards/<project>/BOARD.md`, `ARCHIVE.md`, and the four entry-type subdirectories.
+
+If no board exists when a session starts, the SessionStart hook prints a one-line reminder pointing at `/board-init` instead of doing anything else — projects that should not have a board are unaffected.
+
+## Layout
+
+This plugin is opinionated about your repo layout. After running `/board-init`, your project will have either:
 
 **Multi-board layout (recommended):**
 ```
@@ -53,7 +70,7 @@ docs/board/
 └── observations/
 ```
 
-If neither exists in your project, the SessionStart hook exits silently — the plugin won't error, it just won't do anything until you create the structure.
+If neither exists, the SessionStart hook prints a one-line nudge to run `/board-init` and otherwise stays out of your way.
 
 ### `BOARD-ROUTER.md` format
 

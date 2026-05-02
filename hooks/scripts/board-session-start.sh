@@ -7,6 +7,8 @@ BOARDS_ROUTER="${CLAUDE_PROJECT_DIR}/docs/boards/BOARD-ROUTER.md"
 LEGACY_BOARD="${CLAUDE_PROJECT_DIR}/docs/board/BOARD.md"
 if [ ! -f "${BOARDS_ROUTER}" ]; then
   if [ ! -f "${LEGACY_BOARD}" ]; then
+    # No board exists — print a one-line nudge and exit
+    echo "Engineering board not initialized in this project. Run /board-init <project-name> to scaffold one (or ignore this if you don't want a board here)."
     exit 0
   fi
   BOARD_PATHS=("${CLAUDE_PROJECT_DIR}/docs/board")

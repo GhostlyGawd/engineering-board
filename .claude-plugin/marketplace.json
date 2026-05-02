@@ -10,7 +10,7 @@
       "name": "engineering-board",
       "source": ".",
       "description": "Autonomous engineering board management — converts a docs/boards/ markdown system into event-driven behavior. Routes findings in real-time, validates entries on write, warns on in_progress state at session start, and enforces routing before session end.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "Acadia",
         "email": "rhen@acadia.io"
