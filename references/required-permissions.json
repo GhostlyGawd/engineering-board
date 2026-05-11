@@ -1,0 +1,25 @@
+{
+  "version": "0.2.2",
+  "patterns": [
+    {
+      "tool": "Bash",
+      "pattern": "bash hooks/scripts/board-claim-acquire.sh:*",
+      "rationale": "claim lifecycle: acquire — atomic mkdir, owner.txt write, heartbeat init"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash hooks/scripts/board-claim-heartbeat.sh:*",
+      "rationale": "claim lifecycle: heartbeat — atomic-rename refresh of heartbeat.txt"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash hooks/scripts/board-claim-release.sh:*",
+      "rationale": "claim lifecycle: release — owner-verified rm -rf with NTFS retry"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash hooks/scripts/board-claim-reclaim-stale.sh:*",
+      "rationale": "claim lifecycle: reclaim-stale — python3 mtime-based stale claim cleanup"
+    }
+  ]
+}
