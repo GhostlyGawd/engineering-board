@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mkdir -p .eb-v3-spike-artifacts && cat > .eb-v3-spike-artifacts/stop-stdin.json"
+          },
+          {
+            "type": "prompt",
+            "prompt": "SPIKE HOOK INSTRUCTION (engineering-board v0.3.0 composability spike). This prompt fires every Stop event while the eb-v3-spike plugin is installed.\n\nLOOP GUARD — read this first. If your immediately previous assistant message contains the literal token <<SPIKE-EXTRACT-DONE>> OR <<SPIKE-EXTRACT-SKIP>>, do NOTHING in this turn except emit the token <<SPIKE-EXTRACT-SKIP>> and stop. Do not re-extract. Do not call any tools. This prevents an infinite Stop-hook loop.\n\nOtherwise, perform the following sequence in order:\n\n1. Identify the most recent assistant message in this conversation (the one that triggered this Stop hook). Treat its visible text content as the input payload for the extractor.\n\n2. Dispatch a single Task tool call with these exact parameters:\n   - subagent_type: finding-extractor\n   - description: spike extraction\n   - prompt: the verbatim text content of the most recent assistant message identified in step 1\n\n3. The subagent will return a single JSON object as its response. Take that JSON verbatim (no prose wrapping, no markdown fences).\n\n4. Use the Write tool to write the raw JSON string to the absolute path equivalent of .eb-v3-spike-artifacts/last-extraction.json (relative to cwd; create the .eb-v3-spike-artifacts directory if it does not exist).\n\n5. After the Write succeeds, emit a final assistant message containing exactly the token <<SPIKE-EXTRACT-DONE>> on its own line and nothing else. Do not narrate the steps. Do not summarize.\n\nCRITERIA COVERAGE — what this sequence is empirically testing:\n  (a) That a Stop hook of type:prompt can actually dispatch Task() in the main session context.\n  (b) That the subagent JSON appears in the captured assistant turn (the Task tool result will be in the transcript).\n  (c) That the JSON is parsed and written to disk before the Stop event resolves.\n\nIf any step fails — Task tool unavailable, subagent missing, Write blocked, etc. — emit the token <<SPIKE-EXTRACT-FAILED>> followed by a single line describing which step failed. Do not retry."
+          }
+        ]
+      }
+    ]
+  }
+}

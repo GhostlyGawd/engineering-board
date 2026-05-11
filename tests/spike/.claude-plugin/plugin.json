@@ -1,0 +1,5 @@
+{
+  "name": "eb-v3-spike",
+  "version": "0.0.1",
+  "description": "Composability spike for engineering-board v0.3.0. Tests whether a Stop hook of type:prompt can dispatch Task(subagent_type=finding-extractor) from the main session, capture JSON output, and write it to disk before Stop returns. Installs no production hooks against the engineering-board domain; artifacts land in .eb-v3-spike-artifacts/ in cwd."
+}

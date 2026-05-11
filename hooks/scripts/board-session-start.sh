@@ -86,6 +86,21 @@ for i in "${!BOARD_PATHS[@]}"; do
     echo "${pattern_clusters}"
     echo ""
   fi
+
+  # Un-promoted scratch entries from prior interrupted sessions (v0.2.1)
+  SCRATCH_DIR="${BOARD_DIR}/_sessions"
+  if [ -d "${SCRATCH_DIR}" ]; then
+    # Count *.md files directly under _sessions/ (exclude _archive/ subdir)
+    scratch_count=$(find "${SCRATCH_DIR}" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "${scratch_count}" -gt 0 ]; then
+      echo "  SCRATCH ENTRIES — ${scratch_count} un-promoted session file(s) in _sessions/. Will consolidate on real session end. Run \`bash \$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-consolidate.sh\` manually to consolidate now."
+      while IFS= read -r scratch_file; do
+        session_id=$(basename "${scratch_file}" .md)
+        echo "    ${session_id}"
+      done < <(find "${SCRATCH_DIR}" -maxdepth 1 -type f -name "*.md" 2>/dev/null | sort)
+      echo ""
+    fi
+  fi
 done
 
 echo "Real-time routing active: route findings to the correct project board as they surface — do not batch."

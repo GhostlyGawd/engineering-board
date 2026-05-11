@@ -1,0 +1,13 @@
+{
+  "name": "eb-v3-spike-marketplace",
+  "owner": {
+    "name": "engineering-board"
+  },
+  "plugins": [
+    {
+      "name": "eb-v3-spike",
+      "source": "./",
+      "description": "Composability spike fixture for engineering-board v0.3.0."
+    }
+  ]
+}

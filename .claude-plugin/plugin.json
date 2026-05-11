@@ -1,7 +1,7 @@
 {
   "name": "engineering-board",
-  "version": "0.2.0",
-  "description": "Autonomous engineering board management — converts the docs/board/ markdown system into event-driven behavior. Routes findings in real-time, validates entries on write, warns on in_progress state at session start, and enforces routing before session end.",
+  "version": "0.2.1",
+  "description": "Autonomous engineering board management with passive listening. Converts docs/boards/ markdown into event-driven behavior: per-turn finding-extractor populates per-session scratch boards; live-board promotion happens via deterministic consolidation at session end. Routes findings in real-time, validates entries on write, warns on in_progress at session start, enforces routing before session end. v0.2.1 adds Scratch Capture (extractor + scratch boards + /board-pause + /board-resume).",
   "author": {
     "name": "Acadia",
     "email": "rhen@acadia.io"
