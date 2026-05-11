@@ -144,6 +144,17 @@ Then enable it in your Claude Code settings.
 
 ## Changelog
 
+### 0.2.1.2 — Prompt-author tightenings (2026-05-11)
+
+Two small, non-behavioral patches surfaced during v0.2.1 live smoke testing. No new scope; both are prompt-author tightenings against existing v0.2.1 surfaces.
+
+**Modified:**
+- `hooks/hooks.json` Stop hook step (d) — timestamp instruction now explicitly forbids placeholder times and pins the canonical computation (`python3 -c "...datetime.now(timezone.utc)..."`). v0.2.1 left "ISO-8601" loose, and live testing observed the model emitting midnight stubs.
+- `agents/finding-extractor.md` — opens by documenting the canonical input format (`---USER MESSAGE---` / `---ASSISTANT MESSAGE---` / `---END---`) as a first-class section, matching the v0.2.1 hook fix in commit `8e03757`. Eliminates the prior ambiguity where the agent doc said "current assistant turn" while the hook actually dispatched a user+assistant pair.
+- `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` — version 0.2.1 → 0.2.1.2.
+
+No new files. No behavioral change to the consolidator, scratch corpus, or AC coverage. v0.2.1's 12/12 verifier and 21/21 smoke continue to pass post-patch.
+
 ### 0.2.1 — Scratch Capture (2026-05-11)
 
 **New:**
