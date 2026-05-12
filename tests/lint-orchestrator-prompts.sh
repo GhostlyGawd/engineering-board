@@ -13,6 +13,7 @@ FILES=(
   "agents/finding-extractor.md"
   "agents/tdd-builder.md"
   "hooks/hooks.json"
+  "hooks/stop-hook-procedure.md"
   "skills/board-consolidate/SKILL.md"
 )
 
