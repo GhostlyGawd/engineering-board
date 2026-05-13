@@ -1,6 +1,6 @@
 ---
-description: Start a Worker session for the engineering board with a specific discipline (M2.2.b ships discipline=tdd only). Writes session-mode=worker + discipline to .engineering-board/session-mode.json so the Stop hook dispatches the matching worker subagent each turn. Idempotent.
-argument-hint: --discipline <tdd>
+description: Start a Worker session for the engineering board with a specific discipline (tdd, review, or validate). Writes session-mode=worker + discipline to .engineering-board/session-mode.json so the Stop hook dispatches the matching worker subagent each turn. Idempotent.
+argument-hint: --discipline <tdd|review|validate>
 ---
 
 # /worker-start — start Worker mode
@@ -15,11 +15,11 @@ You are writing a small JSON state file that the Stop hook reads. Be precise abo
 
 The argument list is `$ARGUMENTS`. Look for `--discipline <value>` (one-token value, kebab-case). Accept the long form `--discipline=value` as well.
 
-- If `--discipline` is missing, print `Usage: /worker-start --discipline <tdd>. No action taken.` and stop.
+- If `--discipline` is missing, print `Usage: /worker-start --discipline <tdd|review|validate>. No action taken.` and stop.
 - If `<value>` is empty, print the same usage message and stop.
-- If `<value>` is anything other than `tdd`, print `Engineering board: unsupported discipline "<value>". v0.2.2 M2.2.b ships only "tdd"; "review" and "validate" land in v0.2.2 M2.2.c. No action taken.` and stop.
+- If `<value>` is anything other than `tdd`, `review`, or `validate`, print `Engineering board: unsupported discipline "<value>". v0.2.2 ships disciplines: tdd, review, validate. No action taken.` and stop.
 
-The supported-discipline set for this milestone is exactly `{"tdd"}`. Do not silently coerce or accept aliases.
+The supported-discipline set for this milestone is exactly `{"tdd","review","validate"}`. Do not silently coerce or accept aliases.
 
 ### Step 2 — Resolve paths
 
@@ -61,7 +61,7 @@ Write `${CLAUDE_PROJECT_DIR}/.engineering-board/session-mode.json` with content:
 
 Field rules:
 - `mode` is always the JSON string `"worker"`.
-- `discipline` is the validated value from Step 1 (currently only `"tdd"`).
+- `discipline` is the validated value from Step 1 (`"tdd"`, `"review"`, or `"validate"`).
 - `previous_mode` is always JSON `null` for a fresh /worker-start.
 - `started_at` is a JSON string; compute the current UTC time at second precision (e.g. via Bash: `python3 -c "import datetime; print(datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'))"`). Do not stub the time.
 - `session_id` is a JSON string (possibly empty).
@@ -71,7 +71,7 @@ Field rules:
 Print exactly:
 
 ```
-Engineering board: Worker mode active (discipline=<value>). Stop hook will dispatch <value>-builder each turn until no needs:<value> entries remain, then emit <<EB-WORKER-NOTHING-TO-DO>>. Run /board-pause to suspend.
+Engineering board: Worker mode active (discipline=<value>). Stop hook will dispatch the <value> worker subagent each turn until no needs:<value> entries remain, then emit <<EB-WORKER-NOTHING-TO-DO>>. Run /board-pause to suspend.
 ```
 
 Then stop.
@@ -80,6 +80,6 @@ Then stop.
 
 - This command is idempotent in the "already worker with same discipline" sense (Step 3 short-circuit).
 - The Stop hook reads `session-mode.json` at the start of its procedure; the next Stop-hook turn after this command will execute the Worker continuation procedure for the configured discipline.
-- The Worker continuation in M2.2.b matches the locked-plan AC A2: "Within 10 continuations, worker claims `needs:`-matching task OR emits `nothing-to-do`."
-- v0.2.2 M2.2.b ships discipline=`tdd` only. v0.2.2 M2.2.c will add disciplines `review` (code-reviewer subagent) and `validate` (validator subagent), wired through the `needs: tdd → review → validate → resolved` state machine.
-- `/board-pause` and `/board-resume` continue to work — pause sets `mode=paused` with `previous_mode=worker`, resume restores `mode=worker` with the original `discipline`.
+- The Worker continuation matches the locked-plan AC A2: "Within 10 continuations, worker claims `needs:`-matching task OR emits `nothing-to-do`."
+- All three disciplines (tdd, review, validate) ship in v0.2.2 M2.2.c and are wired through the `needs: tdd -> review -> validate -> resolved` state machine.
+- `/board-pause` and `/board-resume` continue to work -- pause sets `mode=paused` with `previous_mode=worker`, resume restores `mode=worker` with the original `discipline`.

@@ -56,6 +56,7 @@ Required frontmatter by type — see `references/frontmatter-schema.md` for full
 id: B###
 type: bug
 status: open
+needs: tdd
 priority: P1
 title: Short present-tense description of the broken behavior
 affects: path/to/affected/file.md

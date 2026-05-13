@@ -2,9 +2,11 @@
 # tests/modes/automated.sh — Top-level runner for v0.2.2 M2.2.b mode-routing tests.
 #
 # Sub-tests (in order):
-#   1. command-frontmatter.sh    — /pm-start and /worker-start markdown lint
-#   2. agent-frontmatter.sh      — tdd-builder.md frontmatter + body lint
-#   3. stop-hook-mode-routing.sh — hooks.json Stop prompt body structural lint
+#   1. command-frontmatter.sh                 — /pm-start, /worker-start, /board-claim-release, /board-install-permissions markdown lint
+#   2. agent-frontmatter.sh                   — tdd-builder.md frontmatter + body lint
+#   3. agent-frontmatter-disciplines.sh       — code-reviewer.md + validator.md frontmatter + body lint (M2.2.c)
+#   4. agent-frontmatter-pm-subagents.sh      — consolidator.md + tidier.md + learnings-curator.md frontmatter + body lint (M2.2.c)
+#   5. stop-hook-mode-routing.sh              — hooks.json Stop prompt body + stop-hook-procedure.md structural lint
 #
 # Mirrors tests/claims/automated.sh style.
 #
@@ -12,7 +14,7 @@
 #   bash tests/modes/automated.sh                # auto-detect plugin root
 #   bash tests/modes/automated.sh <plugin-root>  # explicit root
 #
-# Exits 0 iff all 3 sub-tests pass.
+# Exits 0 iff all 5 sub-tests pass.
 
 set -euo pipefail
 
@@ -25,6 +27,8 @@ TESTS_DIR="$PLUGIN_ROOT/tests/modes"
 SUBTESTS=(
   "command-frontmatter.sh"
   "agent-frontmatter.sh"
+  "agent-frontmatter-disciplines.sh"
+  "agent-frontmatter-pm-subagents.sh"
   "stop-hook-mode-routing.sh"
 )
 

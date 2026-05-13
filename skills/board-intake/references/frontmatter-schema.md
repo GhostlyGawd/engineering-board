@@ -14,6 +14,7 @@
 
 | Field | Required | Values | Notes |
 |---|---|---|---|
+| `needs` | Conditional | `tdd`, `review`, `validate`, or absent | Set to `tdd` on intake for bug/feature entries. Workers transition this field via the Stop-hook orchestrator (tdd -> review -> validate -> resolved). Questions, observations, and learnings do not use this field. Users typically do not edit this directly. See locked-plan "needs: state machine". |
 | `priority` | Yes | `P0`, `P1`, `P2`, `P3` | P0 = production down/data loss; P1 = broken output delivered; P2 = quality degraded; P3 = minor/cosmetic |
 | `affects` | Yes | Relative file path | The prompt, script, or module where the fix lands |
 | `blocked_by` | Conditional | `[Q###]` or `[Q###, Q###]` | Required when a question must be answered before this can be fixed |

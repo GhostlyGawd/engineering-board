@@ -162,28 +162,58 @@ check_proc "procedure: EXTRACTOR step (c) ASSISTANT MESSAGE delim" "---ASSISTANT
 check_proc "procedure: EXTRACTOR step (d) iso timestamp comment"  '<!-- <iso8601> -->'
 check_proc "procedure: EXTRACTOR step (e) emit PASSIVE-DONE"      "<<EB-PASSIVE-DONE>>"
 
-# Section 3-PM.
+# Section 3-PM (M2.2.c — full dispatch chain).
 check_proc "procedure: Section 3-PM present"                      "Section 3-PM:"
 check_proc "procedure: PM reuses EXTRACTOR steps"                 "Section 3-EXTRACTOR steps"
+check_proc "procedure: PM step (b) consolidator dispatch"         "subagent_type=\`consolidator\`"
+check_proc "procedure: PM step (c) tidier dispatch"               "subagent_type=\`tidier\`"
+check_proc "procedure: PM step (d) learnings-curator dispatch"    "subagent_type=\`learnings-curator\`"
+check_proc "procedure: PM tidier described as idempotent"         "idempotent"
+check_proc "procedure: PM learnings-curator placeholder note"     "placeholder"
 check_proc "procedure: PM emits PM-CONTINUE"                      "<<EB-PM-CONTINUE>>"
 check_proc "procedure: PM emits PM-FAIL on failure"               "<<EB-PM-FAIL>>"
 
-# Section 3-WORKER.
+# Section 3-PM dispatch order: extractor -> consolidator -> tidier -> learnings-curator.
+# Verified by line-offset ordering: each subagent_type must appear after the prior one.
+PM_ORDER_OK=1
+EXTRACTOR_LINE=$(grep -nF "Section 3-EXTRACTOR steps" "$PROCEDURE_MD" | head -1 | cut -d: -f1)
+CONSOLIDATOR_LINE=$(grep -nF "subagent_type=\`consolidator\`" "$PROCEDURE_MD" | head -1 | cut -d: -f1)
+TIDIER_LINE=$(grep -nF "subagent_type=\`tidier\`" "$PROCEDURE_MD" | head -1 | cut -d: -f1)
+LEARNINGS_LINE=$(grep -nF "subagent_type=\`learnings-curator\`" "$PROCEDURE_MD" | head -1 | cut -d: -f1)
+if [ -n "$EXTRACTOR_LINE" ] && [ -n "$CONSOLIDATOR_LINE" ] && [ -n "$TIDIER_LINE" ] && [ -n "$LEARNINGS_LINE" ]; then
+  if [ "$EXTRACTOR_LINE" -lt "$CONSOLIDATOR_LINE" ] && [ "$CONSOLIDATOR_LINE" -lt "$TIDIER_LINE" ] && [ "$TIDIER_LINE" -lt "$LEARNINGS_LINE" ]; then
+    report 0 "procedure: PM dispatch order extractor -> consolidator -> tidier -> learnings-curator"
+  else
+    report 1 "procedure: PM dispatch order extractor -> consolidator -> tidier -> learnings-curator" "lines: ext=$EXTRACTOR_LINE cons=$CONSOLIDATOR_LINE tid=$TIDIER_LINE lc=$LEARNINGS_LINE"
+  fi
+else
+  report 1 "procedure: PM dispatch order extractor -> consolidator -> tidier -> learnings-curator" "one or more dispatch sites not found"
+fi
+
+# Section 3-WORKER (M2.2.c — disciplines tdd/review/validate).
 check_proc "procedure: Section 3-WORKER present"                  "Section 3-WORKER:"
 check_proc "procedure: WORKER step (a) reads discipline"          "discipline"
-check_proc "procedure: WORKER step (a) tdd-only constraint"       "discipline=tdd only"
+check_proc "procedure: WORKER step (a) tdd discipline"            '"tdd"'
+check_proc "procedure: WORKER step (a) review discipline"         '"review"'
+check_proc "procedure: WORKER step (a) validate discipline"       '"validate"'
+check_proc "procedure: WORKER step (a) discipline set"            '{"tdd","review","validate"}'
 check_proc "procedure: WORKER step (c) legacy board fallback"     "docs/board/"
-check_proc "procedure: WORKER step (d) grep needs: tdd"           "needs: tdd"
+check_proc "procedure: WORKER step (d) grep needs: tdd example"   "needs: tdd"
+check_proc "procedure: WORKER step (d) grep needs: review example" "needs: review"
+check_proc "procedure: WORKER step (d) grep needs: validate example" "needs: validate"
 check_proc "procedure: WORKER step (d) NOTHING-TO-DO sentinel"    "<<EB-WORKER-NOTHING-TO-DO>>"
 check_proc "procedure: WORKER step (f) acquire script"            "board-claim-acquire.sh"
 check_proc "procedure: WORKER step (f) reclaim-stale on exit 2"   "board-claim-reclaim-stale.sh"
 check_proc "procedure: WORKER step (g) tdd-builder dispatch"      "tdd-builder"
+check_proc "procedure: WORKER step (g) code-reviewer dispatch"    "code-reviewer"
+check_proc "procedure: WORKER step (g) validator dispatch"        "subagent_type=\`validator\`"
 check_proc "procedure: WORKER step (g) ENTRY-ID delimiter"        "---ENTRY-ID---"
 check_proc "procedure: WORKER step (g) ENTRY-CONTENT delimiter"   "---ENTRY-CONTENT---"
 check_proc "procedure: WORKER step (h) suggested_next_needs"      "suggested_next_needs"
 check_proc "procedure: WORKER step (i) release script"            "board-claim-release.sh"
 check_proc "procedure: WORKER step (j) emit WORKER-CONTINUE"      "<<EB-WORKER-CONTINUE>>"
 check_proc "procedure: WORKER emits WORKER-FAIL on failure"       "<<EB-WORKER-FAIL>>"
+check_proc "procedure: WORKER state machine documented"           "tdd -> review -> validate -> resolved"
 
 # Section 4 sentinel inventory: all 10 must be documented.
 for s in PASSIVE-SKIP PASSIVE-PAUSED PASSIVE-NO-BOARD PASSIVE-DONE PASSIVE-FAIL PM-CONTINUE PM-FAIL WORKER-CONTINUE WORKER-NOTHING-TO-DO WORKER-FAIL; do

@@ -69,8 +69,18 @@ grep -qF '"mode": "worker"' "$WORKER_START" && report 0 "worker-start.md writes 
 grep -qF '"discipline":' "$WORKER_START" && report 0 "worker-start.md writes discipline field" || report 1 "worker-start.md writes discipline field"
 grep -qF 'tdd' "$WORKER_START" && report 0 "worker-start.md mentions tdd discipline" || report 1 "worker-start.md mentions tdd discipline"
 
-# Must reject unsupported disciplines (M2.2.b ships only tdd).
-grep -qiE "unsupported discipline|only.*tdd|tdd.*only" "$WORKER_START" && report 0 "worker-start.md rejects non-tdd disciplines" || report 1 "worker-start.md rejects non-tdd disciplines"
+# M2.2.c: all three disciplines must be present in the supported set.
+grep -qF 'review' "$WORKER_START" && report 0 "worker-start.md mentions review discipline" || report 1 "worker-start.md mentions review discipline"
+grep -qF 'validate' "$WORKER_START" && report 0 "worker-start.md mentions validate discipline" || report 1 "worker-start.md mentions validate discipline"
+
+# argument-hint must reflect all three disciplines.
+grep -qE 'argument-hint:.*tdd.*review.*validate|argument-hint:.*tdd\|review\|validate' "$WORKER_START" && report 0 "worker-start.md argument-hint includes tdd|review|validate" || report 1 "worker-start.md argument-hint includes tdd|review|validate"
+
+# Must reject unsupported disciplines (M2.2.c ships tdd, review, validate).
+grep -qiE 'unsupported discipline' "$WORKER_START" && report 0 "worker-start.md rejects unsupported disciplines" || report 1 "worker-start.md rejects unsupported disciplines"
+
+# Rejection message must name all three valid disciplines.
+grep -qiE 'ships disciplines: tdd, review, validate|disciplines.*tdd.*review.*validate' "$WORKER_START" && report 0 "worker-start.md rejection message names all three disciplines" || report 1 "worker-start.md rejection message names all three disciplines"
 
 grep -qF 'already in worker mode' "$WORKER_START" && report 0 "worker-start.md idempotent short-circuit" || report 1 "worker-start.md idempotent short-circuit"
 

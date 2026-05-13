@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "bash hooks/scripts/board-claim-acquire.sh:*",
+      "bash hooks/scripts/board-claim-heartbeat.sh:*",
+      "bash hooks/scripts/board-claim-release.sh:*",
+      "bash hooks/scripts/board-claim-reclaim-stale.sh:*",
+      "/pm-start"
+    ]
+  }
+}

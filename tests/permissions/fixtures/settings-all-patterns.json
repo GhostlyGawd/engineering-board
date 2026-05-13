@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "bash hooks/scripts/board-claim-acquire.sh:*",
+      "bash hooks/scripts/board-claim-heartbeat.sh:*",
+      "bash hooks/scripts/board-claim-release.sh:*",
+      "bash hooks/scripts/board-claim-reclaim-stale.sh:*",
+      "/pm-start",
+      "/worker-start --discipline tdd",
+      "/worker-start --discipline review",
+      "/worker-start --discipline validate",
+      "/board-install-permissions",
+      "/board-claim-release",
+      "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-permission-self-check.sh"
+    ]
+  }
+}

@@ -20,6 +20,41 @@
       "tool": "Bash",
       "pattern": "bash hooks/scripts/board-claim-reclaim-stale.sh:*",
       "rationale": "claim lifecycle: reclaim-stale — python3 mtime-based stale claim cleanup"
+    },
+    {
+      "tool": "SlashCommand",
+      "pattern": "/pm-start",
+      "rationale": "Start PM (consolidator) session for engineering board"
+    },
+    {
+      "tool": "SlashCommand",
+      "pattern": "/worker-start --discipline tdd",
+      "rationale": "Start TDD-discipline worker session"
+    },
+    {
+      "tool": "SlashCommand",
+      "pattern": "/worker-start --discipline review",
+      "rationale": "Start review-discipline worker session"
+    },
+    {
+      "tool": "SlashCommand",
+      "pattern": "/worker-start --discipline validate",
+      "rationale": "Start validate-discipline worker session"
+    },
+    {
+      "tool": "SlashCommand",
+      "pattern": "/board-install-permissions",
+      "rationale": "Install plugin allowlist (interactive)"
+    },
+    {
+      "tool": "SlashCommand",
+      "pattern": "/board-claim-release",
+      "rationale": "Manual claim release (impatient-user UX)"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-permission-self-check.sh",
+      "rationale": "Permission self-check"
     }
   ]
 }

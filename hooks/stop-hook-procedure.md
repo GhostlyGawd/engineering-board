@@ -61,32 +61,44 @@ and use the literal stdout (e.g. `2026-05-11T22:47:13Z`). If Bash is unavailable
 
 (e) After the write succeeds, emit a final message containing exactly `<<EB-PASSIVE-DONE>>` on its own line and stop.
 
-### Section 3-PM: PM continuation (v0.2.2 M2.2.b minimum — extractor + PM sentinel)
+### Section 3-PM: PM continuation (v0.2.2 M2.2.c — full dispatch chain)
 
-PM mode in M2.2.b does the same scratch-capture work as Section 3-EXTRACTOR, then emits a PM-specific sentinel so M2.2.c's consolidator/tidier dispatch can replace this body without changing the surrounding loop semantics.
+PM mode runs the passive extractor (to capture this turn's findings), then dispatches the three PM subagents (consolidator, tidier, learnings-curator) in sequence to maintain board hygiene, then emits the PM-CONTINUE sentinel so the orchestrator continues looping.
 
 (a) Execute Section 3-EXTRACTOR steps (a), (b), (c), (d) verbatim (read session_id, resolve board path, dispatch finding-extractor, append JSON to scratch).
   - If step (b) emits `<<EB-PASSIVE-NO-BOARD>>`, propagate it and stop (PM mode cannot work without a board).
   - If step (d) succeeds, do NOT emit `<<EB-PASSIVE-DONE>>` — continue to (b) below.
+  - Capture the resolved board directory path (the parent of `_sessions/`) and the scratch session file path (the file the extractor just appended to) for use in (b)-(d) below.
 
-(b) Emit exactly `<<EB-PM-CONTINUE>>` on its own line and stop.
+(b) Dispatch the consolidator subagent. Run a Task call: subagent_type=`consolidator`, description=`PM consolidate`, prompt=the scratch session file path captured in (a) (a single absolute path string, no delimiters). Wait for the subagent to return one JSON object. Parse it but do not act on its `promoted` / `archived_superseded` / `deferred` fields beyond logging — the consolidator owns its own writes.
 
-If any step in (a) fails, emit `<<EB-PM-FAIL>>` on its own line followed by a single line describing which sub-step failed, and stop. Do not retry.
+(c) Dispatch the tidier subagent. Run a Task call: subagent_type=`tidier`, description=`PM tidy`, prompt=the board directory path captured in (a) (a single absolute path string, no delimiters). Wait for the subagent to return one JSON object. The tidier is idempotent and may return all-zero `actions_taken` when nothing is out-of-sync — that is normal; dispatch every PM turn regardless.
 
-(M2.2.c will extend this section with consolidator+tidier subagent dispatch and board-state tidying — that work is OUT OF SCOPE for M2.2.b.)
+(d) Dispatch the learnings-curator subagent. Run a Task call: subagent_type=`learnings-curator`, description=`PM curate learnings`, prompt=the board directory path captured in (a) (same path as (c), no delimiters). Wait for the subagent to return one JSON object. In v0.2.2 this is a placeholder returning `status: "placeholder"` — that is expected; full implementation lands in v0.3.0.
 
-### Section 3-WORKER: Worker continuation (v0.2.2 M2.2.b — discipline=tdd only)
+(e) Emit exactly `<<EB-PM-CONTINUE>>` on its own line and stop.
 
-Worker mode dispatches a discipline-specific worker subagent that processes one `needs:<discipline>` live-board entry per Stop turn. Claim acquire/release is owned by THIS procedure (the main session), not by the worker subagent.
+Per-step failure semantics:
+- If step (a) fails, emit `<<EB-PM-FAIL>>` on its own line followed by `step (a): <which extractor sub-step failed>`, and stop.
+- If step (b) fails (consolidator returns non-JSON, Task errors, or unrecoverable parse error), emit `<<EB-PM-FAIL>>` + `step (b): consolidator <reason>`, and stop.
+- If step (c) fails, emit `<<EB-PM-FAIL>>` + `step (c): tidier <reason>`, and stop.
+- If step (d) fails, emit `<<EB-PM-FAIL>>` + `step (d): learnings-curator <reason>`, and stop.
+
+Do not retry within the same Stop turn.
+
+### Section 3-WORKER: Worker continuation (v0.2.2 M2.2.c — disciplines tdd / review / validate)
+
+Worker mode dispatches a discipline-specific worker subagent that processes one `needs:<discipline>` live-board entry per Stop turn. Claim acquire/release is owned by THIS procedure (the main session), not by the worker subagent. The `needs:` state machine flows `tdd -> review -> validate -> resolved`; each discipline's worker advances the entry to the next state via its `suggested_next_needs` return value, applied to the entry by step (h) below.
 
 (a) Read `$CLAUDE_PROJECT_DIR/.engineering-board/session-mode.json` and extract the `discipline` field.
-  - If `discipline` is missing, null, or not the string `"tdd"`: emit `<<EB-WORKER-FAIL>>` on its own line, followed by `step (a): unsupported or missing discipline`, and stop. (M2.2.b ships discipline=tdd only.)
+  - The supported discipline set is exactly `{"tdd","review","validate"}`.
+  - If `discipline` is missing, null, or not one of those three strings: emit `<<EB-WORKER-FAIL>>` on its own line, followed by `step (a): unsupported or missing discipline`, and stop.
 
 (b) Read `$CLAUDE_PROJECT_DIR/.engineering-board/last-stop-stdin.json` to get `session_id`. If `session_id` is missing or empty, synthesize one from the timestamp (`python3 -c "import uuid; print(uuid.uuid4())"`).
 
 (c) Determine the project board path. Read `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md` if it exists; resolve the first listed project's board directory. If BOARD-ROUTER.md does not exist, fall back to `$CLAUDE_PROJECT_DIR/docs/board/`. If neither a router nor a legacy layout exists, emit `<<EB-PASSIVE-NO-BOARD>>` and stop.
 
-(d) Search the live board for entries needing this discipline: list files under `<board-dir>/bugs/` and `<board-dir>/features/` whose frontmatter contains `^needs: tdd$` (use Grep with the literal string `needs: tdd` over `*.md` files in those subdirs). If zero matches, emit `<<EB-WORKER-NOTHING-TO-DO>>` on its own line and stop. (Per the locked plan AC A2.)
+(d) Search the live board for entries needing this discipline: list files under `<board-dir>/bugs/` and `<board-dir>/features/` whose frontmatter contains `^needs: <discipline>$` (use Grep with the literal string `needs: <discipline>` over `*.md` files in those subdirs, substituting the actual discipline value — e.g. `needs: tdd`, `needs: review`, or `needs: validate`). If zero matches, emit `<<EB-WORKER-NOTHING-TO-DO>>` on its own line and stop. (Per the locked plan AC A2.)
 
 (e) From the match list, pick the first entry whose `status:` frontmatter is `open` (preferred) or `in_progress`. Skip `resolved` and `blocked`. Extract the entry-id (e.g. `B017`) from the filename or the `id:` frontmatter line.
 
@@ -96,7 +108,12 @@ Worker mode dispatches a discipline-specific worker subagent that processes one 
   - 2: stale claim; run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-reclaim-stale.sh <board-dir>` and retry (f) once. If still failing, pick the next candidate.
   - Any other exit code: emit `<<EB-WORKER-FAIL>>` + `step (f): acquire exit <code> for <entry-id>` and stop.
 
-(g) Read the entry file content. Dispatch the worker subagent via Task call: subagent_type=`<discipline>-builder` (for M2.2.b discipline=tdd, this is `tdd-builder`), description=`worker turn <discipline>`, prompt formatted as:
+(g) Read the entry file content. Dispatch the worker subagent via Task call. Map the discipline to the subagent name:
+  - `discipline = "tdd"` -> subagent_type=`tdd-builder`
+  - `discipline = "review"` -> subagent_type=`code-reviewer`
+  - `discipline = "validate"` -> subagent_type=`validator`
+
+Use description=`worker turn <discipline>`, prompt formatted as:
 
 ```
 ---ENTRY-ID---
@@ -119,8 +136,6 @@ Wait for the subagent to return one JSON object.
 (j) Emit `<<EB-WORKER-CONTINUE>>` on its own line, followed on the next line by a one-line summary of the subagent's `status` and `entry_id` (e.g. `entry=B017 status=work_done`). Then stop.
 
 If any step in (a)-(j) fails outside the documented branches, emit `<<EB-WORKER-FAIL>>` on its own line, followed by a single line describing which sub-step failed (e.g., `step (h): subagent returned non-JSON`), and stop. Do not retry.
-
-(M2.2.c will extend this section with disciplines `review` and `validate`, and wire the `needs: tdd -> review -> validate -> resolved` state machine — that work is OUT OF SCOPE for M2.2.b.)
 
 ## Section 4: Failure modes and sentinel inventory
 
