@@ -21,6 +21,18 @@ If triage was requested for a specific project, read that project's board at `do
    grep -r "blocked_by:" docs/boards/<project>/ --include="*.md" -h | sort | uniq
    ```
 
+## Step 1b — Auto-resolve terminal pass (run before triage output)
+
+Before applying the triage rules, run the auto-resolve terminal pass — see `../../references/auto-resolve-pass.md`.
+
+**Why at triage:** recommendations should never point at already-done items. If a Done-when criterion was satisfied by work that happened between the last `/board-rebuild` and this triage call, surface it now so the user can close it before the triage output is computed.
+
+**Scope:** `full` mode across the target board. Suppress `weak` candidates — the triage view should not be cluttered with low-confidence noise. Only surface `verbatim` and `semantic` candidates.
+
+**Silent path:** zero candidates → no output, proceed to Step 2 unchanged.
+
+**If the user closes any entries from the pass:** re-read the open list from disk before continuing to Step 2 (closed entries should not appear in the triage output).
+
 ## Step 2 — Apply triage rules in order
 
 Apply all five rules in sequence. Each pass narrows the candidate set.

@@ -10,7 +10,22 @@ The workspace has multiple project boards under `docs/boards/`. The router lives
 
 **Source of truth for ID sequences:** the highest-numbered existing file in the relevant subdirectory.
 
-## Step 0 — Identify the target board
+## Step 0a — Source the findings
+
+Two invocation modes:
+
+**Specific-finding mode** — the user named what to intake (e.g. "log this regression", "add a bug for X"). Use exactly what the user described. Skip to Step 0b.
+
+**Auto-scan mode** — invoked as a bare command (`/board-intake` with no target). Self-source findings:
+
+1. Scan the current session for candidate findings — bugs (confirmed broken behavior), features (capabilities discussed but not yet built), questions (open unknowns), observations (noteworthy non-actionable facts).
+2. For each candidate, extract: title, one-line evidence quote from the conversation, type, rough priority guess.
+3. **Briefly present the candidate list to the user** (numbered, one line each) and ask: "Intake all of these? Or pick a subset?" — do NOT intake silently. The user may have raised something rhetorically that doesn't deserve a board entry.
+4. After the user confirms or trims, proceed through Steps 0b–5 once per confirmed finding.
+
+If the session contains zero substantial findings (e.g. pure conversational session with no bugs/features surfaced), say so and stop — do not invent entries.
+
+## Step 0b — Identify the target board
 
 Read `docs/boards/BOARD-ROUTER.md`. Match the finding's `affects:` prefix against the prefix column to determine which project board owns this entry. If ambiguous, surface the options before proceeding.
 
@@ -61,6 +76,8 @@ priority: P1
 title: Short present-tense description of the broken behavior
 affects: path/to/affected/file.md
 discovered: YYYY-MM-DD
+discovered_at: YYYY-MM-DDTHH:MM:SSZ
+contradicts: [F001]   # OPTIONAL — list of entry IDs whose claims this entry contradicts
 ---
 ```
 
@@ -72,6 +89,7 @@ type: question
 status: open
 title: Short question in interrogative form
 discovered: YYYY-MM-DD
+discovered_at: YYYY-MM-DDTHH:MM:SSZ
 ---
 ```
 
@@ -82,8 +100,21 @@ id: O###
 type: observation
 title: YYYY-MM-DD ASIN — brief summary
 discovered: YYYY-MM-DD
+discovered_at: YYYY-MM-DDTHH:MM:SSZ
 ---
 ```
+
+**Required fields explained:**
+- `discovered:` — date-only (YYYY-MM-DD) for filename/grouping/weekly rollups
+- `discovered_at:` — full ISO-8601 UTC timestamp for intra-day ordering. Required because same-day sessions need precise ordering to track sequence and recency.
+
+**Optional explicit-relationship fields** (use to wire structural relationships that `/board-graph` will surface deterministically):
+- `blocked_by: [Q###]` — this entry cannot proceed until Q### is resolved
+- `superseded_by: [B###]` — this entry was replaced by B###
+- `merged_into: [B###]` — this entry's content was folded into B###
+- `contradicts: [F###]` — this entry's existence disproves a claim made by F### (use for bug/feature pairs where the bug refutes the feature's promised behavior)
+
+Add these at intake time when the relationship is known. They become `weight: 3` edges in GRAPH.yml. Without them, `/board-graph` can only infer relationships from shared tags/patterns, which is lossy.
 
 Required body sections:
 - **Bugs / Features / Questions**: `## Done when` — one line minimum. Required.
@@ -127,16 +158,25 @@ For each open question, read its `affects:` field. If it overlaps with the new e
 - Change `status: blocked` in the new entry
 - Append `⊘ Q###` to the new entry's BOARD.md line (added in Step 5)
 
-### Step 5 — Update BOARD.md index
+### Step 5 — Run /board-rebuild
 
-Add a line under `## Open` in the target board's `BOARD.md`:
+After the entry file is written, invoke `/board-rebuild <project>` (or run its logic inline). This regenerates BOARD.md from the filesystem — the new entry is automatically added to the correct section in correct priority order, with `⊘ Q###` blocking markers preserved from frontmatter. GRAPH.yml is regenerated in the same step.
 
-- Bug/Feature: `- B### P# | [title](bugs/filename.md)` (append `⊘ Q###` if blocked)
-- Question: `- Q### | [title](questions/filename.md)`
-- Observation: `- O### | [title](observations/filename.md)`
+**Do not manually edit BOARD.md to add the new entry.** Manual edits will be overwritten on the next rebuild. The rebuild is the canonical source for BOARD.md content; the entry file is the canonical source for entry data. This eliminates the drift problem (B004).
 
-Placement: P0 → P1 → P2 → P3 → unranked.
+### Step 6 — Auto-resolve terminal pass (mandatory)
+
+After the rebuild, run the auto-resolve terminal pass — see `../../references/auto-resolve-pass.md`.
+
+**Why at intake:** same-session bug-and-fix is the common case, not the edge case. A user often surfaces a bug *because* they just fixed it (or just observed the fix landing). Writing `status: open` and walking away leaves the entry rotting until the next manual triage. The pass catches this at write time.
+
+**Scope:** `focused` mode. Seed entry is the entry just written. Pass scans the new entry plus its `pattern:` / `affects:` neighbors — closing one finding often closes adjacent ones too (e.g. an observation documenting a fix satisfies the bug entry that fix addresses).
+
+**Silent path:** if the pass finds zero candidates, produce no output. The intake command's normal "intaken B### / F### / Q### / O###" message is sufficient.
+
+**Confirmation:** the pass prompts the user before closing anything. Never auto-close at intake.
 
 ## Additional Resources
 
 - **`references/frontmatter-schema.md`** — complete field definitions, valid values, and rules for all entry types
+- **`../../references/auto-resolve-pass.md`** — the shared auto-resolve terminal-pass protocol invoked at Step 6

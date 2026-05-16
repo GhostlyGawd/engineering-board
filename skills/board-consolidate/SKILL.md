@@ -73,6 +73,18 @@ For each surviving finding:
 
 Move each processed scratch file from `_sessions/<session-id>.md` to `_sessions/_archive/<session-id>-<consolidated-at>.md` (rename, do not delete — preserves the audit trail). On NTFS, retry up to 3 times with 250ms jitter on `EBUSY`.
 
+### Step 8 — Auto-resolve terminal pass (mandatory)
+
+After scratch is GC'd, run the auto-resolve terminal pass — see `../../references/auto-resolve-pass.md`.
+
+**Why at consolidate:** consolidation is a bulk-promotion operation. Many of the newly-promoted entries are findings about work that already happened — their Done-when criteria may already be satisfied at the moment they're promoted (same logic as the intake same-session bug-and-fix case, applied to scratch findings).
+
+**Scope:** `full` mode across each consolidated board. Surface only `verbatim` and `semantic` candidates.
+
+**Silent path:** zero candidates → no output. The consolidator's summary log proceeds normally.
+
+**Note for future repurpose (F006):** when this skill is rewritten for bulk corpus hygiene, the auto-resolve pass remains the appropriate terminal step — it complements the deterministic schema/structure checks F006 will add.
+
 ## Disposition vocabulary
 
 Every scratch entry is recorded in `consolidation.log` (JSON lines) with exactly one disposition:
