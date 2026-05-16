@@ -6,3 +6,6 @@ desktop.ini
 *~
 .vscode/
 .idea/
+
+# Runtime state — not source
+.omc/
