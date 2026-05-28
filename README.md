@@ -1,45 +1,70 @@
 # engineering-board
 
-A Claude Code plugin that converts a markdown-based engineering board (`docs/boards/`) into an autonomous, event-driven system. Findings get routed to the correct project board in real-time, entries are validated on write, in-progress items are surfaced at session start, and unrouted findings are caught before session end.
+A Claude Code plugin that converts a markdown-based engineering board (`docs/boards/`) into an autonomous, multi-agent build system. Findings get captured passively from every session, promoted to the live board via deterministic consolidation, and worked through a `tdd → review → validate` state machine with atomic claim locking — all driven by the Stop hook.
+
+For a full contributor-facing map of every file and how they connect, see [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## What it does
 
-- **Real-time routing** — when a confirmed bug, regression, or noteworthy observation surfaces during a debugging or workflow session, the `board-manager` agent routes it to the correct project board immediately. No batching for end-of-session.
-- **Session-start board view** — every session starts with the open items, in-progress warnings, blocking relationships, and systemic patterns across all your project boards.
-- **Entry validation on write** — when you write to `docs/boards/<project>/{bugs,features,questions,observations}/*.md`, frontmatter is validated and your `BOARD.md` index is checked for the entry ID. Missing fields or unindexed entries block the write.
-- **Routing-before-stop guard** — at session end, the model is prompted to review the conversation for unrouted findings and route any it missed.
-- **Prompt-context priming** — when your prompt looks like a debugging or workflow-run session, a system message reminds the agent that real-time routing is active.
+- **Passive finding capture** — every Stop event dispatches a `finding-extractor` subagent that scans the just-finished turn for bugs, features, questions, observations and writes them to a per-session scratch board at `docs/boards/<project>/_sessions/<session-id>.md`.
+- **Deterministic consolidation** — scratch never reaches the live board until anchor-verified by the `consolidator` subagent (matched against the transcript), with supersession detection and a distinct-`affects:` safeguard.
+- **Real-time routing** — when a confirmed finding surfaces during a session, the `board-manager` agent routes it via the four board-* skills (intake, triage, resolve, consolidate).
+- **PM pipeline** (`/pm-start`) — every Stop event runs `finding-extractor` → `consolidator` → `tidier` → `learnings-curator`, keeping the live board promoted and tidy.
+- **Worker pipeline** (`/worker-start --discipline <tdd|review|validate>`) — every Stop event picks an entry with matching `needs:`, atomically claims it, dispatches the matching worker subagent (`tdd-builder` / `code-reviewer` / `validator`), writes back `suggested_next_needs`, and releases the claim. Three workers run in parallel form a continuous build pipeline.
+- **Entry validation on write** — frontmatter and `BOARD.md` indexing are checked on every Write to `docs/boards/.../*.md`. Missing fields or unindexed entries block the write.
+- **Session-start board view** — every session starts with open items, in-progress warnings, blocking relationships, systemic patterns, and un-promoted scratch counts across all project boards.
 
-## v0.2.1 — Scratch Capture (new)
+## Mode-based Stop routing
 
-Every Stop event in every session now dispatches a `finding-extractor` subagent that scans the just-finished assistant turn for surface-level findings (bugs, features, questions, observations) and writes them to a per-session scratch board at `docs/boards/<project>/_sessions/<session-id>.md`. Scratch entries never reach the live board until a consolidation pass runs — by default on real session end (Stop without continuation), which promotes survivors and archives superseded entries with deterministic anchor verification against the conversation transcript.
+The Stop hook reads `.engineering-board/session-mode.json` and routes to one of three procedures (full canonical procedure in [`hooks/stop-hook-procedure.md`](hooks/stop-hook-procedure.md)):
 
-This means: planning conversations, drafts, and brainstorms no longer pollute the live board with half-formed findings. Capture happens every turn; the live board only ever sees verified, deduplicated, anchor-matched entries.
-
-Two new slash commands:
-- `/board-pause` — bypass passive listening for the current session (useful for drafting / brainstorming). The Stop hook emits the `<<EB-PASSIVE-PAUSED>>` sentinel and skips extraction while paused.
-- `/board-resume` — re-enable.
-
-The composability spike that gated v0.2.1 (a–e) passed empirically: Stop hook `type: "prompt"` dispatches Task() from main session, JSON is captured in the assistant turn, written to disk before Stop returns, the transcript is accessible to the consolidator, and orchestrator framing neutralizes mid-string imperatives.
+| Mode | Set by | Stop dispatches | Use case |
+|---|---|---|---|
+| **Passive** (default) | nothing | `finding-extractor` only | Any session — captures findings without disturbing the work |
+| **Paused** | `/board-pause` | nothing (emits `<<EB-PASSIVE-PAUSED>>`) | Drafting / brainstorming — bypass capture |
+| **PM** | `/pm-start` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` | Long-running session promoting scratch → live |
+| **Worker** | `/worker-start --discipline <d>` | claim-acquire → one of `tdd-builder` / `code-reviewer` / `validator` → claim-release | Long-running session driving `needs:` state machine |
 
 ## Components
 
 | Type | Name | Purpose |
 |------|------|---------|
-| Command | `/board-init <project-name>` | Scaffolds the `docs/boards/` layout for a project |
-| Command | `/board-pause` | Suspend passive listening for the current session |
-| Command | `/board-resume` | Resume passive listening |
-| Agent | `board-manager` | Routes findings, resolves questions, runs triage |
-| Agent | `finding-extractor` | Per-turn passive listener; emits scratch JSON |
+| Command | `/board-init <project> [affects-prefix]` | Scaffold `docs/boards/<project>/` and append to `BOARD-ROUTER.md` |
+| Command | `/board-rebuild [project]` | Deterministically regenerate `BOARD.md` + `GRAPH.yml` from entry files; runs auto-resolve terminal pass |
+| Command | `/board-graph [project] [--include-archive]` | Build structural graph (`GRAPH.yml`): clusters, bridges, isolated nodes, density |
+| Command | `/board-pause` | Suspend passive listening (Stop emits `<<EB-PASSIVE-PAUSED>>`) |
+| Command | `/board-resume` | Restore passive listening |
+| Command | `/pm-start` | Set session to PM mode — Stop runs PM pipeline every turn |
+| Command | `/worker-start --discipline <tdd\|review\|validate>` | Set session to Worker mode — Stop runs worker dispatch every turn |
+| Command | `/board-install-permissions` | Print copy-pasteable `claude config add` commands from `references/required-permissions.json` |
+| Command | `/board-claim-release <entry-id> [--force]` | Manual fallback to release a stuck `_claims/<entry-id>/` after a worker session crashed mid-turn |
+| Agent | `board-manager` | Master router for ad-hoc routing/triage/resolution; wraps the 4 board-* skills |
+| Agent | `finding-extractor` | Per-turn passive listener (`model: inherit`, `tools: Read`); emits scratch JSON |
+| Agent | `consolidator` | PM subagent: promote scratch → live; anchor verification, supersession, T2b distinct-affects safeguard |
+| Agent | `tidier` | PM subagent: index rebuild, stale-claim reclamation, scratch cleanup |
+| Agent | `learnings-curator` | PM subagent — **v0.2.2 stub** (inventory-only; full Learning entity in v0.3.0 plan) |
+| Agent | `tdd-builder` | Worker subagent (`tdd` discipline): write failing test → minimal fix → re-run |
+| Agent | `code-reviewer` | Worker subagent (`review` discipline): inspect tests + impl; suggest `validate` or regress to `tdd` |
+| Agent | `validator` | Worker subagent (`validate` discipline, **strictly read-only**): re-run suite + verify Done-when |
 | Skill | `board-intake` | Protocol for creating new board entries |
 | Skill | `board-triage` | Protocol for prioritizing open items |
 | Skill | `board-resolve` | Protocol for resolving questions and bugs/features |
 | Skill | `board-consolidate` | Protocol for promoting scratch → live board |
-| Hook | `SessionStart` | Loads board state at session start; surfaces un-promoted scratch |
-| Hook | `PostToolUse` (Write) | Validates board entries on write |
-| Hook | `UserPromptSubmit` | Primes routing context on debugging prompts |
-| Hook | `Stop` (command) | Captures Stop stdin to `.engineering-board/last-stop-stdin.json` |
-| Hook | `Stop` (prompt) | Condition-shaped judge that dispatches `finding-extractor` per turn |
+| Hook | `SessionStart` → `board-session-start.sh` | Surface open items, in-progress, blocked, systemic patterns, un-promoted scratch counts |
+| Hook | `PostToolUse` (Write) → `board-validate-entry.sh` | Validate frontmatter + `BOARD.md` indexing |
+| Hook | `UserPromptSubmit` → `board-prompt-guard.sh` | Inject routing reminder on debug/error/bug/crash keyword prompts |
+| Hook | `Stop` (command) → `board-stop-gate.sh` | Capture stdin; check mode; suppress prompt hook if paused or no board |
+| Hook | `Stop` (prompt) → `stop-hook-procedure.md` | Mode-routed orchestrator: passive / PM / worker dispatch |
+| Script | `board-claim-acquire.sh` | Atomic `mkdir`-based claim lock with cloud-sync detection (180s → 300s stale threshold) |
+| Script | `board-claim-release.sh` | Owner-verified claim release with NTFS retry loop |
+| Script | `board-claim-reclaim-stale.sh` | Scan + remove stale claims; cloud-sync detection |
+| Script | `board-claim-heartbeat.sh` | Refresh heartbeat during long worker operations (reserved; not yet wired) |
+| Script | `board-consolidate.sh` | Re-applies reject rules + anchor verification + supersession; promotes scratch → live |
+| Script | `board-audit-scratch.sh` | Completeness audit: every scratch_id must have a `consolidation.log` disposition |
+| Script | `board-index-check.sh` | Invariant: `BOARD.md` row count == entry file count |
+| Script | `board-permission-self-check.sh` | Compare `required-permissions.json` against `~/.claude/settings.json` |
+| Reference | `references/auto-resolve-pass.md` | Shared protocol used by all 4 skills (extract Done-when → evidence → confidence → cascade depth 2) |
+| Reference | `references/required-permissions.json` | Permission allowlist manifest used by `/board-install-permissions` |
 
 ## Quick start
 
@@ -143,6 +168,22 @@ Then enable it in your Claude Code settings.
 ```
 
 ## Changelog
+
+### 0.2.2 — PM + Worker orchestration
+
+Adds the multi-agent orchestration layer on top of v0.2.1 scratch capture: PM pipeline that consolidates scratch into the live board on every Stop turn, and a Worker pipeline that drives a `tdd → review → validate → resolved` state machine on entries with `needs:` set. Per-entry exclusivity is enforced via atomic `mkdir`-based claim locks with cloud-sync detection.
+
+**New commands:** `/pm-start`, `/worker-start --discipline <tdd|review|validate>`, `/board-install-permissions`, `/board-claim-release`, `/board-rebuild`, `/board-graph`.
+
+**New PM subagents:** `consolidator` (promotes verified scratch → live), `tidier` (board hygiene), `learnings-curator` (stub; full Learning entity in v0.3.0 plan).
+
+**New Worker subagents:** `tdd-builder`, `code-reviewer`, `validator` (validator is strictly read-only — enforced by tool list).
+
+**New scripts:** `board-claim-acquire.sh`, `board-claim-release.sh`, `board-claim-reclaim-stale.sh`, `board-claim-heartbeat.sh` (reserved), `board-permission-self-check.sh`.
+
+**New procedure:** `hooks/stop-hook-procedure.md` is the canonical mode-routed Stop orchestrator; `hooks.json`'s Stop entries are intentionally thin.
+
+**New reference:** `references/required-permissions.json` is the permission allowlist manifest installed by `/board-install-permissions`.
 
 ### 0.2.1.2 — Prompt-author tightenings (2026-05-11)
 

@@ -6,7 +6,7 @@
 |---|---|---|---|
 | `id` | Yes | B###, F###, Q###, O### | Zero-padded 3 digits |
 | `type` | Yes | `bug`, `feature`, `question`, `observation` | Lowercase |
-| `status` | Yes (except observations) | `open`, `blocked`, `in_progress`, `resolved` | |
+| `status` | Yes for bugs/features/questions; optional for observations (set `resolved` to omit from `BOARD.md` after closing — see `skills/board-resolve/SKILL.md`) | `open`, `blocked`, `in_progress`, `resolved` | |
 | `title` | Yes | Short string | Present-tense for bugs/features; interrogative for questions |
 | `discovered` | Yes | `YYYY-MM-DD` | Date first observed |
 
@@ -29,7 +29,7 @@
 
 ## Observation Fields
 
-Observations have no `status`, `priority`, `affects`, or `blocked_by`. They are run logs.
+Observations have no required `priority`, `affects`, or `blocked_by` — they are run logs. `status` is optional: omit it while the observation is active reference data, or set `status: resolved` when closing the observation so `/board-rebuild` correctly omits it from `BOARD.md` (per `skills/board-resolve/SKILL.md` observation flow).
 
 | Field | Required | Notes |
 |---|---|---|
