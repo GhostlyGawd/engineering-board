@@ -41,6 +41,10 @@ SUBTESTS=(
   "multi-worker-contention.sh"
   "board-rebuild-command.sh"
   "board-graph-command.sh"
+  "active-workers-registry.sh"
+  "pm-fallback-heartbeat.sh"
+  "learnings-curator.sh"
+  "board-migrate.sh"
 )
 
 for st in "${SUBTESTS[@]}"; do

@@ -53,7 +53,17 @@ Field rules:
 - `started_at` is a JSON string; compute the current UTC time at second precision (e.g. via Bash: `python3 -c "import datetime; print(datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'))"`). Do not stub the time.
 - `session_id` is a JSON string (possibly empty).
 
-### Step 5 — Confirm
+### Step 5 — Register in the active-workers registry (v0.2.3)
+
+After writing `session-mode.json`, invoke the registry helper so PM-fallback heartbeat and stale-session GC can see this session:
+
+```
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-register.sh" "<session_id from step 3>" "pm" "" "<started_at from step 4>"
+```
+
+Pass the empty string `""` for the discipline argument (PM has no discipline). If the script exits non-zero, print its stderr and continue — registry-write failures are not fatal to PM mode (the next register attempt on subsequent turns will retry). See `references/active-workers-registry.md` for the full contract.
+
+### Step 6 — Confirm
 
 Print exactly:
 

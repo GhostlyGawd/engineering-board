@@ -50,7 +50,17 @@ Read the `previous_mode` field from the parsed JSON in Step 2. Rewrite `session-
 
 Important: if the prior `previous_mode` was JSON `null`, the new `mode` must also be JSON `null` (not the string `"null"`). If it was a string like `"pm"` or `"worker"`, the new `mode` is that string.
 
-### Step 5 — Confirm
+### Step 5 — Flip the registry paused field (v0.2.3)
+
+After rewriting `session-mode.json`, clear the paused flag in the active-workers registry:
+
+```
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-bump.sh" "<session_id from step 3>" --paused false
+```
+
+If the session is not registered, the bump script no-ops silently. Continue regardless of its exit status.
+
+### Step 6 — Confirm
 
 Print exactly:
 

@@ -46,7 +46,17 @@ Write `${CLAUDE_PROJECT_DIR}/.engineering-board/session-mode.json` with content:
 
 The `previous_mode` field is a JSON string (or JSON `null` if no prior mode was set). `paused_at` is a JSON string. `session_id` is a JSON string (possibly empty).
 
-### Step 5 — Confirm
+### Step 5 — Flip the registry paused field (v0.2.3)
+
+After writing `session-mode.json`, mark the session as paused in the active-workers registry so PM-fallback heartbeat skips its claims:
+
+```
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-bump.sh" "<session_id from step 3>" --paused true
+```
+
+If the session is not registered (e.g. passive-only mode that never ran `/pm-start` or `/worker-start`), the bump script no-ops silently. Continue regardless of its exit status.
+
+### Step 6 — Confirm
 
 Print exactly:
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 # Read tool input from stdin
@@ -20,10 +20,12 @@ case "${file_path}" in
   "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/features/"*".md" | \
   "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/questions/"*".md" | \
   "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/observations/"*".md" | \
+  "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/learnings/"*".md" | \
   "${CLAUDE_PROJECT_DIR}/docs/board/bugs/"*".md" | \
   "${CLAUDE_PROJECT_DIR}/docs/board/features/"*".md" | \
   "${CLAUDE_PROJECT_DIR}/docs/board/questions/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/docs/board/observations/"*".md")
+  "${CLAUDE_PROJECT_DIR}/docs/board/observations/"*".md" | \
+  "${CLAUDE_PROJECT_DIR}/docs/board/learnings/"*".md")
     ;;
   *)
     exit 0
@@ -71,6 +73,34 @@ case "${entry_type}" in
     fi
     ;;
   observation|"")
+    ;;
+  learning)
+    # Learning entries require subtype, confidence, recurrence, derived_from
+    # (full schema in skills/board-intake/references/frontmatter-schema.md).
+    for field in subtype confidence recurrence derived_from; do
+      if ! has_field "${field}"; then
+        errors+=("Missing required frontmatter field for learning: ${field}")
+      fi
+    done
+    # subtype must be one of pattern|finding|principle
+    subtype=$(echo "${frontmatter}" | grep "^subtype:" | awk '{print $2}' || true)
+    case "${subtype}" in
+      pattern|finding|principle|"") ;;
+      *) errors+=("Invalid subtype for learning: ${subtype} (allowed: pattern, finding, principle)") ;;
+    esac
+    # confidence must be low|medium|high
+    confidence=$(echo "${frontmatter}" | grep "^confidence:" | awk '{print $2}' || true)
+    case "${confidence}" in
+      low|medium|high|"") ;;
+      *) errors+=("Invalid confidence for learning: ${confidence} (allowed: low, medium, high)") ;;
+    esac
+    # Required body sections
+    if ! grep -q "^## Takeaway" "${file_path}" 2>/dev/null; then
+      errors+=("Missing required '## Takeaway' section")
+    fi
+    if ! grep -q "^## Sources" "${file_path}" 2>/dev/null; then
+      errors+=("Missing required '## Sources' section")
+    fi
     ;;
 esac
 

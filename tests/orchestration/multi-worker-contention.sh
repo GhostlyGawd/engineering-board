@@ -101,6 +101,17 @@ while [ "$ITER" -lt "$MAX_ITER" ]; do
     RC=0
     bash "$ACQUIRE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" > /dev/null 2>&1 || RC=$?
     if [ "$RC" = "0" ]; then
+      # Re-verify the file is STILL needs:tdd after acquire. Between grep and
+      # acquire, another worker may have processed and released this entry —
+      # in which case it's now needs:review (or further). Real orchestrator
+      # does this same re-read in Section 3-WORKER step (g) by reading the
+      # entry file before dispatching the subagent; the subagent sees the
+      # advanced state and returns nothing_to_do.
+      if ! grep -qE '^needs:\s*tdd\s*$' "$ENTRY_FILE" 2>/dev/null; then
+        # State changed under us; release and continue.
+        bash "$RELEASE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" > /dev/null 2>&1 || true
+        continue
+      fi
       # Apply mocked transition: needs: tdd -> review.
       python3 - "$ENTRY_FILE" "review" <<PY
 import sys, re

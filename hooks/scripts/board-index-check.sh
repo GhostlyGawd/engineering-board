@@ -38,10 +38,10 @@ for BOARD_DIR in "${BOARD_DIRS[@]}"; do
     continue
   fi
 
-  declare -A PREFIX_FOR=( [bugs]=B [features]=F [questions]=Q [observations]=O )
+  declare -A PREFIX_FOR=( [bugs]=B [features]=F [questions]=Q [observations]=O [learnings]=L )
   PROJECT_NAME="$(basename "${BOARD_DIR}")"
 
-  for sub in bugs features questions observations; do
+  for sub in bugs features questions observations learnings; do
     prefix="${PREFIX_FOR[$sub]}"
     sub_dir="${BOARD_DIR}/${sub}"
 

@@ -169,6 +169,34 @@ Then enable it in your Claude Code settings.
 
 ## Changelog
 
+### 0.3.0 — Resilience + Learning entity
+
+Combines the v0.2.3 Resilience block (active-workers registry + PM-fallback heartbeat) with the v0.3.0 Unification block (Learning entity + `/board-migrate`). Shipped together because they were implemented in one session; the consensus plan kept them logically separate so they can still be rolled back independently via `git revert`.
+
+**v0.2.3 Resilience additions:**
+- `references/active-workers-registry.md` — contract for `.engineering-board/active-workers.json`.
+- `hooks/scripts/board-active-workers-register.sh`, `board-active-workers-bump.sh`, `board-active-workers-cleanup.sh` — registry mutators with mkdir-based lockfile.
+- `hooks/scripts/board-pm-fallback-heartbeat.sh` — PM pre-flight scans `_claims/`, cross-references the registry, refreshes heartbeats for claims whose owning session is alive (and not paused). Wired into `stop-hook-procedure.md` Section 3-PM step `(pre)`.
+- `/pm-start`, `/worker-start` register on session start; `/board-pause`, `/board-resume` toggle `paused: true` in the registry.
+- Worker self-bump on claim acquire / release (Stop hook step (f), (i)); worker subagents document heartbeat refresh for long ops.
+
+**v0.3.0 Unification additions:**
+- Learning entry type (`L###`): subtype `pattern` / `finding` / `principle`; required fields `confidence`, `recurrence`, `derived_from`; required body sections `## Takeaway` and `## Sources`. Schema in `skills/board-intake/references/frontmatter-schema.md`.
+- `agents/learnings-curator.md` — full implementation (replaces the v0.2.2 stub). Dispatches `hooks/scripts/board-curate-learnings.sh`, which scans resolved bug/feature/observation entries for `pattern:` tags and promotes tags with recurrence ≥ 3 to `learnings/L###-<slug>.md`. Idempotent (re-run produces byte-identical learnings).
+- `commands/board-migrate.md` + `hooks/scripts/board-migrate.sh` — `--apply` / `--rollback` / `--status`. Both apply and rollback are SHA256-idempotent (verified by `tests/orchestration/board-migrate.sh`). Apply creates `learnings/`, back-fills `needs: tdd` on open bug/feature entries without it, and snapshots pre-migrate state. Rollback restores the snapshot byte-equal.
+- SessionStart surfaces top 3 medium/high-confidence learnings filtered by cwd against each learning's `applies_to` field.
+
+**Quality-of-life additions:**
+- `tests/run-all.sh` — single CI runner across all 8 suites.
+- `tests/version-coherence.sh` — `plugin.json.version == marketplace.json.plugins[].version` invariant.
+- `tests/crosscompat-lint.sh` — bash + python3 portability lint over `hooks/scripts/*.sh` (no `date -d`/`date -j -f`, no drive letters, no CRLF shebangs, no `jq`, shebang must be `#!/usr/bin/env bash`). Supports per-file `# crosscompat-lint-ignore: <rule>` opt-out for documented exceptions.
+- `ARCHITECTURE.md` §11.5 documents the four-mode transition refusal matrix.
+- 4 new integration test suites: `active-workers-registry.sh`, `pm-fallback-heartbeat.sh`, `learnings-curator.sh`, `board-migrate.sh`.
+
+**Caught in this release:**
+- `hooks/hooks.json` had silently lost its Stop `type: "prompt"` hook in commit 5a4226d. The runtime dispatch chain was inactive for ~13 days. Restored in commit 52e99a4; structural lint covers it.
+- `board-prompt-guard.sh`, `board-session-start.sh`, `board-validate-entry.sh` had `#!/bin/bash` shebangs (Git Bash incompatible). Normalized to `#!/usr/bin/env bash` per the consensus plan global rules.
+
 ### 0.2.2 — PM + Worker orchestration
 
 Adds the multi-agent orchestration layer on top of v0.2.1 scratch capture: PM pipeline that consolidates scratch into the live board on every Stop turn, and a Worker pipeline that drives a `tdd → review → validate → resolved` state machine on entries with `needs:` set. Per-entry exclusivity is enforced via atomic `mkdir`-based claim locks with cloud-sync detection.

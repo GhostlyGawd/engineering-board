@@ -111,27 +111,33 @@ The Stop hook's actual orchestration body (the `type: "prompt"` content) lives s
 | `3-PM` | `mode: pm` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` (4 Tasks) | `<<EB-PM-CONTINUE>>` / `<<EB-PM-FAIL>>` |
 | `3-WORKER` | `mode: worker, discipline: <d>` | claim-acquire script → one of `tdd-builder` / `code-reviewer` / `validator` → write back `needs:` → claim-release script | `<<EB-WORKER-CONTINUE>>` / `<<EB-WORKER-NOTHING-TO-DO>>` / `<<EB-WORKER-FAIL>>` |
 
-### `scripts/` — 12 scripts
+### `scripts/` — 18 scripts
 
 **Hook-triggered (4):**
-- `board-session-start.sh` — SessionStart
-- `board-validate-entry.sh` — PostToolUse(Write)
+- `board-session-start.sh` — SessionStart. v0.3.0 also surfaces top medium/high-confidence learnings filtered by cwd against each learning's `applies_to` field.
+- `board-validate-entry.sh` — PostToolUse(Write). v0.3.0 validates `learnings/*.md` against the Learning schema.
 - `board-prompt-guard.sh` — UserPromptSubmit
 - `board-stop-gate.sh` — Stop
 
-**Procedure-invoked from `stop-hook-procedure.md` (4):**
+**Procedure-invoked from `stop-hook-procedure.md` (6):**
 - `board-claim-acquire.sh <board> <entry> <session>` — atomic `mkdir` lock; exit 0 acquired / 1 contention / 2 stale
 - `board-claim-release.sh <board> <entry> <session>` — owner-verified release; NTFS retry loop
 - `board-claim-reclaim-stale.sh <board>` — scan + remove stale claims (heartbeat age > threshold); cloud-sync detection bumps threshold 180s→300s
+- `board-claim-heartbeat.sh <board> <entry> <session>` — owner-verified heartbeat refresh; v0.2.3 wired into worker subagents (`tdd-builder`, `code-reviewer`, `validator`) for long operations
 - `board-consolidate.sh` — re-applies reject rules + anchor verification + supersession; promotes scratch → live; writes `consolidation.log`
+- `board-pm-fallback-heartbeat.sh <board>` — v0.2.3 PM pre-flight; scans `_claims/`, cross-references `.engineering-board/active-workers.json`, refreshes heartbeats for claims whose owning session is registered + alive + not paused
 
-**Operator/CI invoked (3):**
+**Registry mutators (3) — v0.2.3:**
+- `board-active-workers-register.sh <session> <mode> <discipline> <started-at>` — append-or-update session entry in `active-workers.json`; lazy GC drops stale entries; mkdir-based lockfile
+- `board-active-workers-bump.sh <session> [--claim-acquire id] [--claim-release id] [--paused true|false]` — refresh `last_seen`, optionally mutate `claim_ids_held` or `paused`
+- `board-active-workers-cleanup.sh <session>` — remove session entry by id
+
+**Operator/CI invoked (5):**
 - `board-audit-scratch.sh` — completeness audit: every scratch_id must have a `consolidation.log` disposition
-- `board-index-check.sh` — invariant: `BOARD.md` row count == `{bugs,features,questions,observations}/*.md` file count
+- `board-index-check.sh` — invariant: `BOARD.md` row count == `{bugs,features,questions,observations,learnings}/*.md` file count
 - `board-permission-self-check.sh` — compare `references/required-permissions.json` against `~/.claude/settings.json`
-
-**Reserved (1):**
-- `board-claim-heartbeat.sh` — refresh heartbeat during long worker operations; not yet wired (workers currently complete inside one Stop cycle, so no heartbeat needed yet)
+- `board-curate-learnings.sh <board> [min-recurrence]` — v0.3.0; deterministic Learning promotion. Dispatched by `learnings-curator` subagent
+- `board-migrate.sh --apply|--rollback|--status <board>` — v0.3.0; SHA256-idempotent migration of v0.2.x boards to v0.3.0 (creates `learnings/`, back-fills `needs: tdd` on open bugs/features without it, snapshots pre-state). Dispatched by `/board-migrate` command
 
 ---
 
@@ -250,6 +256,27 @@ These are aspirational/historical — the canonical record of how v0.2.1 → v0.
 - v0.2.2 Orchestration — ✅ shipped (PM + Worker + claims + permissions)
 - v0.2.3 Resilience — ❌ not shipped (PM-fallback heartbeat, active-workers registry)
 - v0.3.0 Unification — ❌ not shipped (Learning entity L###, migration command)
+
+---
+
+## 11.5. Mode transitions
+
+Four mode-setting commands write `.engineering-board/session-mode.json`: `/pm-start`, `/worker-start --discipline <d>`, `/board-pause`, `/board-resume`. The four `commands/*.md` files each enforce a *refusal matrix* — they will not silently overwrite a conflicting mode. The matrix below is the canonical reference; the actual enforcement lives in Step 2 / Step 3 of each command.
+
+| From → To | `/pm-start` | `/worker-start --discipline X` | `/board-pause` | `/board-resume` |
+|---|---|---|---|---|
+| **unset / null** | sets `pm` | sets `worker, X` | sets `paused, previous=null` | no-op ("not currently paused") |
+| **pm** | no-op ("already in PM mode") | refuses ("currently in PM mode. Restart session to switch") | sets `paused, previous=pm` | no-op ("not currently paused") |
+| **worker, X** | refuses ("currently in worker mode. Restart session to switch") | no-op if same X; refuses if different X ("Restart session to switch discipline") | sets `paused, previous=worker` | no-op ("not currently paused") |
+| **paused** (prev=null) | refuses ("currently paused. Run /board-resume first") | refuses ("currently paused. Run /board-resume first") | no-op ("already paused") | restores to `null` |
+| **paused** (prev=pm) | refuses | refuses | no-op | restores to `pm` |
+| **paused** (prev=worker, X) | refuses | refuses | no-op | restores to `worker, X` |
+
+**Why refuse instead of overwrite:** mode is session-bound. Mid-session mode flips would silently change which Stop pipeline runs on the next turn, with no signal to the user that orchestration has changed underneath them. Forcing a session restart on transitions between active modes makes the intent explicit and matches the run-orchestrators-in-separate-terminals model the consensus plan locks in.
+
+**`/board-pause` and `/board-resume` are the in-session escape hatch.** They preserve the prior mode in `previous_mode` so `/board-resume` round-trips cleanly. Pause is the only state-change that the four mode commands accept mid-session without restart.
+
+**Future extension (v0.2.3, Tier 2.4):** when active-workers registry ships, `/board-pause` will also set `paused: true` on the session's registry entry, and PM-fallback heartbeat will skip paused entries — their claims become reclaimable after `staleClaimSec`.
 
 ---
 

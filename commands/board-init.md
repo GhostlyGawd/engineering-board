@@ -41,8 +41,9 @@ Create:
 - `docs/boards/$1/features/`
 - `docs/boards/$1/questions/`
 - `docs/boards/$1/observations/`
+- `docs/boards/$1/learnings/` (v0.3.0 — populated by the `learnings-curator` PM subagent)
 
-Add a `.gitkeep` file in each of the four entry-type subdirectories so they survive an empty git commit.
+Add a `.gitkeep` file in each of the five entry-type subdirectories so they survive an empty git commit.
 
 ### Step 4 — Create `docs/boards/$1/BOARD.md`
 
@@ -62,6 +63,7 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 - Bug/Feature lines: `- B### P# | [title](bugs/filename.md)` (append `⊘ Q###` when blocked)
 - Question lines: `- Q### | [title](questions/filename.md)`
 - Observation lines: `- O### | [title](observations/filename.md)`
+- Learning lines: `- L### | [title](learnings/filename.md)` (v0.3.0)
 - Order within each section: P0 → P1 → P2 → P3 → unranked
 ```
 
@@ -84,7 +86,7 @@ Initialized board for "$1":
   ✓ docs/boards/BOARD-ROUTER.md (added row)
   ✓ docs/boards/$1/BOARD.md
   ✓ docs/boards/$1/ARCHIVE.md
-  ✓ docs/boards/$1/{bugs,features,questions,observations}/
+  ✓ docs/boards/$1/{bugs,features,questions,observations,learnings}/
 
 The board-manager agent will now route findings affecting `${2:-$1/}` to this board automatically.
 Restart Claude Code (or open a new session) so the SessionStart hook picks up the new layout.

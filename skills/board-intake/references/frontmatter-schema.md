@@ -4,10 +4,10 @@
 
 | Field | Required | Values | Notes |
 |---|---|---|---|
-| `id` | Yes | B###, F###, Q###, O### | Zero-padded 3 digits |
-| `type` | Yes | `bug`, `feature`, `question`, `observation` | Lowercase |
-| `status` | Yes for bugs/features/questions; optional for observations (set `resolved` to omit from `BOARD.md` after closing — see `skills/board-resolve/SKILL.md`) | `open`, `blocked`, `in_progress`, `resolved` | |
-| `title` | Yes | Short string | Present-tense for bugs/features; interrogative for questions |
+| `id` | Yes | B###, F###, Q###, O###, L### | Zero-padded 3 digits |
+| `type` | Yes | `bug`, `feature`, `question`, `observation`, `learning` | Lowercase |
+| `status` | Yes for bugs/features/questions; optional for observations and learnings (set `resolved` to omit from `BOARD.md` after closing — see `skills/board-resolve/SKILL.md`) | `open`, `blocked`, `in_progress`, `resolved` | |
+| `title` | Yes | Short string | Present-tense for bugs/features; interrogative for questions; one-line takeaway for learnings |
 | `discovered` | Yes | `YYYY-MM-DD` | Date first observed |
 
 ## Bug / Feature Additional Fields
@@ -37,6 +37,30 @@ Observations have no required `priority`, `affects`, or `blocked_by` — they ar
 | `type` | Yes | `observation` |
 | `title` | Yes | Format: `YYYY-MM-DD ASIN — brief summary` |
 | `discovered` | Yes | Date of run |
+
+## Learning Fields (v0.3.0)
+
+Learnings are durable takeaways promoted from recurring patterns across resolved bugs/features. They are written by the `learnings-curator` PM subagent, not by users directly — but the schema is enforced on every Write to `learnings/*.md`.
+
+| Field | Required | Values | Notes |
+|---|---|---|---|
+| `id` | Yes | L### | Zero-padded 3 digits |
+| `type` | Yes | `learning` | |
+| `subtype` | Yes | `pattern`, `finding`, `principle` | `pattern` = recurring failure mode; `finding` = single-source insight; `principle` = synthesised heuristic |
+| `title` | Yes | One-line takeaway | Present-tense, declarative, no question marks |
+| `discovered` | Yes | `YYYY-MM-DD` | First date the underlying pattern was observed |
+| `confidence` | Yes | `low`, `medium`, `high` | Curator-assigned; high requires recurrence ≥ 3 |
+| `recurrence` | Yes | Integer ≥ 1 | Number of resolved entries this learning is derived from |
+| `derived_from` | Yes | `[B###, F###, ...]` | List of resolved entry IDs that surfaced this pattern |
+| `applies_to` | No | List of paths or component names | Where this learning is relevant; informs SessionStart filtering by cwd |
+| `pattern_tag` | No | kebab-case string | The original `pattern:` tag from `derived_from` entries, retained for cross-reference |
+| `status` | No | `open`, `resolved` | Default omitted (active); `resolved` retires the learning from active surfacing |
+
+### Required Body Sections — Learning
+
+- `## Takeaway` — **required** — 1-3 sentences capturing the durable lesson.
+- `## Sources` — **required** — bulleted list of `derived_from` entries with their titles.
+- `## When this applies` — recommended — short prose on the conditions that surface this pattern.
 
 ## Priority Definitions
 
