@@ -1,116 +1,84 @@
 # Next-phase recommendations
 
-A prioritized list of what to build next, derived from a full structural audit of the v0.2.2 codebase against the v0.3.0 consensus plan (`.omc/plans/engineering-board-v3-consensus-plan.md`) and the test-coverage matrix.
+Prioritized backlog after the **v0.3.0** unification release (Resilience + Learning entity + Tier-4 QoL pack) and the **v0.3.1** follow-on (mode-transition guard). Replaces the prior pre-v0.3.0 doc, which described work that has since landed.
 
-The audit found **zero broken references** and **two minor doc drifts** (already fixed in the same commit that added this file). The codebase is internally coherent — the work below is about closing the gap between what's shipped and what's tested, then executing the planned v0.2.3 and v0.3.0 milestones.
-
----
-
-## Tier 1 — Integration tests for v0.2.2 (highest ROI, lowest risk)
-
-The v0.2.2 PM and Worker pipelines shipped, but `tests/modes/` only covers their **frontmatter lint**. The full end-to-end loops have never been exercised by the test suite. Every other test domain (claims, smoke, permissions) has automated coverage; the orchestration layer is the gap.
-
-### 1.1 PM pipeline end-to-end test
-- New: `tests/orchestration/pm-loop.sh`
-- Plant a synthetic board with seeded `_sessions/<id>.md` scratch
-- Set `session-mode.json` to `pm`
-- Drive one Stop cycle (mock or real)
-- Assert: scratch promoted to live (anchor-verified survivors only), superseded entries archived, `consolidation.log` complete, `<<EB-PM-CONTINUE>>` emitted
-- Validates the chain: `finding-extractor` → `consolidator` → `tidier` → `learnings-curator`
-
-### 1.2 Worker pipeline end-to-end test (per discipline)
-- New: `tests/orchestration/worker-tdd-loop.sh`, `worker-review-loop.sh`, `worker-validate-loop.sh`
-- Plant entries with `needs: tdd` / `needs: review` / `needs: validate`
-- Set `session-mode.json` to `worker, discipline: <d>`
-- Drive Stop cycles until `<<EB-WORKER-NOTHING-TO-DO>>`
-- Assert: claim acquired before each dispatch, `needs:` field rewritten per `suggested_next_needs`, claim released after, no orphan `_claims/` directories
-- Validates the `tdd → review → validate → resolved` state machine
-
-### 1.3 Multi-worker contention test
-- New: `tests/orchestration/multi-worker-contention.sh`
-- Two concurrent worker sessions on the same discipline pool
-- Assert: every entry is worked exactly once, no double-dispatch, no orphan claims after both sessions complete
-- Validates the atomic-claim contract under real concurrency (not just `claims/race-acquire.sh` which tests at the script level)
-
-### 1.4 Tests for two untested commands
-- `/board-rebuild`: assert BOARD.md and GRAPH.yml deterministic regeneration; drift detection; auto-resolve terminal pass
-- `/board-graph`: assert deterministic graph output; cluster/bridge/isolated-node correctness on fixture boards
+The codebase is internally coherent: 8/8 test suites green (`tests/run-all.sh`), `tests/modes/mode-transition-guard.sh` pins every cell of the §11.5 refusal matrix (30 assertions), and `version-coherence.sh` + `crosscompat-lint.sh` keep manifest and portability invariants.
 
 ---
 
-## Tier 2 — Ship v0.2.3 (Resilience)
+## What just shipped (commits 591289f and the v0.3.1 follow-on)
 
-Per the consensus plan (`.omc/plans/engineering-board-v3-consensus-plan.md`, lines 230–268). Required when PM and Worker sessions run for hours and one crashes mid-turn.
-
-### 2.1 Active-workers registry
-- New agent: `agents/active-workers-registry.md` — tracks `{session_id, mode, discipline, started_at, last_heartbeat}` for every active PM/Worker session
-- New scripts: `hooks/scripts/board-active-workers-register.sh` (on `/pm-start` / `/worker-start`) and `hooks/scripts/board-active-workers-cleanup.sh` (on Stop with no continuation)
-- Persists to `docs/boards/_active-workers/<session-id>.json`
-
-### 2.2 PM fallback heartbeat
-- New script: `hooks/scripts/board-pm-fallback-heartbeat.sh`
-- If a PM session goes offline (no heartbeat for 5 minutes), the next session that starts in PM mode picks up its un-consolidated scratch and runs catch-up consolidation
-- Wired into the PM section of `stop-hook-procedure.md` as a pre-flight step
-
-### 2.3 Wire `board-claim-heartbeat.sh`
-- Currently reserved but not invoked. Workers that take longer than the stale threshold (180s baseline, 300s cloud-sync) will have their claims reclaimed mid-work
-- Add heartbeat refresh to long-running operations inside `tdd-builder` / `code-reviewer` / `validator` (e.g., before/after every Bash invocation)
-
-### 2.4 `paused: true` board-level field
-- Already documented in the plan (lines 130–145) but not implemented
-- Adds a per-board pause registry so an operator can pause a single project's PM pipeline without affecting others
+- **v0.2.3 Resilience block** — active-workers registry (`board-active-workers-register/bump/cleanup.sh`), PM-fallback heartbeat, `paused: true` registry field, heartbeat wiring into all three worker subagents.
+- **v0.3.0 Learning entity** — `L###` entry type, `learnings-curator` agent + `board-curate-learnings.sh`, `/board-migrate` with SHA256-idempotent apply/rollback/status, SessionStart top-learnings surface.
+- **Tier-4 QoL pack** — `tests/run-all.sh` single runner, `tests/version-coherence.sh`, `tests/crosscompat-lint.sh` (19 scripts), ARCHITECTURE.md §11.5 documenting the mode-transition refusal matrix.
+- **v0.3.1 mode-transition guard** — `hooks/scripts/board-mode-guard.sh` decides every cell of the §11.5 matrix (`0=ALLOW / 2=NOOP / 3=REFUSE`). The four mode commands (`/pm-start`, `/worker-start`, `/board-pause`, `/board-resume`) now delegate the decision to the guard instead of each re-implementing six rows of matrix logic in markdown. `board-pause` and `board-resume` were also fixed to round-trip the full (mode, discipline) tuple via `previous_discipline` / `RESTORE_DISCIPLINE` — the prior commands dropped discipline on pause and resumed without it.
 
 ---
 
-## Tier 3 — Ship v0.3.0 (Learning entity)
+## Risks and debt being tracked
 
-Per the consensus plan (lines 269–276). The `learnings-curator` agent is currently a stub — full implementation requires:
+### R1 — Resilience and Learning blocks shipped in one commit
+The v0.3.0 consensus plan kept v0.2.3 (Resilience) and v0.3.0 (Unification) logically separate, but commit `591289f` bundled them. This is reversible — both blocks are independently revertable via `git revert` because their file sets are disjoint — but the cadence violation matters for the next cycle. **Action:** future releases follow the plan's per-milestone boundary. Pre-release checklist: "does this commit deliver exactly one milestone from the consensus plan?" If two milestones are ready, split into two commits with the second's changes staged separately. The v0.3.1 mode-guard release is the first commit of the restored cadence.
 
-### 3.1 Learning entry type (`L###`)
-- New entry type in `frontmatter-schema.md`
-- New subdirectory: `docs/boards/<project>/learnings/`
-- New fields: `derived_from: [B001, B007, F003]` (pattern across resolved entries), `confidence`, `applies_to`
+### R2 — Mode-transition enforcement gap (closed)
+Was: "§11.5 documents the refusal matrix but does not enforce it; each command re-implements the matrix in markdown that the model interprets, which is non-deterministic."
+Now: shipped in v0.3.1 as `board-mode-guard.sh` with 30 matrix-cell assertions in `tests/modes/mode-transition-guard.sh`. Closed.
 
-### 3.2 `learnings-curator` implementation
-- Reads `tidier`'s `patterns{}` output (already shipped)
-- Promotes recurring patterns to `learnings/L###-<slug>.md`
-- Cross-references original entries
-
-### 3.3 `/board-migrate` command
-- One-shot migration: scans existing `observations/` for ones that should have been `learnings`; offers operator-confirmed reclassification
-- Updates BOARD.md indexing accordingly
-
-### 3.4 SessionStart surfaces top learnings
-- `board-session-start.sh` extension: show top 3 high-confidence learnings relevant to the current working directory's `affects:` prefix
-- Closes the loop: capture → consolidate → tidy → learn → inform next session
+### R3 — `previous_discipline` was never persisted by pause (closed)
+Was: latent bug — pausing a `worker, X` session and then resuming would restore `mode=worker` but lose `discipline=X`, silently regressing the §11.5 matrix's "restores to `worker, X`" guarantee.
+Now: fixed in v0.3.1. `board-pause.md` writes `previous_discipline` from the guard's `PREVIOUS_DISCIPLINE` output; `board-resume.md` reads `previous_discipline` and writes the restored `discipline` from the guard's `RESTORE_DISCIPLINE` output. Pinned by `mode-transition-guard.sh` "preserves disc" + "restores disc" assertions. Closed.
 
 ---
 
-## Tier 4 — Quality of life
+## Tier A — Substrate hygiene (highest ROI, lowest risk)
 
-Lower priority but high value once Tiers 1–3 are stable.
+### A.1 PM/Worker subagent layer tests (LLM-dispatched layer is still uncovered)
+The `tests/orchestration/` suite exercises the deterministic substrate (claim acquire/release, consolidator, tidier, audit, registry, fallback heartbeat) by mocking the LLM-dispatched subagent step. The subagent layer itself (Task dispatch from the Stop hook into `consolidator` / `tdd-builder` / `code-reviewer` / `validator`) has no test harness — only frontmatter lint.
+- **Proposal:** golden-input + golden-output fixtures per agent (one input scratch block + one expected output JSON shape), wired into a `tests/orchestration/subagent-fixtures.sh` runner that asserts the JSON-shape contract documented in each agent's body. Cannot exercise the real model; can pin the input/output contract so refactors to agent prompts can't silently break the JSON shape downstream.
 
-### 4.1 Single CI runner
-- New: `tests/run-all.sh` that invokes every `automated.sh` + the lint and reports a single pass/fail
-- Required for any CI integration (GitHub Actions, etc.)
+### A.2 Learning curator coverage gap
+`board-curate-learnings.sh` has an integration test (`tests/orchestration/learnings-curator.sh`, 13 assertions). What it does NOT test: the `learnings-curator` subagent's behavior when called from the PM stop-hook procedure with a non-empty board. The current test only validates the deterministic backing script. **Proposal:** add a fixture-driven `subagent-fixtures` entry for `learnings-curator` per A.1.
 
-### 4.2 Cross-platform script audit
-- Plan commits to bash + python3 portability for 13 scripts (lines 145–165) but there is no automated cross-platform lint
-- Borrow the `crosscompat-lint.ps1` pattern from prior work: detect literal-backslash path constructions, hardcoded drive letters, CRLF shebangs
+### A.3 SessionStart top-learnings surface
+v0.3.0 added the top-3 high-confidence learnings filter to `board-session-start.sh` based on the cwd matching each learning's `applies_to` prefix. There is no test for the filtering logic — only that `board-session-start.sh` runs successfully on an empty board. **Proposal:** add fixture boards with 5+ learnings of varying confidence × applies_to and assert the filter selects the right 3.
 
-### 4.3 Plugin version coherence check
-- The v0.2.2 work shipped without a `plugin.json` version bump until this audit. Add a hook or pre-push check that flags when `agents/`, `commands/`, or `hooks/` change without a corresponding `plugin.json` version delta.
+---
 
-### 4.4 Document mode-transition semantics
-- What happens when a Worker session calls `/pm-start`? When a PM session calls `/worker-start`? Currently undocumented; the `session-mode.json` is just overwritten
-- Either document the override semantics explicitly or add a guard that requires `/board-pause` first
+## Tier B — Plan items the v0.3.0 consensus plan left explicitly for v0.3.1+
+
+### B.1 Auto-promote tidier `patterns{}` output
+The consensus plan (lines 269–276) describes the curator as "promotes recurring patterns to L### entries when count ≥ N". v0.3.0 ships the curator script, but the threshold N is hard-coded (3) and not yet operator-configurable per board. **Proposal:** read N from `docs/boards/<project>/board.config.json` with default 3.
+
+### B.2 Cross-board learning visibility
+Learnings live under `docs/boards/<project>/learnings/`. When a session's cwd matches `<other-project>/`, the SessionStart surface only consults the matching project's learnings. A learning derived from `project-A` whose `applies_to` prefix matches `project-B`'s cwd is invisible. **Proposal:** SessionStart enumerates `BOARD-ROUTER.md`-listed projects and unions their learnings before filtering — preserves project-scoped writes while making cross-project knowledge surface.
+
+### B.3 `/board-migrate` --dry-run flag
+`--apply` mutates immediately (with snapshot for rollback). Operators on production boards have asked for `--dry-run` that prints the planned diff without writing. **Proposal:** add `--dry-run` to the `migrate.sh` script + command markdown; reuse existing diff-generation step, suppress the write.
+
+---
+
+## Tier C — Quality of life
+
+### C.1 CI integration in GitHub Actions
+`tests/run-all.sh` exists (v0.3.0) but is not wired into a GitHub Actions workflow. **Proposal:** `.github/workflows/test.yml` invoking `bash tests/run-all.sh` on push and PR; cache python3 + bash.
+
+### C.2 Crosscompat lint coverage
+`crosscompat-lint.sh` checks 19 scripts and supports per-file ignore pragmas. It does NOT yet check shell scripts under `tests/`. **Proposal:** extend the glob to include `tests/**/*.sh` so test scripts can't drift from the portability contract.
+
+### C.3 Mode-guard error path observability
+When `board-mode-guard.sh` returns exit 1 (bad args), the calling command prints stderr and stops, but there is no audit trail. **Proposal:** the guard appends a one-line JSON record to `.engineering-board/mode-guard.log` on every invocation (target, current state, decision, exit code). Cheap, helps post-mortem cases where a session reportedly "got stuck" mid-transition.
+
+### C.4 Plugin source-of-truth lint
+There is no test that asserts `plugin.json` / `marketplace.json` descriptions are in sync (only versions). **Proposal:** extend `tests/version-coherence.sh` to also assert `plugin.json.description == marketplace.json.plugins[0].description`.
 
 ---
 
 ## Decision recommended
 
-The cleanest sequencing is **Tier 1 → Tier 2 → Tier 3**, with Tier 4 items pulled in as they become blocking.
+**Sequencing:** Tier A → Tier C → Tier B.
 
-Tier 1 is the highest ROI because (a) it locks in the v0.2.2 contract before it's exercised in anger, (b) it catches the kind of integration bugs the consensus plan's pre-mortems flagged as most likely (claim contention, supersession edge cases, PM-Worker mode collisions), and (c) it gives the v0.2.3 and v0.3.0 work a regression net to land on.
+- Tier A closes the test-coverage gap that the v0.3.0 shipping cycle exposed (substrate has 11/11 integration tests; subagent layer has zero).
+- Tier C is mostly bookkeeping but C.1 (GitHub Actions CI) is what turns `tests/run-all.sh` from a local convenience into a merge gate.
+- Tier B items are user-driven enhancements to v0.3.0 features; they're real but lower-priority than the test debt above.
 
-The Tier 1 work is also the most parallelizable: each test can be drafted by an independent worker session driving the just-shipped Worker pipeline on this very repo — the dogfooding loop closes on itself.
+**Cadence policy (per R1):** the next release MUST be a single milestone. v0.3.2 = either Tier A (subagent fixtures), or Tier C.1 (CI), or a single Tier B item — never a bundle. The v0.3.0 bundle shipped because two milestones happened to be ready simultaneously; the next cycle restores the per-milestone cadence the plan locked in.

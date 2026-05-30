@@ -18,14 +18,20 @@ You are writing a small JSON state file that the Stop hook reads. Be precise abo
 
 Create the state directory if it does not exist (`mkdir -p` semantics).
 
-### Step 2 — Read current mode (if any)
+### Step 2 — Run the mode-transition guard
 
-If `session-mode.json` already exists:
-- Parse it as JSON.
-- Read the existing `mode` field — this becomes the `previous_mode` value below.
-- If the existing `mode` is already `"paused"`, print `Engineering board: already paused. No action taken.` and stop.
+Delegate the refusal-matrix decision to the deterministic guard (single source of truth for ARCHITECTURE.md §11.5):
 
-If the file does not exist, `previous_mode` is `null`.
+```
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-mode-guard.sh" paused
+```
+
+Inspect the exit code:
+
+- **0 (ALLOW)** — parse the guard's stdout. It emits key=value lines including `PREVIOUS_MODE=<pm|worker|null>` and `PREVIOUS_DISCIPLINE=<tdd|review|validate|null>`. Use these values in Step 4 below. Then continue to Step 3.
+- **2 (NOOP)** — print the guard's stdout verbatim and stop. The canonical message for this branch is `Engineering board: already paused. No action taken.`
+
+`/board-pause` has no REFUSE branch — every non-paused state allows the transition. The matrix in ARCHITECTURE.md §11.5 lists `/board-pause` as the in-session escape hatch.
 
 ### Step 3 — Determine current session_id
 
@@ -38,13 +44,18 @@ Write `${CLAUDE_PROJECT_DIR}/.engineering-board/session-mode.json` with content:
 ```json
 {
   "mode": "paused",
-  "previous_mode": "<value from step 2, or null>",
+  "previous_mode": "<PREVIOUS_MODE from the guard's stdout; JSON null if null>",
+  "previous_discipline": "<PREVIOUS_DISCIPLINE from the guard's stdout; JSON null if null>",
   "paused_at": "<ISO-8601 now, UTC, e.g. 2026-05-11T14:32:07Z>",
   "session_id": "<value from step 3>"
 }
 ```
 
-The `previous_mode` field is a JSON string (or JSON `null` if no prior mode was set). `paused_at` is a JSON string. `session_id` is a JSON string (possibly empty).
+Field rules:
+- `previous_mode` is a JSON string (`"pm"` or `"worker"`) or JSON `null`. The guard's stdout key is the source of truth.
+- `previous_discipline` is a JSON string (`"tdd"` / `"review"` / `"validate"`) only when `previous_mode == "worker"`; otherwise JSON `null`. Preserving this lets `/board-resume` restore the exact (mode, discipline) tuple per ARCHITECTURE.md §11.5.
+- `paused_at` is a JSON string at second precision.
+- `session_id` is a JSON string (possibly empty).
 
 ### Step 5 — Flip the registry paused field (v0.2.3)
 
@@ -68,6 +79,6 @@ Then stop.
 
 ## Notes
 
-- This command is idempotent in the "already paused" sense (Step 2 short-circuit).
+- This command is idempotent in the "already paused" sense (Step 2 NOOP short-circuit via the guard).
 - The Stop hook reads `session-mode.json` at the start of its procedure; the next Stop-hook turn after this command will emit `<<EB-PASSIVE-PAUSED>>` and skip extraction.
-- `/board-resume` reverses this state.
+- `/board-resume` reverses this state and restores the prior (mode, discipline) tuple from `previous_mode` + `previous_discipline`.

@@ -28,18 +28,24 @@ The supported-discipline set for this milestone is exactly `{"tdd","review","val
 
 Create the state directory if it does not exist (`mkdir -p` semantics).
 
-### Step 3 — Read current mode (if any)
+### Step 3 — Run the mode-transition guard
 
-If `session-mode.json` already exists:
-- Parse it as JSON.
-- Read the existing `mode` and `discipline` fields.
-- If `mode` is already `"worker"` AND the existing `discipline` matches the requested one, print `Engineering board: already in worker mode (discipline=<value>). No action taken.` and stop.
-- If `mode` is `"worker"` with a DIFFERENT discipline, print `Engineering board: currently in worker mode (discipline=<existing>). Restart the session to switch to discipline=<requested>. No action taken.` and stop.
-- If `mode` is `"pm"`, print `Engineering board: currently in PM mode. Restart the session to switch to worker mode. No action taken.` and stop.
-- If `mode` is `"paused"`, print `Engineering board: currently paused. Run /board-resume first, then /worker-start --discipline <value>. No action taken.` and stop.
-- Otherwise (mode is null, missing, or unrecognized), continue to Step 4 — switching to worker mode is allowed.
+Delegate the refusal-matrix decision to the deterministic guard (single source of truth for ARCHITECTURE.md §11.5):
 
-If the file does not exist, continue to Step 4.
+```
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-mode-guard.sh" worker --discipline <value from step 1>
+```
+
+Inspect the exit code:
+
+- **0 (ALLOW)** — continue to Step 4.
+- **2 (NOOP)** — print the guard's stdout verbatim and stop. The canonical message for this branch is `Engineering board: already in worker mode (discipline=<value>). No action taken.`
+- **3 (REFUSE)** — print the guard's stdout verbatim and stop. The canonical messages for this branch are:
+  - `Engineering board: currently in PM mode. Restart the session to switch to worker mode. No action taken.`
+  - `Engineering board: currently in worker mode (discipline=<existing>). Restart the session to switch to discipline=<requested>. No action taken.`
+  - `Engineering board: currently paused. Run /board-resume first, then /worker-start --discipline <value>. No action taken.`
+
+The four canonical messages live in `hooks/scripts/board-mode-guard.sh` so the same matrix is enforced identically by `/pm-start`, `/worker-start`, `/board-pause`, and `/board-resume`. Do not re-implement the matrix in this file.
 
 ### Step 4 — Determine current session_id
 
@@ -88,8 +94,8 @@ Then stop.
 
 ## Notes
 
-- This command is idempotent in the "already worker with same discipline" sense (Step 3 short-circuit).
+- This command is idempotent in the "already worker with same discipline" sense (Step 3 NOOP short-circuit via the guard).
 - The Stop hook reads `session-mode.json` at the start of its procedure; the next Stop-hook turn after this command will execute the Worker continuation procedure for the configured discipline.
 - The Worker continuation matches the locked-plan AC A2: "Within 10 continuations, worker claims `needs:`-matching task OR emits `nothing-to-do`."
 - All three disciplines (tdd, review, validate) ship in v0.2.2 M2.2.c and are wired through the `needs: tdd -> review -> validate -> resolved` state machine.
-- `/board-pause` and `/board-resume` continue to work -- pause sets `mode=paused` with `previous_mode=worker`, resume restores `mode=worker` with the original `discipline`.
+- `/board-pause` and `/board-resume` continue to work -- pause sets `mode=paused` with `previous_mode=worker` and `previous_discipline=<value>`, resume restores `mode=worker` with the original `discipline`.

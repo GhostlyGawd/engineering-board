@@ -13,23 +13,20 @@ Resume the engineering-board passive listener after a `/board-pause`. Restores t
 
 State file: `${CLAUDE_PROJECT_DIR}/.engineering-board/session-mode.json`
 
-### Step 2 — Read current state
+### Step 2 — Run the mode-transition guard
 
-If the state file does not exist, print exactly:
-
-```
-Engineering board: not currently paused. No action taken.
-```
-
-and stop.
-
-Otherwise, parse the file as JSON and inspect the `mode` field. If `mode` is not `"paused"` (e.g., it is `null`, `"pm"`, `"worker"`, or missing), print exactly:
+Delegate the refusal-matrix decision to the deterministic guard (single source of truth for ARCHITECTURE.md §11.5):
 
 ```
-Engineering board: not currently paused. No action taken.
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-mode-guard.sh" resumed
 ```
 
-and stop.
+Inspect the exit code:
+
+- **0 (ALLOW)** — parse the guard's stdout. It emits key=value lines including `RESTORE_MODE=<pm|worker|null>` and `RESTORE_DISCIPLINE=<tdd|review|validate|null>`. Use these in Step 4 below. Then continue to Step 3.
+- **2 (NOOP)** — print the guard's stdout verbatim and stop. The canonical message for this branch is `Engineering board: not currently paused. No action taken.` (Fires when no state file exists OR `mode` is anything other than `"paused"`.)
+
+`/board-resume` has no REFUSE branch — every state either ALLOWs (paused) or NOOPs (not paused).
 
 ### Step 3 — Determine current session_id
 
@@ -37,18 +34,26 @@ Read `${CLAUDE_PROJECT_DIR}/.engineering-board/last-stop-stdin.json` if it exist
 
 ### Step 4 — Rewrite the state file
 
-Read the `previous_mode` field from the parsed JSON in Step 2. Rewrite `session-mode.json` with content:
+Rewrite `session-mode.json` with content:
 
 ```json
 {
-  "mode": "<previous_mode value from step 2; if it was JSON null, write JSON null (not the string \"null\")>",
+  "mode": "<RESTORE_MODE from the guard's stdout; JSON null if null>",
+  "discipline": "<RESTORE_DISCIPLINE from the guard's stdout; only present when RESTORE_MODE == 'worker'; JSON null otherwise>",
   "previous_mode": null,
+  "previous_discipline": null,
   "paused_at": null,
   "session_id": "<value from step 3>"
 }
 ```
 
-Important: if the prior `previous_mode` was JSON `null`, the new `mode` must also be JSON `null` (not the string `"null"`). If it was a string like `"pm"` or `"worker"`, the new `mode` is that string.
+Field rules:
+- If `RESTORE_MODE == null`: write the literal JSON `null` (not the string `"null"`) for `mode`, and JSON `null` for `discipline`.
+- If `RESTORE_MODE == "pm"`: write `"mode": "pm"`, `"discipline": null`.
+- If `RESTORE_MODE == "worker"`: write `"mode": "worker"`, `"discipline": "<RESTORE_DISCIPLINE>"`. The discipline MUST match the one captured at `/board-pause` time so the (mode, discipline) round-trip is bit-exact per ARCHITECTURE.md §11.5.
+- `previous_mode` and `previous_discipline` reset to JSON `null` — the pause/resume cycle has completed.
+- `paused_at` resets to JSON `null`.
+- `session_id` is a JSON string (possibly empty).
 
 ### Step 5 — Flip the registry paused field (v0.2.3)
 
@@ -72,5 +77,5 @@ Then stop.
 
 ## Notes
 
-- This command is safe to run when not paused — it prints a no-op message and exits.
-- After resume, the Stop hook resumes normal scratch capture on the next assistant turn.
+- This command is safe to run when not paused — it prints a no-op message and exits via the guard's NOOP branch.
+- After resume, the Stop hook resumes normal scratch capture on the next assistant turn. If the prior mode was `worker`, the Stop hook dispatches the matching worker subagent because `discipline` is restored too.

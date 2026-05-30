@@ -2,7 +2,7 @@
 
 A complete structural map of the plugin: what every file does, how the pieces connect, and the lifecycle that ties them together. Companion to `README.md` (which is the install/usage surface).
 
-Current shipped state: **v0.2.2** — passive listening + PM pipeline + Worker pipeline with atomic claim locking.
+Current shipped state: **v0.3.0** — passive listening + PM pipeline + Worker pipeline with atomic claim locking + Resilience layer (active-workers registry, PM-fallback heartbeat, paused-field) + Learning entity (L### with curator + `/board-migrate` + SessionStart top-learnings surface) + Tier-4 QoL (single CI runner, version-coherence + cross-platform lint). Post-v0.3.0 follow-on: **v0.3.1** ships the deterministic mode-transition guard (§11.5).
 
 ---
 
@@ -111,7 +111,7 @@ The Stop hook's actual orchestration body (the `type: "prompt"` content) lives s
 | `3-PM` | `mode: pm` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` (4 Tasks) | `<<EB-PM-CONTINUE>>` / `<<EB-PM-FAIL>>` |
 | `3-WORKER` | `mode: worker, discipline: <d>` | claim-acquire script → one of `tdd-builder` / `code-reviewer` / `validator` → write back `needs:` → claim-release script | `<<EB-WORKER-CONTINUE>>` / `<<EB-WORKER-NOTHING-TO-DO>>` / `<<EB-WORKER-FAIL>>` |
 
-### `scripts/` — 18 scripts
+### `scripts/` — 19 scripts
 
 **Hook-triggered (4):**
 - `board-session-start.sh` — SessionStart. v0.3.0 also surfaces top medium/high-confidence learnings filtered by cwd against each learning's `applies_to` field.
@@ -131,6 +131,9 @@ The Stop hook's actual orchestration body (the `type: "prompt"` content) lives s
 - `board-active-workers-register.sh <session> <mode> <discipline> <started-at>` — append-or-update session entry in `active-workers.json`; lazy GC drops stale entries; mkdir-based lockfile
 - `board-active-workers-bump.sh <session> [--claim-acquire id] [--claim-release id] [--paused true|false]` — refresh `last_seen`, optionally mutate `claim_ids_held` or `paused`
 - `board-active-workers-cleanup.sh <session>` — remove session entry by id
+
+**Mode-transition decision (1) — v0.3.1:**
+- `board-mode-guard.sh <pm|worker|paused|resumed> [--discipline <d>]` — deterministic enforcement of the §11.5 refusal matrix. Reads `session-mode.json`, decides `0=ALLOW / 2=NOOP / 3=REFUSE`, prints canonical user-facing message (NOOP/REFUSE) or key=value decision payload (ALLOW) for the calling command to read back. Invoked by `/pm-start`, `/worker-start`, `/board-pause`, `/board-resume` before each writes state.
 
 **Operator/CI invoked (5):**
 - `board-audit-scratch.sh` — completeness audit: every scratch_id must have a `consolidation.log` disposition
@@ -231,7 +234,7 @@ Per-entry exclusivity is enforced via `docs/boards/<project>/_claims/<entry-id>/
 |---|---|---|
 | `claims/` | atomic locking, heartbeat, stale reclamation, OneDrive detection (5 sub-tests) | `bash tests/claims/automated.sh` |
 | `smoke/` | consolidation, anchor verification, T2b distinct-affects safeguard, prompt-injection rejection on synthetic boards | `bash tests/smoke/automated.sh` + 2 manual checks |
-| `modes/` | frontmatter lint for all v0.2.2 commands + agents + Stop-procedure structural lint | `bash tests/modes/automated.sh` |
+| `modes/` | frontmatter lint for all v0.2.2 commands + agents + Stop-procedure structural lint + v0.3.1 mode-transition guard matrix (6 sub-tests) | `bash tests/modes/automated.sh` |
 | `orchestration/` | PM and Worker pipeline end-to-end at the deterministic-substrate layer (consolidate -> tidy -> audit; claim-locked needs:tdd/review/validate transitions; multi-worker contention on a shared pool) + `/board-rebuild` and `/board-graph` command structural lint (7 sub-tests) | `bash tests/orchestration/automated.sh` |
 | `permissions/` | required-permissions.json schema + self-check exit codes + interactive installer | `bash tests/permissions/automated.sh` |
 | `fixtures/benign-findings/` (20) + `fixtures/adversarial-paste/` (30) | corpora for C6 ≥95% accept-rate on benign + Scenario 4 100% reject-rate on adversarial | consumed by smoke and lint |
@@ -254,14 +257,15 @@ These are aspirational/historical — the canonical record of how v0.2.1 → v0.
 **Plan alignment with shipped state:**
 - v0.2.1 Scratch Capture — ✅ shipped
 - v0.2.2 Orchestration — ✅ shipped (PM + Worker + claims + permissions)
-- v0.2.3 Resilience — ❌ not shipped (PM-fallback heartbeat, active-workers registry)
-- v0.3.0 Unification — ❌ not shipped (Learning entity L###, migration command)
+- v0.2.3 Resilience — ✅ shipped in v0.3.0 commit (active-workers registry + PM-fallback heartbeat + `paused: true` field + heartbeat wiring)
+- v0.3.0 Unification — ✅ shipped (Learning entity L###, curator, `/board-migrate`, SessionStart surface)
+- v0.3.1 Mode-transition guard — ✅ shipped (single deterministic enforcer for §11.5; Tier-4 follow-on after v0.3.0 docs left it as "documented but not enforced")
 
 ---
 
 ## 11.5. Mode transitions
 
-Four mode-setting commands write `.engineering-board/session-mode.json`: `/pm-start`, `/worker-start --discipline <d>`, `/board-pause`, `/board-resume`. The four `commands/*.md` files each enforce a *refusal matrix* — they will not silently overwrite a conflicting mode. The matrix below is the canonical reference; the actual enforcement lives in Step 2 / Step 3 of each command.
+Four mode-setting commands write `.engineering-board/session-mode.json`: `/pm-start`, `/worker-start --discipline <d>`, `/board-pause`, `/board-resume`. The four `commands/*.md` files each enforce a *refusal matrix* — they will not silently overwrite a conflicting mode. The matrix below is the canonical reference; the actual decision is delegated to `hooks/scripts/board-mode-guard.sh` (v0.3.1), so all four commands share one deterministic state machine instead of each re-implementing six rows of conditional logic in markdown that the model interprets.
 
 | From → To | `/pm-start` | `/worker-start --discipline X` | `/board-pause` | `/board-resume` |
 |---|---|---|---|---|
@@ -274,9 +278,9 @@ Four mode-setting commands write `.engineering-board/session-mode.json`: `/pm-st
 
 **Why refuse instead of overwrite:** mode is session-bound. Mid-session mode flips would silently change which Stop pipeline runs on the next turn, with no signal to the user that orchestration has changed underneath them. Forcing a session restart on transitions between active modes makes the intent explicit and matches the run-orchestrators-in-separate-terminals model the consensus plan locks in.
 
-**`/board-pause` and `/board-resume` are the in-session escape hatch.** They preserve the prior mode in `previous_mode` so `/board-resume` round-trips cleanly. Pause is the only state-change that the four mode commands accept mid-session without restart.
+**`/board-pause` and `/board-resume` are the in-session escape hatch.** They preserve the prior mode in `previous_mode` AND the discipline in `previous_discipline` so `/board-resume` round-trips the full (mode, discipline) tuple cleanly. Pause is the only state-change that the four mode commands accept mid-session without restart.
 
-**Future extension (v0.2.3, Tier 2.4):** when active-workers registry ships, `/board-pause` will also set `paused: true` on the session's registry entry, and PM-fallback heartbeat will skip paused entries — their claims become reclaimable after `staleClaimSec`.
+**Enforcement (v0.3.1):** `hooks/scripts/board-mode-guard.sh <target>` decides every cell of the matrix above with exit codes `0=ALLOW / 2=NOOP / 3=REFUSE`, prints the canonical user-facing message on NOOP/REFUSE, and emits `CURRENT_*` / `PREVIOUS_*` / `RESTORE_*` key=value lines on ALLOW for the calling command to read back. Each of the four commands invokes the guard before writing state, so the matrix is enforced identically by all four entry points. `tests/modes/mode-transition-guard.sh` pins every cell (30 assertions). The active-workers registry was wired in v0.2.3: `/board-pause` flips `paused: true` on the session's registry entry, and PM-fallback heartbeat skips paused entries — their claims become reclaimable after `staleClaimSec`.
 
 ---
 
