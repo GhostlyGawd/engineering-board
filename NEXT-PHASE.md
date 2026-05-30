@@ -1,17 +1,18 @@
 # Next-phase recommendations
 
-Prioritized backlog after the **v0.3.0** unification release (Resilience + Learning entity + Tier-4 QoL pack) and the **v0.3.1** follow-on (mode-transition guard). Replaces the prior pre-v0.3.0 doc, which described work that has since landed.
+Prioritized backlog after the **v0.3.0** unification release (Resilience + Learning entity + Tier-4 QoL pack), the **v0.3.1** mode-transition-guard follow-on, and the **v0.3.2** test-debt closeout. Replaces the prior pre-v0.3.0 doc, which described work that has since landed.
 
-The codebase is internally coherent: 8/8 test suites green (`tests/run-all.sh`), `tests/modes/mode-transition-guard.sh` pins every cell of the §11.5 refusal matrix (30 assertions), and `version-coherence.sh` + `crosscompat-lint.sh` keep manifest and portability invariants.
+The codebase is internally coherent: 8/8 test suites green (`tests/run-all.sh`), `tests/modes/mode-transition-guard.sh` pins every cell of the §11.5 refusal matrix (30 assertions), `tests/orchestration/subagent-fixtures.sh` pins every dispatched agent's Output contract (30 assertions), `tests/orchestration/pause-resume-registry.sh` pins the pause/resume cycle invariants (19 assertions), and `.github/workflows/test.yml` makes green a merge gate on every push.
 
 ---
 
-## What just shipped (commits 591289f and the v0.3.1 follow-on)
+## What just shipped (commits 591289f, v0.3.1 follow-on, v0.3.2 closeout)
 
 - **v0.2.3 Resilience block** — active-workers registry (`board-active-workers-register/bump/cleanup.sh`), PM-fallback heartbeat, `paused: true` registry field, heartbeat wiring into all three worker subagents.
 - **v0.3.0 Learning entity** — `L###` entry type, `learnings-curator` agent + `board-curate-learnings.sh`, `/board-migrate` with SHA256-idempotent apply/rollback/status, SessionStart top-learnings surface.
 - **Tier-4 QoL pack** — `tests/run-all.sh` single runner, `tests/version-coherence.sh`, `tests/crosscompat-lint.sh` (19 scripts), ARCHITECTURE.md §11.5 documenting the mode-transition refusal matrix.
 - **v0.3.1 mode-transition guard** — `hooks/scripts/board-mode-guard.sh` decides every cell of the §11.5 matrix (`0=ALLOW / 2=NOOP / 3=REFUSE`). The four mode commands (`/pm-start`, `/worker-start`, `/board-pause`, `/board-resume`) now delegate the decision to the guard instead of each re-implementing six rows of matrix logic in markdown. `board-pause` and `board-resume` were also fixed to round-trip the full (mode, discipline) tuple via `previous_discipline` / `RESTORE_DISCIPLINE` — the prior commands dropped discipline on pause and resumed without it.
+- **v0.3.2 test-debt closeout** — `tests/orchestration/subagent-fixtures.sh` pins every dispatched agent's Output contract (heading + load-bearing keys + JSON-block parse + orchestrator/contract cross-check). `tests/orchestration/pause-resume-registry.sh` pins the pause/resume cycle invariants (round-trip, idempotency, multi-cycle identity preservation, heartbeat refresh, absent-session no-op, paused-flag isolation across sessions, claim_ids_held preservation). `.github/workflows/test.yml` runs `tests/run-all.sh` on every push and PR.
 
 ---
 
@@ -32,12 +33,11 @@ Now: fixed in v0.3.1. `board-pause.md` writes `previous_discipline` from the gua
 
 ## Tier A — Substrate hygiene (highest ROI, lowest risk)
 
-### A.1 PM/Worker subagent layer tests (LLM-dispatched layer is still uncovered)
-The `tests/orchestration/` suite exercises the deterministic substrate (claim acquire/release, consolidator, tidier, audit, registry, fallback heartbeat) by mocking the LLM-dispatched subagent step. The subagent layer itself (Task dispatch from the Stop hook into `consolidator` / `tdd-builder` / `code-reviewer` / `validator`) has no test harness — only frontmatter lint.
-- **Proposal:** golden-input + golden-output fixtures per agent (one input scratch block + one expected output JSON shape), wired into a `tests/orchestration/subagent-fixtures.sh` runner that asserts the JSON-shape contract documented in each agent's body. Cannot exercise the real model; can pin the input/output contract so refactors to agent prompts can't silently break the JSON shape downstream.
+### A.1 PM/Worker subagent contract lint — shipped in v0.3.2 ✅
+`tests/orchestration/subagent-fixtures.sh` pins every dispatched agent's Output contract: `## Output contract` heading + all load-bearing JSON keys documented + every fenced JSON block parses + orchestrator/contract cross-check (keys the orchestrator reads MUST be documented by the agent and vice versa). 30 assertions across 7 agents. Closed.
 
 ### A.2 Learning curator coverage gap
-`board-curate-learnings.sh` has an integration test (`tests/orchestration/learnings-curator.sh`, 13 assertions). What it does NOT test: the `learnings-curator` subagent's behavior when called from the PM stop-hook procedure with a non-empty board. The current test only validates the deterministic backing script. **Proposal:** add a fixture-driven `subagent-fixtures` entry for `learnings-curator` per A.1.
+`board-curate-learnings.sh` has an integration test (`tests/orchestration/learnings-curator.sh`, 13 assertions). What it does NOT test: the `learnings-curator` subagent's behavior when called from the PM stop-hook procedure with a non-empty board. The current test only validates the deterministic backing script. Subagent-level contract is now pinned by A.1; runtime behavior of the subagent step itself (Task dispatch) still cannot be exercised from a shell. **Proposal:** if/when a transcript-replay harness exists, plug it in here.
 
 ### A.3 SessionStart top-learnings surface
 v0.3.0 added the top-3 high-confidence learnings filter to `board-session-start.sh` based on the cwd matching each learning's `applies_to` prefix. There is no test for the filtering logic — only that `board-session-start.sh` runs successfully on an empty board. **Proposal:** add fixture boards with 5+ learnings of varying confidence × applies_to and assert the filter selects the right 3.
@@ -59,8 +59,8 @@ Learnings live under `docs/boards/<project>/learnings/`. When a session's cwd ma
 
 ## Tier C — Quality of life
 
-### C.1 CI integration in GitHub Actions
-`tests/run-all.sh` exists (v0.3.0) but is not wired into a GitHub Actions workflow. **Proposal:** `.github/workflows/test.yml` invoking `bash tests/run-all.sh` on push and PR; cache python3 + bash.
+### C.1 CI integration in GitHub Actions — shipped in v0.3.2 ✅
+`.github/workflows/test.yml` runs `bash tests/run-all.sh` on every push and pull request, on ubuntu-latest. bash + python3 + POSIX coreutils are preinstalled; no package install step needed. Closed.
 
 ### C.2 Crosscompat lint coverage
 `crosscompat-lint.sh` checks 19 scripts and supports per-file ignore pragmas. It does NOT yet check shell scripts under `tests/`. **Proposal:** extend the glob to include `tests/**/*.sh` so test scripts can't drift from the portability contract.
@@ -71,14 +71,23 @@ When `board-mode-guard.sh` returns exit 1 (bad args), the calling command prints
 ### C.4 Plugin source-of-truth lint
 There is no test that asserts `plugin.json` / `marketplace.json` descriptions are in sync (only versions). **Proposal:** extend `tests/version-coherence.sh` to also assert `plugin.json.description == marketplace.json.plugins[0].description`.
 
+### C.5 Pause/resume registry round-trip — shipped in v0.3.2 ✅
+`tests/orchestration/pause-resume-registry.sh` pins seven invariants of the pause/resume cycle: single round-trip, idempotent double-pause and double-resume, multi-cycle identity preservation, heartbeat refresh on every flip (paused-but-alive distinction), absent-session no-op, paused-flag isolation across sessions, and claim_ids_held preservation. 19 assertions. Closed.
+
 ---
 
 ## Decision recommended
 
-**Sequencing:** Tier A → Tier C → Tier B.
+After v0.3.2 the **test-debt closeout is done**: substrate, subagent contracts, mode transitions, and pause/resume cycles are all pinned, and green is now a merge gate. What's left is purely enhancement work, not debt.
 
-- Tier A closes the test-coverage gap that the v0.3.0 shipping cycle exposed (substrate has 11/11 integration tests; subagent layer has zero).
-- Tier C is mostly bookkeeping but C.1 (GitHub Actions CI) is what turns `tests/run-all.sh` from a local convenience into a merge gate.
-- Tier B items are user-driven enhancements to v0.3.0 features; they're real but lower-priority than the test debt above.
+**Sequencing for v0.3.3+:** pick one Tier item per release.
 
-**Cadence policy (per R1):** the next release MUST be a single milestone. v0.3.2 = either Tier A (subagent fixtures), or Tier C.1 (CI), or a single Tier B item — never a bundle. The v0.3.0 bundle shipped because two milestones happened to be ready simultaneously; the next cycle restores the per-milestone cadence the plan locked in.
+- **A.3** (SessionStart top-learnings filter test) — smallest, closes the last test-coverage gap.
+- **B.3** (`/board-migrate --dry-run`) — user-driven, single file.
+- **C.4** (plugin/marketplace description lint) — bookkeeping, one-line addition to `version-coherence.sh`.
+- **C.2** (extend crosscompat to `tests/**/*.sh`) — bookkeeping, single regex.
+- **C.3** (mode-guard audit log) — observability; non-trivial if done well.
+- **B.1** (configurable curator threshold per board) — user-driven, medium-complexity.
+- **B.2** (cross-board learning visibility) — touches SessionStart and Router; larger.
+
+**Cadence policy (per R1, restored from v0.3.1 onward):** each release MUST be a single milestone. v0.3.1 (guard), v0.3.2 (test-debt closeout) are bundles of closely-related items but stay focused around one theme each. v0.3.3 picks ONE item from the list above.

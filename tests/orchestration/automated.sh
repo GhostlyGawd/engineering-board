@@ -11,19 +11,25 @@
 # produce the contracted state transitions around it.
 #
 # Sub-tests (in order):
-#   1. pm-loop.sh                  — PM pipeline: scratch -> consolidate -> tidy -> audit
-#   2. worker-tdd-loop.sh          — Worker TDD discipline: tdd -> review transition
-#   3. worker-review-loop.sh       — Worker review discipline: review -> validate / regress
-#   4. worker-validate-loop.sh     — Worker validate discipline: validate -> resolved
-#   5. multi-worker-contention.sh  — Two concurrent workers on a shared pool
-#   6. board-rebuild-command.sh    — /board-rebuild command markdown structural lint
-#   7. board-graph-command.sh      — /board-graph command markdown structural lint
+#   1.  pm-loop.sh                  — PM pipeline: scratch -> consolidate -> tidy -> audit
+#   2.  worker-tdd-loop.sh          — Worker TDD discipline: tdd -> review transition
+#   3.  worker-review-loop.sh       — Worker review discipline: review -> validate / regress
+#   4.  worker-validate-loop.sh     — Worker validate discipline: validate -> resolved
+#   5.  multi-worker-contention.sh  — Two concurrent workers on a shared pool
+#   6.  board-rebuild-command.sh    — /board-rebuild command markdown structural lint
+#   7.  board-graph-command.sh      — /board-graph command markdown structural lint
+#   8.  active-workers-registry.sh  — v0.2.3 registry lifecycle (8 invariants)
+#   9.  pm-fallback-heartbeat.sh    — v0.2.3 PM pre-flight refreshes registered/alive heartbeats
+#   10. learnings-curator.sh        — v0.3.0 L### promotion + idempotency
+#   11. board-migrate.sh            — v0.3.0 migration apply/rollback/status SHA256-idempotent
+#   12. pause-resume-registry.sh    — v0.3.2 pause/resume cycle invariants (round-trip, isolation, identity)
+#   13. subagent-fixtures.sh        — v0.3.2 subagent contract lint (Output contract heading + load-bearing keys + JSON parse)
 #
 # Usage:
 #   bash tests/orchestration/automated.sh                # auto-detect plugin root
 #   bash tests/orchestration/automated.sh <plugin-root>  # explicit root
 #
-# Exits 0 iff all 7 sub-tests pass.
+# Exits 0 iff all sub-tests pass.
 
 set -euo pipefail
 
@@ -45,6 +51,8 @@ SUBTESTS=(
   "pm-fallback-heartbeat.sh"
   "learnings-curator.sh"
   "board-migrate.sh"
+  "pause-resume-registry.sh"
+  "subagent-fixtures.sh"
 )
 
 for st in "${SUBTESTS[@]}"; do

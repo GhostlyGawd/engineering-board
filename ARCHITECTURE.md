@@ -2,7 +2,7 @@
 
 A complete structural map of the plugin: what every file does, how the pieces connect, and the lifecycle that ties them together. Companion to `README.md` (which is the install/usage surface).
 
-Current shipped state: **v0.3.0** — passive listening + PM pipeline + Worker pipeline with atomic claim locking + Resilience layer (active-workers registry, PM-fallback heartbeat, paused-field) + Learning entity (L### with curator + `/board-migrate` + SessionStart top-learnings surface) + Tier-4 QoL (single CI runner, version-coherence + cross-platform lint). Post-v0.3.0 follow-on: **v0.3.1** ships the deterministic mode-transition guard (§11.5).
+Current shipped state: **v0.3.0** — passive listening + PM pipeline + Worker pipeline with atomic claim locking + Resilience layer (active-workers registry, PM-fallback heartbeat, paused-field) + Learning entity (L### with curator + `/board-migrate` + SessionStart top-learnings surface) + Tier-4 QoL (single CI runner, version-coherence + cross-platform lint). Post-v0.3.0 follow-ons: **v0.3.1** ships the deterministic mode-transition guard (§11.5); **v0.3.2** closes the test-debt loop (subagent contract lint + pause/resume round-trip + GitHub Actions CI gate).
 
 ---
 
@@ -235,7 +235,7 @@ Per-entry exclusivity is enforced via `docs/boards/<project>/_claims/<entry-id>/
 | `claims/` | atomic locking, heartbeat, stale reclamation, OneDrive detection (5 sub-tests) | `bash tests/claims/automated.sh` |
 | `smoke/` | consolidation, anchor verification, T2b distinct-affects safeguard, prompt-injection rejection on synthetic boards | `bash tests/smoke/automated.sh` + 2 manual checks |
 | `modes/` | frontmatter lint for all v0.2.2 commands + agents + Stop-procedure structural lint + v0.3.1 mode-transition guard matrix (6 sub-tests) | `bash tests/modes/automated.sh` |
-| `orchestration/` | PM and Worker pipeline end-to-end at the deterministic-substrate layer (consolidate -> tidy -> audit; claim-locked needs:tdd/review/validate transitions; multi-worker contention on a shared pool) + `/board-rebuild` and `/board-graph` command structural lint (7 sub-tests) | `bash tests/orchestration/automated.sh` |
+| `orchestration/` | PM and Worker pipeline end-to-end at the deterministic-substrate layer (consolidate -> tidy -> audit; claim-locked needs:tdd/review/validate transitions; multi-worker contention on a shared pool) + `/board-rebuild` and `/board-graph` command structural lint + v0.2.3 registry lifecycle + v0.3.0 learnings curator + `/board-migrate` + v0.3.2 pause/resume round-trip + subagent contract lint (13 sub-tests) | `bash tests/orchestration/automated.sh` |
 | `permissions/` | required-permissions.json schema + self-check exit codes + interactive installer | `bash tests/permissions/automated.sh` |
 | `fixtures/benign-findings/` (20) + `fixtures/adversarial-paste/` (30) | corpora for C6 ≥95% accept-rate on benign + Scenario 4 100% reject-rate on adversarial | consumed by smoke and lint |
 | `spike/` | standalone mini-plugin proving the 5 composability criteria (a–e) that gated v0.2.1 merge | manual run + `bash tests/spike/check-results.sh` |
@@ -260,6 +260,7 @@ These are aspirational/historical — the canonical record of how v0.2.1 → v0.
 - v0.2.3 Resilience — ✅ shipped in v0.3.0 commit (active-workers registry + PM-fallback heartbeat + `paused: true` field + heartbeat wiring)
 - v0.3.0 Unification — ✅ shipped (Learning entity L###, curator, `/board-migrate`, SessionStart surface)
 - v0.3.1 Mode-transition guard — ✅ shipped (single deterministic enforcer for §11.5; Tier-4 follow-on after v0.3.0 docs left it as "documented but not enforced")
+- v0.3.2 Test-debt closeout — ✅ shipped (subagent contract lint for all 7 dispatched agents, pause/resume registry round-trip invariants, GitHub Actions CI gate via `.github/workflows/test.yml`)
 
 ---
 
