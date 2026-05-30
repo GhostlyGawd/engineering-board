@@ -64,6 +64,21 @@ mkdir -p "$CLAIMS_DIR"
 # regardless of whether the directory existed — so it cannot be used as a lock.
 # This single mkdir call is the POSIX and NTFS atomic primitive for locking.
 if ! mkdir "$CLAIM_DIR" 2>/dev/null; then
+  # Directory exists. The winning racer may be mid-construction — it has
+  # won the mkdir race but has not yet finished writing owner.txt and
+  # heartbeat.txt. Poll up to 250ms for both files to appear non-empty
+  # before concluding the claim is stale; without this, a racer arriving
+  # inside the construction window would see missing files and exit 2,
+  # breaking the {0,1} mutual-exclusion contract.
+  POLLS_REMAINING=10
+  while [ "$POLLS_REMAINING" -gt 0 ]; do
+    if [ -s "$OWNER_FILE" ] && [ -s "$HEARTBEAT_FILE" ]; then
+      break
+    fi
+    sleep 0.025
+    POLLS_REMAINING=$((POLLS_REMAINING - 1))
+  done
+
   # Directory already exists — check if owner is still alive
   if [ ! -f "$OWNER_FILE" ]; then
     # Claim dir exists but no owner.txt — treat as stale, signal caller

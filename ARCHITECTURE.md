@@ -2,7 +2,7 @@
 
 A complete structural map of the plugin: what every file does, how the pieces connect, and the lifecycle that ties them together. Companion to `README.md` (which is the install/usage surface).
 
-Current shipped state: **v0.3.0** — passive listening + PM pipeline + Worker pipeline with atomic claim locking + Resilience layer (active-workers registry, PM-fallback heartbeat, paused-field) + Learning entity (L### with curator + `/board-migrate` + SessionStart top-learnings surface) + Tier-4 QoL (single CI runner, version-coherence + cross-platform lint). Post-v0.3.0 follow-ons: **v0.3.1** ships the deterministic mode-transition guard (§11.5); **v0.3.2** closes the test-debt loop (subagent contract lint + pause/resume round-trip + GitHub Actions CI gate).
+Current shipped state: **v1.0.0** — stable. Passive listening + PM pipeline + Worker pipeline with atomic claim locking + Resilience layer (active-workers registry, PM-fallback heartbeat, paused-field) + Learning entity (L### with curator + `/board-migrate` + SessionStart top-learnings surface) + Tier-4 QoL (single CI runner, version-coherence + cross-platform lint) + deterministic mode-transition guard (§11.5) + full subagent contract lint + pause/resume round-trip invariants + GitHub Actions CI gate enforcing `tests/run-all.sh` on every push. See `NEXT-PHASE.md` for the closed-backlog tombstone and the release history.
 
 ---
 

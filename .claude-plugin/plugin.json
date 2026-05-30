@@ -1,6 +1,6 @@
 {
   "name": "engineering-board",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "description": "Autonomous engineering board: multi-agent build system over docs/boards/ markdown. Passive finding-extractor captures per-turn scratch; PM pipeline (consolidator + tidier + learnings-curator) promotes verified findings to the live board and Learning entries (L###); Worker pipeline (tdd-builder + code-reviewer + validator) drives a tdd->review->validate needs: state machine with atomic claim locking. v0.2.3 adds active-workers registry + PM-fallback heartbeat. v0.3.0 adds the Learning entity, /board-migrate (with rollback), and SessionStart top-learnings surface. v0.3.1 adds board-mode-guard.sh: deterministic enforcement of the §11.5 mode-transition refusal matrix. v0.3.2 closes the test-debt loop: subagent contract lint (every dispatched agent's Output contract is pinned), pause/resume registry round-trip invariants, and GitHub Actions CI gate so `tests/run-all.sh` is enforced on every push.",
   "author": {
     "name": "Acadia",
