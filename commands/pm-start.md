@@ -18,17 +18,23 @@ You are writing a small JSON state file that the Stop hook reads. Be precise abo
 
 Create the state directory if it does not exist (`mkdir -p` semantics).
 
-### Step 2 — Read current mode (if any)
+### Step 2 — Run the mode-transition guard
 
-If `session-mode.json` already exists:
-- Parse it as JSON.
-- Read the existing `mode` field.
-- If `mode` is already `"pm"`, print `Engineering board: already in PM mode. No action taken.` and stop.
-- If `mode` is `"worker"`, print `Engineering board: currently in worker mode (discipline=<value>). Run /board-resume or restart the session to switch to PM mode. No action taken.` and stop.
-- If `mode` is `"paused"`, print `Engineering board: currently paused. Run /board-resume first, then /pm-start. No action taken.` and stop.
-- Otherwise (mode is null, missing, or unrecognized), continue to Step 3 — switching to PM mode is allowed.
+Delegate the refusal-matrix decision to the deterministic guard (single source of truth for ARCHITECTURE.md §11.5):
 
-If the file does not exist, continue to Step 3.
+```
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-mode-guard.sh" pm
+```
+
+Inspect the exit code:
+
+- **0 (ALLOW)** — continue to Step 3. The guard's stdout contains `CURRENT_MODE=null` (only `null` reaches here; pm/worker/paused all short-circuit at exit 2 or 3).
+- **2 (NOOP)** — print the guard's stdout verbatim and stop. The canonical message for this branch is `Engineering board: already in PM mode. No action taken.`
+- **3 (REFUSE)** — print the guard's stdout verbatim and stop. The canonical messages for this branch are either:
+  - `Engineering board: currently in worker mode (discipline=<value>). Run /board-resume or restart the session to switch to PM mode. No action taken.`
+  - `Engineering board: currently paused. Run /board-resume first, then /pm-start. No action taken.`
+
+The four canonical messages live in `hooks/scripts/board-mode-guard.sh` so the same matrix is enforced identically by `/pm-start`, `/worker-start`, `/board-pause`, and `/board-resume`. Do not re-implement the matrix in this file.
 
 ### Step 3 — Determine current session_id
 
@@ -53,7 +59,17 @@ Field rules:
 - `started_at` is a JSON string; compute the current UTC time at second precision (e.g. via Bash: `python3 -c "import datetime; print(datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'))"`). Do not stub the time.
 - `session_id` is a JSON string (possibly empty).
 
-### Step 5 — Confirm
+### Step 5 — Register in the active-workers registry (v0.2.3)
+
+After writing `session-mode.json`, invoke the registry helper so PM-fallback heartbeat and stale-session GC can see this session:
+
+```
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-register.sh" "<session_id from step 3>" "pm" "" "<started_at from step 4>"
+```
+
+Pass the empty string `""` for the discipline argument (PM has no discipline). If the script exits non-zero, print its stderr and continue — registry-write failures are not fatal to PM mode (the next register attempt on subsequent turns will retry). See `references/active-workers-registry.md` for the full contract.
+
+### Step 6 — Confirm
 
 Print exactly:
 
@@ -65,7 +81,7 @@ Then stop.
 
 ## Notes
 
-- This command is idempotent in the "already pm" sense (Step 2 short-circuit).
+- This command is idempotent in the "already pm" sense (Step 2 NOOP short-circuit via the guard).
 - The Stop hook reads `session-mode.json` at the start of its procedure; the next Stop-hook turn after this command will emit `<<EB-PM-CONTINUE>>` instead of `<<EB-PASSIVE-DONE>>`.
 - `/board-pause` and `/board-resume` continue to work — pause sets `mode=paused` with `previous_mode=pm`, resume restores `mode=pm`.
 - v0.2.2 M2.2.b ships the mode switch and the PM continuation sentinel. v0.2.2 M2.2.c will extend the PM continuation procedure with consolidator + tidier subagent dispatch and board-state tidying.

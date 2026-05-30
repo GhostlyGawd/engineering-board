@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# crosscompat-lint-ignore: drive-letter
 # board-permission-self-check.sh
 # Usage: bash board-permission-self-check.sh
 # Reads references/required-permissions.json and ~/.claude/settings.json,

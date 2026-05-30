@@ -1,0 +1,35 @@
+name: tests
+
+# v0.3.2 CI gate — runs the full engineering-board test suite on every push
+# and pull-request. Mirrors what `bash tests/run-all.sh` runs locally.
+#
+# The 8 sub-suites are: orchestration (13 tests), claims (5), smoke (21
+# assertions), modes (6 tests), permissions (25 assertions), lint
+# (orchestrator prompts), version-coherence, crosscompat-lint (19 scripts).
+#
+# Required toolchain (preinstalled on ubuntu-latest):
+#   - bash (POSIX-compatible; scripts use #!/usr/bin/env bash)
+#   - python3 (date math, JSON parsing, SHA256, atomic file ops)
+#   - mkdir/mv/rm/grep/awk/sed (POSIX coreutils)
+#
+# No external dependencies. No package install step needed.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: run-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show toolchain versions
+        run: |
+          bash --version | head -1
+          python3 --version
+
+      - name: Run full test suite
+        run: bash tests/run-all.sh

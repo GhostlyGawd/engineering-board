@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Injects real-time routing reminder when prompt suggests a debugging/workflow session.
 # Exits silently (no output) when not relevant — no noise on normal prompts.
 set -euo pipefail

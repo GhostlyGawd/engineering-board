@@ -61,9 +61,11 @@ and use the literal stdout (e.g. `2026-05-11T22:47:13Z`). If Bash is unavailable
 
 (e) After the write succeeds, emit a final message containing exactly `<<EB-PASSIVE-DONE>>` on its own line and stop.
 
-### Section 3-PM: PM continuation (v0.2.2 M2.2.c — full dispatch chain)
+### Section 3-PM: PM continuation (v0.2.2 M2.2.c — full dispatch chain, v0.2.3 adds pre-flight fallback heartbeat)
 
-PM mode runs the passive extractor (to capture this turn's findings), then dispatches the three PM subagents (consolidator, tidier, learnings-curator) in sequence to maintain board hygiene, then emits the PM-CONTINUE sentinel so the orchestrator continues looping.
+PM mode runs a pre-flight pass that refreshes claim heartbeats on behalf of live registered worker sessions (v0.2.3), runs the passive extractor (to capture this turn's findings), then dispatches the three PM subagents (consolidator, tidier, learnings-curator) in sequence to maintain board hygiene, then emits the PM-CONTINUE sentinel so the orchestrator continues looping.
+
+(pre) **PM-fallback heartbeat (v0.2.3).** Before any other PM step, run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-pm-fallback-heartbeat.sh <board-dir>` for each board directory listed in `BOARD-ROUTER.md` (or the legacy `docs/board/` if no router). The script reads `.engineering-board/active-workers.json`, scans `<board-dir>/_claims/`, and refreshes the heartbeat for claims whose owning session is registered, alive (last_seen within `2 * staleClaimSec`), and not paused. Skipped claims (orphan, paused, stale-registered) fall through to the normal `board-claim-reclaim-stale.sh` path. The pre-flight exit code is informational; do NOT abort the PM turn on a non-zero exit. Capture its stdout for the turn log.
 
 (a) Execute Section 3-EXTRACTOR steps (a), (b), (c), (d) verbatim (read session_id, resolve board path, dispatch finding-extractor, append JSON to scratch).
   - If step (b) emits `<<EB-PASSIVE-NO-BOARD>>`, propagate it and stop (PM mode cannot work without a board).
@@ -76,13 +78,17 @@ PM mode runs the passive extractor (to capture this turn's findings), then dispa
 
 (d) Dispatch the learnings-curator subagent. Run a Task call: subagent_type=`learnings-curator`, description=`PM curate learnings`, prompt=the board directory path captured in (a) (same path as (c), no delimiters). Wait for the subagent to return one JSON object. In v0.2.2 this is a placeholder returning `status: "placeholder"` — that is expected; full implementation lands in v0.3.0.
 
-(e) Emit exactly `<<EB-PM-CONTINUE>>` on its own line and stop.
+(e) **PM-tidier bumps the PM session's `last_seen` in the registry (v0.2.3).** After step (c) returns, run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-bump.sh <session_id>` to refresh this PM session's liveness signal. Non-fatal on failure — log and continue.
+
+(f) Emit exactly `<<EB-PM-CONTINUE>>` on its own line and stop.
 
 Per-step failure semantics:
+- The (pre) pre-flight is best-effort: a non-zero exit is logged but does NOT trigger `<<EB-PM-FAIL>>` — the rest of the PM pipeline still runs.
 - If step (a) fails, emit `<<EB-PM-FAIL>>` on its own line followed by `step (a): <which extractor sub-step failed>`, and stop.
 - If step (b) fails (consolidator returns non-JSON, Task errors, or unrecoverable parse error), emit `<<EB-PM-FAIL>>` + `step (b): consolidator <reason>`, and stop.
 - If step (c) fails, emit `<<EB-PM-FAIL>>` + `step (c): tidier <reason>`, and stop.
 - If step (d) fails, emit `<<EB-PM-FAIL>>` + `step (d): learnings-curator <reason>`, and stop.
+- If step (e) fails (registry bump), log and continue — non-fatal.
 
 Do not retry within the same Stop turn.
 
@@ -103,7 +109,7 @@ Worker mode dispatches a discipline-specific worker subagent that processes one 
 (e) From the match list, pick the first entry whose `status:` frontmatter is `open` (preferred) or `in_progress`. Skip `resolved` and `blocked`. Extract the entry-id (e.g. `B017`) from the filename or the `id:` frontmatter line.
 
 (f) Acquire the claim: run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-acquire.sh <board-dir> <entry-id> <session-id>`. Branch on exit code:
-  - 0: claim acquired; continue to (g).
+  - 0: claim acquired; **then run** `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-bump.sh <session-id> --claim-acquire <entry-id>` to self-bump in the registry (v0.2.3); non-fatal on bump failure. Continue to (g).
   - 1: contention (live owner holds it); pick the next candidate from the (d) match list and retry (f). If the match list is exhausted, emit `<<EB-WORKER-NOTHING-TO-DO>>` and stop.
   - 2: stale claim; run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-reclaim-stale.sh <board-dir>` and retry (f) once. If still failing, pick the next candidate.
   - Any other exit code: emit `<<EB-WORKER-FAIL>>` + `step (f): acquire exit <code> for <entry-id>` and stop.
@@ -131,7 +137,7 @@ Wait for the subagent to return one JSON object.
   - If `suggested_next_needs` is a non-null JSON string (e.g. `"review"`), Edit the entry file to set the `needs:` frontmatter line to that value. If the entry has no `needs:` line, insert one immediately after the `status:` line. Do NOT modify any other frontmatter fields.
   - If `suggested_next_needs` is JSON null, leave the entry unchanged.
 
-(i) Release the claim: run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-release.sh <board-dir> <entry-id> <session-id>`. Log any non-zero exit but do not abort — the orchestrator continues either way.
+(i) Release the claim: run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-release.sh <board-dir> <entry-id> <session-id>`. Log any non-zero exit but do not abort — the orchestrator continues either way. **Then run** `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-bump.sh <session-id> --claim-release <entry-id>` to self-bump in the registry (v0.2.3); non-fatal on failure.
 
 (j) Emit `<<EB-WORKER-CONTINUE>>` on its own line, followed on the next line by a one-line summary of the subagent's `status` and `entry_id` (e.g. `entry=B017 status=work_done`). Then stop.
 

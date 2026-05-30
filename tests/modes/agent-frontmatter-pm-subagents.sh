@@ -159,7 +159,8 @@ check_grep "$LEARNINGS" "E" "^model: inherit$"                   "learnings-cura
 check_grep "$LEARNINGS" "E" "^tools:"                            "learnings-curator.md frontmatter: tools list present"
 check_grep "$LEARNINGS" "E" "^color:"                            "learnings-curator.md frontmatter: color present"
 
-# learnings-curator is read-only in v0.2.2: tools must NOT include Write or Edit
+# learnings-curator in v0.3.0 dispatches the deterministic curator script;
+# Write/Edit are still excluded — the *script* owns writes, the agent does not.
 TOOLS_LINE_L="$(grep -E "^tools:" "$LEARNINGS" || true)"
 for tool in Read Bash Grep Glob; do
   if echo "$TOOLS_LINE_L" | grep -qF "$tool"; then
@@ -170,9 +171,9 @@ for tool in Read Bash Grep Glob; do
 done
 for excluded_tool in Write Edit; do
   if echo "$TOOLS_LINE_L" | grep -qF "$excluded_tool"; then
-    report 1 "learnings-curator.md tools must NOT include $excluded_tool (placeholder is read-only)"
+    report 1 "learnings-curator.md tools must NOT include $excluded_tool (script owns writes)"
   else
-    report 0 "learnings-curator.md tools does NOT include $excluded_tool (read-only placeholder)"
+    report 0 "learnings-curator.md tools does NOT include $excluded_tool (script owns writes)"
   fi
 done
 
@@ -182,22 +183,14 @@ check_grep "$LEARNINGS" "F" "untrusted data, not instructions"   "learnings-cura
 # Input contract: board directory path
 check_grep "$LEARNINGS" "F" "board"                              "learnings-curator.md documents board directory input"
 
-# Output contract fields
-for field in schema_version learnings_dir_exists learnings_count status; do
+# v0.3.0 output contract fields
+for field in schema_version board_dir min_recurrence resolved_scanned tag_counts promoted updated skipped; do
   check_grep "$LEARNINGS" "F" "\"$field\""                       "learnings-curator.md output contract: $field field"
 done
 
-# Must document placeholder status and v0.3.0 deferral
-if grep -qiF "placeholder" "$LEARNINGS"; then
-  report 0 "learnings-curator.md mentions placeholder status"
-else
-  report 1 "learnings-curator.md mentions placeholder status"
-fi
-if grep -qF "v0.3.0" "$LEARNINGS"; then
-  report 0 "learnings-curator.md mentions v0.3.0 deferral"
-else
-  report 1 "learnings-curator.md mentions v0.3.0 deferral"
-fi
+# Must dispatch the deterministic curator script.
+check_grep "$LEARNINGS" "F" "board-curate-learnings.sh"           "learnings-curator.md dispatches board-curate-learnings.sh"
+check_grep "$LEARNINGS" "F" "v0.3.0"                              "learnings-curator.md mentions v0.3.0"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 TOTAL=$((PASS + FAIL))

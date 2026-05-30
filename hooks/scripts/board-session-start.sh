@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 BOARDS_ROUTER="${CLAUDE_PROJECT_DIR}/docs/boards/BOARD-ROUTER.md"
@@ -98,6 +98,83 @@ for i in "${!BOARD_PATHS[@]}"; do
         session_id=$(basename "${scratch_file}" .md)
         echo "    ${session_id}"
       done < <(find "${SCRATCH_DIR}" -maxdepth 1 -type f -name "*.md" 2>/dev/null | sort)
+      echo ""
+    fi
+  fi
+
+  # v0.3.0 — Surface top learnings (by confidence then recurrence) filtered by
+  # cwd affects-prefix. Shows up to 3 entries; no output if learnings/ is
+  # empty or no high/medium-confidence matches exist.
+  LEARNINGS_DIR="${BOARD_DIR}/learnings"
+  if [ -d "${LEARNINGS_DIR}" ]; then
+    learnings_output="$(python3 - "${LEARNINGS_DIR}" "${PWD}" <<'PY' 2>/dev/null || true
+import os, re, sys
+
+learnings_dir, cwd = sys.argv[1], sys.argv[2]
+cwd_lower = cwd.lower()
+FM = re.compile(r"^---\s*\n(.*?)\n---", re.S)
+
+def parse_fm(t):
+    m = FM.match(t)
+    if not m: return {}
+    out = {}
+    for line in m.group(1).splitlines():
+        if ":" in line:
+            k, v = line.split(":", 1)
+            out[k.strip()] = v.strip()
+    return out
+
+def parse_list(v):
+    if not v: return []
+    v = v.strip()
+    if v.startswith("[") and v.endswith("]"):
+        inner = v[1:-1].strip()
+        if not inner: return []
+        return [t.strip().strip("'\"") for t in inner.split(",") if t.strip()]
+    return [v]
+
+CONF_RANK = {"high": 3, "medium": 2, "low": 1}
+
+entries = []
+try:
+    for fn in sorted(os.listdir(learnings_dir)):
+        if not fn.endswith(".md") or fn.startswith("."): continue
+        p = os.path.join(learnings_dir, fn)
+        try:
+            with open(p, "r", encoding="utf-8", errors="replace") as f:
+                text = f.read()
+        except Exception:
+            continue
+        fm = parse_fm(text)
+        if fm.get("status") == "resolved": continue
+        conf = fm.get("confidence", "low")
+        if CONF_RANK.get(conf, 0) < 2: continue  # only medium+
+        applies = parse_list(fm.get("applies_to", ""))
+        # If applies_to is set, require at least one entry to be a substring of cwd.
+        if applies:
+            match = any(a and a.lower() in cwd_lower for a in applies)
+            if not match: continue
+        try:
+            rec = int(fm.get("recurrence", "0"))
+        except Exception:
+            rec = 0
+        entries.append({
+            "id": fm.get("id", ""),
+            "title": fm.get("title", ""),
+            "confidence": conf,
+            "recurrence": rec,
+        })
+except Exception:
+    pass
+
+entries.sort(key=lambda e: (-CONF_RANK.get(e["confidence"], 0), -e["recurrence"], e["id"]))
+for e in entries[:3]:
+    print(f"    {e['id']} [{e['confidence']} / x{e['recurrence']}] {e['title']}")
+PY
+)"
+    if [ -n "${learnings_output}" ]; then
+      echo "  LEARNINGS — relevant patterns from past resolutions:"
+      printf '%s\n' "${learnings_output}"
       echo ""
     fi
   fi
