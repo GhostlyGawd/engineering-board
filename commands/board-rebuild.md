@@ -1,3 +1,8 @@
+---
+description: Regenerate BOARD.md and GRAPH.yml from the entry .md files on disk (the single source of truth). Deterministic refresh that fixes board/filesystem drift (B004) and is safe to run anytime. Other modifying commands should call this as their last step to close the staleness loop.
+argument-hint: [project-name]
+---
+
 # /board-rebuild — regenerate BOARD.md and GRAPH.yml from the filesystem
 
 The deterministic-cache refresh command. Treats the entry `.md` files in `bugs/`, `features/`, `questions/`, `observations/` as the **single source of truth** and regenerates both `BOARD.md` (the index) and `GRAPH.yml` (the structural graph) from them. This is the fix for B004 (board state drifts from filesystem).

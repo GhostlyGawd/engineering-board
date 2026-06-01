@@ -1,3 +1,8 @@
+---
+description: Build a deterministic structural graph (GRAPH.yml) of all open board entries. Same input always produces byte-identical output (modulo generated_at), with no LLM in the construction step. Downstream AI consumers read the structural facts and interpret them at point of use.
+argument-hint: [project-name] [--include-archive]
+---
+
 # /board-graph — build a deterministic structural graph of the live board
 
 Generates `docs/boards/<project>/GRAPH.yml`: a **purely deterministic** machine-readable graph of all open entries. Same input always produces byte-identical output (modulo `generated_at`). No LLM in the construction step.
