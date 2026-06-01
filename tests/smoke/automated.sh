@@ -87,11 +87,21 @@ EOF
 
 # Synthetic JSONL transcript. Contains every evidence quote the scratch
 # entries reference -- except S-test-10, which is deliberately unanchored.
+#
+# REGRESSION GUARD (B001): the two ANCHORED lines below use the real Claude
+# Code transcript schema, which nests the body under "message":
+#   {"type":"assistant","message":{"role":"assistant","content":[{"type":"text",...}]}}
+# load_transcript_text must read message.content, not just top-level content.
+# Before the fix it read only the top level, so every line resolved to "" and
+# every confirmed/tentative finding deferred. Do NOT "simplify" these back to
+# the flat {"role","content"} shape -- that silently removes the guard.
+# The two filler lines stay flat to keep backward-compat coverage; the assistant
+# block uses list content, the user block string content, exercising both paths.
 TRANSCRIPT="$PROJECT/transcript.jsonl"
 cat > "$TRANSCRIPT" <<'EOF'
 {"role":"user","content":"can you check the ranker"}
-{"role":"assistant","content":"Looking at it: the ranker silently drops keywords below the SV threshold. Also null pointer crash in module X. And different module Z bug. And different module W bug."}
-{"role":"user","content":"could we add feature Y to the system"}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Looking at it: the ranker silently drops keywords below the SV threshold. Also null pointer crash in module X. And different module Z bug. And different module W bug."}]}}
+{"type":"user","message":{"role":"user","content":"could we add feature Y to the system"}}
 {"role":"assistant","content":"That's a reasonable idea."}
 EOF
 

@@ -141,6 +141,16 @@ def load_transcript_text(path):
             continue
         role = obj.get("role") or obj.get("type") or ""
         content = obj.get("content") or obj.get("text") or ""
+        # Claude Code transcripts nest the body under "message":
+        #   {"type":"assistant","message":{"role":"assistant","content":[...]}}
+        # Fall back to it when the top-level content/text keys are absent,
+        # otherwise every line resolves to "" and anchor verification defers
+        # every finding.
+        if not content and isinstance(obj.get("message"), dict):
+            msg = obj["message"]
+            if not role:
+                role = msg.get("role") or ""
+            content = msg.get("content") or msg.get("text") or ""
         if isinstance(content, list):
             content = " ".join(
                 (c.get("text", "") if isinstance(c, dict) else str(c)) for c in content
