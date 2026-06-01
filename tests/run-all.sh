@@ -29,6 +29,7 @@ SUITES=(
   "orchestration|bash tests/orchestration/automated.sh"
   "claims|bash tests/claims/automated.sh"
   "smoke|bash tests/smoke/automated.sh"
+  "scratch-append|bash tests/scratch/append.sh"
   "modes|bash tests/modes/automated.sh"
   "permissions|bash tests/permissions/automated.sh"
   "lint-orchestrator-prompts|bash tests/lint-orchestrator-prompts.sh"

@@ -102,7 +102,7 @@ The `needs:` state machine: `tdd → review → validate → resolved`. The Stop
 | `UserPromptSubmit` | `*` | `board-prompt-guard.sh` | 5s | If prompt matches debug/error/bug/crash keywords, inject system reminder that real-time routing is active |
 | `Stop` | `*` | `board-stop-gate.sh` (command) | 5s | Capture stdin to `.engineering-board/last-stop-stdin.json`; check `session-mode.json`; suppress prompt hook if paused or no board exists |
 
-The Stop hook's actual orchestration body (the `type: "prompt"` content) lives separately in `hooks/stop-hook-procedure.md` — a 173-line procedure the model reads and executes. Splitting prompt-shaped logic into a `.md` keeps `hooks.json` reviewable.
+The Stop hook's actual orchestration body (the `type: "prompt"` content) lives separately in `hooks/stop-hook-procedure.md` — a 184-line procedure the model reads and executes. Splitting prompt-shaped logic into a `.md` keeps `hooks.json` reviewable.
 
 ### `stop-hook-procedure.md` — three sections
 | Section | Triggers when | Dispatches | Emits sentinel |
@@ -111,7 +111,7 @@ The Stop hook's actual orchestration body (the `type: "prompt"` content) lives s
 | `3-PM` | `mode: pm` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` (4 Tasks) | `<<EB-PM-CONTINUE>>` / `<<EB-PM-FAIL>>` |
 | `3-WORKER` | `mode: worker, discipline: <d>` | claim-acquire script → one of `tdd-builder` / `code-reviewer` / `validator` → write back `needs:` → claim-release script | `<<EB-WORKER-CONTINUE>>` / `<<EB-WORKER-NOTHING-TO-DO>>` / `<<EB-WORKER-FAIL>>` |
 
-### `scripts/` — 19 scripts
+### `scripts/` — 20 scripts
 
 **Hook-triggered (4):**
 - `board-session-start.sh` — SessionStart. v0.3.0 also surfaces top medium/high-confidence learnings filtered by cwd against each learning's `applies_to` field.
@@ -119,7 +119,8 @@ The Stop hook's actual orchestration body (the `type: "prompt"` content) lives s
 - `board-prompt-guard.sh` — UserPromptSubmit
 - `board-stop-gate.sh` — Stop
 
-**Procedure-invoked from `stop-hook-procedure.md` (6):**
+**Procedure-invoked from `stop-hook-procedure.md` (7):**
+- `board-scratch-append.sh <scratch-file>` — EXTRACTOR step (d). Reads the finding-extractor's returned JSON on stdin (piped via a quoted heredoc), computes the `<!-- iso8601 -->` timestamp itself, validates the finding shape, canonically re-serializes, and atomically appends. Removes the orchestrating LLM from the scratch byte-copy path so a `printf`/`echo` hop can no longer mangle `evidence_quote` and silently break anchor verification (issue #3); a malformed copy fails loudly. Exit 0 ok / 1 usage / 2 write error / 3 unparseable copy
 - `board-claim-acquire.sh <board> <entry> <session>` — atomic `mkdir` lock; exit 0 acquired / 1 contention / 2 stale
 - `board-claim-release.sh <board> <entry> <session>` — owner-verified release; NTFS retry loop
 - `board-claim-reclaim-stale.sh <board>` — scan + remove stale claims (heartbeat age > threshold); cloud-sync detection bumps threshold 180s→300s
