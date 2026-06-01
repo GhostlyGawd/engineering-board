@@ -26,7 +26,9 @@ _Last updated: 2026-06-01_
 
 ## Active thread — relocate board storage out of `docs/`
 
-**The ask:** the plugin currently houses committed board content under `docs/boards/<project>/` (+ legacy single-board `docs/board/`). User dislikes it living in `docs/` and wants it in a dot-folder like `.engineering-board/` (or similar). Open questions: is it possible, and is it a good idea. **No code written yet — decide direction first.**
+**The ask:** the plugin currently houses committed board content under `docs/boards/<project>/` (+ legacy single-board `docs/board/`). User dislikes it living in `docs/` and wants it in a dot-folder like `.engineering-board/` (or similar). Open questions: is it possible, and is it a good idea.
+
+**DECIDED (2026-06-01): Option 1 — visible top-level `engineering-board/`, committed by default; backward-compatible; target `1.1.0`. Full design is locked in [`specs/board-relocation.md`](specs/board-relocation.md). Still NOT implemented — no code written.**
 
 ### Critical distinction (do not conflate)
 - **`docs/boards/<project>/`** = **committed, human-readable board CONTENT** — `bugs/ features/ questions/ observations/ learnings/`, `BOARD.md`, `_sessions/` scratch, `consolidation.log`, `_claims/`. It is in `docs/` *on purpose*: it is meant to be browsable on GitHub and version-controlled.
@@ -48,8 +50,11 @@ The board is the *product*, and it is meant to be **seen**.
 - **B — Make the board root first-class configurable** (the router already drives it); keep default `docs/boards/` but support pointing anywhere via `/board-init <project> <root>`. Non-breaking, opt-in. Doesn't change the out-of-the-box behavior the user dislikes unless they set it.
 - **C — Top-level visible `engineering-board/`** (no dot, committed, out of `docs/`). Middle ground: removes the `docs/` colonization while keeping the board visible and trivially committable (no gitignore gymnastics).
 
-### Recommendation (for next session to confirm)
-Lean **C or A**, not B (B doesn't fix the default the user objects to). Concretely: change the default scaffold + router location to a single board root out of `docs/`; if it must be the hidden `.engineering-board/`, add a `.gitignore` stanza that commits `.engineering-board/boards/**` while ignoring the runtime files (`session-mode.json`, `last-stop-stdin.json`, `active-workers.json`, `_claims/`). Ship with: a `/board-migrate` relocation, backward-compat resolution of the old paths (so in-flight boards don't break), updated tests/docs, and a version bump (likely **1.1.0**; **2.0.0** if we drop the old-path fallback). Get the user's pick of B/C/A + hidden-vs-visible before writing code.
+### Recommendation — RESOLVED 2026-06-01 → visible top-level `engineering-board/` (= "C" below; called "Option 1" in the spec)
+
+**Decided with the user.** Visible top-level `engineering-board/`, committed by default; backward-compatible (keep reading `docs/boards/` + `docs/board/`); relocate existing boards via `/board-migrate --relocate`; target `1.1.0`. Full design, file-by-file plan, gitignore model, and open questions now live in [`specs/board-relocation.md`](specs/board-relocation.md). The text below is retained as historical reasoning.
+
+Earlier lean was **C or A**, not B (B doesn't fix the default the user objects to). Concretely: change the default scaffold + router location to a single board root out of `docs/`; if it must be the hidden `.engineering-board/`, add a `.gitignore` stanza that commits `.engineering-board/boards/**` while ignoring the runtime files (`session-mode.json`, `last-stop-stdin.json`, `active-workers.json`, `_claims/`). Ship with: a `/board-migrate` relocation, backward-compat resolution of the old paths (so in-flight boards don't break), updated tests/docs, and a version bump (likely **1.1.0**; **2.0.0** if we drop the old-path fallback). Get the user's pick of B/C/A + hidden-vs-visible before writing code.
 
 ### First moves when picked up
 1. Confirm direction (dot-folder vs visible top-level; default-change vs opt-in).
