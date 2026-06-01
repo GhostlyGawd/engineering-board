@@ -51,13 +51,19 @@ Do not error if `session-mode.json` is absent — absence means no mode is confi
 
 This lets the extractor see both sides of the exchange so user-stated findings are not missed. If there is no preceding user message in the current turn (rare — only on session-start or hook-initiated turns), pass only the ---ASSISTANT MESSAGE--- section and omit the ---USER MESSAGE--- section.
 
-(d) The subagent returns one JSON object. Append it to the scratch board file at the path resolved in step (b), preceded by an ISO-8601 timestamp comment line of the form `<!-- <iso8601> -->`. The timestamp MUST be the actual current UTC time at full second precision — do NOT stub the time to midnight or any other placeholder. Compute it deterministically with Bash:
+(d) The subagent returns one JSON object. Persist it to the scratch board file resolved in step (b) by piping the subagent's returned JSON **verbatim** into the deterministic append helper. Do NOT hand-format it, re-indent it, or route it through `printf` / `echo` / Write-then-Edit string interpolation — those mangle quotes and backslashes and silently break the consolidator's anchor verification (this was the failure mode that motivated the helper). Run exactly:
 
 ```
-python3 -c "import datetime; print(datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'))"
+bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-scratch-append.sh <scratch-file-path> <<'EB_FINDING_JSON'
+<the subagent's returned JSON object, pasted verbatim — nothing added, nothing reformatted>
+EB_FINDING_JSON
 ```
 
-and use the literal stdout (e.g. `2026-05-11T22:47:13Z`). If Bash is unavailable, emit a timestamp reflecting the actual current UTC time (do not fabricate). Use Write to create the file if it does not exist, or Edit to append if it does. Create the parent `_sessions/` directory if missing.
+The quoted heredoc delimiter (`'EB_FINDING_JSON'`) passes the payload to the script with zero shell substitution. The script is the single source of truth for the rest: it computes the ISO-8601 timestamp comment line of the form `<!-- <iso8601> -->` (actual current UTC at full-second precision — generated inside the script, never stubbed to a placeholder), creates the parent `_sessions/` directory if missing, validates that the input parses as a finding object, re-serializes it canonically, and atomically appends it. Do NOT compute the timestamp yourself or pre-create the file.
+
+Branch on the script's exit code:
+  - `0`: the append succeeded; continue.
+  - non-zero: the copy was malformed/truncated or the write was denied (the script prints the reason on stderr). Treat this as an EXTRACTOR failure and follow Section 4 — emit `<<EB-PASSIVE-FAIL>>` on its own line followed by `step (d): <script stderr reason>`, and stop. Do NOT fall back to a hand-written Write/Edit: a silently distorted scratch entry is worse than a visible failure.
 
 (e) After the write succeeds, emit a final message containing exactly `<<EB-PASSIVE-DONE>>` on its own line and stop.
 
