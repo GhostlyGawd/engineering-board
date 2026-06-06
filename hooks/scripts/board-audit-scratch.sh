@@ -12,20 +12,15 @@ if [ -z "${CLAUDE_PROJECT_DIR:-}" ]; then
   exit 1
 fi
 
-BOARDS_ROUTER="${CLAUDE_PROJECT_DIR}/docs/boards/BOARD-ROUTER.md"
-LEGACY_BOARD_DIR="${CLAUDE_PROJECT_DIR}/docs/board"
+# Resolve board location via the shared resolver (hooks/scripts/board-paths.sh).
+EB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=board-paths.sh
+. "${EB_SCRIPT_DIR}/board-paths.sh"
+
 BOARD_DIRS=()
-if [ -f "${BOARDS_ROUTER}" ]; then
-  while IFS= read -r line; do
-    rel="$(printf '%s' "${line}" | awk -F'|' '{gsub(/^[[:space:]]+|[[:space:]]+$/,"",$3); print $3}')"
-    if [ -n "${rel}" ] && [ "${rel}" != "path" ]; then
-      BOARD_DIRS+=("${CLAUDE_PROJECT_DIR}/${rel}")
-    fi
-  done < <(grep "^|" "${BOARDS_ROUTER}" | grep -v "^| project" | grep -v "^|---" || true)
-fi
-if [ ${#BOARD_DIRS[@]} -eq 0 ] && [ -d "${LEGACY_BOARD_DIR}" ]; then
-  BOARD_DIRS+=("${LEGACY_BOARD_DIR}")
-fi
+while IFS= read -r line; do
+  BOARD_DIRS+=("${line}")
+done < <(eb_board_dirs)
 if [ ${#BOARD_DIRS[@]} -eq 0 ]; then
   echo "board-audit-scratch: no board layout found"
   exit 0

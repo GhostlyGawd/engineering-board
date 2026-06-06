@@ -16,6 +16,11 @@ fi
 
 # Match both new multi-board layout and legacy single-board layout
 case "${file_path}" in
+  "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/bugs/"*".md" | \
+  "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/features/"*".md" | \
+  "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/questions/"*".md" | \
+  "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/observations/"*".md" | \
+  "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/learnings/"*".md" | \
   "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/bugs/"*".md" | \
   "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/features/"*".md" | \
   "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/questions/"*".md" | \
@@ -104,12 +109,17 @@ case "${entry_type}" in
     ;;
 esac
 
-# Determine which BOARD.md to check — derive from file path
+# Determine which BOARD.md to check — derive from file path.
+# Check the collision-unlikely docs markers first; engineering-board/ falls to
+# the else because CLAUDE_PROJECT_DIR itself may contain "engineering-board".
 if [[ "${file_path}" == *"/docs/boards/"* ]]; then
   # Extract project board dir: everything up to and including the project name segment
   board_dir=$(echo "${file_path}" | sed -E 's|(.*docs/boards/[^/]+)/.*|\1|')
-else
+elif [[ "${file_path}" == *"/docs/board/"* ]]; then
   board_dir="${CLAUDE_PROJECT_DIR}/docs/board"
+else
+  # engineering-board/<project>/... (new default); greedy match grabs the board's segment
+  board_dir=$(echo "${file_path}" | sed -E 's|(.*/engineering-board/[^/]+)/.*|\1|')
 fi
 
 entry_id=$(echo "${frontmatter}" | grep "^id:" | awk '{print $2}' || true)

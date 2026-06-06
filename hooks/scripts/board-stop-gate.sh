@@ -6,6 +6,11 @@
 
 set -euo pipefail
 
+# Shared board path resolver (hooks/scripts/board-paths.sh).
+EB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=board-paths.sh
+. "${EB_SCRIPT_DIR}/board-paths.sh"
+
 EB_DIR="${CLAUDE_PROJECT_DIR}/.engineering-board"
 mkdir -p "$EB_DIR"
 
@@ -31,9 +36,8 @@ except Exception:
 fi
 
 # Gate 2: no board exists — suppress prompt (no-board case handled in prompt fast-path otherwise).
-ROUTER="$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md"
-LEGACY="$CLAUDE_PROJECT_DIR/docs/board"
-if [ ! -f "$ROUTER" ] && [ ! -d "$LEGACY" ]; then
+# Resolver accepts engineering-board/ (new default), docs/boards/ (compat), and docs/board/ (legacy).
+if [ -z "$(eb_router_path)" ] && [ ! -d "${CLAUDE_PROJECT_DIR}/${EB_LEGACY_DIR}" ]; then
   printf '{"continue": false}\n'
   exit 0
 fi

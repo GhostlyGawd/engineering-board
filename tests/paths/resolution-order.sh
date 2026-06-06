@@ -94,6 +94,22 @@ make_router "$P/engineering-board/BOARD-ROUTER.md" "|   delta   |   engineering-
 assert_eq "T6 board_dirs: trimmed, slash kept" "$P/engineering-board/delta/" "$(eb_board_dirs)"
 assert_eq "T6 board_rows: trimmed label+path" "$(printf 'delta\t%s' "$P/engineering-board/delta/")" "$(eb_board_rows)"
 
+# --- T7: end-to-end — a real consumer (board-index-check.sh) resolves the new
+#         engineering-board/ default and processes it cleanly ----------------
+P="$SANDBOX/t7"; export CLAUDE_PROJECT_DIR="$P"
+make_router "$P/engineering-board/BOARD-ROUTER.md" "| demo | engineering-board/demo | demo/ |"
+mkdir -p "$P/engineering-board/demo/bugs"
+printf '# Board\n\n## Open\n\n- B001: demo bug\n' > "$P/engineering-board/demo/BOARD.md"
+printf -- '---\nid: B001\ntype: bug\ntitle: demo bug\ndiscovered: 2026-06-06\nstatus: open\npriority: P2\naffects: demo/\n---\n\n# demo bug\n\n## Done when\n\n- done\n' \
+  > "$P/engineering-board/demo/bugs/B001-demo-bug.md"
+rc=0
+CLAUDE_PROJECT_DIR="$P" bash "$ROOT/hooks/scripts/board-index-check.sh" >/dev/null 2>&1 || rc=$?
+if [ "$rc" -eq 0 ]; then
+  report_pass "T7 board-index-check resolves engineering-board/ (exit 0)"
+else
+  report_fail "T7 board-index-check resolves engineering-board/ (exit 0)" "0" "$rc"
+fi
+
 echo ""
 echo "resolution-order: $PASS pass, $FAIL fail"
 [ "$FAIL" -eq 0 ]
