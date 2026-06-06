@@ -11,8 +11,8 @@ _Last updated: 2026-06-06_
 
 ## Snapshot
 
-- **`1.1.0` is complete on the branch** (`plugin.json` + `marketplace.json` bumped, lockstep-checked by `tests/version-coherence.sh`). `main` is `v1.0.1` until **PR #8** merges, which brings `main` to `1.1.0` (the marketplace re-pulls on the version increase).
-- **Active working branch:** `claude/adoring-turing-ULvhK` → **[PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8)** — the umbrella PR for 1.1.0, **milestone COMPLETE** (resolver + wiring + board-init/bump + relocate + prose + fixtures all landed). Marked ready-for-review and merging to `main`. **Push to this branch to update it; do not open another.**
+- **`main` is at `1.1.0`** — shipped via **[PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8)**, merged as `097dfa1`. `plugin.json` + `marketplace.json` bumped in lockstep (`tests/version-coherence.sh`); the marketplace re-pulls on the version increase. Backward-compatible — pre-1.1.0 `docs/boards/` + legacy `docs/board/` still resolve.
+- **Active working branch:** `claude/adoring-turing-ULvhK` (reused across PRs — don't open a parallel one). **[PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8) is MERGED**; the 1.1.0 relocation milestone is shipped. Push here and **land changes via PR — never push to `main` directly.**
 - **Green check:** `bash tests/run-all.sh` → **10 suites** (orchestration, claims, smoke, scratch-append, **paths**, modes, permissions, lint-orchestrator-prompts, version-coherence, crosscompat-lint); the `orchestration` suite now runs **15 sub-tests** (added `board-init-command.sh` + `board-relocate.sh`). CI gate: `.github/workflows/test.yml` runs `run-all` on every push.
 
 ## Recently completed
