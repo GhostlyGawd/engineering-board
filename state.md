@@ -12,7 +12,7 @@ _Last updated: 2026-06-06_
 ## Snapshot
 
 - **`main` is at `v1.0.1`** (`plugin.json` + `marketplace.json`, kept in lockstep by `tests/version-coherence.sh`).
-- **Active working branch:** `claude/adoring-turing-ULvhK` — **3 commits ahead of `main`** (RFC 0001 + 1.1.0 resolver + consumer wiring), unmerged, **no PR opened yet**.
+- **Active working branch:** `claude/adoring-turing-ULvhK` → **draft [PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8)** — the umbrella PR for 1.1.0. **Push to this branch to update it; do not open another.** Mark it ready-for-review (and add the version bump) when the milestone is done. Ahead of `main`, unmerged.
 - **Green check:** `bash tests/run-all.sh` → **10 suites** (orchestration, claims, smoke, scratch-append, **paths**, modes, permissions, lint-orchestrator-prompts, version-coherence, crosscompat-lint). CI gate: `.github/workflows/test.yml` runs `run-all` on every push.
 
 ## Recently completed
