@@ -20,7 +20,7 @@ The deterministic-cache refresh command. Treats the entry `.md` files in `bugs/`
 
 ### Step 1 — Resolve target board(s)
 
-Read `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md`. Target either the named project or all listed. Fall back to legacy `docs/board/` if no router.
+Resolve the board router in this order (first hit wins): `$CLAUDE_PROJECT_DIR/engineering-board/BOARD-ROUTER.md` (default since 1.1.0), then `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md` (compat). Target either the named project or all listed. Fall back to legacy `docs/board/` if no router.
 
 ### Step 2 — Scan entry files
 

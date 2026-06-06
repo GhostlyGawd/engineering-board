@@ -11,12 +11,13 @@ _Last updated: 2026-06-06_
 
 ## Snapshot
 
-- **`main` is at `v1.0.1`** (`plugin.json` + `marketplace.json`, kept in lockstep by `tests/version-coherence.sh`).
+- **`main` is at `v1.0.1`**; the working **branch now carries the `1.1.0` bump** (`plugin.json` + `marketplace.json`, kept in lockstep by `tests/version-coherence.sh`) — landed with the §6.5 `board-init` default-flip.
 - **Active working branch:** `claude/adoring-turing-ULvhK` → **draft [PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8)** — the umbrella PR for 1.1.0. **Push to this branch to update it; do not open another.** Mark it ready-for-review (and add the version bump) when the milestone is done. Ahead of `main`, unmerged.
-- **Green check:** `bash tests/run-all.sh` → **10 suites** (orchestration, claims, smoke, scratch-append, **paths**, modes, permissions, lint-orchestrator-prompts, version-coherence, crosscompat-lint). CI gate: `.github/workflows/test.yml` runs `run-all` on every push.
+- **Green check:** `bash tests/run-all.sh` → **10 suites** (orchestration, claims, smoke, scratch-append, **paths**, modes, permissions, lint-orchestrator-prompts, version-coherence, crosscompat-lint); the `orchestration` suite now runs **14 sub-tests** (added `board-init-command.sh`). CI gate: `.github/workflows/test.yml` runs `run-all` on every push.
 
 ## Recently completed
 
+- **1.1.0 relocation — `board-init` default flip + `1.0.1 → 1.1.0` bump (this session, 2026-06-06; on the branch).** `/board-init` now scaffolds to `engineering-board/<project>/` by default (router-create block, path column, and Step-1 root check updated); a new Step 6 **prints** the §6.2 additive runtime `.gitignore` stanza (print-only — never auto-edits `.gitignore`) with a `--private` full-tree opt-out. Resolution-order prose in `board-claim-release`/`board-graph`/`board-rebuild` repointed to the §6.1 order. Version bumped in both manifests. New lint `tests/orchestration/board-init-command.sh` (33 assertions) pins the flipped default + print-only behavior.
 - **1.1.0 relocation — resolver + wiring (this session, 2026-06-06; on the branch).** `hooks/scripts/board-paths.sh` now owns board-location resolution and all 6 hook scripts call it, so the `engineering-board/ → docs/boards/ → docs/board/` order is live. **No version bump yet** (board-init still scaffolds to `docs/boards/`). Full status in the Active thread below.
 - **RFC 0001 — Conductor (this session).** Staged `docs/rfcs/0001-symphony-conductor.md`. See the Downstream thread below.
 - **Issue #3 — scratch-append fidelity (DONE, merged to `main` via PR #4 + #5).** `hooks/scripts/board-scratch-append.sh` owns the scratch write (computes the `<!-- iso8601 -->` timestamp, validates shape, re-serializes canonically, atomic append); Stop step (d) pipes the extractor JSON in via a quoted heredoc, so a `printf`/`echo` hop can no longer mangle `evidence_quote`; malformed copies fail loudly (`<<EB-PASSIVE-FAIL>>`). Pinned by `tests/scratch/append.sh` (13 assertions). Residue: a pure semantic paraphrase that is valid JSON still fails the transcript anchor (would require the extractor self-writing — deliberately not taken).
@@ -34,14 +35,15 @@ _Last updated: 2026-06-06_
   - `board-validate-entry` → added `engineering-board/*/{bugs,features,…}/*.md` PostToolUse globs + `board_dir` branch. **`docs/` markers are checked first** because `CLAUDE_PROJECT_DIR` itself can contain "engineering-board" (this repo does); the greedy `sed` then grabs the board's own segment.
 - **Test — `tests/paths/resolution-order.sh`** (15 assertions, incl. T7 end-to-end via `board-index-check`). `run-all` 9 → **10 suites**, green. Each consumer sources the helper relative to `BASH_SOURCE` (works under `$CLAUDE_PLUGIN_ROOT` and when invoked directly in tests).
 
+- **§6.5 `board-init` — default flipped to `engineering-board/` + `1.0.1 → 1.1.0` bump.** Scaffold paths, router-create block, and the router `path` column all write `engineering-board/<project>`; Step-1 root check updated; new Step 6 **prints** the additive runtime `.gitignore` stanza (print-only) + a `--private` full-tree opt-out. Router/legacy prose in `board-claim-release.md` / `board-graph.md` / `board-rebuild.md` repointed to the §6.1 order (kept the `BOARD-ROUTER.md` + `legacy` tokens the rebuild lint pins). Version bumped in both manifests. New `tests/orchestration/board-init-command.sh` (33 assertions), registered in the orchestration runner (now 14 sub-tests).
+
 ### Remaining for 1.1.0 (in order)
-1. **§6.5 `board-init`** — scaffold under `engineering-board/` by default; router rows become `engineering-board/<project>`; emit the additive `.gitignore` stanza. **This flips the out-of-the-box default and earns the `1.0.1 → 1.1.0` bump (both manifests).** Also refresh the router/legacy prose in `commands/board-claim-release.md`, `board-graph.md`, `board-rebuild.md`.
-2. **§6.7 `/board-migrate --relocate`** (+ a new test) — snapshot, move `docs/boards/<p>` → `engineering-board/<p>`, move+rewrite the router `path` column; idempotent.
-3. **§6.6 prose** — README/ARCHITECTURE trees, skills (4), agents (8), `references/`, and the two router-path refs in `hooks/stop-hook-procedure.md` (**edit path strings only — pinned tokens are guarded by `tests/modes/stop-hook-mode-routing.sh`**).
-4. **§8 fixtures** — repoint the ~19 fixtures (+5 adversarial), but **deliberately keep a few on `docs/boards/` + `docs/board/`** to guard the fallback.
+1. **§6.7 `/board-migrate --relocate`** (+ a new test) — snapshot, move `docs/boards/<p>` → `engineering-board/<p>`, move+rewrite the router `path` column; idempotent.
+2. **§6.6 prose** — README/ARCHITECTURE trees, skills (4), agents (8), `references/`, and the two router-path refs in `hooks/stop-hook-procedure.md` (**edit path strings only — pinned tokens are guarded by `tests/modes/stop-hook-mode-routing.sh`**).
+3. **§8 fixtures** — repoint the ~19 fixtures (+5 adversarial), but **deliberately keep a few on `docs/boards/` + `docs/board/`** to guard the fallback.
 
 ### Pending decisions (spec §11 — decide when you reach them)
-- **`board-init` gitignore stanza:** auto-append / print-only / gate behind `--private`?
+- ✅ **`board-init` gitignore stanza (DECIDED 2026-06-06):** **print-only** — `/board-init` prints the §6.2 additive runtime stanza for the user to paste and never edits `.gitignore` itself; `--private` swaps in the one-line full-tree (`engineering-board/`) opt-out. `consolidation.log` stays committed (audit trail), not in the ignore set.
 - **`--relocate`:** `git mv` vs plain `mv`; and also lift a legacy `docs/board/` (synthesizing a router) or handle only `docs/boards/`?
 - (`consolidation.log` committed vs ephemeral, and fallback lifetime — both currently "keep".)
 

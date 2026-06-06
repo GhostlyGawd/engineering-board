@@ -25,7 +25,11 @@ Then stop.
 
 ### Step 2 — Resolve board directory
 
-Read `${CLAUDE_PROJECT_DIR}/docs/boards/BOARD-ROUTER.md` if it exists and extract the board path for the current project. If that file does not exist, fall back to `${CLAUDE_PROJECT_DIR}/docs/board/`.
+Resolve the board router in this order (first hit wins), then extract the board path for the current project:
+
+1. `${CLAUDE_PROJECT_DIR}/engineering-board/BOARD-ROUTER.md` — default since 1.1.0
+2. `${CLAUDE_PROJECT_DIR}/docs/boards/BOARD-ROUTER.md` — compat (pre-1.1.0)
+3. `${CLAUDE_PROJECT_DIR}/docs/board/` — legacy single-board (no router)
 
 ### Step 3 — Check claim existence
 
