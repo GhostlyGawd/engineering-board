@@ -1,6 +1,6 @@
 ---
-description: Apply or roll back the v0.2.x -> v0.3.0 board migration. --apply creates a learnings/ subdir, back-fills needs:tdd on open bugs/features that lack it, and snapshots the pre-migration state. --rollback restores the snapshot. Both are SHA256-idempotent.
-argument-hint: --apply|--rollback|--status [project]
+description: Apply or roll back the v0.2.x -> v0.3.0 board migration, or relocate boards onto the 1.1.0 engineering-board/ default. --apply creates a learnings/ subdir, back-fills needs:tdd on open bugs/features that lack it, and snapshots the pre-migration state. --rollback restores the snapshot. --relocate moves docs/boards/ content to engineering-board/ and rewrites the router. --apply/--rollback are SHA256-idempotent; --relocate is move-idempotent.
+argument-hint: --apply|--rollback|--status|--relocate [project]
 ---
 
 # /board-migrate — v0.2.x → v0.3.0 migration
@@ -28,19 +28,29 @@ After rollback, the live tree SHA equals the pre-migrate SHA.
 **`--status`:**
 Reports whether each project has a snapshot, the current live SHA, and the state file contents.
 
+**`--relocate` (1.1.0):**
+Relocates committed board content from the compat `docs/boards/` location to the visible `engineering-board/` default:
+1. Snapshots the whole `docs/boards/` tree first into the gitignored `.engineering-board/relocate-snapshot/<iso>/`.
+2. Moves `docs/boards/<project>/` → `engineering-board/<project>/` (prefers `git mv` inside a work tree, so the move is history-preserving and reversible; falls back to plain `mv`).
+3. Moves + rewrites the router to `engineering-board/BOARD-ROUTER.md`, rewriting each `docs/boards/<p>` path column to `engineering-board/<p>` (affects-prefix column untouched).
+4. Reports per project (moved / already-relocated / skipped).
+
+Idempotent: re-running on an already-relocated board is a no-op, and old `docs/boards/` + legacy `docs/board/` keep resolving (so a half-migrated repo still works). Legacy single-board `docs/board/` is **not** auto-relocated (that would mean synthesizing a router); it keeps resolving via the fallback.
+
 ## What to do
 
 ### Step 1 — Parse arguments
 
 The argument list is `$ARGUMENTS`. Expect:
-- `--apply [project]` or `--rollback [project]` or `--status [project]`.
+- `--apply [project]`, `--rollback [project]`, `--status [project]`, or `--relocate [project]`.
+- **If the mode is `--relocate`:** skip Steps 2–4 and follow the **Relocate (1.1.0)** section at the end — relocation is a repo-level move dispatched to a separate script, not a per-board loop.
 - If `project` is omitted, operate on every board listed in `docs/boards/BOARD-ROUTER.md` (or the legacy `docs/board/` if no router exists).
 - If `project` is given, operate only on that project's board directory.
 
-If the first argument is missing or not one of the three flags, print:
+If the first argument is missing or not one of the four flags, print:
 
 ```
-Usage: /board-migrate --apply [project] | --rollback [project] | --status [project]
+Usage: /board-migrate --apply [project] | --rollback [project] | --status [project] | --relocate [project]
 ```
 
 and stop.
@@ -77,6 +87,18 @@ After all projects complete, print a summary:
 
 Include the script's reported `sha_after` (or `sha_after_rollback`) per project.
 
+## Relocate (1.1.0): docs/boards/ → engineering-board/
+
+For `--relocate`, do **not** loop per board dir. Run the relocation script once for the whole repo — it resolves the router and moves every project (or just `[project]` when given):
+
+```
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-relocate.sh" "$CLAUDE_PROJECT_DIR" [project]
+```
+
+Print the script's stdout — the per-project moved/already-relocated/skipped lines, the snapshot path, and the summary — back to the user. The script is idempotent and safe to re-run.
+
+After a successful relocate, run `/board-rebuild` so `BOARD.md`/`GRAPH.yml` reflect the new paths, and remind the user to add the `engineering-board/` runtime stanza to `.gitignore` (printed by `/board-init`) if they haven't already.
+
 ## Notes
 
 - The migration is reversible by design — `--apply` always snapshots first. `--rollback` works as long as the snapshot exists.
@@ -84,3 +106,4 @@ Include the script's reported `sha_after` (or `sha_after_rollback`) per project.
 - `--rollback` is destructive of post-apply changes: any user edits made to migrated entries after `--apply` will be overwritten by the snapshot. Re-edit after rollback.
 - The snapshot directory `<board-dir>/_migrate-snapshot/` is excluded from BOARD.md indexing and from `board-index-check.sh` (subdirs starting with `_` are runtime state).
 - After a successful `--apply`, run `/board-rebuild` to refresh `BOARD.md` and `GRAPH.yml` if you want the index to reflect post-migration entry counts (the back-fill changes `needs:` fields but not entry counts).
+- `--relocate` is reversible: in a work tree it uses `git mv` (undo via git) and snapshots `docs/boards/` to `.engineering-board/relocate-snapshot/` first. It does not auto-relocate legacy `docs/board/`.

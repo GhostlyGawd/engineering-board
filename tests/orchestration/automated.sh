@@ -25,6 +25,7 @@
 #   12. pause-resume-registry.sh    — v0.3.2 pause/resume cycle invariants (round-trip, isolation, identity)
 #   13. subagent-fixtures.sh        — v0.3.2 subagent contract lint (Output contract heading + load-bearing keys + JSON parse)
 #   14. board-init-command.sh       — 1.1.0 /board-init engineering-board/ scaffold + .gitignore structural lint
+#   15. board-relocate.sh           — 1.1.0 /board-migrate --relocate move + router rewrite + idempotency
 #
 # Usage:
 #   bash tests/orchestration/automated.sh                # auto-detect plugin root
@@ -55,6 +56,7 @@ SUBTESTS=(
   "pause-resume-registry.sh"
   "subagent-fixtures.sh"
   "board-init-command.sh"
+  "board-relocate.sh"
 )
 
 for st in "${SUBTESTS[@]}"; do
