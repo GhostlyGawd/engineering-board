@@ -1,17 +1,17 @@
 # engineering-board
 
-A Claude Code plugin that converts a markdown-based engineering board (`docs/boards/`) into an autonomous, multi-agent build system. Findings get captured passively from every session, promoted to the live board via deterministic consolidation, and worked through a `tdd → review → validate` state machine with atomic claim locking — all driven by the Stop hook.
+A Claude Code plugin that converts a markdown-based engineering board (`engineering-board/`) into an autonomous, multi-agent build system. Findings get captured passively from every session, promoted to the live board via deterministic consolidation, and worked through a `tdd → review → validate` state machine with atomic claim locking — all driven by the Stop hook.
 
 For a full contributor-facing map of every file and how they connect, see [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## What it does
 
-- **Passive finding capture** — every Stop event dispatches a `finding-extractor` subagent that scans the just-finished turn for bugs, features, questions, observations and writes them to a per-session scratch board at `docs/boards/<project>/_sessions/<session-id>.md`.
+- **Passive finding capture** — every Stop event dispatches a `finding-extractor` subagent that scans the just-finished turn for bugs, features, questions, observations and writes them to a per-session scratch board at `engineering-board/<project>/_sessions/<session-id>.md`.
 - **Deterministic consolidation** — scratch never reaches the live board until anchor-verified by the `consolidator` subagent (matched against the transcript), with supersession detection and a distinct-`affects:` safeguard.
 - **Real-time routing** — when a confirmed finding surfaces during a session, the `board-manager` agent routes it via the four board-* skills (intake, triage, resolve, consolidate).
 - **PM pipeline** (`/pm-start`) — every Stop event runs `finding-extractor` → `consolidator` → `tidier` → `learnings-curator`, keeping the live board promoted and tidy.
 - **Worker pipeline** (`/worker-start --discipline <tdd|review|validate>`) — every Stop event picks an entry with matching `needs:`, atomically claims it, dispatches the matching worker subagent (`tdd-builder` / `code-reviewer` / `validator`), writes back `suggested_next_needs`, and releases the claim. Three workers run in parallel form a continuous build pipeline.
-- **Entry validation on write** — frontmatter and `BOARD.md` indexing are checked on every Write to `docs/boards/.../*.md`. Missing fields or unindexed entries block the write.
+- **Entry validation on write** — frontmatter and `BOARD.md` indexing are checked on every Write to `engineering-board/.../*.md` (and the `docs/boards/.../*.md` compat path). Missing fields or unindexed entries block the write.
 - **Session-start board view** — every session starts with open items, in-progress warnings, blocking relationships, systemic patterns, and un-promoted scratch counts across all project boards.
 
 ## Mode-based Stop routing
@@ -29,7 +29,7 @@ The Stop hook reads `.engineering-board/session-mode.json` and routes to one of 
 
 | Type | Name | Purpose |
 |------|------|---------|
-| Command | `/board-init <project> [affects-prefix]` | Scaffold `docs/boards/<project>/` and append to `BOARD-ROUTER.md` |
+| Command | `/board-init <project> [affects-prefix]` | Scaffold `engineering-board/<project>/` and append to `BOARD-ROUTER.md` |
 | Command | `/board-rebuild [project]` | Deterministically regenerate `BOARD.md` + `GRAPH.yml` from entry files; runs auto-resolve terminal pass |
 | Command | `/board-graph [project] [--include-archive]` | Build structural graph (`GRAPH.yml`): clusters, bridges, isolated nodes, density |
 | Command | `/board-pause` | Suspend passive listening (Stop emits `<<EB-PASSIVE-PAUSED>>`) |
@@ -78,7 +78,7 @@ Examples:
 - `/board-init navigator` — creates a board for project `navigator`, routing entries with `affects: navigator/...`
 - `/board-init platform "platform/, services/, infra/"` — creates a board with multiple affects-prefixes
 
-`/board-init` is idempotent — running it twice does not duplicate files or router rows. It creates `docs/boards/BOARD-ROUTER.md` (or appends to it), `docs/boards/<project>/BOARD.md`, `ARCHIVE.md`, and the four entry-type subdirectories.
+`/board-init` is idempotent — running it twice does not duplicate files or router rows. It creates `engineering-board/BOARD-ROUTER.md` (or appends to it), `engineering-board/<project>/BOARD.md`, `ARCHIVE.md`, and the four entry-type subdirectories. (Existing boards under `docs/boards/` — the pre-1.1.0 default — keep resolving with no action; see the Layout section.)
 
 If no board exists when a session starts, the SessionStart hook prints a one-line reminder pointing at `/board-init` instead of doing anything else — projects that should not have a board are unaffected.
 
@@ -86,9 +86,9 @@ If no board exists when a session starts, the SessionStart hook prints a one-lin
 
 This plugin is opinionated about your repo layout. After running `/board-init`, your project will have either:
 
-**Multi-board layout (recommended):**
+**Multi-board layout (default, recommended):**
 ```
-docs/boards/
+engineering-board/
 ├── BOARD-ROUTER.md          # Maps `affects:` prefix → board directory
 ├── <project-a>/
 │   ├── BOARD.md             # Live index of open items
@@ -99,6 +99,17 @@ docs/boards/
 │   └── observations/
 └── <project-b>/
     └── ...
+```
+
+The board lives in a visible, top-level `engineering-board/` and is **committed by default** — it is meant to be browsed on GitHub and version-controlled. `/board-init` prints a small additive `.gitignore` stanza covering only the ephemeral runtime subdirs (`engineering-board/*/_sessions/`, `_claims/`, `_migrate-snapshot/`). To keep the whole board private instead (e.g. a public repo), run `/board-init --private`, which gives you the one-line opt-out — add `engineering-board/` to `.gitignore` to ignore the entire tree.
+
+> **Two folders, one letter apart.** The visible `engineering-board/` (no dot) is committed board *content*. The hidden `.engineering-board/` (leading dot) is gitignored *runtime* state (`session-mode.json`, `active-workers.json`, etc.) — never committed. Don't conflate them.
+
+**Backward-compatible (pre-1.1.0 default, auto-detected):** boards already under `docs/boards/` keep resolving with no action — board location is resolved in the order `engineering-board/` → `docs/boards/` (compat) → `docs/board/` (legacy single-board). To move an existing board into the new visible location, run `/board-migrate --relocate`.
+
+```
+docs/boards/                 # pre-1.1.0 multi-board default — still resolves
+└── ...                      # same structure as engineering-board/ above
 ```
 
 **Or legacy single-board layout (auto-detected):**
@@ -112,7 +123,7 @@ docs/board/
 └── observations/
 ```
 
-If neither exists, the SessionStart hook prints a one-line nudge to run `/board-init` and otherwise stays out of your way.
+If none of these exist, the SessionStart hook prints a one-line nudge to run `/board-init` and otherwise stays out of your way.
 
 ### `BOARD-ROUTER.md` format
 
@@ -121,8 +132,8 @@ The router is a markdown table with `project | path | affects-prefix` columns:
 ```markdown
 | project    | path                       | affects prefix |
 |------------|----------------------------|----------------|
-| navigator  | docs/boards/navigator      | navigator/, src/, scripts/ |
-| platform   | docs/boards/platform       | platform/      |
+| navigator  | engineering-board/navigator | navigator/, src/, scripts/ |
+| platform   | engineering-board/platform  | platform/      |
 ```
 
 ### Entry frontmatter

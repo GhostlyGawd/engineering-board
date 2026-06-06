@@ -41,7 +41,7 @@ cleanup() { rm -rf "$TMP" 2>/dev/null || true; }
 trap cleanup EXIT
 
 PROJECT="$TMP/project"
-BOARD_DIR="$PROJECT/docs/boards/demo"
+BOARD_DIR="$PROJECT/engineering-board/demo"
 SESSION_ID="worker-tdd-test-session"
 mkdir -p "$BOARD_DIR/bugs" "$BOARD_DIR/features" "$BOARD_DIR/_claims" "$PROJECT/.engineering-board"
 

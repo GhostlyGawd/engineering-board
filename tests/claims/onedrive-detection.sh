@@ -58,7 +58,7 @@ report() {
 BUMP_LOG_LINE="cloud-sync detected, bumped heartbeat to 60s / stale to 300s"
 
 # --- Positive: path with /OneDrive/ substring ----------------------------
-OD_BOARD_DIR="$TMP/Users/testuser/OneDrive/Projects/myproject/docs/boards/myboard"
+OD_BOARD_DIR="$TMP/Users/testuser/OneDrive/Projects/myproject/engineering-board/myboard"
 mkdir -p "$OD_BOARD_DIR/_claims"
 
 OD_OUTPUT="$TMP/od_positive.out"
@@ -82,7 +82,7 @@ else
 fi
 
 # --- Negative: plain path (no OneDrive) ----------------------------------
-PLAIN_BOARD_DIR="$TMP/Users/testuser/Projects/myproject/docs/boards/myboard"
+PLAIN_BOARD_DIR="$TMP/Users/testuser/Projects/myproject/engineering-board/myboard"
 mkdir -p "$PLAIN_BOARD_DIR/_claims"
 
 PLAIN_OUTPUT="$TMP/od_negative.out"

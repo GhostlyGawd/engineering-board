@@ -21,7 +21,7 @@ The scratch session file you receive may contain findings with `title`, `affects
 The Stop-hook orchestrator passes you a single argument: the scratch session file path, e.g.:
 
 ```
-docs/boards/<project>/_sessions/<session-id>.md
+engineering-board/<project>/_sessions/<session-id>.md
 ```
 
 That path is relative to `CLAUDE_PROJECT_DIR`. Resolve it as:

@@ -48,7 +48,7 @@ cleanup() { rm -rf "$TMP" 2>/dev/null || true; }
 trap cleanup EXIT
 
 PROJECT="$TMP/project"
-BOARD_DIR="$PROJECT/docs/boards/demo"
+BOARD_DIR="$PROJECT/engineering-board/demo"
 SESSION_ID="pm-test-session"
 mkdir -p \
   "$BOARD_DIR/bugs" \
@@ -58,12 +58,12 @@ mkdir -p \
   "$BOARD_DIR/_sessions" \
   "$PROJECT/.engineering-board"
 
-cat > "$PROJECT/docs/boards/BOARD-ROUTER.md" <<'EOF'
+cat > "$PROJECT/engineering-board/BOARD-ROUTER.md" <<'EOF'
 # Board Router
 
 | project | path | affects prefix |
 |---------|------|----------------|
-| demo | docs/boards/demo/ | demo/ |
+| demo | engineering-board/demo/ | demo/ |
 EOF
 
 cat > "$BOARD_DIR/BOARD.md" <<'EOF'

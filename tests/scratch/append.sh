@@ -241,16 +241,16 @@ fi
 # promote, where the old printf/echo hand-copy would have mangled it and the
 # consolidator would have logged deferred_anchor_unmatched.
 PROJECT="$TMP/project"
-BOARD_DIR="$PROJECT/docs/boards/scratch"
+BOARD_DIR="$PROJECT/engineering-board/scratch"
 mkdir -p "$BOARD_DIR/bugs" "$BOARD_DIR/features" "$BOARD_DIR/questions" \
          "$BOARD_DIR/observations" "$BOARD_DIR/_sessions" "$PROJECT/.engineering-board"
 
-cat > "$PROJECT/docs/boards/BOARD-ROUTER.md" <<'EOF'
+cat > "$PROJECT/engineering-board/BOARD-ROUTER.md" <<'EOF'
 # Board Router
 
 | project | path | affects prefix |
 |---------|------|----------------|
-| scratch | docs/boards/scratch/ | scratch/ |
+| scratch | engineering-board/scratch/ | scratch/ |
 EOF
 printf '# scratch - Board\n\n## Open\n\n' > "$BOARD_DIR/BOARD.md"
 

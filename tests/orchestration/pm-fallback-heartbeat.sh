@@ -25,7 +25,7 @@ cleanup_tmp() { rm -rf "$TMP" 2>/dev/null || true; }
 trap cleanup_tmp EXIT
 
 export CLAUDE_PROJECT_DIR="$TMP/project"
-BOARD_DIR="$CLAUDE_PROJECT_DIR/docs/boards/p"
+BOARD_DIR="$CLAUDE_PROJECT_DIR/engineering-board/p"
 CLAIMS_DIR="$BOARD_DIR/_claims"
 mkdir -p "$CLAIMS_DIR"
 mkdir -p "$CLAUDE_PROJECT_DIR/.engineering-board"

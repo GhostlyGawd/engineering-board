@@ -1,12 +1,12 @@
 # Spec — Relocate board content to a visible `engineering-board/`
 
-> A returnable design doc. **Status: In progress — §6.3 resolver + §6.4 wiring + §6.5 board-init (default flip + `1.1.0` bump) + §6.7 `--relocate` landed on the branch; prose / fixtures remain (see `state.md`).**
+> A returnable design doc. **Status: ✅ Complete — resolver (§6.3) + wiring (§6.4) + board-init & version bump (§6.5) + prose (§6.6) + `--relocate` (§6.7) + fixtures (§8) all landed on the branch; shipping as `1.1.0` via PR #8. Suite 10/10 green.**
 > Cross-session note: this repo clones fresh each web session, so this spec is the
 > durable record of the decision and plan. `state.md`'s active-thread section points here.
 
 | | |
 |---|---|
-| **Status** | In progress — resolver + wiring + board-init (`1.1.0` bump) + `--relocate` done; prose / fixtures remain |
+| **Status** | ✅ Complete — resolver + wiring + board-init (`1.1.0` bump) + prose + `--relocate` + fixtures all done; shipping via PR #8 |
 | **Decision date** | 2026-06-01 |
 | **Target version** | `1.1.0` (minor; backward-compatible) |
 | **Working branch** | `claude/adoring-turing-ULvhK` |
