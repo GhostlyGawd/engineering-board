@@ -8,7 +8,7 @@ version: 0.1.0
 
 The resolution protocol for all entry types. The question-closing sequence (Steps 6–9) is mandatory and order-sensitive — do not skip or reorder.
 
-**Identify the entry's board first:** the board directory is derived from the entry file's path — `docs/boards/<project>/`. All BOARD.md index updates and ARCHIVE.md appends go to that project's board, not a different one.
+**Identify the entry's board first:** the board directory is derived from the entry file's path — `engineering-board/<project>/` (or `docs/boards/<project>/` on the compat path). All BOARD.md index updates and ARCHIVE.md appends go to that project's board, not a different one.
 
 ## Closing a Bug or Feature
 
@@ -83,7 +83,7 @@ Questions don't carry `pattern:` tags. Append:
 ### Step 4 — Find all blocked dependents
 
 ```bash
-grep -r "blocked_by:.*Q###" docs/boards/<project>/ --include="*.md" -l
+grep -r "blocked_by:.*Q###" engineering-board/<project>/ --include="*.md" -l
 ```
 
 Replace `Q###` with the actual question ID. Collect all matching file paths.

@@ -5,7 +5,7 @@ argument-hint: [project-name] [--include-archive]
 
 # /board-graph — build a deterministic structural graph of the live board
 
-Generates `docs/boards/<project>/GRAPH.yml`: a **purely deterministic** machine-readable graph of all open entries. Same input always produces byte-identical output (modulo `generated_at`). No LLM in the construction step.
+Generates `engineering-board/<project>/GRAPH.yml`: a **purely deterministic** machine-readable graph of all open entries. Same input always produces byte-identical output (modulo `generated_at`). No LLM in the construction step.
 
 Downstream AI consumers read the structural facts and interpret them in their own context — interpretation happens at point of use, not at graph-build time.
 
@@ -106,7 +106,7 @@ Thresholds:
 
 ### Step 1 — Resolve target board(s)
 
-Read `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md`. Target either the named project or all listed. Fall back to `$CLAUDE_PROJECT_DIR/docs/board/` legacy layout if no router.
+Resolve the board router in this order (first hit wins): `$CLAUDE_PROJECT_DIR/engineering-board/BOARD-ROUTER.md` (default since 1.1.0), then `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md` (compat). Target either the named project or all listed. Fall back to `$CLAUDE_PROJECT_DIR/docs/board/` legacy layout if no router.
 
 ### Step 2 — Parse all entry frontmatter
 

@@ -1,12 +1,12 @@
 # Spec — Relocate board content to a visible `engineering-board/`
 
-> A returnable design doc. **Status: Proposed — design locked, NOT yet implemented.**
+> A returnable design doc. **Status: ✅ Complete — resolver (§6.3) + wiring (§6.4) + board-init & version bump (§6.5) + prose (§6.6) + `--relocate` (§6.7) + fixtures (§8) all landed on the branch; shipping as `1.1.0` via PR #8. Suite 10/10 green.**
 > Cross-session note: this repo clones fresh each web session, so this spec is the
 > durable record of the decision and plan. `state.md`'s active-thread section points here.
 
 | | |
 |---|---|
-| **Status** | Proposed — design locked, no code written |
+| **Status** | ✅ Complete — resolver + wiring + board-init (`1.1.0` bump) + prose + `--relocate` + fixtures all done; shipping via PR #8 |
 | **Decision date** | 2026-06-01 |
 | **Target version** | `1.1.0` (minor; backward-compatible) |
 | **Working branch** | `claude/adoring-turing-ULvhK` |
@@ -241,9 +241,14 @@ would be `2.0.0` only if the `docs/...` fallback were dropped.
 
 1. **`--relocate` mechanics:** `git mv` vs plain `mv`? And should it also lift a
    legacy single-board `docs/board/` into `engineering-board/<name>/` + synthesize a
-   router, or handle only `docs/boards/`?
+   router, or handle only `docs/boards/`? **→ Decided (impl, 2026-06-06): `git mv` in a
+   work tree, plain `mv` fallback; snapshot `docs/boards/` first. Handle `docs/boards/`
+   only — legacy `docs/board/` is reported as deferred (no router synthesis), kept on the
+   fallback.**
 2. **`board-init` gitignore behavior:** auto-append the §6.2 stanza, just print it,
-   or gate behind `--private`?
+   or gate behind `--private`? **→ Decided (impl, 2026-06-06): print-only** — print the
+   additive stanza, never edit `.gitignore`; `--private` swaps in the one-line full-tree
+   (`engineering-board/`) opt-out. `consolidation.log` stays committed.
 3. **`consolidation.log`:** confirm it stays committed (treated here as an audit
    trail) vs. moved under the ephemeral set.
 4. **Visible folder name:** `engineering-board/` (assumed). If the near-match with

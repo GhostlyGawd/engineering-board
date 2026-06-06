@@ -35,7 +35,7 @@ Do not error if `session-mode.json` is absent — absence means no mode is confi
 
 (a) Read `$CLAUDE_PROJECT_DIR/.engineering-board/last-stop-stdin.json` to get `session_id` (and `transcript_path` if needed).
 
-(b) Determine the project board path. Read `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md` if it exists. If it exists, resolve the first listed project's board directory and target `$CLAUDE_PROJECT_DIR/docs/boards/<first-listed-project>/_sessions/<session_id>.md`. If BOARD-ROUTER.md does not exist, fall back to the legacy single-board layout at `$CLAUDE_PROJECT_DIR/docs/board/_sessions/<session_id>.md`. If neither a router nor a legacy `docs/board/` layout exists, emit `<<EB-PASSIVE-NO-BOARD>>` and stop.
+(b) Determine the project board path. Resolve the router in order: read `$CLAUDE_PROJECT_DIR/engineering-board/BOARD-ROUTER.md` (default since 1.1.0) if it exists, else `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md` (compat). If a router exists, resolve the first listed project's board directory and target `$CLAUDE_PROJECT_DIR/<board-root>/<first-listed-project>/_sessions/<session_id>.md` (where `<board-root>` is `engineering-board` or `docs/boards` per which router resolved). If no BOARD-ROUTER.md exists, fall back to the legacy single-board layout at `$CLAUDE_PROJECT_DIR/docs/board/_sessions/<session_id>.md`. If neither a router nor a legacy `docs/board/` layout exists, emit `<<EB-PASSIVE-NO-BOARD>>` and stop.
 
 (c) Dispatch a single Task call: subagent_type=finding-extractor, description="passive listen", prompt=<the most recent conversation exchange formatted as the two clearly-delimited sections below>. Use this exact format for the prompt string (literal delimiters; preserve original message text verbatim including any markdown):
 
@@ -71,7 +71,7 @@ Branch on the script's exit code:
 
 PM mode runs a pre-flight pass that refreshes claim heartbeats on behalf of live registered worker sessions (v0.2.3), runs the passive extractor (to capture this turn's findings), then dispatches the three PM subagents (consolidator, tidier, learnings-curator) in sequence to maintain board hygiene, then emits the PM-CONTINUE sentinel so the orchestrator continues looping.
 
-(pre) **PM-fallback heartbeat (v0.2.3).** Before any other PM step, run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-pm-fallback-heartbeat.sh <board-dir>` for each board directory listed in `BOARD-ROUTER.md` (or the legacy `docs/board/` if no router). The script reads `.engineering-board/active-workers.json`, scans `<board-dir>/_claims/`, and refreshes the heartbeat for claims whose owning session is registered, alive (last_seen within `2 * staleClaimSec`), and not paused. Skipped claims (orphan, paused, stale-registered) fall through to the normal `board-claim-reclaim-stale.sh` path. The pre-flight exit code is informational; do NOT abort the PM turn on a non-zero exit. Capture its stdout for the turn log.
+(pre) **PM-fallback heartbeat (v0.2.3).** Before any other PM step, run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-pm-fallback-heartbeat.sh <board-dir>` for each board directory listed in the resolved `BOARD-ROUTER.md` (resolution order: `engineering-board/BOARD-ROUTER.md` → `docs/boards/BOARD-ROUTER.md`; or the legacy `docs/board/` if no router). The script reads `.engineering-board/active-workers.json`, scans `<board-dir>/_claims/`, and refreshes the heartbeat for claims whose owning session is registered, alive (last_seen within `2 * staleClaimSec`), and not paused. Skipped claims (orphan, paused, stale-registered) fall through to the normal `board-claim-reclaim-stale.sh` path. The pre-flight exit code is informational; do NOT abort the PM turn on a non-zero exit. Capture its stdout for the turn log.
 
 (a) Execute Section 3-EXTRACTOR steps (a), (b), (c), (d) verbatim (read session_id, resolve board path, dispatch finding-extractor, append JSON to scratch).
   - If step (b) emits `<<EB-PASSIVE-NO-BOARD>>`, propagate it and stop (PM mode cannot work without a board).
@@ -108,7 +108,7 @@ Worker mode dispatches a discipline-specific worker subagent that processes one 
 
 (b) Read `$CLAUDE_PROJECT_DIR/.engineering-board/last-stop-stdin.json` to get `session_id`. If `session_id` is missing or empty, synthesize one from the timestamp (`python3 -c "import uuid; print(uuid.uuid4())"`).
 
-(c) Determine the project board path. Read `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md` if it exists; resolve the first listed project's board directory. If BOARD-ROUTER.md does not exist, fall back to `$CLAUDE_PROJECT_DIR/docs/board/`. If neither a router nor a legacy layout exists, emit `<<EB-PASSIVE-NO-BOARD>>` and stop.
+(c) Determine the project board path. Resolve the router in order: read `$CLAUDE_PROJECT_DIR/engineering-board/BOARD-ROUTER.md` (default since 1.1.0) if it exists, else `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md` (compat); resolve the first listed project's board directory. If no BOARD-ROUTER.md exists, fall back to `$CLAUDE_PROJECT_DIR/docs/board/`. If neither a router nor a legacy layout exists, emit `<<EB-PASSIVE-NO-BOARD>>` and stop.
 
 (d) Search the live board for entries needing this discipline: list files under `<board-dir>/bugs/` and `<board-dir>/features/` whose frontmatter contains `^needs: <discipline>$` (use Grep with the literal string `needs: <discipline>` over `*.md` files in those subdirs, substituting the actual discipline value — e.g. `needs: tdd`, `needs: review`, or `needs: validate`). If zero matches, emit `<<EB-WORKER-NOTHING-TO-DO>>` on its own line and stop. (Per the locked plan AC A2.)
 
@@ -151,7 +151,7 @@ If any step in (a)-(j) fails outside the documented branches, emit `<<EB-WORKER-
 
 ## Section 4: Failure modes and sentinel inventory
 
-If any step in Section 3-EXTRACTOR fails (extractor unavailable, write blocked, path resolution error, JSON parse failure, etc.), emit `<<EB-PASSIVE-FAIL>>` on its own line followed by a single line describing which step failed (e.g., `step (d): write to docs/boards/foo/_sessions/abc.md denied`). Do not retry.
+If any step in Section 3-EXTRACTOR fails (extractor unavailable, write blocked, path resolution error, JSON parse failure, etc.), emit `<<EB-PASSIVE-FAIL>>` on its own line followed by a single line describing which step failed (e.g., `step (d): write to engineering-board/foo/_sessions/abc.md denied`). Do not retry.
 
 PM-mode failures emit `<<EB-PM-FAIL>>` + reason; Worker-mode failures emit `<<EB-WORKER-FAIL>>` + reason. Same one-line-reason discipline; never retry within a single Stop turn.
 

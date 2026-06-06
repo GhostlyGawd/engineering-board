@@ -14,7 +14,7 @@ The caller supplies one of three scope modes:
 | `cascade` | The `pattern:` / `affects:` neighbors of a just-closed entry | `/board-resolve` after closing an entry |
 | `full` | Every open entry on the target board(s) | `/board-triage`, `/board-rebuild`, `/board-consolidate` |
 
-The caller also supplies the **target board(s)** — the project directory under `docs/boards/<project>/`.
+The caller also supplies the **target board(s)** — the project directory under `engineering-board/<project>/` (the default since 1.1.0; resolved ahead of the `docs/boards/<project>/` compat path and legacy `docs/board/`).
 
 ## Algorithm
 

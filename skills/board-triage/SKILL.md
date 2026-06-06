@@ -10,7 +10,7 @@ Derives the recommended work sequence from open board items and the five triage 
 
 ## Step 0 — Identify the project scope
 
-If triage was requested for a specific project, read that project's board at `docs/boards/<project>/BOARD.md`. If no project was specified, read `docs/boards/BOARD-ROUTER.md` to list all projects, then ask which to triage or triage all.
+If triage was requested for a specific project, read that project's board at `engineering-board/<project>/BOARD.md`. If no project was specified, read the resolved `BOARD-ROUTER.md` (resolution order: `engineering-board/BOARD-ROUTER.md` → `docs/boards/BOARD-ROUTER.md` → legacy `docs/board/`) to list all projects, then ask which to triage or triage all.
 
 ## Step 1 — Read current state
 
@@ -18,7 +18,7 @@ If triage was requested for a specific project, read that project's board at `do
 2. For each open item: read its entry file to get `priority`, `status`, `blocked_by`, and `affects`.
 3. Build the live dependency picture:
    ```bash
-   grep -r "blocked_by:" docs/boards/<project>/ --include="*.md" -h | sort | uniq
+   grep -r "blocked_by:" engineering-board/<project>/ --include="*.md" -h | sort | uniq
    ```
 
 ## Step 1b — Auto-resolve terminal pass (run before triage output)
@@ -56,13 +56,13 @@ Changes requiring new content logic or architectural rethink go after incrementa
 After applying Rules 1–5, run the pattern cluster analysis:
 ```bash
 # Current density — open entries
-grep -r "^pattern:" docs/boards/<project>/bugs/ docs/boards/<project>/features/ \
+grep -r "^pattern:" engineering-board/<project>/bugs/ engineering-board/<project>/features/ \
   --include="*.md" -h 2>/dev/null \
   | sed 's/^pattern: *//' | tr -d '[]' | tr ',' '\n' | tr -d ' ' | grep -v '^$' \
   | sort | uniq -c | sort -rn
 
 # Historical recurrence — archived resolutions
-grep "pattern:" docs/boards/<project>/ARCHIVE.md 2>/dev/null \
+grep "pattern:" engineering-board/<project>/ARCHIVE.md 2>/dev/null \
   | grep -oE '[a-z][a-z-]+' | grep -v '^pattern$' | sort | uniq -c | sort -rn
 ```
 When any pattern appears in **2+ open entries** OR **2+ archived resolutions**: flag it as a systemic investigation candidate. Recommend investigating the shared root cause across all affected entries before fixing them individually — isolated fixes on systemic bugs often recur.
@@ -81,7 +81,7 @@ Before marking any item `in_progress`:
 
 1. Check for existing in_progress items across all project boards:
    ```bash
-   grep -r "^status: in_progress" docs/boards/ --include="*.md" -l
+   grep -r "^status: in_progress" engineering-board/ --include="*.md" -l
    ```
 2. If any found: surface them. One item `in_progress` per session maximum. Either complete the existing item, reset it to `open` with a note on where it stopped, or confirm explicitly before proceeding.
 3. If clear: set `status: in_progress` in the entry file.

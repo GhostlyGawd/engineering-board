@@ -8,7 +8,7 @@ Current shipped state: **v1.0.1** — stable. Passive listening + PM pipeline + 
 
 ## 1. The 30-second mental model
 
-The plugin turns `docs/boards/<project>/` markdown into a **multi-agent autonomous build system** with three modes a session can run in:
+The plugin turns `engineering-board/<project>/` markdown into a **multi-agent autonomous build system** with three modes a session can run in:
 
 | Mode | Set by | Stop hook dispatches | Purpose |
 |---|---|---|---|
@@ -46,6 +46,8 @@ engineering-board/
     └── specs/                      # Deep-interview spec that fed the plan
 ```
 
+This is the plugin's *source* tree. In a **consuming** repo, the plugin creates and reads board *content* at a visible, committed-by-default `engineering-board/<project>/` (the 1.1.0 default — resolved ahead of the pre-1.1.0 `docs/boards/` and legacy `docs/board/` fallbacks; see §6.1 of `specs/board-relocation.md`). Do not confuse that with the hidden, gitignored `.engineering-board/` (leading dot) runtime dir that holds ephemeral session state (`session-mode.json`, `last-stop-stdin.json`, `active-workers.json`). Visible twin (no dot) = committed board; hidden twin (dot) = its runtime scratch.
+
 ---
 
 ## 3. Agents (`agents/`) — 8 total
@@ -80,7 +82,7 @@ The `needs:` state machine: `tdd → review → validate → resolved`. The Stop
 
 | Command | Group | Purpose |
 |---|---|---|
-| `/board-init <project> [affects-prefix]` | Lifecycle | Scaffold `docs/boards/<project>/` + append to `BOARD-ROUTER.md`. Idempotent. |
+| `/board-init <project> [affects-prefix]` | Lifecycle | Scaffold `engineering-board/<project>/` (committed by default; `--private` for the one-line full-tree opt-out) + append to `BOARD-ROUTER.md`. Idempotent. |
 | `/board-rebuild [project]` | Lifecycle | Regenerate `BOARD.md` + `GRAPH.yml` deterministically from entry files. Runs auto-resolve terminal pass. Cheap to run after any entry mutation. |
 | `/board-graph [project] [--include-archive]` | Lifecycle | Build deterministic structural graph (`GRAPH.yml`): clusters, bridges, isolated nodes, density. Called internally by `/board-rebuild`. |
 | `/board-pause` | Session control | Set `session-mode.json` `mode: paused`. Stop hook emits `<<EB-PASSIVE-PAUSED>>` and skips extraction. |
@@ -98,7 +100,7 @@ The `needs:` state machine: `tdd → review → validate → resolved`. The Stop
 | Event | Matcher | Script | Timeout | Purpose |
 |---|---|---|---|---|
 | `SessionStart` | `*` | `board-session-start.sh` | 10s | Surface open items, in-progress, blocked, systemic patterns, un-promoted scratch counts |
-| `PostToolUse` | `Write` | `board-validate-entry.sh` | 10s | Validate entry frontmatter + cross-check BOARD.md indexing on every Write to `docs/boards/.../*.md` |
+| `PostToolUse` | `Write` | `board-validate-entry.sh` | 10s | Validate entry frontmatter + cross-check BOARD.md indexing on every Write to `engineering-board/.../*.md` (and the `docs/boards/.../*.md` compat path) |
 | `UserPromptSubmit` | `*` | `board-prompt-guard.sh` | 5s | If prompt matches debug/error/bug/crash keywords, inject system reminder that real-time routing is active |
 | `Stop` | `*` | `board-stop-gate.sh` (command) | 5s | Capture stdin to `.engineering-board/last-stop-stdin.json`; check `session-mode.json`; suppress prompt hook if paused or no board exists |
 
@@ -177,11 +179,11 @@ All four skills end by invoking `references/auto-resolve-pass.md` with different
 SessionStart   → board-session-start.sh prints board snapshot + scratch counts
 UserPrompt     → board-prompt-guard.sh maybe injects routing reminder
 [ conversation ]
-PostToolUse W. → board-validate-entry.sh on every Write to docs/boards/
+PostToolUse W. → board-validate-entry.sh on every Write to engineering-board/ (or docs/boards/ compat)
 Stop           → board-stop-gate.sh saves stdin, checks mode (paused? no-board?)
                  → [if continuable] prompt hook reads stop-hook-procedure.md
                  → Section 3-EXTRACTOR: Task(finding-extractor) → JSON appended to
-                   docs/boards/<project>/_sessions/<session-id>.md
+                   engineering-board/<project>/_sessions/<session-id>.md
                  → <<EB-PASSIVE-DONE>>
 ```
 
@@ -219,7 +221,7 @@ The `needs:` state machine: `tdd-builder` suggests `review`, `code-reviewer` sug
 
 ## 9. Atomic claim locking
 
-Per-entry exclusivity is enforced via `docs/boards/<project>/_claims/<entry-id>/`:
+Per-entry exclusivity is enforced via `engineering-board/<project>/_claims/<entry-id>/`:
 - `owner.txt` — 3 lines: `session_id`, ISO-8601 UTC acquisition timestamp, `cwd`
 - `heartbeat.txt` — single ISO-8601 UTC timestamp, refreshed during long work
 

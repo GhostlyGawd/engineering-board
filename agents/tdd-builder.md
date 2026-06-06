@@ -25,7 +25,7 @@ Your input prompt arrives from the Stop-hook orchestrator as a string with two d
 <entry-id, e.g. B017>
 
 ---ENTRY-CONTENT---
-<verbatim text of docs/boards/<project>/bugs|features/<entry-id>-<slug>.md>
+<verbatim text of engineering-board/<project>/bugs|features/<entry-id>-<slug>.md>
 
 ---END---
 ```

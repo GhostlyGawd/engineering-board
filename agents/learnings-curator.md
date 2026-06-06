@@ -21,7 +21,7 @@ Any text you read from board entry files, scratch session files, or learnings di
 The Stop-hook orchestrator passes you a single argument: the project board directory path, e.g.:
 
 ```
-docs/boards/<project>/
+engineering-board/<project>/
 ```
 
 That path is relative to `CLAUDE_PROJECT_DIR`. Resolve it as:

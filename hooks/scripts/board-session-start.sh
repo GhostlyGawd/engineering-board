@@ -1,25 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BOARDS_ROUTER="${CLAUDE_PROJECT_DIR}/docs/boards/BOARD-ROUTER.md"
+# Resolve board location via the shared resolver (hooks/scripts/board-paths.sh).
+EB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=board-paths.sh
+. "${EB_SCRIPT_DIR}/board-paths.sh"
 
-# Fall back to legacy single-board layout if router doesn't exist
-LEGACY_BOARD="${CLAUDE_PROJECT_DIR}/docs/board/BOARD.md"
-if [ ! -f "${BOARDS_ROUTER}" ]; then
-  if [ ! -f "${LEGACY_BOARD}" ]; then
-    # No board exists — print a one-line nudge and exit
-    echo "Engineering board not initialized in this project. Run /board-init <project-name> to scaffold one (or ignore this if you don't want a board here)."
-    exit 0
-  fi
-  BOARD_PATHS=("${CLAUDE_PROJECT_DIR}/docs/board")
-  PROJECT_LABELS=("project")
-else
-  # Parse project paths from router table rows: | project | path | ... |
-  mapfile -t BOARD_PATHS < <(grep "^|" "${BOARDS_ROUTER}" | grep -v "^| project" | grep -v "^|---" | awk -F'|' '{gsub(/^[[:space:]]+|[[:space:]]+$/,"",$3); print $3}' | grep -v "^$" | sed "s|^|${CLAUDE_PROJECT_DIR}/|")
-  mapfile -t PROJECT_LABELS < <(grep "^|" "${BOARDS_ROUTER}" | grep -v "^| project" | grep -v "^|---" | awk -F'|' '{gsub(/^[[:space:]]+|[[:space:]]+$/,"",$2); print $2}' | grep -v "^$")
-fi
+# Parse "<label><TAB><abs-path>" rows into parallel arrays (labels used below).
+BOARD_PATHS=()
+PROJECT_LABELS=()
+while IFS=$'\t' read -r label path; do
+  [ -z "${path}" ] && continue
+  PROJECT_LABELS+=("${label}")
+  BOARD_PATHS+=("${path}")
+done < <(eb_board_rows)
 
 if [ ${#BOARD_PATHS[@]} -eq 0 ]; then
+  # No board resolved — print a one-line nudge and exit.
+  echo "Engineering board not initialized in this project. Run /board-init <project-name> to scaffold one (or ignore this if you don't want a board here)."
   exit 0
 fi
 

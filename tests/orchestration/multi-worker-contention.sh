@@ -39,7 +39,7 @@ cleanup() { rm -rf "$TMP" 2>/dev/null || true; }
 trap cleanup EXIT
 
 PROJECT="$TMP/project"
-BOARD_DIR="$PROJECT/docs/boards/demo"
+BOARD_DIR="$PROJECT/engineering-board/demo"
 mkdir -p "$BOARD_DIR/bugs" "$BOARD_DIR/_claims" "$TMP/work-log"
 
 # Pool of 8 needs:tdd bugs. Pool size is intentionally larger than typical

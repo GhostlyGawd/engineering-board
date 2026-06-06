@@ -33,7 +33,7 @@ TMP="$(python3 -c 'import tempfile; print(tempfile.mkdtemp(prefix="eb-reclaim-")
 cleanup() { rm -rf "$TMP" 2>/dev/null || true; }
 trap cleanup EXIT
 
-BOARD_DIR="$TMP/project/docs/boards/test"
+BOARD_DIR="$TMP/project/engineering-board/test"
 CLAIMS_DIR="$BOARD_DIR/_claims"
 mkdir -p "$CLAIMS_DIR"
 

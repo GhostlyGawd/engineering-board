@@ -23,6 +23,8 @@ The registry plus a PM-fallback heartbeat (`board-pm-fallback-heartbeat.sh`, sep
 
 Same directory as `session-mode.json` and `last-stop-stdin.json`. Not committed to the repo (gitignored under `.engineering-board/`).
 
+> **Twin folders, one letter apart — do not conflate.** This registry lives under the **hidden, gitignored** `.engineering-board/` (leading dot) — ephemeral *runtime* state, regenerated each run, never committed. That is a different directory from the **visible, committed-by-default** `engineering-board/` (no dot) introduced in 1.1.0, which holds board *content* (`BOARD-ROUTER.md`, `<project>/bugs|features|questions|observations|learnings/`, `BOARD.md`, `ARCHIVE.md`, `consolidation.log`). Visible twin = your board; hidden twin = its runtime scratch.
+
 ## Schema
 
 A JSON array of session entries. Each entry:

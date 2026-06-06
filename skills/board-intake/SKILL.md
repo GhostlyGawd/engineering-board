@@ -6,7 +6,7 @@ version: 0.1.0
 
 # Board Intake
 
-The workspace has multiple project boards under `docs/boards/`. The router lives at `docs/boards/BOARD-ROUTER.md` and lists each project's board path and `affects:` prefix. Entry files use YAML frontmatter. The full schema is in `references/frontmatter-schema.md`.
+The workspace has multiple project boards under `engineering-board/` (the default since 1.1.0; `docs/boards/` still resolves for pre-1.1.0 repos). The router is resolved in order: `$CLAUDE_PROJECT_DIR/engineering-board/BOARD-ROUTER.md` (default since 1.1.0), then `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md` (compat), then legacy `$CLAUDE_PROJECT_DIR/docs/board/` (single-board, no router). It lists each project's board path and `affects:` prefix. Entry files use YAML frontmatter. The full schema is in `references/frontmatter-schema.md`.
 
 **Source of truth for ID sequences:** the highest-numbered existing file in the relevant subdirectory.
 
@@ -27,11 +27,11 @@ If the session contains zero substantial findings (e.g. pure conversational sess
 
 ## Step 0b — Identify the target board
 
-Read `docs/boards/BOARD-ROUTER.md`. Match the finding's `affects:` prefix against the prefix column to determine which project board owns this entry. If ambiguous, surface the options before proceeding.
+Read the resolved `BOARD-ROUTER.md` (resolution order: `engineering-board/BOARD-ROUTER.md` → `docs/boards/BOARD-ROUTER.md` → legacy `docs/board/`). Match the finding's `affects:` prefix against the prefix column to determine which project board owns this entry. If ambiguous, surface the options before proceeding.
 
 Common routing:
-- `affects: navigator/`, `prompts/`, `scripts/`, `src/` → `docs/boards/navigator/`
-- `affects: engineering-board/` → `docs/boards/engineering-board/`
+- `affects: navigator/`, `prompts/`, `scripts/`, `src/` → `engineering-board/navigator/`
+- `affects: engineering-board/` → `engineering-board/engineering-board/`
 
 ## Protocol
 
