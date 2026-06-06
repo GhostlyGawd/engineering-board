@@ -1,12 +1,12 @@
 # Spec — Relocate board content to a visible `engineering-board/`
 
-> A returnable design doc. **Status: Proposed — design locked, NOT yet implemented.**
+> A returnable design doc. **Status: In progress — §6.3 resolver + §6.4 consumer wiring landed on the branch; board-init / migrate / prose / fixtures remain (see `state.md`).**
 > Cross-session note: this repo clones fresh each web session, so this spec is the
 > durable record of the decision and plan. `state.md`'s active-thread section points here.
 
 | | |
 |---|---|
-| **Status** | Proposed — design locked, no code written |
+| **Status** | In progress — resolver + wiring done; board-init / migrate / prose / fixtures remain |
 | **Decision date** | 2026-06-01 |
 | **Target version** | `1.1.0` (minor; backward-compatible) |
 | **Working branch** | `claude/adoring-turing-ULvhK` |
