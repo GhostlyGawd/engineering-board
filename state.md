@@ -5,6 +5,11 @@
 > Convention: skim this at the start of a session; update the relevant sections as
 > you go — at each push, finished thread, or settled decision, not saved for an end
 > that may never come. Keep it high-signal — it is a pointer to context, not a log.
+>
+> **Don't snapshot pipeline status here.** PR/CI/merge state lives on GitHub — cite a
+> PR by number as a pointer, never copy its open/pending/merged status into prose
+> (that's the part that goes stale). Assume this file can lag GitHub by one PR; fold
+> any catch-up edit into your next real PR, not a bookkeeping-only one.
 
 _Last updated: 2026-06-07_
 
@@ -13,12 +18,12 @@ _Last updated: 2026-06-07_
 ## Snapshot
 
 - **`main` is at `1.1.0`** — shipped via **[PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8)**, merged as `097dfa1`. `plugin.json` + `marketplace.json` bumped in lockstep (`tests/version-coherence.sh`); the marketplace re-pulls on the version increase. Backward-compatible — pre-1.1.0 `docs/boards/` + legacy `docs/board/` still resolve.
-- **Active working branch:** `claude/adoring-turing-ULvhK` (reused across PRs — don't open a parallel one); **reconciled with `main`** (merged `origin/main` on 2026-06-07, so the next PR diff is clean). **[PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8) (1.1.0) and [PR #9](https://github.com/GhostlyGawd/engineering-board/pull/9) (state.md refresh) are MERGED.** In flight on the branch now: the `CLAUDE.md` pointer + state.md "update as you go" convention (PR pending). Push here and **land changes via PR — never push to `main` directly.**
+- **Active working branch:** `claude/adoring-turing-ULvhK` (reused across PRs — don't open a parallel one). Recent work landed in `main` via **[PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8)** (1.1.0), **[PR #9](https://github.com/GhostlyGawd/engineering-board/pull/9)** (state.md refresh), and **[PR #10](https://github.com/GhostlyGawd/engineering-board/pull/10)** (CLAUDE.md pointer + handoff-convention rules) — check GitHub for live PR status. Push here and **land changes via PR — never push to `main` directly.**
 - **Green check:** `bash tests/run-all.sh` → **10 suites** (orchestration, claims, smoke, scratch-append, **paths**, modes, permissions, lint-orchestrator-prompts, version-coherence, crosscompat-lint); the `orchestration` suite now runs **15 sub-tests** (added `board-init-command.sh` + `board-relocate.sh`). CI gate: `.github/workflows/test.yml` runs `run-all` on every push.
 
 ## Recently completed
 
-- **Post-1.1.0 docs + handoff hygiene (2026-06-07; on the branch, PR pending).** Added a top-level **`CLAUDE.md`** that is a pure pointer to `state.md` as the session loader (convention text de-duplicated — it now lives only in the header above), and adopted the **"update as you go"** convention in that header. Branch reconciled with `main` so the PR diff is just these doc edits; suite 10/10 green.
+- **Handoff convention + post-1.1.0 docs (2026-06-07, PR #10).** Added a top-level **`CLAUDE.md`** that is a pure pointer to `state.md` as the session loader (convention text de-duplicated — it now lives only in the header above), and put the handoff rules there: **"update as you go"** plus **"don't snapshot pipeline status"** (cite PRs as pointers; let this file lag GitHub by one PR). Suite 10/10 green.
 - **Non-technical "how it works" visualization — merged to `main`.** `docs/how-it-works.svg` + `.png` (added, then text enlarged for readability).
 - **state.md post-1.1.0 snapshot refresh — merged via [PR #9](https://github.com/GhostlyGawd/engineering-board/pull/9).**
 - **1.1.0 relocation — §6.6 prose + §8 fixtures sweep (this session, 2026-06-06).** All user-facing docs (README, ARCHITECTURE, the 4 skills, agents, references, `stop-hook-procedure.md`) now present `engineering-board/` as the default with `docs/boards/` + legacy `docs/board/` as documented fallbacks; test fixtures repointed to the new default while smoke + migrate + learnings-curator + adversarial fixtures stay on old paths to guard the fallback. **1.1.0 milestone complete; suite 10/10 green.**
