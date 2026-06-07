@@ -1,181 +1,177 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1600" viewBox="0 0 1200 1600" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1990" viewBox="0 0 1200 1990" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
   <defs>
     <linearGradient id="headerGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#4f46e5"/>
       <stop offset="1" stop-color="#7c3aed"/>
     </linearGradient>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.10"/>
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.10"/>
     </filter>
-    <marker id="arrow" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto">
-      <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/>
+    <marker id="arrow" markerWidth="14" markerHeight="14" refX="7" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#94a3b8"/>
     </marker>
   </defs>
 
-  <!-- background -->
-  <rect width="1200" height="1600" fill="#f6f8fb"/>
+  <rect width="1200" height="1990" fill="#f6f8fb"/>
 
   <!-- ===================== HEADER ===================== -->
-  <rect x="0" y="0" width="1200" height="140" fill="url(#headerGrad)"/>
-  <text x="80" y="62" font-size="38" font-weight="700" fill="#ffffff">engineering-board</text>
-  <text x="80" y="100" font-size="19" fill="#e0e7ff">An always-on "back office" team for your AI coding assistant</text>
-  <text x="1120" y="95" text-anchor="end" font-size="14" fill="#c7d2fe">a Claude Code plugin &#183; v1.1.0</text>
+  <rect x="0" y="0" width="1200" height="200" fill="url(#headerGrad)"/>
+  <text x="70" y="112" font-size="54" font-weight="700" fill="#ffffff">engineering-board</text>
+  <text x="70" y="162" font-size="26" fill="#e0e7ff">An always-on "back office" team for your AI coding assistant</text>
 
-  <!-- ===================== INTRO ===================== -->
-  <text font-size="16" fill="#334155">
-    <tspan x="80" y="190">When you work with an AI coding assistant, helpful things come up — a bug it spots, a feature idea, an open</tspan>
-    <tspan x="80" y="216">question — and then vanish when the chat ends. This plugin gives the assistant a small, invisible team that</tspan>
-    <tspan x="80" y="242">quietly captures those things, files them on a shared board, and can even work through them — all by itself.</tspan>
+  <!-- ===================== IDEA ===================== -->
+  <text font-size="25" fill="#334155">
+    <tspan x="70" y="262">When you work with an AI coding assistant, useful things come up — a bug it spots, an idea, an</tspan>
+    <tspan x="70" y="299">open question — then vanish when the chat ends. This plugin gives the assistant a small,</tspan>
+    <tspan x="70" y="336">invisible team that captures those things, files them on a board, and even works through them.</tspan>
   </text>
-
-  <!-- ===================== TIMELINE SPINE ===================== -->
-  <line x1="250" y1="335" x2="250" y2="1140" stroke="#cbd5e1" stroke-width="4"/>
-  <!-- directional arrows on the spine -->
-  <line x1="250" y1="374" x2="250" y2="466" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="250" y1="544" x2="250" y2="661" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="250" y1="739" x2="250" y2="866" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="250" y1="944" x2="250" y2="1101" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
-
-  <!-- ===== NODE 1: SOURCE ===== -->
-  <circle cx="250" cy="340" r="34" fill="#64748b" filter="url(#shadow)"/>
-  <text x="250" y="340" text-anchor="middle" dominant-baseline="central" font-size="30" font-weight="700" fill="#ffffff">0</text>
-  <rect x="320" y="308" width="730" height="64" rx="12" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-  <text x="345" y="338" font-size="19" font-weight="700" fill="#0f172a">You and your AI assistant</text>
-  <text x="345" y="360" font-size="14" fill="#475569">A normal coding conversation — you ask, it builds and explains.</text>
 
   <!-- trigger pill -->
-  <rect x="320" y="392" width="600" height="30" rx="15" fill="#eef2ff" stroke="#c7d2fe"/>
-  <text x="340" y="412" font-size="13.5" font-weight="600" fill="#4338ca">Every time the AI finishes a reply, the team below quietly goes to work — automatically.</text>
+  <rect x="70" y="366" width="1060" height="56" rx="28" fill="#eef2ff" stroke="#c7d2fe" stroke-width="2"/>
+  <text x="600" y="401" text-anchor="middle" font-size="23" font-weight="600" fill="#4338ca">Every time the AI finishes a reply, the whole team springs into action — automatically.</text>
 
-  <!-- ===== NODE 2: NOTE-TAKER ===== -->
-  <circle cx="250" cy="505" r="34" fill="#2563eb" filter="url(#shadow)"/>
-  <text x="250" y="505" text-anchor="middle" dominant-baseline="central" font-size="30" font-weight="700" fill="#ffffff">1</text>
-  <rect x="320" y="437" width="730" height="135" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-  <text x="345" y="476" font-size="21" font-weight="700" fill="#0f172a">The Note-Taker</text>
-  <text x="1030" y="474" text-anchor="end" font-size="12.5" fill="#94a3b8">technical name: finding-extractor</text>
-  <text font-size="14.5" fill="#334155">
-    <tspan x="345" y="506">Re-reads what was just said and quietly writes down anything worth remembering —</tspan>
-    <tspan x="345" y="528">onto private "sticky notes", without ever interrupting the work.</tspan>
+  <!-- ===================== SPINE + ARROWS ===================== -->
+  <line x1="150" y1="497" x2="150" y2="1395" stroke="#cbd5e1" stroke-width="6"/>
+  <line x1="150" y1="547" x2="150" y2="618" stroke="#94a3b8" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="150" y1="722" x2="150" y2="823" stroke="#94a3b8" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="150" y1="927" x2="150" y2="1058" stroke="#94a3b8" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="150" y1="1162" x2="150" y2="1341" stroke="#94a3b8" stroke-width="5" marker-end="url(#arrow)"/>
+
+  <!-- ===== STEP 0: SOURCE ===== -->
+  <circle cx="150" cy="497" r="50" fill="#64748b" filter="url(#shadow)"/>
+  <text x="150" y="497" text-anchor="middle" dominant-baseline="central" font-size="44" font-weight="700" fill="#ffffff">0</text>
+  <rect x="230" y="440" width="900" height="114" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+  <text x="258" y="492" font-size="30" font-weight="700" fill="#0f172a">You and your AI assistant</text>
+  <text x="258" y="528" font-size="24" fill="#475569">A normal coding conversation — you ask, it builds and explains.</text>
+
+  <!-- ===== STEP 1: NOTE-TAKER ===== -->
+  <circle cx="150" cy="672" r="50" fill="#2563eb" filter="url(#shadow)"/>
+  <text x="150" y="672" text-anchor="middle" dominant-baseline="central" font-size="44" font-weight="700" fill="#ffffff">1</text>
+  <rect x="230" y="585" width="900" height="175" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+  <text x="258" y="640" font-size="34" font-weight="700" fill="#0f172a">The Note-Taker</text>
+  <text x="1106" y="638" text-anchor="end" font-size="18" fill="#94a3b8">finding-extractor</text>
+  <text font-size="25" fill="#334155">
+    <tspan x="258" y="682">Re-reads what was just said and quietly notes anything worth</tspan>
+    <tspan x="258" y="714">remembering — without ever interrupting the work.</tspan>
   </text>
-  <text font-size="13.5" fill="#475569">
-    <tspan x="345" y="556">Looks for: </tspan><tspan fill="#ef4444" font-size="15">&#9679;</tspan><tspan> Bugs   </tspan><tspan fill="#10b981" font-size="15">&#9679;</tspan><tspan> Features   </tspan><tspan fill="#3b82f6" font-size="15">&#9679;</tspan><tspan> Questions   </tspan><tspan fill="#8b5cf6" font-size="15">&#9679;</tspan><tspan> Observations</tspan>
+  <text font-size="23" fill="#475569">
+    <tspan x="258" y="748">It captures:  </tspan><tspan fill="#ef4444" font-size="26">&#9679;</tspan><tspan> Bugs   </tspan><tspan fill="#10b981" font-size="26">&#9679;</tspan><tspan> Features   </tspan><tspan fill="#3b82f6" font-size="26">&#9679;</tspan><tspan> Questions   </tspan><tspan fill="#8b5cf6" font-size="26">&#9679;</tspan><tspan> Observations</tspan>
   </text>
 
-  <!-- ===== NODE 3: PROJECT MANAGER ===== -->
-  <circle cx="250" cy="700" r="34" fill="#7c3aed" filter="url(#shadow)"/>
-  <text x="250" y="700" text-anchor="middle" dominant-baseline="central" font-size="30" font-weight="700" fill="#ffffff">2</text>
-  <rect x="320" y="632" width="730" height="135" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-  <text x="345" y="671" font-size="21" font-weight="700" fill="#0f172a">The Project Manager</text>
-  <text x="1030" y="669" text-anchor="end" font-size="12.5" fill="#94a3b8">technical name: consolidator + tidier</text>
-  <text font-size="14.5" fill="#334155">
-    <tspan x="345" y="701">Reviews each sticky note against what was actually said. Throws out duplicates and</tspan>
-    <tspan x="345" y="723">anything made-up. Pins only the genuine findings to the board below —</tspan>
-    <tspan x="345" y="745">and keeps everything tidy and organized.</tspan>
+  <!-- ===== STEP 2: PROJECT MANAGER ===== -->
+  <circle cx="150" cy="877" r="50" fill="#7c3aed" filter="url(#shadow)"/>
+  <text x="150" y="877" text-anchor="middle" dominant-baseline="central" font-size="44" font-weight="700" fill="#ffffff">2</text>
+  <rect x="230" y="790" width="900" height="175" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+  <text x="258" y="845" font-size="34" font-weight="700" fill="#0f172a">The Project Manager</text>
+  <text x="1106" y="843" text-anchor="end" font-size="18" fill="#94a3b8">consolidator + tidier</text>
+  <text font-size="25" fill="#334155">
+    <tspan x="258" y="887">Fact-checks each note against what was really said, throws out</tspan>
+    <tspan x="258" y="919">duplicates and anything made-up, and pins the genuine findings</tspan>
+    <tspan x="258" y="951">to the board — keeping everything tidy.</tspan>
   </text>
 
-  <!-- ===== NODE 4: THE BOARD ===== -->
-  <circle cx="250" cy="905" r="34" fill="#0f172a" filter="url(#shadow)"/>
-  <text x="250" y="905" text-anchor="middle" dominant-baseline="central" font-size="30" font-weight="700" fill="#ffffff">3</text>
-  <rect x="320" y="827" width="730" height="158" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
-  <text x="345" y="864" font-size="21" font-weight="700" fill="#0f172a">The Board <tspan font-size="15" font-weight="400" fill="#64748b">— the shared, lasting record</tspan></text>
-  <text font-size="14.5" fill="#334155">
-    <tspan x="345" y="894">A simple set of text files that live inside your project. Anyone can read them — like</tspan>
-    <tspan x="345" y="916">ordinary pages on GitHub. Findings are sorted into four trays:</tspan>
+  <!-- ===== STEP 3: THE BOARD ===== -->
+  <circle cx="150" cy="1112" r="50" fill="#0f172a" filter="url(#shadow)"/>
+  <text x="150" y="1112" text-anchor="middle" dominant-baseline="central" font-size="44" font-weight="700" fill="#ffffff">3</text>
+  <rect x="230" y="995" width="900" height="235" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+  <text x="258" y="1048" font-size="34" font-weight="700" fill="#0f172a">The Board <tspan font-size="22" font-weight="400" fill="#64748b">— the lasting record</tspan></text>
+  <text font-size="25" fill="#334155">
+    <tspan x="258" y="1090">Plain text files that live inside your project — readable by anyone,</tspan>
+    <tspan x="258" y="1122">like normal pages on GitHub. Findings sort into four trays:</tspan>
   </text>
-  <!-- trays -->
-  <rect x="345" y="932" width="160" height="40" rx="8" fill="#fee2e2"/>
-  <text x="425" y="957" text-anchor="middle" font-size="14" font-weight="600" fill="#991b1b">Bugs</text>
-  <rect x="521" y="932" width="160" height="40" rx="8" fill="#dcfce7"/>
-  <text x="601" y="957" text-anchor="middle" font-size="14" font-weight="600" fill="#166534">Features</text>
-  <rect x="697" y="932" width="160" height="40" rx="8" fill="#dbeafe"/>
-  <text x="777" y="957" text-anchor="middle" font-size="14" font-weight="600" fill="#1e40af">Questions</text>
-  <rect x="873" y="932" width="160" height="40" rx="8" fill="#ede9fe"/>
-  <text x="953" y="957" text-anchor="middle" font-size="14" font-weight="600" fill="#5b21b6">Observations</text>
+  <rect x="258" y="1150" width="200" height="60" rx="10" fill="#fee2e2"/>
+  <text x="358" y="1188" text-anchor="middle" font-size="24" font-weight="600" fill="#991b1b">Bugs</text>
+  <rect x="476" y="1150" width="200" height="60" rx="10" fill="#dcfce7"/>
+  <text x="576" y="1188" text-anchor="middle" font-size="24" font-weight="600" fill="#166534">Features</text>
+  <rect x="694" y="1150" width="200" height="60" rx="10" fill="#dbeafe"/>
+  <text x="794" y="1188" text-anchor="middle" font-size="24" font-weight="600" fill="#1e40af">Questions</text>
+  <rect x="912" y="1150" width="200" height="60" rx="10" fill="#ede9fe"/>
+  <text x="1012" y="1188" text-anchor="middle" font-size="22" font-weight="600" fill="#5b21b6">Observations</text>
 
-  <!-- ===== NODE 5: BUILD TEAM ===== -->
-  <circle cx="250" cy="1140" r="34" fill="#059669" filter="url(#shadow)"/>
-  <text x="250" y="1140" text-anchor="middle" dominant-baseline="central" font-size="30" font-weight="700" fill="#ffffff">4</text>
-  <rect x="320" y="1037" width="730" height="205" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-  <text x="345" y="1074" font-size="21" font-weight="700" fill="#0f172a">The Build Team</text>
-  <text x="1030" y="1072" text-anchor="end" font-size="12.5" fill="#94a3b8">tdd-builder &#183; code-reviewer &#183; validator</text>
-  <text font-size="14.5" fill="#334155">
-    <tspan x="345" y="1104">Picks tasks off the board and moves each one down an assembly line until it is</tspan>
-    <tspan x="345" y="1126">genuinely finished:</tspan>
+  <!-- ===== STEP 4: BUILD TEAM ===== -->
+  <circle cx="150" cy="1395" r="50" fill="#059669" filter="url(#shadow)"/>
+  <text x="150" y="1395" text-anchor="middle" dominant-baseline="central" font-size="44" font-weight="700" fill="#ffffff">4</text>
+  <rect x="230" y="1260" width="900" height="285" rx="16" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+  <text x="258" y="1313" font-size="34" font-weight="700" fill="#0f172a">The Build Team</text>
+  <text x="1106" y="1311" text-anchor="end" font-size="18" fill="#94a3b8">builder &#183; reviewer &#183; validator</text>
+  <text font-size="25" fill="#334155">
+    <tspan x="258" y="1355">Picks a task off the board and moves it down an assembly line</tspan>
+    <tspan x="258" y="1387">until it is genuinely finished:</tspan>
   </text>
   <!-- assembly line -->
-  <rect x="345" y="1142" width="150" height="44" rx="8" fill="#dbeafe"/>
-  <text x="420" y="1169" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">Build</text>
-  <text x="420" y="1203" text-anchor="middle" font-size="11.5" fill="#64748b">write a test, then fix</text>
-  <path d="M503,1156 L519,1164 L503,1172 Z" fill="#94a3b8"/>
-  <rect x="525" y="1142" width="150" height="44" rx="8" fill="#ede9fe"/>
-  <text x="600" y="1169" text-anchor="middle" font-size="15" font-weight="700" fill="#5b21b6">Review</text>
-  <text x="600" y="1203" text-anchor="middle" font-size="11.5" fill="#64748b">check the work</text>
-  <path d="M683,1156 L699,1164 L683,1172 Z" fill="#94a3b8"/>
-  <rect x="705" y="1142" width="150" height="44" rx="8" fill="#cffafe"/>
-  <text x="780" y="1169" text-anchor="middle" font-size="15" font-weight="700" fill="#155e75">Double-check</text>
-  <text x="780" y="1203" text-anchor="middle" font-size="11.5" fill="#64748b">confirm it really works</text>
-  <path d="M863,1156 L879,1164 L863,1172 Z" fill="#94a3b8"/>
-  <rect x="885" y="1142" width="150" height="44" rx="8" fill="#dcfce7"/>
-  <text x="960" y="1169" text-anchor="middle" font-size="15" font-weight="700" fill="#166534">Done &#10003;</text>
-  <text x="960" y="1203" text-anchor="middle" font-size="11.5" fill="#64748b">task complete</text>
-  <text x="345" y="1230" font-size="12.5" fill="#64748b" font-style="italic">A simple numbered-ticket system makes sure two workers never grab the same task at once.</text>
+  <rect x="258" y="1410" width="190" height="64" rx="10" fill="#dbeafe"/>
+  <text x="353" y="1450" text-anchor="middle" font-size="25" font-weight="700" fill="#1e40af">Build</text>
+  <text x="353" y="1498" text-anchor="middle" font-size="18" fill="#64748b">write a test, then fix</text>
+  <path d="M455,1432 L473,1442 L455,1452 Z" fill="#94a3b8"/>
+  <rect x="479" y="1410" width="190" height="64" rx="10" fill="#ede9fe"/>
+  <text x="574" y="1450" text-anchor="middle" font-size="25" font-weight="700" fill="#5b21b6">Review</text>
+  <text x="574" y="1498" text-anchor="middle" font-size="18" fill="#64748b">check the work</text>
+  <path d="M676,1432 L694,1442 L676,1452 Z" fill="#94a3b8"/>
+  <rect x="700" y="1410" width="190" height="64" rx="10" fill="#cffafe"/>
+  <text x="795" y="1450" text-anchor="middle" font-size="24" font-weight="700" fill="#155e75">Double-check</text>
+  <text x="795" y="1498" text-anchor="middle" font-size="18" fill="#64748b">confirm it works</text>
+  <path d="M897,1432 L915,1442 L897,1452 Z" fill="#94a3b8"/>
+  <rect x="921" y="1410" width="190" height="64" rx="10" fill="#dcfce7"/>
+  <text x="1016" y="1450" text-anchor="middle" font-size="25" font-weight="700" fill="#166534">Done &#10003;</text>
+  <text x="1016" y="1498" text-anchor="middle" font-size="18" fill="#64748b">complete</text>
+  <text x="258" y="1530" font-size="18" font-style="italic" fill="#64748b">A numbered-ticket system stops two workers ever grabbing the same task at once.</text>
 
   <!-- ===================== MODES ===================== -->
-  <text x="80" y="1310" font-size="20" font-weight="700" fill="#0f172a">You choose how much of the team is awake — with one command</text>
+  <text x="70" y="1615" font-size="32" font-weight="700" fill="#0f172a">You choose how much of the team is awake</text>
 
-  <!-- mode card 1 -->
-  <rect x="80" y="1330" width="248" height="190" rx="12" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-  <rect x="80" y="1330" width="248" height="8" rx="4" fill="#64748b"/>
-  <text x="104" y="1372" font-size="16" font-weight="700" fill="#0f172a">Passive</text>
-  <text x="104" y="1392" font-size="12" fill="#64748b">the default</text>
-  <text font-size="13" fill="#334155">
-    <tspan x="104" y="1422">Only the Note-Taker runs.</tspan>
-    <tspan x="104" y="1442">Captures everything,</tspan>
-    <tspan x="104" y="1462">disturbs nothing.</tspan>
+  <!-- mode 1 -->
+  <rect x="70" y="1645" width="247" height="225" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+  <rect x="70" y="1645" width="247" height="10" rx="5" fill="#64748b"/>
+  <text x="94" y="1700" font-size="25" font-weight="700" fill="#0f172a">Passive</text>
+  <text x="94" y="1726" font-size="17" fill="#64748b">the default</text>
+  <text font-size="19" fill="#334155">
+    <tspan x="94" y="1762">Only the Note-Taker</tspan>
+    <tspan x="94" y="1788">runs. Captures all,</tspan>
+    <tspan x="94" y="1814">disturbs nothing.</tspan>
   </text>
-  <rect x="104" y="1480" width="120" height="24" rx="6" fill="#f1f5f9"/>
-  <text x="114" y="1497" font-size="12" font-family="monospace" fill="#475569">(automatic)</text>
+  <rect x="94" y="1832" width="135" height="28" rx="7" fill="#f1f5f9"/>
+  <text x="106" y="1852" font-size="16" font-family="monospace" fill="#475569">(automatic)</text>
 
-  <!-- mode card 2 -->
-  <rect x="348" y="1330" width="248" height="190" rx="12" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-  <rect x="348" y="1330" width="248" height="8" rx="4" fill="#7c3aed"/>
-  <text x="372" y="1372" font-size="16" font-weight="700" fill="#0f172a">PM mode</text>
-  <text x="372" y="1392" font-size="12" fill="#64748b">project-manager on</text>
-  <text font-size="13" fill="#334155">
-    <tspan x="372" y="1422">Adds the Project Manager.</tspan>
-    <tspan x="372" y="1442">Notes get checked and</tspan>
-    <tspan x="372" y="1462">filed onto the board.</tspan>
+  <!-- mode 2 -->
+  <rect x="341" y="1645" width="247" height="225" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+  <rect x="341" y="1645" width="247" height="10" rx="5" fill="#7c3aed"/>
+  <text x="365" y="1700" font-size="25" font-weight="700" fill="#0f172a">PM mode</text>
+  <text x="365" y="1726" font-size="17" fill="#64748b">manager on</text>
+  <text font-size="19" fill="#334155">
+    <tspan x="365" y="1762">Adds the Project</tspan>
+    <tspan x="365" y="1788">Manager. Notes get</tspan>
+    <tspan x="365" y="1814">filed to the board.</tspan>
   </text>
-  <rect x="372" y="1480" width="120" height="24" rx="6" fill="#f5f3ff"/>
-  <text x="382" y="1497" font-size="12" font-family="monospace" fill="#6d28d9">/pm-start</text>
+  <rect x="365" y="1832" width="115" height="28" rx="7" fill="#f5f3ff"/>
+  <text x="377" y="1852" font-size="16" font-family="monospace" fill="#6d28d9">/pm-start</text>
 
-  <!-- mode card 3 -->
-  <rect x="616" y="1330" width="248" height="190" rx="12" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-  <rect x="616" y="1330" width="248" height="8" rx="4" fill="#059669"/>
-  <text x="640" y="1372" font-size="16" font-weight="700" fill="#0f172a">Worker mode</text>
-  <text x="640" y="1392" font-size="12" fill="#64748b">build-team on</text>
-  <text font-size="13" fill="#334155">
-    <tspan x="640" y="1422">Wakes the Build Team.</tspan>
-    <tspan x="640" y="1442">Tasks get built, reviewed,</tspan>
-    <tspan x="640" y="1462">and finished.</tspan>
+  <!-- mode 3 -->
+  <rect x="612" y="1645" width="247" height="225" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+  <rect x="612" y="1645" width="247" height="10" rx="5" fill="#059669"/>
+  <text x="636" y="1700" font-size="25" font-weight="700" fill="#0f172a">Worker mode</text>
+  <text x="636" y="1726" font-size="17" fill="#64748b">build-team on</text>
+  <text font-size="19" fill="#334155">
+    <tspan x="636" y="1762">Wakes the Build</tspan>
+    <tspan x="636" y="1788">Team. Tasks get built</tspan>
+    <tspan x="636" y="1814">and finished.</tspan>
   </text>
-  <rect x="640" y="1480" width="170" height="24" rx="6" fill="#ecfdf5"/>
-  <text x="650" y="1497" font-size="11.5" font-family="monospace" fill="#047857">/worker-start</text>
+  <rect x="636" y="1832" width="160" height="28" rx="7" fill="#ecfdf5"/>
+  <text x="648" y="1852" font-size="16" font-family="monospace" fill="#047857">/worker-start</text>
 
-  <!-- mode card 4 -->
-  <rect x="884" y="1330" width="236" height="190" rx="12" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
-  <rect x="884" y="1330" width="236" height="8" rx="4" fill="#94a3b8"/>
-  <text x="908" y="1372" font-size="16" font-weight="700" fill="#0f172a">Paused</text>
-  <text x="908" y="1392" font-size="12" fill="#64748b">everyone off</text>
-  <text font-size="13" fill="#334155">
-    <tspan x="908" y="1422">The whole team stops —</tspan>
-    <tspan x="908" y="1442">for free-form thinking</tspan>
-    <tspan x="908" y="1462">and brainstorming.</tspan>
+  <!-- mode 4 -->
+  <rect x="883" y="1645" width="247" height="225" rx="14" fill="#ffffff" stroke="#e2e8f0" filter="url(#shadow)"/>
+  <rect x="883" y="1645" width="247" height="10" rx="5" fill="#94a3b8"/>
+  <text x="907" y="1700" font-size="25" font-weight="700" fill="#0f172a">Paused</text>
+  <text x="907" y="1726" font-size="17" fill="#64748b">everyone off</text>
+  <text font-size="19" fill="#334155">
+    <tspan x="907" y="1762">The whole team</tspan>
+    <tspan x="907" y="1788">stops — for free-form</tspan>
+    <tspan x="907" y="1814">brainstorming.</tspan>
   </text>
-  <rect x="908" y="1480" width="140" height="24" rx="6" fill="#f1f5f9"/>
-  <text x="918" y="1497" font-size="12" font-family="monospace" fill="#475569">/board-pause</text>
+  <rect x="907" y="1832" width="150" height="28" rx="7" fill="#f1f5f9"/>
+  <text x="919" y="1852" font-size="16" font-family="monospace" fill="#475569">/board-pause</text>
 
   <!-- ===================== FOOTER ===================== -->
-  <line x1="80" y1="1552" x2="1120" y2="1552" stroke="#e2e8f0" stroke-width="1"/>
-  <text x="80" y="1578" font-size="13" fill="#64748b">Everything is plain text inside your project — nothing hidden. You can read, search, and review the whole board on GitHub like any other file.</text>
+  <line x1="70" y1="1915" x2="1130" y2="1915" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="70" y="1952" font-size="20" fill="#64748b">It is all plain text inside your project — read, search, and review the whole board on GitHub like any other file.</text>
 </svg>
