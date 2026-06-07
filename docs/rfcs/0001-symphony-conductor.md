@@ -1,6 +1,6 @@
 # RFC 0001 — Conductor: always-on orchestrated agents over the engineering board
 
-- **Status:** Draft (rev 3 — drops the policy precondition; the execution backend is now a plain CLI/API adapter choice. rev 2 added the execution/ownership model, concurrency/merge handling, and sequencing against the 1.1.0 board relocation.)
+- **Status:** Draft (rev 3 — drops the policy precondition and pins the execution backend to the `claude` CLI on the subscription (no API fallback/adapter). rev 2 added the execution/ownership model, concurrency/merge handling, and sequencing against the 1.1.0 board relocation.)
 - **Target repo:** `GhostlyGawd/engineering-board`
 - **Author:** GhostlyGawd
 - **Date:** 2026-06-06
@@ -68,9 +68,9 @@ and false of the conductor; plan accordingly.
   their I/O contract, the claim/heartbeat/reclaim scripts, the `needs:` model, and
   the registry schema. The conductor *re-homes* the orchestrator role rather than
   rewriting any of it (§5, §7).
-- Run on the author's own machine. **Backend-agnostic** at the seam: default to the
-  `claude` CLI, but keep worker invocation behind an adapter so the metered
-  API/Agent SDK is a drop-in fallback (§4.5).
+- Run on the author's own machine, driving workers through the **`claude` CLI** on
+  the flat-rate subscription (§4.5). Using the CLI rather than the metered API is the
+  whole point of the feature — there is no API fallback.
 - Be cheap when idle (event-driven wake → reconcile → sleep; fresh context per wake).
 - Safe concurrency: no two agents clobbering the same tree; **no two concurrent
   workers with overlapping file blast radius** (§6); bounded blast radius and
@@ -143,24 +143,19 @@ auto-merged. This matches the plugin's existing "resolve is never automatic"
 stance (`validator.md`: the `needs: validate → resolved` transition is
 human-driven) and Symphony's `Human Review` handoff.
 
-### 4.5 Execution backend (adapter)
-Worker invocation goes through a thin **execution adapter** with one method,
-`run_discipline(entry, discipline, worktree) → result_json`, so the conductor,
-governor, claims, transitions, and PR plumbing stay identical regardless of how a
-worker is actually run. Two backends sit behind it:
-
-- **`cli` (default):** spawn the **`claude` CLI in headless/print mode**
-  (`claude -p …`) under the machine's logged-in account.
-- **`api` (fallback):** the metered API / Agent SDK.
-
-Only the adapter differs between them; everything else in the conductor is
-backend-agnostic.
+### 4.5 Execution backend (the `claude` CLI)
+Workers run as the **`claude` CLI** under the machine's logged-in subscription —
+that is the entire point of the conductor: drive agents on the flat-rate
+subscription, not the metered API. Per worker the conductor spawns one headless CLI
+invocation (`claude -p …`, so it runs with no human at the prompt), hands it the
+canonical entry input (§5.5), and parses the discipline's JSON result from stdout.
+There is no API backend and no backend-selection seam — the CLI is the only path.
 
 **Rate/usage limits are a first-class outcome.** A limit response is not a
-  failure: the adapter surfaces `rate_limited`, the governor backs off and lowers
-  effective concurrency below `MAX_CONCURRENCY`, and the entry is cleanly released
-  and re-queued (claim dropped, worktree GC'd or parked) rather than left holding a
-  claim. Real throughput is bounded by the limit, not the concurrency cap.
+failure: the conductor surfaces `rate_limited`, the governor backs off and lowers
+effective concurrency below `MAX_CONCURRENCY`, and the entry is cleanly released
+and re-queued (claim dropped, worktree GC'd or parked) rather than left holding a
+claim. Real throughput is bounded by the limit, not the concurrency cap.
 
 ### 4.6 Trigger model
 - **Primary:** GitHub webhook on board commits / PR review events / CI completion
@@ -315,7 +310,7 @@ and **PRs-created-per-day** (§4.7), so the human review surface stays bounded.
 | Board format + frontmatter | `board-claim-acquire/release/heartbeat/reclaim-stale` | In-session Stop-hook **orchestrator** → external conductor | Conductor supervisor + supervision table + crash recovery (§5.6) |
 | The three discipline subagents (already pure executors) + their I/O contract | `active-workers` registry bumps | Stop-hook self-continue loop → **contained** in workers (§5.4) | Per-entry worktree lifecycle |
 | `needs:` state model + `suggested_next_needs` output | Claim/runtime *location* → single shared runtime root (§5.2) | Worker self-heartbeat → conductor heartbeat companion (§5.3) | PR-per-entry + evidence-comment plumbing (conductor-owned) |
-| Blocker gating, capture/consolidate | — | — | Trigger listener; adaptive governor; conflict-aware scheduler (§6); execution adapter (§4.5) |
+| Blocker gating, capture/consolidate | — | — | Trigger listener; adaptive governor; conflict-aware scheduler (§6); CLI worker invocation (§4.5) |
 
 The honest headline: **the substrate and disciplines are reused; the orchestrator
 is rebuilt as an always-on external process.** The original two-column table
@@ -346,10 +341,10 @@ RFC needs most) a canonical **runtime root**.
 
 ## 9. Phased plan
 
-0. **Phase 0 — Execution adapter.** Stand up the execution adapter with both `cli`
-   and `api` backends behind one interface (§4.5), so the rest of the conductor is
-   written once against `run_discipline(...)` and the backend choice never dictates a
-   rewrite.
+0. **Phase 0 — CLI worker invocation.** Prove the core call in isolation: spawn a
+   contained `claude` CLI worker (`claude -p`) in a worktree, hand it one discipline's
+   canonical entry input, and parse its JSON result back (§4.5, §5.5). Everything else
+   builds on this.
 1. **Conductor MVP (sequential) — proves the ownership seams.** One entry per tick, one
    worktree, contained headless worker, conductor-owned claim + heartbeat companion +
    `needs:` transition (§5.2–5.4), conductor pushes branch + opens PR. This phase
