@@ -2,10 +2,11 @@
 
 > Cross-session handoff file. Each Claude Code web session starts from a **fresh
 > clone**, so anything that must survive across chats has to be committed here.
-> Convention: skim this at the start of a session; update the relevant sections
-> at the end of one. Keep it high-signal — it is a pointer to context, not a log.
+> Convention: skim this at the start of a session; update the relevant sections as
+> you go — at each push, finished thread, or settled decision, not saved for an end
+> that may never come. Keep it high-signal — it is a pointer to context, not a log.
 
-_Last updated: 2026-06-06_
+_Last updated: 2026-06-07_
 
 ---
 
