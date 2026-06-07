@@ -1,11 +1,11 @@
 # RFC 0001 — Conductor: always-on orchestrated agents over the engineering board
 
-- **Status:** Draft (rev 4 — execution pivots from headless workers to **observable interactive sessions**: a deterministic orchestrator spawns one attachable `claude` session per round, the session drives discipline subagents that write their trail to the task thread and then self-terminates, and the orchestrator reads that durable state to spawn a *pickup* session that resumes. rev 3 dropped the policy precondition and pinned execution to the subscription CLI; rev 2 added the execution/ownership model, concurrency/merge handling, and 1.1.0 sequencing.)
+- **Status:** Draft (rev 5 — adopts **claude-squad's `session/tmux` + `session/git` as the lifted spawn/worktree substrate** for the observable sessions; the conductor stays our own code (claude-squad is the hands, not the brain — it neither selects work nor opens PRs). rev 4 pivoted execution to observable interactive sessions: a deterministic orchestrator spawns one attachable `claude` session per round, the session drives discipline subagents that write their trail to the task thread and then self-terminates, and the orchestrator reads that durable state to spawn a *pickup* session. rev 3 dropped the policy precondition and pinned execution to the subscription CLI; rev 2 added the execution/ownership model, concurrency/merge, and 1.1.0 sequencing.)
 - **Target repo:** `GhostlyGawd/engineering-board`
 - **Author:** GhostlyGawd
 - **Date:** 2026-06-06
 - **Depends on:** [`specs/board-relocation.md`](../../specs/board-relocation.md) (the 1.1.0 path-resolution helper — see §8)
-- **Related:** OpenAI Symphony (`openai/symphony`) — prior art for board-as-control-plane orchestration
+- **Related:** OpenAI Symphony (`openai/symphony`) — prior art for board-as-control-plane orchestration; [`smtg-ai/claude-squad`](https://github.com/smtg-ai/claude-squad) — lifted for the session/worktree substrate (§4.5, §7, §11)
 
 ## 1. Summary
 
@@ -190,20 +190,25 @@ Workers are **interactive `claude` sessions** under the machine's logged-in
 subscription — not headless `claude -p`. The driver is *why*: a headless run is a
 black box; an interactive session can be **attached to and watched live**, and (per
 §5.5) leaves a written trail as it goes. The conductor pays the cost that makes
-interactive impractical by hand — spawning a terminal — by spawning the session
-**programmatically and detached**, in a form a human can attach to on demand. The
-natural fit is a detached terminal multiplexer session, e.g.:
+interactive impractical by hand — spawning and supervising a terminal — by
+**lifting that layer from [claude-squad](https://github.com/smtg-ai/claude-squad)**,
+whose `session/tmux` + `session/git` packages already do exactly this: spawn a
+detached, attachable session in a per-task git worktree, drive it through a PTY, and
+observe it with `capture-pane`. The proven shape:
 
 ```
-tmux new-session -d -s eb-<id> 'claude'      # detached, observable
-tmux send-keys   -t eb-<id> "<pickup prompt>" Enter
-# a human (or a dashboard) can: tmux attach -t eb-<id>
+tmux new-session -d -s eb-<id> 'claude'   # detached; drive via PTY, observe via capture-pane
+#   a human or dashboard attaches with:   tmux attach -t eb-<id>   (Ctrl-Q to detach)
+git worktree add ../wt/<id> -b eb/<id>    # per-task isolation
 ```
 
-The exact spawn/attach mechanism (tmux vs. a PTY library vs. a terminal emulator)
-is an implementation detail (§10), but the contract is fixed: **one detached,
-attachable session per round, on the subscription CLI, that a human can watch.**
-There is no headless/API execution path.
+claude-squad is **the hands, not the brain.** We vendor its session/worktree
+primitives — light surgery only: initialize its global loggers, override its
+hardcoded `~/.claude-squad` root, and drop its `gh`-CLI push path — and write the
+conductor on top. It does **not** select work, drive the `needs:` machine, detect
+round completion, or open PRs; those are the conductor's (§5, §7). The spawn/attach
+mechanism is therefore **settled** (claude-squad's tmux + PTY model), not an open
+question. There is no headless/API execution path.
 
 **Rate/usage limits are a first-class outcome.** A limit response is not a
 failure: the conductor surfaces `rate_limited`, the governor backs off and lowers
@@ -381,13 +386,17 @@ and **PRs-created-per-day** (§4.7), so the human review surface stays bounded.
 | Reused **unchanged** | Re-homed (same code, conductor is now the caller) | Replaced | Net-new |
 |---|---|---|---|
 | Board format + frontmatter | `board-claim-acquire/release/heartbeat/reclaim-stale` | In-session Stop-hook **orchestrator** → deterministic external conductor | Conductor supervisor + supervision table + crash recovery (§5.6) |
-| The three discipline subagents (pure executors) | `active-workers` registry bumps | Headless batch worker → **observable interactive session, one round** (§4.5, §5.4) | Observable-session spawn/attach + pickup-prompt continuation (§4.2, §5.5) |
+| The three discipline subagents (pure executors) | `active-workers` registry bumps | Headless batch worker → **observable interactive session, one round** (§4.5, §5.4) | Pickup-prompt continuation loop (§4.2, §5.5); session/worktree spawn **lifted from claude-squad** (§4.5) |
 | `needs:` state model | Claim/runtime *location* → single shared runtime root (§5.2) | Worker self-heartbeat → conductor heartbeat companion (§5.3) | Evidence written to the task thread by subagents as they work (§4.3, §5.5) |
 | Blocker gating, capture/consolidate | — | Stop-hook self-continue loop → **one-round** containment (§5.4) | Trigger listener; adaptive governor; conflict-aware scheduler (§6) |
 
-The honest headline: **the substrate and disciplines are reused; the orchestrator is
-rebuilt as a deterministic always-on process that drives observable one-round
-sessions.** The original two-column table under-counted the orchestrator rebuild.
+The honest headline: **the substrate and disciplines are reused, the session/worktree
+plumbing is lifted from [claude-squad](https://github.com/smtg-ai/claude-squad)
+(`session/tmux` + `session/git`), and the orchestrator brain is the only thing we
+build.** claude-squad supplies the hands — spawn a detached, attachable session in a
+worktree — but selects no work, drives no `needs:`, detects no round-completion, and
+opens no PRs, so the deterministic conductor + pickup loop remain net-new. The
+original two-column table under-counted the orchestrator rebuild.
 
 ## 8. Sequencing & dependencies
 
@@ -443,21 +452,21 @@ RFC needs most) a canonical **runtime root**.
   conductor-owned, defined by the 1.1.0 resolver (§5.2, §8).
 - *Who heartbeats an in-flight claim?* → the conductor's per-session heartbeat companion (§5.3).
 - *GitHub auth / who opens PRs and merges?* → only the conductor (§4.3, §5.1).
+- *Spawn/attach mechanism?* → **lift claude-squad's `session/tmux` + `session/git`** (detached tmux + PTY + `capture-pane`, Ctrl-Q detach; `git worktree add/remove/prune`), confirmed by source review. Light surgery: init its global loggers, override its hardcoded `~/.claude-squad` root, drop its `gh`-CLI push path (§4.5, §7).
 
 **Still open:**
-- **Spawn/attach mechanism:** tmux (detached + `attach`) vs. a PTY library vs. a real
-  terminal emulator. tmux is the leading candidate (detached session a human can attach
-  to = exactly the observability target), but confirm it drives `claude` cleanly.
 - **Evidence-posting credentials:** does the session post its own thread comments
   directly (needs scoped PR/tracker write access — relaxes the v1 "no creds" stance), or
   does it write evidence to a local file the conductor relays? The §1 model ("subagents
   record as they work") leans toward direct posting; pin the credential scope.
-- **Round-boundary signal:** how does a session know its round is over — task-done,
-  a context/turn budget, or an explicit "round complete" marker it emits? This sets how
-  far each session gets and how the conductor reads progress.
-- **Machine-readable round outcome:** the structured status the conductor reads on
-  session exit — a status line in the thread, a board frontmatter field, or both — and
-  how it stays reliable when the author of that status is an LLM.
+- **Round-boundary signal & machine-readable outcome:** how a session knows its round is
+  over (task-done vs. a context/turn budget vs. an explicit "round complete" it emits), and
+  the exact shape of the outcome the conductor reads on exit (a board frontmatter field vs.
+  a structured status line in the thread). claude-squad's analogue — infer "done" from "the
+  tmux pane stopped changing for 500 ms" plus scraping one hard-coded prompt string per
+  agent — is the **rejected baseline** (it is the cause of its flaky `-y`); our session
+  emits an explicit marker instead. Open: the marker's exact format and how it stays
+  reliable when an LLM writes it.
 - **Task surface for the thread:** PR comments vs. a tracker issue (Linear) for the
   evidence/pickup trail, with the board still the control plane. Linear is available via
   MCP and is Symphony's own substrate (§11); a draft PR opened up front is the
@@ -481,3 +490,12 @@ stalls, and hands off to `Human Review`. This RFC adapts the same pattern to a
 git-native board, fills the orchestrator slot the plugin already defines, runs each
 worker as an observable one-round session rather than an opaque job, and adds
 self-generated work items (with the bounded-volume controls that addition requires).
+
+**claude-squad (`smtg-ai/claude-squad`)** — prior art *and* a lifted dependency for the
+worker substrate: it runs many AI-agent sessions, each in its own detached tmux session
++ git worktree, attachable for live observation. But it is human-driven (manual title +
+prompt, no tracker intake), its daemon only auto-confirms existing sessions, and it
+exposes no programmatic/headless control surface — the hands, not the brain. We lift its
+`session/tmux` + `session/git` packages (§4.5, §7) and build the autonomous board-driven
+orchestrator it lacks. Symphony is the orchestrator prior art; claude-squad is the
+session-substrate prior art.
