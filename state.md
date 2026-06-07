@@ -62,7 +62,7 @@ _Last updated: 2026-06-07_
 ## Downstream thread — Conductor (RFC 0001, staged this session)
 
 - **[`docs/rfcs/0001-symphony-conductor.md`](docs/rfcs/0001-symphony-conductor.md)** (rev 2, Draft, on the branch): an always-on external orchestrator that drives the board to PRs with no human in the session. Key framing: the discipline subagents are **already pure executors** (they disown claims + entry edits and emit `suggested_next_needs`), so the conductor is a drop-in for the "orchestrator" role today played by the in-session Stop hook. Net-new = supervisor + worktree/PR/trigger/governor; RFC §5 resolves the claim/heartbeat/Stop-hook-containment seams.
-- **Gated on this 1.1.0 work:** the conductor must consume the path/runtime-root resolver (don't re-hardcode `docs/boards/**`). Build order: finish 1.1.0 → conductor (**target 1.2.0**, additive/opt-in). Also has a **Phase-0 policy precondition** (using the Max subscription CLI unattended) — verify before building; see RFC §4.5/§9.
+- **Gated on this 1.1.0 work:** the conductor must consume the path/runtime-root resolver (don't re-hardcode `docs/boards/**`). Build order: finish 1.1.0 → conductor (**target 1.2.0**, additive/opt-in).
 
 ## Repo working notes (any session)
 

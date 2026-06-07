@@ -1,6 +1,6 @@
 # RFC 0001 — Conductor: always-on orchestrated agents over the engineering board
 
-- **Status:** Draft (rev 2 — adds the execution/ownership model, concurrency/merge handling, an auth precondition, and sequencing against the 1.1.0 board relocation)
+- **Status:** Draft (rev 3 — drops the policy precondition; the execution backend is now a plain CLI/API adapter choice. rev 2 added the execution/ownership model, concurrency/merge handling, and sequencing against the 1.1.0 board relocation.)
 - **Target repo:** `GhostlyGawd/engineering-board`
 - **Author:** GhostlyGawd
 - **Date:** 2026-06-06
@@ -69,9 +69,8 @@ and false of the conductor; plan accordingly.
   the registry schema. The conductor *re-homes* the orchestrator role rather than
   rewriting any of it (§5, §7).
 - Run on the author's own machine. **Backend-agnostic** at the seam: default to the
-  `claude` CLI under the Max subscription, but keep worker invocation behind an
-  adapter so the metered API/Agent SDK is a drop-in fallback (§4.6) — because the
-  subscription path carries a policy precondition (§9, Phase 0).
+  `claude` CLI, but keep worker invocation behind an adapter so the metered
+  API/Agent SDK is a drop-in fallback (§4.5).
 - Be cheap when idle (event-driven wake → reconcile → sleep; fresh context per wake).
 - Safe concurrency: no two agents clobbering the same tree; **no two concurrent
   workers with overlapping file blast radius** (§6); bounded blast radius and
@@ -144,21 +143,20 @@ auto-merged. This matches the plugin's existing "resolve is never automatic"
 stance (`validator.md`: the `needs: validate → resolved` transition is
 human-driven) and Symphony's `Human Review` handoff.
 
-### 4.5 Auth & execution backend (revised — adapter + precondition)
-Billing against **Max** rather than the metered API requires spawning the
-**`claude` CLI in headless/print mode** (`claude -p …`) under the machine's
-logged-in subscription. **This is the project's load-bearing assumption and is
-gated on a policy precondition (§9, Phase 0): confirm that driving the CLI
-unattended/automated is within the current acceptable-use terms before building.**
-This RFC does not adjudicate that; it makes the architecture robust to either
-answer:
+### 4.5 Execution backend (adapter)
+Worker invocation goes through a thin **execution adapter** with one method,
+`run_discipline(entry, discipline, worktree) → result_json`, so the conductor,
+governor, claims, transitions, and PR plumbing stay identical regardless of how a
+worker is actually run. Two backends sit behind it:
 
-- Worker invocation goes through a thin **execution adapter** with one method,
-  `run_discipline(entry, discipline, worktree) → result_json`. Backends:
-  `cli` (subscription, default) and `api` (metered Agent SDK, fallback). The
-  conductor, governor, claims, transitions, and PR plumbing are identical across
-  backends; only the adapter changes.
-- **Rate/usage limits are a first-class outcome.** A limit response is not a
+- **`cli` (default):** spawn the **`claude` CLI in headless/print mode**
+  (`claude -p …`) under the machine's logged-in account.
+- **`api` (fallback):** the metered API / Agent SDK.
+
+Only the adapter differs between them; everything else in the conductor is
+backend-agnostic.
+
+**Rate/usage limits are a first-class outcome.** A limit response is not a
   failure: the adapter surfaces `rate_limited`, the governor backs off and lowers
   effective concurrency below `MAX_CONCURRENCY`, and the entry is cleanly released
   and re-queued (claim dropped, worktree GC'd or parked) rather than left holding a
@@ -348,10 +346,10 @@ RFC needs most) a canonical **runtime root**.
 
 ## 9. Phased plan
 
-0. **Phase 0 — Policy & backend precondition (blocking).** Confirm unattended CLI use
-   is within subscription terms (§4.5). Stand up the execution adapter with both `cli`
-   and `api` backends behind one interface so the answer doesn't dictate a rewrite.
-   *Nothing else starts until this is settled.*
+0. **Phase 0 — Execution adapter.** Stand up the execution adapter with both `cli`
+   and `api` backends behind one interface (§4.5), so the rest of the conductor is
+   written once against `run_discipline(...)` and the backend choice never dictates a
+   rewrite.
 1. **Conductor MVP (sequential) — proves the ownership seams.** One entry per tick, one
    worktree, contained headless worker, conductor-owned claim + heartbeat companion +
    `needs:` transition (§5.2–5.4), conductor pushes branch + opens PR. This phase
