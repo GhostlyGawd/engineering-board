@@ -1,6 +1,6 @@
 # RFC 0001 — Conductor: always-on orchestrated agents over the engineering board
 
-- **Status:** Draft (rev 2 — adds the execution/ownership model, concurrency/merge handling, an auth precondition, and sequencing against the 1.1.0 board relocation)
+- **Status:** Draft (rev 4 — execution pivots from headless workers to **observable interactive sessions**: a deterministic orchestrator spawns one attachable `claude` session per round, the session drives discipline subagents that write their trail to the task thread and then self-terminates, and the orchestrator reads that durable state to spawn a *pickup* session that resumes. rev 3 dropped the policy precondition and pinned execution to the subscription CLI; rev 2 added the execution/ownership model, concurrency/merge handling, and 1.1.0 sequencing.)
 - **Target repo:** `GhostlyGawd/engineering-board`
 - **Author:** GhostlyGawd
 - **Date:** 2026-06-06
@@ -9,27 +9,46 @@
 
 ## 1. Summary
 
-Add a **conductor**: an external, always-on orchestrator that drives the
-engineering board to completion without a human in the session. The board
-(already git-native) is the control plane. The conductor wakes on a trigger,
-reconciles the board against running work, dispatches a headless worker per
-eligible entry in an isolated git worktree, and stops each entry at a **PR**
-that serves as the human-review gate.
+Add a **conductor**: an external, always-on **deterministic** orchestrator that
+drives the engineering board to completion without a human in the session. The
+board (already git-native) is the control plane. The conductor wakes on a trigger,
+reconciles the board against running work, and — for each eligible entry — spawns
+one **observable interactive `claude` session** in an isolated git worktree. That
+session does **one bounded round** of work and self-terminates; the conductor reads
+the resulting durable state and, while the entry is unfinished, spawns the next
+session with a **pickup prompt** that resumes where the last one left off. Each
+entry stops at a **PR** that serves as the human-review gate.
 
-The key structural observation that makes this cheap: **the plugin already
-splits "orchestrator" from "worker."** The discipline subagents
-(`tdd-builder`, `code-reviewer`, `validator`) are already pure executors — they
-do **not** acquire/release claims, never edit the board entry, and return a
-JSON result carrying `suggested_next_needs`. The *orchestrator* (today: the
-in-session Stop hook) owns claims, heartbeats, and `needs:` transitions. The
-conductor is therefore a **drop-in replacement for the orchestrator role the
-disciplines already expect** — moved out of the session and made always-on. The
-disciplines and the board substrate are reused unchanged; what is net-new is the
-external orchestrator and its worktree/PR/trigger/governor plumbing.
+Two choices define this revision:
 
-This is, in effect, a git-native Symphony — with the addition that the board
-*also* manufactures its own work via the existing capture/consolidation
-pipeline, which Symphony leaves to humans.
+- **Observable, not headless.** A headless `claude -p` worker is a black box — you
+  cannot watch it think or step in. Workers are therefore **interactive sessions you
+  can attach to and watch live.** The cost of interactive (a terminal has to be
+  spawned, which is tedious by hand) is paid by the orchestrator, which spawns the
+  session programmatically — e.g. a detached `tmux` session a human can `attach` to
+  (§4.5). The deterministic loop stays code; only the *workers* are live sessions.
+- **One round per session, then die.** To keep each session's context small and
+  focused, a session advances the entry as far as one round allows and then exits.
+  Continuity lives **outside** the session: progress and evidence are written to the
+  task's comment thread and the board, and the deterministic orchestrator stitches
+  rounds together by spawning pickup sessions.
+
+The structural observation that keeps this cheap: **the plugin already splits
+"orchestrator" from "worker."** The discipline subagents (`tdd-builder`,
+`code-reviewer`, `validator`) are pure executors. Here they run as **subagents
+inside the session**, and each leaves its notes, findings, surprises, and evidence
+in the task thread as it works — the trail that makes a run observable *during* and
+*after*. A builder builds and records as it goes, then stops; the code-reviewer
+reviews and records, raising anything blocking; that review↔fix loop iterates until
+the round's goal is met and "done" evidence is left. What is reused is the board
+substrate and the disciplines; what is net-new is the deterministic cross-session
+orchestrator and its session-spawn/pickup, worktree/PR, trigger, and governor
+plumbing.
+
+This is, in effect, a git-native Symphony — with the additions that the board
+*also* manufactures its own work via the existing capture/consolidation pipeline,
+and that every worker run is a live, attachable session rather than an opaque batch
+job.
 
 ## 2. Motivation
 
@@ -44,37 +63,46 @@ The plugin already has a durable orchestration **substrate**:
 - Blocker gating (`blocked_by` / `⊘ Q###`), liveness registry
   (`active-workers.json`), auto-capture (extractor → scratch → consolidate).
 
-What is **missing is the orchestrator running when no human is present.** Today
-the only orchestrator is the Stop hook re-firing inside a live, human-attended
-session; on Claude Code on the web, sessions are ephemeral containers with
-nothing running between them. So entries sit at `needs:<discipline>` until a
-human opens a session. The conductor closes that gap by being the orchestrator
-that is always on.
+Two things are **missing: (1) an orchestrator that runs when no human is present,
+and (2) a way to *see* what an unattended run is doing.** Today the only
+orchestrator is the Stop hook re-firing inside a live, human-attended session; on
+Claude Code on the web, sessions are ephemeral containers with nothing running
+between them, so entries sit at `needs:<discipline>` until a human opens a session.
+The conductor closes the first gap by being always on, and the second by running
+workers as **observable sessions** (you can attach and watch) that leave a written
+trail, rather than as headless batch jobs you can only inspect by their exit code.
 
 **Calibrating "how much is done":** the *substrate* (format, claims, disciplines,
 state model, registry) is close to complete and is genuinely reusable. The
-*orchestrator that runs unattended* — supervisor, worktree lifecycle, PR/evidence
-plumbing, triggers, governor, conflict-aware scheduling, crash recovery — is
-greenfield, and every genuinely novel or risky part of this RFC lives there, not
-in the reused substrate. "We're most of the way there" is true of the substrate
-and false of the conductor; plan accordingly.
+*orchestrator that runs unattended* — supervisor, observable-session spawn +
+pickup, worktree lifecycle, PR/evidence plumbing, triggers, governor,
+conflict-aware scheduling, crash recovery — is greenfield, and every genuinely
+novel or risky part of this RFC lives there, not in the reused substrate. "We're
+most of the way there" is true of the substrate and false of the conductor; plan
+accordingly.
 
 ## 3. Goals / Non-goals
 
 **Goals**
 - Advance every eligible board entry through its discipline pipeline with no
   human in the session, up to the PR gate.
-- **Reuse the substrate as-is**: board format, the three discipline subagents and
-  their I/O contract, the claim/heartbeat/reclaim scripts, the `needs:` model, and
-  the registry schema. The conductor *re-homes* the orchestrator role rather than
-  rewriting any of it (§5, §7).
-- Run on the author's own machine. **Backend-agnostic** at the seam: default to the
-  `claude` CLI under the Max subscription, but keep worker invocation behind an
-  adapter so the metered API/Agent SDK is a drop-in fallback (§4.6) — because the
-  subscription path carries a policy precondition (§9, Phase 0).
-- Be cheap when idle (event-driven wake → reconcile → sleep; fresh context per wake).
+- **Observable runs.** Every worker is a live, attachable `claude` session, and
+  every round leaves a written trail (notes, findings, surprises, evidence) in the
+  task's comment thread — so a human can both *watch* a run in progress and *audit*
+  it afterward. Black-box headless execution is explicitly rejected (§4.5).
+- **One bounded round per session, then self-terminate** — context stays small and
+  focused; continuity is reconstructed from durable state (board + task thread) by
+  the orchestrator's pickup mechanism (§4.2, §5.4).
+- **Reuse the substrate as-is**: board format, the three discipline subagents, the
+  claim/heartbeat/reclaim scripts, the `needs:` model, and the registry schema. The
+  conductor *re-homes* the cross-session orchestrator role rather than rewriting any
+  of it (§5, §7).
+- Run on the author's own machine, on the flat-rate **subscription** `claude` CLI —
+  not the metered API. Running it yourself on the subscription is the whole point.
+- Be cheap when idle (event-driven wake → reconcile → sleep; a fresh, short-lived
+  session per round).
 - Safe concurrency: no two agents clobbering the same tree; **no two concurrent
-  workers with overlapping file blast radius** (§6); bounded blast radius and
+  sessions with overlapping file blast radius** (§6); bounded blast radius and
   bounded PR volume.
 
 **Non-goals (v1)**
@@ -82,8 +110,10 @@ and false of the conductor; plan accordingly.
   mergeability but does not merge — §6.3).
 - Hosted/multi-tenant service. Single-user, single-machine daemon.
 - Replacing the in-session passive-listening / consolidation flow.
-- Giving workers any credentials or network identity. **All git-remote and GitHub
-  interaction is the conductor's**; workers only edit code in a worktree (§5.1).
+- Giving sessions broad credentials or a network identity beyond what they need to
+  leave their evidence trail. **Branch pushes, PR open/update, and merge stay the
+  conductor's;** whether a session posts its own thread comments directly or routes
+  them through the conductor is deferred (§10).
 
 ## 4. Design
 
@@ -98,10 +128,10 @@ table) is gitignored and lives under a **single conductor-owned runtime root**
 ```
 [trigger fires] → conductor wakes (FRESH context window)
   1. git pull --rebase                       # latest board, in the conductor's own checkout
-  2. recover: load supervision table; reattach to or reap any in-flight workers
+  2. recover: load supervision table; reattach to or reap any in-flight sessions
   3. reconcile running set:                  # conductor owns claim liveness
        for each in-flight claim: ensure its heartbeat companion is alive
-       run board-claim-reclaim-stale for any claim whose worker is gone
+       run board-claim-reclaim-stale for any claim whose session is gone
   4. select eligible entries:
        status open/in_progress AND needs:<discipline> set
        AND not claimed AND not blocked_by(open)
@@ -110,59 +140,76 @@ table) is gitignored and lives under a **single conductor-owned runtime root**
   5. governor: clamp to MIN(MAX_CONCURRENCY, free-slots, rate-budget, open-PR-cap)
   6. for each selected entry:
        board-claim-acquire.sh <runtime-root> <id> <conductor-session>   # conductor claims
-       start heartbeat companion for <id>                               # lives for the worker's lifetime
-       git worktree add ../wt/<id> -b eb/<id>
-       spawn CONTAINED headless worker (one discipline, Stop hook off — §5.4)
-       on worker exit: parse JSON result → advance needs: per suggested_next_needs
-                       conductor commits the needs: change, pushes eb/<id>,
-                       opens/updates PR, posts evidence comment
-       stop heartbeat companion; board-claim-release.sh; GC worktree (§6/§10)
+       start heartbeat companion for <id>                               # lives for the session's round
+       ensure worktree + task thread exist:
+         git worktree add ../wt/<id> -b eb/<id>   (reused as-is on a pickup)
+         a thread to write into (draft PR and/or tracker issue) so the round has a home
+       build the PICKUP PROMPT from <id>'s current state (board entry + thread tail)
+       spawn an OBSERVABLE interactive `claude` session in the worktree (§4.5),
+         loaded with that pickup prompt
+       the session runs ONE bounded round via discipline subagents (build → review →
+         iterate), each appending notes/findings/surprises/evidence to the thread,
+         then MARKS THE ROUND OUTCOME (board + a structured status line) and EXITS (§5.4–5.5)
+       on session exit, conductor reads board + thread to classify the round:
+         done            → push branch, finalize PR, release claim, GC worktree (§6/§10)
+         more to do       → push branch, update PR, release claim; a later tick spawns a pickup
+         stuck / errored  → release claim, flag on the thread, back off
+       stop heartbeat companion; board-claim-release.sh
   7. sleep
 ```
 
-Each wake is a clean context window — cheap, and nothing burns tokens idle.
-This mirrors Symphony's reconciliation "tick" but is event-gated instead of a hot
-poll. Note steps 2–3 and 6 make the conductor the **sole owner of claim
-acquisition, heartbeat, transition, and release** — the role the discipline
-contracts already delegate to "the orchestrator."
+Each wake is a clean context window for the *orchestrator*; each round is a clean
+context window for the *worker*. Nothing burns tokens idle. This mirrors Symphony's
+reconciliation "tick" but is event-gated instead of a hot poll. Steps 2–3 keep the
+conductor the **sole owner of claim liveness, the spawn/pickup decision, and the
+branch/PR lifecycle** — the cross-session half of the role the discipline contracts
+delegate to "the orchestrator" (§5.1).
 
 ### 4.3 Worker isolation & integration
-- **Per-entry git worktree** (`git worktree add ../wt/<id> -b eb/<id>`), removed
-  per the GC policy in §6/§10. Prevents concurrent agents from clobbering one shared
-  tree.
+- **Per-entry git worktree** (`git worktree add ../wt/<id> -b eb/<id>`), reused
+  across rounds and removed per the GC policy in §6/§10. Prevents concurrent agents
+  from clobbering one shared tree.
 - **PR per entry**, branch `eb/<id>`. The **conductor** pushes the branch and
-  opens/updates the PR; review iterations and validation evidence are posted as
-  **PR comments** (the audit trail). Workers never push and never call GitHub.
+  opens/updates the PR. The round's evidence (review iterations, validation results)
+  is written into the **task thread** by the session as it works — that thread is
+  the live, observable audit trail (§4.5, §5.5).
 - **Merge:** entries land via their PRs; v1 = manual human merge. The conductor keeps
   branches mergeable and re-validates affected siblings on each merge (§6.3).
 
 ### 4.4 Human-review gate
-Workers run `tdd → review → validate` (driven by the conductor across separate
-worker invocations) and the entry **stops at the PR**. The PR — with accumulated
-evidence comments — is the single human gate. Nothing is auto-closed or
-auto-merged. This matches the plugin's existing "resolve is never automatic"
-stance (`validator.md`: the `needs: validate → resolved` transition is
-human-driven) and Symphony's `Human Review` handoff.
+An entry advances `tdd → review → validate` across one or more rounds — *within* a
+round the session runs the disciplines as subagents; *across* rounds the conductor
+spawns pickups — and the entry **stops at the PR**. The PR, with the accumulated
+evidence thread, is the single human gate. Nothing is auto-closed or auto-merged.
+This matches the plugin's existing "resolve is never automatic" stance
+(`validator.md`: the `needs: validate → resolved` transition is human-driven) and
+Symphony's `Human Review` handoff.
 
-### 4.5 Auth & execution backend (revised — adapter + precondition)
-Billing against **Max** rather than the metered API requires spawning the
-**`claude` CLI in headless/print mode** (`claude -p …`) under the machine's
-logged-in subscription. **This is the project's load-bearing assumption and is
-gated on a policy precondition (§9, Phase 0): confirm that driving the CLI
-unattended/automated is within the current acceptable-use terms before building.**
-This RFC does not adjudicate that; it makes the architecture robust to either
-answer:
+### 4.5 Execution: observable interactive sessions
+Workers are **interactive `claude` sessions** under the machine's logged-in
+subscription — not headless `claude -p`. The driver is *why*: a headless run is a
+black box; an interactive session can be **attached to and watched live**, and (per
+§5.5) leaves a written trail as it goes. The conductor pays the cost that makes
+interactive impractical by hand — spawning a terminal — by spawning the session
+**programmatically and detached**, in a form a human can attach to on demand. The
+natural fit is a detached terminal multiplexer session, e.g.:
 
-- Worker invocation goes through a thin **execution adapter** with one method,
-  `run_discipline(entry, discipline, worktree) → result_json`. Backends:
-  `cli` (subscription, default) and `api` (metered Agent SDK, fallback). The
-  conductor, governor, claims, transitions, and PR plumbing are identical across
-  backends; only the adapter changes.
-- **Rate/usage limits are a first-class outcome.** A limit response is not a
-  failure: the adapter surfaces `rate_limited`, the governor backs off and lowers
-  effective concurrency below `MAX_CONCURRENCY`, and the entry is cleanly released
-  and re-queued (claim dropped, worktree GC'd or parked) rather than left holding a
-  claim. Real throughput is bounded by the limit, not the concurrency cap.
+```
+tmux new-session -d -s eb-<id> 'claude'      # detached, observable
+tmux send-keys   -t eb-<id> "<pickup prompt>" Enter
+# a human (or a dashboard) can: tmux attach -t eb-<id>
+```
+
+The exact spawn/attach mechanism (tmux vs. a PTY library vs. a terminal emulator)
+is an implementation detail (§10), but the contract is fixed: **one detached,
+attachable session per round, on the subscription CLI, that a human can watch.**
+There is no headless/API execution path.
+
+**Rate/usage limits are a first-class outcome.** A limit response is not a
+failure: the conductor surfaces `rate_limited`, the governor backs off and lowers
+effective concurrency below `MAX_CONCURRENCY`, and the entry is cleanly released
+and re-queued (claim dropped, worktree parked for the next pickup) rather than left
+holding a claim. Real throughput is bounded by the limit, not the concurrency cap.
 
 ### 4.6 Trigger model
 - **Primary:** GitHub webhook on board commits / PR review events / CI completion
@@ -173,37 +220,45 @@ answer:
   hardcoded `docs/boards/**` — see §8) for local edits.
 
 ### 4.7 Cost & safety governor
-- `MAX_CONCURRENCY` cap on simultaneous workers; **adaptive** down on rate limits (§4.5).
+- `MAX_CONCURRENCY` cap on simultaneous sessions; **adaptive** down on rate limits (§4.5).
 - **Bounded PR volume:** caps on open-PR count and PRs-created-per-day, so a
   self-generating board can't surface 40 PRs overnight (§6.4).
-- Per-tick and per-day budget/turn ceilings; hard timeout per worker (reuses stall
+- Per-tick and per-day budget/turn ceilings; hard timeout per session (reuses stall
   detection → reclaim).
 - Allowlist of repos/branches the conductor may touch. Human gate at PR (no auto-merge).
 
-## 5. Execution & ownership model (net-new — resolves the in-session→headless seams)
+## 5. Execution & ownership model (net-new — resolves the in-session→cross-session seams)
 
 The original draft promised "reuse the claim/heartbeat/worker/state-machine code
 unchanged." That holds for the **disciplines and the substrate**, but the
-*orchestrator* cannot be reused unchanged: today it is the in-session Stop hook,
-and three of its behaviors assume a live session. This section pins how the
-conductor takes over the orchestrator role so those assumptions hold headlessly.
-These are **MVP requirements**, not hardening.
+*orchestrator* cannot be reused unchanged: today it is the in-session Stop hook, and
+its behaviors assume a single live session that runs forever. This section pins how
+a deterministic, always-on conductor and a fleet of one-round sessions split the
+orchestrator role between them. These are **MVP requirements**, not hardening.
 
-### 5.1 Principle: conductor = control plane, worker = data plane
-The discipline contracts already define this split; the conductor simply fills the
-"orchestrator" slot:
+### 5.1 Principle: two orchestrators, two altitudes
+There are now two orchestrators, and the discipline subagents stay the pure data
+plane beneath both:
 
 | Concern | Owner |
 |---|---|
-| Claim acquire / heartbeat / release / reclaim | **Conductor** (the disciplines explicitly disown it) |
-| `needs:` transitions | **Conductor** (from the worker's `suggested_next_needs`) |
-| Git push, PR create/update, evidence comments, GitHub auth | **Conductor** |
-| Code edits + tests inside one worktree, returning result JSON | **Worker** (no claims, no board-entry edits, no network) |
+| Claim acquire / heartbeat / release / reclaim | **Deterministic conductor** (cross-session) |
+| Reading durable state → deciding done vs. spawn-a-pickup; building the pickup prompt | **Deterministic conductor** |
+| Git branch push, PR create/update, merge-gate, GitHub auth | **Deterministic conductor** |
+| Driving the disciplines for ONE round; collecting their trail; marking the round outcome | **Session agent** (in-session, ephemeral — lives one round) |
+| Code edits + tests; recording notes/findings/surprises/evidence to the task thread | **Discipline subagents** (`tdd-builder` / `code-reviewer` / `validator`) |
 
-The conductor↔worker interface **already exists**: the disciplines' canonical
-input format (`---ENTRY-ID--- / ---ENTRY-CONTENT--- / ---END---`) and their JSON
-Output contract (`status`, `suggested_next_needs`, `test_output_excerpt`,
-`impl_files_changed`, …). The conductor delivers that input and parses that output.
+The split is clean: the **deterministic conductor** owns everything *between*
+sessions (liveness, the spawn/pickup decision, branch/PR/merge); the **session
+agent** owns everything *within* one round; the **disciplines** do the work and
+leave the trail. The conductor never reasons about code; the session never reasons
+about scheduling, claims, or other entries.
+
+The conductor↔session interface is durable state, not a return value: the conductor
+delivers a **pickup prompt** (built from the board entry + the tail of the task
+thread) and, after the session exits, reads the **round outcome** the session wrote
+back to durable state (§5.5). This is the cross-session analogue of the disciplines'
+existing `suggested_next_needs` contract.
 
 ### 5.2 Claim & runtime location (resolves "claims don't cross worktrees")
 `board-claim-acquire.sh` locks via `mkdir "${BOARD_DIR}/_claims/<id>"` — a
@@ -217,66 +272,77 @@ against that root.
 
 - Define `EB_RUNTIME_ROOT` (default: the conductor's main checkout
   `.engineering-board/`). Claims, registry, and the supervision table live here.
-- The conductor passes this root explicitly to the claim scripts; workers never
+- The conductor passes this root explicitly to the claim scripts; sessions never
   invoke claim scripts and never create a competing `_claims/`.
 - This is exactly the "runtime root vs board root" split the 1.1.0 relocation
   resolver introduces — so the location is **decided as part of that resolver's
   contract**, not bolted on (§8).
 
-### 5.3 Heartbeat ownership (resolves stale-reclaim of a live headless worker)
+### 5.3 Heartbeat ownership (resolves stale-reclaim of a live session)
 Today workers self-heartbeat and a PM-fallback refreshes live sessions; a
-`claude -p` subprocess is neither, and the stale threshold is **180 s**. A worker
+conductor-spawned session is neither, and the stale threshold is **180 s**. A round
 that runs longer with nobody bumping its claim would be reclaimed → double-dispatch.
 
-Resolution: when the conductor acquires a claim and spawns the worker, it starts a
+Resolution: when the conductor acquires a claim and spawns the session, it starts a
 **heartbeat companion** that bumps `board-claim-heartbeat.sh` every
-`HEARTBEAT_INTERVAL_SEC` (30 s) for the **entire lifetime of the subprocess**, and
+`HEARTBEAT_INTERVAL_SEC` (30 s) for the **entire lifetime of the session**, and
 stops it on exit. Per-tick "refresh" is insufficient when triggers are event-sparse;
 the companion is continuous. The existing heartbeat script is reused verbatim — only
 the caller moves from the in-session worker to the conductor.
 
-### 5.4 State-machine driver & Stop-hook containment (resolves recursion / non-advancement)
-The `needs:` machine advances today because the in-session Stop hook re-fires,
-greps `needs:<discipline>`, and continues (`<<EB-WORKER-CONTINUE>>`). A
-conductor-spawned `claude` must not inherit that behavior, or one of two failures
-occurs: (a) if its Stop hook fires, the worker becomes its **own** conductor
-(nested orchestration); (b) if it doesn't, nothing advances `needs:`.
+### 5.4 Round boundary & no nested orchestration (resolves runaway / recursion)
+The `needs:` machine advances today because the in-session Stop hook re-fires and
+continues (`<<EB-WORKER-CONTINUE>>`) **indefinitely** inside one session. A
+conductor-spawned session must not inherit that, or one of two failures occurs:
+(a) it never stops — one session does many rounds, defeating "one bounded round, small
+context"; (b) its Stop hook turns it into its **own** cross-session conductor (nested
+orchestration over other entries).
 
-Resolution — two parts:
+Resolution — three parts:
 
-1. **The conductor drives transitions.** After a worker exits `work_done`, the
-   conductor reads `suggested_next_needs`, validates it against the legal
-   transitions for that discipline, and writes the new `needs:` value to the entry
-   frontmatter (a deterministic board edit it then commits/pushes). This is the
-   role `code-reviewer.md`/`validator.md`/`tdd-builder.md` already delegate to "the
-   orchestrator." No discipline change.
-2. **Contain the worker's Stop hook** so the spawned `claude` never self-orchestrates.
-   Belt-and-suspenders, consistent with the Stop hook's existing fast-path gates
-   (`stop_hook_active`, loop-guard):
-   - The conductor sets `EB_CONDUCTOR_MANAGED=1` in the worker's environment; the
-     **command-stage** Stop gate (`board-stop-gate.sh`, which runs before the prompt
-     stage and can read env) short-circuits to a terminal decision when it sees the
-     flag.
-   - And/or the conductor seeds the worker's `session-mode.json` to a single-shot
-     mode the gate treats as "do nothing." Either alone suffices; both together make
-     recursion structurally impossible.
+1. **One round, then exit.** The session is scoped to a single round: drive the
+   disciplines (build → review → iterate) until this round's goal is met or its
+   budget is spent, write the outcome, and terminate. *How* a round's end is detected
+   (task-done vs. context/turn budget vs. an explicit "round complete" signal) is an
+   open question (§10).
+2. **Contain the session's Stop hook** so it never self-orchestrates beyond its one
+   round. Consistent with the Stop hook's existing fast-path gates (`stop_hook_active`,
+   loop-guard):
+   - The conductor sets `EB_CONDUCTOR_MANAGED=1` in the session's environment; the
+     **command-stage** Stop gate (`board-stop-gate.sh`) short-circuits to a terminal
+     decision when it sees the flag.
+   - And/or the conductor seeds the session's `session-mode.json` to a single-shot
+     mode the gate treats as "finish this round, then stop." Either alone suffices;
+     both make a runaway structurally impossible.
+3. **The session marks the round outcome** to durable state — the `needs:` value (or a
+   "still on `needs:<x>`, round N done") plus a structured status line in the task
+   thread — so the deterministic conductor can classify done / more-to-do / stuck on
+   read, without parsing prose. Spawning the *next* round is the conductor's job, never
+   the session's.
 
-### 5.5 Worker contract (I/O)
-- **In:** entry id, discipline, verbatim entry content (canonical delimited format),
-  worktree path. No claims, no creds.
-- **Do:** run exactly one discipline once, in the worktree, with coordination hooks
-  contained (§5.4).
-- **Out (stdout):** the discipline's existing JSON object — `status`,
-  `suggested_next_needs`, evidence fields. The conductor parses it; on
-  `cannot_proceed`/non-JSON/timeout it treats the entry as a failed attempt
-  (release claim, leave `needs:` unchanged, record on the PR).
+### 5.5 Session contract (I/O)
+- **In:** entry id, worktree path, and a **pickup prompt** assembled by the conductor
+  from durable state — the canonical entry content plus the tail of the task thread
+  (what prior rounds did, what's left). No claims; only the credentials needed to
+  write its trail (§3 non-goal, §10).
+- **Do:** run exactly **one bounded round** in the worktree, driving the discipline
+  subagents, with the Stop hook contained (§5.4). Append notes/findings/surprises/
+  evidence to the task thread *as it works* — that is both the live observability
+  surface and the next round's pickup context.
+- **Out (durable side effects, not stdout):** the **round outcome** — updated board
+  state and a structured status line in the thread — and the accumulated evidence
+  trail; then self-terminate. On stuck/non-progress/error it leaves the outcome marked
+  accordingly and flags the thread; the conductor releases the claim and either
+  re-queues for a pickup or escalates to a human. There is no JSON return value to
+  parse, because the session is gone — the conductor reads what the session *wrote*.
 
 ### 5.6 Crash recovery
 The conductor persists a **supervision table** in `EB_RUNTIME_ROOT`:
-`{entry_id → (worktree, branch, pid, claim, last_heartbeat, discipline, started_at)}`.
-On restart (loop step 2) it re-reads the board and the table, reattaches to live
-PIDs, reaps dead ones (release/reclaim their claims, GC or reuse their worktrees),
-and resumes — tracker-driven recovery, like Symphony.
+`{entry_id → (worktree, branch, session-handle, pid, claim, last_heartbeat, round, started_at)}`,
+where the session-handle is the spawn reference (e.g. the `tmux` session name). On
+restart (loop step 2) it re-reads the board and the table, reattaches to live
+sessions, reaps dead ones (release/reclaim their claims, GC or reuse their
+worktrees), and resumes — tracker-driven recovery, like Symphony.
 
 ## 6. Concurrency & merge (net-new — resolves the file-level safety gap)
 
@@ -287,13 +353,13 @@ own work*.
 
 ### 6.1 Blast radius
 Add an optional `touches:` frontmatter hint (a list of path globs) to bug/feature
-entries. The consolidator may populate it at promotion; a worker may refine it in
-its result. It is advisory, not load-bearing.
+entries. The consolidator may populate it at promotion; a session may refine it in
+the round outcome. It is advisory, not load-bearing.
 
 ### 6.2 Conflict-aware scheduling
 In loop step 4 the conductor will not start an entry concurrently with an in-flight
 sibling whose `touches:` overlaps. When `touches:` is absent, the conservative
-fallback is to serialize entries with unknown scope against any in-flight worker, or
+fallback is to serialize entries with unknown scope against any in-flight session, or
 (configurable) run them and resolve conflicts at merge time (§6.3). This keeps "no
 two agents clobbering" honest at the *file* level, not just the worktree level.
 
@@ -301,8 +367,8 @@ two agents clobbering" honest at the *file* level, not just the worktree level.
 v1 keeps human merge as the gate, but the conductor prevents the gate from becoming a
 pile of stale conflicts: it keeps each `eb/<id>` rebased on `main` (or flags when a PR
 no longer merges cleanly), and **on a human merge of one PR it triggers a re-validate
-tick on siblings whose blast radius overlapped** (rebase their worktree, re-run
-`validate`, update the PR). The human still approves and merges; the conductor keeps
+round on siblings whose blast radius overlapped** (rebase their worktree, spawn a
+validate round, update the PR). The human still approves and merges; the conductor keeps
 the set mergeable. Without this, "no human in the session" just relocates the human to
 an ever-growing merge queue.
 
@@ -314,14 +380,14 @@ and **PRs-created-per-day** (§4.7), so the human review surface stays bounded.
 
 | Reused **unchanged** | Re-homed (same code, conductor is now the caller) | Replaced | Net-new |
 |---|---|---|---|
-| Board format + frontmatter | `board-claim-acquire/release/heartbeat/reclaim-stale` | In-session Stop-hook **orchestrator** → external conductor | Conductor supervisor + supervision table + crash recovery (§5.6) |
-| The three discipline subagents (already pure executors) + their I/O contract | `active-workers` registry bumps | Stop-hook self-continue loop → **contained** in workers (§5.4) | Per-entry worktree lifecycle |
-| `needs:` state model + `suggested_next_needs` output | Claim/runtime *location* → single shared runtime root (§5.2) | Worker self-heartbeat → conductor heartbeat companion (§5.3) | PR-per-entry + evidence-comment plumbing (conductor-owned) |
-| Blocker gating, capture/consolidate | — | — | Trigger listener; adaptive governor; conflict-aware scheduler (§6); execution adapter (§4.5) |
+| Board format + frontmatter | `board-claim-acquire/release/heartbeat/reclaim-stale` | In-session Stop-hook **orchestrator** → deterministic external conductor | Conductor supervisor + supervision table + crash recovery (§5.6) |
+| The three discipline subagents (pure executors) | `active-workers` registry bumps | Headless batch worker → **observable interactive session, one round** (§4.5, §5.4) | Observable-session spawn/attach + pickup-prompt continuation (§4.2, §5.5) |
+| `needs:` state model | Claim/runtime *location* → single shared runtime root (§5.2) | Worker self-heartbeat → conductor heartbeat companion (§5.3) | Evidence written to the task thread by subagents as they work (§4.3, §5.5) |
+| Blocker gating, capture/consolidate | — | Stop-hook self-continue loop → **one-round** containment (§5.4) | Trigger listener; adaptive governor; conflict-aware scheduler (§6) |
 
-The honest headline: **the substrate and disciplines are reused; the orchestrator
-is rebuilt as an always-on external process.** The original two-column table
-under-counted the orchestrator rebuild.
+The honest headline: **the substrate and disciplines are reused; the orchestrator is
+rebuilt as a deterministic always-on process that drives observable one-round
+sessions.** The original two-column table under-counted the orchestrator rebuild.
 
 ## 8. Sequencing & dependencies
 
@@ -348,49 +414,70 @@ RFC needs most) a canonical **runtime root**.
 
 ## 9. Phased plan
 
-0. **Phase 0 — Policy & backend precondition (blocking).** Confirm unattended CLI use
-   is within subscription terms (§4.5). Stand up the execution adapter with both `cli`
-   and `api` backends behind one interface so the answer doesn't dictate a rewrite.
-   *Nothing else starts until this is settled.*
-1. **Conductor MVP (sequential) — proves the ownership seams.** One entry per tick, one
-   worktree, contained headless worker, conductor-owned claim + heartbeat companion +
-   `needs:` transition (§5.2–5.4), conductor pushes branch + opens PR. This phase
-   exists to validate §5; the seams are the MVP, not hardening.
-2. **Concurrency + scheduling.** `MAX_CONCURRENCY`, multiple worktrees, the governor,
-   and conflict-aware scheduling (§6.1–6.2).
+0. **Phase 0 — One observable round.** Spawn a detached, attachable `claude` session
+   (§4.5) in a worktree, hand it a pickup prompt, have it run one round via the
+   discipline subagents, write its trail to a task thread, mark a round outcome, and
+   self-terminate (§5.4–5.5). Prove a human can `attach` and watch. This is the load-
+   bearing primitive; everything else builds on it.
+1. **Pickup loop (sequential) — proves the cross-session seams.** Deterministic
+   conductor: one entry per tick, conductor-owned claim + heartbeat companion (§5.2–5.3),
+   read the round outcome, decide done vs. spawn-a-pickup, build the next pickup prompt,
+   push branch + open/update PR. This phase validates §5; the seams are the MVP, not
+   hardening.
+2. **Concurrency + scheduling.** `MAX_CONCURRENCY`, multiple worktrees/sessions, the
+   governor, and conflict-aware scheduling (§6.1–6.2).
 3. **Triggers.** Webhook listener + cron floor (+ optional inotify on the resolver root).
-4. **Evidence & mergeability.** Structured per-stage PR comments; rebase + sibling
-   re-validate on merge (§6.3); PR-volume caps (§6.4).
+4. **Evidence & mergeability.** Structured per-round status the conductor can read
+   reliably; rebase + sibling re-validate on merge (§6.3); PR-volume caps (§6.4).
 5. **Hardening.** Budgets, timeouts, allowlists, rate-limit adaptation, crash recovery
    (§5.6), worktree GC policy.
 
 ## 10. Open questions
 
 **Resolved in this revision** (recorded here so reviewers can challenge the choices):
-- *Worker mode / does its Stop hook fire?* → workers run contained; the conductor
-  drives transitions (§5.4).
+- *Headless or observable?* → observable interactive sessions; headless is rejected for
+  its black-box opacity (§4.5).
+- *How much work per session?* → one bounded round, then self-terminate; the conductor
+  stitches rounds with pickup prompts (§4.2, §5.4).
 - *Where do claims live so conductor + all worktrees agree?* → one runtime root,
   conductor-owned, defined by the 1.1.0 resolver (§5.2, §8).
-- *Who heartbeats an in-flight claim?* → the conductor's per-worker heartbeat companion (§5.3).
-- *GitHub auth / who opens PRs?* → only the conductor; workers hold no creds (§4.3, §5.1).
+- *Who heartbeats an in-flight claim?* → the conductor's per-session heartbeat companion (§5.3).
+- *GitHub auth / who opens PRs and merges?* → only the conductor (§4.3, §5.1).
 
 **Still open:**
-- **Worktree GC policy:** remove on PR open, on merge, or on a TTL? (Reuse-on-rebase for
-  sibling re-validation (§6.3) argues for keep-until-merge or TTL.)
+- **Spawn/attach mechanism:** tmux (detached + `attach`) vs. a PTY library vs. a real
+  terminal emulator. tmux is the leading candidate (detached session a human can attach
+  to = exactly the observability target), but confirm it drives `claude` cleanly.
+- **Evidence-posting credentials:** does the session post its own thread comments
+  directly (needs scoped PR/tracker write access — relaxes the v1 "no creds" stance), or
+  does it write evidence to a local file the conductor relays? The §1 model ("subagents
+  record as they work") leans toward direct posting; pin the credential scope.
+- **Round-boundary signal:** how does a session know its round is over — task-done,
+  a context/turn budget, or an explicit "round complete" marker it emits? This sets how
+  far each session gets and how the conductor reads progress.
+- **Machine-readable round outcome:** the structured status the conductor reads on
+  session exit — a status line in the thread, a board frontmatter field, or both — and
+  how it stays reliable when the author of that status is an LLM.
+- **Task surface for the thread:** PR comments vs. a tracker issue (Linear) for the
+  evidence/pickup trail, with the board still the control plane. Linear is available via
+  MCP and is Symphony's own substrate (§11); a draft PR opened up front is the
+  git-native alternative.
+- **Streaming as an alternative to interactive:** Claude Code's headless mode can emit a
+  structured event stream (e.g. `--output-format stream-json`), which is *a* form of
+  observability without a terminal. This RFC favors live attachable sessions for true
+  step-in/watch; verify the trade-off before locking it in.
 - **Blast-radius source:** is the `touches:` hint reliable enough, or should the
-  conductor derive scope from the worker's `impl_files_changed` after the first attempt
-  and reschedule? (Probably: schedule optimistically, learn scope from the first diff.)
-- **Does capture/consolidation run headless on a tick,** or stay in-session only? If
-  headless, the conductor gains a second job (mint work) feeding the first (execute it) —
+  conductor derive scope from a round's diff and reschedule? (Probably: schedule
+  optimistically, learn scope from the first diff.)
+- **Does capture/consolidation run headless on a tick,** or stay in-session only? If on
+  a tick, the conductor gains a second job (mint work) feeding the first (execute it) —
   amplifying the §6.4 volume concern.
-- **Discipline granularity:** one conductor driving all of tdd/review/validate vs. a
-  conductor instance per discipline. (Leaning single conductor, since it already owns the
-  per-entry transition.)
 
 ## 11. Prior art
 
 OpenAI Symphony (`openai/symphony`): an orchestrator polls an issue tracker (Linear),
 claims eligible issues, runs a per-issue agent in an isolated workspace, restarts
 stalls, and hands off to `Human Review`. This RFC adapts the same pattern to a
-git-native board, fills the orchestrator slot the plugin already defines, and adds
+git-native board, fills the orchestrator slot the plugin already defines, runs each
+worker as an observable one-round session rather than an opaque job, and adds
 self-generated work items (with the bounded-volume controls that addition requires).
