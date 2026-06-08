@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="850" viewBox="0 0 1200 850" font-family="-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <defs>
+    <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f46e5"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+    </marker>
+    <filter id="shadow" x="-5%" y="-5%" width="115%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="850" fill="#f6f8fb"/>
+
+  <!-- Header band -->
+  <rect x="0" y="0" width="1200" height="88" fill="url(#hg)"/>
+  <text x="40" y="52" fill="#ffffff" font-size="32" font-weight="700">Three sibling plugins — one author, one lineage</text>
+  <text x="40" y="76" fill="#e0e7ff" font-size="17">Claude Code multi-agent engineering plugins by GhostlyGawd (rhenmcleod)</text>
+
+  <!-- ===== LINEAGE NODE ===== -->
+  <rect x="400" y="110" width="400" height="72" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="600" y="139" text-anchor="middle" fill="#0f172a" font-size="15" font-weight="700">Superpowers (lineage)</text>
+  <text x="600" y="162" text-anchor="middle" fill="#475569" font-size="13">discipline-as-triggerable-documents · TDD workflow</text>
+
+  <!-- Arrow: lineage down to shared band -->
+  <line x1="600" y1="182" x2="600" y2="212" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ===== SHARED DESIGN INSTINCTS BAND ===== -->
+  <rect x="60" y="216" width="1080" height="92" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="600" y="242" text-anchor="middle" fill="#0f172a" font-size="14" font-weight="700">Shared design instincts</text>
+  <!-- Column 1 bullets (left half) -->
+  <text x="92" y="265" fill="#334155" font-size="12.5">&#x2022; Falsifiability / anti-hand-wave</text>
+  <text x="92" y="287" fill="#334155" font-size="12.5">&#x2022; Atomic claiming for parallel work</text>
+  <!-- Column 2 bullets (right half) -->
+  <text x="640" y="265" fill="#334155" font-size="12.5">&#x2022; Deterministic core, LLM only at the edges</text>
+  <text x="640" y="287" fill="#334155" font-size="12.5">&#x2022; A fresh session can reconstruct state</text>
+
+  <!-- Horizontal rail from band bottom -->
+  <line x1="230" y1="310" x2="970" y2="310" stroke="#94a3b8" stroke-width="2"/>
+  <!-- Drops to three arrows -->
+  <line x1="230" y1="310" x2="230" y2="347" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="600" y1="310" x2="600" y2="347" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="970" y1="310" x2="970" y2="347" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ===== EB CARD ===== -->
+  <rect x="52" y="351" width="348" height="300" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="52" y="351" width="6" height="300" rx="3" fill="#2563eb"/>
+  <rect x="58" y="351" width="342" height="60" rx="10" fill="#dbeafe"/>
+  <text x="76" y="376" fill="#1e3a8a" font-size="16" font-weight="700">engineering-board</text>
+  <rect x="76" y="384" width="152" height="18" rx="9" fill="#2563eb"/>
+  <text x="152" y="397" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="600">v1.1.0 · bash + python3</text>
+  <text x="76" y="432" fill="#0f172a" font-size="12.5" font-weight="700">Identity</text>
+  <text x="76" y="450" fill="#334155" font-size="12">triage / work-capture control plane</text>
+  <text x="76" y="474" fill="#0f172a" font-size="12.5" font-weight="700">How it works</text>
+  <text x="76" y="492" fill="#334155" font-size="12">catches findings during any work</text>
+  <text x="76" y="508" fill="#334155" font-size="12">→ routes → grinds a needs: state machine</text>
+  <text x="76" y="532" fill="#0f172a" font-size="12.5" font-weight="700">Substrate</text>
+  <text x="76" y="550" fill="#334155" font-size="12">Markdown board</text>
+  <text x="76" y="574" fill="#0f172a" font-size="12.5" font-weight="700">Autonomous orchestration</text>
+  <text x="76" y="592" fill="#334155" font-size="12">RFC only (target 1.2.0)</text>
+  <rect x="76" y="614" width="94" height="20" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+  <text x="123" y="628" text-anchor="middle" fill="#92400e" font-size="11" font-weight="600">in progress</text>
+
+  <!-- ===== AEM CARD ===== -->
+  <rect x="426" y="351" width="348" height="300" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="426" y="351" width="6" height="300" rx="3" fill="#d97706"/>
+  <rect x="432" y="351" width="342" height="60" rx="10" fill="#fef3c7"/>
+  <text x="450" y="376" fill="#92400e" font-size="15" font-weight="700">agentic-engineering-max</text>
+  <rect x="450" y="384" width="186" height="18" rx="9" fill="#d97706"/>
+  <text x="543" y="397" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="600">v2.4.0 (8 releases) · PowerShell</text>
+  <text x="450" y="432" fill="#0f172a" font-size="12.5" font-weight="700">Identity</text>
+  <text x="450" y="450" fill="#334155" font-size="12">build factory with an org chart</text>
+  <text x="450" y="474" fill="#0f172a" font-size="12.5" font-weight="700">How it works</text>
+  <text x="450" y="492" fill="#334155" font-size="12">plan → build → review</text>
+  <text x="450" y="508" fill="#334155" font-size="12">(PM + worker + reviewer agents)</text>
+  <text x="450" y="532" fill="#0f172a" font-size="12.5" font-weight="700">Substrate</text>
+  <text x="450" y="550" fill="#334155" font-size="12">Markdown tasks + Web HUD</text>
+  <text x="450" y="574" fill="#0f172a" font-size="12.5" font-weight="700">Autonomous orchestration</text>
+  <text x="450" y="592" fill="#334155" font-size="12">shipped</text>
+  <rect x="450" y="614" width="78" height="20" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+  <text x="489" y="628" text-anchor="middle" fill="#92400e" font-size="11" font-weight="600">shipped ✓</text>
+
+  <!-- ===== AE CARD ===== -->
+  <rect x="800" y="351" width="348" height="300" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="800" y="351" width="6" height="300" rx="3" fill="#7c3aed"/>
+  <rect x="806" y="351" width="342" height="60" rx="10" fill="#ede9fe"/>
+  <text x="824" y="376" fill="#5b21b6" font-size="16" font-weight="700">agentic-engineering</text>
+  <rect x="824" y="384" width="146" height="18" rx="9" fill="#7c3aed"/>
+  <text x="897" y="397" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="600">v0.1.0 · Python + MCP</text>
+  <text x="824" y="432" fill="#0f172a" font-size="12.5" font-weight="700">Identity</text>
+  <text x="824" y="450" fill="#334155" font-size="12">self-improving verification engine</text>
+  <text x="824" y="474" fill="#0f172a" font-size="12.5" font-weight="700">How it works</text>
+  <text x="824" y="492" fill="#334155" font-size="12">typed graph · falsifiability-gated</text>
+  <text x="824" y="508" fill="#334155" font-size="12">· independent reviewer agents</text>
+  <text x="824" y="532" fill="#0f172a" font-size="12.5" font-weight="700">Substrate</text>
+  <text x="824" y="550" fill="#334155" font-size="12">SQLite graph via MCP server</text>
+  <text x="824" y="574" fill="#0f172a" font-size="12.5" font-weight="700">Autonomous orchestration</text>
+  <text x="824" y="592" fill="#334155" font-size="12">shipped</text>
+  <rect x="824" y="614" width="78" height="20" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="1"/>
+  <text x="863" y="628" text-anchor="middle" fill="#5b21b6" font-size="11" font-weight="600">shipped ✓</text>
+
+  <!-- ===== DOTTED CONNECTOR AEM ↔ AE ===== -->
+  <!-- Curved path from AEM bottom-center to AE bottom-center, bowing below the cards -->
+  <!-- AEM bottom-center: x=600, y=651. AE bottom-center: x=974, y=651 -->
+  <!-- Lines from card bottoms down to a horizontal connector bar -->
+  <line x1="600" y1="651" x2="600" y2="692" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <line x1="974" y1="651" x2="974" y2="692" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <!-- Horizontal connector bar -->
+  <line x1="600" y1="692" x2="974" y2="692" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <!-- Label box centered on the horizontal bar -->
+  <rect x="668" y="704" width="252" height="56" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="794" y="726" text-anchor="middle" fill="#475569" font-size="12" font-weight="600">shared 8-stance epistemic panel</text>
+  <text x="794" y="744" text-anchor="middle" fill="#94a3b8" font-size="11">AEM: agents · AE: norns-loop-review lenses</text>
+
+  <!-- ===== FOOTER ===== -->
+  <text x="600" y="826" text-anchor="middle" fill="#94a3b8" font-size="12">All three plugins authored by GhostlyGawd · Claude Code multi-agent ecosystem · 2026</text>
+</svg>

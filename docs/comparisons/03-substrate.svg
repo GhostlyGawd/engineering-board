@@ -1,0 +1,286 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="940" viewBox="0 0 1200 940" font-family="-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <defs>
+    <linearGradient id="hg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Full canvas background -->
+  <rect width="1200" height="940" fill="#f6f8fb"/>
+
+  <!-- Header band -->
+  <rect x="0" y="0" width="1200" height="88" fill="url(#hg)"/>
+  <text x="40" y="52" font-size="32" font-weight="700" fill="white">Same job, three substrates</text>
+  <text x="40" y="76" font-size="17" fill="#e0e7ff">Layer-by-layer: where state lives and how it&#39;s driven</text>
+
+  <!--
+    COORDINATE SYSTEM
+    ─────────────────
+    Left col:   x=16   w=174  (ends 190)
+    gap 12
+    Col EB:     x=202  w=314  (ends 516)
+    gap 12
+    Col AEM:    x=528  w=314  (ends 842)
+    gap 12
+    Col AE:     x=854  w=314  (ends 1168, 32px right margin)
+
+    Vertical (from y=96):
+      Column headers:  y=96   h=54  → bottom 150
+      gap 10
+      Row 1:           y=160  h=118 → bottom 278
+      gap 10
+      Row 2:           y=288  h=118 → bottom 406
+      gap 10
+      Row 3:           y=416  h=118 → bottom 534
+      gap 10
+      Row 4:           y=544  h=118 → bottom 662
+      gap 10
+      Row 5:           y=672  h=118 → bottom 790
+      gap 10
+      Takeaway chips:  y=800  h=36  → bottom 836
+      Footer text:     y=890
+  -->
+
+  <!-- ══════════════════════════════════════════════════════════
+       LEFT LABEL COLUMN
+  ══════════════════════════════════════════════════════════ -->
+
+  <!-- Header placeholder aligned to col headers -->
+  <rect x="16" y="96" width="174" height="54" rx="8" fill="#e2e8f0"/>
+  <text x="103" y="128" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b" letter-spacing="1.5">LAYER</text>
+
+  <!-- Row 1 label: y=160 h=118  mid=219 -->
+  <rect x="16" y="160" width="174" height="118" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">
+    <tspan x="103" y="212">Interface</tspan>
+    <tspan x="103" dy="19">/ UX</tspan>
+  </text>
+
+  <!-- Row 2 label: y=288 h=118  mid=347 -->
+  <rect x="16" y="288" width="174" height="118" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">
+    <tspan x="103" y="337">Orchestration</tspan>
+    <tspan x="103" dy="19">(drives work)</tspan>
+  </text>
+
+  <!-- Row 3 label: y=416 h=118  mid=475 -->
+  <rect x="16" y="416" width="174" height="118" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">
+    <tspan x="103" y="465">Review /</tspan>
+    <tspan x="103" dy="19">verification</tspan>
+  </text>
+
+  <!-- Row 4 label: y=544 h=118  mid=603 -->
+  <rect x="16" y="544" width="174" height="118" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">
+    <tspan x="103" y="593">Access layer</tspan>
+    <tspan x="103" dy="19">(state writer)</tspan>
+  </text>
+
+  <!-- Row 5 label: y=672 h=118  mid=731 -->
+  <rect x="16" y="672" width="174" height="118" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">
+    <tspan x="103" y="721">State substrate</tspan>
+    <tspan x="103" dy="19">(where it lives)</tspan>
+  </text>
+
+  <!-- ══════════════════════════════════════════════════════════
+       COLUMN 1 — engineering-board   x=202 w=314
+  ══════════════════════════════════════════════════════════ -->
+
+  <!-- Header -->
+  <rect x="202" y="96" width="314" height="54" rx="8" fill="#2563eb"/>
+  <text text-anchor="middle" font-size="13" font-weight="700" fill="white">
+    <tspan x="359" y="119">engineering-board · v1.1.0</tspan>
+    <tspan x="359" dy="19">bash + python3</tspan>
+  </text>
+
+  <!-- Row 1: Interface/UX -->
+  <rect x="202" y="160" width="314" height="118" rx="10" fill="#dbeafe" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#1e3a8a">
+    <tspan x="222" y="194">Git diff / plain markdown</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="222" y="216">Human-editable files</tspan>
+    <tspan x="222" dy="19">No special tooling required</tspan>
+  </text>
+
+  <!-- Row 2: Orchestration -->
+  <rect x="202" y="288" width="314" height="118" rx="10" fill="#dbeafe" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#1e3a8a">
+    <tspan x="222" y="322">Stop hook, in-session</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="222" y="344">Autonomous = RFC 0001</tspan>
+    <tspan x="222" dy="19">(planned, not yet shipped)</tspan>
+  </text>
+
+  <!-- Row 3: Review -->
+  <rect x="202" y="416" width="314" height="118" rx="10" fill="#dbeafe" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#1e3a8a">
+    <tspan x="222" y="450">code-reviewer + validator</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="222" y="472">Re-run suite + Done-when</tspan>
+    <tspan x="222" dy="19">Read-only validator pass</tspan>
+  </text>
+
+  <!-- Row 4: Access -->
+  <rect x="202" y="544" width="314" height="118" rx="10" fill="#dbeafe" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#1e3a8a">
+    <tspan x="222" y="578">bash + python3</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="222" y="600">Edit files directly</tspan>
+    <tspan x="222" dy="19">No DB, no server</tspan>
+  </text>
+
+  <!-- Row 5: State substrate -->
+  <rect x="202" y="672" width="314" height="118" rx="10" fill="#dbeafe" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#1e3a8a">
+    <tspan x="222" y="706">Markdown board</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="222" y="728">engineering-board/&lt;proj&gt;/</tspan>
+    <tspan x="222" dy="18">BOARD-ROUTER.md</tspan>
+    <tspan x="222" dy="16">affects: / needs: links</tspan>
+  </text>
+
+  <!-- Takeaway chip EB -->
+  <rect x="202" y="800" width="314" height="36" rx="18" fill="#2563eb"/>
+  <text x="359" y="824" text-anchor="middle" font-size="13" font-weight="600" fill="white">Files ARE the database</text>
+
+  <!-- ══════════════════════════════════════════════════════════
+       COLUMN 2 — agentic-engineering-max   x=528 w=314
+  ══════════════════════════════════════════════════════════ -->
+
+  <!-- Header -->
+  <rect x="528" y="96" width="314" height="54" rx="8" fill="#d97706"/>
+  <text text-anchor="middle" font-size="13" font-weight="700" fill="white">
+    <tspan x="685" y="119">agentic-engineering-max · v2.4.0</tspan>
+    <tspan x="685" dy="19">pwsh7</tspan>
+  </text>
+
+  <!-- Row 1 -->
+  <rect x="528" y="160" width="314" height="118" rx="10" fill="#fef3c7" stroke="#fde68a" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#92400e">
+    <tspan x="548" y="194">Web HUD @127.0.0.1:8787</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="548" y="216">Loops · Board · Gates · Logs</tspan>
+    <tspan x="548" dy="19">+ CLI fallback</tspan>
+  </text>
+
+  <!-- Row 2 -->
+  <rect x="528" y="288" width="314" height="118" rx="10" fill="#fef3c7" stroke="#fde68a" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#92400e">
+    <tspan x="548" y="322">orchestrator-loop.ps1 (30s)</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="548" y="344">Headless claude -p fleet</tspan>
+    <tspan x="548" dy="19">4 workers / 2 reviewers</tspan>
+  </text>
+
+  <!-- Row 3 -->
+  <rect x="528" y="416" width="314" height="118" rx="10" fill="#fef3c7" stroke="#fde68a" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#92400e">
+    <tspan x="548" y="450">8 epistemic agents</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="548" y="472">4-lens single pass review</tspan>
+    <tspan x="548" dy="19">Cost retreat on overrun</tspan>
+  </text>
+
+  <!-- Row 4 -->
+  <rect x="528" y="544" width="314" height="118" rx="10" fill="#fef3c7" stroke="#fde68a" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#92400e">
+    <tspan x="548" y="578">PowerShell helpers</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="548" y="600">FileStream CreateNew locks</tspan>
+    <tspan x="548" dy="19">Direct file writes</tspan>
+  </text>
+
+  <!-- Row 5 -->
+  <rect x="528" y="672" width="314" height="118" rx="10" fill="#fef3c7" stroke="#fde68a" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#92400e">
+    <tspan x="548" y="706">Markdown task files</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="548" y="728">task-board.md regenerated</tspan>
+    <tspan x="548" dy="18">.lock siblings per task</tspan>
+  </text>
+
+  <!-- Takeaway chip AEM -->
+  <rect x="528" y="800" width="314" height="36" rx="18" fill="#d97706"/>
+  <text x="685" y="824" text-anchor="middle" font-size="13" font-weight="600" fill="white">Files + a dashboard</text>
+
+  <!-- ══════════════════════════════════════════════════════════
+       COLUMN 3 — agentic-engineering   x=854 w=314
+  ══════════════════════════════════════════════════════════ -->
+
+  <!-- Header -->
+  <rect x="854" y="96" width="314" height="54" rx="8" fill="#7c3aed"/>
+  <text text-anchor="middle" font-size="13" font-weight="700" fill="white">
+    <tspan x="1011" y="119">agentic-engineering · v0.1.0</tspan>
+    <tspan x="1011" dy="19">Python + MCP</tspan>
+  </text>
+
+  <!-- Row 1 -->
+  <rect x="854" y="160" width="314" height="118" rx="10" fill="#ede9fe" stroke="#ddd6fe" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#5b21b6">
+    <tspan x="874" y="194">MCP tools only</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="874" y="216">Not hand-editable</tspan>
+    <tspan x="874" dy="19">SessionStart context injection</tspan>
+  </text>
+
+  <!-- Row 2 -->
+  <rect x="854" y="288" width="314" height="118" rx="10" fill="#ede9fe" stroke="#ddd6fe" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#5b21b6">
+    <tspan x="874" y="322">Stateless orchestrate.py</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="874" y="344">Headless claude -p in worktrees</tspan>
+    <tspan x="874" dy="19">DAG task graph</tspan>
+  </text>
+
+  <!-- Row 3 -->
+  <rect x="854" y="416" width="314" height="118" rx="10" fill="#ede9fe" stroke="#ddd6fe" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#5b21b6">
+    <tspan x="874" y="450">spec-checker &#8594; blind reviewer</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="874" y="472">+ contrarian agent</tspan>
+    <tspan x="874" dy="19">4-tier severity · trust-calibrated</tspan>
+  </text>
+
+  <!-- Row 4 -->
+  <rect x="854" y="544" width="314" height="118" rx="10" fill="#ede9fe" stroke="#ddd6fe" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#5b21b6">
+    <tspan x="874" y="578">Bundled stdio MCP server</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="874" y="600">ONLY writer &#8212; 26 tools</tspan>
+    <tspan x="874" dy="19">No direct file access</tspan>
+  </text>
+
+  <!-- Row 5 -->
+  <rect x="854" y="672" width="314" height="118" rx="10" fill="#ede9fe" stroke="#ddd6fe" stroke-width="1.5"/>
+  <text font-size="13" font-weight="600" fill="#5b21b6">
+    <tspan x="874" y="706">SQLite typed graph</tspan>
+  </text>
+  <text font-size="13" fill="#334155">
+    <tspan x="874" y="728">.agentic/graph.db</tspan>
+    <tspan x="874" dy="18">14 entities + relations + claims</tspan>
+  </text>
+
+  <!-- Takeaway chip AE -->
+  <rect x="854" y="800" width="314" height="36" rx="18" fill="#7c3aed"/>
+  <text x="1011" y="824" text-anchor="middle" font-size="13" font-weight="600" fill="white">A real database behind a server</text>
+
+  <!-- Footer note -->
+  <text x="600" y="890" text-anchor="middle" font-size="12" fill="#94a3b8">Generated 2026-06-08 · engineering-board v1.1.0 architecture comparison</text>
+</svg>
