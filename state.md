@@ -11,15 +11,16 @@
 > (that's the part that goes stale). Assume this file can lag GitHub by one PR; fold
 > any catch-up edit into your next real PR, not a bookkeeping-only one.
 
-_Last updated: 2026-06-07_
+_Last updated: 2026-06-08_
 
 ---
 
 ## Snapshot
 
 - **`main` is at `1.1.0`** — shipped via **[PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8)**, merged as `097dfa1`. `plugin.json` + `marketplace.json` bumped in lockstep (`tests/version-coherence.sh`); the marketplace re-pulls on the version increase. Backward-compatible — pre-1.1.0 `docs/boards/` + legacy `docs/board/` still resolve.
-- **Active working branch:** `claude/adoring-turing-ULvhK` (reused across PRs — don't open a parallel one). Recent work landed in `main` via **[PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8)** (1.1.0), **[PR #9](https://github.com/GhostlyGawd/engineering-board/pull/9)** (state.md refresh), and **[PR #10](https://github.com/GhostlyGawd/engineering-board/pull/10)** (CLAUDE.md pointer + handoff-convention rules) — check GitHub for live PR status. Push here and **land changes via PR — never push to `main` directly.**
+- **Active working branch:** `claude/adoring-turing-ULvhK` (reused across PRs — don't open a parallel one). 1.1.0 shipped via **[PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8)**; subsequent docs, the Conductor RFC iterations, and the **`agentic-ecosystem`** research area landed via later PRs (#9–#15) — check GitHub for the live list. Push here and **land changes via PR — never push to `main` directly.**
 - **Green check:** `bash tests/run-all.sh` → **10 suites** (orchestration, claims, smoke, scratch-append, **paths**, modes, permissions, lint-orchestrator-prompts, version-coherence, crosscompat-lint); the `orchestration` suite now runs **15 sub-tests** (added `board-init-command.sh` + `board-relocate.sh`). CI gate: `.github/workflows/test.yml` runs `run-all` on every push.
+- **Active research:** the **`agentic-ecosystem`** thread lives at [`docs/research/agentic-ecosystem/`](docs/research/agentic-ecosystem/) — comparing the agentic systems I've built toward **consolidating them into one product**. Its `README.md` indexes everything; see the **Research thread** below.
 
 ## Recently completed
 
@@ -64,6 +65,13 @@ _Last updated: 2026-06-07_
 - **[`docs/rfcs/0001-symphony-conductor.md`](docs/rfcs/0001-symphony-conductor.md)** (Draft): an always-on **deterministic** orchestrator that drives the board to PRs with no human in the session. **rev 5 execution model:** workers are **observable interactive `claude` sessions** (not headless) — the orchestrator spawns one attachable session per **bounded round**; inside it the discipline subagents do the work and leave their trail (notes/findings/evidence) in the task (PR/Linear) comment thread, then the session **self-terminates**; the orchestrator reads that durable state and spawns a **pickup session** to resume an unfinished entry. **Session/worktree spawn is lifted from [claude-squad](https://github.com/smtg-ai/claude-squad)** (`session/tmux`+`session/git`; the conductor is our own code — claude-squad is the hands, not the brain: no board intake, no decisions, no PRs; confirmed by source review). Net-new = the cross-session supervisor + pickup loop + worktree/PR/trigger/governor. Live design seams in RFC §10 (evidence-posting creds, round-boundary/outcome marker, PR-vs-Linear thread).
 - **Gated on this 1.1.0 work:** the conductor must consume the path/runtime-root resolver (don't re-hardcode `docs/boards/**`). Build order: finish 1.1.0 → conductor (**target 1.2.0**, additive/opt-in).
 - **Prior art — sibling plugins (2026-06-08, [`docs/research/agentic-ecosystem/`](docs/research/agentic-ecosystem/)):** both `agentic-engineering-max` (external `orchestrator-loop.ps1` + headless `claude -p` fleet + web HUD) and `agentic-engineering` (stateless `orchestrate.py` + headless `claude -p` in git worktrees) **already ship** the autonomous worker-in-worktree loop the Conductor is drafting — both **headless**, the exact model rev 5 rejects for observable sessions. Full profiles + maps + synthesis live in that research thread (which also tracks **consolidating all three systems into one product**). Read before building 1.2.0; our open bet is *observability*, not the loop itself.
+
+## Research thread — agentic-ecosystem (consolidate what I've built) — active
+
+- **Home: [`docs/research/agentic-ecosystem/`](docs/research/agentic-ecosystem/)** — start at its `README.md`, which indexes the whole thread. **Purpose:** compare & contrast the agentic-engineering systems I've built (this board, `agentic-engineering-max`, `agentic-engineering`) → **consolidate into one repo/harness/product.** Feeds a future consolidation PRD.
+- **What's in it:** `profiles/` (one per system, shared template), `comparisons/` (5 visual maps + [`synthesis.md`](docs/research/agentic-ecosystem/comparisons/synthesis.md) = 7 cross-cutting patterns), `consolidation/` (the PRD seed — 7 forks + carry-forward list), `research-log.md` (dated).
+- **Convention:** the research workbench is [`docs/research/`](docs/research/) (its README defines the rules) — upstream of `specs/` / `docs/rfcs/`; a thread graduates into a spec/RFC/PRD when it matures.
+- **Next:** profile the remaining systems (`norns-loop`, `Symphony` / `symphony-clone`, `harness-sdd`, `solo-os`); then resolve the consolidation forks → PRD.
 
 ## Repo working notes (any session)
 
