@@ -16,13 +16,18 @@ unified product has to answer.
    hand-editable, server is a hard dependency) vs. the middle (files + a HUD).
    *Everything else cascades from this.* The unexplored quadrant is "typed **and**
    legible" — is there a representation that's both?
-2. **Worker execution model.** Observable, attachable sessions (engineering-board
-   RFC 0001's bet) vs. headless `claude -p` fleets (what AEM and AE both shipped).
-   Observability vs. throughput/simplicity — pick one, or make it pluggable.
+2. **Worker execution model.** Observable, attachable sessions vs. headless
+   `claude -p` fleets — now **3 headless** builds (AEM, AE, **symphony-clone**) vs.
+   **2 observable** (**harness-sdd** shipped a coordinator-spawns-subagents-in-worktrees
+   wave engine; EB's RFC 0001 bets on attachable tmux sessions). Observability is a
+   *worked* option now, not just EB's bet. Observability vs. throughput/simplicity —
+   pick one, or make it pluggable.
 3. **Where falsifiability is enforced.** At capture (EB transcript anchor) /
-   planning+review (AEM epistemic lenses) / spec-dispatch (AE hard gate). These
-   are complementary, not competing — a unified product could enforce at **all
-   three**.
+   planning+review (AEM epistemic lenses) / spec-dispatch (AE hard gate) / **commit
+   gate (harness-sdd pre-commit+CI)** — four complementary positions, not competing; a
+   unified product could enforce at **all four**. (symphony-clone enforces at *none* —
+   the cautionary baseline: an always-on loop that pushes all quality risk onto the
+   human reviewer.)
 4. **Review model.** reviewer+validator (EB) vs. epistemic-lens panel (AEM) vs.
    context-isolated spec-checker + blind contrarian + trust calibration (AE).
    AE's independent-verification design is the most rigorous; AEM's panel the
@@ -44,6 +49,13 @@ unified product has to answer.
 - **agentic-engineering** — the rigor: typed graph, falsifiability-as-hard-gate,
   context-isolated independent review, trust calibration, stateless resumable
   orchestrator, real-agent e2e tests.
+- **harness-sdd** — the *observable* worktree wave engine (coordinator spawns the
+  subagents — no black box); gate-of-gates + golden-fixture self-eval; commit-time
+  falsifiability; deterministic git-safety guards; the drop-in harness-installer
+  packaging.
+- **symphony-clone** — the cleanest always-on reconcile tick (poll → reconcile →
+  retry → dispatch, with stall-detect + backoff) and a reusable subscription-native
+  `claude` stream-json adapter; pluggable trackers with a git-native markdown default.
 
 ## Open questions for the PRD
 
@@ -54,6 +66,8 @@ unified product has to answer.
 
 ## Next steps
 
-- Profile the remaining systems (norns-loop, Symphony, harness-sdd) — they may
-  hold more carry-forward ideas, or dead-ends to avoid.
+- harness-sdd + Symphony now profiled (5 systems mapped). Remaining: **norns-loop**
+  and **solo-os** — both **private**, blocked on repo access (the GitHub MCP is scoped
+  to engineering-board this session). Unblock (make public / read token / paste
+  source), then profile.
 - Once the forks above have leanings, draft the consolidation PRD.
