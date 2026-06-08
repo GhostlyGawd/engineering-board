@@ -69,9 +69,9 @@ _Last updated: 2026-06-08_
 ## Research thread — agentic-ecosystem (consolidate what I've built) — active
 
 - **Home: [`docs/research/agentic-ecosystem/`](docs/research/agentic-ecosystem/)** — start at its `README.md`, which indexes the whole thread. **Purpose:** compare & contrast the agentic-engineering systems I've built (this board, `agentic-engineering-max`, `agentic-engineering`) → **consolidate into one repo/harness/product.** Feeds a future consolidation PRD.
-- **What's in it:** `profiles/` (one per system, shared template), `comparisons/` (5 visual maps + [`synthesis.md`](docs/research/agentic-ecosystem/comparisons/synthesis.md) = 7 cross-cutting patterns), `consolidation/` (the PRD seed — 7 forks + carry-forward list), `research-log.md` (dated).
+- **What's in it:** `profiles/` (one per system, shared template), `comparisons/` (5 visual maps + [`synthesis.md`](docs/research/agentic-ecosystem/comparisons/synthesis.md) = 7 cross-cutting patterns), `consolidation/` (**draft PRD** [`prd.md`](docs/research/agentic-ecosystem/consolidation/prd.md) + the 7 forks + carry-forward), `research-log.md` (dated).
 - **Convention:** the research workbench is [`docs/research/`](docs/research/) (its README defines the rules) — upstream of `specs/` / `docs/rfcs/`; a thread graduates into a spec/RFC/PRD when it matures.
-- **Next:** `harness-sdd` + `symphony-clone` now profiled (5 systems mapped). Remaining candidates **`norns-loop`** + **`solo-os`** are **private** — blocked on repo access (GitHub MCP is scoped to this repo; no scope-expansion tools this session). Unblock those (make public / read token / paste source), then resolve the consolidation forks → PRD.
+- **Next:** 5 systems profiled; **consolidation PRD drafted** ([`docs/research/agentic-ecosystem/consolidation/prd.md`](docs/research/agentic-ecosystem/consolidation/prd.md)) — Draft positions on all 7 forks + a v0 cut. Remaining candidates **`norns-loop`** + **`solo-os`** are **private** (blocked on repo access; GitHub MCP scoped to this repo). Unblock those, **lock the fork decisions**, then graduate the PRD to `specs/`.
 
 ## Repo working notes (any session)
 

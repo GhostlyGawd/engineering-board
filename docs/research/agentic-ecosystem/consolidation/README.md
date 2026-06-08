@@ -5,8 +5,13 @@ systems and **converge on one.** This folder is where that thinking accumulates
 until it's ready to become a real **consolidation PRD** (then graduate to `specs/`
 or a PRD doc and leave a pointer back here).
 
-Nothing here is decided — these are the questions the comparison surfaced that a
-unified product has to answer.
+**▶ Draft PRD: [`prd.md`](prd.md)** — the first integrated draft: positions on all 7
+forks, the target architecture, and the v0 cut. Still in the workbench; it graduates
+to `specs/` once the forks lock and the two private systems are profiled.
+
+The draft PRD takes **positions** on the questions below; nothing is **locked** until
+it graduates. These are the forks the comparison surfaced that a unified product has
+to answer.
 
 ## The big forks to resolve (from [`../comparisons/synthesis.md`](../comparisons/synthesis.md))
 
@@ -70,4 +75,6 @@ unified product has to answer.
   and **solo-os** — both **private**, blocked on repo access (the GitHub MCP is scoped
   to engineering-board this session). Unblock (make public / read token / paste
   source), then profile.
-- Once the forks above have leanings, draft the consolidation PRD.
+- **PRD drafted** ([`prd.md`](prd.md)). Next: lock the fork decisions (esp. #1 the
+  typed-and-legible substrate and #2 the executor seam), profile norns-loop + solo-os
+  when unblocked, then **graduate the PRD to `specs/`.**
