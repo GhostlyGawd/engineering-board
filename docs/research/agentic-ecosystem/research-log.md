@@ -28,11 +28,10 @@ was found, what's next.
 - **Blocked:** **norns-loop** + **solo-os** are **private**; the GitHub MCP is scoped to
   engineering-board and scope-expansion tools aren't in this session, so they can't be
   profiled without access (make public / read token / paste source).
-- **Drafted the consolidation PRD** (`consolidation/prd.md`) from the 5 profiled
-  systems: positions on all 7 forks, target architecture, a v0 cut, carry-forward map,
-  migration. Draft — graduates to `specs/` once forks lock + private systems profiled.
-- **Next:** unblock norns-loop + solo-os (private); lock the fork decisions; graduate
-  the PRD to `specs/`.
+- **Started a living consolidation PRD** (`consolidation/prd.md`) from the 5 profiled
+  systems: current leanings on all 7 forks, a sketch of the unified product, a
+  thought-experiment v0, carry-forward map. A research doc we keep updating — not a spec.
+- **Next:** unblock norns-loop + solo-os (private) and keep refining the PRD as we go.
 
 ## 2026-06-08 — kickoff: profiled the three core systems + built the maps
 

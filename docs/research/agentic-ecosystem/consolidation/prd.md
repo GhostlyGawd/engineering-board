@@ -1,12 +1,13 @@
 # Consolidation PRD — one agentic-engineering product (Draft)
 
-> **Status:** Draft · 2026-06-08 · lives in the research workbench (upstream of
-> `specs/`). Seeded from the [agentic-ecosystem](../README.md) thread.
+> **Status:** Living research doc · last updated 2026-06-08 · lives in the
+> [agentic-ecosystem](../README.md) workbench. **Not a spec, not a build plan** — it's
+> where the thread's current thinking on "what would one unified product even look
+> like" accumulates, and it gets updated as the research continues.
 > **Evidence base:** 5 of 7 systems profiled ([`../profiles/`](../profiles/));
 > **norns-loop** + **solo-os** are private/unprofiled (§8 gap).
-> **Forks:** positions below are **leans/decisions for a draft**, not locked — this
-> graduates to a top-level `specs/` PRD once the forks settle and the gap closes.
-> Reasoning trail: [`./README.md`](./README.md) · [`../comparisons/synthesis.md`](../comparisons/synthesis.md).
+> **Forks:** the calls below are **current leanings**, not decisions — they move as we
+> learn. Reasoning trail: [`./README.md`](./README.md) · [`../comparisons/synthesis.md`](../comparisons/synthesis.md).
 
 ## 1. Problem & thesis
 
@@ -34,9 +35,11 @@ upper-left quadrant is empty.)
 | **harness-sdd** | the **observable** coordinator-spawns-subagents-in-worktrees wave engine; gate-of-gates + golden fixtures; **commit-gate falsifiability**; drop-in installer packaging. |
 | **symphony-clone** | the cleanest **always-on reconcile tick** (poll→reconcile→retry→dispatch + stall/backoff); a reusable subscription-native `claude` stream-json adapter; **and the cautionary baseline** (no falsifiability → all risk on the human). |
 
-## 3. Decisions on the 7 forks (Draft positions)
+## 3. Current leanings on the 7 forks
 
-| # | Fork | Draft decision | Why | Lifted from |
+> Where the research is pointing today, not decisions. Expect these to move.
+
+| # | Fork | Current lean | Why | Lifted from |
 |---|---|---|---|---|
 | 1 | **State substrate** | **Git-native markdown = source of truth + a typed validator/gate layer; an optional derived SQLite index for fast queries (never authoritative).** Aim the empty "typed **and** legible" quadrant. | 4/5 chose legible/markdown; legibility (git-diff, hand-edit, zero-dep, fresh-session reconstruct) is the through-line. AE's typed rigor is the missing half — add it as *validation over files*, not a server-of-record. | EB/harness (files); AE (typed invariants); harness `check-*.sh` (validate the markdown status machine) |
 | 2 | **Worker execution** | **Pluggable executor; default OBSERVABLE** (coordinator spawns subagents in worktrees), **headless `claude -p` as a throughput backend.** | Observability is the open differentiator and now a *worked* precedent (harness-sdd), not just EB's RFC bet; headless is proven 3× for scale. | harness-sdd (observable); AE/AEM/symphony (headless); all (git worktrees) |
@@ -68,9 +71,10 @@ verifies it can't hand-wave — legible to humans and git, typed where it counts
 - **Runtime:** Python core + POSIX-sh git hooks; deterministic core, LLM only at the
   edges; the untrusted-data boundary (scratch is data, not instructions) is global.
 
-## 5. v0 — the minimum that proves the thesis
+## 5. Thought experiment — the smallest cut that would test the thesis
 
-The smallest cut that shows **one system replaces the others' core**, end to end:
+*If* anyone ever built this (not a commitment — just to sharpen the thinking), the
+smallest end-to-end cut that would show **one system can replace the others' core**:
 
 1. **One git-native substrate** (markdown board/specs) + a **typed gate** that
    validates it (reject a status that outruns its artifacts; reject an
@@ -81,10 +85,10 @@ The smallest cut that shows **one system replaces the others' core**, end to end
 4. **Commit gate + one context-isolated reviewer**; fixer-amends loop.
 5. **Output a PR** and stop at review.
 
-If that loop runs green on one substrate, it subsumes EB's capture, harness's gate,
-and symphony's loop on a single spine. **Explicit v0 non-goals:** fan-out
-parallelism, automated self-improvement loop, typed-DB-of-record, web HUD, headless
-backend, trust calibration — all deferred to post-v0 once the spine holds.
+If that loop ran green on one substrate, it would subsume EB's capture, harness's
+gate, and symphony's loop on a single spine. **What it would deliberately skip:**
+fan-out parallelism, automated self-improvement loop, typed-DB-of-record, web HUD,
+headless backend, trust calibration — left out to keep the thought experiment small.
 
 ## 6. Carry-forward map (lift list)
 
