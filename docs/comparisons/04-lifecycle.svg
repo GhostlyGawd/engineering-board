@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="940" viewBox="0 0 1200 940" font-family="-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <defs>
+    <linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- Full canvas background -->
+  <rect width="1200" height="940" fill="#f6f8fb"/>
+
+  <!-- Header band h=88 -->
+  <rect x="0" y="0" width="1200" height="88" fill="url(#hg)"/>
+  <text x="40" y="52" font-size="32" font-weight="700" fill="white">How work flows — and where it's kept honest</text>
+  <text x="40" y="76" font-size="17" fill="#e0e7ff">Pipeline · where falsifiability bites (&#9733;) · orchestration locus · worker model</text>
+
+  <!-- Column headers -->
+  <text x="268" y="104" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">&#9312; Intake / Plan</text>
+  <text x="436" y="104" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">&#9313; Gate / Spec</text>
+  <text x="604" y="104" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">&#9314; Build</text>
+  <text x="772" y="104" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">&#9315; Review</text>
+  <text x="952" y="104" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">&#9316; Done / Merge</text>
+
+  <!-- ═══════════════════════════════
+       LANE 1 — EB  y=110 h=220
+       stages y=122 h=74  mid=159
+       annotation y=208 h=38
+  ═══════════════════════════════ -->
+  <rect x="12" y="110" width="1176" height="220" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <rect x="24" y="122" width="164" height="74" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="106" y="148" font-size="14" font-weight="700" fill="#1e3a8a" text-anchor="middle">EB</text>
+  <text x="106" y="165" font-size="10" fill="#2563eb" text-anchor="middle">engineering-board</text>
+  <text x="106" y="180" font-size="10" fill="#2563eb" text-anchor="middle">v1.1.0</text>
+
+  <rect x="200" y="122" width="136" height="74" rx="10" fill="#dbeafe" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="268" y="150" font-size="15" font-weight="700" fill="#1e3a8a" text-anchor="middle">Capture</text>
+  <text x="268" y="167" font-size="11" fill="#475569" text-anchor="middle">finding-extractor</text>
+  <text x="268" y="183" font-size="11" fill="#475569" text-anchor="middle">Stop hook</text>
+  <line x1="337" y1="159" x2="365" y2="159" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="368" y="122" width="136" height="74" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="436" y="150" font-size="15" font-weight="700" fill="#1e3a8a" text-anchor="middle">Verify</text>
+  <text x="436" y="167" font-size="11" fill="#475569" text-anchor="middle">evidence quote =</text>
+  <text x="436" y="183" font-size="11" fill="#475569" text-anchor="middle">literal anchor</text>
+  <circle cx="491" cy="126" r="12" fill="#f59e0b"/>
+  <text x="491" y="131" font-size="12" font-weight="700" fill="white" text-anchor="middle">&#9733;</text>
+  <line x1="505" y1="159" x2="533" y2="159" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="536" y="122" width="136" height="74" rx="10" fill="#dbeafe" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="604" y="153" font-size="15" font-weight="700" fill="#1e3a8a" text-anchor="middle">Route</text>
+  <text x="604" y="170" font-size="11" fill="#475569" text-anchor="middle">board needs:</text>
+  <text x="604" y="185" font-size="11" fill="#475569" text-anchor="middle">triage</text>
+  <line x1="673" y1="159" x2="701" y2="159" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="704" y="122" width="136" height="74" rx="10" fill="#dbeafe" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="772" y="153" font-size="15" font-weight="700" fill="#1e3a8a" text-anchor="middle">Review</text>
+  <text x="772" y="170" font-size="11" fill="#475569" text-anchor="middle">code-reviewer</text>
+  <text x="772" y="185" font-size="11" fill="#475569" text-anchor="middle">+ validator</text>
+  <line x1="841" y1="159" x2="881" y2="159" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="884" y="122" width="136" height="74" rx="10" fill="#1e3a8a" stroke="#1e3a8a" stroke-width="1.5"/>
+  <text x="952" y="153" font-size="15" font-weight="700" fill="white" text-anchor="middle">Work Item</text>
+  <text x="952" y="170" font-size="11" fill="#93c5fd" text-anchor="middle">board entry</text>
+  <text x="952" y="185" font-size="11" fill="#93c5fd" text-anchor="middle">committed</text>
+
+  <rect x="200" y="208" width="972" height="38" rx="6" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+  <text x="216" y="224" font-size="11" font-weight="700" fill="#1e3a8a">Orchestration:</text>
+  <text x="318" y="224" font-size="11" fill="#334155">Stop hook, in one session — autonomous = RFC 0001 (planned)</text>
+  <text x="216" y="240" font-size="11" font-weight="700" fill="#1e3a8a">Worker model:</text>
+  <text x="316" y="240" font-size="11" fill="#334155">OBSERVABLE attachable sessions (planned)</text>
+
+  <!-- ═══════════════════════════════
+       LANE 2 — AEM  y=346 h=220
+       stages y=358 h=74  mid=395
+       annotation y=444 h=38
+  ═══════════════════════════════ -->
+  <rect x="12" y="346" width="1176" height="220" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <rect x="24" y="358" width="164" height="74" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="106" y="381" font-size="13" font-weight="700" fill="#92400e" text-anchor="middle">AEM</text>
+  <text x="106" y="397" font-size="10" fill="#d97706" text-anchor="middle">agentic-engineering</text>
+  <text x="106" y="411" font-size="10" fill="#d97706" text-anchor="middle">-max · v2.4.0</text>
+
+  <rect x="200" y="358" width="136" height="74" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <text x="268" y="385" font-size="15" font-weight="700" fill="#92400e" text-anchor="middle">Plan</text>
+  <text x="268" y="402" font-size="11" fill="#475569" text-anchor="middle">sci-method</text>
+  <text x="268" y="417" font-size="11" fill="#475569" text-anchor="middle">interviewer</text>
+  <circle cx="323" cy="362" r="12" fill="#f59e0b"/>
+  <text x="323" y="367" font-size="12" font-weight="700" fill="white" text-anchor="middle">&#9733;</text>
+  <line x1="337" y1="395" x2="365" y2="395" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="368" y="358" width="136" height="74" rx="10" fill="#fef3c7" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="436" y="388" font-size="15" font-weight="700" fill="#92400e" text-anchor="middle">Spec</text>
+  <text x="436" y="405" font-size="11" fill="#475569" text-anchor="middle">hypothesis</text>
+  <text x="436" y="419" font-size="11" fill="#475569" text-anchor="middle">document</text>
+  <line x1="505" y1="395" x2="533" y2="395" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="536" y="358" width="136" height="74" rx="10" fill="#fef3c7" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="604" y="388" font-size="15" font-weight="700" fill="#92400e" text-anchor="middle">Build</text>
+  <text x="604" y="405" font-size="11" fill="#475569" text-anchor="middle">atomic claim</text>
+  <text x="604" y="419" font-size="11" fill="#475569" text-anchor="middle">per commit</text>
+  <line x1="673" y1="395" x2="701" y2="395" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="704" y="358" width="136" height="74" rx="10" fill="#fef3c7" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="772" y="385" font-size="15" font-weight="700" fill="#92400e" text-anchor="middle">Review</text>
+  <text x="772" y="402" font-size="11" fill="#475569" text-anchor="middle">4 epistemic</text>
+  <text x="772" y="416" font-size="11" fill="#475569" text-anchor="middle">lenses</text>
+  <line x1="841" y1="395" x2="881" y2="395" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="884" y="358" width="136" height="74" rx="10" fill="#92400e" stroke="#92400e" stroke-width="1.5"/>
+  <text x="952" y="388" font-size="15" font-weight="700" fill="white" text-anchor="middle">Done</text>
+  <text x="952" y="405" font-size="11" fill="#fcd34d" text-anchor="middle">merged claim</text>
+  <text x="952" y="419" font-size="11" fill="#fcd34d" text-anchor="middle">verified</text>
+
+  <rect x="200" y="444" width="972" height="38" rx="6" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
+  <text x="216" y="460" font-size="11" font-weight="700" fill="#92400e">Orchestration:</text>
+  <text x="318" y="460" font-size="11" fill="#334155">external orchestrator-loop.ps1 (30s tick)</text>
+  <text x="216" y="476" font-size="11" font-weight="700" fill="#92400e">Worker model:</text>
+  <text x="316" y="476" font-size="11" fill="#334155">HEADLESS claude -p fleet + Web HUD</text>
+
+  <!-- ═══════════════════════════════
+       LANE 3 — AE  y=582 h=234
+       stages y=594 h=82  mid=635
+       annotation y=688 h=38
+  ═══════════════════════════════ -->
+  <rect x="12" y="582" width="1176" height="234" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <rect x="24" y="594" width="164" height="82" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="106" y="620" font-size="14" font-weight="700" fill="#5b21b6" text-anchor="middle">AE</text>
+  <text x="106" y="637" font-size="10" fill="#7c3aed" text-anchor="middle">agentic-engineering</text>
+  <text x="106" y="651" font-size="10" fill="#7c3aed" text-anchor="middle">v0.1.0</text>
+
+  <rect x="200" y="594" width="136" height="82" rx="10" fill="#ede9fe" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="268" y="622" font-size="15" font-weight="700" fill="#5b21b6" text-anchor="middle">Spec</text>
+  <text x="268" y="640" font-size="11" fill="#475569" text-anchor="middle">Socratic</text>
+  <text x="268" y="655" font-size="11" fill="#475569" text-anchor="middle">elicitation</text>
+  <line x1="337" y1="635" x2="365" y2="635" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="368" y="594" width="136" height="82" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="436" y="620" font-size="15" font-weight="700" fill="#5b21b6" text-anchor="middle">Gate</text>
+  <text x="436" y="638" font-size="11" fill="#475569" text-anchor="middle">validate_spec:</text>
+  <text x="436" y="653" font-size="11" fill="#475569" text-anchor="middle">runnable verify</text>
+  <circle cx="491" cy="598" r="12" fill="#f59e0b"/>
+  <text x="491" y="603" font-size="12" font-weight="700" fill="white" text-anchor="middle">&#9733;</text>
+  <line x1="505" y1="635" x2="533" y2="635" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="536" y="594" width="136" height="82" rx="10" fill="#ede9fe" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="604" y="622" font-size="15" font-weight="700" fill="#5b21b6" text-anchor="middle">Build</text>
+  <text x="604" y="640" font-size="11" fill="#475569" text-anchor="middle">in worktree</text>
+  <text x="604" y="655" font-size="11" fill="#475569" text-anchor="middle">isolated</text>
+  <line x1="673" y1="635" x2="701" y2="635" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="704" y="594" width="136" height="82" rx="10" fill="#ede9fe" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="772" y="617" font-size="15" font-weight="700" fill="#5b21b6" text-anchor="middle">Review</text>
+  <text x="772" y="634" font-size="11" fill="#475569" text-anchor="middle">spec-checker</text>
+  <text x="772" y="649" font-size="11" fill="#475569" text-anchor="middle">blind+contrarian</text>
+  <text x="772" y="664" font-size="11" fill="#475569" text-anchor="middle">CriticalLoop</text>
+  <line x1="841" y1="635" x2="881" y2="635" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="884" y="594" width="136" height="82" rx="10" fill="#5b21b6" stroke="#5b21b6" stroke-width="1.5"/>
+  <text x="952" y="622" font-size="15" font-weight="700" fill="white" text-anchor="middle">Merge</text>
+  <text x="952" y="640" font-size="11" fill="#c4b5fd" text-anchor="middle">DAG order</text>
+  <text x="952" y="655" font-size="11" fill="#c4b5fd" text-anchor="middle">resolved</text>
+
+  <rect x="200" y="688" width="972" height="38" rx="6" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1"/>
+  <text x="216" y="704" font-size="11" font-weight="700" fill="#5b21b6">Orchestration:</text>
+  <text x="318" y="704" font-size="11" fill="#334155">stateless tick orchestrate.py</text>
+  <text x="216" y="720" font-size="11" font-weight="700" fill="#5b21b6">Worker model:</text>
+  <text x="316" y="720" font-size="11" fill="#334155">HEADLESS claude -p in git worktrees</text>
+
+  <!-- Divider -->
+  <line x1="24" y1="832" x2="1176" y2="832" stroke="#cbd5e1" stroke-width="1"/>
+
+  <!-- ═══════════════════════════════
+       BOTTOM CALLOUT  y=842 h=84
+  ═══════════════════════════════ -->
+  <rect x="24" y="842" width="1152" height="84" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2"/>
+  <rect x="40" y="854" width="82" height="22" rx="4" fill="#0f172a"/>
+  <text x="81" y="869" font-size="12" font-weight="700" fill="white" text-anchor="middle">PATTERN</text>
+  <text x="136" y="869" font-size="13" fill="#334155">— The autonomous, parallel, headless-worker-in-worktree orchestrator was built TWICE (AEM + AE).</text>
+  <text x="40" y="892" font-size="13" fill="#334155">engineering-board designs the OPPOSITE: observable, attachable sessions (RFC 0001). EB is the contrarian on worker observability.</text>
+  <!-- ★ legend (inside box, right side) -->
+  <circle cx="1075" cy="877" r="10" fill="#f59e0b"/>
+  <text x="1075" y="882" font-size="11" font-weight="700" fill="white" text-anchor="middle">&#9733;</text>
+  <text x="1091" y="882" font-size="11" fill="#475569">= falsifiability enforced</text>
+
+</svg>

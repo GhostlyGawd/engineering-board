@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="880" viewBox="0 0 1200 880" font-family="-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <defs>
+    <linearGradient id="hg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <marker id="arrowE" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrowS" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrowUp" markerWidth="7" markerHeight="10" refX="3.5" refY="1" orient="auto">
+      <polygon points="0 10, 3.5 0, 7 10" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrowDn" markerWidth="7" markerHeight="10" refX="3.5" refY="9" orient="auto-start-reverse">
+      <polygon points="0 0, 3.5 10, 7 0" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrowTiny" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- Full canvas background -->
+  <rect width="1200" height="880" fill="#f6f8fb"/>
+
+  <!-- Header band -->
+  <rect x="0" y="0" width="1200" height="88" fill="url(#hg)"/>
+  <text x="40" y="52" fill="white" font-size="32" font-weight="700" text-anchor="start">Where each sits — two defining axes</text>
+  <text x="40" y="76" fill="#e0e7ff" font-size="17" text-anchor="start">Reactive triage vs directed build  ×  legible markdown vs typed-DB substrate</text>
+
+  <!-- ================================================================
+       PLOT AREA
+       x: 180 → 1060  (width 880)
+       y: 168 → 748   (height 580)
+       Axis cross: x=620, y=458
+       This gives 80px of space above plot (header is 88px, so plot starts at 168).
+       Top axis label placed at y=108 (inside header — no, use y=98 to be within header)
+       Actually: top label above plot, between header bottom (88) and plot top (168).
+       That 80px zone: label at y=104 and y=119 lines up nicely.
+  ================================================================ -->
+
+  <!-- Plot background -->
+  <rect x="180" y="168" width="880" height="580" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Quadrant tints (very subtle) -->
+  <rect x="180" y="168" width="440" height="290" fill="#eff6ff" opacity="0.5"/>
+  <rect x="620" y="168" width="440" height="290" fill="#f5f3ff" opacity="0.5"/>
+  <rect x="180" y="458" width="440" height="290" fill="#f0f9ff" opacity="0.5"/>
+  <rect x="620" y="458" width="440" height="290" fill="#fafafa" opacity="0.4"/>
+
+  <!-- Minor grid lines -->
+  <line x1="400" y1="168" x2="400" y2="748" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="840" y1="168" x2="840" y2="748" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="180" y1="313" x2="1060" y2="313" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="180" y1="603" x2="1060" y2="603" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <!-- X Axis (y=458) -->
+  <line x1="180" y1="458" x2="1060" y2="458" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowE)" marker-start="url(#arrowS)"/>
+
+  <!-- Y Axis (x=620) -->
+  <line x1="620" y1="168" x2="620" y2="748" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowUp)" marker-start="url(#arrowDn)"/>
+
+  <!-- ================================================================
+       AXIS LABELS
+  ================================================================ -->
+
+  <!-- X LEFT: REACTIVE -->
+  <text x="193" y="476" fill="#475569" font-size="12" font-weight="700" text-anchor="start">REACTIVE</text>
+  <text x="193" y="492" fill="#64748b" font-size="11" text-anchor="start">triage / capture</text>
+
+  <!-- X RIGHT: DIRECTED -->
+  <text x="1048" y="476" fill="#475569" font-size="12" font-weight="700" text-anchor="end">DIRECTED</text>
+  <text x="1048" y="492" fill="#64748b" font-size="11" text-anchor="end">plan &amp; build</text>
+
+  <!-- Y TOP: TYPED DB — in the band between header bottom (88) and plot top (168) -->
+  <!-- Placed left of axis, right-aligned at x=614 -->
+  <text x="614" y="108" fill="#475569" font-size="12" font-weight="700" text-anchor="end">TYPED DB substrate</text>
+  <text x="614" y="124" fill="#64748b" font-size="11" text-anchor="end">(tool-mediated)</text>
+
+  <!-- Y BOTTOM: LEGIBLE — below plot (y > 748) -->
+  <text x="614" y="766" fill="#475569" font-size="12" font-weight="700" text-anchor="end">LEGIBLE markdown</text>
+  <text x="614" y="782" fill="#64748b" font-size="11" text-anchor="end">(git-native, hand-editable)</text>
+
+  <!-- ================================================================
+       QUADRANT ANNOTATIONS
+  ================================================================ -->
+
+  <!-- Upper-left: empty note -->
+  <text x="400" y="278" fill="#94a3b8" font-size="13" text-anchor="middle" font-style="italic">(empty)</text>
+  <text x="400" y="298" fill="#94a3b8" font-size="12" text-anchor="middle" font-style="italic">no 'typed-DB triage' tool here</text>
+
+  <!-- ================================================================
+       TREND CALLOUT
+       Place in lower-left quadrant above the EB bubble.
+       EB is at y=640; callout at y=490–548 (well above it).
+  ================================================================ -->
+  <rect x="192" y="490" width="368" height="58" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1.5" opacity="0.97"/>
+  <text x="376" y="513" fill="#475569" font-size="12" text-anchor="middle">All three trend toward directed + structured;</text>
+  <text x="376" y="532" fill="#2563eb" font-size="12" font-weight="600" text-anchor="middle">EB anchors the legible / triage corner</text>
+
+  <!-- ================================================================
+       EB BUBBLE: lower-left (285, 645)
+  ================================================================ -->
+  <circle cx="285" cy="645" r="36" fill="#2563eb"/>
+  <text x="285" y="652" fill="white" font-size="15" font-weight="700" text-anchor="middle">EB</text>
+
+  <!-- EB label card: to the right -->
+  <rect x="334" y="610" width="224" height="70" rx="10" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="348" y="629" fill="#1e3a8a" font-size="13" font-weight="700" text-anchor="start">engineering-board</text>
+  <text x="348" y="646" fill="#1e40af" font-size="12" text-anchor="start">markdown board;</text>
+  <text x="348" y="662" fill="#1e40af" font-size="12" text-anchor="start">passive capture &amp; triage</text>
+  <line x1="321" y1="645" x2="334" y2="645" stroke="#93c5fd" stroke-width="1.5"/>
+
+  <!-- ================================================================
+       AEM BUBBLE: directed + below center (845, 510)
+  ================================================================ -->
+  <circle cx="845" cy="510" r="36" fill="#d97706"/>
+  <text x="845" y="517" fill="white" font-size="13" font-weight="700" text-anchor="middle">AEM</text>
+
+  <!-- AEM label card: below and left of bubble -->
+  <!-- Card: x=634 to x=634+244=878, y=562 to y=562+76=638 -->
+  <rect x="634" y="562" width="244" height="76" rx="10" fill="#fef3c7" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="648" y="581" fill="#92400e" font-size="12" font-weight="700" text-anchor="start">agentic-engineering-max</text>
+  <text x="648" y="598" fill="#92400e" font-size="12" text-anchor="start">task files + Web HUD;</text>
+  <text x="648" y="614" fill="#92400e" font-size="12" text-anchor="start">plan→build→review org</text>
+  <text x="648" y="629" fill="#78350f" font-size="11" font-style="italic" text-anchor="start">(structured files, not typed DB)</text>
+
+  <!-- Connector from AEM bubble to card -->
+  <line x1="824" y1="543" x2="790" y2="562" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+  <!-- ================================================================
+       AE BUBBLE: upper-right (935, 230)
+  ================================================================ -->
+  <circle cx="935" cy="230" r="36" fill="#7c3aed"/>
+  <text x="935" y="237" fill="white" font-size="15" font-weight="700" text-anchor="middle">AE</text>
+
+  <!-- AE label card: left of the bubble, inside upper-right quadrant -->
+  <!-- Card: x=632 to x=632+262=894, y=186 to y=186+66=252 -->
+  <rect x="632" y="186" width="262" height="66" rx="10" fill="#ede9fe" stroke="#c4b5fd" stroke-width="1.5"/>
+  <text x="646" y="206" fill="#5b21b6" font-size="13" font-weight="700" text-anchor="start">agentic-engineering</text>
+  <text x="646" y="223" fill="#6d28d9" font-size="12" text-anchor="start">SQLite graph via MCP;</text>
+  <text x="646" y="239" fill="#6d28d9" font-size="12" text-anchor="start">spec→build→verify</text>
+
+  <!-- Connector from card right to bubble left -->
+  <line x1="894" y1="219" x2="899" y2="219" stroke="#c4b5fd" stroke-width="1.5"/>
+
+  <!-- Trend dashed arrow: from AEM upward to AE -->
+  <line x1="865" y1="475" x2="922" y2="268" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowTiny)"/>
+
+  <!-- ================================================================
+       LEGEND
+  ================================================================ -->
+  <rect x="30" y="795" width="560" height="70" rx="14" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <circle cx="58" cy="823" r="10" fill="#2563eb"/>
+  <text x="74" y="828" fill="#0f172a" font-size="13" font-weight="700" text-anchor="start">EB</text>
+  <text x="96" y="828" fill="#334155" font-size="13" text-anchor="start">engineering-board</text>
+
+  <circle cx="58" cy="851" r="10" fill="#d97706"/>
+  <text x="74" y="856" fill="#0f172a" font-size="13" font-weight="700" text-anchor="start">AEM</text>
+  <text x="103" y="856" fill="#334155" font-size="13" text-anchor="start">agentic-engineering-max</text>
+
+  <circle cx="316" cy="823" r="10" fill="#7c3aed"/>
+  <text x="332" y="828" fill="#0f172a" font-size="13" font-weight="700" text-anchor="start">AE</text>
+  <text x="354" y="828" fill="#334155" font-size="13" text-anchor="start">agentic-engineering</text>
+
+</svg>
