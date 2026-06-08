@@ -19,7 +19,9 @@ product should be, and what to carry forward from each existing build.
 | **engineering-board** (this repo) | triage / work-capture control plane | markdown board | ✅ [profile](profiles/engineering-board.md) |
 | **agentic-engineering-max** (AEM) | build factory + web HUD (plan→build→review) | markdown tasks + web HUD | ✅ [profile](profiles/agentic-engineering-max.md) |
 | **agentic-engineering** (AE) | self-improving verification engine | SQLite graph via MCP | ✅ [profile](profiles/agentic-engineering.md) |
-| _candidates_ | norns-loop · symphony-clone / Symphony · harness-sdd · solo-os | — | ☐ not yet profiled |
+| **harness-sdd** | drop-in spec-driven-dev harness (gates, not an engine) | markdown specs + git gates | ✅ [profile](profiles/harness-sdd.md) |
+| **symphony-clone** (Symphony) | clean-room Claude-native clone of OpenAI's Symphony orchestrator | markdown board + in-memory loop | ✅ [profile](profiles/symphony-clone.md) |
+| _candidates (private — blocked)_ | norns-loop · solo-os | — | ☐ not accessible (private repos) |
 
 ## Contents
 
