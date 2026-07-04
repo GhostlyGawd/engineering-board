@@ -136,6 +136,21 @@ else
 fi
 rm -rf "$T05_HOME"
 
+# ── Test 4b (B046): bare specifiers WITHOUT the Tool(...) wrapper are NOT a ───
+# match. Pre-fix, the self-check compared the bare `pattern`, so a settings file
+# full of bare rules reported a false green over an install that never fires.
+# Now the check requires the wrapped `Tool(specifier)` rule, so the same bare
+# file must report every pattern MISSING (installed 0, exit 1).
+T05B_HOME="$(make_home "$FIXTURES/settings-bare-legacy.json")"
+out="$(CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T05B_HOME" bash "$SELF_CHECK" 2>&1 || true)"
+ec=0; CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T05B_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
+if [ "$ec" -eq 1 ] && echo "$out" | grep -qF "0 installed, $TOTAL missing"; then
+  pass "T05b: bare (unwrapped) rules report all missing, not a false green (B046)"
+else
+  fail "T05b: bare rules must NOT count as installed (got exit=$ec, out=$out)"
+fi
+rm -rf "$T05B_HOME"
+
 # ── Test 5: missing settings.json -> treated as empty, exit 1 ────────────────
 T07_HOME="$(make_home "")"
 ec=0; CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T07_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?

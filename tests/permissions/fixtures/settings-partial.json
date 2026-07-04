@@ -1,11 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-acquire.sh:*",
-      "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-heartbeat.sh:*",
-      "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-release.sh:*",
-      "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-reclaim-stale.sh:*",
-      "/pm-start"
+      "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-acquire.sh:*)",
+      "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-heartbeat.sh:*)",
+      "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-release.sh:*)",
+      "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-reclaim-stale.sh:*)",
+      "SlashCommand(/pm-start)"
     ]
   }
 }

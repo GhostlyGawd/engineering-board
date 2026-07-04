@@ -5,7 +5,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 ## Open
 
 ### Bugs
-- B046 P1 | [B046-permission-rules-emitted-without-tool-wrapper](bugs/B046-permission-rules-emitted-without-tool-wrapper.md)
 - B005 P2 | [B005-first-captured-finding-is-invisible--buried-in-s](bugs/B005-first-captured-finding-is-invisible--buried-in-s.md)
 - B006 P2 | [B006-advancing-one-entry-through-tdd-review-validate-](bugs/B006-advancing-one-entry-through-tdd-review-validate-.md)
 - B007 P2 | [B007-validator-success-is-a-dead-end-the-board-does-n](bugs/B007-validator-success-is-a-dead-end-the-board-does-n.md)
@@ -17,7 +16,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 - B020 P3 | [B020-board-migrate-is-two-unrelated-operations-under-](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
 - B021 P3 | [B021-code-reviewer-name-collides-with-code-review-and](bugs/B021-code-reviewer-name-collides-with-code-review-and.md)
 - B022 P3 | [B022-nothingtotest--nothingtoreview-still-advance-the](bugs/B022-nothingtotest--nothingtoreview-still-advance-the.md)
-- B047 P3 | [B047-worker-to-pm-refusal-hint-points-to-dead-end](bugs/B047-worker-to-pm-refusal-hint-points-to-dead-end.md)
 - B049 P3 | [B049-changelog-boardview-entry-omits-14-suite-bump](bugs/B049-changelog-boardview-entry-omits-14-suite-bump.md)
 
 ### Features

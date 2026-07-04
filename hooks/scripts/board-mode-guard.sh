@@ -160,7 +160,7 @@ if [ "$TARGET" = "pm" ]; then
       echo "Engineering board: already in PM mode. No action taken."
       exit 2 ;;
     worker)
-      echo "Engineering board: currently in worker mode (discipline=${CURRENT_DISCIPLINE}). Run /board-resume or restart the session to switch to PM mode. No action taken."
+      echo "Engineering board: currently in worker mode (discipline=${CURRENT_DISCIPLINE}). Restart the session to switch to PM mode. No action taken."
       exit 3 ;;
     paused)
       echo "Engineering board: currently paused. Run /board-resume first, then /pm-start. No action taken."
