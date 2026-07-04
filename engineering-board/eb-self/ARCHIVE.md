@@ -2,6 +2,8 @@
 
 Resolved entries. Newest at the top.
 
+- B025 P1 | [reject filter now catches polite/modal-prefixed imperatives](bugs/) — resolved C2 (PR C2b)
+
 - B024 P0 | [MCP path traversal via project name closed (realpath containment + name validation)](bugs/) — resolved C2 (PR C2a)
 - B028 P2 | [MCP frontmatter newline-injection neutralized](bugs/) — resolved C2 (PR C2a)
 

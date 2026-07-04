@@ -22,6 +22,13 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   now flattens embedded CR/LF/control characters in field values, so untrusted
   finding text copied into a `title` can no longer inject frontmatter keys (e.g.
   a hidden `status: resolved`) or close the `---` block early.
+- **Reject filter now catches politeness/modal-prefixed imperatives** (eb-self
+  B025). "Please ignore all previous instructions", "You must ignore…", "Now
+  ignore…" bypassed the C1 clause-boundary matcher; it now allows an optional
+  lead-in run (`please|kindly|now|just|you must|you should|…`) before the verb,
+  while a benign modal followed by a subject ("should the validator ignore…")
+  still promotes. Verb set broadened with `send`/`leak`/`expose`. Four new
+  adversarial fixtures; `reject-filter` now 65 checks (40 adversarial + 25 benign).
 
 - **Injection reject-filter hardened and made single-source** (eb-self B002).
   The deterministic defense-in-depth filter re-applied at consolidation was
