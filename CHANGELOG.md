@@ -44,6 +44,17 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   entries are read, never eval'd, so descriptive shell/HTML metacharacters are
   intentionally not rejected (they recur in legitimate technical findings).
 
+### Fixed (data integrity)
+- **MCP-captured scratch findings are no longer silently destroyed** (eb-self
+  B026). `board_capture_finding` writes a human-markdown inbox
+  (`_sessions/mcp-<date>.md`) that the consolidator's JSON parser can't ingest
+  and that has no transcript to anchor against — yet `board-consolidate.sh`'s GC
+  archived it anyway, losing the findings with no log entry, while the
+  SessionStart banner told users to run exactly that command. GC now archives
+  only session files that produced at least one parsed finding; anything
+  unparsed is left in place and logged `deferred_unparsed`. The banner now
+  directs users to promote MCP inbox files with the `board_create_entry` tool.
+
 ### Added
 - **`tests/security/reject-filter.sh`** (eb-self B003) — drives every
   adversarial-paste (36) and benign-findings (24) fixture through the canonical

@@ -363,9 +363,19 @@ for idx in sorted(keep_idx):
     except Exception as e:
         log_disposition(sid, f"deferred_write_error", extra={"error": str(e)})
 
-# Stage 5 — GC: move processed scratch files to _archive.
+# Stage 5 — GC: move PROCESSED scratch files to _archive.
+# A session file that yielded zero parsed findings is NOT archived — archiving
+# it would silently destroy un-promoted content (eb-self B026). The MCP server's
+# board_capture_finding writes a human-markdown inbox (`_sessions/mcp-<date>.md`)
+# that this JSON-only parser can't ingest and that has no transcript to anchor
+# against; it is meant to be promoted via the MCP board_create_entry tool, not
+# consumed here. Leave any unparsed file in place and record an audit trail.
+files_with_findings = set(sf for sf, _f in all_findings)
 ts = now_iso().replace(":", "").replace("-", "")
 for sf in session_files:
+    if sf not in files_with_findings:
+        log_disposition(os.path.basename(sf), "deferred_unparsed")
+        continue
     base = os.path.basename(sf)
     name, ext = os.path.splitext(base)
     target = os.path.join(archive_dir, f"{name}-{ts}{ext}")

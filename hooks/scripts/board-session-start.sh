@@ -131,10 +131,13 @@ PY
     # Count *.md files directly under _sessions/ (exclude _archive/ subdir)
     scratch_count=$(find "${SCRATCH_DIR}" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
     if [ "${scratch_count}" -gt 0 ]; then
-      echo "  SCRATCH ENTRIES — ${scratch_count} un-promoted session file(s) in _sessions/. Will consolidate on real session end. Run \`bash \$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-consolidate.sh\` manually to consolidate now."
+      echo "  SCRATCH ENTRIES — ${scratch_count} un-promoted session file(s) in _sessions/. Plugin session files consolidate on real session end (or run \`bash \$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-consolidate.sh\` now). MCP inbox files (\`mcp-*.md\`) are promoted with the MCP \`board_create_entry\` tool — the consolidator leaves them untouched."
       while IFS= read -r scratch_file; do
         session_id=$(basename "${scratch_file}" .md)
-        echo "    ${session_id}"
+        case "${session_id}" in
+          mcp-*) echo "    ${session_id}  (MCP inbox — promote via board_create_entry)" ;;
+          *)     echo "    ${session_id}" ;;
+        esac
       done < <(find "${SCRATCH_DIR}" -maxdepth 1 -type f -name "*.md" 2>/dev/null | sort)
       echo ""
     fi

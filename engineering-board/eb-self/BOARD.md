@@ -5,7 +5,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 ## Open
 
 ### Bugs
-- B026 P1 | [B026-mcp-captured-scratch-findings-are-silently-des](bugs/B026-mcp-captured-scratch-findings-are-silently-des.md)
 - B027 P1 | [B027-readme-quickstart-dead-ends-at-board-init-capt](bugs/B027-readme-quickstart-dead-ends-at-board-init-capt.md)
 - B005 P2 | [B005-first-captured-finding-is-invisible--buried-in-s](bugs/B005-first-captured-finding-is-invisible--buried-in-s.md)
 - B006 P2 | [B006-advancing-one-entry-through-tdd-review-validate-](bugs/B006-advancing-one-entry-through-tdd-review-validate-.md)
