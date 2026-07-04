@@ -203,6 +203,17 @@ def type_subdir(ftype):
         "observation": ("observations", "O"),
     }.get(ftype, (None, None))
 
+def flatten(value):
+    """Collapse a promoted field to a single line so it cannot break out of the
+    frontmatter block or inject extra markdown into the entry body (eb-self B052;
+    same class as the MCP server's `_oneline`, B028/B040, but this is a DIFFERENT
+    writer the MCP-only fix never covered). Folds every CR/LF/tab/VT/FF/control
+    char to a space; `reject_finding` only scans title/quote/affects/tags, so
+    fields it never sees (discovered/type) must be flattened here regardless."""
+    if value is None:
+        return ""
+    return " ".join(str(value).split())
+
 def append_board_index(board_dir, entry_id, title):
     board_md = os.path.join(board_dir, "BOARD.md")
     line = f"- {entry_id}: {title}\n"
@@ -319,11 +330,11 @@ for idx in sorted(keep_idx):
     sub = os.path.join(board_dir, subdir_name)
     os.makedirs(sub, exist_ok=True)
     live_id = next_id(sub, prefix)
-    title = f.get("title") or "(untitled finding)"
+    title = flatten(f.get("title")) or "(untitled finding)"
     affects = f.get("affects")
-    affects_field = "" if affects in (None, "null") else str(affects)
+    affects_field = "" if affects in (None, "null") else flatten(affects)
     tags = f.get("tags") or []
-    tags_field = "[" + ", ".join(str(t) for t in tags) + "]"
+    tags_field = "[" + ", ".join(flatten(t) for t in tags) + "]"
     slug = slugify(title)
     fname = f"{live_id}-{slug}.md"
     fm_lines = [
@@ -331,7 +342,7 @@ for idx in sorted(keep_idx):
         f"id: {live_id}",
         f"type: {ftype}",
         f"title: {title}",
-        f"discovered: {f.get('discovered') or today}",
+        f"discovered: {flatten(f.get('discovered')) or today}",
     ]
     if affects_field:
         fm_lines.append(f"affects: {affects_field}")
@@ -354,7 +365,7 @@ for idx in sorted(keep_idx):
         body_lines += ["## Done when", "", "<!-- TODO — define completion criteria. -->", ""]
     quote = f.get("evidence_quote") or ""
     if quote:
-        body_lines += ["## Evidence", "", "> " + quote.replace("\n", " "), ""]
+        body_lines += ["## Evidence", "", "> " + flatten(quote), ""]
     try:
         with open(os.path.join(sub, fname), "w", encoding="utf-8") as f_out:
             f_out.write("\n".join(body_lines))
