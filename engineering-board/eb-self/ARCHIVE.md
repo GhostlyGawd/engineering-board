@@ -2,6 +2,9 @@
 
 Resolved entries. Newest at the top.
 
+- B059 P1 | [reject skip-run now covers the whole markdown list-marker family (ordered/lettered/checkbox)](bugs/B059-reject-skip-run-misses-ordered-list-markers.md) — resolved C11 (PR C11a)
+- B060 P3 | [slash-directive rule catches a slash abutting a marker/quote/paren](bugs/B060-slash-directive-bypassed-by-punct-abutment.md) — resolved C11 (PR C11a)
+
 - B058 P1 | [reject invisible-strip now covers the whole Cf/default-ignorable class (soft hyphen etc.)](bugs/B058-reject-invisible-strip-incomplete-cf-class.md) — resolved C10 (PR C10a)
 
 - B056 P2 | [reject terminator fold now spans the major living scripts (comprehensive-by-construction)](bugs/B056-reject-terminator-fold-incomplete-arabic-armen.md) — resolved C9 (PR C9a)
