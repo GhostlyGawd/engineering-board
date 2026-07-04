@@ -2,6 +2,8 @@
 
 Resolved entries. Newest at the top.
 
+- B026 P1 | [MCP-captured findings no longer silently destroyed by consolidate](bugs/) — resolved C2 (PR C2c)
+
 - B025 P1 | [reject filter now catches polite/modal-prefixed imperatives](bugs/) — resolved C2 (PR C2b)
 
 - B024 P0 | [MCP path traversal via project name closed (realpath containment + name validation)](bugs/) — resolved C2 (PR C2a)

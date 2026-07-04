@@ -292,6 +292,33 @@ else
   report 1 "resolve-in-place setup: B001 entry file found" "no $BOARD_DIR/bugs/B001-*.md"
 fi
 
+# 23. Unparsed-scratch preservation (B026): a session file with no JSON findings
+# (the MCP board_capture_finding markdown inbox) must NOT be silently archived by
+# consolidate — it must stay in place with a deferred_unparsed audit-trail entry.
+cat > "$BOARD_DIR/_sessions/mcp-2026-07-04.md" <<'EOF'
+# MCP scratch inbox — 2026-07-04
+
+Un-promoted findings captured via the MCP server. Promote with board_create_entry.
+
+## 2026-07-04T00:00:00Z — bug: real parser bug
+
+- kind: bug
+- affects: src/p.py
+
+the parser drops the last token under load
+EOF
+bash "$CONSOLIDATE" </dev/null > "$TMP/consolidate2.stdout" 2> "$TMP/consolidate2.stderr" || true
+if [ -f "$BOARD_DIR/_sessions/mcp-2026-07-04.md" ]; then
+  report 0 "unparsed MCP inbox preserved (not archived) by consolidate (B026)"
+else
+  report 1 "unparsed MCP inbox preserved (not archived) by consolidate (B026)" "mcp inbox was archived/destroyed"
+fi
+if grep -q "deferred_unparsed" "$BOARD_DIR/consolidation.log" 2>/dev/null; then
+  report 0 "consolidate logs deferred_unparsed for the MCP inbox (B026 audit trail)"
+else
+  report 1 "consolidate logs deferred_unparsed for the MCP inbox (B026 audit trail)" "no deferred_unparsed in consolidation.log"
+fi
+
 # --- Final tally -------------------------------------------------------------
 echo ""
 echo "================================================================"
