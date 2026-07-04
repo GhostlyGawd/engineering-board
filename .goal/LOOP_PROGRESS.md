@@ -17,12 +17,12 @@ _Last updated: 2026-07-04 (C1 in progress)_
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ not yet (C1 in progress) |
-| 2 | eb-self board has no open blocker/major/P0/P1 | ⬜ |
-| 3 | Time-to-first-value measured, documented, defensible (≤5min first capture, ≤15min first promote) | ⬜ |
-| 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | ⬜ |
-| 5 | README+landing+CHANGELOG+positioning coherent, link-checked, Lighthouse ≥95, real animated demo | ⬜ |
-| 6 | Release batched+CHANGELOG'd+manifests bumped; BLOCKERS only human-gated; FINAL_REPORT closing section | ⬜ |
+| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C1 done but NOT clean (fixed 4 P1s, surfaced B023 P2) → need clean C2 + C3 |
+| 2 | eb-self board has no open blocker/major/P0/P1 | ✅ MET after C1 — all open entries are P2/P3 |
+| 3 | Time-to-first-value measured, documented, defensible (≤5min first capture, ≤15min first promote) | ⬜ pending (C2 Track B walkthrough) |
+| 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | 🟡 Track B produced the table (in this file's C1 notes); not yet consolidated to docs/rfcs/ |
+| 5 | README+landing+CHANGELOG+positioning coherent, link-checked, Lighthouse ≥95, real animated demo | 🟡 coherence fixed (C1d); animated demo + Lighthouse re-run pending |
+| 6 | Release batched+CHANGELOG'd+manifests bumped; BLOCKERS only human-gated; FINAL_REPORT closing section | ⬜ pending (batch at convergence) |
 
 ## Cycle log
 
@@ -54,14 +54,45 @@ _Last updated: 2026-07-04 (C1 in progress)_
 - Next: REFLECT (C1 retro + Learnings) → convergence assessment → begin C2 (need 2 consecutive clean full cycles per criterion 1).
 - **eb-self open blocker/major/P1: NONE.** Open (all P2/P3): B005/B006/B007/B008/B009/B014 (P2); B016/B020/B021/B022 (P3); F001–F003; Q001.
 
-### Track status (current cycle)
+### Track status (C1)
 
 | Track | Status |
 |-------|--------|
-| A — Red team & hardening | DISCOVER ✅ · intaked · slate C1a/C1c |
-| B — UX & first-principles | DISCOVER ✅ · intaked · slate C1b, rest deferred |
-| C — PM feature development | DISCOVER ✅ · intaked · features deferred to C2 |
-| D — Surface coherence | DISCOVER ✅ · intaked · slate C1d |
+| A — Red team & hardening | DISCOVER ✅ · shipped B002/B003 (C1a), B001/B010 (C1c), B023 (C1e) |
+| B — UX & first-principles | DISCOVER ✅ · shipped B004/B015 (C1b); B005/B006/B007/B014 deferred to C2 |
+| C — PM feature development | DISCOVER ✅ · F001/F002/F003 RFCs on board; build deferred to C2 |
+| D — Surface coherence | DISCOVER ✅ · shipped B011/B012/B013/B017/B018/B019 (C1d) |
+
+### C1 REFLECT (retro)
+
+**Shipped:** 5 PRs merged (#21–#25). 13 findings resolved: **4 P1s** (B002 injection
+bypass, B003 dead fixtures, B004 permission gap, B001 O(n²) SessionStart), plus B010,
+B015, B011–B013/B017–B019, and B023 (a bug the dogfood board surfaced about itself).
+
+**What C1 proved:** the *mechanics* the prior run shipped had real gaps under adversarial
++ scale + coherence pressure — all now closed with tests. The board dogfooded cleanly:
+26 findings intaked, 13 resolved through the real state machine, index-check/validator
+run on the board itself.
+
+**What C1 disproved:** the "100% reject-rate" and "runs without babysitting" claims were
+both false as shipped (untested fixtures; allowlist missing the core scripts). Positioning
+copy now matches reality (C1d).
+
+**Learnings promoted (product memory about itself):** L001 (guards need tests that drive
+real fixtures/call-sites — from B002/B003/B004) and L002 (invariants must respect the
+open-vs-resolved lifecycle — from B023/B010).
+
+**Convergence:** criterion 2 now MET (no open blocker/major/P1). C1 was NOT a *clean*
+cycle (it found P1s), so criterion 1 needs two *consecutive clean* cycles ahead. Carrying
+to C2: verify C1 fixes hold, measure time-to-first-value (crit 3), consolidate the surface
+keep/simplify/merge/deprecate table into a `docs/rfcs/` product-review doc (crit 4), and
+evaluate building F001 (board viewer) / F002 (onboarding wizard).
+
+**Surface keep/simplify/merge/deprecate (Track B, to be moved into docs/rfcs/ in C2):**
+commands mostly keep; `/board-graph` simplify (fold into rebuild), `/worker-start` simplify
+(discipline lock → B006), `/board-migrate` simplify (two ops, B020); agents: `consolidator`/
+`board-consolidate` skill merge (B014), `code-reviewer` rename (B021); MCP tools all keep
+(best-designed surface); skills keep with the fixes shipped in C1d.
 
 ## Evidence
 
