@@ -20,7 +20,7 @@ _The board is the database._
 
 <img src="docs/board-demo.svg" alt="A finding is captured, promoted to the board, and driven through the tdd → review → validate pipeline to done — every step committed markdown." width="720">
 
-_A finding is captured, promoted, and driven through `tdd → review → validate` to done — [rendered live by `/board-view`](engineering-board/eb-self/board.html), every step committed markdown you can diff._
+_A finding is captured, promoted, and driven through `tdd → review → validate` to done — see [the HTML `/board-view` generates](engineering-board/eb-self/board.html) (committed to the repo; open it locally to render), every step markdown you can diff._
 
 </div>
 

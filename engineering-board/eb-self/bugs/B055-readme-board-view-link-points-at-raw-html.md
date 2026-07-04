@@ -3,7 +3,7 @@ id: B055
 type: bug
 title: README "rendered live by /board-view" link points at a raw .html blob (GitHub shows source)
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P3
 affects: README.md
 needs: tdd
@@ -18,3 +18,6 @@ README hero links "rendered live by /board-view" to `engineering-board/eb-self/b
 
 ## Fix direction
 Soften the link text (e.g. "the HTML `/board-view` generates") or point at a hosted render.
+
+## Resolution (C8, PR C8b)
+README hero link text now reads 'the HTML /board-view generates … open it locally to render' so the raw-source destination isn't surprising.

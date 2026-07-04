@@ -12,6 +12,21 @@ increases.
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security
+- **Reject filter now folds non-Latin sentence terminators to a clause boundary**
+  (eb-self B053). The boundary class `[.!?:;,\n]` was ASCII-only, so a bare
+  imperative after a CJK `。`/`、`, Devanagari danda `।`/`॥`, Ethiopic `።`, or
+  Arabic `۔`/`؟` did not anchor and promoted — and (unlike a cross-script
+  homoglyph) these leave the following verb pristine, so an LLM reads a clean
+  command. `_normalize` folds a curated terminator set to ASCII `.` before
+  scanning. Three new adversarial fixtures. Lineage B043/B051.
+- **MCP evidence blockquote splits on every line separator** (eb-self B054). The
+  `board_capture_finding` evidence blockquote used `.split("\n")`, so a bare
+  `\r`/`\f`/NEL before `## …` escaped the `> ` prefix and forged a scratch header
+  (one finding counted as two) — re-opening the B040 harm in a writer the
+  MCP-only fix never covered. Now `.splitlines()`, and `_oneline` (title/kind/
+  affects/heading) is hardened to the full separator class. CR/FF/NEL regressions
+  added. (B053/B054 are the same incomplete-line-handling class as B051/B052, now
+  fixed across every writer/reader.)
 - **Reject filter now folds every line break to a clause boundary** (eb-self
   B051). `_normalize` folded only `U+2028/2029/0085`, and the boundary class was
   `[.!?:;,\n]` — so an imperative hidden after CR (`\r`, the most common
@@ -129,6 +144,11 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   only the README). Measurement: `.goal/evidence/loop/C2-time-to-first-value.md`.
 
 ### Fixed (permissions & UX)
+- **README hero link no longer implies a hosted render** (eb-self B055). The
+  "rendered live by `/board-view`" hero link pointed at the committed
+  `board.html`, which GitHub serves as raw source; the text now reads "the HTML
+  `/board-view` generates … open it locally to render" so the destination isn't
+  surprising.
 - **Quickstart points at the visual board viewer** (eb-self B050). The "visible
   confirmation" step pointed only at `_sessions/` or `/board-rebuild` (which
   refreshes the markdown `BOARD.md` index, not the visual board); it now surfaces
