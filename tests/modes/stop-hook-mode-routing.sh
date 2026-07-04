@@ -81,7 +81,7 @@ PROCEDURE_BODY="$(cat "$PROCEDURE_MD")"
 
 check_body() {
   local label="$1" needle="$2"
-  if echo "$PROMPT_BODY" | grep -qF -- "$needle"; then
+  if grep -qF -- "$needle" <<<"$PROMPT_BODY"; then
     report 0 "$label"
   else
     report 1 "$label" "missing in prompt body: $needle"
@@ -90,7 +90,7 @@ check_body() {
 
 check_body_absent() {
   local label="$1" needle="$2"
-  if echo "$PROMPT_BODY" | grep -qF -- "$needle"; then
+  if grep -qF -- "$needle" <<<"$PROMPT_BODY"; then
     report 1 "$label" "unexpectedly present in prompt body: $needle"
   else
     report 0 "$label"
@@ -99,7 +99,7 @@ check_body_absent() {
 
 check_proc() {
   local label="$1" needle="$2"
-  if echo "$PROCEDURE_BODY" | grep -qF -- "$needle"; then
+  if grep -qF -- "$needle" <<<"$PROCEDURE_BODY"; then
     report 0 "$label"
   else
     report 1 "$label" "missing in procedure file: $needle"
@@ -123,7 +123,7 @@ check_body "hooks.json: forces Read tool before infer"            "MUST Read"
 
 # All 10 sentinels must appear in the fast-path-2 loop guard list.
 for s in PASSIVE-DONE PASSIVE-SKIP PASSIVE-PAUSED PASSIVE-NO-BOARD PASSIVE-FAIL PM-CONTINUE PM-FAIL WORKER-CONTINUE WORKER-NOTHING-TO-DO WORKER-FAIL; do
-  if echo "$PROMPT_BODY" | grep -qF -- "<<EB-$s>>"; then
+  if grep -qF -- "<<EB-$s>>" <<<"$PROMPT_BODY"; then
     report 0 "hooks.json fast-path 2 covers EB-$s"
   else
     report 1 "hooks.json fast-path 2 covers EB-$s"
@@ -139,7 +139,7 @@ check_body_absent "hooks.json: no '=== Section 3-WORKER' header"       "Section 
 check_body_absent "hooks.json: no '---USER MESSAGE---' delimiter"      "---USER MESSAGE---"
 check_body_absent "hooks.json: no '---ENTRY-CONTENT---' delimiter"     "---ENTRY-CONTENT---"
 check_body_absent "hooks.json: no finding-extractor dispatch prose"    "subagent_type=finding-extractor"
-check_body_absent "hooks.json: no tdd-builder dispatch prose"          "subagent_type=`tdd-builder`"
+check_body_absent "hooks.json: no tdd-builder dispatch prose"          'subagent_type=`tdd-builder`'
 
 # ── stop-hook-procedure.md: full procedure ───────────────────────────────────
 # Section 2: untrusted-data framing.
@@ -217,7 +217,7 @@ check_proc "procedure: WORKER state machine documented"           "tdd -> review
 
 # Section 4 sentinel inventory: all 10 must be documented.
 for s in PASSIVE-SKIP PASSIVE-PAUSED PASSIVE-NO-BOARD PASSIVE-DONE PASSIVE-FAIL PM-CONTINUE PM-FAIL WORKER-CONTINUE WORKER-NOTHING-TO-DO WORKER-FAIL; do
-  if echo "$PROCEDURE_BODY" | grep -qF -- "<<EB-$s>>"; then
+  if grep -qF -- "<<EB-$s>>" <<<"$PROCEDURE_BODY"; then
     report 0 "procedure: Section 4 documents EB-$s"
   else
     report 1 "procedure: Section 4 documents EB-$s"
@@ -228,7 +228,7 @@ done
 check_proc "procedure: Section 5 loop guard present"              "Section 5"
 LOOP_GUARD="$(echo "$PROCEDURE_BODY" | awk '/## Section 5/,EOF')"
 for s in PASSIVE-DONE PASSIVE-SKIP PASSIVE-PAUSED PASSIVE-NO-BOARD PASSIVE-FAIL PM-CONTINUE PM-FAIL WORKER-CONTINUE WORKER-NOTHING-TO-DO WORKER-FAIL; do
-  if echo "$LOOP_GUARD" | grep -qF -- "<<EB-$s>>"; then
+  if grep -qF -- "<<EB-$s>>" <<<"$LOOP_GUARD"; then
     report 0 "procedure: Section 5 loop guard covers EB-$s"
   else
     report 1 "procedure: Section 5 loop guard covers EB-$s"
