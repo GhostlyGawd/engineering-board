@@ -2,6 +2,8 @@
 
 Resolved entries. Newest at the top.
 
+- B056 P2 | [reject terminator fold now spans the major living scripts (comprehensive-by-construction)](bugs/B056-reject-terminator-fold-incomplete-arabic-armen.md) — resolved C9 (PR C9a)
+
 - B055 P3 | [README hero link no longer implies a hosted render (raw-html honesty)](bugs/B055-readme-board-view-link-points-at-raw-html.md) — resolved C8 (PR C8b)
 - B053 P1 | [reject filter folds non-Latin sentence terminators to a clause boundary](bugs/B053-reject-filter-misses-non-ascii-sentence-term.md) — resolved C8 (PR C8a)
 - B054 P2 | [MCP capture evidence splits on all line separators (forged-header injection closed)](bugs/B054-mcp-capture-evidence-split-misses-cr-ff-nel.md) — resolved C8 (PR C8a)
