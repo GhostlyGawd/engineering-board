@@ -44,6 +44,10 @@ _Last updated: 2026-07-04 (C1 in progress)_
 - **PR C1d — docs coherence sweep:** B011, B012, B013, B015, B017, B018, B019.
 - **Deferred (recorded):** B005/B007 UX (touch pinned stop-hook tokens — C2 with care); B006/B014 (design, likely Conductor-adjacent — C2); features F001/F002/F003 (C2, after P1s clear — red-team surfaced P1s that gate adding new surface); B020/B021/B022 (P3, C2).
 
+**SHIP progress (C1):**
+- **PR C1a → [#21](https://github.com/GhostlyGawd/engineering-board/pull/21)** (draft) — B002 injection filter + B003 fixture-corpus CI wiring + board init/intake. Awaiting CI, then un-draft + merge. B002/B003 resolved on eb-self board.
+- Next: C1b (B004 permission allowlist) → C1c (B001 perf) → C1d (docs sweep). Reset branch to updated main after each merge.
+
 ### Track status (current cycle)
 
 | Track | Status |
