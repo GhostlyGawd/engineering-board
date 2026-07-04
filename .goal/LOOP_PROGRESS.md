@@ -75,17 +75,20 @@ _Last updated: 2026-07-04 (C1 in progress)_
 - **C3 REFLECT:** L003 (newest surface = most risk) now has **recurrence 5** (B024/B026/B028/B034/B035) — the MCP server has yielded a security finding every cycle it's been red-teamed. Consider a proactive full input-validation audit of the remaining MCP tools to break the pattern before C4.
 - **eb-self open blocker/major/P1: NONE.** Open (all P2/P3): B005/B006/B007/B008/B009/B014/B029/B030 (P2); B016/B020/B021/B022 (P3); F002/F003; Q001.
 
-### Next — C4 (must be the first clean cycle)
+### C4 — fourth full DISCOVER sweep (COMPLETE — NOT clean)
 
-Criterion 1 needs **two consecutive clean cycles**; C1/C2/C3 were all unclean.
-C4 (and C5) must surface zero new blocker/major/P1. To de-risk the recurring MCP
-finding, C4's red-team should do an exhaustive input-validation sweep of every
-MCP tool (all params that reach a path or a serialized file). Remaining owed:
-criterion 5 (animated demo — the F001 `board.html` is now the asset; script an
-asciinema/GIF or embed the viewer; re-run Lighthouse on the landing page) and
-criterion 6 (batch the release: bump `plugin.json`+`marketplace.json`, promote
-the CHANGELOG `[Unreleased]` heading, write the FINAL_REPORT closing section) —
-do criterion 6 once criterion 1 is within reach.
+- **DISCOVER:** all four tracks. The exhaustive MCP red-team + reject-filter probe found **2 majors + 2 minors**, again the same injection class: B037 (reject filter bypassed by markdown markers `- ignore…`), B038 (MCP `affects_prefix` injects a router row), B039 (MCP `board_init` symlink write-outside-root), B040 (capture header injection). Track B+D: coherent, 2 P3s (B041 RFC count, B042 landing viewer). My own pre-audit missed the string-into-structured-file vectors — the agent red-team was more thorough (lesson logged).
+- **SHIP:** PRs #35–#36 merged. C4a (#35): B037–B040 — reject markdown markers + affects_prefix sanitize + board_init containment + capture flatten (reject-filter 65→69, MCP 74→79). C4b (#36): B041/B042 docs coherence + surfaced `/board-view` on the landing page.
+- **C4 REFLECT:** L003 (newest surface = most risk) → **recurrence 7** (+B038/B039); L004 (a denylist is never done) → **recurrence 3** (+B037). Both moats keep paying rent. The injection class is now hardened at every known site; C5's red-team should confirm it's finally exhausted.
+- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3): B005/B006/B007/B008/B009/B014/B029/B030 (P2); B016/B020/B021/B022 (P3); F002/F003; Q001.
+
+### Next — C5 (must be the first clean cycle)
+
+Criterion 1 needs **two consecutive clean cycles**; C1–C4 were all unclean. C5
+must surface zero new blocker/major/P1 — the injection class is now closed at
+every known site, so this is the best shot. Remaining owed:
+- **Criterion 5:** the landing page already has a scripted animated board demo and now surfaces `/board-view`; still owed is a **README animated demo** (F001's `board.html` is the asset — an animated SVG of the pipeline, or reference the live demo) + a **Lighthouse re-run** (curl-mirror technique in `.goal/evidence/G4-live-verification.txt`).
+- **Criterion 6** (once criterion 1 is within reach): batch the release — bump `plugin.json`+`marketplace.json` (lockstep), promote the CHANGELOG `[Unreleased]` heading, add the `.goal/FINAL_REPORT.md` closing "improvement loop" section; the git tag itself stays human-gated (BLOCKERS B2).
 
 ### Track status (C1)
 

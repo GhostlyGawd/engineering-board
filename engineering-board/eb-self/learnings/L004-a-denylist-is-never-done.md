@@ -5,8 +5,8 @@ subtype: principle
 title: A denylist heuristic is never done — assume every pattern has an adjacent bypass
 discovered: 2026-07-04
 confidence: medium
-recurrence: 2
-derived_from: [B002, B025]
+recurrence: 3
+derived_from: [B002, B025, B037]
 applies_to: [hooks/scripts/board_reject_check.py, tests/security/]
 pattern_tag: filter-completeness
 ---
@@ -30,3 +30,4 @@ capability limits) where the denylist's leakage would be dangerous.
 ## Sources
 - B002 — C1 injection filter hardening (unanchored, broadened, all-fields).
 - B025 — C2 politeness/modal-prefixed bypass of that same filter.
+- B037 — C4 markdown list/blockquote-marker bypass of that same filter.

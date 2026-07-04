@@ -5,8 +5,8 @@ subtype: principle
 title: The newest surface carries the most risk — red-team it hardest
 discovered: 2026-07-04
 confidence: high
-recurrence: 5
-derived_from: [B024, B026, B028, B034, B035]
+recurrence: 7
+derived_from: [B024, B026, B028, B034, B035, B038, B039]
 applies_to: [mcp-server/]
 pattern_tag: new-surface-risk
 ---
@@ -27,6 +27,8 @@ serialized files, one component's output → another's parser).
 - B028 — MCP frontmatter injection via unescaped newlines.
 - B034 — MCP entry_id path traversal (C3, same class as B024, left open for entry_id).
 - B035 — MCP bulk tools bypassed router-row containment (C3).
+- B038 — MCP affects_prefix injected a router row (C4).
+- B039 — MCP board_init followed symlinks out of root (C4).
 
 ## When this applies
 Immediately after shipping any net-new surface (a server, a tool, a new hook).
