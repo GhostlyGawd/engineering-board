@@ -3,7 +3,7 @@ id: B032
 type: bug
 title: CHANGELOG Unreleased fixture arithmetic reads as a contradiction (50 vs 36+24)
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P3
 affects: CHANGELOG.md
 needs: tdd
@@ -15,3 +15,6 @@ pattern: [doc-drift]
 
 ## Observed behavior (C2 Track D — LOW)
 `CHANGELOG.md:30-36` gives 36 adversarial + 24 benign but calls it "the 50-fixture corpus." 50 is historically correct (C1 added 10) but reads as bad arithmetic next to 36+24.
+
+## Resolution (C2, PR C2d)
+CHANGELOG '50-fixture corpus' -> 'then-50-fixture corpus (now 60)' so it no longer reads as bad arithmetic next to 36+24.

@@ -5,7 +5,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 ## Open
 
 ### Bugs
-- B027 P1 | [B027-readme-quickstart-dead-ends-at-board-init-capt](bugs/B027-readme-quickstart-dead-ends-at-board-init-capt.md)
 - B005 P2 | [B005-first-captured-finding-is-invisible--buried-in-s](bugs/B005-first-captured-finding-is-invisible--buried-in-s.md)
 - B006 P2 | [B006-advancing-one-entry-through-tdd-review-validate-](bugs/B006-advancing-one-entry-through-tdd-review-validate-.md)
 - B007 P2 | [B007-validator-success-is-a-dead-end-the-board-does-n](bugs/B007-validator-success-is-a-dead-end-the-board-does-n.md)
@@ -18,9 +17,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 - B020 P3 | [B020-board-migrate-is-two-unrelated-operations-under-](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
 - B021 P3 | [B021-code-reviewer-name-collides-with-code-review-and](bugs/B021-code-reviewer-name-collides-with-code-review-and.md)
 - B022 P3 | [B022-nothingtotest--nothingtoreview-still-advance-the](bugs/B022-nothingtotest--nothingtoreview-still-advance-the.md)
-- B031 P3 | [B031-stale-suitefile-counts-across-readme-and-archi](bugs/B031-stale-suitefile-counts-across-readme-and-archi.md)
-- B032 P3 | [B032-changelog-unreleased-fixture-arithmetic-reads-](bugs/B032-changelog-unreleased-fixture-arithmetic-reads-.md)
-- B033 P3 | [B033-worker-start-unsupported-discipline-error-leak](bugs/B033-worker-start-unsupported-discipline-error-leak.md)
 
 ### Features
 - F001 P2 | [F001-zero-dep-html-board-viewer-board-view---committe](features/F001-zero-dep-html-board-viewer-board-view---committe.md)

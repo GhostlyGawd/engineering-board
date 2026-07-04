@@ -64,6 +64,20 @@ Then scaffold a board, once per project:
 /board-init <project> [affects-prefix]
 ```
 
+Grant the pipeline's permissions once, so it runs without prompting on every step:
+
+```
+/board-install-permissions
+```
+
+**Now you have a board. Here's how the first value shows up — no further setup:**
+
+1. **Capture is automatic.** Just work in Claude Code as usual. When a turn ends, the Stop hook quietly extracts any bug/feature/question/observation you or the agent surfaced and writes it to the board's scratch inbox at `engineering-board/<project>/_sessions/`. You don't run anything — capture is a passive side effect. (Peek at that folder to confirm it's working.)
+2. **Promote when you're ready.** Run `/pm-start`, then end a turn: the PM pipeline consolidates the scratch findings into real, committed board entries under `engineering-board/<project>/bugs/` (etc.) and updates `BOARD.md`. That's your first entry on the board.
+3. **Let an agent work it.** Run `/worker-start --discipline tdd`, then end a turn: a worker claims a `needs: tdd` entry and drives it through the `tdd → review → validate` pipeline. (Advancing one entry across all three disciplines currently takes one worker session per discipline — see the [roadmap](#roadmap).)
+
+**What to expect (measured, following only this page):** first captured finding in ~5 minutes from install; first promoted board entry in ~10–15 minutes once you run `/pm-start`. The capture in step 1 is deliberately quiet — if you want a visible confirmation, look in `_sessions/` or run `/board-rebuild` to see the board. Full mode reference is the [feature tour](#feature-tour) below.
+
 ### MCP server
 
 Register the zero-dependency `python3` server with the Claude Code CLI:
@@ -164,7 +178,7 @@ Directional and honest — the items below are designed, not shipped.
 The test suite is bash + python3 only, no install step:
 
 ```sh
-bash tests/run-all.sh   # 11 suites
+bash tests/run-all.sh   # 13 suites
 ```
 
 Cross-compat rules for any new `hooks/scripts/*.sh` (pinned by `tests/crosscompat-lint.sh`): shebang exactly `#!/usr/bin/env bash`; no `date -d` / `date -j -f`; no `jq`; no drive letters — use `python3` for JSON and timestamps. Version bumps must touch both `.claude-plugin/plugin.json` and `marketplace.json` in lockstep. Develop on a branch and land changes via PR — never push to `main` directly.

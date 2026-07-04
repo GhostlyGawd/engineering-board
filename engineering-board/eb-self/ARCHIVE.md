@@ -2,6 +2,11 @@
 
 Resolved entries. Newest at the top.
 
+- B027 P1 | [README Quickstart now covers capture->promote->fix + time-to-first-value](bugs/) — resolved C2 (PR C2d)
+- B031 P3 | [stale suite/file counts fixed across README + ARCHITECTURE](bugs/) — resolved C2 (PR C2d)
+- B032 P3 | [CHANGELOG fixture-count wording](bugs/) — resolved C2 (PR C2d)
+- B033 P3 | [worker-start version leak removed](bugs/) — resolved C2 (PR C2d)
+
 - B026 P1 | [MCP-captured findings no longer silently destroyed by consolidate](bugs/) — resolved C2 (PR C2c)
 
 - B025 P1 | [reject filter now catches polite/modal-prefixed imperatives](bugs/) — resolved C2 (PR C2b)

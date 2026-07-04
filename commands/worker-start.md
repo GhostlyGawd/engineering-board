@@ -17,7 +17,7 @@ The argument list is `$ARGUMENTS`. Look for `--discipline <value>` (one-token va
 
 - If `--discipline` is missing, print `Usage: /worker-start --discipline <tdd|review|validate>. No action taken.` and stop.
 - If `<value>` is empty, print the same usage message and stop.
-- If `<value>` is anything other than `tdd`, `review`, or `validate`, print `Engineering board: unsupported discipline "<value>". v0.2.2 ships disciplines: tdd, review, validate. No action taken.` and stop.
+- If `<value>` is anything other than `tdd`, `review`, or `validate`, print `Engineering board: unsupported discipline "<value>". supported disciplines: tdd, review, validate. No action taken.` and stop.
 
 The supported-discipline set for this milestone is exactly `{"tdd","review","validate"}`. Do not silently coerce or accept aliases.
 
