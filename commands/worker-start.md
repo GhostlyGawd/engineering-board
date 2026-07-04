@@ -97,5 +97,5 @@ Then stop.
 - This command is idempotent in the "already worker with same discipline" sense (Step 3 NOOP short-circuit via the guard).
 - The Stop hook reads `session-mode.json` at the start of its procedure; the next Stop-hook turn after this command will execute the Worker continuation procedure for the configured discipline.
 - The Worker continuation matches the locked-plan AC A2: "Within 10 continuations, worker claims `needs:`-matching task OR emits `nothing-to-do`."
-- All three disciplines (tdd, review, validate) ship in v0.2.2 M2.2.c and are wired through the `needs: tdd -> review -> validate -> resolved` state machine.
+- All three disciplines (tdd, review, validate) are wired through the `needs: tdd -> review -> validate -> resolved` state machine.
 - `/board-pause` and `/board-resume` continue to work -- pause sets `mode=paused` with `previous_mode=worker` and `previous_discipline=<value>`, resume restores `mode=worker` with the original `discipline`.

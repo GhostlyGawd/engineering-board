@@ -15,3 +15,8 @@ pattern: [version-drift]
 
 ## Observed behavior (Track B F7)
 `references/required-permissions.json:2` = 0.2.2 while plugin is 1.2.0; agents carry 0.2.1.2/0.2.2/0.3.0; skills are 0.1.0 frontmatter over 0.2.1 bodies. No surface tells a newcomer which version is authoritative. (Bundle with B004's allowlist rewrite where they overlap.)
+
+## Progress (C1, PR C1b — partial)
+`references/required-permissions.json` version stamp aligned to the plugin
+version (0.2.2 -> 1.2.0). Remaining sprawl (agent frontmatter 0.2.x, skills
+0.1.0) still open — sweep with the docs-coherence PR. Kept open (P3).

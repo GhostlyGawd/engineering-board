@@ -5,7 +5,7 @@ argument-hint: (no arguments)
 
 # /pm-start — start PM mode
 
-Mark the current session as the engineering-board PM session. While `session-mode=pm`, the Stop hook runs the PM continuation procedure (passive extractor + PM-CONTINUE sentinel in v0.2.2 M2.2.b; full consolidator+tidier dispatch in v0.2.2 M2.2.c). Use this to designate a long-running session whose job is consolidating scratch into the live board.
+Mark the current session as the engineering-board PM session. While `session-mode=pm`, the Stop hook runs the PM continuation procedure — the passive extractor plus the full consolidator + tidier + learnings-curator dispatch chain. Use this to designate a long-running session whose job is consolidating scratch into the live board.
 
 ## What to do
 
@@ -84,4 +84,4 @@ Then stop.
 - This command is idempotent in the "already pm" sense (Step 2 NOOP short-circuit via the guard).
 - The Stop hook reads `session-mode.json` at the start of its procedure; the next Stop-hook turn after this command will emit `<<EB-PM-CONTINUE>>` instead of `<<EB-PASSIVE-DONE>>`.
 - `/board-pause` and `/board-resume` continue to work — pause sets `mode=paused` with `previous_mode=pm`, resume restores `mode=pm`.
-- v0.2.2 M2.2.b ships the mode switch and the PM continuation sentinel. v0.2.2 M2.2.c will extend the PM continuation procedure with consolidator + tidier subagent dispatch and board-state tidying.
+- PM mode dispatches the full continuation chain: the passive extractor, then the consolidator + tidier + learnings-curator subagents that promote scratch into the live board and keep the index tidy.

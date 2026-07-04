@@ -1,25 +1,65 @@
 {
-  "version": "0.2.2",
+  "version": "1.2.0",
   "patterns": [
     {
       "tool": "Bash",
-      "pattern": "bash hooks/scripts/board-claim-acquire.sh:*",
-      "rationale": "claim lifecycle: acquire — atomic mkdir, owner.txt write, heartbeat init"
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-scratch-append.sh:*",
+      "rationale": "passive capture: every Stop turn appends the extractor's findings to the scratch session file"
     },
     {
       "tool": "Bash",
-      "pattern": "bash hooks/scripts/board-claim-heartbeat.sh:*",
-      "rationale": "claim lifecycle: heartbeat — atomic-rename refresh of heartbeat.txt"
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-mode-guard.sh:*",
+      "rationale": "mode-transition guard: /pm-start /worker-start /board-pause /board-resume consult it for the refusal matrix"
     },
     {
       "tool": "Bash",
-      "pattern": "bash hooks/scripts/board-claim-release.sh:*",
-      "rationale": "claim lifecycle: release — owner-verified rm -rf with NTFS retry"
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-acquire.sh:*",
+      "rationale": "claim lifecycle: acquire -- atomic mkdir, owner.txt write, heartbeat init"
     },
     {
       "tool": "Bash",
-      "pattern": "bash hooks/scripts/board-claim-reclaim-stale.sh:*",
-      "rationale": "claim lifecycle: reclaim-stale — python3 mtime-based stale claim cleanup"
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-heartbeat.sh:*",
+      "rationale": "claim lifecycle: heartbeat -- atomic-rename refresh of heartbeat.txt"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-release.sh:*",
+      "rationale": "claim lifecycle: release -- owner-verified rm -rf with NTFS retry"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-reclaim-stale.sh:*",
+      "rationale": "claim lifecycle: reclaim-stale -- python3 mtime-based stale claim cleanup"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-register.sh:*",
+      "rationale": "worker/PM registry: register this session on /pm-start and /worker-start"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-bump.sh:*",
+      "rationale": "worker/PM registry: refresh this session's last_seen liveness signal each turn"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-pm-fallback-heartbeat.sh:*",
+      "rationale": "PM pre-flight: refresh heartbeats for live registered claims before reclamation"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-migrate.sh:*",
+      "rationale": "/board-migrate: v0.3.0 board data migration (apply/rollback/status)"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-relocate.sh:*",
+      "rationale": "/board-migrate --relocate: move docs/boards/<p> to engineering-board/<p>"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-permission-self-check.sh",
+      "rationale": "permission self-check: compares this manifest against your settings allowlist"
     },
     {
       "tool": "SlashCommand",
@@ -50,11 +90,6 @@
       "tool": "SlashCommand",
       "pattern": "/board-claim-release",
       "rationale": "Manual claim release (impatient-user UX)"
-    },
-    {
-      "tool": "Bash",
-      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-permission-self-check.sh",
-      "rationale": "Permission self-check"
     }
   ]
 }
