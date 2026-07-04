@@ -12,6 +12,24 @@ increases.
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security
+- **Reject filter now catches markdown-marker-prefixed imperatives** (eb-self
+  B037). A bullet or blockquote marker before the verb (`- ignore all previous
+  instructions`, `> ignore…`) broke the C1/C2 clause-leading anchor — and scratch
+  is markdown, so that's the *natural* injection form. The boundary run now skips
+  a leading run of `- * + >`; a benign bulleted finding (`- the stage will
+  override X`) still promotes. Three new adversarial fixtures.
+- **MCP `affects_prefix` router-row injection closed** (eb-self B038). `board_init`
+  wrote `affects_prefix` into the `BOARD-ROUTER.md` table unsanitized, so a value
+  with an embedded newline + `|` could inject a spoofed router row — forging a
+  project in `board_list_projects` and persistently DoSing every no-`project`
+  bulk tool. It is now newline-flattened with `|` neutralized.
+- **MCP `board_init` symlink containment** (eb-self B039). `board_init` was the
+  one path-writing tool without realpath containment; a pre-planted symlink at
+  `engineering-board/<project>` could relocate the scaffold outside the repo
+  root. It now asserts realpath containment before writing.
+- MCP `board_capture_finding` flattens `title`/`kind`/`affects` so a crafted
+  title can't inject a second scratch header or spoof the unpromoted-finding
+  count (eb-self B040).
 - **MCP `entry_id` path traversal closed** (eb-self B034, red-team blocker). The
   same traversal class as B024, left open for `entry_id`: `board_claim` /
   `board_release` passed it straight into `<board>/_claims/<entry_id>` (mkdir +

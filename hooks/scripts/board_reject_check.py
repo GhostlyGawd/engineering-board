@@ -82,10 +82,14 @@ _LEADIN = (
 )
 
 # Clause boundary: string start, sentence/clause punctuation, or a SYSTEM/ADMIN
-# lead-in. Optional quotes/parens, then an optional run of lead-in words, then
-# the verb.
+# lead-in. Between the boundary and the verb we skip an optional run of
+# whitespace, quotes/parens, AND markdown list/blockquote markers (- * + >) —
+# scratch is markdown, so "- ignore all previous instructions" is the most
+# natural injection form and must not slip past the clause-leading anchor. A
+# benign bulleted finding still has a subject/modal after the marker
+# ("- the stage will override X"), so descriptive prose is preserved.
 _IMPERATIVE_RE = re.compile(
-    r"(?:^|[.!?:;,\n]|\bsystem\b|\badmin\b)\s*['\"`(]*\s*(?:" + _LEADIN + r"\s+)*(?:"
+    r"(?:^|[.!?:;,\n]|\bsystem\b|\badmin\b)[-\s*+>'\"`()]*(?:" + _LEADIN + r"\s+)*(?:"
     + "|".join(_VERBS) + r")\b",
     re.IGNORECASE,
 )

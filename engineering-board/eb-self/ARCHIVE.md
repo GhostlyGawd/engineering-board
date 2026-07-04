@@ -2,6 +2,11 @@
 
 Resolved entries. Newest at the top.
 
+- B037 P1 | [reject filter now catches markdown-marker-prefixed imperatives](bugs/) — resolved C4 (PR C4a)
+- B038 P1 | [MCP affects_prefix router-row injection closed](bugs/) — resolved C4 (PR C4a)
+- B039 P2 | [MCP board_init symlink write-outside-root closed](bugs/) — resolved C4 (PR C4a)
+- B040 P3 | [MCP capture_finding header injection closed](bugs/) — resolved C4 (PR C4a)
+
 - B034 P0 | [MCP entry_id path traversal closed (claim/release validation + realpath)](bugs/) — resolved C3 (PR C3b)
 - B035 P1 | [MCP bulk tools now enforce router-row containment](bugs/) — resolved C3 (PR C3b)
 - B036 P3 | [MCP append_section heading newline-flattened](bugs/) — resolved C3 (PR C3b)
