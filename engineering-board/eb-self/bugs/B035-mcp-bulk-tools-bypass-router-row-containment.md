@@ -3,7 +3,7 @@ id: B035
 type: bug
 title: MCP bulk tools bypass router-row containment (arbitrary BOARD.md overwrite + cross-root read)
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P1
 affects: mcp-server/engineering_board_mcp.py
 needs: tdd
@@ -22,3 +22,10 @@ router row must not escape the root"). A router row `| evil | ../outside | |`
 makes board_rebuild overwrite `../outside/BOARD.md`; a `../secret` row makes
 board_list_entries/board_status read entries outside root. Gated behind a
 tampered (hand-editable) router, hence P1 not P0.
+
+## Resolution (C3, PR C3b)
+Added resolve_board_row() (realpath containment) and routed the three bulk
+(no-project) tools — board_rebuild, board_status, board_list_entries — through
+it instead of raw os.path.join(root, r["path"]). A router row whose path escapes
+root now raises ToolError; external files are not read or overwritten. Pinned by
+an MCP test with a tampered router row.

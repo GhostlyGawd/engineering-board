@@ -188,6 +188,40 @@ def validate_project(project):
     return project
 
 
+_SAFE_ENTRY_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+def validate_entry_id(entry_id):
+    """Return `entry_id` if it is a safe single path segment, else raise ToolError.
+
+    Like a project name, an entry id becomes a path segment — it is interpolated
+    into `<board>/_claims/<entry_id>` by the claim scripts (mkdir + rm -rf), so a
+    `../` id would create/delete directories outside the board (eb-self B034).
+    """
+    if not isinstance(entry_id, str) or not entry_id.strip():
+        raise ToolError("entry_id must be a non-empty string")
+    if not _SAFE_ENTRY_RE.match(entry_id) or ".." in entry_id:
+        raise ToolError(
+            "invalid entry_id %r: use letters, digits, '.', '_', '-' only "
+            "(no path separators, no '..')" % entry_id)
+    return entry_id
+
+
+def resolve_board_row(root, row):
+    """Absolute board dir for a router row, asserting it stays within root.
+
+    The bulk tools (rebuild/status/list_entries with no `project`) iterate router
+    rows; a hand-edited `path` column could point outside the repo (eb-self B035).
+    This mirrors the containment `board_dir_for` enforces so those tools can't be
+    made to read or overwrite files outside root."""
+    bd = os.path.join(root, row["path"])
+    root_real = os.path.realpath(root)
+    bd_real = os.path.realpath(bd)
+    if bd_real != root_real and not bd_real.startswith(root_real + os.sep):
+        raise ToolError("router row for %r escapes root: %r" % (row.get("project"), row["path"]))
+    return bd
+
+
 def board_dir_for(root, project):
     """Absolute board dir for a project. Router-driven, with fallback to
     engineering-board/<project>/. Rejects names that escape the root."""
@@ -616,7 +650,7 @@ def tool_board_list_entries(params):
         targets = [(want_project, ensure_board_exists(root, want_project))]
     else:
         rows = parse_router(root)
-        targets = [(r["project"], os.path.join(root, r["path"])) for r in rows]
+        targets = [(r["project"], resolve_board_row(root, r)) for r in rows]
 
     result = []
     for project, bd in targets:
@@ -742,6 +776,9 @@ def tool_board_update_entry(params):
         section_body = append_section.get("body", "") if isinstance(append_section, dict) else str(append_section)
         if not heading:
             raise ToolError("append_section requires a 'heading'")
+        # A heading is a single markdown line; flatten embedded newlines so it
+        # can't inject extra lines into the entry body (eb-self B036, hygiene).
+        heading = _oneline(heading)
         if not heading.startswith("#"):
             heading = "## " + heading
         body = body.rstrip() + "\n\n" + heading + "\n\n" + section_body.rstrip() + "\n"
@@ -870,7 +907,7 @@ def tool_board_rebuild(params):
         targets = [(want_project, ensure_board_exists(root, want_project))]
     else:
         rows = parse_router(root)
-        targets = [(r["project"], os.path.join(root, r["path"])) for r in rows]
+        targets = [(r["project"], resolve_board_row(root, r)) for r in rows]
     results = []
     for project, bd in targets:
         if not os.path.isdir(bd):
@@ -965,7 +1002,7 @@ RELEASE_MEANING = {0: "released", 3: "owner_mismatch_or_missing", 4: "retries_ex
 
 def tool_board_claim(params):
     project = require(params, "project")
-    entry_id = require(params, "entry_id")
+    entry_id = validate_entry_id(require(params, "entry_id"))
     session_id = require(params, "session_id")
     root = resolve_root(params)
     bd = ensure_board_exists(root, project)
@@ -988,7 +1025,7 @@ def tool_board_claim(params):
 
 def tool_board_release(params):
     project = require(params, "project")
-    entry_id = require(params, "entry_id")
+    entry_id = validate_entry_id(require(params, "entry_id"))
     session_id = require(params, "session_id")
     root = resolve_root(params)
     bd = ensure_board_exists(root, project)
@@ -1046,7 +1083,7 @@ def tool_board_status(params):
         targets = [(want_project, ensure_board_exists(root, want_project))]
     else:
         rows = parse_router(root)
-        targets = [(r["project"], os.path.join(root, r["path"])) for r in rows]
+        targets = [(r["project"], resolve_board_row(root, r)) for r in rows]
     boards = []
     for project, bd in targets:
         if not os.path.isdir(bd):

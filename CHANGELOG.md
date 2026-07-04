@@ -12,6 +12,22 @@ increases.
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security
+- **MCP `entry_id` path traversal closed** (eb-self B034, red-team blocker). The
+  same traversal class as B024, left open for `entry_id`: `board_claim` /
+  `board_release` passed it straight into `<board>/_claims/<entry_id>` (mkdir +
+  `rm -rf`), so a `../` id could create files or **`rm -rf` directories outside
+  the repo root**. Added `validate_entry_id()` at both tools, plus a
+  path-separator/`..` guard in `board-claim-acquire.sh` / `board-claim-release.sh`
+  for direct invocation.
+- **MCP bulk tools now enforce router-row containment** (eb-self B035). The
+  no-`project` branches of `board_rebuild` / `board_status` / `board_list_entries`
+  built targets with a raw `os.path.join(root, router_path)`, bypassing the
+  containment `board_dir_for` enforces — a hand-edited router `path` column of
+  `../outside` could overwrite an external `BOARD.md` or read entries outside the
+  root. They now resolve rows through `resolve_board_row()` (realpath containment)
+  and raise on escape.
+- MCP `append_section.heading` is newline-flattened so it can't inject extra
+  lines into an entry body (eb-self B036, hygiene).
 - **MCP path traversal closed** (eb-self B024, red-team blocker). The MCP
   server built board paths from an unvalidated `project` name, so an absolute
   (`/tmp/x`) or `../../` project name wrote board scaffolding and entry files

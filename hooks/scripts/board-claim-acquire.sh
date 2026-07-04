@@ -29,6 +29,13 @@ if [ -z "$BOARD_DIR" ] || [ -z "$ENTRY_ID" ] || [ -z "$SESSION_ID" ]; then
   exit 1
 fi
 
+# ENTRY_ID becomes a path segment under _claims/; reject traversal so a crafted
+# id cannot mkdir outside the board (eb-self B034, defense-in-depth for direct
+# invocation — the MCP layer validates too).
+case "$ENTRY_ID" in
+  */*|*'\'*|*..*) echo "invalid entry-id (no path separators or '..'): $ENTRY_ID" >&2; exit 1 ;;
+esac
+
 # --- Cloud-sync detection ------------------------------------------------
 # Detect OneDrive (or other cloud-sync) by checking for /OneDrive/ or
 # \OneDrive\ in the board path.  Normalise backslashes to forward slashes

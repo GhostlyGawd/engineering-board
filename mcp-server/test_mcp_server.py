@@ -306,6 +306,52 @@ def suite_lifecycle(mod, tmp_repo):
     check(before == after, "no files written outside root by traversal attempts (B024)",
           str(after - before))
 
+    # security: entry_id path traversal in claim/release (eb-self B034).
+    for bad in ["../../../pwned", "../victim", "..", "a/b", "x\\y"]:
+        try:
+            mod.tool_board_claim({"project": "atlas", "root": root,
+                                  "entry_id": bad, "session_id": "s"})
+            raise Failure("board_claim accepted traversal entry_id: %r" % bad)
+        except mod.ToolError:
+            pass
+    ok("board_claim rejects path-traversal entry_id (B034)")
+    try:
+        mod.tool_board_release({"project": "atlas", "root": root,
+                                "entry_id": "../victim", "session_id": "s"})
+        raise Failure("board_release accepted traversal entry_id")
+    except mod.ToolError:
+        ok("board_release rejects path-traversal entry_id (B034)")
+
+    # security: bulk tools must not follow a router row that escapes root (B035).
+    rp = os.path.join(root, "engineering-board", "BOARD-ROUTER.md")
+    with open(rp, "a", encoding="utf-8") as f:
+        f.write("| evil | ../outside | evil/ |\n")
+    outside = os.path.join(os.path.dirname(root), "outside")
+    os.makedirs(outside, exist_ok=True)
+    with open(os.path.join(outside, "BOARD.md"), "w") as f:
+        f.write("PRECIOUS\n")
+    for tool, nm in ((mod.tool_board_rebuild, "rebuild"),
+                     (mod.tool_board_status, "status"),
+                     (mod.tool_board_list_entries, "list_entries")):
+        try:
+            tool({"root": root})
+            raise Failure("board_%s followed an escaping router row" % nm)
+        except mod.ToolError:
+            pass
+    check(open(os.path.join(outside, "BOARD.md")).read().strip() == "PRECIOUS",
+          "bulk tools did not overwrite a file outside root via router escape (B035)")
+    # Remove the poisoned row so later assertions see a clean router.
+    lines = [ln for ln in open(rp, encoding="utf-8") if "../outside" not in ln]
+    open(rp, "w", encoding="utf-8").write("".join(lines))
+
+    # hygiene: append_section heading is newline-flattened (eb-self B036).
+    # Reuse an existing entry so the board's entry counts are unchanged.
+    mod.tool_board_update_entry({"project": "atlas", "root": root, "entry_id": "B001",
+                                 "append_section": {"heading": "H\n---\ninjected: yes", "body": "x"}})
+    hmd = mod.tool_board_get_entry({"project": "atlas", "root": root, "entry_id": "B001"})["markdown"]
+    check("\n---\ninjected: yes" not in hmd,
+          "append_section heading is newline-flattened, no body injection (B036)")
+
     # security: frontmatter injection via newline in a field value (eb-self B028).
     fm = mod.serialize_frontmatter([("id", "B900"), ("type", "bug"),
                                     ("title", "pwn\nstatus: resolved\nmalicious: yes"),
