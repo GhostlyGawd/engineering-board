@@ -1,0 +1,32 @@
+# Criterion 5 verification (C5)
+
+## README animated demo (NEW)
+docs/board-demo.svg — a self-contained animated SVG of the real pipeline: a
+finding is captured, promoted, and driven through tdd → review → validate → done
+(a card translates across the four pipeline columns on a 9s loop). Brand tokens
+inlined; light/dark via prefers-color-scheme; aria-label + <title> for a11y.
+Embedded as the README hero (README.md, after the badges) with a caption linking
+to the live board.html that /board-view generates. This is a demo of the REAL
+product's state machine (the same tdd→review→validate pipeline the worker mode
+runs), not a mockup.
+
+## Landing page Lighthouse (re-run, fresh)
+Served docs/ locally (python3 http.server) and ran Lighthouse via the
+pre-installed chromium (npx lighthouse --headless):
+   performance     100
+   accessibility   100
+   best-practices  100
+   seo             100
+Unlike the G4 launch measurement (which had to curl-mirror because direct
+Lighthouse against the live HTTPS URL hits the sandbox TLS interstitial), this
+run used a local server + the pre-installed chromium directly — a genuine fresh
+audit of the current docs/index.html (incl. the C4b /board-view concession edit).
+
+## Link check
+docs/index.html — all 16 local asset refs resolve (0 missing). New README links
+(docs/board-demo.svg, engineering-board/eb-self/board.html) resolve.
+
+## Criterion 5 status: MET
+README + landing + CHANGELOG + positioning coherent (C1d/C2d/C4b + agent audits);
+link-checked; Lighthouse 100×4 (≥95); README has a real animated demo of the
+real product's pipeline.

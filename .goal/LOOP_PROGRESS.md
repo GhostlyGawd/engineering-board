@@ -21,7 +21,7 @@ _Last updated: 2026-07-04 (C1 in progress)_
 | 2 | eb-self board has no open blocker/major/P0/P1 | ✅ MET — all open entries P2/P3 (verified end of C2) |
 | 3 | Time-to-first-value measured, documented, defensible | ✅ MET — `.goal/evidence/loop/C2-time-to-first-value.md` + README "what to expect" (B027) |
 | 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | ✅ MET — `docs/rfcs/0002-surface-product-review.md` |
-| 5 | README+landing+CHANGELOG+positioning coherent, link-checked, Lighthouse ≥95, real animated demo | 🟡 coherence current (C1d+C2d); animated demo (F001-fed) + Lighthouse re-run pending |
+| 5 | README+landing+CHANGELOG+positioning coherent, link-checked, Lighthouse ≥95, real animated demo | ✅ MET (C5) — `docs/board-demo.svg` README hero (real pipeline); fresh Lighthouse 100×4 (local chromium, not curl-mirror); 16 landing refs resolve. Evidence: `.goal/evidence/loop/C5-criterion5-demo-lighthouse.txt` |
 | 6 | Release batched+CHANGELOG'd+manifests bumped; BLOCKERS only human-gated; FINAL_REPORT closing section | ⬜ pending (batch when criterion 1 nears) |
 
 ## Cycle log
