@@ -1,0 +1,2 @@
+11/11 suites green — baseline for C1
+RUN-ALL SUMMARY: 11 pass, 0 fail (of 11 suites)
