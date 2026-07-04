@@ -1,5 +1,6 @@
 {
   "name": "engineering-board",
+  "description": "The board is the database: a git-committed kanban board your AI agents run and remember — distributed as a Claude Code plugin and an MCP server.",
   "owner": {
     "name": "Acadia",
     "url": "https://github.com/GhostlyGawd"

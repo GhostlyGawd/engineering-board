@@ -1,0 +1,24 @@
+# G2 evidence — plugin validation + MCP Inspector (captured 2026-07-04)
+
+## claude plugin validate .
+Validating marketplace manifest: /home/user/engineering-board/.claude-plugin/marketplace.json
+
+√ Validation passed
+
+## MCP Inspector (official @modelcontextprotocol/inspector, CLI mode) — tools/list
+tool count: 11
+ - board_init
+ - board_list_projects
+ - board_create_entry
+ - board_list_entries
+ - board_get_entry
+ - board_update_entry
+ - board_rebuild
+ - board_capture_finding
+ - board_claim
+ - board_release
+ - board_status
+
+## MCP Inspector — live tools/call board_init (temp repo) → created full board tree; board_create_entry → B001. See session transcript.
+claude CLI version: 2.1.201 (Claude Code)
+node: v22.22.2, inspector: @modelcontextprotocol/inspector (npx --yes)
