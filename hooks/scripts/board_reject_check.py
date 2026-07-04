@@ -74,6 +74,26 @@ if it defeats an *in-scope* rule below.
   lead a clause). New OUT-OF-SCOPE observations are not — add them here if the
   boundary needs refining, don't re-file them as filter bugs.
 
+Severity rubric — mechanism vs coverage (so severity stays consistent)
+----------------------------------------------------------------------
+As the filter matured, findings shifted from "a whole mechanism is missing" to
+"a mature mechanism's data set is one entry short". Rate them accordingly:
+
+  - MECHANISM missing / broadly broken -> major (P1): e.g. no adverb handling
+    (B048), line breaks not folded at all (B051), no non-Latin terminator fold
+    (B053). These let a large, easily-found class through.
+  - COVERAGE gap in a shipped, comprehensive-by-construction mechanism -> P2/P3:
+    e.g. one more script's terminator not yet in `_SENTENCE_TERMINATORS` when the
+    fold already spans the major living scripts (B055). Defense-in-depth, found
+    only by Unicode enumeration, primary framing intact. A brand-new *common*-
+    script terminator is at most P2; an obscure/rare one is P3 "grow the set".
+
+Do NOT down-rate a genuine mechanism gap to force a "clean" cycle; equally, do
+NOT inflate a single-glyph coverage gap in a comprehensive fold into a P1. The
+line-break (`splitlines()`) and terminator (`_SENTENCE_TERMINATORS`, major
+living scripts) folds are now comprehensive-by-construction — treat further
+additions as corpus growth, not mechanism defects.
+
 Public API
 ----------
     reject_finding(finding: dict) -> str | None
@@ -102,12 +122,29 @@ _ZERO_WIDTH = dict.fromkeys(
 # reaches the board as a clean, obeyable command. Fold them to ASCII `.` so the
 # boundary anchor fires — folding the class rather than enumerating each glyph in
 # the boundary alternation (eb-self B053; mirrors the B051 splitlines() fold).
-# Curated to genuine sentence/clause terminals (CJK/fullwidth stop + comma,
-# Devanagari danda/double-danda, Ethiopic full stop, Arabic full stop + question
-# mark); deliberately NOT the interrobang/reversed-question-mark, which an LLM
-# does not treat as a clause reset (accepted residual).
-_SENTENCE_TERMINATORS = dict.fromkeys(
-    [0x3002, 0x3001, 0xFF61, 0x0964, 0x0965, 0x1362, 0x06D4, 0x061F], ord("."))
+# Folded COMPREHENSIVELY across the living scripts (not one glyph per cycle — L005):
+# a coverage gap in a curated list just schedules the next cycle's finding (B053
+# folded CJK/danda/Ethiopic-stop/Arabic-stop but missed Arabic comma, Armenian,
+# Tibetan, Khmer, Mongolian, Myanmar, … → B055). This set folds the clause/
+# sentence terminators of the major scripts to ASCII "." so the mechanism is
+# complete-by-construction; a missing terminator from here on is a P3 corpus-growth
+# item, not a mechanism defect. Deliberately EXCLUDES marks an LLM does not treat
+# as a clause reset (interrobang, reversed-question-mark, pilcrow, section sign,
+# and intra-word delimiters like the Tibetan tsheg U+0F0B).
+_SENTENCE_TERMINATORS = dict.fromkeys([
+    0x3001, 0x3002, 0xFF61,                        # CJK comma / full stop / halfwidth stop
+    0x0964, 0x0965,                                # Devanagari danda / double danda
+    0x060C, 0x061B, 0x06D4, 0x061F,                # Arabic comma / semicolon / full stop / question
+    0x0589, 0x055D,                                # Armenian full stop / comma
+    0x1362, 0x1363, 0x1364, 0x1365, 0x1367, 0x1368,  # Ethiopic stop/comma/semicolon/colon/question/para
+    0x0F0D, 0x0F0E,                                # Tibetan shad / double shad
+    0x17D4, 0x17D5,                                # Khmer khan / bariyoosan
+    0x1802, 0x1803,                                # Mongolian comma / full stop
+    0x104A, 0x104B,                                # Myanmar little section / section
+    0x0DF4,                                        # Sinhala kunddaliya
+    0x10FB,                                        # Georgian paragraph separator
+    0x0700, 0x0701, 0x0702,                        # Syriac end-of-paragraph / full stops
+], ord("."))
 
 
 def _normalize(text):
