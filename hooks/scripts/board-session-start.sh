@@ -34,7 +34,14 @@ for i in "${!BOARD_PATHS[@]}"; do
   fi
 
   open_items=$(grep "^- [BFQO]" "${BOARD_FILE}" 2>/dev/null || true)
-  open_count=$(echo "${open_items}" | grep -c "^- " 2>/dev/null || echo "0")
+  # Count open lines. grep -c on empty input prints 0 AND exits 1, so a naive
+  # `|| echo 0` fallback double-counts to "0\n0" and garbles the header (D6);
+  # gate on emptiness instead.
+  if [ -n "${open_items}" ]; then
+    open_count=$(printf '%s\n' "${open_items}" | grep -c "^- " || true)
+  else
+    open_count=0
+  fi
 
   echo "[ ${LABEL} ] — ${open_count} open item(s):"
   if [ -n "${open_items}" ]; then
@@ -57,20 +64,53 @@ for i in "${!BOARD_PATHS[@]}"; do
     echo ""
   fi
 
-  # Live dependency map
-  blocked_lines=$(grep -r "^blocked_by:" "${BOARD_DIR}" --include="*.md" -h 2>/dev/null | sort | uniq || true)
-  if [ -n "${blocked_lines}" ]; then
+  # Live dependency map — single python3 pass over entry frontmatter.
+  # The prior shell loop ran a full-tree `grep -rl` for EACH unique blocked_by
+  # line, i.e. O(unique_blockers x files); on a mature board (~1000+ entries
+  # with distinct blocking relationships) it blew past the 10s SessionStart
+  # timeout (measured 1200 entries = 15s). This reads each file once and maps
+  # each entry's own blockers to its id (also fixing the prior head -1 quirk
+  # that mis-attributed identical blocked_by lines).
+  blocking_map=$(python3 - "${BOARD_DIR}" <<'PY' 2>/dev/null || true
+import os, re, sys
+
+board_dir = sys.argv[1]
+FM = re.compile(r"^---\s*\n(.*?)\n---", re.S)
+skip = (os.sep + "_sessions" + os.sep, os.sep + "_archive" + os.sep,
+        os.sep + "_claims" + os.sep, os.sep + "_migrate-snapshot" + os.sep)
+
+rels = []
+for root, dirs, files in os.walk(board_dir):
+    if any(s.strip(os.sep) in root.split(os.sep) for s in ("_sessions", "_archive", "_claims", "_migrate-snapshot")):
+        continue
+    for fn in files:
+        if not fn.endswith(".md") or fn.startswith("."):
+            continue
+        p = os.path.join(root, fn)
+        try:
+            with open(p, "r", encoding="utf-8", errors="replace") as f:
+                text = f.read()
+        except Exception:
+            continue
+        m = FM.match(text)
+        if not m:
+            continue
+        fm = m.group(1)
+        idm = re.search(r"^id:\s*(\S+)", fm, re.M)
+        bm = re.search(r"^blocked_by:\s*(.+)$", fm, re.M)
+        if not idm or not bm:
+            continue
+        entry_id = idm.group(1)
+        for blocker in re.findall(r"[QBF][0-9]+", bm.group(1)):
+            rels.append((blocker, entry_id))
+
+for blocker, entry_id in sorted(set(rels)):
+    print(f"    {blocker} blocks {entry_id}")
+PY
+)
+  if [ -n "${blocking_map}" ]; then
     echo "  Blocking relationships:"
-    while IFS= read -r line; do
-      blockers=$(echo "${line}" | grep -oE '[QBF][0-9]+' || true)
-      entry_file=$(grep -rl "${line}" "${BOARD_DIR}" --include="*.md" 2>/dev/null | head -1 || true)
-      if [ -n "${entry_file}" ] && [ -n "${blockers}" ]; then
-        entry_id=$(grep "^id:" "${entry_file}" 2>/dev/null | awk '{print $2}' || true)
-        for blocker in ${blockers}; do
-          echo "    ${blocker} blocks ${entry_id}"
-        done
-      fi
-    done <<< "${blocked_lines}"
+    printf '%s\n' "${blocking_map}"
     echo ""
   fi
 

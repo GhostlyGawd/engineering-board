@@ -46,9 +46,10 @@ _Last updated: 2026-07-04 (C1 in progress)_
 
 **SHIP progress (C1):**
 - **PR C1a → [#21](https://github.com/GhostlyGawd/engineering-board/pull/21)** — MERGED (`e2f8a6f`). B002 injection filter + B003 fixture-corpus CI wiring + board init/intake. B002/B003 resolved.
-- **PR C1b** (in flight) — B004 permission allowlist coverage + coverage test (T26–T28) + B015 jargon removal + partial B016. B004/B015 resolved on board; B016 kept open (partial).
-- Next: C1c (B001 perf) → C1d (docs sweep: B011/B012/B013/B017/B018/B019 + finish B016). Reset branch to updated main after each merge.
-- **eb-self open P1 remaining: B001** (perf). No open blocker/major beyond that.
+- **PR C1b → #22** — MERGED (`657c072`). B004 permission allowlist + coverage test (T26–T28) + B015 jargon + partial B016. B004/B015 resolved.
+- **PR C1c** (in flight) — B001 SessionStart perf (15s→0.1s, new session-start suite) + B010 count fix. B001/B010 resolved on board.
+- Next: C1d (docs sweep: B011/B012/B013/B017/B018/B019 + finish B016). Reset branch after merge.
+- **eb-self open blocker/major/P1: NONE remaining.** All open entries now P2/P3 (B005/B006/B007/B008/B009/B014 P2; B011–B022 minus resolved P3; features F001–F003; Q001).
 
 ### Track status (current cycle)
 
