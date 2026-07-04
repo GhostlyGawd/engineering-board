@@ -6,7 +6,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ### Bugs
 - B001 P1 | [B001-sessionstart-on2-blockedby-loop-exceeds-10s-time](bugs/B001-sessionstart-on2-blockedby-loop-exceeds-10s-time.md)
-- B004 P1 | [B004-permission-allowlist-does-not-cover-the-scripts-](bugs/B004-permission-allowlist-does-not-cover-the-scripts-.md)
 - B005 P2 | [B005-first-captured-finding-is-invisible--buried-in-s](bugs/B005-first-captured-finding-is-invisible--buried-in-s.md)
 - B006 P2 | [B006-advancing-one-entry-through-tdd-review-validate-](bugs/B006-advancing-one-entry-through-tdd-review-validate-.md)
 - B007 P2 | [B007-validator-success-is-a-dead-end-the-board-does-n](bugs/B007-validator-success-is-a-dead-end-the-board-does-n.md)
@@ -17,8 +16,7 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 - B011 P3 | [B011-architecturemd-is-stale-for-120-version-header-m](bugs/B011-architecturemd-is-stale-for-120-version-header-m.md)
 - B012 P3 | [B012-changelog-120-link-points-to-an-unpushed-rc-tag-](bugs/B012-changelog-120-link-points-to-an-unpushed-rc-tag-.md)
 - B013 P3 | [B013-readme-uses-emoji-violating-brandmd-no-emoji-in-](bugs/B013-readme-uses-emoji-violating-brandmd-no-emoji-in-.md)
-- B015 P3 | [B015-internal-milestone-jargon-m22c-leaks-into-user-f](bugs/B015-internal-milestone-jargon-m22c-leaks-into-user-f.md)
-- B016 P3 | [B016-version-sprawl-across-surfaces-no-authoritative-](bugs/B016-version-sprawl-across-surfaces-no-authoritative-.md)
+- B016 P3 | [B016-version-sprawl-across-surfaces-no-authoritative-](bugs/B016-version-sprawl-across-surfaces-no-authoritative-.md) (partial — required-permissions.json done)
 - B017 P3 | [B017-board-triage-says-five-rules-but-defines-six](bugs/B017-board-triage-says-five-rules-but-defines-six.md)
 - B018 P3 | [B018-board-resolve-contradicts-itself-on-which-steps-](bugs/B018-board-resolve-contradicts-itself-on-which-steps-.md)
 - B019 P3 | [B019-pattern-recurrence-threshold-is-inconsistent-2-v](bugs/B019-pattern-recurrence-threshold-is-inconsistent-2-v.md)

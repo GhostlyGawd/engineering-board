@@ -20,7 +20,7 @@ bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-permission-self-check.sh
 If the script exits 0 (all installed), print:
 
 ```
-All M2.2.c permissions installed. Nothing to do.
+All engineering-board permissions installed. Nothing to do.
 ```
 
 Then stop.
@@ -53,8 +53,8 @@ Then print a numbered list. For each pattern entry, print two lines:
 Example:
 
 ```
-  1. Bash: bash hooks/scripts/board-claim-acquire.sh:*
-     Reason: claim lifecycle: acquire -- atomic mkdir, owner.txt write, heartbeat init
+  1. Bash: bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-scratch-append.sh:*
+     Reason: passive capture: every Stop turn appends the extractor's findings to the scratch session file
   2. SlashCommand: /pm-start
      Reason: Start PM (consolidator) session for engineering board
 ```

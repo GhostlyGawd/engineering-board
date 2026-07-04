@@ -1,10 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "bash hooks/scripts/board-claim-acquire.sh:*",
-      "bash hooks/scripts/board-claim-heartbeat.sh:*",
-      "bash hooks/scripts/board-claim-release.sh:*",
-      "bash hooks/scripts/board-claim-reclaim-stale.sh:*",
+      "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-acquire.sh:*",
+      "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-heartbeat.sh:*",
+      "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-release.sh:*",
+      "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-reclaim-stale.sh:*",
       "/pm-start"
     ]
   }

@@ -250,6 +250,69 @@ else
   fail "T25: board-claim-release.md documents --force flag"
 fi
 
+# ── Test 14: allowlist covers every board-*.sh the orchestrator actually runs ─
+# eb-self B004: the manifest listed only 5 claim scripts (in a relative path
+# form that does not match the $CLAUDE_PLUGIN_ROOT-absolute invocations), while
+# the Stop procedure and commands shell out to board-scratch-append.sh (every
+# passive capture), the registry, the mode-guard, migrate/relocate, etc. Missing
+# entries mean the autonomous loop prompts on its core scripts. This asserts:
+#   (a) every board-*.sh invoked via `bash ...` in stop-hook-procedure.md and
+#       commands/*.md has a Bash pattern in required-permissions.json, and
+#   (b) every Bash pattern uses the $CLAUDE_PLUGIN_ROOT/hooks/scripts/ form that
+#       matches the real invocations.
+COVERAGE_OUT="$(python3 - "$PLUGIN_ROOT" <<'PY'
+import json, os, re, sys, glob
+root = sys.argv[1]
+manifest = json.load(open(os.path.join(root, "references", "required-permissions.json")))
+bash_patterns = [p["pattern"] for p in manifest["patterns"] if p.get("tool") == "Bash"]
+allowed = set()
+for pat in bash_patterns:
+    m = re.search(r"(board-[a-z0-9-]+\.sh)", pat)
+    if m:
+        allowed.add(m.group(1))
+
+sources = [os.path.join(root, "hooks", "stop-hook-procedure.md")]
+sources += sorted(glob.glob(os.path.join(root, "commands", "*.md")))
+invoked = set()
+inv_re = re.compile(r"bash\s+[\"']?\$?\{?CLAUDE_PLUGIN_ROOT\}?[^\s\"'`]*?/(board-[a-z0-9-]+\.sh)")
+rel_re = re.compile(r"bash\s+hooks/scripts/(board-[a-z0-9-]+\.sh)")
+for src in sources:
+    if not os.path.isfile(src):
+        continue
+    text = open(src, encoding="utf-8").read()
+    for m in inv_re.finditer(text):
+        invoked.add(m.group(1))
+    for m in rel_re.finditer(text):
+        invoked.add(m.group(1))
+
+missing = sorted(invoked - allowed)
+# Path-form consistency: every Bash pattern must use the $CLAUDE_PLUGIN_ROOT form.
+badform = [p for p in bash_patterns if not p.startswith("bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/")]
+
+print("MISSING=" + ",".join(missing))
+print("BADFORM=" + ",".join(badform))
+print("INVOKED_COUNT=" + str(len(invoked)))
+PY
+)"
+COV_MISSING="$(echo "$COVERAGE_OUT" | sed -n 's/^MISSING=//p')"
+COV_BADFORM="$(echo "$COVERAGE_OUT" | sed -n 's/^BADFORM=//p')"
+COV_INVOKED="$(echo "$COVERAGE_OUT" | sed -n 's/^INVOKED_COUNT=//p')"
+if [ -z "$COV_MISSING" ]; then
+  pass "T26: allowlist covers all $COV_INVOKED orchestrator-invoked board scripts"
+else
+  fail "T26: allowlist missing scripts the orchestrator invokes: $COV_MISSING"
+fi
+if [ -z "$COV_BADFORM" ]; then
+  pass "T27: every Bash allowlist pattern uses the \$CLAUDE_PLUGIN_ROOT form"
+else
+  fail "T27: Bash patterns not in \$CLAUDE_PLUGIN_ROOT form: $COV_BADFORM"
+fi
+if [ "${COV_INVOKED:-0}" -ge 8 ]; then
+  pass "T28: invocation scan found the expected script surface ($COV_INVOKED >= 8)"
+else
+  fail "T28: invocation scan under-counted ($COV_INVOKED < 8) — regex or sources drifted"
+fi
+
 # ── Summary ──────────────────────────────────────────────────────────────────
 TOTAL_TESTS=$((PASS + FAIL))
 echo ""

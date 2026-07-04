@@ -39,6 +39,21 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 - `ARCHITECTURE.md` §10 now describes the real reject-filter suite instead of
   the never-measured guarantee; `finding-extractor.md` / `consolidator.md`
   reject-rule prose aligned with the shipped filter.
+- **Permission allowlist now covers every script the orchestrator runs** (eb-self
+  B004). `references/required-permissions.json` listed only 5 claim scripts — in
+  a relative path form that does not match the `$CLAUDE_PLUGIN_ROOT`-absolute
+  invocations — while the Stop procedure and commands shell out to
+  `board-scratch-append.sh` (every passive capture), the worker/PM registry, the
+  mode-guard, and migrate/relocate. Those omissions meant the autonomous loop
+  hit permission prompts on its core scripts. The manifest now covers all 11
+  invoked scripts in the matching `$CLAUDE_PLUGIN_ROOT` form; new coverage
+  assertions in `tests/permissions/automated.sh` (T26–T28) parse every
+  `bash …board-*.sh` invocation in `stop-hook-procedure.md` + `commands/*.md`
+  and fail if any is unlisted or uses an inconsistent path form.
+- Removed internal milestone jargon (`M2.2.b`/`M2.2.c`) from user-facing command
+  copy (`board-install-permissions.md`, `pm-start.md`, `worker-start.md`;
+  eb-self B015). Aligned `required-permissions.json`'s version stamp to the
+  plugin version (partial B016).
 
 ## [1.2.0] — 2026-07-04
 
