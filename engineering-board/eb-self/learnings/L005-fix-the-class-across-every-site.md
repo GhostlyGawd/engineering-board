@@ -5,8 +5,8 @@ subtype: principle
 title: Fix an input-handling class across every site at once, not one site per cycle
 discovered: 2026-07-04
 confidence: high
-recurrence: 4
-derived_from: [B051, B052, B053, B054]
+recurrence: 5
+derived_from: [B051, B052, B053, B054, B056]
 applies_to: [hooks/scripts/board_reject_check.py, hooks/scripts/board-consolidate.sh, mcp-server/engineering_board_mcp.py]
 pattern_tag: whole-class-sweep
 ---
@@ -40,3 +40,6 @@ call-site to the whole class of call-sites.
 - B052 — C7 consolidate promotion writer flattened only evidence_quote.
 - B053 — C8 reject filter boundary class was ASCII-only (missed non-Latin terminators).
 - B054 — C8 MCP capture evidence split on `\n` only (CR/FF/NEL forged a header).
+- B056 — C9 terminator fold was a curated list (leaked Arabic/Armenian/Tibetan/…);
+  fixed by folding the whole common-living-script class comprehensively, so the
+  mechanism is complete-by-construction rather than one glyph short each cycle.
