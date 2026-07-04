@@ -49,9 +49,10 @@ _Last updated: 2026-07-04 (C1 in progress)_
 - **PR C1b → #22** — MERGED (`657c072`). B004 permission allowlist + coverage test (T26–T28) + B015 jargon + partial B016. B004/B015 resolved.
 - **PR C1c → #23** — MERGED (`6322dc2`). B001 SessionStart perf (15s→0.1s) + B010 count fix + new session-start suite. B001/B010 resolved.
 - **PR C1d** (in flight) — docs coherence: B011 (ARCHITECTURE→v1.2.0), B012 (CHANGELOG link), B013 (README emoji→text), B017/B018/B019 (skill fixes). Resolved on board. B016 kept open P3 (why-deferred noted).
-- **New finding (dogfooding):** B023 (P2) — `board-index-check` invariant defeated by resolve-in-place; intaked, fix planned for C1e.
-- Next: C1e (fix B023) → REFLECT + convergence assessment → begin C2 (need 2 consecutive clean full cycles).
-- **eb-self open blocker/major/P1: NONE.** Open: B005/B006/B007/B008/B009/B014/B023 (P2); B016/B020/B021/B022 (P3); F001–F003; Q001.
+- **PR C1d → #24** — MERGED (`9f30d20`). B011/B012/B013/B017/B018/B019 resolved; B023 intaked; B016 kept open P3.
+- **PR C1e** (in flight) — fix B023 (`board-index-check` counts open files only) + smoke resolve-in-place regression test. B023 resolved; eb-self index-check exits 0 again.
+- Next: REFLECT (C1 retro + Learnings) → convergence assessment → begin C2 (need 2 consecutive clean full cycles per criterion 1).
+- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3): B005/B006/B007/B008/B009/B014 (P2); B016/B020/B021/B022 (P3); F001–F003; Q001.
 
 ### Track status (current cycle)
 

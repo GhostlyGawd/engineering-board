@@ -42,7 +42,31 @@ for BOARD_DIR in "${BOARD_DIRS[@]}"; do
 
     file_count=0
     if [ -d "${sub_dir}" ]; then
-      file_count=$(find "${sub_dir}" -maxdepth 1 -type f -name "*.md" ! -name ".gitkeep" 2>/dev/null | wc -l | tr -d ' ')
+      # Count only OPEN entry files. BOARD.md lists open entries only; resolved
+      # entries stay in the subdir (status: resolved, provenance in ARCHIVE.md)
+      # per the resolve-in-place convention. Counting them here defeated the
+      # invariant on every board that had ever resolved anything (eb-self B023).
+      file_count=$(python3 - "${sub_dir}" <<'PY'
+import os, re, sys, glob
+sub_dir = sys.argv[1]
+n = 0
+for p in glob.glob(os.path.join(sub_dir, "*.md")):
+    if os.path.basename(p) == ".gitkeep":
+        continue
+    try:
+        with open(p, "r", encoding="utf-8", errors="replace") as f:
+            text = f.read()
+    except Exception:
+        n += 1  # unreadable file: count it so a real problem still surfaces
+        continue
+    m = re.match(r"^---\s*\n(.*?)\n---", text, re.S)
+    fm = m.group(1) if m else ""
+    if re.search(r"^status:\s*resolved\s*$", fm, re.M):
+        continue
+    n += 1
+print(n)
+PY
+)
     fi
 
     row_count=$(grep -c "^- ${prefix}[0-9]" "${BOARD_MD}" 2>/dev/null || true)

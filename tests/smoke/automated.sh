@@ -262,6 +262,36 @@ else
   report 1 "board-index-check.sh exit 0" "exit=$INDEX_EXIT; stderr=$(head -3 "$TMP/index.stderr" | tr '\n' ' ')"
 fi
 
+# 22. Resolve-in-place regression (B023): a resolved entry stays in the subdir
+# (status: resolved) while its BOARD.md row is removed; index-check must count
+# only OPEN files and still exit 0. Before the B023 fix this exited 2 because
+# the resolved file was counted but its row was gone.
+B001_FILE="$(compgen -G "$BOARD_DIR/bugs/B001-*.md" | head -1 || true)"
+if [ -n "${B001_FILE:-}" ]; then
+  python3 - "$B001_FILE" <<'PY'
+import sys, re
+p = sys.argv[1]; s = open(p).read()
+if re.search(r'^status:', s, re.M):
+    s = re.sub(r'^status:.*$', 'status: resolved', s, count=1, flags=re.M)
+else:
+    s = re.sub(r'^(---\n)', r'\1status: resolved\n', s, count=1)
+open(p, 'w').write(s)
+PY
+  python3 - "$BOARD_DIR/BOARD.md" <<'PY'
+import sys, re
+p = sys.argv[1]; s = open(p).read()
+open(p, 'w').write(re.sub(r'^- B001[^\n]*\n', '', s, flags=re.M))
+PY
+  if bash "$INDEX_CHECK" > "$TMP/index2.stdout" 2> "$TMP/index2.stderr"; then
+    report 0 "board-index-check.sh exit 0 with a resolved-in-place entry (B023)"
+  else
+    INDEX2_EXIT=$?
+    report 1 "board-index-check.sh exit 0 with a resolved-in-place entry (B023)" "exit=$INDEX2_EXIT; stderr=$(head -3 "$TMP/index2.stderr" | tr '\n' ' ')"
+  fi
+else
+  report 1 "resolve-in-place setup: B001 entry file found" "no $BOARD_DIR/bugs/B001-*.md"
+fi
+
 # --- Final tally -------------------------------------------------------------
 echo ""
 echo "================================================================"
