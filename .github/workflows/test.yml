@@ -3,10 +3,10 @@ name: tests
 # v0.3.2 CI gate — runs the full engineering-board test suite on every push
 # and pull-request. Mirrors what `bash tests/run-all.sh` runs locally.
 #
-# The 10 sub-suites are: orchestration (15 tests), claims (5), smoke (21
+# The 11 sub-suites are: orchestration (15 tests), claims (5), smoke (21
 # assertions), scratch-append (13 assertions), paths (15 assertions), modes
 # (6 tests), permissions (25 assertions), lint (orchestrator prompts),
-# version-coherence, crosscompat-lint (22 scripts).
+# version-coherence, crosscompat-lint (22 scripts), mcp-server (65 checks).
 #
 # Required toolchain (preinstalled on ubuntu-latest):
 #   - bash (POSIX-compatible; scripts use #!/usr/bin/env bash)
