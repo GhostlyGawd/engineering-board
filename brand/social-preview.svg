@@ -1,0 +1,42 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .h  { font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, 'DejaVu Sans', sans-serif; }
+    </style>
+  </defs>
+  <rect width="1280" height="640" fill="#17191E"/>
+  <!-- hairline frame for a premium, contained feel -->
+  <rect x="0.5" y="0.5" width="1279" height="639" fill="none" stroke="#2A2D34" stroke-width="1"/>
+
+  <!-- content -->
+  <g transform="translate(88,150)">
+    <text class="h" x="0" y="0" font-size="22" font-weight="600" letter-spacing="3" fill="#E6A94E">CLAUDE CODE PLUGIN · MCP SERVER</text>
+    <text class="h" x="-3" y="96" font-size="82" font-weight="700" letter-spacing="-2" fill="#ECEBE6">The board is the database.</text>
+    <text class="h" x="0" y="162" font-size="34" font-weight="400" fill="#9EA3AB">A git-committed kanban board your AI agents</text>
+    <text class="h" x="0" y="208" font-size="34" font-weight="400" fill="#9EA3AB">run and remember.</text>
+
+    <!-- wordmark lockup at the bottom -->
+    <g transform="translate(0,300)">
+      <rect x="0"  y="0"  width="26" height="15" rx="4" fill="#ECEBE6"/>
+      <rect x="0"  y="21" width="26" height="15" rx="4" fill="#ECEBE6" opacity="0.34"/>
+      <rect x="46" y="30" width="26" height="15" rx="4" fill="#ECEBE6" opacity="0.34"/>
+      <rect x="24" y="10" width="30" height="16" rx="5" fill="#E6A94E"/>
+      <text class="h" x="90" y="34" font-size="30" font-weight="600" letter-spacing="-0.5" fill="#ECEBE6">engineering<tspan fill="#E6A94E">·</tspan>board</text>
+    </g>
+  </g>
+
+  <!-- right-side board visual: two columns, a card promoted across the gutter -->
+  <g transform="translate(880,150)">
+    <line x1="150" y1="0" x2="150" y2="340" stroke="#ECEBE6" stroke-width="1" opacity="0.12"/>
+    <rect x="18"  y="24"  width="120" height="40" rx="8" fill="#ECEBE6" opacity="0.20"/>
+    <rect x="18"  y="76"  width="120" height="40" rx="8" fill="#ECEBE6" opacity="0.14"/>
+    <rect x="18"  y="128" width="120" height="40" rx="8" fill="#ECEBE6" opacity="0.10"/>
+    <rect x="182" y="248" width="120" height="40" rx="8" fill="#ECEBE6" opacity="0.14"/>
+    <!-- motion trail -->
+    <path d="M138 148 C 190 148, 200 172, 210 190" stroke="#E6A94E" stroke-width="2.5" stroke-dasharray="2 8" stroke-linecap="round" opacity="0.55" fill="none"/>
+    <!-- the accent card, straddling the gutter -->
+    <rect x="96" y="150" width="132" height="44" rx="9" fill="#E6A94E"/>
+    <rect x="112" y="166" width="70" height="5" rx="2.5" fill="#17191E" opacity="0.55"/>
+    <rect x="112" y="177" width="44" height="5" rx="2.5" fill="#17191E" opacity="0.35"/>
+  </g>
+</svg>

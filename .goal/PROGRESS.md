@@ -36,12 +36,12 @@ _Last updated: 2026-07-04_
 - Deliverables: tests ✅, CI ✅, manifests ✅, MCP server ✅, E2E evidence ✅, CHANGELOG ✅, RC tag ✅(local)
 
 ## Phase 3 — Brand identity
-- [ ] 3.1 Three direction studies; select one w/ rationale
-- [ ] 3.2 Assets: logo+wordmark SVG (light/dark), favicon set, social preview 1280×640, motifs
-- [ ] 3.3 Design tokens file
-- [ ] 3.4 BRAND.md
-- [ ] **G3 gate**: assets exist; WCAG AA contrast; premium/minimal/non-sci-fi; tokens single source
-- Deliverables: `BRAND.md`, `brand/`, tokens file
+- [done] 3.1 Three direction studies (Promote / WIP-bars / Monogram); chose "Promote" w/ rationale (BRAND.md §1)
+- [done] 3.2 Assets: logomark + wordmark SVG (light/dark), favicon set (svg + 16/32/48/180 png), social preview 1280×640 (svg+png), 3 motifs (columns, card-flow, state-pipeline)
+- [done] 3.3 Design tokens file `brand/tokens.css` (colors, type scale, spacing, radii, motion)
+- [done] 3.4 BRAND.md (direction, tokens, logo usage, motion, voice, self-review)
+- [done] **G3 gate PASSED**: assets in stated formats ✅; all 12 text/bg pairs pass WCAG AA (0 fails) — `evidence/G3-wcag-contrast.txt`; premium/minimal/non-sci-fi self-review ✅; tokens = single source ✅
+- Deliverables: `BRAND.md` ✅, `brand/` ✅, `brand/tokens.css` ✅
 
 ## Phase 4 — Launch assets: README + landing
 - [ ] 4.1 README rewrite (hero, demo, value props, dual quickstart, feature tour, comparison, arch, roadmap, contributing, license)

@@ -1,0 +1,13 @@
+<svg width="320" height="140" viewBox="0 0 320 140" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="card promotion flow motif">
+  <!-- Motif 2: a card promoted left→right across columns, with a motion trail. -->
+  <style>.ln{stroke:currentColor;opacity:.16}.cd{fill:currentColor;opacity:.20}.acc{fill:#9A5B00}.tr{stroke:#9A5B00;opacity:.5}</style>
+  <line class="ln" x1="106" y1="10" x2="106" y2="130" stroke-width="1"/>
+  <line class="ln" x1="214" y1="10" x2="214" y2="130" stroke-width="1"/>
+  <rect class="cd" x="20"  y="24" width="64" height="18" rx="3"/>
+  <rect class="cd" x="20"  y="50" width="64" height="18" rx="3"/>
+  <rect class="cd" x="236" y="90" width="64" height="18" rx="3"/>
+  <!-- motion trail (dotted) from left column into the middle -->
+  <path class="tr" d="M84 61 C 130 61, 150 61, 168 61" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+  <!-- the accent card in transit -->
+  <rect class="acc" x="140" y="52" width="64" height="18" rx="3"/>
+</svg>
