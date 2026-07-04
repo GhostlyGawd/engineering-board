@@ -2,6 +2,12 @@
 
 Resolved entries. Newest at the top.
 
+- B045 P3 | [CHANGELOG reject-filter count drift removed (bounds, not brittle numbers)](bugs/B045-changelog-reject-filter-count-drift.md) — resolved C5 (PR C5b)
+
+- B043 P1 | [reject filter sees through Unicode bullets/headings/line-seps](bugs/) — resolved C5 (PR C5b)
+- B044 P3 | [MCP capture evidence header-injection closed](bugs/) — resolved C5 (PR C5b)
+- B029 P2 | [claim whitespace session_id rejected (self-DoS + injection closed)](bugs/) — resolved C5 (PR C5b)
+
 - B041 P3 | [RFC 0002 command count + /board-view verdict](bugs/) — resolved C4 (PR C4b)
 - B042 P3 | [landing page now surfaces /board-view + honest visualization concession](bugs/) — resolved C4 (PR C4b)
 

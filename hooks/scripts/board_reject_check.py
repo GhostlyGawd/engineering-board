@@ -57,6 +57,30 @@ CLI
 import json
 import re
 import sys
+import unicodedata
+
+# Characters an attacker can use to visually "lead a clause" the way an ASCII
+# bullet/newline does, so the reject rules must see through them. We normalize
+# once before scanning rather than enumerating every glyph in the regex.
+_ZERO_WIDTH = dict.fromkeys(
+    [0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF], None)  # ZWSP/ZWNJ/ZWJ/WJ/BOM
+
+
+def _normalize(text):
+    """Fold Unicode tricks to their ASCII intent before the rules scan.
+
+    NFKC maps many compatibility variants to ASCII; then strip zero-width
+    characters (a ZWSP inside a verb would split the token) and map the Unicode
+    line/paragraph separators to `\n` so they count as clause boundaries. This
+    closes the Unicode-bullet / heading / line-separator bypass class rather
+    than chasing one glyph at a time (eb-self B043; lineage B025/B037).
+    """
+    if not isinstance(text, str):
+        return text
+    text = unicodedata.normalize("NFKC", text)
+    text = text.translate(_ZERO_WIDTH)
+    text = re.sub("[\u2028\u2029\u0085]", "\n", text)
+    return text
 
 # Verbs that signal an instruction to the orchestrator when they lead a clause.
 # `send`/`leak`/`expose` cover exfiltration openers ("send the API keys to …").
@@ -89,7 +113,7 @@ _LEADIN = (
 # benign bulleted finding still has a subject/modal after the marker
 # ("- the stage will override X"), so descriptive prose is preserved.
 _IMPERATIVE_RE = re.compile(
-    r"(?:^|[.!?:;,\n]|\bsystem\b|\badmin\b)[-\s*+>'\"`()]*(?:" + _LEADIN + r"\s+)*(?:"
+    r"(?:^|[.!?:;,\n]|\bsystem\b|\badmin\b)[-\s*+>#'\"`()•‣⁃◦▪●·–—]*(?:" + _LEADIN + r"\s+)*(?:"
     + "|".join(_VERBS) + r")\b",
     re.IGNORECASE,
 )
@@ -104,6 +128,7 @@ def _scan(text):
     """Return a reason code for the first rule that fires on `text`, else None."""
     if not isinstance(text, str):
         return None
+    text = _normalize(text)
     if _IMPERATIVE_RE.search(text):
         return "imperative_prefix"
     if _SLASH_RE.search(text):

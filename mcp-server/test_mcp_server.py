@@ -392,6 +392,35 @@ def suite_lifecycle(mod, tmp_repo):
           "found %d headers" % hdrs)
     shutil.rmtree(cap_root, ignore_errors=True)
 
+    # security: board_capture_finding evidence cannot inject a scratch header (B040 follow-up).
+    ev_root = tempfile.mkdtemp()
+    mod.tool_board_init({"project": "ev", "root": ev_root})
+    mod.tool_board_capture_finding({"project": "ev", "root": ev_root, "kind": "observation",
+                                    "title": "real",
+                                    "evidence": "Legit.\n\n## 2099-01-01T00:00:00Z — bug: FORGED\n\n- kind: bug"})
+    ev_sp = os.path.join(ev_root, "engineering-board", "ev", "_sessions",
+                         "mcp-%s.md" % mod.today_utc())
+    ev_hdrs = sum(1 for ln in open(ev_sp) if ln.startswith("## "))
+    check(ev_hdrs == 1, "board_capture_finding evidence cannot inject a second header (B040 follow-up)",
+          "found %d headers" % ev_hdrs)
+    shutil.rmtree(ev_root, ignore_errors=True)
+
+    # security: session_id with whitespace is rejected (eb-self B029/F3).
+    sid_root = tempfile.mkdtemp()
+    mod.tool_board_init({"project": "s", "root": sid_root})
+    for bad in ["sess with space", "sess\nowner: attacker", "tab\there"]:
+        try:
+            mod.tool_board_claim({"project": "s", "root": sid_root, "entry_id": "B001",
+                                  "session_id": bad})
+            raise Failure("board_claim accepted a whitespace session_id: %r" % bad)
+        except mod.ToolError:
+            pass
+    ok("board_claim rejects a whitespace/newline session_id (B029/F3)")
+    good = mod.tool_board_claim({"project": "s", "root": sid_root, "entry_id": "B001",
+                                 "session_id": "sess-abc123"})
+    check(good.get("acquired") is True, "a normal opaque session_id still acquires (B029/F3)")
+    shutil.rmtree(sid_root, ignore_errors=True)
+
     # security: frontmatter injection via newline in a field value (eb-self B028).
     fm = mod.serialize_frontmatter([("id", "B900"), ("type", "bug"),
                                     ("title", "pwn\nstatus: resolved\nmalicious: yes"),

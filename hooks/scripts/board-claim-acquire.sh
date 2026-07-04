@@ -35,6 +35,12 @@ fi
 case "$ENTRY_ID" in
   */*|*'\'*|*..*) echo "invalid entry-id (no path separators or '..'): $ENTRY_ID" >&2; exit 1 ;;
 esac
+# SESSION_ID is written to owner.txt and read back via grep|awk '{print $2}';
+# whitespace/newline breaks that round-trip (self-DoS) and injects owner lines
+# (eb-self B029). Session tokens never contain whitespace — reject it.
+case "$SESSION_ID" in
+  *[[:space:]]*) echo "invalid session-id (no whitespace): $SESSION_ID" >&2; exit 1 ;;
+esac
 
 # --- Cloud-sync detection ------------------------------------------------
 # Detect OneDrive (or other cloud-sync) by checking for /OneDrive/ or

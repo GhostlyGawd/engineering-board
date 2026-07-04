@@ -11,7 +11,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 - B008 P2 | [B008-corrupttruncated-session-modejson-silently-un-pa](bugs/B008-corrupttruncated-session-modejson-silently-un-pa.md)
 - B009 P2 | [B009-consolidator-silently-no-ops-findings-lost-when-](bugs/B009-consolidator-silently-no-ops-findings-lost-when-.md)
 - B014 P2 | [B014-two-implementations-of-scratch-live-promotion-wi](bugs/B014-two-implementations-of-scratch-live-promotion-wi.md)
-- B029 P2 | [B029-claim-acquire-self-deletes-its-lock-on-a-sessi](bugs/B029-claim-acquire-self-deletes-its-lock-on-a-sessi.md)
 - B030 P2 | [B030-permission-install-delivery-is-a-6-step-copy-p](bugs/B030-permission-install-delivery-is-a-6-step-copy-p.md)
 - B016 P3 | [B016-version-sprawl-across-surfaces-no-authoritative-](bugs/B016-version-sprawl-across-surfaces-no-authoritative-.md) (partial — required-permissions.json done)
 - B020 P3 | [B020-board-migrate-is-two-unrelated-operations-under-](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
