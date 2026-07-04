@@ -16,7 +16,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 - B020 P3 | [B020-board-migrate-is-two-unrelated-operations-under-](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
 - B021 P3 | [B021-code-reviewer-name-collides-with-code-review-and](bugs/B021-code-reviewer-name-collides-with-code-review-and.md)
 - B022 P3 | [B022-nothingtotest--nothingtoreview-still-advance-the](bugs/B022-nothingtotest--nothingtoreview-still-advance-the.md)
-- B050 P3 | [B050-board-view-absent-from-quickstart-first-valu](bugs/B050-board-view-absent-from-quickstart-first-valu.md)
 
 ### Features
 - F002 P2 | [F002-onboarding-wizard-board-setup-that-collapses-ins](features/F002-onboarding-wizard-board-setup-that-collapses-ins.md)

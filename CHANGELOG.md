@@ -12,6 +12,23 @@ increases.
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security
+- **Reject filter now folds every line break to a clause boundary** (eb-self
+  B051). `_normalize` folded only `U+2028/2029/0085`, and the boundary class was
+  `[.!?:;,\n]` — so an imperative hidden after CR (`\r`, the most common
+  real-world break), VT, FF, or `U+001C/1D/1E` did not anchor and promoted. Now
+  `"\n".join(text.splitlines())` folds the whole line-break class at once. Three
+  new adversarial fixtures (VT/FF/FS) + direct CR/CRLF assertions. The module
+  docstring now documents the filter's **accepted-residual boundary** (in-scope
+  imperative-mood verbs vs accepted out-of-scope excluded-verbs / non-imperative
+  moods / NFKC-irreducible homoglyphs), so a denylist leak is a defect only if it
+  defeats an in-scope rule. Lineage B025/B037/B043/B048.
+- **`board-consolidate.sh` flattens every promoted field** (eb-self B052). The
+  promotion writer wrote `title`/`affects`/`tags`/`discovered` raw (only
+  `evidence_quote` was flattened), so a crafted title newline could close the
+  frontmatter fence early and inject a body header — the same class as the
+  MCP-side B028/B040 but in a writer that fix never covered. A `flatten()` helper
+  now collapses all whitespace/control in every promoted field; an isolated smoke
+  regression drives the real writer.
 - **Reject filter now catches adverb-fronted imperatives** (eb-self B048). The
   clause-boundary anchor only fired when an injection verb led the clause after
   an optional lead-in chain; an ordinary adverb fronted before the verb
@@ -112,6 +129,11 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   only the README). Measurement: `.goal/evidence/loop/C2-time-to-first-value.md`.
 
 ### Fixed (permissions & UX)
+- **Quickstart points at the visual board viewer** (eb-self B050). The "visible
+  confirmation" step pointed only at `_sessions/` or `/board-rebuild` (which
+  refreshes the markdown `BOARD.md` index, not the visual board); it now surfaces
+  `/board-view` (the themed HTML Kanban F001 shipped) at the moment a first-time
+  user wants to *see* their board.
 - **Permission rules now install in the wrapped `Tool(specifier)` form** (eb-self
   B046). `/board-install-permissions` emitted `claude config add
   permissions.allow "<bare specifier>"` and the self-check compared the bare

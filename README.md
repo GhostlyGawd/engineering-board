@@ -80,7 +80,7 @@ Grant the pipeline's permissions once, so it runs without prompting on every ste
 2. **Promote when you're ready.** Run `/pm-start`, then end a turn: the PM pipeline consolidates the scratch findings into real, committed board entries under `engineering-board/<project>/bugs/` (etc.) and updates `BOARD.md`. That's your first entry on the board.
 3. **Let an agent work it.** Run `/worker-start --discipline tdd`, then end a turn: a worker claims a `needs: tdd` entry and drives it through the `tdd → review → validate` pipeline. (Advancing one entry across all three disciplines currently takes one worker session per discipline — see the [roadmap](#roadmap).)
 
-**What to expect (measured, following only this page):** first captured finding in ~5 minutes from install; first promoted board entry in ~10–15 minutes once you run `/pm-start`. The capture in step 1 is deliberately quiet — if you want a visible confirmation, look in `_sessions/` or run `/board-rebuild` to see the board. Full mode reference is the [feature tour](#feature-tour) below.
+**What to expect (measured, following only this page):** first captured finding in ~5 minutes from install; first promoted board entry in ~10–15 minutes once you run `/pm-start`. The capture in step 1 is deliberately quiet — if you want a visible confirmation, look in `_sessions/`, or run `/board-view` to open a themed visual Kanban of the board (or `/board-rebuild` to refresh the markdown `BOARD.md` index). Full mode reference is the [feature tour](#feature-tour) below.
 
 ### MCP server
 

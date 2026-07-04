@@ -5,8 +5,8 @@ subtype: principle
 title: A denylist heuristic is never done — assume every pattern has an adjacent bypass
 discovered: 2026-07-04
 confidence: high
-recurrence: 5
-derived_from: [B002, B025, B037, B043, B048]
+recurrence: 6
+derived_from: [B002, B025, B037, B043, B048, B051]
 applies_to: [hooks/scripts/board_reject_check.py, tests/security/]
 pattern_tag: filter-completeness
 ---
@@ -44,3 +44,15 @@ corpus rather than believing any single patch closes the class.
 - B037 — C4 markdown list/blockquote-marker bypass of that same filter.
 - B043 — C5 Unicode-bullet/heading/line-separator bypass of that same filter.
 - B048 — C6 adverb-fronted imperative bypass of that same filter.
+- B051 — C7 incomplete line-break folding (CR/VT/FF/FS-GS-RS) of that same filter.
+
+## Boundary drawn (C7)
+After six recurrences, C7 documented the filter's **accepted-residual boundary**
+in `board_reject_check.py` (the "Out of scope" docstring section): a denylist leak
+is a *defect* only if it defeats an IN-SCOPE rule (an imperative-mood `_VERBS` verb
+leading a clause through any obfuscation normalization folds). Deliberately-excluded
+verbs, non-imperative moods, and NFKC-irreducible homoglyphs are accepted residuals,
+not bugs to re-file each cycle. This converts an open-ended P1 generator into a
+bounded spec — the practical form of "the durable defense is the framing, not the
+denylist." B051 was still a genuine in-scope defect (a real line break the anchor
+missed); the fix folds the whole line-break class structurally via `splitlines()`.
