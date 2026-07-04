@@ -3,7 +3,7 @@ id: B050
 type: bug
 title: /board-view (flagship visual viewer) absent from the Quickstart first-value path
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P3
 affects: README.md
 needs: tdd
@@ -18,3 +18,6 @@ README Quickstart's "visible confirmation" sentence points only at `_sessions/` 
 
 ## Fix direction
 One-line README edit: add `/board-view` to the step-3 "visible confirmation" sentence.
+
+## Resolution (C7, PR C7b)
+README Quickstart 'visible confirmation' sentence now surfaces /board-view (themed visual Kanban) alongside /board-rebuild (markdown index refresh).
