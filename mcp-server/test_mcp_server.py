@@ -405,6 +405,28 @@ def suite_lifecycle(mod, tmp_repo):
           "found %d headers" % ev_hdrs)
     shutil.rmtree(ev_root, ignore_errors=True)
 
+    # security: evidence blockquote must split on ALL line separators, not just
+    # \n — a bare \r / \f / NEL escaped the `> ` prefix and forged a `## ` header
+    # (eb-self B054, re-opening B040 via .split("\n")). The reader below iterates
+    # with universal-newline semantics, so \r IS a line boundary on read.
+    for sep, sep_name in (("\r", "CR"), ("\f", "FF"), ("\x85", "NEL")):
+        b54_root = tempfile.mkdtemp()
+        mod.tool_board_init({"project": "b54", "root": b54_root})
+        mod.tool_board_capture_finding(
+            {"project": "b54", "root": b54_root, "kind": "observation", "title": "one real finding",
+             "evidence": "Legit evidence." + sep + "## 2099-01-01T00:00:00Z — bug: FORGED\n\n- kind: bug"})
+        b54_bd = mod.board_dir_for(b54_root, "b54")
+        b54_sp = os.path.join(b54_bd, "_sessions", "mcp-%s.md" % mod.today_utc())
+        b54_hdrs = sum(1 for ln in open(b54_sp) if ln.startswith("## "))
+        check(b54_hdrs == 1,
+              "board_capture_finding evidence %s cannot forge a scratch header (B054)" % sep_name,
+              "found %d headers" % b54_hdrs)
+        # count_scratch_findings must also see exactly one finding, not two.
+        check(mod.count_scratch_findings(b54_bd) == 1,
+              "count_scratch_findings unaffected by %s-hidden forged header (B054)" % sep_name,
+              "got %d" % mod.count_scratch_findings(b54_bd))
+        shutil.rmtree(b54_root, ignore_errors=True)
+
     # security: session_id with whitespace is rejected (eb-self B029/F3).
     sid_root = tempfile.mkdtemp()
     mod.tool_board_init({"project": "s", "root": sid_root})

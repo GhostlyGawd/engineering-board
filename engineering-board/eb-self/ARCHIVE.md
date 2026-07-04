@@ -2,6 +2,9 @@
 
 Resolved entries. Newest at the top.
 
+- B053 P1 | [reject filter folds non-Latin sentence terminators to a clause boundary](bugs/B053-reject-filter-misses-non-ascii-sentence-term.md) — resolved C8 (PR C8a)
+- B054 P2 | [MCP capture evidence splits on all line separators (forged-header injection closed)](bugs/B054-mcp-capture-evidence-split-misses-cr-ff-nel.md) — resolved C8 (PR C8a)
+
 - B050 P3 | [Quickstart surfaces /board-view (visual board discoverable at first value)](bugs/B050-board-view-absent-from-quickstart-first-valu.md) — resolved C7 (PR C7b)
 - B051 P1 | [reject filter folds all line breaks (CR/VT/FF/FS-GS-RS) to a boundary](bugs/B051-reject-filter-line-separator-folding-incomple.md) — resolved C7 (PR C7a)
 - B052 P3 | [consolidate promotion writer flattens all fields (frontmatter-injection closed)](bugs/B052-consolidate-promotion-writer-flattens-only-e.md) — resolved C7 (PR C7a)
