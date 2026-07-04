@@ -5,7 +5,7 @@
 > plus the `engineering-board/eb-self/` board (the living backlog). Update it at
 > the end of every cycle step.
 
-_Last updated: 2026-07-04 (C9 complete — CLEAN cycle #1; C10 must confirm)_
+_Last updated: 2026-07-04 (C10 complete — NOT clean, B058 P1; streak reset; C11 = new candidate)_
 
 ## How to resume
 
@@ -17,7 +17,7 @@ _Last updated: 2026-07-04 (C9 complete — CLEAN cycle #1; C10 must confirm)_
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | 🟨 **C9 = clean cycle #1** — its only reject-filter finding (B056 terminator coverage gap) is P2 under the documented mechanism-vs-coverage rubric (indep. red-team also rated Low); MCP/bash sweep + Track B/D clean. C1–C8 unclean. **C10 must confirm** (also clean) to MEET this criterion. |
+| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C9 was clean #1, but **C10 = NOT clean** (B058 P1: the invisible-char strip was a non-comprehensive hand-list — a mechanism gap under the same rubric). Streak **reset**. After B058 all three `_normalize` folds are comprehensive-by-construction (enumeration treadmill structurally closed). **C11 = new candidate clean #1; C12 must confirm.** |
 | 2 | eb-self board has no open blocker/major/P0/P1 | ✅ MET — all open entries P2/P3 (verified end of C2) |
 | 3 | Time-to-first-value measured, documented, defensible | ✅ MET — `.goal/evidence/loop/C2-time-to-first-value.md` + README "what to expect" (B027) |
 | 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | ✅ MET — `docs/rfcs/0002-surface-product-review.md` |
@@ -202,19 +202,50 @@ _Last updated: 2026-07-04 (C9 complete — CLEAN cycle #1; C10 must confirm)_
 - **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
   B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022/B057 (P3); F002/F003; Q001.
 
-### Next — C10 (must CONFIRM the clean streak → then release)
+### C10 — tenth full DISCOVER sweep (COMPLETE — NOT clean; streak reset)
 
-C10 runs all four DISCOVER tracks. If C10 is **also clean** (zero new blocker/major/
-P0/P1 — apply the documented mechanism-vs-coverage rubric consistently; do not invent
-a P1, do not down-rate a genuine mechanism gap), then **criterion 1 is MET** (two
-consecutive clean cycles: C9 + C10) and the **criterion-6 release batch** runs:
+- **DISCOVER:** all four tracks. Track A (max rigor, confirming cycle) found **one**
+  finding — **B058 P1, mechanism tier**: `_ZERO_WIDTH` was still the original
+  hand-list of 5, the ONE `_normalize` fold never made comprehensive. Soft hyphen
+  U+00AD + the whole Cf/default-ignorable class split a verb token INVISIBLY (so —
+  unlike the excluded homoglyph residual — the payload reaches the agent clean). The
+  MCP + bash sweep was **CLEAN** (traversal/injection/TOCTOU/separator all hold).
+  Track B (UX) and Track D (coherence): **CLEAN, no new** — Track D explicitly noted
+  nothing blocks a coherent 1.3.0 cut.
+- **Honest call:** B058 is a mechanism gap (an enumerated fold missing common members
+  of its class, exactly like pre-B051 line breaks) → **P1** under the SAME documented
+  rubric that let C9 be clean. The independent red-team also rated it major. I did
+  NOT down-rate it to preserve the streak → **C10 is NOT clean; the streak resets.**
+  The rubric's two-way integrity (it made C9 honestly clean AND C10 honestly unclean)
+  is the point: it's a real standard, not a convergence lever.
+- **SHIP:** PRs #50–#51 merged.
+  - **C10a → #50** — B058: replaced `_ZERO_WIDTH` with `_strip_invisible()` (whole
+    Cf + variation-selector + CGJ class). reject-filter 89→91. All three `_normalize`
+    folds now comprehensive-by-construction; rubric doc updated.
+  - **C10b (this PR)** — C10 CHANGELOG entry + L004 (rec 9) / L005 (rec 6) + C10 REFLECT.
+- **C10 REFLECT:** L004 → rec 9 (+B058), L005 → rec 6 (+B058, with its corollary:
+  when you make one fold comprehensive, sweep its SIBLING folds for the same
+  hand-list smell). The enumeration treadmill is now structurally closed — line
+  breaks, terminators, AND invisibles are all comprehensive-by-construction, so a new
+  reject-filter bypass would require a genuinely novel class (new grammar/mood/verb).
+- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
+  B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022/B057 (P3); F002/F003; Q001.
+
+### Next — C11 (new candidate clean #1)
+
+C11 runs all four DISCOVER tracks. With all three `_normalize` folds now
+comprehensive-by-construction and the MCP/bash surface hardened over 10 cycles, a new
+in-scope P1 would require a genuinely novel vector, not another enumeration glyph.
+Apply the documented mechanism-vs-coverage rubric consistently (do not invent a P1,
+do not down-rate a genuine mechanism gap). If C11 is clean it is the new clean #1 and
+**C12 must confirm**; two consecutive clean cycles then MEET criterion 1 → run the
+criterion-6 release batch:
 - bump `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` to **1.3.0**
   (lockstep — version-coherence.sh enforces it),
 - promote CHANGELOG `[Unreleased]` → `## [1.3.0] — <date>`,
 - add the `.goal/FINAL_REPORT.md` closing "improvement loop" section,
-- the git **tag stays human-gated** (BLOCKERS B2) — do NOT tag/release.
-Only criteria 1 and 6 remain (2/3/4/5 met). If C10 surfaces a genuine new P1, the
-streak resets and C11 becomes the new candidate.
+- git **tag stays human-gated** (BLOCKERS B2) — do NOT tag/release.
+Only criteria 1 and 6 remain (2/3/4/5 met).
 - **Criterion 6** (batch once criterion 1 is within reach): bump `plugin.json` + `marketplace.json` (lockstep) to 1.3.0, promote the CHANGELOG `[Unreleased]` heading to `[1.3.0]`, add the `.goal/FINAL_REPORT.md` closing "improvement loop" section; the git tag stays human-gated (BLOCKERS B2).
 - Only criteria 1 and 6 remain (2/3/4/5 met).
 

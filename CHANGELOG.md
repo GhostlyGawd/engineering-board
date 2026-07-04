@@ -12,6 +12,15 @@ increases.
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security
+- **Invisible-character strip now covers the whole default-ignorable class**
+  (eb-self B058). The strip was a hand-list of 5 (ZWSP/ZWNJ/ZWJ/WJ/BOM) — the one
+  `_normalize` fold never made comprehensive — so a soft hyphen `U+00AD`, the
+  Mongolian vowel separator, the invisible math operators, the Arabic letter mark,
+  or a variation selector could split a verb token invisibly and slip a clean,
+  obeyable imperative past every rule. Replaced with a whole-class strip (Unicode
+  category `Cf` + variation selectors + combining grapheme joiner). All three
+  `_normalize` folds — line breaks, sentence terminators, invisibles — are now
+  comprehensive-by-construction. Two new fixtures.
 - **Terminator fold now spans the major living scripts** (eb-self B056). B053's
   terminator set was hand-picked and missed the clause/sentence marks of many
   scripts — Arabic comma/semicolon, Armenian, Ethiopic comma, Tibetan, Khmer,

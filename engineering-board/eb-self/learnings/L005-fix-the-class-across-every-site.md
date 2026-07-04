@@ -5,8 +5,8 @@ subtype: principle
 title: Fix an input-handling class across every site at once, not one site per cycle
 discovered: 2026-07-04
 confidence: high
-recurrence: 5
-derived_from: [B051, B052, B053, B054, B056]
+recurrence: 6
+derived_from: [B051, B052, B053, B054, B056, B058]
 applies_to: [hooks/scripts/board_reject_check.py, hooks/scripts/board-consolidate.sh, mcp-server/engineering_board_mcp.py]
 pattern_tag: whole-class-sweep
 ---
@@ -43,3 +43,8 @@ call-site to the whole class of call-sites.
 - B056 — C9 terminator fold was a curated list (leaked Arabic/Armenian/Tibetan/…);
   fixed by folding the whole common-living-script class comprehensively, so the
   mechanism is complete-by-construction rather than one glyph short each cycle.
+- B058 — C10 the invisible-char strip was STILL a hand-list of 5 (the last
+  `_normalize` fold not yet made comprehensive) → soft hyphen / Cf class bypass.
+  This is the lesson's own corollary: when you make one fold in a function
+  comprehensive, sweep its SIBLING folds in the same function for the same
+  hand-list smell. All three folds are now comprehensive-by-construction.
