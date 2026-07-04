@@ -30,3 +30,5 @@ ok     200  https://paddo.dev/blog/flux-kanban-for-ai-agents/
    → CHANGELOG.md is new on the productize branch; resolves on main after the PR merges,
      exactly as ARCHITECTURE.md/LICENSE (blob/main) already 200 today.
  (403s from github.com/shields are bot-mitigation on HEAD, not broken links — pages load in a browser.)
+
+## Final CI on 966c617 (pre-merge): both run-all jobs SUCCESS (2026-07-04T16:50Z)
