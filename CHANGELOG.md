@@ -12,6 +12,17 @@ increases.
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security
+- **MCP path traversal closed** (eb-self B024, red-team blocker). The MCP
+  server built board paths from an unvalidated `project` name, so an absolute
+  (`/tmp/x`) or `../../` project name wrote board scaffolding and entry files
+  **outside the repo root**. Added `validate_project()` (safe single-segment
+  names only) at `board_init` and every board op, plus an `os.path.realpath`
+  containment assertion in `board_dir_for`. Pinned by new MCP tests.
+- **MCP frontmatter-injection neutralized** (eb-self B028). `serialize_frontmatter`
+  now flattens embedded CR/LF/control characters in field values, so untrusted
+  finding text copied into a `title` can no longer inject frontmatter keys (e.g.
+  a hidden `status: resolved`) or close the `---` block early.
+
 - **Injection reject-filter hardened and made single-source** (eb-self B002).
   The deterministic defense-in-depth filter re-applied at consolidation was
   trivially bypassable: it only matched imperative verbs anchored at the string

@@ -167,13 +167,44 @@ def parse_router(root):
     return rows
 
 
+# A project name becomes a path segment, so it must not be able to traverse or
+# escape the board root. Reject anything but a plain kebab/snake token.
+_SAFE_PROJECT_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+def validate_project(project):
+    """Return `project` if it is a safe single path segment, else raise ToolError.
+
+    Guards against path traversal (eb-self B024): an absolute name, a `../`
+    name, or a leading `~` would otherwise let os.path.join write board
+    scaffolding and entry files outside the repo root.
+    """
+    if not isinstance(project, str) or not project.strip():
+        raise ToolError("project name must be a non-empty string")
+    if not _SAFE_PROJECT_RE.match(project) or ".." in project:
+        raise ToolError(
+            "invalid project name %r: use letters, digits, '.', '_', '-' only "
+            "(no path separators, no '..', no leading '~' or '.')" % project)
+    return project
+
+
 def board_dir_for(root, project):
     """Absolute board dir for a project. Router-driven, with fallback to
-    engineering-board/<project>/."""
+    engineering-board/<project>/. Rejects names that escape the root."""
+    validate_project(project)
+    bd = None
     for row in parse_router(root):
         if row["project"] == project:
-            return os.path.join(root, row["path"])
-    return os.path.join(root, "engineering-board", project)
+            bd = os.path.join(root, row["path"])
+            break
+    if bd is None:
+        bd = os.path.join(root, "engineering-board", project)
+    # Defense in depth: even a tampered router row must not escape the root.
+    root_real = os.path.realpath(root)
+    bd_real = os.path.realpath(bd)
+    if bd_real != root_real and not bd_real.startswith(root_real + os.sep):
+        raise ToolError("resolved board dir escapes root: %r" % bd)
+    return bd
 
 
 def ensure_board_exists(root, project):
@@ -229,8 +260,19 @@ def fmt_list(items):
     return "[" + ", ".join(str(x) for x in items) + "]"
 
 
+def _oneline(val):
+    """Collapse CR/LF (and other control chars) to spaces so a field value can
+    never inject extra frontmatter keys or close the `---` block early (eb-self
+    B028). Frontmatter is line-oriented `key: value`, so a newline in a value is
+    always invalid; entry text is often copied from untrusted finding content."""
+    return re.sub(r"[\r\n\t\f\v]+", " ", str(val)).strip()
+
+
 def serialize_frontmatter(fields):
-    """fields: list of (key, value) pairs, preserving order. Lists -> [a, b]."""
+    """fields: list of (key, value) pairs, preserving order. Lists -> [a, b].
+
+    Scalar and list values are flattened to a single line to prevent
+    frontmatter-injection via embedded newlines."""
     out = ["---"]
     for key, val in fields:
         if val is None:
@@ -238,9 +280,9 @@ def serialize_frontmatter(fields):
         if isinstance(val, list):
             if not val:
                 continue
-            out.append("%s: %s" % (key, fmt_list(val)))
+            out.append("%s: %s" % (key, fmt_list([_oneline(x) for x in val])))
         else:
-            out.append("%s: %s" % (key, val))
+            out.append("%s: %s" % (key, _oneline(val)))
     out.append("---")
     return "\n".join(out)
 
@@ -338,7 +380,7 @@ ARCHIVE_SKELETON = (
 
 
 def tool_board_init(params):
-    project = require(params, "project")
+    project = validate_project(require(params, "project"))
     root = resolve_root(params)
     affects_prefix = params.get("affects_prefix") or ("%s/" % project)
 

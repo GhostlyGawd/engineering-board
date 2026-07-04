@@ -285,6 +285,37 @@ def suite_lifecycle(mod, tmp_repo):
     except mod.ToolError:
         ok("board_update_entry rejects invalid status value")
 
+    # security: path traversal via project name (eb-self B024) — every traversal
+    # form must be rejected, and nothing may be written outside root.
+    import glob as _glob
+    before = set(_glob.glob(os.path.join(os.path.dirname(root), "*")))
+    for bad in ["/tmp/EB_PWNED", "../../EB_PWNED", "..", "~evil", "a/b", "x\\y", "a..b", ""]:
+        try:
+            mod.tool_board_init({"project": bad, "root": root})
+            raise Failure("path traversal project name accepted: %r" % bad)
+        except mod.ToolError:
+            pass
+    ok("board_init rejects path-traversal project names (B024)")
+    try:
+        mod.tool_board_create_entry({"project": "../../evil", "root": root, "type": "bug",
+                                     "title": "x", "priority": "P1", "affects": "y"})
+        raise Failure("create_entry accepted traversal project")
+    except mod.ToolError:
+        ok("board_create_entry rejects path-traversal project (B024)")
+    after = set(_glob.glob(os.path.join(os.path.dirname(root), "*")))
+    check(before == after, "no files written outside root by traversal attempts (B024)",
+          str(after - before))
+
+    # security: frontmatter injection via newline in a field value (eb-self B028).
+    fm = mod.serialize_frontmatter([("id", "B900"), ("type", "bug"),
+                                    ("title", "pwn\nstatus: resolved\nmalicious: yes"),
+                                    ("status", "open")])
+    lines = fm.splitlines()
+    check(not any(l.strip().startswith("malicious:") for l in lines),
+          "serialize_frontmatter does not inject keys from a newline (B028)")
+    check(sum(1 for l in lines if l.strip().startswith("status:")) == 1,
+          "serialize_frontmatter keeps a single status line (B028)")
+
     # board_rebuild — deterministic + idempotent
     rb1 = mod.tool_board_rebuild({"project": "atlas", "root": root})
     board_md = os.path.join(board_dir, "BOARD.md")
