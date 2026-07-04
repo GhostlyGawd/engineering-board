@@ -42,7 +42,7 @@ The Stop hook reads `.engineering-board/session-mode.json` and routes to one of 
 | Agent | `finding-extractor` | Per-turn passive listener (`model: inherit`, `tools: Read`); emits scratch JSON |
 | Agent | `consolidator` | PM subagent: promote scratch → live; anchor verification, supersession, T2b distinct-affects safeguard |
 | Agent | `tidier` | PM subagent: index rebuild, stale-claim reclamation, scratch cleanup |
-| Agent | `learnings-curator` | PM subagent — **v0.2.2 stub** (inventory-only; full Learning entity in v0.3.0 plan) |
+| Agent | `learnings-curator` | PM subagent — promotes recurring `pattern:` tags (recurrence ≥ 3) into Learning entries (`L###`); delegates to `board-curate-learnings.sh`. Idempotent. (Shipped v0.3.0.) |
 | Agent | `tdd-builder` | Worker subagent (`tdd` discipline): write failing test → minimal fix → re-run |
 | Agent | `code-reviewer` | Worker subagent (`review` discipline): inspect tests + impl; suggest `validate` or regress to `tdd` |
 | Agent | `validator` | Worker subagent (`validate` discipline, **strictly read-only**): re-run suite + verify Done-when |

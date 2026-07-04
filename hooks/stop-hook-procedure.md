@@ -82,7 +82,7 @@ PM mode runs a pre-flight pass that refreshes claim heartbeats on behalf of live
 
 (c) Dispatch the tidier subagent. Run a Task call: subagent_type=`tidier`, description=`PM tidy`, prompt=the board directory path captured in (a) (a single absolute path string, no delimiters). Wait for the subagent to return one JSON object. The tidier is idempotent and may return all-zero `actions_taken` when nothing is out-of-sync — that is normal; dispatch every PM turn regardless.
 
-(d) Dispatch the learnings-curator subagent. Run a Task call: subagent_type=`learnings-curator`, description=`PM curate learnings`, prompt=the board directory path captured in (a) (same path as (c), no delimiters). Wait for the subagent to return one JSON object. In v0.2.2 this is a placeholder returning `status: "placeholder"` — that is expected; full implementation lands in v0.3.0.
+(d) Dispatch the learnings-curator subagent. Run a Task call: subagent_type=`learnings-curator`, description=`PM curate learnings`, prompt=the board directory path captured in (a) (same path as (c), no delimiters). Wait for the subagent to return one JSON object. The curator delegates to `board-curate-learnings.sh` and returns its JSON verbatim; it is idempotent and may report zero new learnings when no `pattern:` tag has recurred ≥ 3 — that is normal; dispatch every PM turn regardless.
 
 (e) **PM-tidier bumps the PM session's `last_seen` in the registry (v0.2.3).** After step (c) returns, run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-bump.sh <session_id>` to refresh this PM session's liveness signal. Non-fatal on failure — log and continue.
 

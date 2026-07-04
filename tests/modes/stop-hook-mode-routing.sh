@@ -169,7 +169,7 @@ check_proc "procedure: PM step (b) consolidator dispatch"         "subagent_type
 check_proc "procedure: PM step (c) tidier dispatch"               "subagent_type=\`tidier\`"
 check_proc "procedure: PM step (d) learnings-curator dispatch"    "subagent_type=\`learnings-curator\`"
 check_proc "procedure: PM tidier described as idempotent"         "idempotent"
-check_proc "procedure: PM learnings-curator placeholder note"     "placeholder"
+check_proc "procedure: PM learnings-curator returns script JSON"  "returns its JSON verbatim"
 check_proc "procedure: PM emits PM-CONTINUE"                      "<<EB-PM-CONTINUE>>"
 check_proc "procedure: PM emits PM-FAIL on failure"               "<<EB-PM-FAIL>>"
 
