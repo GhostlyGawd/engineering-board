@@ -2,6 +2,9 @@
 
 Resolved entries. Newest at the top.
 
+- B001 P1 | [SessionStart blocked_by map is now a single O(files) pass (15s→0.1s at 1200 entries)](bugs/B001-sessionstart-on2-blockedby-loop-exceeds-10s-time.md) — resolved C1 (PR C1c)
+- B010 P3 | [empty-board open-count no longer double-prints](bugs/B010-empty-board-renders-a-broken-two-line-open-count.md) — resolved C1 (PR C1c)
+
 - B015 P3 | [internal milestone jargon removed from user-facing command copy](bugs/B015-internal-milestone-jargon-m22c-leaks-into-user-f.md) — resolved C1 (PR C1b)
 - B004 P1 | [permission allowlist covers all invoked scripts + consistent path form](bugs/B004-permission-allowlist-does-not-cover-the-scripts-.md) — resolved C1 (PR C1b)
 

@@ -54,6 +54,15 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   copy (`board-install-permissions.md`, `pm-start.md`, `worker-start.md`;
   eb-self B015). Aligned `required-permissions.json`'s version stamp to the
   plugin version (partial B016).
+- **SessionStart no longer risks its 10s timeout on large boards** (eb-self
+  B001). The `blocked_by` dependency map ran a full-tree `grep -rl` per unique
+  blocker — O(blockers × files); a ~1200-entry board took **15s** and lost the
+  board banner. It now computes in a single `python3` pass over frontmatter:
+  **1200 entries render in ~0.1s** (linear to 2000+). Also fixes a `head -1`
+  quirk that mis-attributed identical `blocked_by` lines.
+- Empty boards no longer print a garbled two-line `0` open-count (eb-self B010).
+- New `tests/session-start/automated.sh` suite (correctness + a perf guard that
+  fails if a 1200-entry board takes ≥ 10s); `tests/run-all.sh` now **13 suites**.
 
 ## [1.2.0] — 2026-07-04
 

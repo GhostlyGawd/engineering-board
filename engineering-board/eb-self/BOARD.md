@@ -5,14 +5,12 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 ## Open
 
 ### Bugs
-- B001 P1 | [B001-sessionstart-on2-blockedby-loop-exceeds-10s-time](bugs/B001-sessionstart-on2-blockedby-loop-exceeds-10s-time.md)
 - B005 P2 | [B005-first-captured-finding-is-invisible--buried-in-s](bugs/B005-first-captured-finding-is-invisible--buried-in-s.md)
 - B006 P2 | [B006-advancing-one-entry-through-tdd-review-validate-](bugs/B006-advancing-one-entry-through-tdd-review-validate-.md)
 - B007 P2 | [B007-validator-success-is-a-dead-end-the-board-does-n](bugs/B007-validator-success-is-a-dead-end-the-board-does-n.md)
 - B008 P2 | [B008-corrupttruncated-session-modejson-silently-un-pa](bugs/B008-corrupttruncated-session-modejson-silently-un-pa.md)
 - B009 P2 | [B009-consolidator-silently-no-ops-findings-lost-when-](bugs/B009-consolidator-silently-no-ops-findings-lost-when-.md)
 - B014 P2 | [B014-two-implementations-of-scratch-live-promotion-wi](bugs/B014-two-implementations-of-scratch-live-promotion-wi.md)
-- B010 P3 | [B010-empty-board-renders-a-broken-two-line-open-count](bugs/B010-empty-board-renders-a-broken-two-line-open-count.md)
 - B011 P3 | [B011-architecturemd-is-stale-for-120-version-header-m](bugs/B011-architecturemd-is-stale-for-120-version-header-m.md)
 - B012 P3 | [B012-changelog-120-link-points-to-an-unpushed-rc-tag-](bugs/B012-changelog-120-link-points-to-an-unpushed-rc-tag-.md)
 - B013 P3 | [B013-readme-uses-emoji-violating-brandmd-no-emoji-in-](bugs/B013-readme-uses-emoji-violating-brandmd-no-emoji-in-.md)

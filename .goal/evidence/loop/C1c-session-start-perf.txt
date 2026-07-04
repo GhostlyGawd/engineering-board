@@ -1,0 +1,10 @@
+board-session-start.sh perf after B001 fix (single python3 pass over frontmatter)
+machine: sandbox CI-equivalent; prior O(n^2) grep-loop measured by red-team: 1200=15.05s
+
+  N=  300 entries (distinct blocked_by): 0.069s
+  N=  500 entries (distinct blocked_by): 0.083s
+  N=  800 entries (distinct blocked_by): 0.094s
+  N= 1200 entries (distinct blocked_by): 0.104s
+  N= 2000 entries (distinct blocked_by): 0.140s
+
+All well under the 10s SessionStart hook timeout. New: O(files) single pass.
