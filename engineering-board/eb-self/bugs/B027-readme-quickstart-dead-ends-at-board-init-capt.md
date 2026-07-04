@@ -3,7 +3,7 @@ id: B027
 type: bug
 title: README Quickstart dead-ends at board-init; capture-promote-fix path is undiscoverable
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P1
 affects: README.md
 needs: tdd
@@ -16,3 +16,6 @@ pattern: [onboarding, time-to-first-value]
 
 ## Observed behavior (C2 Track B — new P1)
 The Quickstart (README.md:48-89) contains only `marketplace add` → `install` → `/board-init` and stops. `/pm-start`, `/worker-start`, the passive-capture behavior, and the `_sessions/` location appear ONLY in the reference Modes table (README.md:98-107), never as onboarding steps. A user following only the Quickstart cannot reach first-promotion or first-fix, and cannot even confirm first-capture (invisible, B005). This is the dominant time-to-first-value cliff (measured: ≤5min capture and ≤15min promote are NOT met following public docs). Distinct from B005 (invisibility) and B006 (discipline restart).
+
+## Resolution (C2, PR C2d)
+README Quickstart extended past board-init with a 'first value' block (automatic capture + _sessions/ location, /pm-start to promote, /board-install-permissions) and an honest time-to-first-value expectation (~5min capture, ~10-15min promote). Measurement saved to .goal/evidence/loop/C2-time-to-first-value.md (convergence criterion 3).

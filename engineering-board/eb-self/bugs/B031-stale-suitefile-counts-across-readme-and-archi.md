@@ -3,7 +3,7 @@ id: B031
 type: bug
 title: Stale suite/file counts across README and ARCHITECTURE after C1
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P3
 affects: README.md
 needs: tdd
@@ -17,3 +17,6 @@ pattern: [doc-drift, count-mismatch]
 
 ## Observed behavior (C2 Track D)
 C1's coherence fix updated the ARCHITECTURE §2 tree to 13 suites but missed README:167 ("11 suites") and left §10 at "8 domains" (omits session-start, lists spike). The 11-vs-10 prompt-file count is pre-existing (predates C1) but folds into this cleanup.
+
+## Resolution (C2, PR C2d)
+README:181 '11 suites' -> '13 suites'; ARCHITECTURE §10 rebuilt to 13 run-all suites (added session-start/paths/scratch/version-coherence/crosscompat/mcp-server rows, spike relabeled standalone); '11 orchestrator-facing prompt files' -> 10 (matches the lint FILES array).

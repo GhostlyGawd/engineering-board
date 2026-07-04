@@ -44,6 +44,23 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   entries are read, never eval'd, so descriptive shell/HTML metacharacters are
   intentionally not rejected (they recur in legitimate technical findings).
 
+### Changed (onboarding)
+- **README Quickstart now covers the whole first-value path** (eb-self B027).
+  It dead-ended at `/board-init`; `/pm-start`, `/worker-start`, and the passive-
+  capture behavior lived only in a reference table, so a Quickstart-follower
+  could never reach first promotion. The Quickstart now walks capture → promote
+  → autonomous fix, names where captures land (`_sessions/`), points at
+  `/board-install-permissions`, and states an honest time-to-first-value
+  expectation (~5 min to first capture, ~10–15 min to first promotion following
+  only the README). Measurement: `.goal/evidence/loop/C2-time-to-first-value.md`.
+
+### Fixed (docs coherence)
+- Corrected stale counts left by the C1 refresh: README "11 suites" → 13;
+  `ARCHITECTURE.md` §10 rebuilt to the 13 real run-all suites (was "8 domains",
+  omitted `session-start`); "11 orchestrator-facing prompt files" → 10 (eb-self
+  B031). CHANGELOG "50-fixture corpus" wording clarified (B032). `worker-start`
+  unsupported-discipline error no longer leaks a version number (B033).
+
 ### Fixed (data integrity)
 - **MCP-captured scratch findings are no longer silently destroyed** (eb-self
   B026). `board_capture_finding` writes a human-markdown inbox
@@ -60,7 +77,7 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   adversarial-paste (36) and benign-findings (24) fixture through the canonical
   filter and asserts each fixture's declared `expect:`/`expect_reason:`.
   Registered in `tests/run-all.sh` (now **12 suites**) and CI-enforced. The
-  50-fixture corpus previously had **no** consumer, so the "100% reject-rate"
+  then-50-fixture corpus (now 60) previously had **no** consumer, so the "100% reject-rate"
   guarantee `ARCHITECTURE.md` advertised was never measured. New fixtures pin
   the bypass vectors above.
 
