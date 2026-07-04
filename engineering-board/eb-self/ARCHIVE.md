@@ -2,6 +2,9 @@
 
 Resolved entries. Newest at the top.
 
+- B041 P3 | [RFC 0002 command count + /board-view verdict](bugs/) — resolved C4 (PR C4b)
+- B042 P3 | [landing page now surfaces /board-view + honest visualization concession](bugs/) — resolved C4 (PR C4b)
+
 - B037 P1 | [reject filter now catches markdown-marker-prefixed imperatives](bugs/) — resolved C4 (PR C4a)
 - B038 P1 | [MCP affects_prefix router-row injection closed](bugs/) — resolved C4 (PR C4a)
 - B039 P2 | [MCP board_init symlink write-outside-root closed](bugs/) — resolved C4 (PR C4a)
