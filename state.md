@@ -11,18 +11,22 @@
 > (that's the part that goes stale). Assume this file can lag GitHub by one PR; fold
 > any catch-up edit into your next real PR, not a bookkeeping-only one.
 
-_Last updated: 2026-06-08_
+_Last updated: 2026-07-04_
 
 ---
 
 ## Snapshot
 
-- **`main` is at `1.1.0`** — shipped via **[PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8)**, merged as `097dfa1`. `plugin.json` + `marketplace.json` bumped in lockstep (`tests/version-coherence.sh`); the marketplace re-pulls on the version increase. Backward-compatible — pre-1.1.0 `docs/boards/` + legacy `docs/board/` still resolve.
-- **Active working branch:** `claude/adoring-turing-ULvhK` (reused across PRs — don't open a parallel one). 1.1.0 shipped via **[PR #8](https://github.com/GhostlyGawd/engineering-board/pull/8)**; subsequent docs, the Conductor RFC iterations, and the **`agentic-ecosystem`** research area landed via later PRs (#9–#15) — check GitHub for the live list. Push here and **land changes via PR — never push to `main` directly.**
-- **Green check:** `bash tests/run-all.sh` → **10 suites** (orchestration, claims, smoke, scratch-append, **paths**, modes, permissions, lint-orchestrator-prompts, version-coherence, crosscompat-lint); the `orchestration` suite now runs **15 sub-tests** (added `board-init-command.sh` + `board-relocate.sh`). CI gate: `.github/workflows/test.yml` runs `run-all` on every push.
+- **`main` is at `1.2.0`** — the productization release, shipped via **[PR #18](https://github.com/GhostlyGawd/engineering-board/pull/18)**, merged as `0060afd`. Adds a **zero-dependency MCP server** (`mcp-server/`, 11 tools over stdio, protocol 2025-06-18, bundled via root `.mcp.json`), a full **brand identity** (`BRAND.md` + `brand/`, tokens single-source, WCAG AA verified), a rewritten launch `README.md`, `CHANGELOG.md`, and the landing page. `plugin.json` + `marketplace.json` still bump in lockstep (`tests/version-coherence.sh`).
+- **Landing page is LIVE:** <https://ghostlygawd.github.io/engineering-board/> — served from the **`gh-pages` branch** (branch-deploy; the Actions-native `deploy-pages` path is denied for this repo's workflow token). `.github/workflows/pages.yml` syncs `docs/{index.html,assets,.nojekyll}` → `gh-pages` on every `main` push; `docs/` on `main` is the source of truth.
+- **Active working branch:** `claude/engineering-board-productize-fu2vvk` (the productization session's branch; earlier history used `claude/adoring-turing-ULvhK`, PRs #8–#16). Push here and **land changes via PR — never push to `main` directly.** Note: the sandbox git relay allows **branch** pushes but rejects **tag** pushes — releases/tags are a human step (see `.goal/BLOCKERS.md`).
+- **Green check:** `bash tests/run-all.sh` → **11 suites** (orchestration, claims, smoke, scratch-append, paths, modes, permissions, lint-orchestrator-prompts, version-coherence, crosscompat-lint, **mcp-server** — 65 checks). CI gate: `.github/workflows/test.yml` runs `run-all` on every push.
+- **Productization run docs:** `.goal/` holds the run's artifacts — `PROGRESS.md` (gate-by-gate status), `PRODUCT_FACTS.md`, `POSITIONING.md` ("the board is the database"), `LAUNCH.md` (remaining human launch steps: release tag/publish, repo description+topics+social preview, channel submissions), `FINAL_REPORT.md`, `BLOCKERS.md`, and `evidence/`.
 - **Active research:** the **`agentic-ecosystem`** thread lives at [`docs/research/agentic-ecosystem/`](docs/research/agentic-ecosystem/) — comparing the agentic systems I've built toward **consolidating them into one product**. Its `README.md` indexes everything; see the **Research thread** below.
 
 ## Recently completed
+
+- **1.2.0 productization (2026-07-04, PR #18).** Autonomous run: G0 audit (3 major doc/runtime-drift defects found+fixed, incl. the stop-hook step (d) "placeholder" lie about the learnings-curator), G1 market research (8 live-cited competitors) + positioning, G2 dual packaging (MCP server + Inspector-verified E2E + `claude plugin validate` clean + SIGPIPE test-flake fix), G3 brand, G4 launch surfaces (README rewrite; landing Lighthouse **100×4**; live-deploy verified byte-identical). MCP server reports its version from `plugin.json`.
 
 - **Handoff convention + post-1.1.0 docs (2026-06-07, PR #10).** Added a top-level **`CLAUDE.md`** that is a pure pointer to `state.md` as the session loader (convention text de-duplicated — it now lives only in the header above), and put the handoff rules there: **"update as you go"** plus **"don't snapshot pipeline status"** (cite PRs as pointers; let this file lag GitHub by one PR). Suite 10/10 green.
 - **Non-technical "how it works" visualization — merged to `main`.** `docs/how-it-works.svg` + `.png` (added, then text enlarged for readability).

@@ -11,8 +11,19 @@ _Written 2026-07-04._
 All four phase gates passed (G0–G4). The product is bug-fixed (3 major defects
 resolved), dual-packaged (plugin + new MCP server), branded, and fitted with a
 launch README and a GitHub Pages landing page scoring **100/100/100/100** on
-Lighthouse. Two items require a human account/UI to finish (remote release tag,
-Pages enablement + submissions) — all prepared and documented, none blocking.
+Lighthouse.
+
+_Post-merge update (2026-07-04):_ **PR #18 is merged** (`main` @ `0060afd`,
+CI green) and the **landing page is live** at
+`https://ghostlygawd.github.io/engineering-board/` — deployed via a `gh-pages`
+branch after the Actions-native path was denied ("Resource not accessible by
+integration"); `pages.yml` now syncs `docs/` → `gh-pages` on main pushes. Both
+install paths were re-verified from a fresh clone of merged `main` (11/11
+suites, `claude plugin validate` clean, MCP handshake + 11 tools), and the MCP
+server now reports its version from `plugin.json` (was hardcoded 1.1.0).
+Remaining human steps: release tag/publish (B2), repo description + topics +
+social preview (B3, UI-only), optional interactive plugin E2E (B1), and channel
+submissions (excluded from this run by request).
 
 ## What shipped, by phase
 

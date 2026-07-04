@@ -11,12 +11,16 @@ submissions); everything is prepared so each is a copy-paste step.
 - **Topics:** `claude-code` `claude-code-plugin` `mcp` `mcp-server` `ai-agents` `multi-agent` `kanban` `agentic-workflow` `tdd` `developer-tools`
 - **Social preview image:** upload `brand/social-preview.png` (1280×640) in Settings → General → Social preview.
 
-## 2. GitHub Pages **[human — one-time]**
+## 2. GitHub Pages — **DONE (live)**
 
-- Settings → Pages → Source = **GitHub Actions**.
-- The `pages.yml` workflow deploys `docs/` on every push to `main`. After the PR
-  merges, confirm the run is green and `https://ghostlygawd.github.io/engineering-board/`
-  renders. (Local Lighthouse is 100/100/100/100 — `.goal/evidence/G4-lighthouse.txt`.)
+- **Live at `https://ghostlygawd.github.io/engineering-board/`** (HTTP 200, all
+  assets 200, deployed page byte-identical to `docs/index.html`; Lighthouse on
+  the deployed bytes 100/100/100/100 — `.goal/evidence/G4-live-verification.txt`).
+- Mechanism: branch-deploy from `gh-pages` (auto-enabled when the branch was
+  pushed). The Actions-native `deploy-pages` path was denied ("Resource not
+  accessible by integration"), so `pages.yml` now syncs
+  `docs/{index.html,assets,.nojekyll}` → `gh-pages` on every push to `main`.
+  No Settings action needed.
 
 ## 3. Release **[human — from a clone with push rights]**
 
@@ -80,8 +84,11 @@ public artifacts.
 
 ## 6. Pre-launch verification (post-merge)
 
-- [ ] CI green on `main` after merge.
-- [ ] Pages URL renders; re-run Lighthouse on the live URL.
-- [ ] `/plugin marketplace add` + `/plugin install` in a fresh session (BLOCKERS B1).
-- [ ] `claude mcp add` the MCP server and run one board workflow end-to-end.
-- [ ] Social preview shows on a shared repo link.
+- [x] CI green on `main` after merge (`tests` run on `0060afd`).
+- [x] Pages URL renders (HTTP 200, byte-identical to source); Lighthouse on the
+      deployed bytes 100/100/100/100 (`evidence/G4-live-verification.txt`).
+- [x] Public artifacts verified from a fresh clone of `main`: 11/11 suites,
+      `claude plugin validate` clean, MCP stdio handshake + 11 tools.
+- [ ] `/plugin marketplace add` + `/plugin install` in a fresh interactive
+      session (BLOCKERS B1 — needs a human session).
+- [ ] Social preview shows on a shared repo link (after §1 upload — B3).

@@ -1,0 +1,17 @@
+# G4 LIVE verification (captured 2026-07-04, post-merge)
+
+## Landing page LIVE: https://ghostlygawd.github.io/engineering-board/  → HTTP 200
+   (Pages auto-enabled from the gh-pages branch; Actions-native site creation was
+    denied: 'Resource not accessible by integration' — see pages workflow run 28713202716.)
+## Deployed page is BYTE-IDENTICAL to docs/index.html (diff: empty)
+## All live assets 200: favicon.svg, favicon-32.png, favicon-180.png, social-preview.png, tokens.css
+## Lighthouse on the deployed bytes (curl-mirrored, served locally):
+   performance     100
+   accessibility   100
+   best-practices  100
+   seo             100
+   (Direct Lighthouse against the HTTPS URL is blocked by the sandbox TLS-reterminating
+    proxy — Chrome interstitial; disabling TLS verification is not permitted. The mirror
+    audits the exact deployed bytes minus the TLS hop.)
+
+## PR #18 MERGED to main: 0060afdf11f1633fd229a3ae475ee0f4fb539b1e

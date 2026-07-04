@@ -53,11 +53,11 @@ _Last updated: 2026-07-04_
 
 ## Definition of Done
 - [x] G0–G4 passed with evidence (all linked above)
-- [~] productize branch merged; default branch green — CI green on branch; **merge = human** (PR #18)
-- [~] Release published; both install paths verified — RC tag local (B2); marketplace live, MCP tested; live-verify post-merge (B1)
-- [~] Landing page live — built + Lighthouse 100; **Pages enable + deploy = human/post-merge**
-- [x] FINAL_REPORT.md written; BLOCKERS.md contains only justified, non-blocking items (B1, B2)
+- [x] productize branch **merged** — PR #18 → `main` @ `0060afd`; `tests` green on main
+- [~] Release published; both install paths verified — install paths **verified from public artifacts** (fresh clone of main: 11/11 suites, plugin validate clean, MCP handshake + 11 tools); RC tag/Release = human (B2: relay rejects tag refs)
+- [x] Landing page **LIVE** — https://ghostlygawd.github.io/engineering-board/ (HTTP 200, byte-identical deploy, Lighthouse 100×4 on deployed bytes — `evidence/G4-live-verification.txt`)
+- [x] FINAL_REPORT.md written; BLOCKERS.md contains only justified, non-blocking items (B1 interactive E2E, B2 tag push, B3 repo-metadata UI)
 
-**Run status: all autonomous work complete.** Remaining DoD items (merge, Pages
-enable, release push, submissions) require a human GitHub account/UI — prepared
-and documented in `.goal/LAUNCH.md` + `.goal/BLOCKERS.md`.
+**Run status: complete.** Remaining human steps: push/publish the release tag
+(B2), set repo description/topics + social preview (B3), optional interactive
+plugin E2E (B1), and channel submissions (deliberately excluded from this run).

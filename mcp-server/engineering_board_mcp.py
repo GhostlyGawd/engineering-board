@@ -35,12 +35,25 @@ from datetime import datetime, timezone
 
 PROTOCOL_VERSION = "2025-06-18"
 SERVER_NAME = "engineering-board"
-SERVER_VERSION = "1.1.0"
 
 # Directory of this script; used to locate the sibling hook scripts we shell out
 # to (claim acquire/release + validation).
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PLUGIN_ROOT = os.path.dirname(SCRIPT_DIR)  # repo root (mcp-server/..)
+
+
+def _plugin_version():
+    """Read the version from the plugin manifest so the server always reports
+    the same version as the plugin (single source of truth; the two manifests
+    are already coherence-checked by tests/version-coherence.sh)."""
+    try:
+        with open(os.path.join(PLUGIN_ROOT, ".claude-plugin", "plugin.json")) as f:
+            return json.load(f).get("version", "0.0.0")
+    except (OSError, ValueError):
+        return "0.0.0"
+
+
+SERVER_VERSION = _plugin_version()
 
 TYPE_PREFIX = {
     "bug": "B",
