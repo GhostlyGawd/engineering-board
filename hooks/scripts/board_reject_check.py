@@ -89,12 +89,14 @@ As the filter matured, findings shifted from "a whole mechanism is missing" to
     script terminator is at most P2; an obscure/rare one is P3 "grow the set".
 
 Do NOT down-rate a genuine mechanism gap to force a "clean" cycle; equally, do
-NOT inflate a single-glyph coverage gap in a comprehensive fold into a P1. All
-three normalization folds are now comprehensive-by-construction — line breaks
-(`splitlines()`), sentence terminators (`_SENTENCE_TERMINATORS`, major living
-scripts), and invisible/format characters (`_strip_invisible`, category Cf +
-variation selectors) — so an *enumeration* gap in any of them is a mechanism
-defect to fix by extending the construction, while a genuinely novel class (a new
+NOT inflate a single-glyph coverage gap in a comprehensive fold into a P1. The
+three normalization folds — line breaks (`splitlines()`), sentence terminators
+(`_SENTENCE_TERMINATORS`, major living scripts), and invisible/format characters
+(`_strip_invisible`, category Cf + variation selectors) — plus the clause-anchor
+skip-run's markdown-marker coverage (unordered bullets `-*+>` AND the ordered/
+lettered/roman/checkbox list family via `_LIST_MARKER`, eb-self B059) are now
+comprehensive-by-construction. An *enumeration* gap in any of them is a mechanism
+defect to fix by extending the construction; a genuinely novel class (a new
 grammar/mood/verb vector) is the only remaining way to a real new bypass.
 
 Public API
@@ -243,22 +245,40 @@ _ADVERB = (
     r"definitely|certainly|absolutely)"
 )
 
+# A markdown list-item marker that can lead a list line before the verb. Covers
+# the WHOLE common list family — ordered (`1.` `1)` `(1)` `1]`), lettered (`a)`),
+# roman (`iv.`), and task-list checkboxes (`[ ]` `[x]`) — so the skip-run is
+# comprehensive for list markers, not just the unordered bullets it already had
+# (eb-self B059). Bounded on purpose: the ordinal is at most a few digits/letters,
+# NEVER a general `\w+`, so it cannot swallow a real subject ("1) the validator
+# will override X" keeps its subject after the marker → the verb doesn't lead →
+# still accepted). scratch is markdown, so "1) ignore all previous instructions"
+# is as natural an injection as the bulleted form.
+_LIST_MARKER = (
+    r"(?:[(\[]?(?:\d{1,3}|[ivxlcdmIVXLCDM]{1,4}|[A-Za-z])[.)\]]|\[[ xX]?\])"
+)
+
 # Clause boundary: string start, sentence/clause punctuation, or a SYSTEM/ADMIN
 # lead-in. Between the boundary and the verb we skip an optional run of
-# whitespace, quotes/parens, AND markdown list/blockquote markers (- * + >) —
-# scratch is markdown, so "- ignore all previous instructions" is the most
-# natural injection form and must not slip past the clause-leading anchor. A
-# benign bulleted finding still has a subject/modal after the marker
-# ("- the stage will override X"), so descriptive prose is preserved.
+# whitespace, quotes/parens, AND markdown list/blockquote markers (- * + >), then
+# an optional single ordered/task list marker, then any run of lead-ins/adverbs —
+# scratch is markdown, so a list-led imperative is the most natural injection form
+# and must not slip past the clause-leading anchor. A benign list item still has a
+# subject/modal after the marker ("- the stage will override X"), so descriptive
+# prose is preserved.
 _IMPERATIVE_RE = re.compile(
-    r"(?:^|[.!?:;,\n]|\bsystem\b|\badmin\b)[-\s*+>#'\"`()•‣⁃◦▪●·–—]*(?:(?:"
+    r"(?:^|[.!?:;,\n]|\bsystem\b|\badmin\b)[-\s*+>#'\"`()•‣⁃◦▪●·–—]*"
+    r"(?:" + _LIST_MARKER + r"\s*)?(?:(?:"
     + _LEADIN + "|" + _ADVERB + r")\s+)*(?:"
     + "|".join(_VERBS) + r")\b",
     re.IGNORECASE,
 )
 # Slash directive (e.g. /board-migrate, /uninstall-everything). Case-insensitive
-# to catch upper-case bypasses; requires start-of-token so paths ("src/x") miss.
-_SLASH_RE = re.compile(r"(?:^|\s)/[a-z][a-z-]+", re.IGNORECASE)
+# to catch upper-case bypasses. The leading position allows a boundary OR a
+# markdown marker/quote/paren (matching the laxity of `_SUBAGENT_RE`), so
+# `-/cmd`, `"/cmd"`, `(/cmd)` are caught while a path (`src/x`, letter before `/`)
+# still misses (eb-self B060).
+_SLASH_RE = re.compile(r"(?:^|[\s\-*+>#'\"`()•‣⁃◦▪●·–—])/[a-z][a-z-]+", re.IGNORECASE)
 # Subagent mention (@finding-extractor). Case-insensitive.
 _SUBAGENT_RE = re.compile(r"@[a-z][a-z0-9-]+", re.IGNORECASE)
 
