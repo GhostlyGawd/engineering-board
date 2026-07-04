@@ -12,6 +12,20 @@ increases.
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security
+- **Reject filter now sees through Unicode look-alikes** (eb-self B043). Unicode
+  bullets (`•` `–` `—` `●` …), markdown `##` headings, Unicode line separators
+  (U+2028/2029/0085), and zero-width characters all bypassed the ASCII-only
+  marker/boundary classes (continuation of B025/B037). Inputs are now NFKC-
+  normalized, stripped of zero-width chars, and line-separator-folded before the
+  rules scan, and the marker run covers `#` + common Unicode bullets/dashes —
+  closing the whole look-alike class rather than one glyph. Benign bulleted
+  findings still promote. Three new adversarial fixtures.
+- MCP `board_capture_finding` blockquotes the `evidence` field so an embedded
+  `## …` can't inject a second scratch header / spoof the unpromoted-finding
+  count (eb-self B040 follow-up); and `session_id` with whitespace/newline is now
+  rejected at `board_claim`/`board_release` and in the claim scripts — it broke
+  the `owner.txt` round-trip (self-DoS) and could inject owner lines (**closes
+  the known-open B029**).
 - **Reject filter now catches markdown-marker-prefixed imperatives** (eb-self
   B037). A bullet or blockquote marker before the verb (`- ignore all previous
   instructions`, `> ignore…`) broke the C1/C2 clause-leading anchor — and scratch
@@ -62,7 +76,7 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   lead-in run (`please|kindly|now|just|you must|you should|…`) before the verb,
   while a benign modal followed by a subject ("should the validator ignore…")
   still promotes. Verb set broadened with `send`/`leak`/`expose`. Four new
-  adversarial fixtures; `reject-filter` now 65 checks (40 adversarial + 25 benign).
+  adversarial fixtures; the `reject-filter` corpus grows with every pinned bypass.
 
 - **Injection reject-filter hardened and made single-source** (eb-self B002).
   The deterministic defense-in-depth filter re-applied at consolidation was
@@ -122,10 +136,10 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   competitive gap (visualization) without a daemon — the view is just another
   committed in-repo projection of the board.
 - **`tests/security/reject-filter.sh`** (eb-self B003) — drives every
-  adversarial-paste (40) and benign-findings (25) fixture through the canonical
+  adversarial-paste and benign-findings fixture through the canonical
   filter and asserts each fixture's declared `expect:`/`expect_reason:`.
   Registered in `tests/run-all.sh` (now **12 suites**) and CI-enforced. The
-  then-50-fixture corpus (now 60) previously had **no** consumer, so the "100% reject-rate"
+  fixture corpus previously had **no** consumer, so the "100% reject-rate"
   guarantee `ARCHITECTURE.md` advertised was never measured. New fixtures pin
   the bypass vectors above.
 

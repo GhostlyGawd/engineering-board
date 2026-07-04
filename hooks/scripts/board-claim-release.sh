@@ -16,6 +16,10 @@ SESSION_ID="${3:?session-id required}"
 case "$ENTRY_ID" in
   */*|*'\'*|*..*) echo "invalid entry-id (no path separators or '..'): $ENTRY_ID" >&2; exit 1 ;;
 esac
+# Reject whitespace in SESSION_ID (owner.txt round-trip self-DoS + injection; B029).
+case "$SESSION_ID" in
+  *[[:space:]]*) echo "invalid session-id (no whitespace): $SESSION_ID" >&2; exit 1 ;;
+esac
 
 CLAIM_DIR="${BOARD_DIR}/_claims/${ENTRY_ID}"
 OWNER_FILE="${CLAIM_DIR}/owner.txt"

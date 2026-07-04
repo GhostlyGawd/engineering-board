@@ -207,6 +207,22 @@ def validate_entry_id(entry_id):
     return entry_id
 
 
+def validate_session_id(session_id):
+    """Return `session_id` if it has no whitespace/control chars, else ToolError.
+
+    session_id is written into `_claims/<id>/owner.txt` as `session_id: <id>`
+    and read back with `grep | awk '{print $2}'` by the claim scripts. Whitespace
+    or a newline both break that round-trip (self-DoS) and let a newline inject
+    extra owner.txt lines — so reject it (opaque session tokens never contain
+    whitespace). Closes eb-self B040-follow-up + the known-open B029.
+    """
+    if not isinstance(session_id, str) or not session_id.strip():
+        raise ToolError("session_id must be a non-empty string")
+    if re.search(r"\s", session_id):
+        raise ToolError("invalid session_id %r: must not contain whitespace" % session_id)
+    return session_id
+
+
 def resolve_board_row(root, row):
     """Absolute board dir for a router row, asserting it stays within root.
 
@@ -961,7 +977,13 @@ def tool_board_capture_finding(params):
     if affects:
         block.append("- affects: %s" % affects)
     if evidence:
-        block += ["", evidence.rstrip()]
+        # Blockquote each evidence line so an embedded `## …` can't inject a
+        # second scratch header (which would spoof the unpromoted-finding count)
+        # while keeping legitimately multi-line evidence readable (eb-self B040
+        # follow-up: B040 flattened title/kind/affects but left `evidence`).
+        quoted = "\n".join(("> " + ln) if ln.strip() else ">"
+                           for ln in str(evidence).rstrip().split("\n"))
+        block += ["", quoted]
     block.append("")
     text = "\n".join(block) + "\n"
 
@@ -1019,7 +1041,7 @@ RELEASE_MEANING = {0: "released", 3: "owner_mismatch_or_missing", 4: "retries_ex
 def tool_board_claim(params):
     project = require(params, "project")
     entry_id = validate_entry_id(require(params, "entry_id"))
-    session_id = require(params, "session_id")
+    session_id = validate_session_id(require(params, "session_id"))
     root = resolve_root(params)
     bd = ensure_board_exists(root, project)
     if not os.path.isfile(CLAIM_ACQUIRE):
@@ -1042,7 +1064,7 @@ def tool_board_claim(params):
 def tool_board_release(params):
     project = require(params, "project")
     entry_id = validate_entry_id(require(params, "entry_id"))
-    session_id = require(params, "session_id")
+    session_id = validate_session_id(require(params, "session_id"))
     root = resolve_root(params)
     bd = ensure_board_exists(root, project)
     if not os.path.isfile(CLAIM_RELEASE):
