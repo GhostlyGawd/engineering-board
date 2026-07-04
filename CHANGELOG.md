@@ -144,5 +144,6 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 - Resilience layer: active-workers registry, PM-fallback heartbeat, `paused:`
   field.
 
-[1.2.0]: https://github.com/GhostlyGawd/engineering-board/releases/tag/v1.2.0-rc.1
+[Unreleased]: https://github.com/GhostlyGawd/engineering-board/commits/main
+[1.2.0]: https://github.com/GhostlyGawd/engineering-board/pull/18
 [1.1.0]: https://github.com/GhostlyGawd/engineering-board/pull/8

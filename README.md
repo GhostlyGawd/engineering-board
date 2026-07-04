@@ -136,12 +136,12 @@ Honest and cited; traction figures are live snapshots (2026-07-04) that drift.
 
 | | git-committed board? | durable memory? | atomic multi-agent locking? | Claude-native? | MCP? |
 |---|:---:|:---:|:---:|:---:|:---:|
-| **engineering-board** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Backlog.md](https://github.com/MrLesk/Backlog.md) · ~5.9k★ | ✅ | ❌ | ❌ | ❌ | ✅ |
-| [Agent-MCP](https://github.com/rinadelph/Agent-MCP) · ~1.3k★ | ❌ (RAG DB) | ✅ (opaque) | ✅ | ❌ | ✅ |
-| [kanban-mcp](https://github.com/eyalzh/kanban-mcp) · ~40★ | ❌ (SQLite) | ❌ | ❌ | ❌ | ✅ |
-| [claude-code-workflows](https://github.com/shinpr/claude-code-workflows) · ~536★ | ❌ (ephemeral) | ❌ | ❌ | ✅ | ❌ |
-| [Flux](https://paddo.dev/blog/flux-kanban-for-ai-agents/) · early | ❌ (side-branch SQLite/JSON) | ❌ | ❌ | ❌ | ✅ |
+| **engineering-board** | Yes | Yes | Yes | Yes | Yes |
+| [Backlog.md](https://github.com/MrLesk/Backlog.md) · ~5.9k★ | Yes | No | No | No | Yes |
+| [Agent-MCP](https://github.com/rinadelph/Agent-MCP) · ~1.3k★ | No (RAG DB) | Yes (opaque) | Yes | No | Yes |
+| [kanban-mcp](https://github.com/eyalzh/kanban-mcp) · ~40★ | No (SQLite) | No | No | No | Yes |
+| [claude-code-workflows](https://github.com/shinpr/claude-code-workflows) · ~536★ | No (ephemeral) | No | No | Yes | No |
+| [Flux](https://paddo.dev/blog/flux-kanban-for-ai-agents/) · early | No (side-branch SQLite/JSON) | No | No | No | Yes |
 
 No competitor combines all four traits engineering-board owns — git-committed board + durable memory + atomic locking + Claude-native — now with MCP as the fifth.
 

@@ -2,6 +2,13 @@
 
 Resolved entries. Newest at the top.
 
+- B011 P3 | [ARCHITECTURE refreshed for v1.2.0](bugs/) — resolved C1 (PR C1d)
+- B012 P3 | [CHANGELOG 1.2.0 link now resolvable](bugs/) — resolved C1 (PR C1d)
+- B013 P3 | [README emoji -> Yes/No text (BRAND-clean)](bugs/) — resolved C1 (PR C1d)
+- B017 P3 | [board-triage five->six rules](bugs/) — resolved C1 (PR C1d)
+- B018 P3 | [board-resolve mandatory-steps contradiction fixed](bugs/) — resolved C1 (PR C1d)
+- B019 P3 | [recurrence thresholds (2+ vs >=3) distinguished](bugs/) — resolved C1 (PR C1d)
+
 - B001 P1 | [SessionStart blocked_by map is now a single O(files) pass (15s→0.1s at 1200 entries)](bugs/B001-sessionstart-on2-blockedby-loop-exceeds-10s-time.md) — resolved C1 (PR C1c)
 - B010 P3 | [empty-board open-count no longer double-prints](bugs/B010-empty-board-renders-a-broken-two-line-open-count.md) — resolved C1 (PR C1c)
 

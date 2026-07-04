@@ -20,3 +20,6 @@ pattern: [version-drift]
 `references/required-permissions.json` version stamp aligned to the plugin
 version (0.2.2 -> 1.2.0). Remaining sprawl (agent frontmatter 0.2.x, skills
 0.1.0) still open — sweep with the docs-coherence PR. Kept open (P3).
+
+## Why still open (P3, deferred)
+The required-permissions.json stamp is aligned (done in C1b). The remaining sprawl is agent/skill frontmatter version stamps (agents 0.2.x, skills 0.1.0). Deferred: these frontmatter fields are lightly load-bearing (some modes lints read frontmatter) and a bulk realignment is a mechanical sweep better done as its own small PR to avoid coupling with substantive fixes. No user impact — purely a maintainer-legibility polish. Revisit in a later cycle.

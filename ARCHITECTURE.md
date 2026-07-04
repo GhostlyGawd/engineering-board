@@ -2,7 +2,7 @@
 
 A complete structural map of the plugin: what every file does, how the pieces connect, and the lifecycle that ties them together. Companion to `README.md` (which is the install/usage surface).
 
-Current shipped state: **v1.1.0** — stable. Passive listening + PM pipeline + Worker pipeline with atomic claim locking + Resilience layer (active-workers registry, PM-fallback heartbeat, paused-field) + Learning entity (L### with curator + `/board-migrate` + SessionStart top-learnings surface) + Tier-4 QoL (single CI runner, version-coherence + cross-platform lint) + deterministic mode-transition guard (§11.5) + full subagent contract lint + pause/resume round-trip invariants + GitHub Actions CI gate enforcing `tests/run-all.sh` on every push. v1.0.1 makes scratch-append fidelity deterministic: `board-scratch-append.sh` owns the timestamp + canonical write so the orchestrating LLM is out of the scratch byte-copy path. v1.1.0 relocates board content to a visible, committed `engineering-board/` directory (`docs/boards/` and legacy `docs/board/` still resolve). See `NEXT-PHASE.md` for the closed-backlog tombstone and the release history.
+Current shipped state: **v1.2.0** — stable. Passive listening + PM pipeline + Worker pipeline with atomic claim locking + Resilience layer (active-workers registry, PM-fallback heartbeat, paused-field) + Learning entity (L### with curator + `/board-migrate` + SessionStart top-learnings surface) + Tier-4 QoL (single CI runner, version-coherence + cross-platform lint) + deterministic mode-transition guard (§11.5) + full subagent contract lint + pause/resume round-trip invariants + GitHub Actions CI gate enforcing `tests/run-all.sh` on every push. v1.0.1 makes scratch-append fidelity deterministic: `board-scratch-append.sh` owns the timestamp + canonical write so the orchestrating LLM is out of the scratch byte-copy path. v1.1.0 relocates board content to a visible, committed `engineering-board/` directory (`docs/boards/` and legacy `docs/board/` still resolve). **v1.2.0 adds dual distribution: a zero-dependency `python3` MCP server (`mcp-server/`) exposing the board substrate as 11 tools over stdio, so the same committed board is drivable from any MCP client, not just Claude Code.** See `NEXT-PHASE.md` for the closed-backlog tombstone and the release history.
 
 ---
 
@@ -30,17 +30,19 @@ engineering-board/
 ├── README.md                       # Install + usage (user-facing)
 ├── ARCHITECTURE.md                 # This file (contributor-facing)
 ├── LICENSE                         # MIT
+├── .mcp.json                       # Bundles the MCP server at the plugin root
 ├── agents/                         # 8 agent definitions (Claude Code subagents)
 ├── commands/                       # 10 slash commands
 ├── hooks/
 │   ├── hooks.json                  # 4 hook events wired
 │   ├── stop-hook-procedure.md      # Canonical Stop procedure (passive/PM/worker)
-│   └── scripts/                    # 12 bash scripts (board mutation, claims, audit)
+│   └── scripts/                    # 22 bash scripts + board_reject_check.py (mutation, claims, audit, reject filter)
+├── mcp-server/                     # v1.2.0 zero-dep python3 MCP server (11 tools, stdio) + tests
 ├── skills/                         # 4 Skills (intake, triage, resolve, consolidate)
 ├── references/
 │   ├── auto-resolve-pass.md        # Shared protocol used by all 4 skills
 │   └── required-permissions.json   # Permission allowlist for board-install-permissions
-├── tests/                          # 8 domains (claims, smoke, modes, orchestration, permissions, fixtures, spike, lint)
+├── tests/                          # 13 suites (claims, smoke, modes, orchestration, permissions, paths, scratch, security, session-start, version-coherence, crosscompat, mcp-server, lint)
 └── .omc/
     ├── plans/                      # Roadmap (v0.2.1 → v0.3.0 consensus plan)
     └── specs/                      # Deep-interview spec that fed the plan
@@ -114,7 +116,9 @@ The Stop hook's actual orchestration body (the `type: "prompt"` content) lives s
 | `3-PM` | `mode: pm` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` (4 Tasks) | `<<EB-PM-CONTINUE>>` / `<<EB-PM-FAIL>>` |
 | `3-WORKER` | `mode: worker, discipline: <d>` | claim-acquire script → one of `tdd-builder` / `code-reviewer` / `validator` → write back `needs:` → claim-release script | `<<EB-WORKER-CONTINUE>>` / `<<EB-WORKER-NOTHING-TO-DO>>` / `<<EB-WORKER-FAIL>>` |
 
-### `scripts/` — 20 scripts
+### `scripts/` — 22 bash scripts + 1 python module
+
+Board-location resolution lives in one place: **`board-paths.sh`** (sourced helper, not invoked directly) exposes `eb_router_path` / `eb_board_dirs` / `eb_board_rows`, implementing the `engineering-board/` → `docs/boards/` → legacy `docs/board/` resolution order; all consumers source it rather than re-hardcoding paths. **`board_reject_check.py`** is the single source of truth for the injection reject filter (imported by `board-consolidate.sh`, driven by `tests/security/reject-filter.sh`). **`board-relocate.sh`** backs `/board-migrate --relocate` (moves `docs/boards/<p>` → `engineering-board/<p>`).
 
 **Hook-triggered (4):**
 - `board-session-start.sh` — SessionStart. v0.3.0 also surfaces top medium/high-confidence learnings filtered by cwd against each learning's `applies_to` field.
