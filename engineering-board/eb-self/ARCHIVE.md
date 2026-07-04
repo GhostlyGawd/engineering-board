@@ -2,6 +2,9 @@
 
 Resolved entries. Newest at the top.
 
+- B024 P0 | [MCP path traversal via project name closed (realpath containment + name validation)](bugs/) — resolved C2 (PR C2a)
+- B028 P2 | [MCP frontmatter newline-injection neutralized](bugs/) — resolved C2 (PR C2a)
+
 - B023 P2 | [board-index-check counts only open files (invariant no longer defeated by resolve-in-place)](bugs/B023-index-check-invariant-defeated-by-resolve-in-place.md) — resolved C1 (PR C1e)
 
 - B011 P3 | [ARCHITECTURE refreshed for v1.2.0](bugs/) — resolved C1 (PR C1d)
