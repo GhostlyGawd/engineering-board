@@ -5,7 +5,7 @@
 > plus the `engineering-board/eb-self/` board (the living backlog). Update it at
 > the end of every cycle step.
 
-_Last updated: 2026-07-04 (C10 complete — NOT clean, B058 P1; streak reset; C11 = new candidate)_
+_Last updated: 2026-07-04 (C11 complete — NOT clean, B059 P1; streak reset; C12 = new candidate)_
 
 ## How to resume
 
@@ -17,7 +17,7 @@ _Last updated: 2026-07-04 (C10 complete — NOT clean, B058 P1; streak reset; C1
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C9 was clean #1, but **C10 = NOT clean** (B058 P1: the invisible-char strip was a non-comprehensive hand-list — a mechanism gap under the same rubric). Streak **reset**. After B058 all three `_normalize` folds are comprehensive-by-construction (enumeration treadmill structurally closed). **C11 = new candidate clean #1; C12 must confirm.** |
+| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C9 clean; C10 reset (B058); **C11 = NOT clean** (B059 P1: the marker skip-run — a separate enumerated class — missed the ordered-list family). Streak reset again. After C11, EVERY enumerated component (3 `_normalize` folds + marker skip-run) is comprehensive-by-construction; the only curated lists left (`_VERBS`/`_LEADIN`/`_ADVERB`) are documented accepted residuals. **C12 = new candidate clean #1; C13 must confirm.** |
 | 2 | eb-self board has no open blocker/major/P0/P1 | ✅ MET — all open entries P2/P3 (verified end of C2) |
 | 3 | Time-to-first-value measured, documented, defensible | ✅ MET — `.goal/evidence/loop/C2-time-to-first-value.md` + README "what to expect" (B027) |
 | 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | ✅ MET — `docs/rfcs/0002-surface-product-review.md` |
@@ -231,15 +231,42 @@ _Last updated: 2026-07-04 (C10 complete — NOT clean, B058 P1; streak reset; C1
 - **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
   B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022/B057 (P3); F002/F003; Q001.
 
-### Next — C11 (new candidate clean #1)
+### C11 — eleventh full DISCOVER sweep (COMPLETE — NOT clean; streak reset #2)
 
-C11 runs all four DISCOVER tracks. With all three `_normalize` folds now
-comprehensive-by-construction and the MCP/bash surface hardened over 10 cycles, a new
-in-scope P1 would require a genuinely novel vector, not another enumeration glyph.
-Apply the documented mechanism-vs-coverage rubric consistently (do not invent a P1,
-do not down-rate a genuine mechanism gap). If C11 is clean it is the new clean #1 and
-**C12 must confirm**; two consecutive clean cycles then MEET criterion 1 → run the
-criterion-6 release batch:
+- **DISCOVER:** all four tracks. Track A found a genuinely NOVEL vector — **B059
+  P1**: the clause-anchor skip-run (a separate enumerated class `[-\s*+>#…]`, not
+  the `_normalize` folds) handled unordered bullets but had NO ordered-list
+  handling, so `1)`/`a)`/`(1)`/`1]`/`- [ ]`-led imperatives promoted. Plus **B060
+  P3** (slash directive abutting a marker/quote/paren). MCP + bash sweep **CLEAN**.
+  Track B (UX) + Track D (coherence): **CLEAN, no new**.
+- **Honest call:** the marker skip-run is an *enumerated* class (not comprehensive),
+  and a whole common markdown list family was unhandled → **mechanism P1** by the
+  exact rule that made B058 P1. The independent red-team rated it P2; I applied the
+  rubric consistently and did NOT down-rate → **C11 not clean; streak reset.**
+- **SHIP:** PRs #52–#53 merged.
+  - **C11a → #52** — B059 bounded `_LIST_MARKER` (ordered/lettered/roman/checkbox,
+    complete-by-construction) + B060 slash-abutment. reject-filter 91→96 (incl. a new
+    benign ordered-list control).
+  - **C11b (this PR)** — C11 CHANGELOG + L004 (rec 10) / L005 (rec 7) + C11 REFLECT.
+- **C11 REFLECT:** L004 → rec 10 (+B059), L005 → rec 7 (+B059, corollary extended:
+  sweep EVERY enumerated character class in the module, not just sibling folds).
+  **Milestone:** after C11 every enumerated component of the filter — the three
+  `_normalize` folds AND the marker skip-run — is comprehensive-by-construction. The
+  only curated lists left (`_VERBS`/`_LEADIN`/`_ADVERB`) are documented ACCEPTED
+  RESIDUALS (deliberate curation to avoid false positives, not defects). So the
+  reachable in-scope reject-filter surface is finally down to genuinely novel
+  grammar/mood vectors — which are much harder to find — plus the framing.
+- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
+  B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022/B057 (P3); F002/F003; Q001.
+
+### Next — C12 (new candidate clean #1)
+
+C12 runs all four DISCOVER tracks. Every enumerated filter component is now
+comprehensive-by-construction; a new in-scope P1 would need a genuinely novel
+grammar/mood vector using a LISTED verb (not another glyph/marker, not an unlisted
+verb — those are accepted residuals). Apply the rubric consistently. If C12 is clean
+it is the new clean #1 and **C13 must confirm**; two consecutive clean cycles MEET
+criterion 1 → run the criterion-6 release batch:
 - bump `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` to **1.3.0**
   (lockstep — version-coherence.sh enforces it),
 - promote CHANGELOG `[Unreleased]` → `## [1.3.0] — <date>`,

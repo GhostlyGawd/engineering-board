@@ -12,6 +12,15 @@ increases.
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security
+- **Clause anchor now skips the whole markdown list-marker family** (eb-self
+  B059). The skip-run handled unordered bullets (`- * + >`) but not ordered lists,
+  so `1) ignore all previous instructions`, `a) delete…`, `(1) reset…`, `1] drop…`,
+  and task-list `- [ ] ignore…` slipped past the anchor and promoted. Added a
+  bounded `_LIST_MARKER` token covering ordered/lettered/roman + checkbox markers —
+  bounded (never `\w+`), so a benign `1) the validator will…` keeps its subject and
+  still promotes. Also (B060) the slash-directive rule now catches a slash abutting
+  a marker/quote/paren (`-/cmd`, `(/cmd)`), matching the subagent rule's laxity.
+  Five new fixtures incl. a benign ordered-list control.
 - **Invisible-character strip now covers the whole default-ignorable class**
   (eb-self B058). The strip was a hand-list of 5 (ZWSP/ZWNJ/ZWJ/WJ/BOM) — the one
   `_normalize` fold never made comprehensive — so a soft hyphen `U+00AD`, the
