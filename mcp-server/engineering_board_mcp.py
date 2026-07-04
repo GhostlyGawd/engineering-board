@@ -314,8 +314,13 @@ def _oneline(val):
     """Collapse CR/LF (and other control chars) to spaces so a field value can
     never inject extra frontmatter keys or close the `---` block early (eb-self
     B028). Frontmatter is line-oriented `key: value`, so a newline in a value is
-    always invalid; entry text is often copied from untrusted finding content."""
-    return re.sub(r"[\r\n\t\f\v]+", " ", str(val)).strip()
+    always invalid; entry text is often copied from untrusted finding content.
+
+    The class covers every separator a downstream universal-newline reader would
+    treat as a line break — not just `\\r\\n\\t\\f\\v` but the C0 separators
+    U+001C-001F, U+0085 (NEL), and U+2028/2029 (LS/PS) — so a field flattened
+    here cannot regain a line break when re-read (eb-self B054, same class)."""
+    return re.sub(r"[\r\n\t\f\v\x1c-\x1f\x85\u2028\u2029]+", " ", str(val)).strip()
 
 
 def serialize_frontmatter(fields):
@@ -981,8 +986,14 @@ def tool_board_capture_finding(params):
         # second scratch header (which would spoof the unpromoted-finding count)
         # while keeping legitimately multi-line evidence readable (eb-self B040
         # follow-up: B040 flattened title/kind/affects but left `evidence`).
+        # splitlines() (not split("\n")) so every line separator — CR/CRLF, FF,
+        # VT, the C0 separators, U+0085, U+2028/2029 — starts its own blockquoted
+        # line; otherwise a bare `\r` before `## …` escapes the `> ` prefix and
+        # forges a scratch header a reader / count_scratch_findings would honor
+        # (eb-self B054, re-opening the B040 harm). Downstream readers use
+        # universal-newline semantics, so the split must too.
         quoted = "\n".join(("> " + ln) if ln.strip() else ">"
-                           for ln in str(evidence).rstrip().split("\n"))
+                           for ln in str(evidence).rstrip().splitlines())
         block += ["", quoted]
     block.append("")
     text = "\n".join(block) + "\n"

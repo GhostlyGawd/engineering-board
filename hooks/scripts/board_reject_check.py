@@ -95,6 +95,20 @@ import unicodedata
 _ZERO_WIDTH = dict.fromkeys(
     [0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF], None)  # ZWSP/ZWNJ/ZWJ/WJ/BOM
 
+# Sentence/clause terminators in non-Latin scripts that an LLM reads as a fresh
+# clause but the ASCII boundary class `[.!?:;,\n]` misses. NFKC leaves them
+# intact, and — unlike a cross-script homoglyph — they do NOT corrupt the verb
+# that follows, so a bare imperative after one ("… punctuation。ignore all …")
+# reaches the board as a clean, obeyable command. Fold them to ASCII `.` so the
+# boundary anchor fires — folding the class rather than enumerating each glyph in
+# the boundary alternation (eb-self B053; mirrors the B051 splitlines() fold).
+# Curated to genuine sentence/clause terminals (CJK/fullwidth stop + comma,
+# Devanagari danda/double-danda, Ethiopic full stop, Arabic full stop + question
+# mark); deliberately NOT the interrobang/reversed-question-mark, which an LLM
+# does not treat as a clause reset (accepted residual).
+_SENTENCE_TERMINATORS = dict.fromkeys(
+    [0x3002, 0x3001, 0xFF61, 0x0964, 0x0965, 0x1362, 0x06D4, 0x061F], ord("."))
+
 
 def _normalize(text):
     """Fold Unicode tricks to their ASCII intent before the rules scan.
@@ -113,6 +127,9 @@ def _normalize(text):
         return text
     text = unicodedata.normalize("NFKC", text)
     text = text.translate(_ZERO_WIDTH)
+    # Fold non-Latin sentence terminators to ASCII "." so they count as a clause
+    # boundary the anchor recognizes (eb-self B053).
+    text = text.translate(_SENTENCE_TERMINATORS)
     # splitlines() breaks on \n \r \r\n \v \f \x1c \x1d \x1e \x85 \u2028 \u2029;
     # rejoining with \n normalizes them all to the recognized clause boundary.
     text = "\n".join(text.splitlines())
