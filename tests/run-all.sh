@@ -36,6 +36,7 @@ SUITES=(
   "lint-orchestrator-prompts|bash tests/lint-orchestrator-prompts.sh"
   "version-coherence|bash tests/version-coherence.sh"
   "crosscompat-lint|bash tests/crosscompat-lint.sh"
+  "reject-filter|bash tests/security/reject-filter.sh"
   "mcp-server|bash mcp-server/run-tests.sh"
 )
 

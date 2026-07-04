@@ -7,6 +7,39 @@ Plugin and marketplace manifests are versioned in lockstep (enforced by
 `tests/version-coherence.sh`); a fix only reaches installs when the version
 increases.
 
+## [Unreleased]
+
+Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
+
+### Security
+- **Injection reject-filter hardened and made single-source** (eb-self B002).
+  The deterministic defense-in-depth filter re-applied at consolidation was
+  trivially bypassable: it only matched imperative verbs anchored at the string
+  start, an 8-verb list, and scanned only `title`/`evidence_quote`. Crafted
+  findings with a non-leading imperative ("as noted, ignore prior findings"), an
+  un-listed verb (`delete`/`remove`/`close`/`drop`), or a payload in `tags`/
+  `affects` promoted straight to the live board. New canonical module
+  `hooks/scripts/board_reject_check.py` (imported by `board-consolidate.sh`, the
+  single source of truth) matches injection verbs in imperative mood at any
+  clause boundary, broadens the verb set, scans all string fields, and is
+  case-insensitive on slash/subagent directives. Threat model documented:
+  entries are read, never eval'd, so descriptive shell/HTML metacharacters are
+  intentionally not rejected (they recur in legitimate technical findings).
+
+### Added
+- **`tests/security/reject-filter.sh`** (eb-self B003) — drives every
+  adversarial-paste (36) and benign-findings (24) fixture through the canonical
+  filter and asserts each fixture's declared `expect:`/`expect_reason:`.
+  Registered in `tests/run-all.sh` (now **12 suites**) and CI-enforced. The
+  50-fixture corpus previously had **no** consumer, so the "100% reject-rate"
+  guarantee `ARCHITECTURE.md` advertised was never measured. New fixtures pin
+  the bypass vectors above.
+
+### Fixed
+- `ARCHITECTURE.md` §10 now describes the real reject-filter suite instead of
+  the never-measured guarantee; `finding-extractor.md` / `consolidator.md`
+  reject-rule prose aligned with the shipped filter.
+
 ## [1.2.0] — 2026-07-04
 
 ### Added

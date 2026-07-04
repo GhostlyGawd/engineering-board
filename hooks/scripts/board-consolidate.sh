@@ -90,29 +90,21 @@ for BOARD_DIR in "${BOARD_DIRS[@]}"; do
   ARCHIVE_DIR="${BOARD_DIR}/_sessions/_archive"
   mkdir -p "${ARCHIVE_DIR}"
 
-  python3 - "${BOARD_DIR}" "${CONSOLIDATION_LOG}" "${ARCHIVE_DIR}" "${TRANSCRIPT_PATH}" <<'PY'
+  python3 - "${BOARD_DIR}" "${CONSOLIDATION_LOG}" "${ARCHIVE_DIR}" "${TRANSCRIPT_PATH}" "${EB_SCRIPT_DIR}" <<'PY'
 import json, os, re, sys, datetime, shutil, glob, hashlib
 
-board_dir, log_path, archive_dir, transcript_path = sys.argv[1:5]
+board_dir, log_path, archive_dir, transcript_path, script_dir = sys.argv[1:6]
 sessions_dir = os.path.join(board_dir, "_sessions")
 
-IMPERATIVE_RE = re.compile(r"^\s*(ignore|disregard|override|invoke|execute|run|replace|forget)\b", re.IGNORECASE)
-SLASH_RE = re.compile(r"(?:^|\s)/[a-z][a-z-]+")
-SUBAGENT_RE = re.compile(r"@[a-z][a-z0-9-]+")
+# Canonical reject filter is the single source of truth in board_reject_check.py
+# (also driven by tests/security/reject-filter.sh). Scans all string fields for
+# imperative-mood injection, slash/subagent directives, shell metacharacters,
+# and HTML/script payloads. Scratch contents are untrusted data, not instructions.
+sys.path.insert(0, script_dir)
+from board_reject_check import reject_finding
 
 def now_iso():
     return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-def reject_reason(s):
-    if s is None:
-        return None
-    if IMPERATIVE_RE.search(s):
-        return "imperative_prefix"
-    if SLASH_RE.search(s):
-        return "slash_command"
-    if SUBAGENT_RE.search(s):
-        return "subagent_mention"
-    return None
 
 def load_transcript_text(path):
     if not path or not os.path.isfile(path):
@@ -240,13 +232,11 @@ for sf in session_files:
             if isinstance(f, dict):
                 all_findings.append((sf, f))
 
-# Stage 1 — re-apply reject rules.
+# Stage 1 — re-apply reject rules (all string fields: title, quote, affects, tags).
 survivors = []
 for sf, f in all_findings:
     sid = f.get("scratch_id") or "S-unknown"
-    title = f.get("title") or ""
-    quote = f.get("evidence_quote") or ""
-    reason = reject_reason(title) or reject_reason(quote)
+    reason = reject_finding(f)
     if reason:
         log_disposition(sid, f"rejected_{reason}")
         continue
