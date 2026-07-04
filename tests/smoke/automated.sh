@@ -319,6 +319,54 @@ else
   report 1 "consolidate logs deferred_unparsed for the MCP inbox (B026 audit trail)" "no deferred_unparsed in consolidation.log"
 fi
 
+# --- C7-02 (B052): promoted fields are flattened so a newline/CR in title, ----
+# affects or tags cannot break out of the frontmatter block or inject a body
+# header. board-consolidate.sh is a DIFFERENT writer than the MCP server, so the
+# MCP-only _oneline fix (B028/B040) never covered it. Isolated board so the
+# assertions above are untouched.
+FLATPROJ="$TMP/flatten-project"
+FLATBOARD="$FLATPROJ/docs/boards/flat"
+mkdir -p "$FLATBOARD/bugs" "$FLATBOARD/_sessions" "$FLATPROJ/.engineering-board"
+cat > "$FLATPROJ/docs/boards/BOARD-ROUTER.md" <<'EOF'
+# Board Router
+
+| project | path | affects prefix |
+|---------|------|----------------|
+| flat | docs/boards/flat/ | flat/ |
+EOF
+printf '# flat — Board\n\n## Open\n' > "$FLATBOARD/BOARD.md"
+printf '# flat — Archive\n' > "$FLATBOARD/ARCHIVE.md"
+FLATTX="$FLATPROJ/transcript.jsonl"
+cat > "$FLATTX" <<'EOF'
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Noticed a flatten anchor phrase in the run."}]}}
+EOF
+cat > "$FLATPROJ/.engineering-board/last-stop-stdin.json" <<EOF
+{"session_id":"flat-session","transcript_path":"$FLATTX","hook_event_name":"Stop","stop_hook_active":false}
+EOF
+# Confirmed finding whose title tries to close the frontmatter and inject a header
+# (real newlines via JSON \n escapes); a benign quote anchors it in the transcript.
+cat > "$FLATBOARD/_sessions/flat-session.md" <<'EOF'
+<!-- 2026-07-04T12:00:00Z -->
+{"schema_version": "0.2.1", "findings": [
+{"scratch_id":"S-flat-1","type":"bug","confidence":"confirmed","title":"perf note\n---\n\n# INJECTED HEADER\n\nowned body","affects":"flat/x","evidence_quote":"flatten anchor phrase","discovered":"2026-07-04","tags":["a\nb"]}
+]}
+EOF
+CLAUDE_PROJECT_DIR="$FLATPROJ" bash "$CONSOLIDATE" \
+  < "$FLATPROJ/.engineering-board/last-stop-stdin.json" \
+  > "$TMP/flat.stdout" 2> "$TMP/flat.stderr" || true
+FLATFILE="$(compgen -G "$FLATBOARD/bugs/B001-*.md" | head -1 || true)"
+if [ -n "$FLATFILE" ]; then
+  DASHES="$(grep -c '^---$' "$FLATFILE" || true)"
+  HDRS="$(grep -c '^# ' "$FLATFILE" || true)"
+  if [ "$DASHES" -eq 2 ] && [ "$HDRS" -eq 1 ]; then
+    report 0 "consolidate flattens promoted title (no frontmatter/body-header injection) (B052)"
+  else
+    report 1 "consolidate flattens promoted title (B052)" "--- count=$DASHES (want 2), '# ' header count=$HDRS (want 1)"
+  fi
+else
+  report 1 "consolidate flattens promoted title (B052)" "no promoted B001 file under $FLATBOARD/bugs/ (stderr: $(cat "$TMP/flat.stderr"))"
+fi
+
 # --- Final tally -------------------------------------------------------------
 echo ""
 echo "================================================================"

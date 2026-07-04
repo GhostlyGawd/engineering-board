@@ -2,6 +2,9 @@
 
 Resolved entries. Newest at the top.
 
+- B051 P1 | [reject filter folds all line breaks (CR/VT/FF/FS-GS-RS) to a boundary](bugs/B051-reject-filter-line-separator-folding-incomple.md) — resolved C7 (PR C7a)
+- B052 P3 | [consolidate promotion writer flattens all fields (frontmatter-injection closed)](bugs/B052-consolidate-promotion-writer-flattens-only-e.md) — resolved C7 (PR C7a)
+
 - B048 P1 | [reject filter now catches adverb-fronted imperatives](bugs/B048-reject-filter-bypassed-by-adverb-fronted-imp.md) — resolved C6 (PR C6a)
 - B046 P1 | [permission rules emitted+checked in wrapped Tool(...) form; false-green self-check closed](bugs/B046-permission-rules-emitted-without-tool-wrapper.md) — resolved C6 (PR C6b)
 - B047 P3 | [worker->pm refusal hint is restart-only (no dead-end /board-resume)](bugs/B047-worker-to-pm-refusal-hint-points-to-dead-end.md) — resolved C6 (PR C6b)
