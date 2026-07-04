@@ -105,6 +105,24 @@ _LEADIN = (
     r"go\s+ahead\s+and)"
 )
 
+# Adverbials an attacker fronts before the verb to knock it off the clause
+# boundary ("Immediately ignore…", "Quietly delete…", "Always disregard…").
+# Folded into the same optional skip-run as the lead-ins so an adverb-fronted
+# imperative still anchors to the boundary (eb-self B048; lineage B025/B037/B043
+# — L004: a denylist is never done). Curated rather than a blanket `\w+ly` on
+# purpose: `\w+ly` collides with non-adverb -ly words ("apply override…",
+# "supply reset…") and would reject legitimate findings. This set fails toward
+# ACCEPTING benign prose (the module's stated value) — it is defense-in-depth,
+# not the primary defense (see the threat-model note above). Safe against
+# descriptive findings anyway because each verb is still required in its BARE
+# form (the trailing `\b` rejects inflected "drops"/"removes"), which is the
+# imperative form; descriptive prose uses the inflected verb.
+_ADVERB = (
+    r"(?:immediately|instantly|instead|quickly|quietly|silently|secretly|"
+    r"carefully|promptly|urgently|hastily|swiftly|always|never|finally|"
+    r"definitely|certainly|absolutely)"
+)
+
 # Clause boundary: string start, sentence/clause punctuation, or a SYSTEM/ADMIN
 # lead-in. Between the boundary and the verb we skip an optional run of
 # whitespace, quotes/parens, AND markdown list/blockquote markers (- * + >) —
@@ -113,7 +131,8 @@ _LEADIN = (
 # benign bulleted finding still has a subject/modal after the marker
 # ("- the stage will override X"), so descriptive prose is preserved.
 _IMPERATIVE_RE = re.compile(
-    r"(?:^|[.!?:;,\n]|\bsystem\b|\badmin\b)[-\s*+>#'\"`()•‣⁃◦▪●·–—]*(?:" + _LEADIN + r"\s+)*(?:"
+    r"(?:^|[.!?:;,\n]|\bsystem\b|\badmin\b)[-\s*+>#'\"`()•‣⁃◦▪●·–—]*(?:(?:"
+    + _LEADIN + "|" + _ADVERB + r")\s+)*(?:"
     + "|".join(_VERBS) + r")\b",
     re.IGNORECASE,
 )
