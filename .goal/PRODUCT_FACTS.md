@@ -56,15 +56,17 @@ Installing/using the plugin itself: add the marketplace, install the plugin, the
 
 | # | Defect | File | Severity | Justification |
 |---|---|---|---|---|
-| D1 | README line 45 still calls `learnings-curator` a "v0.2.2 stub (inventory-only)"; it was fully implemented in v0.3.0 (Learning entity L###). Stale/inaccurate doc. | `README.md:45`, and README:217 | **minor** | Doc accuracy only; contradicts shipped behavior. Fix in Phase 2/4 README rewrite. |
-| D2 | README §"Component" table + line 61 mark `board-claim-heartbeat.sh` "reserved; not yet wired". | `README.md:61` | **minor** | Documented intentional state; no runtime impact. Confirm whether to wire or keep documented. |
-| D3 | `board-index-check.sh`, `board-claim-*.sh`, `board-consolidate.sh`, etc. are `-rw` (not executable) while others are `-rwx`. Invoked via `bash <script>` so this is harmless, but inconsistent. | `hooks/scripts/*.sh` | **minor** | Cosmetic; scripts are sourced/`bash`-invoked, not exec'd directly. |
-| D4 | No MCP server. Positioning wants dual distribution (plugin + MCP). | (absent) | **major** (scope, not bug) | Required Phase 2 build item; not a regression. |
-| — | `<!-- TODO — define completion criteria. -->` in `consolidator.md:146` and `board-consolidate.sh:364` | | **not a defect** | This is intentional *template text* written INTO generated board entries as a Done-when placeholder for the user. Verified by context. |
+| D1 | **Runtime doc lies to the orchestrator:** `stop-hook-procedure.md` step (d) tells the model `learnings-curator` "In v0.2.2 this is a placeholder returning `status: placeholder` … full implementation lands in v0.3.0" — but it is fully implemented (delegates to executable `board-curate-learnings.sh`). The model reads this at **runtime** and is told to expect a placeholder. | `hooks/stop-hook-procedure.md` step (d); `ARCHITECTURE.md` §3/§5; `README.md:45,217` | **major** | Not cosmetic — misleads the live orchestrator about a shipped agent's behavior. Fix in Phase 2. |
+| D2 | `ARCHITECTURE.md` command surface stale: says "9 slash commands" / "Commands — 9 total"; `commands/` has **10**; `/board-migrate` absent from §4 table. | `ARCHITECTURE.md:81` | **major** | A doc audit under-counts the product surface; user-facing map is wrong. Fix in Phase 2. |
+| D3 | No MCP server. Positioning VP5 wants dual distribution (plugin + MCP). | (absent) | **major** (scope, not bug) | Required Phase 2 build item; not a regression. |
+| D4 | Fail-open error handling: many hooks parse via `python3 … 2>/dev/null \|\| true`; in `board-stop-gate.sh` a corrupt `session-mode.json` yields empty `MODE` → treated as *not paused* → prompt hook runs. A corrupt state file silently un-pauses a paused session; absent `python3`, hooks degrade to silent no-ops. | `board-stop-gate.sh:24-31`, others | **minor** | Low probability; fail-open on a runtime state file. Add a preflight/loud-fail in Phase 2 if cheap. |
+| D5 | Stale doc/comment lag: `ARCHITECTURE.md` header "v1.0.1" (manifests 1.1.0); §10 "no CI runner that chains these" (contradicted by `run-all.sh` + CI); `test.yml` comment "8 sub-suites" (actually 10). README:61 `board-claim-heartbeat.sh` "reserved; not yet wired". | `ARCHITECTURE.md`, `.github/workflows/test.yml`, `README.md:61` | **minor** | Doc/comment accuracy; no runtime impact. Sweep in Phase 2/4. |
+| D6 | `board-session-start.sh:37` double-zero: empty board prints `0\n0` in the "N open item(s)" line (`grep -c` exits 1 → `\|\| echo 0` also fires). | `board-session-start.sh:37` | **minor** | Cosmetic display glitch on empty boards. |
+| — | `<!-- TODO — define completion criteria. -->` in `consolidator.md:146` and `board-consolidate.sh:364`; `mktemp … XXXXXX` | | **not a defect** | Intentional template text written INTO generated entries / mktemp template. Verified by context. |
 
-**Failing tests:** none — 10/10 suites green. **Open GitHub issues affecting scope:** none blocking (historical #3 scratch-append fidelity already shipped in v1.0.1).
+**Failing tests:** none — 10/10 suites green. **Open GitHub issues affecting scope:** none blocking (#3 scratch-append fidelity shipped in v1.0.1).
 
-**Severity summary:** 0 blocker, 1 major (MCP packaging = build item), 3 minor (doc/cosmetic).
+**Severity summary:** 0 blocker, 3 major (D1 runtime stub-lie, D2 stale command map, D3 MCP packaging), 3 minor (D4 fail-open, D5 doc lag, D6 cosmetic). All 3 majors are fixed/built in Phase 2.
 
 ## 6. Existing packaging state
 

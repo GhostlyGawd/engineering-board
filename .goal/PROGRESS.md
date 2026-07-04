@@ -15,14 +15,14 @@ _Last updated: 2026-07-04_
 - Deliverable: `.goal/PRODUCT_FACTS.md` ✅
 
 ## Phase 1 — Market research & positioning
-- [in-progress] 1.1 Landscape map — ≥5 competitors, cited URLs — delegated to research agent
-- [in-progress] 1.2 Distribution-channel map (marketplaces, MCP registries, awesome-lists)
-- [ ] 1.3 Personas (2–3) with JTBD
-- [ ] 1.4 Positioning: category, differentiators, one-liner ≤12 words, 3 taglines, messaging hierarchy
-- [ ] 1.5 Name decision (keep engineering-board unless conflict)
-- [ ] 1.6 SEO keyword list
-- [ ] **G1 gate**: ≥5 competitors cited; value props mapped; one-liner ≤12 words; naming recorded
-- Deliverable: `.goal/POSITIONING.md`
+- [done] 1.1 Landscape map — 8 competitors, live cited URLs
+- [done] 1.2 Distribution-channel map (marketplaces, MCP registries, awesome-lists)
+- [done] 1.3 Personas (3) with JTBD
+- [done] 1.4 Positioning: category, differentiators, one-liner (9 words), tagline chosen ("The board is the database"), messaging hierarchy (VP1–5 mapped)
+- [done] 1.5 Name decision: keep engineering-board (no conflict found)
+- [done] 1.6 SEO keyword list + repo topics
+- [done] **G1 gate PASSED**: 8 competitors cited; every VP mapped to feature or Phase-2 item; one-liner ≤12 words; naming recorded
+- Deliverable: `.goal/POSITIONING.md` ✅
 
 ## Phase 2 — Product hardening & dual packaging
 - [ ] 2.1 Fix blocker/major defects from G0
