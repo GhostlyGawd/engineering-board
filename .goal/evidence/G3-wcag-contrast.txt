@@ -1,0 +1,13 @@
+pair                                    ratio  AA-text  AA-large
+ink on paper (body)                     16.69     PASS  PASS
+muted on paper (secondary)               6.01     PASS  PASS
+faint on paper (tertiary)                4.66     PASS  PASS
+accent on paper (link, light)            5.15     PASS  PASS
+paper on accent (btn, light)             5.15     PASS  PASS
+paper on ink (body)                     14.73     PASS  PASS
+muted on ink (secondary)                 6.93     PASS  PASS
+faint on ink (tertiary)                  4.93     PASS  PASS
+accent on ink (link, dark)                8.5     PASS  PASS
+ink on accent (btn, dark)                 8.5     PASS  PASS
+accent-light mark on paper               5.15     PASS  PASS
+accent-dark mark on ink                   8.5     PASS  PASS

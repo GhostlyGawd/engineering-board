@@ -1,0 +1,13 @@
+<svg width="240" height="160" viewBox="0 0 240 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="board columns motif">
+  <!-- Motif 1: three board lanes with settled cards. Uses currentColor so it
+       adapts to the surrounding text color when inlined; accent via .acc. -->
+  <style>.ln{stroke:currentColor;opacity:.16}.cd{fill:currentColor;opacity:.20}.acc{fill:#9A5B00}</style>
+  <line class="ln" x1="80"  y1="12" x2="80"  y2="148" stroke-width="1"/>
+  <line class="ln" x1="160" y1="12" x2="160" y2="148" stroke-width="1"/>
+  <rect class="cd" x="14"  y="20" width="52" height="16" rx="3"/>
+  <rect class="cd" x="14"  y="44" width="52" height="16" rx="3"/>
+  <rect class="cd" x="14"  y="68" width="52" height="16" rx="3"/>
+  <rect class="cd" x="94"  y="20" width="52" height="16" rx="3"/>
+  <rect class="acc" x="94"  y="44" width="52" height="16" rx="3"/>
+  <rect class="cd" x="174" y="20" width="52" height="16" rx="3"/>
+</svg>

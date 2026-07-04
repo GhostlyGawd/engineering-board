@@ -1,9 +1,23 @@
 {
   "name": "engineering-board",
-  "version": "1.1.0",
-  "description": "Autonomous engineering board: multi-agent build system over a committed, visible engineering-board/ markdown tree. Passive finding-extractor captures per-turn scratch; PM pipeline (consolidator + tidier + learnings-curator) promotes verified findings to the live board and Learning entries (L###); Worker pipeline (tdd-builder + code-reviewer + validator) drives a tdd->review->validate needs: state machine with atomic claim locking. v0.2.3 adds active-workers registry + PM-fallback heartbeat. v0.3.0 adds the Learning entity, /board-migrate (with rollback), and SessionStart top-learnings surface. v0.3.1 adds board-mode-guard.sh: deterministic enforcement of the §11.5 mode-transition refusal matrix. v0.3.2 closes the test-debt loop: subagent contract lint (every dispatched agent's Output contract is pinned), pause/resume registry round-trip invariants, and GitHub Actions CI gate so `tests/run-all.sh` is enforced on every push. v1.1.0 relocates board content to a visible, committed engineering-board/ directory (docs/boards/ and legacy docs/board/ still resolve).",
+  "version": "1.2.0",
+  "description": "The board is the database: a git-committed kanban board your AI agents run and remember. Multi-agent build system over a committed, visible engineering-board/ markdown tree. Passive finding-extractor captures per-turn scratch; PM pipeline (consolidator + tidier + learnings-curator) promotes verified findings to the live board and Learning entries (L###); Worker pipeline (tdd-builder + code-reviewer + validator) drives a tdd->review->validate needs: state machine with atomic claim locking. v1.1.0 relocates board content to a visible, committed engineering-board/ directory (docs/boards/ and legacy docs/board/ still resolve). v1.2.0 adds a zero-dependency MCP server (11 tools over stdio, protocol 2025-06-18) bundled via .mcp.json, so the same board is drivable from any MCP client.",
   "author": {
     "name": "Acadia",
     "email": "rhen@acadia.io"
-  }
+  },
+  "homepage": "https://ghostlygawd.github.io/engineering-board/",
+  "repository": "https://github.com/GhostlyGawd/engineering-board",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "claude-code-plugin",
+    "mcp",
+    "mcp-server",
+    "multi-agent",
+    "kanban",
+    "agentic-workflow",
+    "tdd",
+    "developer-tools"
+  ]
 }

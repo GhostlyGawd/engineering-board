@@ -1,0 +1,106 @@
+/* ============================================================================
+   engineering-board — design tokens (single source of truth)
+   Consumed by the GitHub Pages landing page and any brand surface.
+   Direction: premium through restraint — near-monochrome ink/paper base with
+   ONE accent (amber), geometry derived from the product's own columns & cards.
+   Every text/background pair below passes WCAG AA (verified; see BRAND.md).
+   ============================================================================ */
+
+:root {
+  /* ---- Base neutrals ------------------------------------------------------ */
+  --eb-ink:        #17191E;  /* deep neutral (slightly cool near-black)       */
+  --eb-paper:      #FAF9F5;  /* warm off-white                                */
+  --eb-ink-2:      #1E2127;  /* raised surface on ink (cards on dark)         */
+  --eb-paper-2:    #F1F0EA;  /* recessed surface on paper (columns on light)  */
+  --eb-line:       #E3E1D9;  /* hairline on paper                             */
+  --eb-line-dark:  #2A2D34;  /* hairline on ink                               */
+
+  /* ---- Accent (one hue, two tints for the two themes) --------------------- */
+  --eb-accent:        #9A5B00;  /* amber — for light theme (5.15:1 on paper)  */
+  --eb-accent-strong: #7E4A00;  /* pressed/hover on light                     */
+  --eb-accent-dark:   #E6A94E;  /* amber tint — for dark theme (8.5:1 on ink) */
+
+  /* ---- Semantic text (LIGHT theme defaults) ------------------------------- */
+  --eb-text:        #17191E;  /* primary   16.69:1 on paper                   */
+  --eb-text-muted:  #5B6068;  /* secondary  6.01:1 on paper                   */
+  --eb-text-faint:  #6C717A;  /* tertiary   4.66:1 on paper                   */
+  --eb-bg:          var(--eb-paper);
+  --eb-surface:     var(--eb-paper-2);
+  --eb-border:      var(--eb-line);
+  --eb-link:        var(--eb-accent);
+  --eb-on-accent:   var(--eb-paper);   /* text on an accent fill (5.15:1)     */
+
+  /* ---- Type ---------------------------------------------------------------- */
+  --eb-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+                  "Helvetica Neue", Arial, sans-serif;
+  --eb-font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code",
+                  Menlo, Consolas, monospace;
+
+  --eb-fs-xs:   0.75rem;
+  --eb-fs-sm:   0.875rem;
+  --eb-fs-base: 1rem;
+  --eb-fs-md:   1.125rem;
+  --eb-fs-lg:   1.375rem;
+  --eb-fs-xl:   1.75rem;
+  --eb-fs-2xl:  2.25rem;
+  --eb-fs-3xl:  3rem;
+  --eb-fs-4xl:  3.75rem;   /* hero */
+
+  --eb-lh-tight: 1.1;
+  --eb-lh-snug:  1.28;
+  --eb-lh-body:  1.6;
+
+  --eb-fw-regular: 400;
+  --eb-fw-medium:  500;
+  --eb-fw-semibold:600;
+  --eb-tracking-tight: -0.02em;   /* headings */
+  --eb-tracking-wide:   0.06em;   /* eyebrow labels */
+
+  /* ---- Spacing (4px base) -------------------------------------------------- */
+  --eb-sp-1: 0.25rem;  --eb-sp-2: 0.5rem;  --eb-sp-3: 0.75rem;
+  --eb-sp-4: 1rem;     --eb-sp-5: 1.5rem;  --eb-sp-6: 2rem;
+  --eb-sp-7: 3rem;     --eb-sp-8: 4rem;    --eb-sp-9: 6rem;
+  --eb-maxw: 72rem;    /* content container */
+
+  /* ---- Radii --------------------------------------------------------------- */
+  --eb-radius-sm:   6px;
+  --eb-radius-card: 10px;
+  --eb-radius-lg:   16px;
+  --eb-radius-pill: 999px;
+
+  /* ---- Elevation (quiet — no glow) ---------------------------------------- */
+  --eb-shadow-card: 0 1px 2px rgba(23,25,30,0.06), 0 4px 16px rgba(23,25,30,0.06);
+  --eb-shadow-lift: 0 6px 24px rgba(23,25,30,0.12);
+
+  /* ---- Motion (purposeful; 150–400ms; ease-out / gentle spring) ----------- */
+  --eb-dur-fast: 150ms;
+  --eb-dur-base: 240ms;
+  --eb-dur-slow: 360ms;
+  --eb-ease-out:    cubic-bezier(0.16, 1, 0.30, 1);
+  --eb-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);  /* slight settle       */
+}
+
+/* ---- Dark theme override (prefers-color-scheme + [data-theme]) ------------ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --eb-text:       #ECEBE6;   /* 14.73:1 on ink   */
+    --eb-text-muted: #9EA3AB;   /*  6.93:1 on ink   */
+    --eb-text-faint: #83888F;   /*  4.93:1 on ink   */
+    --eb-bg:         var(--eb-ink);
+    --eb-surface:    var(--eb-ink-2);
+    --eb-border:     var(--eb-line-dark);
+    --eb-link:       var(--eb-accent-dark);
+    --eb-on-accent:  var(--eb-ink);   /* ink on amber fill (8.5:1) */
+  }
+}
+
+:root[data-theme="dark"] {
+  --eb-text:       #ECEBE6;
+  --eb-text-muted: #9EA3AB;
+  --eb-text-faint: #83888F;
+  --eb-bg:         var(--eb-ink);
+  --eb-surface:    var(--eb-ink-2);
+  --eb-border:     var(--eb-line-dark);
+  --eb-link:       var(--eb-accent-dark);
+  --eb-on-accent:  var(--eb-ink);
+}

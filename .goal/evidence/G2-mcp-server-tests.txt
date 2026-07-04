@@ -1,0 +1,74 @@
+
+== Suite 1: real stdio subprocess session ==
+  [PASS] initialize response id matches
+  [PASS] protocolVersion 2025-06-18
+  [PASS] serverInfo.name
+  [PASS] capabilities.tools.listChanged is false
+  [PASS] initialize includes instructions
+  [PASS] ping after notification returns {}
+  [PASS] tools/list exposes all expected tools
+  [PASS] tool board_init has object inputSchema
+  [PASS] tool board_list_projects has object inputSchema
+  [PASS] tool board_create_entry has object inputSchema
+  [PASS] tool board_list_entries has object inputSchema
+  [PASS] tool board_get_entry has object inputSchema
+  [PASS] tool board_update_entry has object inputSchema
+  [PASS] tool board_rebuild has object inputSchema
+  [PASS] tool board_capture_finding has object inputSchema
+  [PASS] tool board_claim has object inputSchema
+  [PASS] tool board_release has object inputSchema
+  [PASS] tool board_status has object inputSchema
+  [PASS] board_init call not an error
+  [PASS] board_init returned project navigator
+  [PASS] stdio board_create_entry bug ok
+  [PASS] stdio-created bug got id B001
+  [PASS] unknown method -> -32601
+  [PASS] unknown tool -> -32602
+
+== Suite 2: in-process board lifecycle + real validation ==
+  [PASS] board_init created BOARD.md
+  [PASS] board_init created bugs/.gitkeep
+  [PASS] board_init created features/.gitkeep
+  [PASS] board_init created questions/.gitkeep
+  [PASS] board_init created observations/.gitkeep
+  [PASS] board_init created learnings/.gitkeep
+  [PASS] board_init created ARCHIVE.md
+  [PASS] board_init is idempotent (no crash on re-run)
+  [PASS] re-init reports BOARD.md existed
+  [PASS] board_list_projects lists atlas
+  [PASS] first bug is B001
+  [PASS] created bug passes board-validate-entry.sh
+  [PASS] first question is Q001
+  [PASS] created question passes board-validate-entry.sh
+  [PASS] first feature is F001
+  [PASS] created feature passes board-validate-entry.sh
+  [PASS] board_create_entry rejects bug without priority
+  [PASS] board_list_entries finds 3 entries
+  [PASS] type filter returns 1 bug
+  [PASS] needs=tdd filter returns bug+feature
+  [PASS] board_get_entry returns full markdown
+  [PASS] board_get_entry parsed priority
+  [PASS] update set status=in_progress
+  [PASS] appended section present
+  [PASS] status persisted
+  [PASS] updated bug still passes validation
+  [PASS] board_update_entry rejects invalid status value
+  [PASS] board_rebuild is idempotent (byte-identical)
+  [PASS] BOARD.md bug line format with in_progress suffix
+  [PASS] BOARD.md shows blocked marker ⊘ Q001
+  [PASS] BOARD.md question line format
+  [PASS] status bug open count
+  [PASS] status lists B001 in_progress
+  [PASS] status lists F001 blocked
+  [PASS] capture_finding created scratch file
+  [PASS] finding written to scratch
+  [PASS] status counts 1 unpromoted scratch
+  [PASS] board_claim acquired
+  [PASS] second claim contended
+  [PASS] board_release released
+  [PASS] created learning passes board-validate-entry.sh
+
+RESULT: PASS (65 checks)
+================================================================
+mcp-server tests: PASS
+================================================================

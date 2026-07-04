@@ -1,0 +1,20 @@
+<svg width="420" height="72" viewBox="0 0 420 72" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="tdd to review to validate to resolved state pipeline">
+  <!-- Motif 3: the needs: state machine as connected nodes. The final,
+       resolved state is the accent — the point every card is promoted toward. -->
+  <style>
+    .ln{stroke:currentColor;opacity:.24}.node{fill:none;stroke:currentColor;opacity:.5;stroke-width:1.5}
+    .lbl{fill:currentColor;font-family:ui-sans-serif,system-ui,sans-serif;font-size:12px;font-weight:500}
+    .acc{fill:#9A5B00}.accs{stroke:#9A5B00;opacity:1}
+  </style>
+  <line class="ln" x1="52"  y1="26" x2="150" y2="26" stroke-width="1.5"/>
+  <line class="ln" x1="200" y1="26" x2="298" y2="26" stroke-width="1.5"/>
+  <line class="accs" x1="348" y1="26" x2="392" y2="26" stroke-width="1.5"/>
+  <circle class="node" cx="26"  cy="26" r="9"/>
+  <circle class="node" cx="176" cy="26" r="9"/>
+  <circle class="node" cx="324" cy="26" r="9"/>
+  <circle class="acc"  cx="404" cy="26" r="9"/>
+  <text class="lbl" x="26"  y="58" text-anchor="middle">tdd</text>
+  <text class="lbl" x="176" y="58" text-anchor="middle">review</text>
+  <text class="lbl" x="324" y="58" text-anchor="middle">validate</text>
+  <text class="lbl" x="404" y="58" text-anchor="middle" fill="#9A5B00">resolved</text>
+</svg>

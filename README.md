@@ -1,270 +1,174 @@
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="brand/logomark-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="brand/logomark-light.svg">
+  <img src="brand/logomark-light.svg" alt="engineering-board" width="88" height="88">
+</picture>
+
 # engineering-board
 
-A Claude Code plugin that converts a markdown-based engineering board (`engineering-board/`) into an autonomous, multi-agent build system. Findings get captured passively from every session, promoted to the live board via deterministic consolidation, and worked through a `tdd → review → validate` state machine with atomic claim locking — all driven by the Stop hook.
+**A git-committed kanban board your AI agents run and remember.**
 
-For a full contributor-facing map of every file and how they connect, see [`ARCHITECTURE.md`](ARCHITECTURE.md).
+_The board is the database._
 
-## What it does
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-1.2.0-E6A94E.svg)](CHANGELOG.md)
+[![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
+[![MCP](https://img.shields.io/badge/MCP-server-171719.svg)](mcp-server/README.md)
 
-- **Passive finding capture** — every Stop event dispatches a `finding-extractor` subagent that scans the just-finished turn for bugs, features, questions, observations and writes them to a per-session scratch board at `engineering-board/<project>/_sessions/<session-id>.md`.
-- **Deterministic consolidation** — scratch never reaches the live board until anchor-verified by the `consolidator` subagent (matched against the transcript), with supersession detection and a distinct-`affects:` safeguard.
-- **Real-time routing** — when a confirmed finding surfaces during a session, the `board-manager` agent routes it via the four board-* skills (intake, triage, resolve, consolidate).
-- **PM pipeline** (`/pm-start`) — every Stop event runs `finding-extractor` → `consolidator` → `tidier` → `learnings-curator`, keeping the live board promoted and tidy.
-- **Worker pipeline** (`/worker-start --discipline <tdd|review|validate>`) — every Stop event picks an entry with matching `needs:`, atomically claims it, dispatches the matching worker subagent (`tdd-builder` / `code-reviewer` / `validator`), writes back `suggested_next_needs`, and releases the claim. Three workers run in parallel form a continuous build pipeline.
-- **Entry validation on write** — frontmatter and `BOARD.md` indexing are checked on every Write to `engineering-board/.../*.md` (and the `docs/boards/.../*.md` compat path). Missing fields or unindexed entries block the write.
-- **Session-start board view** — every session starts with open items, in-progress warnings, blocking relationships, systemic patterns, and un-promoted scratch counts across all project boards.
+</div>
 
-## Mode-based Stop routing
+## What it is
 
-The Stop hook reads `.engineering-board/session-mode.json` and routes to one of three procedures (full canonical procedure in [`hooks/stop-hook-procedure.md`](hooks/stop-hook-procedure.md)):
+engineering-board turns a committed markdown tree — `engineering-board/<project>/` — into an autonomous, multi-agent software-engineering board. Findings are captured passively from every session, promoted to the live board via deterministic consolidation, and worked through a `tdd → review → validate` state machine with atomic claim-locking. Coordination state, work-in-progress locks, and durable learnings all live as markdown in your repo — no hidden database, no external service, no daemon. It ships as a native Claude Code plugin **and**, as of 1.2.0, a zero-dependency MCP server.
 
-| Mode | Set by | Stop dispatches | Use case |
-|---|---|---|---|
-| **Passive** (default) | nothing | `finding-extractor` only | Any session — captures findings without disturbing the work |
-| **Paused** | `/board-pause` | nothing (emits `<<EB-PASSIVE-PAUSED>>`) | Drafting / brainstorming — bypass capture |
-| **PM** | `/pm-start` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` | Long-running session promoting scratch → live |
-| **Worker** | `/worker-start --discipline <d>` | claim-acquire → one of `tdd-builder` / `code-reviewer` / `validator` → claim-release | Long-running session driving `needs:` state machine |
+### Why it's different
 
-## Components
+The market splits into two camps: **visible-but-dumb** git-markdown boards (no locking, no memory) and **smart-but-opaque** MCP coordination servers (locks and memory, but hidden in a database). engineering-board is the four-way intersection neither camp reaches:
 
-| Type | Name | Purpose |
-|------|------|---------|
-| Command | `/board-init <project> [affects-prefix]` | Scaffold `engineering-board/<project>/` and append to `BOARD-ROUTER.md` |
-| Command | `/board-rebuild [project]` | Deterministically regenerate `BOARD.md` + `GRAPH.yml` from entry files; runs auto-resolve terminal pass |
-| Command | `/board-graph [project] [--include-archive]` | Build structural graph (`GRAPH.yml`): clusters, bridges, isolated nodes, density |
-| Command | `/board-pause` | Suspend passive listening (Stop emits `<<EB-PASSIVE-PAUSED>>`) |
-| Command | `/board-resume` | Restore passive listening |
-| Command | `/pm-start` | Set session to PM mode — Stop runs PM pipeline every turn |
-| Command | `/worker-start --discipline <tdd\|review\|validate>` | Set session to Worker mode — Stop runs worker dispatch every turn |
-| Command | `/board-install-permissions` | Print copy-pasteable `claude config add` commands from `references/required-permissions.json` |
-| Command | `/board-claim-release <entry-id> [--force]` | Manual fallback to release a stuck `_claims/<entry-id>/` after a worker session crashed mid-turn |
-| Agent | `board-manager` | Master router for ad-hoc routing/triage/resolution; wraps the 4 board-* skills |
-| Agent | `finding-extractor` | Per-turn passive listener (`model: inherit`, `tools: Read`); emits scratch JSON |
-| Agent | `consolidator` | PM subagent: promote scratch → live; anchor verification, supersession, T2b distinct-affects safeguard |
-| Agent | `tidier` | PM subagent: index rebuild, stale-claim reclamation, scratch cleanup |
-| Agent | `learnings-curator` | PM subagent — **v0.2.2 stub** (inventory-only; full Learning entity in v0.3.0 plan) |
-| Agent | `tdd-builder` | Worker subagent (`tdd` discipline): write failing test → minimal fix → re-run |
-| Agent | `code-reviewer` | Worker subagent (`review` discipline): inspect tests + impl; suggest `validate` or regress to `tdd` |
-| Agent | `validator` | Worker subagent (`validate` discipline, **strictly read-only**): re-run suite + verify Done-when |
-| Skill | `board-intake` | Protocol for creating new board entries |
-| Skill | `board-triage` | Protocol for prioritizing open items |
-| Skill | `board-resolve` | Protocol for resolving questions and bugs/features |
-| Skill | `board-consolidate` | Protocol for promoting scratch → live board |
-| Hook | `SessionStart` → `board-session-start.sh` | Surface open items, in-progress, blocked, systemic patterns, un-promoted scratch counts |
-| Hook | `PostToolUse` (Write) → `board-validate-entry.sh` | Validate frontmatter + `BOARD.md` indexing |
-| Hook | `UserPromptSubmit` → `board-prompt-guard.sh` | Inject routing reminder on debug/error/bug/crash keyword prompts |
-| Hook | `Stop` (command) → `board-stop-gate.sh` | Capture stdin; check mode; suppress prompt hook if paused or no board |
-| Hook | `Stop` (prompt) → `stop-hook-procedure.md` | Mode-routed orchestrator: passive / PM / worker dispatch |
-| Script | `board-claim-acquire.sh` | Atomic `mkdir`-based claim lock with cloud-sync detection (180s → 300s stale threshold) |
-| Script | `board-claim-release.sh` | Owner-verified claim release with NTFS retry loop |
-| Script | `board-claim-reclaim-stale.sh` | Scan + remove stale claims; cloud-sync detection |
-| Script | `board-claim-heartbeat.sh` | Refresh heartbeat during long worker operations (reserved; not yet wired) |
-| Script | `board-consolidate.sh` | Re-applies reject rules + anchor verification + supersession; promotes scratch → live |
-| Script | `board-audit-scratch.sh` | Completeness audit: every scratch_id must have a `consolidation.log` disposition |
-| Script | `board-index-check.sh` | Invariant: `BOARD.md` row count == entry file count |
-| Script | `board-permission-self-check.sh` | Compare `required-permissions.json` against `~/.claude/settings.json` |
-| Reference | `references/auto-resolve-pass.md` | Shared protocol used by all 4 skills (extract Done-when → evidence → confidence → cascade depth 2) |
-| Reference | `references/required-permissions.json` | Permission allowlist manifest used by `/board-install-permissions` |
+- **git-committed, human-visible board** — reviewed in the same PRs as your code
+- **durable cross-session memory** — recurring lessons promote into committed `Learning` entries
+- **atomic multi-agent claim-locking** — parallel worker agents never collide
+- **native to Claude Code** — plus an MCP server for any MCP client
 
-## Quick start
+## Value props
 
-After installing, run this once per project that should have a board:
+**VP1 — Visible, diffable coordination state.** Your agents' board is committed markdown, reviewed in the same PRs as code. Every entry is validated on write (frontmatter + index) by `board-validate-entry.sh`; the index and structural graph are regenerated deterministically by `/board-rebuild` and `/board-graph`.
 
-```
-/board-init <project-name> [affects-prefix]
-```
+**VP2 — Durable cross-session memory.** Recurring lessons promote into committed `Learning` entries (`L###`) that survive session boundaries. The `learnings-curator` scans resolved entries and promotes `pattern:` tags with recurrence ≥ 3 via `board-curate-learnings.sh`. Idempotent.
 
-Examples:
-- `/board-init navigator` — creates a board for project `navigator`, routing entries with `affects: navigator/...`
-- `/board-init platform "platform/, services/, infra/"` — creates a board with multiple affects-prefixes
+**VP3 — Collision-free parallel agents.** Atomic `mkdir`-based claim-locking with heartbeat, stale reclamation, and cloud-sync detection lets multiple worker agents run without stepping on each other (`board-claim-acquire/release/reclaim-stale.sh`, tested under `tests/claims/`).
 
-`/board-init` is idempotent — running it twice does not duplicate files or router rows. It creates `engineering-board/BOARD-ROUTER.md` (or appends to it), `engineering-board/<project>/BOARD.md`, `ARCHIVE.md`, and the four entry-type subdirectories. (Existing boards under `docs/boards/` — the pre-1.1.0 default — keep resolving with no action; see the Layout section.)
+**VP4 — Autonomous build pipeline.** Findings flow through a `tdd → review → validate` state machine driven by the Stop hook. Worker mode dispatches `tdd-builder` / `code-reviewer` / `validator` on each entry's `needs:` state and writes back the suggested next step.
 
-If no board exists when a session starts, the SessionStart hook prints a one-line reminder pointing at `/board-init` instead of doing anything else — projects that should not have a board are unaffected.
+**VP5 — Runs where you already are, and everywhere else.** A native Claude Code plugin (commands, agents, hooks, skills) **and** an MCP server exposing the same board format to any MCP client — Claude Desktop, Claude Code, or your own.
 
-## Layout
+## Quickstart
 
-This plugin is opinionated about your repo layout. After running `/board-init`, your project will have either:
+Two paths. The plugin gives you the full autonomous pipeline inside Claude Code; the MCP server exposes the board to any MCP client.
 
-**Multi-board layout (default, recommended):**
-```
-engineering-board/
-├── BOARD-ROUTER.md          # Maps `affects:` prefix → board directory
-├── <project-a>/
-│   ├── BOARD.md             # Live index of open items
-│   ├── ARCHIVE.md           # Resolved items
-│   ├── bugs/
-│   ├── features/
-│   ├── questions/
-│   └── observations/
-└── <project-b>/
-    └── ...
-```
+### Plugin (Claude Code)
 
-The board lives in a visible, top-level `engineering-board/` and is **committed by default** — it is meant to be browsed on GitHub and version-controlled. `/board-init` prints a small additive `.gitignore` stanza covering only the ephemeral runtime subdirs (`engineering-board/*/_sessions/`, `_claims/`, `_migrate-snapshot/`). To keep the whole board private instead (e.g. a public repo), run `/board-init --private`, which gives you the one-line opt-out — add `engineering-board/` to `.gitignore` to ignore the entire tree.
-
-> **Two folders, one letter apart.** The visible `engineering-board/` (no dot) is committed board *content*. The hidden `.engineering-board/` (leading dot) is gitignored *runtime* state (`session-mode.json`, `active-workers.json`, etc.) — never committed. Don't conflate them.
-
-**Backward-compatible (pre-1.1.0 default, auto-detected):** boards already under `docs/boards/` keep resolving with no action — board location is resolved in the order `engineering-board/` → `docs/boards/` (compat) → `docs/board/` (legacy single-board). To move an existing board into the new visible location, run `/board-migrate --relocate`.
-
-```
-docs/boards/                 # pre-1.1.0 multi-board default — still resolves
-└── ...                      # same structure as engineering-board/ above
-```
-
-**Or legacy single-board layout (auto-detected):**
-```
-docs/board/
-├── BOARD.md
-├── ARCHIVE.md
-├── bugs/
-├── features/
-├── questions/
-└── observations/
-```
-
-If none of these exist, the SessionStart hook prints a one-line nudge to run `/board-init` and otherwise stays out of your way.
-
-### `BOARD-ROUTER.md` format
-
-The router is a markdown table with `project | path | affects-prefix` columns:
-
-```markdown
-| project    | path                       | affects prefix |
-|------------|----------------------------|----------------|
-| navigator  | engineering-board/navigator | navigator/, src/, scripts/ |
-| platform   | engineering-board/platform  | platform/      |
-```
-
-### Entry frontmatter
-
-Bug/feature entries require:
-```yaml
----
-id: B001
-type: bug
-title: Short description
-discovered: 2026-05-02
-status: open
-priority: high
-affects: navigator/ranking
----
-
-## Done when
-- [ ] Specific exit criterion
-```
-
-Question entries require `id`, `type: question`, `title`, `discovered`, `status`, and a `## Done when` section.
-
-## Requirements
-
-- **python3** on PATH — used for date math, JSON parsing, SHA256 in board scripts. The plugin degrades to a one-line warning if python3 is missing; consolidation will not run.
-- **bash** — POSIX or Git Bash (bundled with Git for Windows). All scripts use `#!/usr/bin/env bash`.
-- **Cost model:** v0.2.1's Stop hook fires the finding-extractor on every turn. There is no per-session call cap and no sampling. Users on flat-rate plans (Claude Max) absorb this naturally; users on metered API billing should review the cost model before enabling.
-
-## Install
+Install from this repo's own marketplace:
 
 ```
 /plugin marketplace add GhostlyGawd/engineering-board
 /plugin install engineering-board
 ```
 
-Then enable it in your Claude Code settings.
-
-## Uninstall
+Then scaffold a board, once per project:
 
 ```
-/plugin uninstall engineering-board
-/plugin marketplace remove engineering-board
+/board-init <project> [affects-prefix]
 ```
 
-## Changelog
+### MCP server
 
-### 0.3.0 — Resilience + Learning entity
+Register the zero-dependency `python3` server with the Claude Code CLI:
 
-Combines the v0.2.3 Resilience block (active-workers registry + PM-fallback heartbeat) with the v0.3.0 Unification block (Learning entity + `/board-migrate`). Shipped together because they were implemented in one session; the consensus plan kept them logically separate so they can still be rolled back independently via `git revert`.
+```sh
+claude mcp add engineering-board -- python3 /abs/path/to/engineering-board/mcp-server/engineering_board_mcp.py
+```
 
-**v0.2.3 Resilience additions:**
-- `references/active-workers-registry.md` — contract for `.engineering-board/active-workers.json`.
-- `hooks/scripts/board-active-workers-register.sh`, `board-active-workers-bump.sh`, `board-active-workers-cleanup.sh` — registry mutators with mkdir-based lockfile.
-- `hooks/scripts/board-pm-fallback-heartbeat.sh` — PM pre-flight scans `_claims/`, cross-references the registry, refreshes heartbeats for claims whose owning session is alive (and not paused). Wired into `stop-hook-procedure.md` Section 3-PM step `(pre)`.
-- `/pm-start`, `/worker-start` register on session start; `/board-pause`, `/board-resume` toggle `paused: true` in the registry.
-- Worker self-bump on claim acquire / release (Stop hook step (f), (i)); worker subagents document heartbeat refresh for long ops.
+Or add it to Claude Desktop's `claude_desktop_config.json`:
 
-**v0.3.0 Unification additions:**
-- Learning entry type (`L###`): subtype `pattern` / `finding` / `principle`; required fields `confidence`, `recurrence`, `derived_from`; required body sections `## Takeaway` and `## Sources`. Schema in `skills/board-intake/references/frontmatter-schema.md`.
-- `agents/learnings-curator.md` — full implementation (replaces the v0.2.2 stub). Dispatches `hooks/scripts/board-curate-learnings.sh`, which scans resolved bug/feature/observation entries for `pattern:` tags and promotes tags with recurrence ≥ 3 to `learnings/L###-<slug>.md`. Idempotent (re-run produces byte-identical learnings).
-- `commands/board-migrate.md` + `hooks/scripts/board-migrate.sh` — `--apply` / `--rollback` / `--status`. Both apply and rollback are SHA256-idempotent (verified by `tests/orchestration/board-migrate.sh`). Apply creates `learnings/`, back-fills `needs: tdd` on open bug/feature entries without it, and snapshots pre-migrate state. Rollback restores the snapshot byte-equal.
-- SessionStart surfaces top 3 medium/high-confidence learnings filtered by cwd against each learning's `applies_to` field.
+```json
+{
+  "mcpServers": {
+    "engineering-board": {
+      "command": "python3",
+      "args": ["/abs/path/to/engineering-board/mcp-server/engineering_board_mcp.py"]
+    }
+  }
+}
+```
 
-**Quality-of-life additions:**
-- `tests/run-all.sh` — single CI runner across all 8 suites.
-- `tests/version-coherence.sh` — `plugin.json.version == marketplace.json.plugins[].version` invariant.
-- `tests/crosscompat-lint.sh` — bash + python3 portability lint over `hooks/scripts/*.sh` (no `date -d`/`date -j -f`, no drive letters, no CRLF shebangs, no `jq`, shebang must be `#!/usr/bin/env bash`). Supports per-file `# crosscompat-lint-ignore: <rule>` opt-out for documented exceptions.
-- `ARCHITECTURE.md` §11.5 documents the four-mode transition refusal matrix.
-- 4 new integration test suites: `active-workers-registry.sh`, `pm-fallback-heartbeat.sh`, `learnings-curator.sh`, `board-migrate.sh`.
+Installing the plugin auto-registers the same server via the repo-root [`.mcp.json`](.mcp.json) (resolved through `${CLAUDE_PLUGIN_ROOT}`), so no separate step is needed when the plugin is installed. Full config reference: [`mcp-server/README.md`](mcp-server/README.md).
 
-**Caught in this release:**
-- `hooks/hooks.json` had silently lost its Stop `type: "prompt"` hook in commit 5a4226d. The runtime dispatch chain was inactive for ~13 days. Restored in commit 52e99a4; structural lint covers it.
-- `board-prompt-guard.sh`, `board-session-start.sh`, `board-validate-entry.sh` had `#!/bin/bash` shebangs (Git Bash incompatible). Normalized to `#!/usr/bin/env bash` per the consensus plan global rules.
+## Feature tour
 
-### 0.2.2 — PM + Worker orchestration
+<div align="center">
 
-Adds the multi-agent orchestration layer on top of v0.2.1 scratch capture: PM pipeline that consolidates scratch into the live board on every Stop turn, and a Worker pipeline that drives a `tdd → review → validate → resolved` state machine on entries with `needs:` set. Per-entry exclusivity is enforced via atomic `mkdir`-based claim locks with cloud-sync detection.
+<img src="docs/how-it-works.svg" alt="How engineering-board works" width="720">
 
-**New commands:** `/pm-start`, `/worker-start --discipline <tdd|review|validate>`, `/board-install-permissions`, `/board-claim-release`, `/board-rebuild`, `/board-graph`.
+</div>
 
-**New PM subagents:** `consolidator` (promotes verified scratch → live), `tidier` (board hygiene), `learnings-curator` (stub; full Learning entity in v0.3.0 plan).
+**Modes** — the Stop hook reads `.engineering-board/session-mode.json` and routes to one procedure (canonical: [`hooks/stop-hook-procedure.md`](hooks/stop-hook-procedure.md)):
 
-**New Worker subagents:** `tdd-builder`, `code-reviewer`, `validator` (validator is strictly read-only — enforced by tool list).
+| Mode | Set by | Stop dispatches |
+|---|---|---|
+| **Passive** (default) | nothing | `finding-extractor` only — captures findings without disturbing work |
+| **Paused** | `/board-pause` | nothing (emits `<<EB-PASSIVE-PAUSED>>`) — bypass capture while drafting |
+| **PM** | `/pm-start` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` |
+| **Worker** | `/worker-start --discipline <tdd\|review\|validate>` | claim-acquire → `tdd-builder` / `code-reviewer` / `validator` → claim-release |
 
-**New scripts:** `board-claim-acquire.sh`, `board-claim-release.sh`, `board-claim-reclaim-stale.sh`, `board-claim-heartbeat.sh` (reserved), `board-permission-self-check.sh`.
+**Commands (10)** — `/board-init`, `/board-rebuild`, `/board-graph`, `/board-pause`, `/board-resume`, `/pm-start`, `/worker-start`, `/board-install-permissions`, `/board-claim-release`, `/board-migrate`.
 
-**New procedure:** `hooks/stop-hook-procedure.md` is the canonical mode-routed Stop orchestrator; `hooks.json`'s Stop entries are intentionally thin.
+**Agents (8)** — `board-manager` (router over the 4 skills); the PM pipeline `finding-extractor` → `consolidator` → `tidier` → `learnings-curator`; the Worker pipeline `tdd-builder` / `code-reviewer` / `validator` (the validator is strictly read-only).
 
-**New reference:** `references/required-permissions.json` is the permission allowlist manifest installed by `/board-install-permissions`.
+**Skills (4)** — `board-intake`, `board-triage`, `board-resolve`, `board-consolidate`, sharing the `references/auto-resolve-pass.md` protocol.
 
-### 0.2.1.2 — Prompt-author tightenings (2026-05-11)
+**Hooks (4 events)** — `SessionStart` (board view), `PostToolUse(Write)` (entry validation), `UserPromptSubmit` (routing reminder), `Stop` (mode-routed orchestrator).
 
-Two small, non-behavioral patches surfaced during v0.2.1 live smoke testing. No new scope; both are prompt-author tightenings against existing v0.2.1 surfaces.
+## The MCP tools
 
-**Modified:**
-- `hooks/hooks.json` Stop hook step (d) — timestamp instruction now explicitly forbids placeholder times and pins the canonical computation (`python3 -c "...datetime.now(timezone.utc)..."`). v0.2.1 left "ISO-8601" loose, and live testing observed the model emitting midnight stubs.
-- `agents/finding-extractor.md` — opens by documenting the canonical input format (`---USER MESSAGE---` / `---ASSISTANT MESSAGE---` / `---END---`) as a first-class section, matching the v0.2.1 hook fix in commit `8e03757`. Eliminates the prior ambiguity where the agent doc said "current assistant turn" while the hook actually dispatched a user+assistant pair.
-- `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` — version 0.2.1 → 0.2.1.2.
+Eleven tools, all backed by the same on-disk format the plugin's hooks and skills expect. Locking is not reimplemented — `board_claim` / `board_release` shell out to the plugin's existing claim scripts.
 
-No new files. No behavioral change to the consolidator, scratch corpus, or AC coverage. v0.2.1's 12/12 verifier and 21/21 smoke continue to pass post-patch.
+| Tool | What it does |
+|---|---|
+| `board_init` | Scaffold a project board (router row, `BOARD.md`, `ARCHIVE.md`, subdirs). Idempotent. |
+| `board_list_projects` | List projects from `BOARD-ROUTER.md` (id, path, affects prefix). |
+| `board_create_entry` | Create a valid entry with correct frontmatter + body sections; allocate the next id; rebuild the index. |
+| `board_list_entries` | List entries with parsed frontmatter; filters `project` / `type` / `status` / `needs`. |
+| `board_get_entry` | Full markdown of one entry by id, plus parsed frontmatter. |
+| `board_update_entry` | Update frontmatter and/or append a body section; validate the status transition; rebuild the index. |
+| `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files. Idempotent. |
+| `board_capture_finding` | Append a finding to the scratch inbox `_sessions/mcp-<UTC-date>.md`. |
+| `board_claim` | Acquire an entry lock (shells out to `board-claim-acquire.sh`). |
+| `board_release` | Release an entry lock (shells out to `board-claim-release.sh`). |
+| `board_status` | Overview: per-type open counts, `in_progress` / `blocked` ids, un-promoted scratch count. |
 
-### 0.2.1 — Scratch Capture (2026-05-11)
+## Comparison
 
-**New:**
-- `agents/finding-extractor.md` — per-turn passive listener (`model: inherit`); emits JSON scratch findings.
-- `hooks/hooks.json` Stop hook — replaced the v0.2.0 routing-guard prompt with a condition-shaped `type: "prompt"` hook that dispatches `finding-extractor` via `Task()` every turn, plus a `type: "command"` hook that captures stdin for the consolidator. New `<<EB-PASSIVE-PAUSED>>` sentinel emitted when `session-mode = paused`.
-- `hooks/scripts/board-consolidate.sh` — deterministic anchor verification + consolidator-detected supersession + AC T2b safeguard (distinct `affects:` never archived).
-- `hooks/scripts/board-audit-scratch.sh` — completeness audit; zero unaccounted scratch IDs.
-- `hooks/scripts/board-index-check.sh` — BOARD.md row count == subdir file count invariant (AC T4 partial).
-- `commands/board-pause.md`, `commands/board-resume.md` — passive-listening kill switch and restore.
-- `skills/board-consolidate/SKILL.md` — consolidation protocol.
-- `tests/fixtures/benign-findings/` (20 fixtures) + `tests/fixtures/adversarial-paste/` (30 fixtures, covering all three reject categories: imperative-prefix, slash-command, subagent-mention) — corpora for AC C6 accept-rate and Scenario 4 reject-rate.
-- `tests/lint-orchestrator-prompts.sh` — verifies the canonical "untrusted data" framing string is present in all orchestrator-facing prompt files (live PASS 3/3).
+Honest and cited; traction figures are live snapshots (2026-07-04) that drift.
 
-**Modified:**
-- `hooks/scripts/board-session-start.sh` — recognizes `_sessions/` and surfaces un-promoted scratch counts per project.
-- `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` — version 0.2.0 → 0.2.1.
+| | git-committed board? | durable memory? | atomic multi-agent locking? | Claude-native? | MCP? |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **engineering-board** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Backlog.md](https://github.com/MrLesk/Backlog.md) · ~5.9k★ | ✅ | ❌ | ❌ | ❌ | ✅ |
+| [Agent-MCP](https://github.com/rinadelph/Agent-MCP) · ~1.3k★ | ❌ (RAG DB) | ✅ (opaque) | ✅ | ❌ | ✅ |
+| [kanban-mcp](https://github.com/eyalzh/kanban-mcp) · ~40★ | ❌ (SQLite) | ❌ | ❌ | ❌ | ✅ |
+| [claude-code-workflows](https://github.com/shinpr/claude-code-workflows) · ~536★ | ❌ (ephemeral) | ❌ | ❌ | ✅ | ❌ |
+| [Flux](https://paddo.dev/blog/flux-kanban-for-ai-agents/) · early | ❌ (side-branch SQLite/JSON) | ❌ | ❌ | ❌ | ✅ |
 
-**Consistency fix:** The slash-command reject regex in `agents/finding-extractor.md` and `skills/board-consolidate/SKILL.md` is anchored at a token boundary — `(?:^|\s)/[a-z][a-z-]+` — so Unix file paths like `src/foo.py` do not produce false-positive drops. The naked `/[a-z][a-z-]+` form would have rejected every finding whose `affects:` referenced a slash-pathed file. Caught during the T2b lint test.
+No competitor combines all four traits engineering-board owns — git-committed board + durable memory + atomic locking + Claude-native — now with MCP as the fifth.
 
-**Composability spike:** all 5 criteria PASS (Stop-hook type:prompt dispatches Task() from main session; JSON captured; written to disk pre-Stop; transcript accessible via stdin; orchestrator framing neutralizes mid-string imperatives). Documented in `tests/spike/`.
+**Where they're better (fairness note):** [Backlog.md](https://github.com/MrLesk/Backlog.md) is the category leader by a wide margin, with a polished Kanban UI and broad install channels (npm/Homebrew/Nix/Bun); [Agent-MCP](https://github.com/rinadelph/Agent-MCP) ships a richer RAG knowledge-graph and a live dashboard. engineering-board is younger and not yet on a public marketplace — install it from this repo's marketplace.
 
-**Architectural finding (for v0.2.2 ADR):** Claude Code presents `type: "prompt"` Stop hook bodies as a "stop-condition judge" prompt to the model. Production hook bodies are written as condition-shaped — explicitly "if condition unmet, execute the procedure" — and reference `stop_hook_active` in stdin to skip self-triggered re-firings.
+## Architecture
 
-**Acceptance criteria covered:** C1 (every-turn extraction, no sampling, no caps — spec-compliant), C2 (scratch write before Stop returns), C3 (consolidation log accountability), C6 (framing-string lint + ≥95% benign-corpus accept rate), T2 (consolidator-detected supersession), T2b (distinct `affects:` never archived), partial T4 (index-check script).
+The board is human-visible markdown (cards, a `BOARD.md` index, a `GRAPH.yml` structural graph, a `BOARD-ROUTER.md`), not a hidden database. Everything runs on vanilla Claude Code primitives — hooks, slash commands, subagents, `Task()` dispatch — plus `bash` + `python3`. Zero runtime package dependencies. Full contributor-facing map: [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
-**Constraints (user-stated):** Claude Max 20x subscription. No haiku locks anywhere; all subagents `model: inherit`. No per-session call caps. No cost-driven sampling.
+## Roadmap
 
-### 0.2.0 — Multi-board layout
-(previous release — see git history)
+Directional and honest — the items below are designed, not shipped.
+
+- **Conductor** ([`docs/rfcs/0001-symphony-conductor.md`](docs/rfcs/0001-symphony-conductor.md), Draft) — an always-on deterministic orchestrator that drives the board to PRs across sessions with no human in the loop, spawning observable interactive worker sessions per bounded round. Additive and opt-in; not built.
+- **Consolidation research** ([`docs/research/agentic-ecosystem/`](docs/research/agentic-ecosystem/)) — comparing the agentic systems in this ecosystem toward one product. Feeds a future PRD.
+- **Broader distribution** — submission to the Claude community marketplace, the official MCP Registry, and awesome-lists is prepared; see [`.goal/POSITIONING.md`](.goal/POSITIONING.md) §2.
+
+## Contributing
+
+The test suite is bash + python3 only, no install step:
+
+```sh
+bash tests/run-all.sh   # 11 suites
+```
+
+Cross-compat rules for any new `hooks/scripts/*.sh` (pinned by `tests/crosscompat-lint.sh`): shebang exactly `#!/usr/bin/env bash`; no `date -d` / `date -j -f`; no `jq`; no drive letters — use `python3` for JSON and timestamps. Version bumps must touch both `.claude-plugin/plugin.json` and `marketplace.json` in lockstep. Develop on a branch and land changes via PR — never push to `main` directly.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+[MIT](LICENSE).

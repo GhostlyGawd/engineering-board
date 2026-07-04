@@ -1,0 +1,7 @@
+Lighthouse (local, docs/index.html) 13.4.0
+{
+  "performance": 100,
+  "accessibility": 100,
+  "best-practices": 100,
+  "seo": 100
+}
