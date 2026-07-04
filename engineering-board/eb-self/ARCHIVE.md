@@ -2,6 +2,8 @@
 
 Resolved entries. Newest at the top.
 
+- B048 P1 | [reject filter now catches adverb-fronted imperatives](bugs/B048-reject-filter-bypassed-by-adverb-fronted-imp.md) — resolved C6 (PR C6a)
+
 - B045 P3 | [CHANGELOG reject-filter count drift removed (bounds, not brittle numbers)](bugs/B045-changelog-reject-filter-count-drift.md) — resolved C5 (PR C5b)
 
 - B043 P1 | [reject filter sees through Unicode bullets/headings/line-seps](bugs/) — resolved C5 (PR C5b)
