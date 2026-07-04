@@ -89,10 +89,13 @@ As the filter matured, findings shifted from "a whole mechanism is missing" to
     script terminator is at most P2; an obscure/rare one is P3 "grow the set".
 
 Do NOT down-rate a genuine mechanism gap to force a "clean" cycle; equally, do
-NOT inflate a single-glyph coverage gap in a comprehensive fold into a P1. The
-line-break (`splitlines()`) and terminator (`_SENTENCE_TERMINATORS`, major
-living scripts) folds are now comprehensive-by-construction — treat further
-additions as corpus growth, not mechanism defects.
+NOT inflate a single-glyph coverage gap in a comprehensive fold into a P1. All
+three normalization folds are now comprehensive-by-construction — line breaks
+(`splitlines()`), sentence terminators (`_SENTENCE_TERMINATORS`, major living
+scripts), and invisible/format characters (`_strip_invisible`, category Cf +
+variation selectors) — so an *enumeration* gap in any of them is a mechanism
+defect to fix by extending the construction, while a genuinely novel class (a new
+grammar/mood/verb vector) is the only remaining way to a real new bypass.
 
 Public API
 ----------
@@ -109,11 +112,34 @@ import re
 import sys
 import unicodedata
 
-# Characters an attacker can use to visually "lead a clause" the way an ASCII
-# bullet/newline does, so the reject rules must see through them. We normalize
-# once before scanning rather than enumerating every glyph in the regex.
-_ZERO_WIDTH = dict.fromkeys(
-    [0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF], None)  # ZWSP/ZWNJ/ZWJ/WJ/BOM
+def _strip_invisible(text):
+    """Drop invisible / default-ignorable characters that render as nothing but
+    split a verb token so the rules never see the whole word.
+
+    Comprehensive-by-construction (eb-self B058): rather than a hand list — which
+    caught ZWSP/ZWNJ/ZWJ/WJ/BOM but missed soft hyphen U+00AD, the Mongolian vowel
+    separator, the invisible math operators U+2061-2064, the Arabic letter mark,
+    and the variation selectors — drop the WHOLE class: every format character
+    (Unicode category `Cf`) plus the default-ignorable variation selectors and the
+    combining grapheme joiner. This is the same "fold the class, not the glyph"
+    upgrade already applied to line breaks (`splitlines()`) and terminators
+    (`_SENTENCE_TERMINATORS`); this was the last enumerated fold in `_normalize`.
+    Line/paragraph separators (Zl/Zp) and NEL are NOT stripped here — they are
+    clause boundaries handled by the `splitlines()` fold.
+    """
+    out = []
+    for ch in text:
+        cp = ord(ch)
+        if unicodedata.category(ch) == "Cf":            # ZW*, WJ, BOM, soft hyphen, bidi, invisibles
+            continue
+        if cp == 0x034F:                                # combining grapheme joiner
+            continue
+        if 0xFE00 <= cp <= 0xFE0F or 0xE0100 <= cp <= 0xE01EF:  # variation selectors
+            continue
+        if 0xE0000 <= cp <= 0xE007F:                    # deprecated tag characters (invisible)
+            continue
+        out.append(ch)
+    return "".join(out)
 
 # Sentence/clause terminators in non-Latin scripts that an LLM reads as a fresh
 # clause but the ASCII boundary class `[.!?:;,\n]` misses. NFKC leaves them
@@ -150,9 +176,11 @@ _SENTENCE_TERMINATORS = dict.fromkeys([
 def _normalize(text):
     """Fold Unicode tricks to their ASCII intent before the rules scan.
 
-    NFKC maps many compatibility variants to ASCII; then strip zero-width
-    characters (a ZWSP inside a verb would split the token) and fold EVERY
-    line break Python recognizes to `\n` so it counts as a clause boundary.
+    NFKC maps many compatibility variants to ASCII; then strip the whole
+    invisible / default-ignorable class (Cf + variation selectors + CGJ — a
+    soft hyphen or ZWSP inside a verb would split the token; see
+    `_strip_invisible`, eb-self B058) and fold EVERY line break Python
+    recognizes to `\n` so it counts as a clause boundary.
     Using `str.splitlines()` (rather than an enumerated character class) closes
     the whole line-separator class at once \u2014 CR (`\r`, the most common real-world
     break), VT/FF (`\v`/`\f`), the C1/C0 separators U+001C/1D/1E, U+0085, and the
@@ -163,7 +191,9 @@ def _normalize(text):
     if not isinstance(text, str):
         return text
     text = unicodedata.normalize("NFKC", text)
-    text = text.translate(_ZERO_WIDTH)
+    # Drop invisible / default-ignorable chars (Cf + variation selectors + CGJ)
+    # that split a verb token — the whole class, not a hand list (eb-self B058).
+    text = _strip_invisible(text)
     # Fold non-Latin sentence terminators to ASCII "." so they count as a clause
     # boundary the anchor recognizes (eb-self B053).
     text = text.translate(_SENTENCE_TERMINATORS)

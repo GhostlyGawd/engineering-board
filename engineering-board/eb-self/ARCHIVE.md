@@ -2,6 +2,8 @@
 
 Resolved entries. Newest at the top.
 
+- B058 P1 | [reject invisible-strip now covers the whole Cf/default-ignorable class (soft hyphen etc.)](bugs/B058-reject-invisible-strip-incomplete-cf-class.md) — resolved C10 (PR C10a)
+
 - B056 P2 | [reject terminator fold now spans the major living scripts (comprehensive-by-construction)](bugs/B056-reject-terminator-fold-incomplete-arabic-armen.md) — resolved C9 (PR C9a)
 
 - B055 P3 | [README hero link no longer implies a hosted render (raw-html honesty)](bugs/B055-readme-board-view-link-points-at-raw-html.md) — resolved C8 (PR C8b)
