@@ -5,8 +5,8 @@ subtype: principle
 title: Fix an input-handling class across every site at once, not one site per cycle
 discovered: 2026-07-04
 confidence: high
-recurrence: 6
-derived_from: [B051, B052, B053, B054, B056, B058]
+recurrence: 7
+derived_from: [B051, B052, B053, B054, B056, B058, B059]
 applies_to: [hooks/scripts/board_reject_check.py, hooks/scripts/board-consolidate.sh, mcp-server/engineering_board_mcp.py]
 pattern_tag: whole-class-sweep
 ---
@@ -48,3 +48,7 @@ call-site to the whole class of call-sites.
   This is the lesson's own corollary: when you make one fold in a function
   comprehensive, sweep its SIBLING folds in the same function for the same
   hand-list smell. All three folds are now comprehensive-by-construction.
+- B059 — C11 the marker SKIP-RUN (a different enumerated class outside `_normalize`)
+  handled unordered bullets but not the ordered/checkbox list family. The corollary
+  extends past one function: sweep EVERY enumerated character class in the module
+  for the same hand-list smell, not just the sibling folds. Now comprehensive too.

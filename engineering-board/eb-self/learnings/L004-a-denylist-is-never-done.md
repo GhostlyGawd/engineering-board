@@ -5,8 +5,8 @@ subtype: principle
 title: A denylist heuristic is never done — assume every pattern has an adjacent bypass
 discovered: 2026-07-04
 confidence: high
-recurrence: 9
-derived_from: [B002, B025, B037, B043, B048, B051, B053, B056, B058]
+recurrence: 10
+derived_from: [B002, B025, B037, B043, B048, B051, B053, B056, B058, B059]
 applies_to: [hooks/scripts/board_reject_check.py, tests/security/]
 pattern_tag: filter-completeness
 ---
@@ -84,6 +84,20 @@ C10 to be honestly unclean. That two-way integrity is the point: the rubric is a
 real standard, not a convergence lever. After B058 all three `_normalize` folds are
 comprehensive-by-construction, so the enumeration treadmill is structurally closed;
 only a genuinely novel class (new grammar/mood/verb) can yield a new bypass now.
+
+## …and the skip-run had one too (C11)
+"Only a novel class remains" was premature: C11 found B059 — the clause-anchor
+SKIP-RUN (a separate enumerated class `[-\s*+>#…]`, not the `_normalize` folds)
+handled unordered bullets but not ordered/lettered/checkbox list markers, a whole
+common markdown list family. Same enumerated-fold-gap = mechanism = P1 rule (the
+independent red-team said P2; the rubric applied consistently says P1), so C11
+reset the (new) streak too. Fixed comprehensively via a bounded `_LIST_MARKER`.
+Tally after C11: EVERY enumerated component of the filter — the three `_normalize`
+folds AND the marker skip-run — is now comprehensive-by-construction. The only
+curated denylists left (`_VERBS`, `_LEADIN`, `_ADVERB`) are DELIBERATELY curated
+(documented accepted residuals — a missing verb/adverb is a design trade-off to
+avoid false positives, not a defect). So the reachable in-scope surface is finally
+down to genuinely novel grammar/mood vectors + the untrusted-data framing.
 
 ## Boundary drawn (C7)
 After six recurrences, C7 documented the filter's **accepted-residual boundary**
