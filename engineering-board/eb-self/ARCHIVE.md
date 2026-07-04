@@ -2,6 +2,10 @@
 
 Resolved entries. Newest at the top.
 
+- B034 P0 | [MCP entry_id path traversal closed (claim/release validation + realpath)](bugs/) — resolved C3 (PR C3b)
+- B035 P1 | [MCP bulk tools now enforce router-row containment](bugs/) — resolved C3 (PR C3b)
+- B036 P3 | [MCP append_section heading newline-flattened](bugs/) — resolved C3 (PR C3b)
+
 - F001 P2 | [zero-dep HTML board viewer (/board-view) shipped](features/) — resolved C3 (PR C3a)
 
 - B027 P1 | [README Quickstart now covers capture->promote->fix + time-to-first-value](bugs/) — resolved C2 (PR C2d)

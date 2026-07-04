@@ -11,6 +11,12 @@ BOARD_DIR="${1:?board-dir required}"
 ENTRY_ID="${2:?entry-id required}"
 SESSION_ID="${3:?session-id required}"
 
+# ENTRY_ID becomes a path segment; reject traversal so a crafted id cannot
+# rm -rf outside the board (eb-self B034, defense-in-depth for direct invocation).
+case "$ENTRY_ID" in
+  */*|*'\'*|*..*) echo "invalid entry-id (no path separators or '..'): $ENTRY_ID" >&2; exit 1 ;;
+esac
+
 CLAIM_DIR="${BOARD_DIR}/_claims/${ENTRY_ID}"
 OWNER_FILE="${CLAIM_DIR}/owner.txt"
 

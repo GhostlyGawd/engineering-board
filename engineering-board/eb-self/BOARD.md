@@ -5,8 +5,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 ## Open
 
 ### Bugs
-- B034 P0 | [B034-mcp-entryid-path-traversal-in-boardclaimboar](bugs/B034-mcp-entryid-path-traversal-in-boardclaimboar.md)
-- B035 P1 | [B035-mcp-bulk-tools-bypass-router-row-containment](bugs/B035-mcp-bulk-tools-bypass-router-row-containment.md)
 - B005 P2 | [B005-first-captured-finding-is-invisible--buried-in-s](bugs/B005-first-captured-finding-is-invisible--buried-in-s.md)
 - B006 P2 | [B006-advancing-one-entry-through-tdd-review-validate-](bugs/B006-advancing-one-entry-through-tdd-review-validate-.md)
 - B007 P2 | [B007-validator-success-is-a-dead-end-the-board-does-n](bugs/B007-validator-success-is-a-dead-end-the-board-does-n.md)
@@ -19,7 +17,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 - B020 P3 | [B020-board-migrate-is-two-unrelated-operations-under-](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
 - B021 P3 | [B021-code-reviewer-name-collides-with-code-review-and](bugs/B021-code-reviewer-name-collides-with-code-review-and.md)
 - B022 P3 | [B022-nothingtotest--nothingtoreview-still-advance-the](bugs/B022-nothingtotest--nothingtoreview-still-advance-the.md)
-- B036 P3 | [B036-mcp-appendsection-headingbody-not-newline-fl](bugs/B036-mcp-appendsection-headingbody-not-newline-fl.md)
 
 ### Features
 - F002 P2 | [F002-onboarding-wizard-board-setup-that-collapses-ins](features/F002-onboarding-wizard-board-setup-that-collapses-ins.md)

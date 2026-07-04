@@ -3,7 +3,7 @@ id: B034
 type: bug
 title: MCP entry_id path traversal in board_claim/board_release (arbitrary create + rm -rf)
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P0
 affects: mcp-server/engineering_board_mcp.py
 needs: tdd
@@ -22,3 +22,10 @@ and board-claim-release.sh (`rm -rf "${CLAIM_DIR}"`). Reproduced:
 OUTSIDE root; `board_release(entry_id="../../../../victim")` rm -rf's an external
 dir (owner-match trivially satisfied — same caller supplies session_id + owner.txt).
 Same traversal class as B024, left open for entry_id.
+
+## Resolution (C3, PR C3b)
+Added validate_entry_id() (safe single-segment charset, reject `..`) applied in
+tool_board_claim/tool_board_release before shelling out; plus defense-in-depth
+ENTRY_ID guards in board-claim-acquire.sh and board-claim-release.sh (reject
+path separators / `..` for direct invocation). Traversal ids now rejected;
+nothing created/deleted outside root. Pinned by MCP tests.
