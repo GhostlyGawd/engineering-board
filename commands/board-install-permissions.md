@@ -84,10 +84,16 @@ Run the following commands to add each permission. Copy and paste them into your
 Then print one line per pattern:
 
 ```
-claude config add permissions.allow "<pattern>"
+claude config add permissions.allow "<tool>(<pattern>)"
 ```
 
-Where `<pattern>` is the `pattern` field from the JSON entry (with surrounding double-quotes as shown).
+Where `<tool>` is the `tool` field and `<pattern>` is the `pattern` field from the
+JSON entry, combined into a Claude Code allow-rule of the form `Tool(specifier)` —
+e.g. `Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-scratch-append.sh:*)` and
+`SlashCommand(/pm-start)` (with surrounding double-quotes as shown). A **bare**
+specifier without the `Tool(...)` wrapper is parsed as a tool *name* and never
+matches the real `Bash`/`SlashCommand` tools, so the permission would silently
+have no effect (eb-self B046).
 
 After all lines, print:
 

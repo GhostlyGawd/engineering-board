@@ -58,7 +58,22 @@ if os.path.exists(settings_path):
 
 installed_set = set(installed_allow)
 
-missing = [p for p in patterns if p["pattern"] not in installed_set]
+
+def rule_for(p):
+    """The Claude Code allow-rule string for a manifest entry.
+
+    permissions.allow entries must be `Tool(specifier)` (e.g.
+    `Bash(bash …:*)`, `SlashCommand(/pm-start)`); a bare specifier is parsed
+    as a tool NAME and never matches the real Bash/SlashCommand tools, so
+    comparing (and installing) the bare `pattern` silently no-ops while this
+    check reported a false green (eb-self B046). The manifest keeps `tool`
+    and `pattern` separate for coverage/path-form checks; the wrapped rule is
+    reconstructed here and at emit time.
+    """
+    return f"{p['tool']}({p['pattern']})"
+
+
+missing = [p for p in patterns if rule_for(p) not in installed_set]
 installed_count = total - len(missing)
 missing_count = len(missing)
 
@@ -66,7 +81,7 @@ print(f"permission self-check: {total} needed, {installed_count} installed, {mis
 
 if missing_count > 0:
     for p in missing:
-        print(f"MISSING: {p['tool']}: {p['pattern']}")
+        print(f"MISSING: {rule_for(p)}")
     sys.exit(1)
 else:
     print("all permissions installed.")

@@ -3,7 +3,7 @@ id: B046
 type: bug
 title: Permission rules emitted without Tool(...) wrapper; self-check reports a false green
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P1
 affects: commands/board-install-permissions.md
 needs: tdd
@@ -18,3 +18,6 @@ pattern: [permissions, false-negative-selfcheck]
 
 ## Fix direction
 Generate the wrapped rule from the `tool` field (or store the wrapped string) in both the printed `claude config add` lines and the self-check comparison; update the settings-all-patterns fixture + T26-T28 assertions to the wrapped form.
+
+## Resolution (C6, PR C6b)
+self-check now compares the wrapped `Tool(specifier)` rule (rule_for = f"{tool}({pattern})"); the install command emits the wrapped form; all-patterns/partial fixtures wrapped; new T05b regression fixture (settings-bare-legacy.json) asserts bare rules report all-missing, not a false green. permissions suite 28->29.

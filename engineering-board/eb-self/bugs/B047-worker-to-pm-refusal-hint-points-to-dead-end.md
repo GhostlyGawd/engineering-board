@@ -3,7 +3,7 @@ id: B047
 type: bug
 title: worker->pm refusal hint points to a dead-end (/board-resume no-ops from worker mode)
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P3
 affects: hooks/scripts/board-mode-guard.sh
 needs: tdd
@@ -18,3 +18,6 @@ pattern: [error-message, wrong-recovery-hint]
 
 ## Fix direction
 Drop "Run /board-resume or" from the worker->pm refusal message; update the mode-routing test assertion in lockstep.
+
+## Resolution (C6, PR C6b)
+Dropped "Run /board-resume or" from the worker->pm refusal in board-mode-guard.sh; now restart-only, matching the symmetric pm->worker message. mode-transition-guard substring assertion ("currently in worker mode") preserved.
