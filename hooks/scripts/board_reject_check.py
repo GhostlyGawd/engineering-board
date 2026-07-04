@@ -59,16 +59,34 @@ import re
 import sys
 
 # Verbs that signal an instruction to the orchestrator when they lead a clause.
+# `send`/`leak`/`expose` cover exfiltration openers ("send the API keys to …").
+# `print`/`respond`/`output` are deliberately EXCLUDED: they routinely lead
+# legitimate findings ("print statement leaks PII", "respond with 500 on …"),
+# and the threat model is prompt injection, not keyword presence.
 _VERBS = (
     "ignore", "disregard", "override", "invoke", "execute", "run", "replace",
     "forget", "delete", "remove", "close", "drop", "reveal", "emit", "bypass",
-    "disable", "exfiltrate", "uninstall", "reset",
+    "disable", "exfiltrate", "uninstall", "reset", "send", "leak", "expose",
+)
+
+# Politeness / directive lead-ins that can sit between the clause boundary and
+# the verb in an injection ("Please ignore…", "You must ignore…", "Now ignore…").
+# Each is followed DIRECTLY by the verb; a benign modal is followed by a SUBJECT
+# then the verb ("should THE VALIDATOR ignore…"), which this does not match — so
+# descriptive prose is preserved. Bare modals (should/would/can/will) are NOT
+# lead-ins for exactly that reason.
+_LEADIN = (
+    r"(?:please|kindly|now|just|simply|first|then|also|"
+    r"you\s+must|you\s+should|you\s+may|you\s+will|you\s+need\s+to|"
+    r"go\s+ahead\s+and)"
 )
 
 # Clause boundary: string start, sentence/clause punctuation, or a SYSTEM/ADMIN
-# lead-in. Optional quotes/parens between the boundary and the verb are skipped.
+# lead-in. Optional quotes/parens, then an optional run of lead-in words, then
+# the verb.
 _IMPERATIVE_RE = re.compile(
-    r"(?:^|[.!?:;,\n]|\bsystem\b|\badmin\b)\s*['\"`(]*\s*(?:" + "|".join(_VERBS) + r")\b",
+    r"(?:^|[.!?:;,\n]|\bsystem\b|\badmin\b)\s*['\"`(]*\s*(?:" + _LEADIN + r"\s+)*(?:"
+    + "|".join(_VERBS) + r")\b",
     re.IGNORECASE,
 )
 # Slash directive (e.g. /board-migrate, /uninstall-everything). Case-insensitive
