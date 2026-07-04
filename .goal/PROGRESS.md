@@ -31,9 +31,9 @@ _Last updated: 2026-07-04_
 - [done] 2.4 MCP server packaging — 11 tools, `.mcp.json` bundling, README config snippets (Claude Code + Desktop). Evidence: `evidence/G2-mcp-server-tests.txt`, `evidence/G2-mcp-stdio-handshake.txt`
 - [done] 2.5 Testing pyramid + E2E — 65-check MCP suite (subprocess stdio + lifecycle), official MCP Inspector live workflow. Plugin fresh-session E2E partial (see BLOCKERS.md B1 — env limit; covered by validate + suite). Evidence: `evidence/G2-plugin-validate-and-inspector.txt`
 - [done] 2.6 CI green — 11 suites incl. mcp-server, enforced by `.github/workflows/test.yml`
-- [in-progress] 2.7 Release hygiene: CHANGELOG.md ✅ (semver, Keep-a-Changelog); RC tag pending CI-green confirmation
-- [in-progress] **G2 gate**: tests green in CI ✅; MCP Inspector + scripted client ✅; zero blocker/major defects ✅; every VP works ✅; plugin fresh-session E2E = documented partial (B1). RC tag next.
-- Deliverables: tests ✅, CI ✅, manifests ✅, MCP server ✅, E2E evidence ✅, CHANGELOG ✅, RC tag ⏳
+- [done] 2.7 Release hygiene: CHANGELOG.md ✅ (semver, Keep-a-Changelog); RC tag `v1.2.0-rc.1` created locally at CI-green `88d4ee6` — remote push blocked by sandbox git relay (BLOCKERS B2, justified/non-blocking)
+- [done] **G2 gate PASSED** (with 2 documented deferrals): CI green ✅ (11 suites, both runs on 88d4ee6); MCP Inspector + scripted client ✅; zero blocker/major defects ✅; every VP works ✅. Deferrals: plugin fresh-session E2E (B1) + remote RC tag (B2) — both environment limits, covered by validate + suite / local tag.
+- Deliverables: tests ✅, CI ✅, manifests ✅, MCP server ✅, E2E evidence ✅, CHANGELOG ✅, RC tag ✅(local)
 
 ## Phase 3 — Brand identity
 - [ ] 3.1 Three direction studies; select one w/ rationale

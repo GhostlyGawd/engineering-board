@@ -31,3 +31,33 @@ engineering-board`, then `/board-init demo`, `/pm-start`, `/worker-start
 --discipline tdd` in a scratch repo and confirm the transcripts. Expected ~5 min.
 Nothing in the code blocks this; it is purely an environment limitation of the
 autonomous run.
+
+## B2 — Remote RC tag / release push blocked by the sandbox git relay
+
+**Gate:** G2 deliverable "tag a release candidate"; DoD "Release published".
+
+**What was tried (3 distinct approaches):**
+1. `git push origin refs/tags/v1.2.0-rc.1` → `send-pack: unexpected disconnect
+   … the remote end hung up unexpectedly` (branch pushes to the assigned
+   working branch succeed; only non-branch refs fail).
+2. Retry with exponential backoff (5 attempts) → same disconnect every time.
+3. GitHub MCP API → no `create_release` / `create_tag` / generic `create_ref`
+   tool is exposed (only `create_branch`, which makes `refs/heads/*`).
+
+**Root cause:** the sandbox git relay (the `local_proxy` remote on port 41729)
+permits pushes only to this session's designated working branch
+(`claude/engineering-board-productize-fu2vvk`); tag refs are rejected at the
+connection level. This is an environment policy, not a repo problem.
+
+**State:** the annotated tag **`v1.2.0-rc.1` exists locally** at the CI-green
+commit `88d4ee6`, documenting the RC. It is not on the remote.
+
+**Why it is non-blocking for the run:** no remaining phase (brand, README,
+landing page) depends on the remote tag existing. G2's substantive pass
+conditions (CI green, MCP Inspector + scripted-client validation, zero
+blocker/major defects, every value prop works) are all satisfied.
+
+**Recommended human action:** from a clone with push rights, run
+`git tag -a v1.2.0-rc.1 <sha> -m "…" && git push origin v1.2.0-rc.1`, then
+publish a GitHub Release from that tag (the release step needs a human account
+anyway). The tag message and CHANGELOG 1.2.0 section are ready to paste.
