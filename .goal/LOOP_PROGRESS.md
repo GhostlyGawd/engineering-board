@@ -82,13 +82,22 @@ _Last updated: 2026-07-04 (C1 in progress)_
 - **C4 REFLECT:** L003 (newest surface = most risk) → **recurrence 7** (+B038/B039); L004 (a denylist is never done) → **recurrence 3** (+B037). Both moats keep paying rent. The injection class is now hardened at every known site; C5's red-team should confirm it's finally exhausted.
 - **eb-self open blocker/major/P1: NONE.** Open (all P2/P3): B005/B006/B007/B008/B009/B014/B029/B030 (P2); B016/B020/B021/B022 (P3); F002/F003; Q001.
 
-### Next — C5 (must be the first clean cycle)
+### C5 — fifth full DISCOVER sweep (COMPLETE — NOT clean; criterion 5 MET)
 
-Criterion 1 needs **two consecutive clean cycles**; C1–C4 were all unclean. C5
-must surface zero new blocker/major/P1 — the injection class is now closed at
-every known site, so this is the best shot. Remaining owed:
-- **Criterion 5:** the landing page already has a scripted animated board demo and now surfaces `/board-view`; still owed is a **README animated demo** (F001's `board.html` is the asset — an animated SVG of the pipeline, or reference the live demo) + a **Lighthouse re-run** (curl-mirror technique in `.goal/evidence/G4-live-verification.txt`).
-- **Criterion 6** (once criterion 1 is within reach): batch the release — bump `plugin.json`+`marketplace.json` (lockstep), promote the CHANGELOG `[Unreleased]` heading, add the `.goal/FINAL_REPORT.md` closing "improvement loop" section; the git tag itself stays human-gated (BLOCKERS B2).
+- **DISCOVER:** all four tracks. Track A found the reject filter's ASCII-only classes bypassed by Unicode look-alikes (B043 major: `•`/`—`/`##`/U+2028/zero-width) + 2 minors (B044 evidence header injection, F3/B029 session_id). Track B+D: **clean** except one LOW (B045 CHANGELOG count drift). MCP path/traversal hardening all held.
+- **SHIP:** PRs #38–#39 merged. C5a (#38): **criterion 5** — README animated demo `docs/board-demo.svg` + fresh Lighthouse 100×4 (real chromium run). C5b (#39): B043 (NFKC-normalize + Unicode marker class — closes the whole look-alike class), B044 (evidence blockquote), B029/F3 (session_id whitespace reject), B045 (CHANGELOG bounds).
+- **C5 REFLECT:** L004 (a denylist is never done) → **recurrence 4** (+B043); its takeaway strengthened — C5 normalizes inputs to their ASCII intent BEFORE the denylist runs (folds a class, not a glyph), with the untrusted-data framing as the primary defense.
+- **Criterion 5 MET** this cycle. Also resolved the known-open B029.
+- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3): B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022 (P3); F002/F003; Q001.
+
+### Next — C6 (must be the first clean cycle)
+
+Criterion 1 needs **two consecutive clean cycles**; C1–C5 were all unclean (the
+reject filter yielded a bypass every cycle, but the class is now folded at the
+normalization layer — the best structural shot yet). C6 runs all four DISCOVER
+tracks; if clean, C6 is clean cycle #1 and C7 must confirm.
+- **Criterion 6** (batch once criterion 1 is within reach): bump `plugin.json` + `marketplace.json` (lockstep) to 1.3.0, promote the CHANGELOG `[Unreleased]` heading to `[1.3.0]`, add the `.goal/FINAL_REPORT.md` closing "improvement loop" section; the git tag stays human-gated (BLOCKERS B2).
+- Only criteria 1 and 6 remain (2/3/4/5 met).
 
 ### Track status (C1)
 
