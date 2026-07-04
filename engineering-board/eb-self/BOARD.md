@@ -24,6 +24,10 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 ### Questions
 - Q001 | [Q001-does-driving-one-board-from-claude-code--claude-](questions/Q001-does-driving-one-board-from-claude-code--claude-.md)
 
+### Learnings
+- L001 | [Ship every deterministic guard with a test that drives its real fixtures and call-sites](learnings/L001-guards-need-tests-that-drive-real-callsites.md)
+- L002 | [Board health invariants must respect the open-vs-resolved entry lifecycle](learnings/L002-invariants-must-respect-the-entry-lifecycle.md)
+
 ## Conventions
 
 - Bug/Feature lines: `- B### P# | [title](bugs/filename.md)` (append `⊘ Q###` when blocked)
