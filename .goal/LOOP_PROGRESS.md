@@ -47,9 +47,11 @@ _Last updated: 2026-07-04 (C1 in progress)_
 **SHIP progress (C1):**
 - **PR C1a → [#21](https://github.com/GhostlyGawd/engineering-board/pull/21)** — MERGED (`e2f8a6f`). B002 injection filter + B003 fixture-corpus CI wiring + board init/intake. B002/B003 resolved.
 - **PR C1b → #22** — MERGED (`657c072`). B004 permission allowlist + coverage test (T26–T28) + B015 jargon + partial B016. B004/B015 resolved.
-- **PR C1c** (in flight) — B001 SessionStart perf (15s→0.1s, new session-start suite) + B010 count fix. B001/B010 resolved on board.
-- Next: C1d (docs sweep: B011/B012/B013/B017/B018/B019 + finish B016). Reset branch after merge.
-- **eb-self open blocker/major/P1: NONE remaining.** All open entries now P2/P3 (B005/B006/B007/B008/B009/B014 P2; B011–B022 minus resolved P3; features F001–F003; Q001).
+- **PR C1c → #23** — MERGED (`6322dc2`). B001 SessionStart perf (15s→0.1s) + B010 count fix + new session-start suite. B001/B010 resolved.
+- **PR C1d** (in flight) — docs coherence: B011 (ARCHITECTURE→v1.2.0), B012 (CHANGELOG link), B013 (README emoji→text), B017/B018/B019 (skill fixes). Resolved on board. B016 kept open P3 (why-deferred noted).
+- **New finding (dogfooding):** B023 (P2) — `board-index-check` invariant defeated by resolve-in-place; intaked, fix planned for C1e.
+- Next: C1e (fix B023) → REFLECT + convergence assessment → begin C2 (need 2 consecutive clean full cycles).
+- **eb-self open blocker/major/P1: NONE.** Open: B005/B006/B007/B008/B009/B014/B023 (P2); B016/B020/B021/B022 (P3); F001–F003; Q001.
 
 ### Track status (current cycle)
 

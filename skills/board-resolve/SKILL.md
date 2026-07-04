@@ -6,7 +6,7 @@ version: 0.1.0
 
 # Board Resolve
 
-The resolution protocol for all entry types. The question-closing sequence (Steps 6–9) is mandatory and order-sensitive — do not skip or reorder.
+The resolution protocol for all entry types. The question-closing sequence below is a 9-step, order-sensitive protocol — do not skip or reorder; its mandatory steps (1, 6, 7, and 8) are specified precisely in that section.
 
 **Identify the entry's board first:** the board directory is derived from the entry file's path — `engineering-board/<project>/` (or `docs/boards/<project>/` on the compat path). All BOARD.md index updates and ARCHIVE.md appends go to that project's board, not a different one.
 

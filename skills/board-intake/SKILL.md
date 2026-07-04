@@ -145,7 +145,7 @@ grep "pattern:" <board-dir>/ARCHIVE.md 2>/dev/null \
   | grep -oE '[a-z][a-z-]+' | grep -v '^pattern$' | sort | uniq -c | sort -rn
 ```
 
-If a tag appears 2+ times (open) or 2+ times (archived): add a `## Pattern recurrence` section to the new entry noting the cluster and flagging it as a systemic investigation candidate.
+If a tag appears 2+ times (open) or 2+ times (archived): add a `## Pattern recurrence` section to the new entry noting the cluster and flagging it as a systemic investigation candidate. (This `2+` cluster-surfacing threshold is distinct from the `learnings-curator`'s **recurrence ≥ 3** threshold for promoting a pattern to a durable `L###` Learning — surfacing a cluster is not the same as earning a committed Learning.)
 
 ### Step 4 — Wire blocking relationships (bugs and features only)
 

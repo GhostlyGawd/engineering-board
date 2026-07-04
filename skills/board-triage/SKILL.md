@@ -6,7 +6,7 @@ version: 0.1.0
 
 # Board Triage
 
-Derives the recommended work sequence from open board items and the five triage rules. Also governs Starting Work — setting an item `in_progress`.
+Derives the recommended work sequence from open board items and the six triage rules. Also governs Starting Work — setting an item `in_progress`.
 
 ## Step 0 — Identify the project scope
 
@@ -35,7 +35,7 @@ Before applying the triage rules, run the auto-resolve terminal pass — see `..
 
 ## Step 2 — Apply triage rules in order
 
-Apply all five rules in sequence. Each pass narrows the candidate set.
+Apply all six rules in sequence. Each pass narrows the candidate set.
 
 **Rule 1 — Deliverable failures first**
 Any bug that caused a missing or broken output already delivered ranks above all quality work regardless of complexity. These are P0/P1 bugs without `blocked_by`. Pull them to the top.
@@ -66,6 +66,8 @@ grep "pattern:" engineering-board/<project>/ARCHIVE.md 2>/dev/null \
   | grep -oE '[a-z][a-z-]+' | grep -v '^pattern$' | sort | uniq -c | sort -rn
 ```
 When any pattern appears in **2+ open entries** OR **2+ archived resolutions**: flag it as a systemic investigation candidate. Recommend investigating the shared root cause across all affected entries before fixing them individually — isolated fixes on systemic bugs often recur.
+
+> **Two distinct thresholds — not a contradiction.** `2+` here is the *cluster-surfacing* threshold: it flags a pattern for human investigation during triage. It is separate from the *Learning-promotion* threshold used by the `learnings-curator` PM subagent, which promotes a pattern to a durable `L###` entry only at **recurrence ≥ 3** (across resolved entries). A pattern can be surfaced as a cluster (2+) well before it earns a committed Learning (3+).
 
 ## Step 3 — Output the sequence
 
