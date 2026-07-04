@@ -5,6 +5,7 @@ Resolved entries. Newest at the top.
 - B048 P1 | [reject filter now catches adverb-fronted imperatives](bugs/B048-reject-filter-bypassed-by-adverb-fronted-imp.md) — resolved C6 (PR C6a)
 - B046 P1 | [permission rules emitted+checked in wrapped Tool(...) form; false-green self-check closed](bugs/B046-permission-rules-emitted-without-tool-wrapper.md) — resolved C6 (PR C6b)
 - B047 P3 | [worker->pm refusal hint is restart-only (no dead-end /board-resume)](bugs/B047-worker-to-pm-refusal-hint-points-to-dead-end.md) — resolved C6 (PR C6b)
+- B049 P3 | [CHANGELOG records run-all at 14 suites; stale "13 suites" line softened](bugs/B049-changelog-boardview-entry-omits-14-suite-bump.md) — resolved C6 (PR C6c)
 
 - B045 P3 | [CHANGELOG reject-filter count drift removed (bounds, not brittle numbers)](bugs/B045-changelog-reject-filter-count-drift.md) — resolved C5 (PR C5b)
 
