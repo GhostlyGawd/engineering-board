@@ -5,8 +5,8 @@ subtype: principle
 title: A denylist heuristic is never done — assume every pattern has an adjacent bypass
 discovered: 2026-07-04
 confidence: high
-recurrence: 6
-derived_from: [B002, B025, B037, B043, B048, B051]
+recurrence: 7
+derived_from: [B002, B025, B037, B043, B048, B051, B053]
 applies_to: [hooks/scripts/board_reject_check.py, tests/security/]
 pattern_tag: filter-completeness
 ---
@@ -45,6 +45,17 @@ corpus rather than believing any single patch closes the class.
 - B043 — C5 Unicode-bullet/heading/line-separator bypass of that same filter.
 - B048 — C6 adverb-fronted imperative bypass of that same filter.
 - B051 — C7 incomplete line-break folding (CR/VT/FF/FS-GS-RS) of that same filter.
+- B053 — C8 non-Latin sentence terminators (CJK/danda/Ethiopic/Arabic) missed by
+  the ASCII boundary class of that same filter.
+
+## Boundary surface after C8
+NFKC already folds most punctuation look-alikes to their ASCII boundary form
+(ellipsis→"...", fullwidth→"!"/"?"/".", double-marks→"!!"/"??"), and B053 folds
+the major non-Latin sentence terminators. So the common clause-terminator surface
+is now covered; the remaining tail is exotic marks (pilcrow ¶, section §) that an
+LLM does NOT reliably treat as a fresh clause reset — accepted residuals, not P1s,
+under the same in-scope test the docstring draws ("does an LLM read this as a
+fresh clause"). A new *common*-script terminator would still be an in-scope defect.
 
 ## Boundary drawn (C7)
 After six recurrences, C7 documented the filter's **accepted-residual boundary**

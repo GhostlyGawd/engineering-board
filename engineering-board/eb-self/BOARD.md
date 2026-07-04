@@ -16,7 +16,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 - B020 P3 | [B020-board-migrate-is-two-unrelated-operations-under-](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
 - B021 P3 | [B021-code-reviewer-name-collides-with-code-review-and](bugs/B021-code-reviewer-name-collides-with-code-review-and.md)
 - B022 P3 | [B022-nothingtotest--nothingtoreview-still-advance-the](bugs/B022-nothingtotest--nothingtoreview-still-advance-the.md)
-- B055 P3 | [B055-readme-board-view-link-points-at-raw-html](bugs/B055-readme-board-view-link-points-at-raw-html.md)
 
 ### Features
 - F002 P2 | [F002-onboarding-wizard-board-setup-that-collapses-ins](features/F002-onboarding-wizard-board-setup-that-collapses-ins.md)
@@ -30,6 +29,7 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 - L002 | [Board health invariants must respect the open-vs-resolved entry lifecycle](learnings/L002-invariants-must-respect-the-entry-lifecycle.md)
 - L003 | [The newest surface carries the most risk — red-team it hardest](learnings/L003-newest-surfaces-carry-the-most-risk.md)
 - L004 | [A denylist heuristic is never done — assume every pattern has an adjacent bypass](learnings/L004-a-denylist-is-never-done.md)
+- L005 | [Fix an input-handling class across every site at once, not one site per cycle](learnings/L005-fix-the-class-across-every-site.md)
 
 ## Conventions
 

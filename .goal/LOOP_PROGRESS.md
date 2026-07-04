@@ -5,7 +5,7 @@
 > plus the `engineering-board/eb-self/` board (the living backlog). Update it at
 > the end of every cycle step.
 
-_Last updated: 2026-07-04 (C7 complete — not clean; accepted-residual boundary drawn; C8 next)_
+_Last updated: 2026-07-04 (C8 complete — not clean; whole-class sweep done; C9 next)_
 
 ## How to resume
 
@@ -17,7 +17,7 @@ _Last updated: 2026-07-04 (C7 complete — not clean; accepted-residual boundary
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C1–C7 all unclean (each found ≥1 P1; the reject-filter denylist yielded a bypass every cycle — L004, recurrence 6). C7 drew the filter's accepted-residual boundary (docstring) so future OUT-OF-SCOPE leaks are non-defects. Need first genuinely clean cycle at C8. |
+| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C1–C8 all unclean (L004 recurrence 7). C8 swept the incomplete-line-handling class across ALL writers/readers (L005) — the surface that yielded B051/B052/B053/B054 is now closed codebase-wide, and NFKC+B053 cover the common clause-terminator surface. Need first genuinely clean cycle at C9. |
 | 2 | eb-self board has no open blocker/major/P0/P1 | ✅ MET — all open entries P2/P3 (verified end of C2) |
 | 3 | Time-to-first-value measured, documented, defensible | ✅ MET — `.goal/evidence/loop/C2-time-to-first-value.md` + README "what to expect" (B027) |
 | 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | ✅ MET — `docs/rfcs/0002-surface-product-review.md` |
@@ -145,17 +145,44 @@ _Last updated: 2026-07-04 (C7 complete — not clean; accepted-residual boundary
 - **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
   B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022 (P3); F002/F003; Q001.
 
-### Next — C8 (candidate first clean cycle)
+### C8 — eighth full DISCOVER sweep (COMPLETE — NOT clean; whole-class sweep)
 
-C8 runs all four DISCOVER tracks. With the line-break class folded structurally and
-the accepted-residual boundary now documented, a NEW reject-filter finding is a
-defect only if it defeats an in-scope rule (a genuinely new way to make a `_VERBS`
-verb lead a clause). If C8's red-team finds only out-of-scope residuals (now
-non-defects) and nothing else reaches P1, **C8 is clean cycle #1** and C9 must
-confirm — then criterion 1 is met and the criterion-6 release batch runs (bump
-`plugin.json` + `marketplace.json` to 1.3.0 lockstep, promote CHANGELOG
-`[Unreleased]`→`[1.3.0]`, add `.goal/FINAL_REPORT.md` closing section; git tag stays
-human-gated). Only criteria 1 and 6 remain (2/3/4/5 met).
+- **DISCOVER:** all four tracks. Track A found **B053 P1** (reject filter boundary
+  class ASCII-only → non-Latin sentence terminators CJK/danda/Ethiopic/Arabic
+  bypass; genuinely in-scope, verb stays pristine) + **B054 P2** (MCP capture
+  evidence blockquote `.split("\n")` → CR/FF/NEL forge a scratch header,
+  re-opening B040). Track B: one **B055 P3** (README hero link → raw HTML). Track
+  D: **CLEAN** (all counts verified, versions coherent, no drift).
+- **Key realization:** B051/B052/B053/B054 are the SAME incomplete-line-handling
+  class at four different sites across C7–C8 — each prior fix patched only the one
+  site the red-team hit. → new learning **L005** (fix the class across every site
+  at once). C8a fixed it codebase-wide: reject-filter terminator fold, MCP evidence
+  `splitlines()`, `_oneline` full-separator hardening; verified NFKC already folds
+  the common punctuation look-alikes so the clause-terminator surface is now covered.
+- **SHIP:** PRs #46–#47 merged.
+  - **C8a → #46** — B053 (fold non-Latin terminators) + B054 (evidence splitlines +
+    _oneline hardening). reject-filter 83→86, MCP 82→88.
+  - **C8b (this PR)** — B055 README link + C8 CHANGELOG entries + L005 + C8 REFLECT.
+- **C8 REFLECT:** L004 → **recurrence 7** (+B053); new **L005** (whole-class sweep,
+  from B051/B052/B053/B054). Accepted-residual boundary refined: NFKC + B053 cover
+  the common clause terminators; remaining exotic marks (¶/§) are accepted residuals
+  under the in-scope test. B053 was NOT down-rated — a common-script terminator is a
+  real in-scope P1.
+- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
+  B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022 (P3); F002/F003; Q001.
+
+### Next — C9 (candidate first clean cycle)
+
+C9 runs all four DISCOVER tracks. After C8's codebase-wide class sweep (L005) the
+incomplete-line-handling surface that yielded four straight P1/P2s is closed at
+every writer/reader, and NFKC+B053 cover the common clause-terminator surface. A new
+reject-filter finding is a defect only if it defeats an in-scope rule (a genuinely
+new way to make a `_VERBS` verb lead a clause) or introduces a common-script
+terminator. If C9 finds only out-of-scope residuals and nothing else reaches P1,
+**C9 is clean cycle #1** and C10 must confirm → then criterion 1 is met and the
+criterion-6 release batch runs (bump `plugin.json` + `marketplace.json` to 1.3.0
+lockstep, promote CHANGELOG `[Unreleased]`→`[1.3.0]`, add `.goal/FINAL_REPORT.md`
+closing section; git tag stays human-gated). Only criteria 1 and 6 remain (2/3/4/5 met).
 - **Criterion 6** (batch once criterion 1 is within reach): bump `plugin.json` + `marketplace.json` (lockstep) to 1.3.0, promote the CHANGELOG `[Unreleased]` heading to `[1.3.0]`, add the `.goal/FINAL_REPORT.md` closing "improvement loop" section; the git tag stays human-gated (BLOCKERS B2).
 - Only criteria 1 and 6 remain (2/3/4/5 met).
 
