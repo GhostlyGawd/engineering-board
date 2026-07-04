@@ -6,8 +6,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ### Bugs
 - B001 P1 | [B001-sessionstart-on2-blockedby-loop-exceeds-10s-time](bugs/B001-sessionstart-on2-blockedby-loop-exceeds-10s-time.md)
-- B002 P1 | [B002-injection-reject-blocklist-is-trivially-bypassab](bugs/B002-injection-reject-blocklist-is-trivially-bypassab.md)
-- B003 P1 | [B003-adversarialbenign-fixtures-are-dead-code-archite](bugs/B003-adversarialbenign-fixtures-are-dead-code-archite.md)
 - B004 P1 | [B004-permission-allowlist-does-not-cover-the-scripts-](bugs/B004-permission-allowlist-does-not-cover-the-scripts-.md)
 - B005 P2 | [B005-first-captured-finding-is-invisible--buried-in-s](bugs/B005-first-captured-finding-is-invisible--buried-in-s.md)
 - B006 P2 | [B006-advancing-one-entry-through-tdd-review-validate-](bugs/B006-advancing-one-entry-through-tdd-review-validate-.md)
