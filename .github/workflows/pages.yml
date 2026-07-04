@@ -1,44 +1,51 @@
 name: pages
 
-# Deploys the GitHub Pages landing page (docs/) via GitHub Actions.
-# configure-pages runs with enablement:true, so the first run creates the
-# Pages site itself — no manual Settings → Pages step is needed.
+# Publishes the landing page by syncing docs/{index.html,assets,.nojekyll}
+# to the gh-pages branch, which GitHub Pages serves (branch-deploy mode —
+# the site auto-enabled when gh-pages was first pushed).
+#
+# Why not actions/deploy-pages? The workflow GITHUB_TOKEN on this repo cannot
+# create or manage the Pages site via the API ("Resource not accessible by
+# integration", run 28713202716), but it CAN push branches (contents: write).
+# Branch-deploy needs no special Pages permissions and keeps docs/ on main as
+# the single source of truth.
 
 on:
   push:
     branches: [main]
     paths:
-      - "docs/**"
+      - "docs/index.html"
+      - "docs/assets/**"
+      - "docs/.nojekyll"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# Allow one concurrent deployment; don't cancel an in-progress one.
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+
+      - name: Publish docs/ to gh-pages
+        run: |
+          set -euo pipefail
+          SHA=$(git rev-parse --short HEAD)
+          SITE=$(mktemp -d)
+          cp -r docs/index.html docs/assets docs/.nojekyll "$SITE"/
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan gh-pages
+          git rm -rfq .
+          git clean -fdq
+          cp -r "$SITE"/. .
+          git add -A
+          git commit -m "pages: publish docs/ from main@${SHA}"
+          git push origin +gh-pages

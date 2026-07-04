@@ -61,3 +61,15 @@ blocker/major defects, every value prop works) are all satisfied.
 `git tag -a v1.2.0-rc.1 <sha> -m "…" && git push origin v1.2.0-rc.1`, then
 publish a GitHub Release from that tag (the release step needs a human account
 anyway). The tag message and CHANGELOG 1.2.0 section are ready to paste.
+
+_Post-merge update (2026-07-04):_ retested after PR #18 merged — tag refs are
+still rejected by the relay (branch refs are allowed: the `gh-pages` push
+succeeded). Recommend tagging the merge commit `0060afd` on `main`.
+
+## B3 — Repo metadata (description / topics / social preview) — UI-only
+
+The GitHub MCP toolset exposes no repository-update endpoint (only
+create/fork), and there is no `gh` CLI or direct API access in this
+environment. Setting the repo description, topics, and social-preview image
+(values ready in `.goal/LAUNCH.md` §1) remains a Settings-UI step. Everything
+else in LAUNCH §1–§2 that could be automated has been (Pages is live).
