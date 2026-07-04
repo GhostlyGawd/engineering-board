@@ -3,7 +3,7 @@ id: B023
 type: bug
 title: board-index-check invariant is defeated by the resolve-in-place convention
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P2
 affects: hooks/scripts/board-index-check.sh
 needs: tdd
@@ -35,3 +35,9 @@ Filter `find` in `board-index-check.sh` to entries whose frontmatter lacks
 `status: resolved` (a small python3 pass, crosscompat-safe), matching BOARD.md's
 open-only semantics. The smoke test never caught this because its fixture board
 has zero resolved entries.
+
+## Resolution (C1, PR C1e)
+board-index-check.sh now counts only OPEN entry files (a python3 pass that
+excludes `status: resolved`), matching BOARD.md's open-only rows. eb-self's own
+index-check exits 0 again. Regression pinned by tests/smoke/automated.sh test 22
+(resolve an entry in-place, assert index-check exit 0 — exited 2 before the fix).

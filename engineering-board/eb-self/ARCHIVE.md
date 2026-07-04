@@ -2,6 +2,8 @@
 
 Resolved entries. Newest at the top.
 
+- B023 P2 | [board-index-check counts only open files (invariant no longer defeated by resolve-in-place)](bugs/B023-index-check-invariant-defeated-by-resolve-in-place.md) — resolved C1 (PR C1e)
+
 - B011 P3 | [ARCHITECTURE refreshed for v1.2.0](bugs/) — resolved C1 (PR C1d)
 - B012 P3 | [CHANGELOG 1.2.0 link now resolvable](bugs/) — resolved C1 (PR C1d)
 - B013 P3 | [README emoji -> Yes/No text (BRAND-clean)](bugs/) — resolved C1 (PR C1d)

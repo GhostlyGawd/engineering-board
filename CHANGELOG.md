@@ -63,6 +63,12 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 - Empty boards no longer print a garbled two-line `0` open-count (eb-self B010).
 - New `tests/session-start/automated.sh` suite (correctness + a perf guard that
   fails if a 1200-entry board takes ≥ 10s); `tests/run-all.sh` now **13 suites**.
+- **`board-index-check` no longer false-alarms on resolved entries** (eb-self
+  B023, surfaced by dogfooding). It counted every file in each subdir while
+  BOARD.md lists open entries only, so the invariant broke on any board that had
+  resolved anything (the tidier then rebuilt on every run). It now counts only
+  open (non-`resolved`) files. Pinned by a new resolve-in-place case in the
+  smoke suite.
 
 ## [1.2.0] — 2026-07-04
 
