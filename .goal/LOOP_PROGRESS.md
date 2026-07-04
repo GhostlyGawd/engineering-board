@@ -17,12 +17,12 @@ _Last updated: 2026-07-04 (C1 in progress)_
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C1 done but NOT clean (fixed 4 P1s, surfaced B023 P2) → need clean C2 + C3 |
-| 2 | eb-self board has no open blocker/major/P0/P1 | ✅ MET after C1 — all open entries are P2/P3 |
-| 3 | Time-to-first-value measured, documented, defensible (≤5min first capture, ≤15min first promote) | ⬜ pending (C2 Track B walkthrough) |
-| 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | 🟡 Track B produced the table (in this file's C1 notes); not yet consolidated to docs/rfcs/ |
-| 5 | README+landing+CHANGELOG+positioning coherent, link-checked, Lighthouse ≥95, real animated demo | 🟡 coherence fixed (C1d); animated demo + Lighthouse re-run pending |
-| 6 | Release batched+CHANGELOG'd+manifests bumped; BLOCKERS only human-gated; FINAL_REPORT closing section | ⬜ pending (batch at convergence) |
+| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C1 not clean (4 P1s); C2 not clean (1 P0 + 3 P1s) → need clean C3 + C4 |
+| 2 | eb-self board has no open blocker/major/P0/P1 | ✅ MET — all open entries P2/P3 (verified end of C2) |
+| 3 | Time-to-first-value measured, documented, defensible | ✅ MET — `.goal/evidence/loop/C2-time-to-first-value.md` + README "what to expect" (B027) |
+| 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | ✅ MET — `docs/rfcs/0002-surface-product-review.md` |
+| 5 | README+landing+CHANGELOG+positioning coherent, link-checked, Lighthouse ≥95, real animated demo | 🟡 coherence current (C1d+C2d); animated demo (F001-fed) + Lighthouse re-run pending |
+| 6 | Release batched+CHANGELOG'd+manifests bumped; BLOCKERS only human-gated; FINAL_REPORT closing section | ⬜ pending (batch when criterion 1 nears) |
 
 ## Cycle log
 
@@ -51,8 +51,30 @@ _Last updated: 2026-07-04 (C1 in progress)_
 - **PR C1d** (in flight) — docs coherence: B011 (ARCHITECTURE→v1.2.0), B012 (CHANGELOG link), B013 (README emoji→text), B017/B018/B019 (skill fixes). Resolved on board. B016 kept open P3 (why-deferred noted).
 - **PR C1d → #24** — MERGED (`9f30d20`). B011/B012/B013/B017/B018/B019 resolved; B023 intaked; B016 kept open P3.
 - **PR C1e** (in flight) — fix B023 (`board-index-check` counts open files only) + smoke resolve-in-place regression test. B023 resolved; eb-self index-check exits 0 again.
-- Next: REFLECT (C1 retro + Learnings) → convergence assessment → begin C2 (need 2 consecutive clean full cycles per criterion 1).
-- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3): B005/B006/B007/B008/B009/B014 (P2); B016/B020/B021/B022 (P3); F001–F003; Q001.
+- **C1 REFLECT → #26** — MERGED. L001/L002 self-Learnings + retro.
+
+### C2 — second full DISCOVER sweep (COMPLETE)
+
+- **DISCOVER:** all four tracks re-run (parallel agents). Verified all C1 fixes hold except one new bypass class. Intaked 10 findings (B024–B033): **1 P0 blocker + 3 P1s** (mostly the newer MCP server) + P2/P3s.
+- **SHIP:** PRs #27–#30 merged.
+  - **C2a → #27** — B024 (P0 MCP path traversal) + B028 (MCP frontmatter injection) + intake.
+  - **C2b → #28** — B025 (reject polite/modal-prefix bypass) + 4 fixtures.
+  - **C2c → #29** — B026 (MCP findings silently destroyed on consolidate — data loss).
+  - **C2d → #30** — B027 (README Quickstart first-value path = criterion 3) + B031/B032/B033 docs coherence.
+  - **C2e (this PR)** — criterion-4 product-review doc (`docs/rfcs/0002-surface-product-review.md`) + C2 REFLECT (L003/L004 self-Learnings).
+- **C2 REFLECT:** proved the C1-hardened plugin substrate holds under a second red-team; disproved that the newer MCP surface was as battle-tested (it carried the blocker + 2 more). Learnings: **L003** (newest surface = most risk, red-team it hardest — B024/B026/B028) and **L004** (a denylist is never done — grow the corpus — B002/B025).
+- **Deliverables met this cycle:** criterion 3 (time-to-first-value) ✅ and criterion 4 (surface product-review) ✅.
+- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3): B005/B006/B007/B008/B009/B014/B029/B030 (P2); B016/B020/B021/B022 (P3); F001–F003; Q001.
+
+### Next — C3
+
+Convergence criterion 1 needs **two consecutive clean cycles**; neither C1 nor C2
+was clean. C3 must run all four DISCOVER tracks again and, ideally, surface zero
+new blocker/major/P1. Also owed: criterion 5 (animated demo — build **F001**
+board viewer to feed it, then re-run Lighthouse) and, once criterion 1 nears,
+criterion 6 (batch a release: bump manifests + CHANGELOG heading + FINAL_REPORT
+closing section). Consider building F001/F002 in C3 (≤1 feature/cycle) since the
+P0/P1 backlog is now clear.
 
 ### Track status (C1)
 
