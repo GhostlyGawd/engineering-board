@@ -2,6 +2,8 @@
 
 Resolved entries. Newest at the top.
 
+- F001 P2 | [zero-dep HTML board viewer (/board-view) shipped](features/) — resolved C3 (PR C3a)
+
 - B027 P1 | [README Quickstart now covers capture->promote->fix + time-to-first-value](bugs/) — resolved C2 (PR C2d)
 - B031 P3 | [stale suite/file counts fixed across README + ARCHITECTURE](bugs/) — resolved C2 (PR C2d)
 - B032 P3 | [CHANGELOG fixture-count wording](bugs/) — resolved C2 (PR C2d)

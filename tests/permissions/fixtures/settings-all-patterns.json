@@ -13,6 +13,7 @@
       "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-migrate.sh:*",
       "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-relocate.sh:*",
       "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-permission-self-check.sh",
+      "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-view.sh:*",
       "/pm-start",
       "/worker-start --discipline tdd",
       "/worker-start --discipline review",

@@ -3,7 +3,7 @@ id: F001
 type: feature
 title: Zero-dep HTML board viewer (/board-view -> committed board.html)
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P2
 affects: commands/board-view.md
 needs: tdd
@@ -20,3 +20,14 @@ Rank-1 opportunity (Track C). The #1 conceded competitive gap: Backlog.md (Kanba
 
 ## Kill criteria
 Kill the committed-file framing if it produces noisy diffs on every board change (fall back to on-demand). Kill the MCP variant if it duplicates rather than shares the command's generator.
+
+## Resolution (C3, PR C3a)
+Shipped `hooks/scripts/board-view.sh` + `/board-view` command: a zero-dep,
+offline, byte-deterministic HTML Kanban view written to
+`engineering-board/<project>/board.html`, reusing the landing-page brand tokens.
+Four pipeline columns (To do/Review/Validate/Done) + a Questions/Observations/
+Learnings lane; light/dark theme; all entry text HTML-escaped (no markup
+injection). New `tests/view/automated.sh` (10 checks incl. XSS-escaping +
+determinism); committed eb-self/board.html as the real-data demo artifact
+(also the asset criterion 5's animated demo can build on). F003 (learnings
+panel) can extend it next.
