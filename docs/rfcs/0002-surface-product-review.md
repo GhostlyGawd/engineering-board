@@ -1,8 +1,8 @@
 # RFC 0002 — Surface product review: keep / simplify / merge / deprecate
 
-_Status: Living. Written during the product-improvement loop (cycles C1–C2), 2026-07-04._
+_Status: Living. Written during the product-improvement loop (cycles C1–C4), 2026-07-04._
 
-Every shipped surface — 10 commands, 8 agents, 4 skills, 11 MCP tools, 4 hook
+Every shipped surface — 11 commands, 8 agents, 4 skills, 11 MCP tools, 4 hook
 events — is challengeable, including existing ones (goal rule 3). This RFC records
 a first-principles **"would we build this today, this way?"** decision for each,
 so the product's surface area is deliberate rather than accumulated. Each
@@ -13,13 +13,14 @@ The evidence base is the C1/C2 dogfooding: red-team (Track A), persona walkthrou
 and the time-to-first-value measurement (Track B, `.goal/evidence/loop/C2-time-to-first-value.md`),
 and the surface-coherence audits (Track D).
 
-## Commands (10)
+## Commands (11)
 
 | Command | Verdict | Rationale |
 |---|---|---|
 | `/board-init` | **keep** | Core scaffold; idempotent; print-only `.gitignore` (respects the user's files). C2 extended the Quickstart so its value is discoverable (B027). |
 | `/board-rebuild` | **keep** | Deterministic, byte-stable cache refresh; safe to run anytime. The trust anchor of the board model. |
 | `/board-graph` | **simplify** | `GRAPH.yml` is machine-only and `/board-rebuild` already regenerates it; rarely a standalone user need. Candidate to fold into a `--graph` flag on rebuild. No board entry yet — low priority; tracked here. |
+| `/board-view` | **keep** | Zero-dep, offline, byte-deterministic HTML Kanban projection (F001); closes the visualization gap without a daemon. HTML-escapes untrusted entry text. |
 | `/board-pause` / `/board-resume` | **keep** | Clear escape hatch with good NOOP messaging; paired symmetry; guarded by the single-source refusal matrix. |
 | `/pm-start` | **keep** | Needed to enter the promotion pipeline. Jargon removed (B015). |
 | `/worker-start` | **simplify** | The per-discipline session lock forces two restarts to advance one entry (B006). Either allow discipline rotation / `--discipline auto`, or frame worker mode explicitly as a primitive the Conductor (RFC 0001) drives. Tracked: **B006**. |
@@ -58,9 +59,10 @@ and the surface-coherence audits (Track D).
 The best-designed surface in the product: enum-constrained schemas, `ToolError`
 messages that name allowed values, exit-code legends inline in descriptions.
 `board_capture_finding` (scratch) vs `board_create_entry` (live) is a sensible
-split, not redundancy. C2 hardening added path-traversal (B024) and
-frontmatter-injection (B028) guards, and fixed the capture→consolidate data-loss
-gap (B026). No tool is a candidate for removal.
+split, not redundancy. C2–C4 hardening added path-traversal (project, entry_id, router-row,
+affects_prefix, symlink), frontmatter/header-injection, and consolidate
+data-loss guards across the tools (B024/B026/B028/B034/B035/B038/B039/B040). No
+tool is a candidate for removal.
 
 ## Hook events (4) — **keep all**
 
