@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en" data-theme="">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>engineering-board — the board is the database</title>
+  <meta name="description" content="A git-committed kanban board your AI agents run and remember. A Claude Code plugin and MCP server: multi-agent coordination, atomic claim-locking, and durable cross-session memory — all as committed markdown in your repo.">
+  <link rel="canonical" href="https://ghostlygawd.github.io/engineering-board/">
+  <meta name="keywords" content="claude code plugin, mcp server, task board, git-committed kanban, multi-agent coordination, ai agent memory, autonomous software engineering, agent claim locking, cross-session agent memory, markdown kanban, claude code orchestration, tdd agent pipeline">
+  <meta name="theme-color" content="#17191E">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="engineering-board — the board is the database">
+  <meta property="og:description" content="A git-committed kanban board your AI agents run and remember. Claude Code plugin + MCP server.">
+  <meta property="og:url" content="https://ghostlygawd.github.io/engineering-board/">
+  <meta property="og:image" content="https://ghostlygawd.github.io/engineering-board/assets/social-preview.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="engineering-board — the board is the database">
+  <meta name="twitter:description" content="A git-committed kanban board your AI agents run and remember. Claude Code plugin + MCP server.">
+  <meta name="twitter:image" content="https://ghostlygawd.github.io/engineering-board/assets/social-preview.png">
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="assets/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/favicon-180.png">
+
+  <style>
+    /* ===== Design tokens — mirror of brand/tokens.css (single source) ===== */
+    :root{
+      --eb-ink:#17191E;--eb-paper:#FAF9F5;--eb-ink-2:#1E2127;--eb-paper-2:#F1F0EA;
+      --eb-line:#E3E1D9;--eb-line-dark:#2A2D34;
+      --eb-accent:#9A5B00;--eb-accent-strong:#7E4A00;--eb-accent-dark:#E6A94E;
+      --eb-text:#17191E;--eb-text-muted:#5B6068;--eb-text-faint:#6C717A;
+      --eb-bg:var(--eb-paper);--eb-surface:var(--eb-paper-2);--eb-border:var(--eb-line);
+      --eb-link:var(--eb-accent);--eb-on-accent:var(--eb-paper);
+      --eb-font-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      --eb-font-mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
+      --eb-fs-sm:.875rem;--eb-fs-base:1rem;--eb-fs-md:1.125rem;--eb-fs-lg:1.375rem;
+      --eb-fs-xl:1.75rem;--eb-fs-2xl:2.25rem;--eb-fs-3xl:3rem;--eb-fs-4xl:3.75rem;
+      --eb-maxw:72rem;
+      --eb-radius-sm:6px;--eb-radius-card:10px;--eb-radius-lg:16px;--eb-radius-pill:999px;
+      --eb-shadow-card:0 1px 2px rgba(23,25,30,.06),0 4px 16px rgba(23,25,30,.06);
+      --eb-dur-fast:150ms;--eb-dur-base:240ms;--eb-dur-slow:360ms;
+      --eb-ease-out:cubic-bezier(.16,1,.30,1);--eb-ease-spring:cubic-bezier(.34,1.4,.64,1);
+    }
+    @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+      --eb-text:#ECEBE6;--eb-text-muted:#9EA3AB;--eb-text-faint:#83888F;
+      --eb-bg:var(--eb-ink);--eb-surface:var(--eb-ink-2);--eb-border:var(--eb-line-dark);
+      --eb-link:var(--eb-accent-dark);--eb-on-accent:var(--eb-ink);
+    }}
+    :root[data-theme="dark"]{
+      --eb-text:#ECEBE6;--eb-text-muted:#9EA3AB;--eb-text-faint:#83888F;
+      --eb-bg:var(--eb-ink);--eb-surface:var(--eb-ink-2);--eb-border:var(--eb-line-dark);
+      --eb-link:var(--eb-accent-dark);--eb-on-accent:var(--eb-ink);
+    }
+
+    /* ===== Base ===== */
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    body{margin:0;background:var(--eb-bg);color:var(--eb-text);
+      font-family:var(--eb-font-sans);font-size:var(--eb-fs-base);line-height:1.6;
+      -webkit-font-smoothing:antialiased;transition:background var(--eb-dur-base) var(--eb-ease-out),color var(--eb-dur-base) var(--eb-ease-out)}
+    a{color:var(--eb-link);text-decoration:none}
+    a:hover{text-decoration:underline}
+    h1,h2,h3{line-height:1.15;letter-spacing:-.02em;font-weight:600;margin:0 0 .5em}
+    code,pre{font-family:var(--eb-font-mono)}
+    .wrap{max-width:var(--eb-maxw);margin:0 auto;padding:0 1.5rem}
+    .eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:.8rem;font-weight:600;color:var(--eb-accent)}
+    :root[data-theme="dark"] .eyebrow,@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .eyebrow{color:var(--eb-accent-dark)}}
+    .muted{color:var(--eb-text-muted)}
+    :focus-visible{outline:2px solid var(--eb-accent);outline-offset:2px;border-radius:3px}
+
+    /* ===== Header ===== */
+    header.nav{position:sticky;top:0;z-index:20;backdrop-filter:saturate(1.1) blur(8px);
+      background:color-mix(in srgb,var(--eb-bg) 82%,transparent);border-bottom:1px solid var(--eb-border)}
+    .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+    .brand{display:flex;align-items:center;gap:.6rem;font-weight:600;letter-spacing:-.01em}
+    .brand img{width:26px;height:26px}
+    .nav-links{display:flex;align-items:center;gap:1.25rem;font-size:var(--eb-fs-sm)}
+    .nav-links a{color:var(--eb-text-muted)}
+    .nav-links a:hover{color:var(--eb-text);text-decoration:none}
+    .theme-btn{background:none;border:1px solid var(--eb-border);color:var(--eb-text-muted);
+      border-radius:var(--eb-radius-pill);padding:.3rem .7rem;font:inherit;font-size:.8rem;cursor:pointer}
+    @media(max-width:640px){.nav-links a:not(.ghlink){display:none}}
+
+    /* ===== Hero ===== */
+    .hero{padding:5rem 0 3rem;text-align:center}
+    .hero h1{font-size:clamp(2rem,6vw,var(--eb-fs-4xl));max-width:16ch;margin:1rem auto .6rem}
+    .hero .tagline{font-size:var(--eb-fs-lg);color:var(--eb-text-muted);max-width:34ch;margin:0 auto 2rem}
+    .cta-row{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.2rem;border-radius:var(--eb-radius-pill);
+      font-weight:600;font-size:var(--eb-fs-sm);border:1px solid transparent;cursor:pointer;transition:transform var(--eb-dur-fast) var(--eb-ease-out),background var(--eb-dur-fast)}
+    .btn-primary{background:var(--eb-accent);color:var(--eb-on-accent)}
+    :root[data-theme="dark"] .btn-primary,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn-primary{background:var(--eb-accent-dark);color:var(--eb-ink)}}
+    .btn-ghost{background:transparent;color:var(--eb-text);border-color:var(--eb-border)}
+    .btn:hover{transform:translateY(-1px)}
+    @media(prefers-reduced-motion:reduce){.btn:hover{transform:none}}
+
+    /* ===== Board demo ===== */
+    .demo{margin:3rem auto 0;max-width:60rem;background:var(--eb-surface);border:1px solid var(--eb-border);
+      border-radius:var(--eb-radius-lg);padding:1.25rem;box-shadow:var(--eb-shadow-card)}
+    .demo-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+    .demo-head .label{font-size:.8rem;color:var(--eb-text-faint);font-family:var(--eb-font-mono)}
+    .cols{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}
+    .col{background:var(--eb-bg);border:1px solid var(--eb-border);border-radius:var(--eb-radius-card);
+      min-height:150px;padding:.55rem}
+    .col h4{margin:0 0 .5rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--eb-text-faint);font-weight:600;text-align:center}
+    .card{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:var(--eb-radius-sm);
+      padding:.5rem .55rem;font-size:.78rem;box-shadow:var(--eb-shadow-card);margin-bottom:.4rem}
+    .card .cid{font-family:var(--eb-font-mono);font-size:.68rem;color:var(--eb-text-faint)}
+    .card.live{border-color:var(--eb-accent);box-shadow:0 4px 14px rgba(154,91,0,.22)}
+    :root[data-theme="dark"] .card.live,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.live{border-color:var(--eb-accent-dark);box-shadow:0 4px 14px rgba(230,169,78,.22)}}
+    .card.live .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--eb-accent);margin-right:.35rem;vertical-align:middle}
+    :root[data-theme="dark"] .card.live .dot,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.live .dot{background:var(--eb-accent-dark)}}
+    .card.moving{animation:settle var(--eb-dur-slow) var(--eb-ease-spring)}
+    @keyframes settle{0%{transform:translateY(-10px) scale(.98);opacity:.4}100%{transform:none;opacity:1}}
+    @media(prefers-reduced-motion:reduce){.card.moving{animation:none}}
+
+    /* ===== Sections ===== */
+    section{padding:4rem 0}
+    section h2{font-size:clamp(1.6rem,4vw,var(--eb-fs-2xl));text-align:center;margin-bottom:.4rem}
+    section .sub{text-align:center;color:var(--eb-text-muted);max-width:46ch;margin:0 auto 2.5rem}
+    .grid{display:grid;gap:1rem}
+    .vp{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+    .vp .card2{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:var(--eb-radius-lg);padding:1.5rem}
+    .vp h3{font-size:var(--eb-fs-md);margin-bottom:.4rem}
+    .vp p{margin:0;color:var(--eb-text-muted);font-size:var(--eb-fs-sm)}
+    .vp .proof{margin-top:.75rem;font-family:var(--eb-font-mono);font-size:.72rem;color:var(--eb-text-faint)}
+
+    table.cmp{width:100%;border-collapse:collapse;font-size:var(--eb-fs-sm)}
+    table.cmp th,table.cmp td{padding:.6rem .5rem;border-bottom:1px solid var(--eb-border);text-align:center}
+    table.cmp th:first-child,table.cmp td:first-child{text-align:left}
+    table.cmp thead th{color:var(--eb-text-faint);font-weight:600;font-size:.78rem}
+    table.cmp tr.us td{background:color-mix(in srgb,var(--eb-accent) 8%,transparent);font-weight:600}
+    .yes{color:var(--eb-accent);font-weight:700}
+    :root[data-theme="dark"] .yes,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .yes{color:var(--eb-accent-dark)}}
+    .no{color:var(--eb-text-faint)}
+    .cmp-scroll{overflow-x:auto}
+
+    .install{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+    @media(max-width:720px){.install{grid-template-columns:1fr}.cols{grid-template-columns:repeat(2,1fr)}}
+    .install .card2{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:var(--eb-radius-lg);padding:1.5rem}
+    pre{background:var(--eb-ink);color:#ECEBE6;padding:.9rem 1rem;border-radius:var(--eb-radius-card);overflow-x:auto;font-size:.8rem;line-height:1.5;border:1px solid var(--eb-line-dark)}
+    :root[data-theme="dark"] pre{background:#0F1114}
+
+    footer{border-top:1px solid var(--eb-border);padding:2.5rem 0;color:var(--eb-text-muted);font-size:var(--eb-fs-sm)}
+    footer .wrap{display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center}
+    footer a{color:var(--eb-text-muted)}
+
+    /* staged reveal on scroll */
+    .reveal{opacity:0;transform:translateY(12px);transition:opacity var(--eb-dur-slow) var(--eb-ease-out),transform var(--eb-dur-slow) var(--eb-ease-out)}
+    .reveal.in{opacity:1;transform:none}
+    @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap">
+      <span class="brand">
+        <img src="assets/favicon.svg" alt="" width="26" height="26" aria-hidden="true">
+        engineering<span style="color:var(--eb-accent)">·</span>board
+      </span>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#why">Why</a>
+        <a href="#compare">Compare</a>
+        <a href="#install">Install</a>
+        <a class="ghlink" href="https://github.com/GhostlyGawd/engineering-board">GitHub</a>
+        <button class="theme-btn" id="theme" type="button" aria-label="Toggle color theme">Theme</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero wrap" aria-labelledby="h1">
+      <p class="eyebrow">Claude Code plugin · MCP server</p>
+      <h1 id="h1">A git-committed kanban board your AI agents run and remember.</h1>
+      <p class="tagline"><strong>The board is the database.</strong> Coordination, work-in-progress locks, and durable learnings — all committed markdown in your repo.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#install">Install</a>
+        <a class="btn btn-ghost" href="https://github.com/GhostlyGawd/engineering-board">View on GitHub</a>
+      </div>
+
+      <div class="demo" aria-label="Interactive board demo">
+        <div class="demo-head">
+          <span class="label" id="demo-status">a finding, promoted through the state machine</span>
+          <button class="btn btn-ghost" id="play" type="button" style="padding:.4rem .9rem">▸ Play</button>
+        </div>
+        <div class="cols">
+          <div class="col" data-state="tdd"><h4>needs: tdd</h4></div>
+          <div class="col" data-state="review"><h4>needs: review</h4></div>
+          <div class="col" data-state="validate"><h4>needs: validate</h4></div>
+          <div class="col" data-state="resolved"><h4>resolved</h4></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="why" aria-labelledby="why-h">
+      <div class="wrap">
+        <h2 id="why-h" class="reveal">Why it's different</h2>
+        <p class="sub reveal">Competitors force a choice: a board that's <em>visible but dumb</em>, or coordination that's <em>smart but hidden in a database</em>. engineering-board refuses the trade-off.</p>
+        <div class="vp">
+          <div class="card2 reveal"><h3>Visible, diffable state</h3><p>Your agents' board is committed markdown — cards, an index, a graph — reviewed in the same PRs as code.</p><p class="proof">engineering-board/ · BOARD.md · GRAPH.yml</p></div>
+          <div class="card2 reveal"><h3>Durable memory</h3><p>Recurring lessons promote into committed Learning entries (L###) that survive session boundaries.</p><p class="proof">learnings-curator → learnings/L###</p></div>
+          <div class="card2 reveal"><h3>Collision-free agents</h3><p>Atomic claim-locking lets multiple worker agents run in parallel without stepping on each other.</p><p class="proof">board-claim-acquire.sh · tested</p></div>
+          <div class="card2 reveal"><h3>Autonomous pipeline</h3><p>Findings flow through a tdd → review → validate state machine, driven by the Stop hook.</p><p class="proof">tdd-builder · code-reviewer · validator</p></div>
+          <div class="card2 reveal"><h3>Runs where you are — and everywhere else</h3><p>A native Claude Code plugin and an MCP server (11 tools) over the same board format.</p><p class="proof">.mcp.json · protocol 2025-06-18</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="compare" style="background:var(--eb-surface)" aria-labelledby="cmp-h">
+      <div class="wrap">
+        <h2 id="cmp-h" class="reveal">Nobody else occupies the intersection</h2>
+        <p class="sub reveal">Honest comparison. Every competitor is linked; traction figures are snapshots.</p>
+        <div class="cmp-scroll reveal">
+          <table class="cmp">
+            <thead><tr>
+              <th>Tool</th><th>Git-committed board</th><th>Durable memory</th><th>Atomic multi-agent locking</th><th>Claude-native</th><th>MCP</th>
+            </tr></thead>
+            <tbody>
+              <tr class="us"><td>engineering-board</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+              <tr><td><a href="https://github.com/MrLesk/Backlog.md">Backlog.md</a></td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">CLI</td><td class="yes">Yes</td></tr>
+              <tr><td><a href="https://github.com/rinadelph/Agent-MCP">Agent-MCP</a></td><td class="no">RAG DB</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td></tr>
+              <tr><td><a href="https://github.com/eyalzh/kanban-mcp">kanban-mcp</a></td><td class="no">SQLite</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td></tr>
+              <tr><td><a href="https://github.com/shinpr/claude-code-workflows">claude-code-workflows</a></td><td class="no">Ephemeral</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td><td class="no">No</td></tr>
+              <tr><td><a href="https://paddo.dev/blog/flux-kanban-for-ai-agents/">Flux</a></td><td class="no">Side branch</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Where they're better: Backlog.md is the category leader (~5.9k★) with a polished standalone CLI and TUI; Agent-MCP ships a live dashboard. engineering-board's bet is the four-way intersection, not any single feature.</p>
+      </div>
+    </section>
+
+    <section id="install" aria-labelledby="install-h">
+      <div class="wrap">
+        <h2 id="install-h" class="reveal">Install both ways</h2>
+        <p class="sub reveal">One shared board format. Two thin adapters.</p>
+        <div class="install">
+          <div class="card2 reveal">
+            <p class="eyebrow">Claude Code plugin</p>
+            <pre><code>/plugin marketplace add GhostlyGawd/engineering-board
+/plugin install engineering-board
+
+# then, in a project:
+/board-init my-project</code></pre>
+            <p class="muted" style="font-size:.8rem">Installing the plugin also registers the MCP server via the bundled <code>.mcp.json</code>.</p>
+          </div>
+          <div class="card2 reveal">
+            <p class="eyebrow">MCP server (any client)</p>
+            <pre><code># Claude Code
+claude mcp add engineering-board -- \
+  python3 /path/to/engineering-board/mcp-server/engineering_board_mcp.py
+
+# Claude Desktop: claude_desktop_config.json
+"mcpServers": {
+  "engineering-board": {
+    "command": "python3",
+    "args": ["/path/to/mcp-server/engineering_board_mcp.py"]
+  }
+}</code></pre>
+            <p class="muted" style="font-size:.8rem">Pure python3, zero dependencies. 11 tools over stdio.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>engineering-board · MIT licensed · <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/LICENSE">LICENSE</a></span>
+      <span>
+        <a href="https://github.com/GhostlyGawd/engineering-board">Repository</a> ·
+        <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/ARCHITECTURE.md">Architecture</a> ·
+        <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELOG.md">Changelog</a>
+      </span>
+    </div>
+  </footer>
+
+  <script>
+    // Theme toggle — persists choice; defaults to OS preference.
+    (function(){
+      var root=document.documentElement, key="eb-theme";
+      var saved=localStorage.getItem(key);
+      if(saved){root.setAttribute("data-theme",saved);}
+      document.getElementById("theme").addEventListener("click",function(){
+        var cur=root.getAttribute("data-theme");
+        var next = cur==="dark" ? "light" : cur==="light" ? "dark"
+          : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "light":"dark");
+        root.setAttribute("data-theme",next);localStorage.setItem(key,next);
+      });
+    })();
+
+    // Reveal on scroll (respects reduced motion).
+    (function(){
+      var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var els=document.querySelectorAll(".reveal");
+      if(reduce||!("IntersectionObserver" in window)){els.forEach(function(e){e.classList.add("in")});return;}
+      var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);}})},{threshold:.15});
+      els.forEach(function(e){io.observe(e)});
+    })();
+
+    // Interactive board demo — a card promoted through the state machine.
+    (function(){
+      var states=["tdd","review","validate","resolved"];
+      var cols={};states.forEach(function(s){cols[s]=document.querySelector('.col[data-state="'+s+'"]')});
+      var status=document.getElementById("demo-status");
+      var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var msgs={tdd:"tdd-builder writes a failing test, then the minimal fix",
+                review:"code-reviewer inspects the test and implementation",
+                validate:"validator re-runs the suite and checks Done-when",
+                resolved:"claim released · card resolved · learning captured"};
+      function makeCard(){
+        var c=document.createElement("div");c.className="card live";
+        c.innerHTML='<span class="dot"></span><span class="cid">B001</span><br>Login retries exhaust silently';
+        return c;
+      }
+      function place(card,state,animate){
+        cols[state].appendChild(card);
+        if(animate&&!reduce){card.classList.remove("moving");void card.offsetWidth;card.classList.add("moving");}
+        status.textContent=msgs[state];
+      }
+      var card=makeCard();place(card,"tdd",false);status.textContent="a finding, ready to build — press Play";
+      var btn=document.getElementById("play"),i=0,timer=null;
+      function step(){
+        i++;
+        if(i<states.length){place(card,states[i],true);timer=setTimeout(step,reduce?0:1300);}
+        else{btn.textContent="↻ Replay";btn.disabled=false;}
+      }
+      btn.addEventListener("click",function(){
+        if(timer)clearTimeout(timer);
+        card.remove();card=makeCard();i=0;place(card,"tdd",true);
+        btn.disabled=true;btn.textContent="▸ Playing";
+        timer=setTimeout(step,reduce?0:900);
+        if(reduce){ // reduced motion: jump straight to resolved
+          clearTimeout(timer);place(card,"resolved",false);btn.disabled=false;btn.textContent="↻ Replay";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

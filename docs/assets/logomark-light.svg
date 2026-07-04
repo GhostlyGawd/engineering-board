@@ -1,0 +1,13 @@
+<svg width="64" height="64" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="engineering-board">
+  <!-- Mark: a card promoted across the gutter between two columns.
+       Neutral cards = committed board state; amber card = the one in transition. -->
+  <!-- left column: two settled cards -->
+  <rect x="3.5"  y="7"  width="9" height="5.2" rx="1.6" fill="#17191E"/>
+  <rect x="3.5"  y="14.6" width="9" height="5.2" rx="1.6" fill="#17191E" opacity="0.32"/>
+  <!-- right column: one settled card, lower (awaiting) -->
+  <rect x="19.5" y="19.8" width="9" height="5.2" rx="1.6" fill="#17191E" opacity="0.32"/>
+  <!-- the gutter -->
+  <line x1="16" y1="5" x2="16" y2="27" stroke="#17191E" stroke-width="1" opacity="0.14"/>
+  <!-- the accent card: mid-promotion, straddling the gutter, slightly lifted -->
+  <rect x="11" y="11.4" width="10" height="5.6" rx="1.8" fill="#9A5B00"/>
+</svg>
