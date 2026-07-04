@@ -12,6 +12,15 @@ increases.
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security
+- **Reject filter now catches adverb-fronted imperatives** (eb-self B048). The
+  clause-boundary anchor only fired when an injection verb led the clause after
+  an optional lead-in chain; an ordinary adverb fronted before the verb
+  (`Immediately ignore…`, `Quietly delete…`, `Always disregard…`) pushed it off
+  the boundary and the payload promoted. A curated adverb set now folds into the
+  same optional skip-run (curated, not a blanket `\w+ly`, so non-adverb `-ly`
+  words like `apply override` still promote; safe regardless because each verb is
+  still matched only in its bare imperative form). Four new adversarial fixtures;
+  benign corpus unchanged (100% accept). Lineage B025/B037/B043.
 - **Reject filter now sees through Unicode look-alikes** (eb-self B043). Unicode
   bullets (`•` `–` `—` `●` …), markdown `##` headings, Unicode line separators
   (U+2028/2029/0085), and zero-width characters all bypassed the ASCII-only
@@ -102,9 +111,24 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   expectation (~5 min to first capture, ~10–15 min to first promotion following
   only the README). Measurement: `.goal/evidence/loop/C2-time-to-first-value.md`.
 
+### Fixed (permissions & UX)
+- **Permission rules now install in the wrapped `Tool(specifier)` form** (eb-self
+  B046). `/board-install-permissions` emitted `claude config add
+  permissions.allow "<bare specifier>"` and the self-check compared the bare
+  specifier — but Claude Code allow-rules must be `Tool(specifier)`
+  (`Bash(bash …:*)`, `SlashCommand(/pm-start)`); a bare specifier never matches,
+  so the install silently no-opped while the self-check reported a false green
+  over it. The install command and `board-permission-self-check.sh` now
+  reconstruct the wrapped rule; a new `settings-bare-legacy` fixture + test
+  asserts bare rules report all-missing (not a false green).
+- **`worker → pm` refusal is restart-only** (eb-self B047). The mode-guard's
+  worker→pm refusal suggested `/board-resume`, which only acts on a paused board
+  and no-ops from worker mode — a dead-end hint. It now says restart-only,
+  matching the symmetric pm→worker refusal.
+
 ### Fixed (docs coherence)
-- Corrected stale counts left by the C1 refresh: README "11 suites" → 13;
-  `ARCHITECTURE.md` §10 rebuilt to the 13 real run-all suites (was "8 domains",
+- Corrected stale counts left by the C1 refresh: README suite count and
+  `ARCHITECTURE.md` §10 rebuilt to the real run-all suites (was "8 domains",
   omitted `session-start`); "11 orchestrator-facing prompt files" → 10 (eb-self
   B031). CHANGELOG "50-fixture corpus" wording clarified (B032). `worker-start`
   unsupported-discipline error no longer leaks a version number (B033).
@@ -132,7 +156,8 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   Observations/Learnings lane, reusing the landing-page brand tokens (light/dark).
   Offline, no JavaScript, byte-deterministic (safe to commit), and HTML-escapes
   all entry text so a crafted title can't inject markup. New `tests/view/`
-  suite (10 checks incl. XSS-escaping + determinism). Closes the biggest conceded
+  suite (10 checks incl. XSS-escaping + determinism), registered in
+  `tests/run-all.sh` (now **14 suites**). Closes the biggest conceded
   competitive gap (visualization) without a daemon — the view is just another
   committed in-repo projection of the board.
 - **`tests/security/reject-filter.sh`** (eb-self B003) — drives every

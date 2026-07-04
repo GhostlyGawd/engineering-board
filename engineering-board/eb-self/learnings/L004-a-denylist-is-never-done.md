@@ -4,9 +4,9 @@ type: learning
 subtype: principle
 title: A denylist heuristic is never done — assume every pattern has an adjacent bypass
 discovered: 2026-07-04
-confidence: medium
-recurrence: 4
-derived_from: [B002, B025, B037, B043]
+confidence: high
+recurrence: 5
+derived_from: [B002, B025, B037, B043, B048]
 applies_to: [hooks/scripts/board_reject_check.py, tests/security/]
 pattern_tag: filter-completeness
 ---
@@ -29,9 +29,18 @@ capability limits) where the denylist's leakage would be dangerous. C5's fix
 normalizes inputs (NFKC + zero-width strip + line-sep fold) BEFORE the denylist
 runs — folding a whole look-alike class to its ASCII intent is more durable than
 adding glyphs one at a time; the primary defense remains the untrusted-data framing.
+C6 confirmed the treadmill again (B048: a fronted adverb knocks the verb off the
+clause boundary the anchor relies on) — five straight cycles, every one a bypass
+of the *same* filter. The fix that DID hold across all of them is the one at the
+grammatical layer: the verbs are matched only in their bare imperative form (the
+trailing word-boundary rejects inflected "drops"/"removes"), so descriptive prose
+is preserved no matter what prefix an attacker fronts. Confidence raised to high:
+this filter WILL yield again; budget for it, and keep leaning on the framing +
+corpus rather than believing any single patch closes the class.
 
 ## Sources
 - B002 — C1 injection filter hardening (unanchored, broadened, all-fields).
 - B025 — C2 politeness/modal-prefixed bypass of that same filter.
 - B037 — C4 markdown list/blockquote-marker bypass of that same filter.
 - B043 — C5 Unicode-bullet/heading/line-separator bypass of that same filter.
+- B048 — C6 adverb-fronted imperative bypass of that same filter.

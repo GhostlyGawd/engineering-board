@@ -5,7 +5,7 @@
 > plus the `engineering-board/eb-self/` board (the living backlog). Update it at
 > the end of every cycle step.
 
-_Last updated: 2026-07-04 (C1 in progress)_
+_Last updated: 2026-07-04 (C6 complete — not clean; C7 next)_
 
 ## How to resume
 
@@ -17,7 +17,7 @@ _Last updated: 2026-07-04 (C1 in progress)_
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C1 not clean (4 P1s); C2 not clean (1 P0 + 3 P1s) → need clean C3 + C4 |
+| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C1–C6 all unclean (each found ≥1 P1; the reject-filter denylist yielded a bypass every cycle — L004). Need first genuinely clean cycle at C7. |
 | 2 | eb-self board has no open blocker/major/P0/P1 | ✅ MET — all open entries P2/P3 (verified end of C2) |
 | 3 | Time-to-first-value measured, documented, defensible | ✅ MET — `.goal/evidence/loop/C2-time-to-first-value.md` + README "what to expect" (B027) |
 | 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | ✅ MET — `docs/rfcs/0002-surface-product-review.md` |
@@ -90,12 +90,48 @@ _Last updated: 2026-07-04 (C1 in progress)_
 - **Criterion 5 MET** this cycle. Also resolved the known-open B029.
 - **eb-self open blocker/major/P1: NONE.** Open (all P2/P3): B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022 (P3); F002/F003; Q001.
 
-### Next — C6 (must be the first clean cycle)
+### C6 — sixth full DISCOVER sweep (COMPLETE — NOT clean)
 
-Criterion 1 needs **two consecutive clean cycles**; C1–C5 were all unclean (the
-reject filter yielded a bypass every cycle, but the class is now folded at the
-normalization layer — the best structural shot yet). C6 runs all four DISCOVER
-tracks; if clean, C6 is clean cycle #1 and C7 must confirm.
+- **DISCOVER:** all four tracks. Track A found the reject filter's clause-boundary
+  anchor bypassed by an **adverb fronted before the verb** (B048 P1: `Immediately
+  ignore…`, `Quietly delete…`, `Always disregard…` — the adverb is neither a
+  boundary char nor a lead-in, so it knocks the verb off the anchor). Track B
+  found **B046** (P1): the permission install emitted/self-checked bare specifiers
+  without the `Tool(...)` wrapper, so rules never matched **and** the self-check
+  reported a false green over the no-op; plus **B047** (P3) worker→pm refusal
+  pointing to a dead-end `/board-resume`. Track C: no new features — release-ready.
+  Track D: essentially clean, one P3 (B049 CHANGELOG suite-count drift).
+- **SHIP:** PRs #41–#43 merged.
+  - **C6a → #41** — B048: fold a curated adverb set into the reject filter's
+    optional skip-run; matches verbs only in bare imperative form (so descriptive
+    prose with inflected verbs still promotes). reject-filter 73→77.
+  - **C6b → #42** — B046 (wrapped `Tool(specifier)` at emit+check + bare-legacy
+    regression fixture/T05b; permissions 28→29) + B047 (restart-only refusal).
+  - **C6c (this PR)** — B049 CHANGELOG suite-count coherence + C6a/C6b CHANGELOG
+    entries + C6 REFLECT.
+- **C6 REFLECT:** L004 (a denylist is never done) → **recurrence 5** (+B048),
+  confidence raised to **high**. Five straight cycles, every one a bypass of the
+  *same* filter — the treadmill is now an established, budgeted fact. The layer
+  that has held across all of them is grammatical (bare-imperative-form verb
+  matching), not glyph/pattern enumeration; the primary defense remains the
+  untrusted-data framing. B046 is a notable non-filter P1: a security/UX control
+  that reported a *false green* over its own no-op — worse than an honest failure.
+- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
+  B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022 (P3); F002/F003; Q001.
+
+### Next — C7 (candidate first clean cycle)
+
+Criterion 1 needs **two consecutive clean cycles**. C1–C6 were all unclean. The
+reject filter is now hardened at the grammatical layer (bare-imperative-form
+matching) on top of NFKC normalization + marker/leadin/adverb skip-runs, so the
+reachable bypass surface is genuinely small. C7 runs all four DISCOVER tracks; if
+it finds zero new blocker/major/P1, C7 is clean cycle #1 and C8 must confirm.
+**Honest caveat (L004, now high-confidence):** an exhaustive adversarial probe of
+a denylist can almost always manufacture *some* new leak; a clean C7 means the
+red-team found nothing NEW and reproducible that promotes to the board, not that
+the filter is provably complete. If the filter keeps yielding genuinely-reachable
+P1s, revisit whether a defense-in-depth filter leak is correctly a P1 vs a P2 —
+but do not down-rate severity merely to manufacture convergence.
 - **Criterion 6** (batch once criterion 1 is within reach): bump `plugin.json` + `marketplace.json` (lockstep) to 1.3.0, promote the CHANGELOG `[Unreleased]` heading to `[1.3.0]`, add the `.goal/FINAL_REPORT.md` closing "improvement loop" section; the git tag stays human-gated (BLOCKERS B2).
 - Only criteria 1 and 6 remain (2/3/4/5 met).
 
