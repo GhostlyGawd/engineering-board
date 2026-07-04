@@ -416,13 +416,27 @@ ARCHIVE_SKELETON = (
 def tool_board_init(params):
     project = validate_project(require(params, "project"))
     root = resolve_root(params)
-    affects_prefix = params.get("affects_prefix") or ("%s/" % project)
+    # affects_prefix is written into the BOARD-ROUTER.md table; flatten newlines
+    # and neutralize the `|` column separator so it can't inject a router row
+    # (eb-self B038) — the control file every bulk tool reads.
+    affects_prefix = _oneline(params.get("affects_prefix") or ("%s/" % project)).replace("|", "/")
 
     created = []
     existed = []
 
     eb_dir = os.path.join(root, "engineering-board")
     os.makedirs(eb_dir, exist_ok=True)
+
+    # board_init is the only path-writing tool; apply the same realpath
+    # containment the read/bulk tools use so a symlinked engineering-board/ or
+    # engineering-board/<project> can't relocate the scaffold outside root
+    # (eb-self B039).
+    bd = os.path.join(eb_dir, project)
+    root_real = os.path.realpath(root)
+    for target in (eb_dir, bd):
+        tgt_real = os.path.realpath(target)
+        if tgt_real != root_real and not tgt_real.startswith(root_real + os.sep):
+            raise ToolError("board path escapes root (symlink?): %r" % target)
 
     # Router
     rp = os.path.join(eb_dir, "BOARD-ROUTER.md")
@@ -440,7 +454,6 @@ def tool_board_init(params):
                 f.write("| %s | engineering-board/%s | %s |\n" % (project, project, affects_prefix))
             created.append("engineering-board/BOARD-ROUTER.md (added row)")
 
-    bd = os.path.join(eb_dir, project)
     os.makedirs(bd, exist_ok=True)
 
     # Subdirs + .gitkeep
@@ -927,13 +940,16 @@ def scratch_file_path(board_dir):
 
 def tool_board_capture_finding(params):
     project = require(params, "project")
-    kind = require(params, "kind")
-    title = require(params, "title")
+    # Flatten newlines so a crafted title/kind can't inject a second `## ` header
+    # into the scratch inbox (which would forge findings + spoof the unpromoted
+    # count that board_status reports) — eb-self B040.
+    kind = _oneline(require(params, "kind"))
+    title = _oneline(require(params, "title"))
     root = resolve_root(params)
     bd = ensure_board_exists(root, project)
 
     evidence = params.get("evidence")
-    affects = params.get("affects")
+    affects = _oneline(params.get("affects")) if params.get("affects") else None
     ts = now_utc_iso()
 
     sp = scratch_file_path(bd)

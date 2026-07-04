@@ -352,6 +352,46 @@ def suite_lifecycle(mod, tmp_repo):
     check("\n---\ninjected: yes" not in hmd,
           "append_section heading is newline-flattened, no body injection (B036)")
 
+    # security: affects_prefix router-row injection in board_init (eb-self B038).
+    inj_root = tempfile.mkdtemp()
+    mod.tool_board_init({"project": "beta", "root": inj_root,
+                         "affects_prefix": "alpha/ |\n| evil | /etc/cron.d | evil/"})
+    projs = [p["id"] for p in mod.tool_board_list_projects({"root": inj_root})["projects"]]
+    check(projs == ["beta"], "affects_prefix cannot inject a spoofed router project (B038)", str(projs))
+    try:
+        mod.tool_board_status({"root": inj_root})  # must not be DoS'd by an escaping row
+        ok("bulk tools still work after affects_prefix injection attempt (B038)")
+    except mod.ToolError as e:
+        raise Failure("affects_prefix injection DoS'd board_status: %s" % e)
+    shutil.rmtree(inj_root, ignore_errors=True)
+
+    # security: board_init must not follow a symlink out of root (eb-self B039).
+    sym_root = tempfile.mkdtemp()
+    outside = tempfile.mkdtemp()
+    os.makedirs(os.path.join(sym_root, "engineering-board"), exist_ok=True)
+    os.symlink(outside, os.path.join(sym_root, "engineering-board", "sneaky"))
+    try:
+        mod.tool_board_init({"project": "sneaky", "root": sym_root})
+        raise Failure("board_init followed a symlink out of root")
+    except mod.ToolError:
+        ok("board_init rejects a symlinked project dir (B039)")
+    check(not os.path.exists(os.path.join(outside, "BOARD.md")),
+          "no scaffold written outside root via symlink (B039)")
+    shutil.rmtree(sym_root, ignore_errors=True)
+    shutil.rmtree(outside, ignore_errors=True)
+
+    # security: board_capture_finding must not inject a second scratch header (B040).
+    cap_root = tempfile.mkdtemp()
+    mod.tool_board_init({"project": "cap", "root": cap_root})
+    mod.tool_board_capture_finding({"project": "cap", "root": cap_root, "kind": "bug",
+                                    "title": "real\n## FAKE — evil: pwn\n\n- kind: bug"})
+    sp = os.path.join(cap_root, "engineering-board", "cap", "_sessions",
+                      "mcp-%s.md" % mod.today_utc())
+    hdrs = sum(1 for ln in open(sp) if ln.startswith("## "))
+    check(hdrs == 1, "board_capture_finding title cannot inject a second header (B040)",
+          "found %d headers" % hdrs)
+    shutil.rmtree(cap_root, ignore_errors=True)
+
     # security: frontmatter injection via newline in a field value (eb-self B028).
     fm = mod.serialize_frontmatter([("id", "B900"), ("type", "bug"),
                                     ("title", "pwn\nstatus: resolved\nmalicious: yes"),
