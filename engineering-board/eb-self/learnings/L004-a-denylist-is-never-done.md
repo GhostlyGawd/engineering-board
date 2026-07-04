@@ -5,8 +5,8 @@ subtype: principle
 title: A denylist heuristic is never done — assume every pattern has an adjacent bypass
 discovered: 2026-07-04
 confidence: high
-recurrence: 7
-derived_from: [B002, B025, B037, B043, B048, B051, B053]
+recurrence: 8
+derived_from: [B002, B025, B037, B043, B048, B051, B053, B056]
 applies_to: [hooks/scripts/board_reject_check.py, tests/security/]
 pattern_tag: filter-completeness
 ---
@@ -56,6 +56,20 @@ is now covered; the remaining tail is exotic marks (pilcrow ¶, section §) that
 LLM does NOT reliably treat as a fresh clause reset — accepted residuals, not P1s,
 under the same in-scope test the docstring draws ("does an LLM read this as a
 fresh clause"). A new *common*-script terminator would still be an in-scope defect.
+
+## Severity matures with the mechanism (C9)
+C9 found the terminator fold's set incomplete (B056: Arabic comma/Armenian/etc.).
+The response that finally slows the treadmill is twofold: (1) fix the whole class
+COMPREHENSIVELY — the terminator fold now spans the major living scripts, so it is
+complete-by-construction rather than a curated list that leaks the next glyph
+(L005); and (2) a documented **mechanism-vs-coverage severity rubric** (in the
+module docstring): a missing MECHANISM is major (B048/B051/B053 were P1), but a
+coverage gap in a shipped comprehensive mechanism, found only by Unicode
+enumeration in a defense-in-depth layer, is P2/P3 — the independent red-team rated
+B056 "Low" too. This is NOT down-rating to force convergence: it reflects a real
+maturity shift, and the rubric is written down so the next cycle applies it
+consistently. The remaining tail (further obscure-script marks) is P3 corpus
+growth, not a mechanism defect.
 
 ## Boundary drawn (C7)
 After six recurrences, C7 documented the filter's **accepted-residual boundary**

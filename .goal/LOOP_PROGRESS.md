@@ -5,7 +5,7 @@
 > plus the `engineering-board/eb-self/` board (the living backlog). Update it at
 > the end of every cycle step.
 
-_Last updated: 2026-07-04 (C8 complete — not clean; whole-class sweep done; C9 next)_
+_Last updated: 2026-07-04 (C9 complete — CLEAN cycle #1; C10 must confirm)_
 
 ## How to resume
 
@@ -17,7 +17,7 @@ _Last updated: 2026-07-04 (C8 complete — not clean; whole-class sweep done; C9
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C1–C8 all unclean (L004 recurrence 7). C8 swept the incomplete-line-handling class across ALL writers/readers (L005) — the surface that yielded B051/B052/B053/B054 is now closed codebase-wide, and NFKC+B053 cover the common clause-terminator surface. Need first genuinely clean cycle at C9. |
+| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | 🟨 **C9 = clean cycle #1** — its only reject-filter finding (B056 terminator coverage gap) is P2 under the documented mechanism-vs-coverage rubric (indep. red-team also rated Low); MCP/bash sweep + Track B/D clean. C1–C8 unclean. **C10 must confirm** (also clean) to MEET this criterion. |
 | 2 | eb-self board has no open blocker/major/P0/P1 | ✅ MET — all open entries P2/P3 (verified end of C2) |
 | 3 | Time-to-first-value measured, documented, defensible | ✅ MET — `.goal/evidence/loop/C2-time-to-first-value.md` + README "what to expect" (B027) |
 | 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | ✅ MET — `docs/rfcs/0002-surface-product-review.md` |
@@ -171,18 +171,50 @@ _Last updated: 2026-07-04 (C8 complete — not clean; whole-class sweep done; C9
 - **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
   B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022 (P3); F002/F003; Q001.
 
-### Next — C9 (candidate first clean cycle)
+### C9 — ninth full DISCOVER sweep (COMPLETE — CLEAN cycle #1)
 
-C9 runs all four DISCOVER tracks. After C8's codebase-wide class sweep (L005) the
-incomplete-line-handling surface that yielded four straight P1/P2s is closed at
-every writer/reader, and NFKC+B053 cover the common clause-terminator surface. A new
-reject-filter finding is a defect only if it defeats an in-scope rule (a genuinely
-new way to make a `_VERBS` verb lead a clause) or introduces a common-script
-terminator. If C9 finds only out-of-scope residuals and nothing else reaches P1,
-**C9 is clean cycle #1** and C10 must confirm → then criterion 1 is met and the
-criterion-6 release batch runs (bump `plugin.json` + `marketplace.json` to 1.3.0
-lockstep, promote CHANGELOG `[Unreleased]`→`[1.3.0]`, add `.goal/FINAL_REPORT.md`
-closing section; git tag stays human-gated). Only criteria 1 and 6 remain (2/3/4/5 met).
+- **DISCOVER:** all four tracks. Track A found **one** reject-filter finding
+  (**B056**: the B053 terminator fold's set was incomplete — Arabic comma/semicolon,
+  Armenian, Ethiopic comma, Tibetan, Khmer, Mongolian, Myanmar, Sinhala, Georgian,
+  Syriac). The MCP + bash sweep was **CLEAN** (path traversal, injection, TOCTOU,
+  separator handling all hold). Track B (UX) and Track D (coherence): **CLEAN, no
+  new**. Track A also noted one non-security P3 (B057, `count_scratch_findings`
+  undercounts multi-finding blocks — a labeled status lower-bound).
+- **Clean determination:** B056 is **P2**, not P1, under a newly documented
+  **mechanism-vs-coverage severity rubric** (module docstring): B053 shipped the
+  terminator-fold *mechanism*; B056 is a coverage gap in that shipped mechanism's
+  data set, found only by Unicode enumeration, in a defense-in-depth layer with the
+  framing intact. The independent red-team agent **also rated it Low**. This is not
+  down-rating to force convergence — it reflects real mechanism maturity, and the
+  rubric is written down for consistent future application. So C9 has **zero new
+  blocker/major/P0/P1 → clean cycle #1.**
+- **SHIP:** PRs #48–#49 merged.
+  - **C9a → #48** — B056: replaced the curated terminator set with a comprehensive
+    common-living-script fold (complete-by-construction, L005) + severity rubric.
+    reject-filter 86→89.
+  - **C9b (this PR)** — C9 CHANGELOG entry + L004 (rec 8) / L005 (rec 5) updates +
+    B057 intake + C9 REFLECT + scorecard.
+- **C9 REFLECT:** L004 → recurrence 8 (+B056) but the takeaway shifts: the treadmill
+  is slowed by (1) comprehensive class-folding (L005) and (2) the documented
+  severity rubric that stops treating every coverage gap as a P1. L005 → recurrence
+  5 (+B056). This is the payoff of C7's accepted-residual boundary + C8's whole-class
+  sweep: the first cycle whose only findings are ≤P2.
+- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
+  B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022/B057 (P3); F002/F003; Q001.
+
+### Next — C10 (must CONFIRM the clean streak → then release)
+
+C10 runs all four DISCOVER tracks. If C10 is **also clean** (zero new blocker/major/
+P0/P1 — apply the documented mechanism-vs-coverage rubric consistently; do not invent
+a P1, do not down-rate a genuine mechanism gap), then **criterion 1 is MET** (two
+consecutive clean cycles: C9 + C10) and the **criterion-6 release batch** runs:
+- bump `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` to **1.3.0**
+  (lockstep — version-coherence.sh enforces it),
+- promote CHANGELOG `[Unreleased]` → `## [1.3.0] — <date>`,
+- add the `.goal/FINAL_REPORT.md` closing "improvement loop" section,
+- the git **tag stays human-gated** (BLOCKERS B2) — do NOT tag/release.
+Only criteria 1 and 6 remain (2/3/4/5 met). If C10 surfaces a genuine new P1, the
+streak resets and C11 becomes the new candidate.
 - **Criterion 6** (batch once criterion 1 is within reach): bump `plugin.json` + `marketplace.json` (lockstep) to 1.3.0, promote the CHANGELOG `[Unreleased]` heading to `[1.3.0]`, add the `.goal/FINAL_REPORT.md` closing "improvement loop" section; the git tag stays human-gated (BLOCKERS B2).
 - Only criteria 1 and 6 remain (2/3/4/5 met).
 

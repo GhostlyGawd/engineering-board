@@ -12,6 +12,14 @@ increases.
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security
+- **Terminator fold now spans the major living scripts** (eb-self B056). B053's
+  terminator set was hand-picked and missed the clause/sentence marks of many
+  scripts — Arabic comma/semicolon, Armenian, Ethiopic comma, Tibetan, Khmer,
+  Mongolian, Myanmar, Sinhala, Georgian, Syriac. Rather than add glyphs one cycle
+  at a time (the enumeration treadmill), the fold is now comprehensive across the
+  common living scripts, so the mechanism is complete-by-construction. The module
+  docstring adds a mechanism-vs-coverage severity rubric: a missing *mechanism* is
+  major; a coverage gap in a comprehensive fold is P2/P3. Three new fixtures.
 - **Reject filter now folds non-Latin sentence terminators to a clause boundary**
   (eb-self B053). The boundary class `[.!?:;,\n]` was ASCII-only, so a bare
   imperative after a CJK `。`/`、`, Devanagari danda `।`/`॥`, Ethiopic `።`, or
