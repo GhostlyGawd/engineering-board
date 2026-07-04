@@ -66,15 +66,26 @@ _Last updated: 2026-07-04 (C1 in progress)_
 - **Deliverables met this cycle:** criterion 3 (time-to-first-value) ✅ and criterion 4 (surface product-review) ✅.
 - **eb-self open blocker/major/P1: NONE.** Open (all P2/P3): B005/B006/B007/B008/B009/B014/B029/B030 (P2); B016/B020/B021/B022 (P3); F001–F003; Q001.
 
-### Next — C3
+### C3 — third full DISCOVER sweep + F001 (COMPLETE)
 
-Convergence criterion 1 needs **two consecutive clean cycles**; neither C1 nor C2
-was clean. C3 must run all four DISCOVER tracks again and, ideally, surface zero
-new blocker/major/P1. Also owed: criterion 5 (animated demo — build **F001**
-board viewer to feed it, then re-run Lighthouse) and, once criterion 1 nears,
-criterion 6 (batch a release: bump manifests + CHANGELOG heading + FINAL_REPORT
-closing section). Consider building F001/F002 in C3 (≤1 feature/cycle) since the
-P0/P1 backlog is now clear.
+- **DISCOVER:** all four tracks re-run. Verified all C1/C2 fixes hold. Track A found **a 3rd round of MCP path-traversal** (B034 P0 blocker `entry_id`, B035 major router-row escape, B036 minor) — again the MCP surface. Track B+D: committed state coherent (caught 1 stale CHANGELOG count + flagged the in-progress F001's counts before commit — both fixed).
+- **SHIP:** PRs #32–#33 merged.
+  - **C3a → #32** — **F001** `/board-view` zero-dep HTML board viewer (Track C feature slice; competitive gap closed; feeds criterion 5). New `view` suite → 14 suites. Counts updated (11 commands, 23 scripts).
+  - **C3b → #33** — B034 (P0) + B035 + B036: `validate_entry_id()` + `resolve_board_row()` containment + claim-script guards + heading flatten. MCP suite → 74 checks.
+- **C3 REFLECT:** L003 (newest surface = most risk) now has **recurrence 5** (B024/B026/B028/B034/B035) — the MCP server has yielded a security finding every cycle it's been red-teamed. Consider a proactive full input-validation audit of the remaining MCP tools to break the pattern before C4.
+- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3): B005/B006/B007/B008/B009/B014/B029/B030 (P2); B016/B020/B021/B022 (P3); F002/F003; Q001.
+
+### Next — C4 (must be the first clean cycle)
+
+Criterion 1 needs **two consecutive clean cycles**; C1/C2/C3 were all unclean.
+C4 (and C5) must surface zero new blocker/major/P1. To de-risk the recurring MCP
+finding, C4's red-team should do an exhaustive input-validation sweep of every
+MCP tool (all params that reach a path or a serialized file). Remaining owed:
+criterion 5 (animated demo — the F001 `board.html` is now the asset; script an
+asciinema/GIF or embed the viewer; re-run Lighthouse on the landing page) and
+criterion 6 (batch the release: bump `plugin.json`+`marketplace.json`, promote
+the CHANGELOG `[Unreleased]` heading, write the FINAL_REPORT closing section) —
+do criterion 6 once criterion 1 is within reach.
 
 ### Track status (C1)
 
