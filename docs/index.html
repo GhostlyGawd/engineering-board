@@ -103,14 +103,14 @@
     .demo{margin:3rem auto 0;max-width:60rem;background:var(--eb-surface);border:1px solid var(--eb-border);
       border-radius:var(--eb-radius-lg);padding:1.25rem;box-shadow:var(--eb-shadow-card)}
     .demo-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-    .demo-head .label{font-size:.8rem;color:var(--eb-text-faint);font-family:var(--eb-font-mono)}
+    .demo-head .label{font-size:.8rem;color:var(--eb-text-muted);font-family:var(--eb-font-mono)}
     .cols{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}
     .col{background:var(--eb-bg);border:1px solid var(--eb-border);border-radius:var(--eb-radius-card);
       min-height:150px;padding:.55rem}
-    .col h4{margin:0 0 .5rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--eb-text-faint);font-weight:600;text-align:center}
+    .col .col-h{margin:0 0 .5rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--eb-text-muted);font-weight:600;text-align:center}
     .card{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:var(--eb-radius-sm);
       padding:.5rem .55rem;font-size:.78rem;box-shadow:var(--eb-shadow-card);margin-bottom:.4rem}
-    .card .cid{font-family:var(--eb-font-mono);font-size:.68rem;color:var(--eb-text-faint)}
+    .card .cid{font-family:var(--eb-font-mono);font-size:.68rem;color:var(--eb-text-muted)}
     .card.live{border-color:var(--eb-accent);box-shadow:0 4px 14px rgba(154,91,0,.22)}
     :root[data-theme="dark"] .card.live,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.live{border-color:var(--eb-accent-dark);box-shadow:0 4px 14px rgba(230,169,78,.22)}}
     .card.live .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--eb-accent);margin-right:.35rem;vertical-align:middle}
@@ -189,10 +189,10 @@
           <button class="btn btn-ghost" id="play" type="button" style="padding:.4rem .9rem">▸ Play</button>
         </div>
         <div class="cols">
-          <div class="col" data-state="tdd"><h4>needs: tdd</h4></div>
-          <div class="col" data-state="review"><h4>needs: review</h4></div>
-          <div class="col" data-state="validate"><h4>needs: validate</h4></div>
-          <div class="col" data-state="resolved"><h4>resolved</h4></div>
+          <div class="col" data-state="tdd"><div class="col-h">needs: tdd</div></div>
+          <div class="col" data-state="review"><div class="col-h">needs: review</div></div>
+          <div class="col" data-state="validate"><div class="col-h">needs: validate</div></div>
+          <div class="col" data-state="resolved"><div class="col-h">resolved</div></div>
         </div>
       </div>
     </section>
