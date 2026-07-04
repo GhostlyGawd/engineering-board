@@ -62,6 +62,11 @@
       "rationale": "permission self-check: compares this manifest against your settings allowlist"
     },
     {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-view.sh:*",
+      "rationale": "/board-view: generate the self-contained HTML board view (board.html)"
+    },
+    {
       "tool": "SlashCommand",
       "pattern": "/pm-start",
       "rationale": "Start PM (consolidator) session for engineering board"

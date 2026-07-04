@@ -73,8 +73,17 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   directs users to promote MCP inbox files with the `board_create_entry` tool.
 
 ### Added
+- **`/board-view` — zero-dependency HTML board viewer** (eb-self F001). Generates
+  a self-contained, themed Kanban view to `engineering-board/<project>/board.html`
+  — a four-column pipeline (To do → Review → Validate → Done) plus a Questions/
+  Observations/Learnings lane, reusing the landing-page brand tokens (light/dark).
+  Offline, no JavaScript, byte-deterministic (safe to commit), and HTML-escapes
+  all entry text so a crafted title can't inject markup. New `tests/view/`
+  suite (10 checks incl. XSS-escaping + determinism). Closes the biggest conceded
+  competitive gap (visualization) without a daemon — the view is just another
+  committed in-repo projection of the board.
 - **`tests/security/reject-filter.sh`** (eb-self B003) — drives every
-  adversarial-paste (36) and benign-findings (24) fixture through the canonical
+  adversarial-paste (40) and benign-findings (25) fixture through the canonical
   filter and asserts each fixture's declared `expect:`/`expect_reason:`.
   Registered in `tests/run-all.sh` (now **12 suites**) and CI-enforced. The
   then-50-fixture corpus (now 60) previously had **no** consumer, so the "100% reject-rate"

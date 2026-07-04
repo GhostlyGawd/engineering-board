@@ -38,6 +38,7 @@ SUITES=(
   "crosscompat-lint|bash tests/crosscompat-lint.sh"
   "reject-filter|bash tests/security/reject-filter.sh"
   "session-start|bash tests/session-start/automated.sh"
+  "view|bash tests/view/automated.sh"
   "mcp-server|bash mcp-server/run-tests.sh"
 )
 
