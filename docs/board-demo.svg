@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300" role="img" aria-label="A finding is captured, promoted to the board, and driven through the tdd, review, and validate pipeline to done.">
+  <title>engineering-board — capture → promote → tdd → review → validate → done</title>
+  <style>
+    :root { color-scheme: light dark; }
+    .surface { fill: #FAF9F5; stroke: #E3E1D9; }
+    .col     { fill: #F1F0EA; stroke: #E3E1D9; }
+    .colh    { fill: #5B6068; font: 600 11px ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+    .card    { fill: #FFFFFF; stroke: #E3E1D9; }
+    .cardlive{ fill: #FFFFFF; stroke: #9A5B00; }
+    .cid     { fill: #5B6068; font: 600 10px ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+    .ctitle  { fill: #17191E; font: 500 12px ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif; }
+    .cap     { fill: #5B6068; font: 400 12px ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif; }
+    .accent  { fill: #9A5B00; }
+    .amber   { fill: #9A5B00; }
+    .dot     { fill: #9A5B00; }
+    @media (prefers-color-scheme: dark) {
+      .surface { fill: #1E2127; stroke: #2A2D34; }
+      .col     { fill: #17191E; stroke: #2A2D34; }
+      .colh    { fill: #9EA3AB; }
+      .card    { fill: #23262D; stroke: #2A2D34; }
+      .cardlive{ fill: #23262D; stroke: #E6A94E; }
+      .cid     { fill: #9EA3AB; }
+      .ctitle  { fill: #ECEBE6; }
+      .cap     { fill: #9EA3AB; }
+      .accent  { fill: #E6A94E; }
+      .amber   { fill: #E6A94E; }
+      .dot     { fill: #E6A94E; }
+    }
+  </style>
+
+  <!-- board surface -->
+  <rect class="surface" x="8" y="8" width="704" height="230" rx="12"/>
+
+  <!-- 4 columns -->
+  <g>
+    <rect class="col" x="24"  y="52" width="160" height="170" rx="8"/>
+    <rect class="col" x="200" y="52" width="160" height="170" rx="8"/>
+    <rect class="col" x="376" y="52" width="160" height="170" rx="8"/>
+    <rect class="col" x="552" y="52" width="160" height="170" rx="8"/>
+    <text class="colh" x="104" y="42" text-anchor="middle">To do</text>
+    <text class="colh" x="280" y="42" text-anchor="middle">Review</text>
+    <text class="colh" x="456" y="42" text-anchor="middle">Validate</text>
+    <text class="colh" x="632" y="42" text-anchor="middle">Done</text>
+  </g>
+
+  <!-- moving card: capture (fade in over To do), then translate across the pipeline, loop -->
+  <g>
+    <animateTransform attributeName="transform" type="translate" additive="sum"
+      dur="9s" repeatCount="indefinite" calcMode="spline"
+      keyTimes="0;0.10;0.30;0.35;0.55;0.60;0.80;0.85;1"
+      keySplines="0.16 1 0.3 1;0.16 1 0.3 1;0.16 1 0.3 1;0.16 1 0.3 1;0.16 1 0.3 1;0.16 1 0.3 1;0.16 1 0.3 1;0.16 1 0.3 1"
+      values="0,0; 0,0; 176,0; 176,0; 352,0; 352,0; 528,0; 528,0; 528,0"/>
+    <g transform="translate(40,90)">
+      <rect class="cardlive" width="128" height="60" rx="6"/>
+      <circle class="dot" cx="14" cy="16" r="3.5"/>
+      <text class="cid" x="24" y="20">B042</text>
+      <text class="ctitle" x="12" y="40">surface the</text>
+      <text class="ctitle" x="12" y="54">board viewer</text>
+    </g>
+  </g>
+
+  <!-- capture pulse: a "finding" fades in just before it lands in To do -->
+  <g opacity="0">
+    <animate attributeName="opacity" dur="9s" repeatCount="indefinite"
+      keyTimes="0;0.04;0.10;1" values="0;1;0;0"/>
+    <text class="cap" x="104" y="120" text-anchor="middle">finding</text>
+    <text class="cap" x="104" y="136" text-anchor="middle">captured…</text>
+  </g>
+
+  <!-- caption -->
+  <text class="cap" x="360" y="266" text-anchor="middle">
+    <tspan class="amber">capture</tspan> → promote → <tspan class="amber">tdd</tspan> → review → validate → <tspan class="amber">done</tspan>
+  </text>
+  <text class="cap" x="360" y="286" text-anchor="middle" font-size="10.5">The board is the database — every step is committed markdown you can diff.</text>
+</svg>

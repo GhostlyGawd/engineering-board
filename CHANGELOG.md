@@ -107,6 +107,11 @@ Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
   directs users to promote MCP inbox files with the `board_create_entry` tool.
 
 ### Added
+- **Animated README demo** (`docs/board-demo.svg`). A self-contained animated
+  SVG of the real pipeline — a finding is captured, promoted, and driven through
+  `tdd → review → validate → done` (a card moving across the four pipeline
+  columns), brand-tokened, light/dark, with an aria-label. Embedded as the
+  README hero; links to the live `board.html` that `/board-view` generates.
 - **`/board-view` — zero-dependency HTML board viewer** (eb-self F001). Generates
   a self-contained, themed Kanban view to `engineering-board/<project>/board.html`
   — a four-column pipeline (To do → Review → Validate → Done) plus a Questions/
