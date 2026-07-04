@@ -5,8 +5,8 @@ subtype: principle
 title: A denylist heuristic is never done — assume every pattern has an adjacent bypass
 discovered: 2026-07-04
 confidence: high
-recurrence: 8
-derived_from: [B002, B025, B037, B043, B048, B051, B053, B056]
+recurrence: 9
+derived_from: [B002, B025, B037, B043, B048, B051, B053, B056, B058]
 applies_to: [hooks/scripts/board_reject_check.py, tests/security/]
 pattern_tag: filter-completeness
 ---
@@ -70,6 +70,20 @@ B056 "Low" too. This is NOT down-rating to force convergence: it reflects a real
 maturity shift, and the rubric is written down so the next cycle applies it
 consistently. The remaining tail (further obscure-script marks) is P3 corpus
 growth, not a mechanism defect.
+
+## The rubric cuts BOTH ways (C10)
+C10 was the confirming cycle — one more clean cycle and 1.3.0 released. The
+red-team found B058: the invisible-char strip (`_ZERO_WIDTH`) was still a hand-list
+of 5, the ONE `_normalize` fold never made comprehensive — soft hyphen and the
+whole Cf/default-ignorable class split a verb token invisibly (and, being
+invisible, do NOT corrupt the verb, so it is in-scope, not the homoglyph residual).
+Under the SAME rubric this is a MECHANISM gap (an enumerated fold missing common
+members of its class, exactly like pre-B051 line breaks) → P1. So C10 was NOT clean
+and the clean streak reset — the rubric that let C9 be honestly clean also forced
+C10 to be honestly unclean. That two-way integrity is the point: the rubric is a
+real standard, not a convergence lever. After B058 all three `_normalize` folds are
+comprehensive-by-construction, so the enumeration treadmill is structurally closed;
+only a genuinely novel class (new grammar/mood/verb) can yield a new bypass now.
 
 ## Boundary drawn (C7)
 After six recurrences, C7 documented the filter's **accepted-residual boundary**
