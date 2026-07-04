@@ -282,11 +282,22 @@ _SLASH_RE = re.compile(r"(?:^|[\s\-*+>#'\"`()•‣⁃◦▪●·–—])/[a-z][
 # Subagent mention (@finding-extractor). Case-insensitive.
 _SUBAGENT_RE = re.compile(r"@[a-z][a-z0-9-]+", re.IGNORECASE)
 
+# Unicode Tag characters (U+E0000–E007F) mirror ASCII invisibly. `_strip_invisible`
+# deletes them (right when they SPLIT a visible verb), but when they ENCODE the
+# whole command, stripping hides the payload from the scan while the promotion
+# writer keeps the raw tag chars — so an invisible imperative a tag-decoding reader
+# obeys would land on the board (eb-self B061). Tag chars are DEPRECATED with no
+# legitimate use in a finding, so their mere presence is a zero-false-positive
+# reject signal — reject on sight, before normalization strips them.
+_TAG_RE = re.compile(r"[\U000E0000-\U000E007F]")
+
 
 def _scan(text):
     """Return a reason code for the first rule that fires on `text`, else None."""
     if not isinstance(text, str):
         return None
+    if _TAG_RE.search(text):
+        return "invisible_tag"
     text = _normalize(text)
     if _IMPERATIVE_RE.search(text):
         return "imperative_prefix"

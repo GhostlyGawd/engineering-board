@@ -2,6 +2,8 @@
 
 Resolved entries. Newest at the top.
 
+- B061 P2 | [reject filter rejects Unicode tag chars on sight (ASCII-smuggling strip-and-promote closed)](bugs/B061-reject-filter-strips-tag-chars-but-promotes-.md) — resolved C12 (PR C12a)
+
 - B059 P1 | [reject skip-run now covers the whole markdown list-marker family (ordered/lettered/checkbox)](bugs/B059-reject-skip-run-misses-ordered-list-markers.md) — resolved C11 (PR C11a)
 - B060 P3 | [slash-directive rule catches a slash abutting a marker/quote/paren](bugs/B060-slash-directive-bypassed-by-punct-abutment.md) — resolved C11 (PR C11a)
 
