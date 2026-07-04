@@ -5,8 +5,8 @@ subtype: principle
 title: A denylist heuristic is never done — assume every pattern has an adjacent bypass
 discovered: 2026-07-04
 confidence: high
-recurrence: 10
-derived_from: [B002, B025, B037, B043, B048, B051, B053, B056, B058, B059]
+recurrence: 11
+derived_from: [B002, B025, B037, B043, B048, B051, B053, B056, B058, B059, B061]
 applies_to: [hooks/scripts/board_reject_check.py, tests/security/]
 pattern_tag: filter-completeness
 ---
@@ -98,6 +98,19 @@ curated denylists left (`_VERBS`, `_LEADIN`, `_ADVERB`) are DELIBERATELY curated
 (documented accepted residuals — a missing verb/adverb is a design trade-off to
 avoid false positives, not a defect). So the reachable in-scope surface is finally
 down to genuinely novel grammar/mood vectors + the untrusted-data framing.
+
+## First honestly-clean-again cycle (C12)
+C12 found only B061 (Unicode tag-char ASCII-smuggling: `_strip_invisible` deletes
+tags for the scan but the promotion writer keeps them, so an invisible imperative a
+tag-decoding reader obeys would land on the board). Rated **P2, not P1** — gated on a
+reader that decodes a deprecated Unicode block (limits reachability) and the framing
+holds; the independent red-team rated it P3. Fixed by rejecting any finding
+containing a tag char on sight (zero-false-positive: tags are deprecated). Because
+B061 is the ONLY finding and it is ≤P2, **C12 is clean** — the first cycle since the
+enumerated-component sweep whose worst finding is a conditional P2, not a mechanism
+P1. That is the convergence signal L004 predicted: not "the denylist is done" (it
+never is), but "what's left is P2/P3 residuals a documented rubric classifies
+consistently, behind an intact primary defense."
 
 ## Boundary drawn (C7)
 After six recurrences, C7 documented the filter's **accepted-residual boundary**

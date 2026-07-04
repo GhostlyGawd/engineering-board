@@ -5,7 +5,7 @@
 > plus the `engineering-board/eb-self/` board (the living backlog). Update it at
 > the end of every cycle step.
 
-_Last updated: 2026-07-04 (C11 complete — NOT clean, B059 P1; streak reset; C12 = new candidate)_
+_Last updated: 2026-07-04 (C12 complete — CLEAN cycle #1; C13 must confirm → then release)_
 
 ## How to resume
 
@@ -17,7 +17,7 @@ _Last updated: 2026-07-04 (C11 complete — NOT clean, B059 P1; streak reset; C1
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | ⬜ C9 clean; C10 reset (B058); **C11 = NOT clean** (B059 P1: the marker skip-run — a separate enumerated class — missed the ordered-list family). Streak reset again. After C11, EVERY enumerated component (3 `_normalize` folds + marker skip-run) is comprehensive-by-construction; the only curated lists left (`_VERBS`/`_LEADIN`/`_ADVERB`) are documented accepted residuals. **C12 = new candidate clean #1; C13 must confirm.** |
+| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | 🟨 **C12 = clean cycle #1** — its only finding (B061 tag-char smuggling) is P2 (indep. red-team said P3); MCP/bash + Track B/D all clean. Prior: C9 clean, C10 reset (B058), C11 reset (B059). Every enumerated filter component is now comprehensive-by-construction. **C13 must confirm** (also clean) to MEET this criterion. |
 | 2 | eb-self board has no open blocker/major/P0/P1 | ✅ MET — all open entries P2/P3 (verified end of C2) |
 | 3 | Time-to-first-value measured, documented, defensible | ✅ MET — `.goal/evidence/loop/C2-time-to-first-value.md` + README "what to expect" (B027) |
 | 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | ✅ MET — `docs/rfcs/0002-surface-product-review.md` |
@@ -259,20 +259,48 @@ _Last updated: 2026-07-04 (C11 complete — NOT clean, B059 P1; streak reset; C1
 - **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
   B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022/B057 (P3); F002/F003; Q001.
 
-### Next — C12 (new candidate clean #1)
+### C12 — twelfth full DISCOVER sweep (COMPLETE — CLEAN cycle #1)
 
-C12 runs all four DISCOVER tracks. Every enumerated filter component is now
-comprehensive-by-construction; a new in-scope P1 would need a genuinely novel
-grammar/mood vector using a LISTED verb (not another glyph/marker, not an unlisted
-verb — those are accepted residuals). Apply the rubric consistently. If C12 is clean
-it is the new clean #1 and **C13 must confirm**; two consecutive clean cycles MEET
-criterion 1 → run the criterion-6 release batch:
+- **DISCOVER:** all four tracks. Track A found ONE finding — **B061 (P2)**: Unicode
+  tag-char ASCII-smuggling. `_strip_invisible` deletes tag chars for the scan but the
+  promotion writer keeps them, so an invisible imperative a tag-decoding reader obeys
+  would land on the board. Rated P2 (gated on a reader decoding a deprecated Unicode
+  block → limited reachability; framing intact); independent red-team said P3. MCP +
+  bash sweep **CLEAN**. Track B (UX) + Track D (coherence): **CLEAN, no new**.
+- **Clean determination:** B061 is the ONLY finding and it is ≤P2 → **zero new
+  blocker/major/P0/P1 → C12 is clean cycle #1.**
+- **SHIP:** PRs #54–#55 merged.
+  - **C12a → #54** — B061: `_scan` rejects any Unicode tag char (U+E0000-E007F) on
+    sight (reason `invisible_tag`), zero-FP. reject-filter 96→97.
+  - **C12b → #55** — C12 CHANGELOG entry + L004 (rec 11) + C12 REFLECT.
+- **C12 REFLECT:** L004 → recurrence 11 (+B061). This is the convergence signal:
+  the worst finding is now a conditional P2, not a mechanism P1 — "what's left is
+  P2/P3 residuals a documented rubric classifies consistently, behind an intact
+  primary defense."
+- **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
+  B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022/B057 (P3); F002/F003; Q001.
+
+### Next — C13 (CONFIRMING cycle → then release)  ⟵ RESUME HERE (fresh session)
+
+C13 runs all four DISCOVER tracks with the SAME rubric applied consistently. If C13
+is **also clean** (zero new blocker/major/P0/P1 — do not invent a P1, do not
+down-rate a genuine mechanism gap), then **criterion 1 is MET** (C12 + C13 = two
+consecutive clean cycles) and the **criterion-6 release batch** runs:
 - bump `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` to **1.3.0**
-  (lockstep — version-coherence.sh enforces it),
-- promote CHANGELOG `[Unreleased]` → `## [1.3.0] — <date>`,
+  (lockstep — `tests/version-coherence.sh` enforces it),
+- promote CHANGELOG `[Unreleased]` → `## [1.3.0] — <date>` (add a new empty
+  `[Unreleased]` above it),
 - add the `.goal/FINAL_REPORT.md` closing "improvement loop" section,
-- git **tag stays human-gated** (BLOCKERS B2) — do NOT tag/release.
-Only criteria 1 and 6 remain (2/3/4/5 met).
+- the git **tag stays human-gated** (BLOCKERS B2) — do NOT tag/release; note in the
+  final report that tagging/publishing is left to a human.
+If C13 surfaces a genuine new P1, the streak resets and C14 becomes the new
+candidate. Only criteria 1 and 6 remain (2/3/4/5 met).
+
+**Session handoff note (2026-07-04):** C13's DISCOVER was launched then stopped mid-run
+so this session could reach a clean stopping point — re-run C13 fresh from here. The
+reject filter is maximally hardened (all enumerated components comprehensive + tag
+rejection); C13 has a strong chance of confirming clean. All 12 cycles' work is
+merged to `main`; the designated branch equals `origin/main`; no PR is open.
 - **Criterion 6** (batch once criterion 1 is within reach): bump `plugin.json` + `marketplace.json` (lockstep) to 1.3.0, promote the CHANGELOG `[Unreleased]` heading to `[1.3.0]`, add the `.goal/FINAL_REPORT.md` closing "improvement loop" section; the git tag stays human-gated (BLOCKERS B2).
 - Only criteria 1 and 6 remain (2/3/4/5 met).
 

@@ -12,6 +12,13 @@ increases.
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security
+- **Unicode Tag characters are rejected on sight** (eb-self B061). `_strip_invisible`
+  deletes tag chars (`U+E0000–E007F`) before scanning — right when they *split* a
+  visible verb, but when they *encode* the whole command the scan saw empty text and
+  accepted, while the promotion writer kept the raw tag chars, so an invisible
+  imperative a tag-decoding reader obeys would land on the board. Tags are deprecated
+  with no legitimate use in a finding, so `_scan` now rejects any finding containing
+  one (reason `invisible_tag`), closing the strip-and-promote asymmetry. One fixture.
 - **Clause anchor now skips the whole markdown list-marker family** (eb-self
   B059). The skip-run handled unordered bullets (`- * + >`) but not ordered lists,
   so `1) ignore all previous instructions`, `a) delete…`, `(1) reset…`, `1] drop…`,
