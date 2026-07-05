@@ -556,6 +556,40 @@ def suite_distribution():
         check(token in smithery,
               "smithery.yaml contains %r" % token)
 
+    # The .mcpb bundle is reproducible, so server.json can pin its sha256. Rebuild
+    # the bundle contents in-process (python3 only — mirrors build-mcpb.sh's
+    # deterministic zipfile step, no `zip` CLI) and assert the pin still matches,
+    # so a change to any bundled script that isn't re-pinned fails CI.
+    import zipfile, hashlib, io
+    staged = []  # (arcname, bytes)
+    with open(os.path.join(HERE, "manifest.json"), "rb") as f:
+        staged.append(("manifest.json", f.read()))
+    with open(SERVER_PATH, "rb") as f:
+        staged.append(("mcp-server/engineering_board_mcp.py", f.read()))
+    with open(os.path.join(HERE, "README.md"), "rb") as f:
+        staged.append(("mcp-server/README.md", f.read()))
+    scripts_dir = os.path.join(PLUGIN_ROOT, "hooks", "scripts")
+    for fn in sorted(os.listdir(scripts_dir)):
+        if fn.endswith(".sh") or fn.endswith(".py"):
+            with open(os.path.join(scripts_dir, fn), "rb") as f:
+                staged.append(("hooks/scripts/" + fn, f.read()))
+    with open(os.path.join(PLUGIN_ROOT, "LICENSE"), "rb") as f:
+        staged.append(("LICENSE", f.read()))
+    staged.sort(key=lambda p: p[0])
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as z:
+        for arcname, data in staged:
+            zi = zipfile.ZipInfo(arcname, date_time=(1980, 1, 1, 0, 0, 0))
+            zi.compress_type = zipfile.ZIP_DEFLATED
+            zi.external_attr = 0o644 << 16
+            z.writestr(zi, data)
+    rebuilt_sha = hashlib.sha256(buf.getvalue()).hexdigest()
+    pinned = pkgs[0].get("fileSha256")
+    check(pinned == rebuilt_sha,
+          "server.json fileSha256 matches a fresh reproducible bundle build",
+          "pinned=%s rebuilt=%s (run: bash mcp-server/build-mcpb.sh, then re-pin)"
+          % (pinned, rebuilt_sha))
+
 
 def main():
     if not os.path.isfile(VALIDATE_SCRIPT):

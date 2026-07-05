@@ -34,15 +34,37 @@ cp "$ROOT"/hooks/scripts/*.py "$STAGE/hooks/scripts/" 2>/dev/null || true
 
 cp "$ROOT/LICENSE" "$STAGE/LICENSE"
 
-# deterministic zip (sorted entries, no extra attributes)
-( cd "$STAGE" && find . -type f | LC_ALL=C sort | zip -q -X "$BUNDLE" -@ )
-
-SHA="$(python3 -c "import hashlib,sys; print(hashlib.sha256(open('$BUNDLE','rb').read()).hexdigest())")"
+# Reproducible zip via python3 (no `zip` CLI dependency — python3 is the one
+# interpreter present everywhere): sorted entry names + a fixed timestamp +
+# fixed permissions, so the same input tree always yields a byte-identical
+# bundle and therefore a stable sha256 that can be pinned in server.json.
+SHA="$(python3 - "$STAGE" "$BUNDLE" <<'PY'
+import os, sys, zipfile, hashlib
+stage, bundle = sys.argv[1], sys.argv[2]
+paths = []
+for root, _dirs, files in os.walk(stage):
+    for fn in files:
+        full = os.path.join(root, fn)
+        paths.append((os.path.relpath(full, stage).replace(os.sep, "/"), full))
+paths.sort(key=lambda p: p[0])
+FIXED = (1980, 1, 1, 0, 0, 0)  # normalization constant, not a real build time
+with zipfile.ZipFile(bundle, "w", compression=zipfile.ZIP_DEFLATED) as z:
+    for arcname, full in paths:
+        with open(full, "rb") as f:
+            data = f.read()
+        zi = zipfile.ZipInfo(arcname, date_time=FIXED)
+        zi.compress_type = zipfile.ZIP_DEFLATED
+        zi.external_attr = 0o644 << 16
+        z.writestr(zi, data)
+print(hashlib.sha256(open(bundle, "rb").read()).hexdigest())
+PY
+)"
 
 echo "built: $BUNDLE"
 echo "version: $VERSION"
 echo "sha256: $SHA"
 echo
-echo "next (human): upload as a release asset on tag v$VERSION, then set"
-echo "  packages[0].fileSha256 in mcp-server/server.json to the sha above and run"
-echo "  mcp-publisher publish (see .goal/LAUNCH.md §4)."
+echo "The build is reproducible: this sha is already pinned in mcp-server/server.json"
+echo "(packages[0].fileSha256) and verified by the MCP test suite. Next (human):"
+echo "upload this exact file as the v$VERSION release asset, then run"
+echo "  mcp-publisher publish   (see .goal/LAUNCH.md §4)."
