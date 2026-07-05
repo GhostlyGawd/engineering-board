@@ -31,7 +31,7 @@ Inspect the exit code:
 - **0 (ALLOW)** — continue to Step 3. The guard's stdout contains `CURRENT_MODE=null` (only `null` reaches here; pm/worker/paused all short-circuit at exit 2 or 3).
 - **2 (NOOP)** — print the guard's stdout verbatim and stop. The canonical message for this branch is `Engineering board: already in PM mode. No action taken.`
 - **3 (REFUSE)** — print the guard's stdout verbatim and stop. The canonical messages for this branch are either:
-  - `Engineering board: currently in worker mode (discipline=<value>). Run /board-resume or restart the session to switch to PM mode. No action taken.`
+  - `Engineering board: currently in worker mode (discipline=<value>). Restart the session to switch to PM mode. No action taken.`
   - `Engineering board: currently paused. Run /board-resume first, then /pm-start. No action taken.`
 
 The four canonical messages live in `hooks/scripts/board-mode-guard.sh` so the same matrix is enforced identically by `/pm-start`, `/worker-start`, `/board-pause`, and `/board-resume`. Do not re-implement the matrix in this file.

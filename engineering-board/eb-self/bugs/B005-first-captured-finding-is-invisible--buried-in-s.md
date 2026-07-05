@@ -3,10 +3,10 @@ id: B005
 type: bug
 title: First captured finding is invisible — buried in _sessions/, only a count shown
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P2
 affects: hooks/stop-hook-procedure.md
-needs: tdd
+needs: done
 pattern: [invisible-feedback, ux-affordance]
 ---
 

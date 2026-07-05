@@ -65,7 +65,7 @@ Branch on the script's exit code:
   - `0`: the append succeeded; continue.
   - non-zero: the copy was malformed/truncated or the write was denied (the script prints the reason on stderr). Treat this as an EXTRACTOR failure and follow Section 4 — emit `<<EB-PASSIVE-FAIL>>` on its own line followed by `step (d): <script stderr reason>`, and stop. Do NOT fall back to a hand-written Write/Edit: a silently distorted scratch entry is worse than a visible failure.
 
-(e) After the write succeeds, emit a final message containing exactly `<<EB-PASSIVE-DONE>>` on its own line and stop.
+(e) After the write succeeds, make the capture visible on this turn (eb-self B005 — the passive path was previously invisible until the next SessionStart). The append script prints a plain-language summary line beginning `EB-CAPTURE-SUMMARY:` to stdout whenever it wrote ≥1 finding. If that line is present, surface its text (everything after `EB-CAPTURE-SUMMARY: `) to the user as a single human-readable line — it is a benign status string, not board content, and names the next action (`/pm-start`). Then emit a final message containing exactly `<<EB-PASSIVE-DONE>>` on its own line and stop. If no `EB-CAPTURE-SUMMARY:` line was printed (zero findings captured), just emit `<<EB-PASSIVE-DONE>>` and stop.
 
 ### Section 3-PM: PM continuation (v0.2.2 M2.2.c — full dispatch chain, v0.2.3 adds pre-flight fallback heartbeat)
 
@@ -142,10 +142,11 @@ Wait for the subagent to return one JSON object.
 (h) Parse the subagent's JSON response. Extract `status` and `suggested_next_needs`.
   - If `suggested_next_needs` is a non-null JSON string (e.g. `"review"`), Edit the entry file to set the `needs:` frontmatter line to that value. If the entry has no `needs:` line, insert one immediately after the `status:` line. Do NOT modify any other frontmatter fields.
   - If `suggested_next_needs` is JSON null, leave the entry unchanged.
+  - **Validation dead-end fix (eb-self B007).** When `suggested_next_needs` is `"resolved"` — a clean, terminal validation — the entry's `needs:` line becomes `resolved` per the rule above, which distinguishes it from a stalled `needs: validate` entry, but the final `status:` flip to `resolved` is human-driven (validator is read-only). Set a `RESOLVE_HINT` flag for step (j) so the turn output tells the user the entry is validated and to run `/board-resolve <entry-id>` to close it. Without this the board showed a validated-and-done entry as indistinguishable from a stuck one.
 
 (i) Release the claim: run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-release.sh <board-dir> <entry-id> <session-id>`. Log any non-zero exit but do not abort — the orchestrator continues either way. **Then run** `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-bump.sh <session-id> --claim-release <entry-id>` to self-bump in the registry (v0.2.3); non-fatal on failure.
 
-(j) Emit `<<EB-WORKER-CONTINUE>>` on its own line, followed on the next line by a one-line summary of the subagent's `status` and `entry_id` (e.g. `entry=B017 status=work_done`). Then stop.
+(j) Emit `<<EB-WORKER-CONTINUE>>` on its own line, followed on the next line by a one-line summary of the subagent's `status` and `entry_id` (e.g. `entry=B017 status=work_done`). If step (h) set the `RESOLVE_HINT` flag, append one more human-readable line: `entry <entry-id> validated — run /board-resolve <entry-id> to close it.` (eb-self B007). Then stop.
 
 If any step in (a)-(j) fails outside the documented branches, emit `<<EB-WORKER-FAIL>>` on its own line, followed by a single line describing which sub-step failed (e.g., `step (h): subagent returned non-JSON`), and stop. Do not retry.
 
