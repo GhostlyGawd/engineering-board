@@ -14,6 +14,16 @@ increases.
   records the ranked, dependency-ordered plan (release → distribution → retention
   UX → community → learnings surfacing) with a decided-"no" on premature paywalls,
   so the post-launch work is deliberate.
+- **Community & contributor scaffolding** (roadmap Lever 4). `CONTRIBUTING.md`
+  (the no-install `bash`+`python3` suite as the merge gate, crosscompat rules,
+  version-lockstep, where things live), `SECURITY.md` (private reporting + a
+  security posture that documents the untrusted-data model, the injection corpus,
+  the accepted-residual boundary, and the severity rubric), `CODE_OF_CONDUCT.md`
+  (Contributor Covenant 2.1), `.github/` issue forms (bug / feature, mirroring the
+  RFC discipline), a PR template, `config.yml` (security + Discussions contact
+  links), and `FUNDING.yml` (GitHub Sponsors). The README gains a "Community &
+  support" section; the product's own `engineering-board/eb-self/` board is named
+  as the public roadmap.
 - **MCP distribution artifacts** (roadmap Lever 2). Three publish-ready, version-locked
   configs for the MCP server: [`mcp-server/server.json`](mcp-server/server.json) (official
   MCP Registry manifest, namespace `io.github.ghostlygawd/engineering-board`),

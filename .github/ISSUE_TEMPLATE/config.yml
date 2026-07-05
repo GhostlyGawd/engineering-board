@@ -1,0 +1,13 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/GhostlyGawd/engineering-board/security/advisories/new
+    about: >-
+      Please report security issues privately, not as a public issue. Use
+      GitHub's private advisory flow. See SECURITY.md for the full policy and an
+      email fallback.
+  - name: Questions & discussion
+    url: https://github.com/GhostlyGawd/engineering-board/discussions
+    about: >-
+      Have a question, an idea to talk through, or want to share how you use the
+      board? Start a Discussion.

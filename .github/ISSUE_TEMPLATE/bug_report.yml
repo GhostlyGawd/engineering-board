@@ -1,0 +1,88 @@
+name: Bug report
+description: Something in the plugin or MCP server behaves incorrectly.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Thanks for the report. Please do not include secrets or private repo
+        contents. If this is a security vulnerability, do not file it here — see
+        SECURITY.md and report it privately.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: A clear description of the bug — what you saw.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: The commands or actions that trigger it, in order.
+      placeholder: |
+        1. Run `/board-init myproject`
+        2. Run `/pm-start`, then end a turn
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+      description: What you expected to happen, and what actually happened instead.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface
+      description: Where the bug occurs.
+      options:
+        - Claude Code plugin
+        - MCP server
+        - Both / not sure
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: e.g. macOS 14.5, Ubuntu 24.04, Windows 11 + WSL2
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: python3 version
+      description: Output of `python3 --version`.
+      placeholder: e.g. Python 3.11.9
+    validations:
+      required: true
+
+  - type: textarea
+    id: board-state
+    attributes:
+      label: Relevant board / scratch state
+      description: >-
+        If it helps, paste the relevant entry, `BOARD.md` row, or `_sessions/`
+        scratch content. Redact anything sensitive.
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: test-output
+    attributes:
+      label: Test suite output (if relevant)
+      description: >-
+        If `bash tests/run-all.sh` is failing, paste the failing suite's output.
+      render: shell
+    validations:
+      required: false
