@@ -112,3 +112,54 @@ Neither blocks the run; no remaining phase depended on them.
 4. Set repo description/topics; upload `brand/social-preview.png`.
 5. Verify both public install paths, then submit to the channels in `LAUNCH.md` §4
    (start with awesome-claude-code — highest signal).
+
+---
+
+## Closing: the product-improvement loop (C1–C13)
+
+The improvement loop set out to prove the *experience* (not just the mechanics) and
+to converge on zero new blocker/major/P0/P1 findings across two consecutive cycles.
+
+**What the loop shipped.** Thirteen DISCOVER cycles, dogfooded on the
+`engineering-board/eb-self/` board, each running four tracks (red-team, UX,
+feature, coherence). The bulk of the work hardened the finding-reject filter and
+the MCP server against a long tail of injection and path-traversal vectors: every
+enumerated component of the reject filter (line-break, sentence-terminator,
+invisible-character, and list-marker folds, plus Unicode-tag rejection) is now
+comprehensive-by-construction rather than a curated glyph list, behind an intact
+untrusted-data framing as the primary defense. A documented mechanism-vs-coverage
+severity rubric keeps the classification honest in both directions. The feature
+track shipped the `/board-view` zero-dependency HTML board viewer (F001) and the
+animated README demo; the coherence track kept every user-facing count and claim
+matched to shipped reality.
+
+**What was killed or deferred, and why.** The Conductor (RFC 0001) — an always-on
+orchestrator that would subsume the per-discipline worker friction (B006) — stays a
+Draft RFC, not a shipped feature: it needs cross-session supervision and PR
+credentials the autonomous container cannot stand up, and shipping vaporware would
+violate the loop's own evidence rule. Premature monetization was recorded as
+direction (open-core around the Conductor; a read-only team dashboard) and
+deliberately **not** built — there is no user base to monetize until distribution
+lands, and paywalling the markdown board would destroy the differentiator. Both are
+honest "no"s, captured in `docs/rfcs/0003-productization-roadmap.md`.
+
+**Convergence — honest status.** Criteria 2–5 are met (no open blocker/major/P1 on
+the board; time-to-first-value measured and documented; every surface has a
+keep/simplify/merge/deprecate decision in `docs/rfcs/0002`; README+landing+CHANGELOG
+coherent, Lighthouse 100×4, real demo). Criterion 1 (two consecutive clean cycles)
+was **not** formally met: C12 was clean, but the C13 confirming sweep — run at full
+rigor with the same rubric — surfaced a genuine new UX **P1** (the README's
+documented `/pm-start`→`/worker-start` first-run flow dead-ended in one session at
+the flagship value moment). That finding is fixed in the 1.3.0 release (README
+mode note + a SessionStart mode banner), rather than down-rated to manufacture a
+clean streak. The red-team and coherence tracks were clean. Per the product owner's
+direction, the twelve cycles of merged hardening plus the C13 fix are shipped as
+**1.3.0** now rather than spinning further confirming cycles; the remaining
+retention, distribution, community, and learnings-surfacing work proceeds on the
+`docs/rfcs/0003` roadmap toward 1.4.0.
+
+**PMF evidence and its limits.** All persona validation here is simulated
+(fresh-install audits, persona walkthroughs, adversarial red-team) and labeled as
+such. Real product-market fit needs real users; the launch surfaces, health files,
+and instrumented channels (`.goal/LAUNCH.md`) are prepared to capture that signal
+once the human-gated distribution steps run.

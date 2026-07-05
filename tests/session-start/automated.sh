@@ -125,6 +125,53 @@ else
   fail "T4: 1200-entry board took ${ELAPSED}s (>= 10s SessionStart timeout — O(n^2) regression)"
 fi
 
+# ── Test 5-8: current session mode is surfaced in the banner (C13 observability) ─
+# Passive (no mode file) prints the passive hint naming /pm-start.
+P5="$TMP/mode-passive"
+make_board "$P5"
+OUT5="$(CLAUDE_PROJECT_DIR="$P5" bash "$SESSION_START" 2>/dev/null || true)"
+if printf '%s\n' "$OUT5" | grep -qF "Mode: passive"; then
+  pass "T5: passive mode surfaced (no session-mode.json)"
+else
+  fail "T5: passive mode line missing"
+fi
+
+# PM mode prints the PM line and the restart-to-switch guidance.
+P6="$TMP/mode-pm"
+make_board "$P6"
+mkdir -p "$P6/.engineering-board"
+printf '{"mode":"pm","session_id":"s1"}\n' > "$P6/.engineering-board/session-mode.json"
+OUT6="$(CLAUDE_PROJECT_DIR="$P6" bash "$SESSION_START" 2>/dev/null || true)"
+if printf '%s\n' "$OUT6" | grep -qF "Mode: PM" && printf '%s\n' "$OUT6" | grep -qiF "fresh session"; then
+  pass "T6: PM mode surfaced with restart-to-switch guidance"
+else
+  fail "T6: PM mode line or restart guidance missing"
+fi
+
+# Worker mode reflects the discipline.
+P7="$TMP/mode-worker"
+make_board "$P7"
+mkdir -p "$P7/.engineering-board"
+printf '{"mode":"worker","discipline":"tdd","session_id":"s1"}\n' > "$P7/.engineering-board/session-mode.json"
+OUT7="$(CLAUDE_PROJECT_DIR="$P7" bash "$SESSION_START" 2>/dev/null || true)"
+if printf '%s\n' "$OUT7" | grep -qF "Mode: Worker (discipline=tdd)"; then
+  pass "T7: worker mode surfaced with discipline"
+else
+  fail "T7: worker mode line missing or discipline wrong"
+fi
+
+# Corrupt mode file falls back to passive (fail-safe, not a crash).
+P8="$TMP/mode-corrupt"
+make_board "$P8"
+mkdir -p "$P8/.engineering-board"
+printf 'not json{' > "$P8/.engineering-board/session-mode.json"
+OUT8="$(CLAUDE_PROJECT_DIR="$P8" bash "$SESSION_START" 2>/dev/null || true)"
+if printf '%s\n' "$OUT8" | grep -qF "Mode: passive"; then
+  pass "T8: corrupt session-mode.json falls back to passive line"
+else
+  fail "T8: corrupt session-mode.json did not fall back cleanly"
+fi
+
 echo ""
 echo "================================================================"
 echo "session-start: $PASS pass, $FAIL fail"

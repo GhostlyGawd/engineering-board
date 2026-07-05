@@ -1,6 +1,6 @@
 {
   "name": "engineering-board",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "The board is the database: a git-committed kanban board your AI agents run and remember. Multi-agent build system over a committed, visible engineering-board/ markdown tree. Passive finding-extractor captures per-turn scratch; PM pipeline (consolidator + tidier + learnings-curator) promotes verified findings to the live board and Learning entries (L###); Worker pipeline (tdd-builder + code-reviewer + validator) drives a tdd->review->validate needs: state machine with atomic claim locking. v1.1.0 relocates board content to a visible, committed engineering-board/ directory (docs/boards/ and legacy docs/board/ still resolve). v1.2.0 adds a zero-dependency MCP server (11 tools over stdio, protocol 2025-06-18) bundled via .mcp.json, so the same board is drivable from any MCP client.",
   "author": {
     "name": "Acadia",

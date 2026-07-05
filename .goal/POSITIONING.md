@@ -61,7 +61,7 @@ The market splits into two camps that each make a trade-off engineering-board re
 | **VP2 — Durable cross-session memory.** Recurring lessons promote into committed Learning entries (L###) that survive session boundaries. | `learnings-curator` promotes `pattern:` tags with recurrence ≥3 → `learnings/L###` | **Existing** — `board-curate-learnings.sh` |
 | **VP3 — Collision-free parallel agents.** Atomic claim-locking lets multiple worker agents run without stepping on each other. | mkdir-based atomic lock, heartbeat, stale reclamation, cloud-sync detection | **Existing** — `board-claim-acquire/release/reclaim-stale.sh` (tested: `tests/claims/`) |
 | **VP4 — Autonomous build pipeline.** Findings flow through a `tdd → review → validate` state machine, driven by the Stop hook. | Worker pipeline dispatches `tdd-builder`/`code-reviewer`/`validator` on `needs:` state | **Existing** — worker mode + `stop-hook-procedure.md` |
-| **VP5 — Runs where you already are, and everywhere else.** Native Claude Code plugin **and** an MCP server for any MCP client. | Plugin (commands/agents/hooks/skills) + MCP tools over the same board format | Plugin **existing**; **MCP server = Phase 2 build item** |
+| **VP5 — Runs where you already are, and everywhere else.** Native Claude Code plugin **and** an MCP server for any MCP client. | Plugin (commands/agents/hooks/skills) + MCP tools over the same board format | Plugin **existing**; **MCP server existing** (shipped 1.2.0 — 11 tools over stdio) |
 
 ## 5. Name decision
 
