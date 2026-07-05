@@ -1,0 +1,74 @@
+name: Feature request
+description: Propose a change, framed the way the project frames its own RFCs.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        engineering-board plans work with a light RFC discipline (see
+        `docs/rfcs/`): name the persona and their moment of need, state the
+        problem, propose the smallest shippable slice, and say why it beats the
+        next-best alternative. A well-argued "no" is also a useful outcome. This
+        form mirrors that.
+
+  - type: dropdown
+    id: persona
+    attributes:
+      label: Persona
+      description: >-
+        Who is this for? These are the product's three personas — pick the
+        closest, or "Other" and describe.
+      options:
+        - Solo agentic dev ("Sam") — long autonomous sessions, wants findings captured and worked without babysitting
+        - Small-team lead ("Priya") — shared board humans and agents read/write, reviewable in PRs, no collisions
+        - OSS maintainer ("Devon") — durable in-repo memory, stop relearning the same lessons
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: moment
+    attributes:
+      label: Moment of need
+      description: >-
+        The concrete moment this persona reaches for the feature. What are they
+        doing, and what's missing right then?
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What can't be done today, or what is painful. Describe the gap, not a solution yet.
+    validations:
+      required: true
+
+  - type: textarea
+    id: slice
+    attributes:
+      label: Smallest shippable slice
+      description: >-
+        The minimum change that delivers real value. Prefer something that ships
+        with tests over a large design.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Why it beats the next-best alternative
+      description: >-
+        What are the alternatives (including doing nothing, or an existing
+        workaround), and why is this better? This is the part the RFC discipline
+        cares about most.
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional context
+      description: Links, prior art, related entries or RFCs, anything else.
+    validations:
+      required: false

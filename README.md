@@ -189,6 +189,16 @@ bash tests/run-all.sh   # 14 suites
 
 Cross-compat rules for any new `hooks/scripts/*.sh` (pinned by `tests/crosscompat-lint.sh`): shebang exactly `#!/usr/bin/env bash`; no `date -d` / `date -j -f`; no `jq`; no drive letters — use `python3` for JSON and timestamps. Version bumps must touch both `.claude-plugin/plugin.json` and `marketplace.json` in lockstep. Develop on a branch and land changes via PR — never push to `main` directly.
 
+Full guide: **[CONTRIBUTING.md](CONTRIBUTING.md)**. Please also read our **[Code of Conduct](CODE_OF_CONDUCT.md)**.
+
+## Community & support
+
+- **Questions, ideas, show-and-tell** → [GitHub Discussions](https://github.com/GhostlyGawd/engineering-board/discussions).
+- **Bugs & features** → [open an issue](https://github.com/GhostlyGawd/engineering-board/issues/new/choose) (guided templates).
+- **Security** → report privately via [Security Advisories](https://github.com/GhostlyGawd/engineering-board/security/advisories/new); see **[SECURITY.md](SECURITY.md)** for the posture (untrusted-data model + a red-teamed injection corpus).
+- **Roadmap** → the honest, live backlog is the product's own board at [`engineering-board/eb-self/`](engineering-board/eb-self/BOARD.md), plus [`docs/rfcs/0003-productization-roadmap.md`](docs/rfcs/0003-productization-roadmap.md). We run our own board.
+- **Support the project** → [GitHub Sponsors](https://github.com/sponsors/GhostlyGawd).
+
 ## License
 
 [MIT](LICENSE).
