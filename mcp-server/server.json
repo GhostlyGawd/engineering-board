@@ -13,7 +13,7 @@
       "registryType": "mcpb",
       "identifier": "https://github.com/GhostlyGawd/engineering-board/releases/download/v1.4.0/engineering-board-mcp.mcpb",
       "version": "1.4.0",
-      "fileSha256": "REPLACE_WITH_SHA256_OF_UPLOADED_BUNDLE",
+      "fileSha256": "aa2505d4979cf42124af8375753b4ee5f5a908e73baa6f6c9dfa46d40e9bfaf3",
       "transport": {
         "type": "stdio"
       },

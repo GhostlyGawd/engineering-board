@@ -9,6 +9,15 @@ increases.
 
 ## [Unreleased]
 
+### Changed
+- **The `.mcpb` bundle is now byte-reproducible** (launch prep). `build-mcpb.sh`
+  zips via python3 `zipfile` with fixed timestamps + permissions (no `zip` CLI
+  dependency), so the same input tree always yields the same sha256. That sha is
+  now **pinned** in `mcp-server/server.json` (`packages[0].fileSha256`) and a new
+  MCP-suite check (99 checks) rebuilds the bundle and fails if the pin drifts —
+  removing the manual "compute + paste the sha" step from the MCP-Registry publish
+  flow. `.goal/LAUNCH.md` §4 updated accordingly.
+
 ## [1.4.0] — 2026-07-05
 
 Productization roadmap release (Levers 2–5 from `docs/rfcs/0003`): MCP distribution

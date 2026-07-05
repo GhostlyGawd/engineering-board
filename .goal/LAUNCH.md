@@ -53,15 +53,18 @@ public artifacts.
 
 The server ships from the repo tree (it shells out to sibling `hooks/scripts/`),
 so the registry package is an **MCP bundle** (`.mcpb`), built and version-locked
-to `plugin.json`. All three configs are validated by the MCP test suite.
+to `plugin.json`. The build is **reproducible** (python3 `zipfile`, fixed
+timestamps), so `packages[0].fileSha256` in `server.json` is **already pinned**
+to the exact sha the build produces — and the MCP test suite fails if they drift.
+No manual sha copy-paste step.
 
 ```sh
-# 1. Build the bundle (server + hook scripts + manifest.json); prints its sha256.
+# 1. Build the bundle. It is byte-reproducible: the sha it prints already equals
+#    packages[0].fileSha256 in mcp-server/server.json (CI-verified).
 bash mcp-server/build-mcpb.sh          # → dist/engineering-board-mcp.mcpb
 
-# 2. Attach the bundle to the GitHub Release for the tag (after the tag is pushed
-#    — see §3), then set packages[0].fileSha256 in mcp-server/server.json to the
-#    sha the build printed.
+# 2. Attach that exact file as the v<version> GitHub Release asset (after the tag
+#    is pushed — see §3). server.json already points at that release-asset URL.
 
 # 3. Publish to the official MCP Registry from mcp-server/.
 cd mcp-server
