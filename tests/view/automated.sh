@@ -83,6 +83,21 @@ status: open
 ## Done when
 - x
 EOF
+mk learnings/L001.md <<'EOF'
+---
+id: L001
+type: learning
+title: durable lesson worth surfacing
+discovered: 2026-07-04
+status: open
+confidence: high
+recurrence: 4
+applies_to: [src/]
+pattern_tag: some-pattern
+---
+## Lesson
+- x
+EOF
 
 OUT="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
 
@@ -99,6 +114,19 @@ else
   pass "untrusted title is HTML-escaped (no markup injection)"
 fi
 echo "$OUT" | grep -qF '&lt;script&gt;' && pass "escaped entity present for the crafted title" || fail "no escaped entity"
+
+# F003: learnings render in their own dedicated panel (not the Q/O lane), with
+# confidence + recurrence surfaced.
+echo "$OUT" | grep -qF 'Learnings · durable memory' && pass "learnings panel header present" || fail "learnings panel header missing"
+echo "$OUT" | grep -qF 'lcard' && echo "$OUT" | grep -q 'L001' && pass "learning L001 rendered as a panel card" || fail "learning card missing"
+echo "$OUT" | grep -qF 'durable lesson worth surfacing' && pass "learning title rendered" || fail "learning title missing"
+if echo "$OUT" | grep -qF '>high<' && echo "$OUT" | grep -qF '×4'; then
+  pass "learning confidence + recurrence surfaced"
+else
+  fail "learning confidence/recurrence not surfaced"
+fi
+# The Q/O lane header no longer claims to include Learnings.
+echo "$OUT" | grep -qF 'Questions · Observations<' && pass "Q/O lane header no longer lists Learnings" || fail "Q/O lane header not updated"
 
 # Determinism: two renders are byte-identical.
 A="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"

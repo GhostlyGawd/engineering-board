@@ -9,11 +9,24 @@ increases.
 
 ## [Unreleased]
 
+## [1.4.0] — 2026-07-05
+
+Productization roadmap release (Levers 2–5 from `docs/rfcs/0003`): MCP distribution
+artifacts, first-run retention UX, community scaffolding, and learnings surfacing.
+
 ### Added
 - **Productization roadmap** — [`docs/rfcs/0003-productization-roadmap.md`](docs/rfcs/0003-productization-roadmap.md)
   records the ranked, dependency-ordered plan (release → distribution → retention
   UX → community → learnings surfacing) with a decided-"no" on premature paywalls,
   so the post-launch work is deliberate.
+- **Learnings panel in `/board-view`** (roadmap Lever 5, eb-self F003, partial). The
+  zero-dependency HTML board viewer now renders `learnings/` in a dedicated
+  "Learnings · durable memory" panel — confidence + recurrence + `applies_to`
+  surfaced — instead of burying them in the shared Questions/Observations lane. The
+  moat (durable cross-session memory) is now visible in the best demo artifact,
+  agreeing with the existing SessionStart surfacing. Five new `tests/view/`
+  assertions. The session-end PM-summary surface is deferred and PR-body injection
+  stays kill-gated to the Conductor (per F003's own kill criteria).
 - **Community & contributor scaffolding** (roadmap Lever 4). `CONTRIBUTING.md`
   (the no-install `bash`+`python3` suite as the merge gate, crosscompat rules,
   version-lockstep, where things live), `SECURITY.md` (private reporting + a
