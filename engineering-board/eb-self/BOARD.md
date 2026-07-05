@@ -18,7 +18,7 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ### Features
 - F002 P2 | [F002-onboarding-wizard-board-setup-that-collapses-ins](features/F002-onboarding-wizard-board-setup-that-collapses-ins.md)
-- F003 P3 | [F003-surface-matched-learnings-at-the-moment-of-need-](features/F003-surface-matched-learnings-at-the-moment-of-need-.md)
+- F003 P3 | [F003-surface-matched-learnings-at-the-moment-of-need-](features/F003-surface-matched-learnings-at-the-moment-of-need-.md) (partial — 1.4.0 viewer Learnings panel done + SessionStart already surfaces matched learnings; session-end PM-summary surfacing deferred, PR-body injection kill-gated to the Conductor)
 
 ### Questions
 - Q001 | [Q001-does-driving-one-board-from-claude-code--claude-](questions/Q001-does-driving-one-board-from-claude-code--claude-.md)

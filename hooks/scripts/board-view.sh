@@ -105,7 +105,19 @@ COLUMNS = [
     ("done", "Done", lambda e: e["_sub"] in ("bugs", "features")
         and e.get("status") == "resolved"),
 ]
-OTHER = [e for e in entries if e["_sub"] in ("questions", "observations", "learnings")]
+OTHER = [e for e in entries if e["_sub"] in ("questions", "observations")]
+# Learnings get their own panel (F003): they are the durable cross-session memory
+# — the moat — so the viewer highlights them rather than burying them in a shared
+# lane. Ordered by confidence (high first) then recurrence, mirroring the
+# SessionStart surfacing so the two views agree.
+_CONF_RANK = {"high": 3, "medium": 2, "low": 1}
+LEARNINGS = [e for e in entries if e["_sub"] == "learnings"
+             and e.get("status") != "resolved"]
+LEARNINGS.sort(key=lambda e: (
+    -_CONF_RANK.get((e.get("confidence") or "").strip().lower(), 0),
+    -(int(e["recurrence"]) if str(e.get("recurrence", "")).strip().isdigit() else 0),
+    e.get("id", ""),
+))
 
 def esc(s):
     return html.escape(str(s or ""))
@@ -137,17 +149,48 @@ for key, title, pred in COLUMNS:
         f'<span class="count">{len(items)}</span></div>{body}</div>'
     )
 
+def learning_card_html(e):
+    conf = (e.get("confidence") or "").strip().lower()
+    conf_badge = (
+        f'<span class="conf {"high" if conf == "high" else ""}">{esc(conf or "—")}</span>'
+    )
+    rec = str(e.get("recurrence", "")).strip()
+    rec_badge = f'<span class="rec">×{esc(rec)}</span>' if rec.isdigit() and int(rec) else ""
+    applies = ", ".join(parse_list(e.get("applies_to", "")))
+    applies_html = f'<div class="lapplies">applies to: {esc(applies)}</div>' if applies else ""
+    # Learnings tag their pattern via `pattern_tag` (single) and/or `pattern` (list).
+    tag_vals = parse_list(e.get("pattern", "")) + (
+        [e["pattern_tag"].strip()] if str(e.get("pattern_tag", "")).strip() else []
+    )
+    tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in tag_vals if t)
+    tags_html = f'<div class="tags">{tags}</div>' if tags else ""
+    return (
+        f'<div class="lcard">'
+        f'<div class="lhead"><span class="cid">{esc(e.get("id"))}</span>{conf_badge}{rec_badge}</div>'
+        f'<div class="ltitle">{esc(e.get("title"))}</div>'
+        f'{applies_html}{tags_html}'
+        f'</div>'
+    )
+
+learn_html = ""
+if LEARNINGS:
+    cards = "".join(learning_card_html(e) for e in LEARNINGS)
+    learn_html = (
+        '<h2 class="lane-h">Learnings · durable memory</h2>'
+        f'<div class="learn-grid">{cards}</div>'
+    )
+
 other_html = ""
 if OTHER:
     rows = []
     for e in OTHER:
-        kind = e["_sub"][:-1]  # question / observation / learning
+        kind = e["_sub"][:-1]  # question / observation
         rows.append(
             f'<li><span class="cid">{esc(e.get("id"))}</span> '
             f'<span class="kind">{esc(kind)}</span> {esc(e.get("title"))}</li>'
         )
     other_html = (
-        '<h2 class="lane-h">Questions · Observations · Learnings</h2>'
+        '<h2 class="lane-h">Questions · Observations</h2>'
         f'<ul class="lane">{"".join(rows)}</ul>'
     )
 
@@ -157,6 +200,7 @@ sys.stdout.write(
     f'<div class="board-head"><h1>{esc(label)}</h1>'
     f'<span class="summary">{open_ct} open · {len(entries)} total</span></div>'
     f'<div class="cols">{"".join(cols_html)}</div>'
+    f'{learn_html}'
     f'{other_html}'
     f'</section>'
 )
@@ -239,6 +283,14 @@ body{margin:0;background:var(--eb-bg);color:var(--eb-text);font-family:var(--eb-
 .lane{list-style:none;margin:0;padding:0;display:grid;gap:.3rem}
 .lane li{font-size:.82rem;padding:.35rem .5rem;background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:6px}
 .kind{font-family:var(--eb-font-mono);font-size:.66rem;color:var(--eb-accent-cur);text-transform:uppercase;letter-spacing:.05em}
+.learn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.5rem}
+.lcard{background:var(--eb-surface);border:1px solid var(--eb-border);border-left:3px solid var(--eb-accent-cur);border-radius:6px;padding:.5rem .6rem}
+.lcard .lhead{display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem}
+.ltitle{font-size:.82rem;line-height:1.3}
+.conf{font-family:var(--eb-font-mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;padding:.05rem .3rem;border-radius:3px;border:1px solid var(--eb-border);color:var(--eb-text-muted)}
+.conf.high{color:var(--eb-accent-cur);border-color:var(--eb-accent-cur)}
+.rec{font-family:var(--eb-font-mono);font-size:.6rem;color:var(--eb-text-muted)}
+.lapplies{margin-top:.3rem;font-family:var(--eb-font-mono);font-size:.62rem;color:var(--eb-text-muted)}
 footer{max-width:80rem;margin:0 auto;color:var(--eb-text-muted);font-size:.72rem;font-family:var(--eb-font-mono);text-align:center}
 </style>
 </head>
