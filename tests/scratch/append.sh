@@ -155,6 +155,15 @@ else
   report 1 "shell-hostile evidence_quote round-trips" "want [$HOSTILE_QUOTE] got [$GOT_QUOTE]"
 fi
 
+# ── B005: a human capture summary is printed on stdout (visible on the turn) ──
+if grep -qF 'EB-CAPTURE-SUMMARY: captured 1 finding(s):' "$UNIT/out1" \
+   && grep -qF 'render helper mishandles format and env expansion' "$UNIT/out1" \
+   && grep -qF '/pm-start' "$UNIT/out1"; then
+  report 0 "B005: capture summary line names the finding + /pm-start"
+else
+  report 1 "B005: capture summary line present" "out1=$(tr '\n' '|' < "$UNIT/out1")"
+fi
+
 # ── 5. Append accumulates, never clobbers ───────────────────────────────────
 FINDING2="$UNIT/finding2.json"
 printf '%s' '{"schema_version":"0.2.1","findings":[{"scratch_id":"S-unit-2","type":"observation","confidence":"tentative","title":"second finding","affects":null,"evidence_quote":"a second one","discovered":"2026-06-01","tags":[]}]}' > "$FINDING2"

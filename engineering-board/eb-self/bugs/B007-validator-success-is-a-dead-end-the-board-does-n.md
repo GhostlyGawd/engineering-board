@@ -3,10 +3,10 @@ id: B007
 type: bug
 title: Validator success is a dead end the board does not reflect
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P2
 affects: agents/validator.md
-needs: tdd
+needs: done
 pattern: [ux-affordance]
 ---
 

@@ -24,6 +24,22 @@ increases.
   drift, and `.goal/LAUNCH.md` §4 now carries the exact `mcp-publisher` / `smithery` publish
   commands. The build output (`dist/`) is a release asset, gitignored.
 
+### Fixed
+- **First captured finding is now visible on the turn** (roadmap Lever 3, eb-self B005).
+  Passive capture wrote silently to `_sessions/` and only surfaced as a count at the
+  *next* SessionStart, so a first-time user saw "nothing happened".
+  `board-scratch-append.sh` now prints a plain-language `EB-CAPTURE-SUMMARY:` line
+  (`captured N finding(s): …  — run /pm-start to promote`) and the Stop-hook passive
+  path (step (e)) surfaces it before `<<EB-PASSIVE-DONE>>`. Titles are flattened +
+  length-bounded (untrusted). One new `tests/scratch/` assertion.
+- **Validation no longer dead-ends invisibly** (roadmap Lever 3, eb-self B007). A clean
+  `validate` set `needs: resolved` but nothing told the user the entry was done, so it
+  looked identical to a stalled `needs: validate` entry. The Worker Stop-hook path
+  (step (h)/(j)) now surfaces `entry <id> validated — run /board-resolve <id> to close it`.
+- **Doc drift** (eb-self C13 P3s). `pm-start.md`'s worker→PM refusal string now matches
+  the mode guard (its single source of truth — no phantom `/board-resume`); `/worker-start`'s
+  success message no longer leaks the raw `<<EB-WORKER-NOTHING-TO-DO>>` sentinel to the user.
+
 ## [1.3.0] — 2026-07-05
 
 Batched hardening + first-run UX release. Consolidates the twelve improvement-loop

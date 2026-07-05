@@ -147,4 +147,28 @@ sys.stdout.write(
     "board-scratch-append: ok findings=%d ts=%s file=%s%s\n"
     % (findings_n, ts, scratch_path, extra)
 )
+
+# Human-readable capture summary (eb-self B005): the passive path was invisible —
+# the first captured value only surfaced as a count at the NEXT SessionStart, so
+# a first-time user saw "nothing happened". Emit a one-line, plain-language summary
+# the Stop hook surfaces on the turn the capture happens. Titles are untrusted, so
+# each is flattened (whitespace/controls collapsed) and length-bounded.
+if findings_n > 0:
+    def _oneline(s, limit=80):
+        s = " ".join(str(s if s is not None else "").split())
+        return (s[: limit - 1] + "…") if len(s) > limit else s
+    labels = []
+    for f in (obj.get("findings") or []):
+        if not isinstance(f, dict):
+            continue
+        kind = _oneline(f.get("type") or "finding", 20)
+        title = _oneline(f.get("title") or "(untitled)")
+        labels.append('%s "%s"' % (kind, title))
+    shown = labels[:5]
+    if len(labels) > 5:
+        shown.append("… +%d more" % (len(labels) - 5))
+    sys.stdout.write(
+        "EB-CAPTURE-SUMMARY: captured %d finding(s): %s — run /pm-start to promote them to the board.\n"
+        % (findings_n, "; ".join(shown))
+    )
 PY

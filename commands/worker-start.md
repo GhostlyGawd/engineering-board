@@ -87,7 +87,7 @@ If the script exits non-zero, print its stderr and continue — registry-write f
 Print exactly:
 
 ```
-Engineering board: Worker mode active (discipline=<value>). Stop hook will dispatch the <value> worker subagent each turn until no needs:<value> entries remain, then emit <<EB-WORKER-NOTHING-TO-DO>>. Run /board-pause to suspend.
+Engineering board: Worker mode active (discipline=<value>). Stop hook will dispatch the <value> worker subagent each turn until no needs:<value> entries remain, then report that there is nothing left to do. Run /board-pause to suspend.
 ```
 
 Then stop.
