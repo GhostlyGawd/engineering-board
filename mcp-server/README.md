@@ -86,6 +86,27 @@ repo-root [`.mcp.json`](../.mcp.json), which resolves the script through
 
 No separate install step is needed when the plugin is installed.
 
+## Distribution channels
+
+The server ships from this repo tree (it shells out to sibling
+`hooks/scripts/board-claim-*.sh` for locking, so it is not a standalone single
+file). Beyond cloning the repo, two packaged channels are prepared:
+
+- **MCP bundle (`.mcpb`)** — `bash mcp-server/build-mcpb.sh` produces
+  `dist/engineering-board-mcp.mcpb`, a self-contained bundle (server + the hook
+  scripts it calls + [`manifest.json`](manifest.json)) for one-click install in
+  MCP-bundle-aware clients. The bundle is a release asset, not committed source.
+- **MCP Registry** — [`server.json`](server.json) is the registry manifest
+  (namespace `io.github.ghostlygawd/engineering-board`), pointing at the `.mcpb`
+  release asset. Publishing is a human step (`mcp-publisher`), tracked in
+  [`.goal/LAUNCH.md`](../.goal/LAUNCH.md) §4; once published it auto-syndicates to
+  PulseMCP / Glama / mcp.so.
+- **Smithery** — [`smithery.yaml`](smithery.yaml) describes the stdio launch for
+  `smithery mcp publish`.
+
+`server.json`, `manifest.json`, and `smithery.yaml` are version-locked to
+`plugin.json` and validated by the MCP test suite so they cannot silently drift.
+
 ## Tests
 
 ```sh

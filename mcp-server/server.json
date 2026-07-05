@@ -1,0 +1,30 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.ghostlygawd/engineering-board",
+  "description": "The board is the database: a git-committed kanban board your AI agents run and remember. Eleven tools over stdio to scaffold boards, create/list/update entries, rebuild the index, capture findings, and claim/release entry locks against a committed markdown tree.",
+  "repository": {
+    "url": "https://github.com/GhostlyGawd/engineering-board",
+    "source": "github"
+  },
+  "version": "1.3.0",
+  "websiteUrl": "https://ghostlygawd.github.io/engineering-board/",
+  "packages": [
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/GhostlyGawd/engineering-board/releases/download/v1.3.0/engineering-board-mcp.mcpb",
+      "version": "1.3.0",
+      "fileSha256": "REPLACE_WITH_SHA256_OF_UPLOADED_BUNDLE",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CLAUDE_PROJECT_DIR",
+          "description": "Absolute path to the repository whose engineering-board/ tree the server operates on. Defaults to the current working directory when unset.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}

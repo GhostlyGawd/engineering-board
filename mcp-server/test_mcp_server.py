@@ -518,6 +518,45 @@ def suite_lifecycle(mod, tmp_repo):
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+def suite_distribution():
+    """Validate the distribution manifests so they cannot silently rot.
+
+    server.json (MCP Registry), manifest.json (.mcpb bundle), and smithery.yaml
+    must stay well-formed and version-coherent with plugin.json — the same
+    lockstep discipline the plugin/marketplace manifests already enforce.
+    """
+    plugin_ver = json.load(
+        open(os.path.join(PLUGIN_ROOT, ".claude-plugin", "plugin.json"))
+    )["version"]
+
+    server = json.load(open(os.path.join(HERE, "server.json")))
+    check(server.get("version") == plugin_ver,
+          "server.json version matches plugin.json",
+          "%s != %s" % (server.get("version"), plugin_ver))
+    check(server.get("name") == "io.github.ghostlygawd/engineering-board",
+          "server.json uses the reverse-DNS registry namespace")
+    pkgs = server.get("packages") or []
+    check(len(pkgs) == 1 and pkgs[0].get("version") == plugin_ver,
+          "server.json package version matches plugin.json")
+    check(pkgs and pkgs[0].get("transport", {}).get("type") == "stdio",
+          "server.json declares the stdio transport")
+
+    manifest = json.load(open(os.path.join(HERE, "manifest.json")))
+    check(manifest.get("version") == plugin_ver,
+          "manifest.json (.mcpb) version matches plugin.json",
+          "%s != %s" % (manifest.get("version"), plugin_ver))
+    srv = manifest.get("server", {})
+    check(srv.get("type") == "python"
+          and srv.get("entry_point") == "mcp-server/engineering_board_mcp.py",
+          "manifest.json points at the real server entry point")
+
+    smithery = open(os.path.join(HERE, "smithery.yaml")).read()
+    for token in ("startCommand:", "type: stdio",
+                  "engineering_board_mcp.py", "commandFunction:"):
+        check(token in smithery,
+              "smithery.yaml contains %r" % token)
+
+
 def main():
     if not os.path.isfile(VALIDATE_SCRIPT):
         print("MISSING validate script: %s" % VALIDATE_SCRIPT, file=sys.stderr)
@@ -529,6 +568,7 @@ def main():
     try:
         suite_stdio(tmp1)
         suite_lifecycle(mod, tmp2)
+        suite_distribution()
     except Failure as e:
         print("\n  [FAIL] %s" % e, file=sys.stderr)
         print("\nRESULT: FAIL (%d checks passed before failure)" % len(PASSED), file=sys.stderr)
