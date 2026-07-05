@@ -9,6 +9,45 @@ increases.
 
 ## [Unreleased]
 
+### Added
+- **Productization roadmap** — [`docs/rfcs/0003-productization-roadmap.md`](docs/rfcs/0003-productization-roadmap.md)
+  records the ranked, dependency-ordered plan (release → distribution → retention
+  UX → community → learnings surfacing) with a decided-"no" on premature paywalls,
+  so the post-launch work is deliberate.
+
+## [1.3.0] — 2026-07-05
+
+Batched hardening + first-run UX release. Consolidates the twelve improvement-loop
+cycles of injection/traversal hardening (dogfooded on the `engineering-board/eb-self/`
+board) and adds the C13 fixes for the documented first-run mode friction. The C13
+confirming red-team and coherence sweeps were clean; the UX sweep surfaced one
+README-accuracy defect at the flagship value moment, fixed here.
+
+### Fixed
+- **README first-run flow no longer dead-ends at the value moment** (eb-self C13
+  UX P1). The Quickstart presented `/pm-start` (step 2) → `/worker-start` (step 3)
+  as one continuous sequence, but a session holds one mode at a time, so
+  `/worker-start` declined mid-session with a restart message the README never
+  mentioned — the documented happy path broke for every first-timer right at the
+  autonomous-pipeline demo. Step 3 now says to start a fresh session, and a new
+  "one session, one mode" note explains the mode model and how to return to passive
+  capture (including deleting `.engineering-board/session-mode.json` on local
+  installs where the file persists across restarts).
+
+### Added
+- **SessionStart banner surfaces the current session mode** (eb-self C13 UX P2).
+  The banner now prints `Mode: passive | PM | Worker (discipline=…) | paused` with a
+  one-line hint on how to change it, so a user always knows which mode they are in —
+  previously the only way to tell was to `cat .engineering-board/session-mode.json`.
+  The passive line also names `/pm-start` and `/worker-start`, improving first-run
+  discoverability. Four new `tests/session-start/` assertions (passive/PM/worker/
+  corrupt-fallback).
+
+### Changed
+- **`.goal/POSITIONING.md` VP5 corrected** — the value-prop table still described the
+  MCP server as a "Phase 2 build item"; it shipped in 1.2.0 (11 tools over stdio).
+  Internal doc; understated a shipped feature (eb-self C13 coherence, LOW).
+
 Product improvement loop (dogfooded on the `engineering-board/eb-self/` board).
 
 ### Security

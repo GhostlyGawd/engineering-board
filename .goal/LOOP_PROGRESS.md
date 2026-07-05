@@ -5,7 +5,7 @@
 > plus the `engineering-board/eb-self/` board (the living backlog). Update it at
 > the end of every cycle step.
 
-_Last updated: 2026-07-04 (C12 complete — CLEAN cycle #1; C13 must confirm → then release)_
+_Last updated: 2026-07-05 (C13 complete — NOT clean: one UX P1 found+fixed; 1.3.0 shipped by product-owner direction; roadmap RFC 0003 drives 1.4.0)_
 
 ## How to resume
 
@@ -17,12 +17,12 @@ _Last updated: 2026-07-04 (C12 complete — CLEAN cycle #1; C13 must confirm →
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | 🟨 **C12 = clean cycle #1** — its only finding (B061 tag-char smuggling) is P2 (indep. red-team said P3); MCP/bash + Track B/D all clean. Prior: C9 clean, C10 reset (B058), C11 reset (B059). Every enumerated filter component is now comprehensive-by-construction. **C13 must confirm** (also clean) to MEET this criterion. |
+| 1 | Two consecutive full cycles → zero new blocker/major/P0/P1 | 🟥 **NOT met — C13 reset the streak.** C12 was clean, but C13's UX track surfaced a genuine new **P1** (README first-run pm→worker dead-end) — fixed in 1.3.0, not down-rated. C13 red-team + coherence tracks were clean. Per product-owner direction, shipping the batched hardening + C13 fix as 1.3.0 rather than spinning further confirming cycles; remaining work follows RFC 0003 toward 1.4.0. |
 | 2 | eb-self board has no open blocker/major/P0/P1 | ✅ MET — all open entries P2/P3 (verified end of C2) |
 | 3 | Time-to-first-value measured, documented, defensible | ✅ MET — `.goal/evidence/loop/C2-time-to-first-value.md` + README "what to expect" (B027) |
 | 4 | Every surface has keep/simplify/merge/deprecate decision in one docs/rfcs/ product-review doc | ✅ MET — `docs/rfcs/0002-surface-product-review.md` |
 | 5 | README+landing+CHANGELOG+positioning coherent, link-checked, Lighthouse ≥95, real animated demo | ✅ MET (C5) — `docs/board-demo.svg` README hero (real pipeline); fresh Lighthouse 100×4 (local chromium, not curl-mirror); 16 landing refs resolve. Evidence: `.goal/evidence/loop/C5-criterion5-demo-lighthouse.txt` |
-| 6 | Release batched+CHANGELOG'd+manifests bumped; BLOCKERS only human-gated; FINAL_REPORT closing section | ⬜ pending (batch when criterion 1 nears) |
+| 6 | Release batched+CHANGELOG'd+manifests bumped; BLOCKERS only human-gated; FINAL_REPORT closing section | ✅ MET (1.3.0) — both manifests bumped 1.2.0→1.3.0 lockstep; CHANGELOG `[1.3.0]` promoted; FINAL_REPORT closing "improvement loop" section added; BLOCKERS remain human-gated (tag push, repo settings, channel submissions). |
 
 ## Cycle log
 
@@ -280,29 +280,45 @@ _Last updated: 2026-07-04 (C12 complete — CLEAN cycle #1; C13 must confirm →
 - **eb-self open blocker/major/P1: NONE.** Open (all P2/P3):
   B005/B006/B007/B008/B009/B014/B030 (P2); B016/B020/B021/B022/B057 (P3); F002/F003; Q001.
 
-### Next — C13 (CONFIRMING cycle → then release)  ⟵ RESUME HERE (fresh session)
+### C13 — thirteenth full DISCOVER sweep (COMPLETE — NOT clean; 1.3.0 shipped; roadmap opened)
 
-C13 runs all four DISCOVER tracks with the SAME rubric applied consistently. If C13
-is **also clean** (zero new blocker/major/P0/P1 — do not invent a P1, do not
-down-rate a genuine mechanism gap), then **criterion 1 is MET** (C12 + C13 = two
-consecutive clean cycles) and the **criterion-6 release batch** runs:
-- bump `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` to **1.3.0**
-  (lockstep — `tests/version-coherence.sh` enforces it),
-- promote CHANGELOG `[Unreleased]` → `## [1.3.0] — <date>` (add a new empty
-  `[Unreleased]` above it),
-- add the `.goal/FINAL_REPORT.md` closing "improvement loop" section,
-- the git **tag stays human-gated** (BLOCKERS B2) — do NOT tag/release; note in the
-  final report that tagging/publishing is left to a human.
-If C13 surfaces a genuine new P1, the streak resets and C14 becomes the new
-candidate. Only criteria 1 and 6 remain (2/3/4/5 met).
-
-**Session handoff note (2026-07-04):** C13's DISCOVER was launched then stopped mid-run
-so this session could reach a clean stopping point — re-run C13 fresh from here. The
-reject filter is maximally hardened (all enumerated components comprehensive + tag
-rejection); C13 has a strong chance of confirming clean. All 12 cycles' work is
-merged to `main`; the designated branch equals `origin/main`; no PR is open.
-- **Criterion 6** (batch once criterion 1 is within reach): bump `plugin.json` + `marketplace.json` (lockstep) to 1.3.0, promote the CHANGELOG `[Unreleased]` heading to `[1.3.0]`, add the `.goal/FINAL_REPORT.md` closing "improvement loop" section; the git tag stays human-gated (BLOCKERS B2).
-- Only criteria 1 and 6 remain (2/3/4/5 met).
+- **DISCOVER:** all four tracks, run in parallel at full rigor.
+  - **Track A (red-team): CLEAN.** Novel grammar/mood/verb reject-filter vectors all
+    caught or documented out-of-scope residuals; MCP path/injection/symlink defenses
+    and claim-lock atomicity all held under live reproduction. Only pre-existing P3
+    residuals (reclaim-stale TOCTOU, cloud-detect asymmetry).
+  - **Track D (coherence): CLEAN.** Every user-facing count verified (11 commands,
+    8 agents, 4 skills, 11 MCP tools, 14 suites, 4 hook events); manifests lockstep.
+    One LOW internal staleness — POSITIONING VP5 called the shipped MCP server a
+    "Phase 2 build item" (C13 coherence, fixed in 1.3.0).
+  - **Track B (UX): NOT clean.** Found a genuine new **P1** — the README Quickstart
+    documented `/pm-start` (step 2) → `/worker-start` (step 3) as one continuous
+    sequence, but a session holds one mode at a time, so `/worker-start` declined
+    mid-session; the documented first-value flow broke for every first-timer at the
+    flagship autonomous-pipeline moment. Plus P2s: mode not surfaced anywhere
+    (users had to `cat` the state file), mode not session-scoped so the "restart"
+    remedy is unreliable on local persistent installs, and no in-session way back to
+    passive. P3s: `/pm-start` vs `/board-*` namespace split, a stale worker→pm
+    refusal string in `pm-start.md`, a raw sentinel leaked in `/worker-start`'s
+    success message.
+- **Honest call:** the Track B P1 is real and cited to file:line; I did **not**
+  down-rate it to preserve the C12→C13 streak. So **C13 is NOT clean; the streak
+  resets.** Criterion 1 is not met.
+- **SHIP (1.3.0 — this PR):** README first-run mode note (P1 fix) + SessionStart
+  banner mode surface (P2 observability, `board-session-start.sh` + 4 new
+  `tests/session-start/` assertions) + POSITIONING VP5 coherence fix + roadmap
+  RFC 0003 + version bump 1.2.0→1.3.0 (lockstep) + CHANGELOG `[1.3.0]` +
+  FINAL_REPORT closing section. `tests/run-all.sh` green.
+- **Product-owner direction:** rather than spin further confirming cycles (twelve
+  already show diminishing returns re-hardening one filter), ship the batched
+  hardening + C13 P1 fix as **1.3.0** and pivot to the productization roadmap
+  ([`docs/rfcs/0003-productization-roadmap.md`](../docs/rfcs/0003-productization-roadmap.md)):
+  Lever 2 distribution artifacts, Lever 3 remaining retention UX (B005/B007 + the
+  C13 P2/P3 residuals), Lever 4 community scaffolding, Lever 5 F003 learnings
+  surfacing — batched into 1.4.0.
+- **New eb-self intake from C13 (toward 1.4.0):** C13 UX P2s (mode session-scoping,
+  return-to-passive) + P3s (namespace split, `pm-start.md` drift, worker sentinel
+  leak). Open blocker/major/P1: **NONE** (the P1 is fixed in 1.3.0).
 
 ### Track status (C1)
 

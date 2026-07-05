@@ -24,6 +24,38 @@ fi
 echo "=== Engineering Board ==="
 echo ""
 
+# Current session mode (C13 observability): the Stop hook routes on
+# .engineering-board/session-mode.json. Surface it so the user always knows
+# which mode they're in and how to change it — a session holds one mode at a
+# time, so switching means starting a new session.
+MODE_FILE="${CLAUDE_PROJECT_DIR:-$PWD}/.engineering-board/session-mode.json"
+mode_line="$(python3 - "$MODE_FILE" <<'PY' 2>/dev/null || true
+import json, sys
+try:
+    with open(sys.argv[1], "r", encoding="utf-8") as f:
+        d = json.load(f)
+    mode = d.get("mode") if isinstance(d, dict) else None
+    disc = d.get("discipline") if isinstance(d, dict) else None
+except Exception:
+    mode, disc = None, None
+if isinstance(mode, str):
+    mode = mode.strip()
+if mode == "pm":
+    print("Mode: PM — findings promote to the board each turn. Start a fresh session to switch to worker or plain capture.")
+elif mode == "worker":
+    d = disc.strip() if isinstance(disc, str) else ""
+    print(f"Mode: Worker (discipline={d or '?'}) — advancing needs:{d or '?'} entries each turn. Start a fresh session to switch.")
+elif mode == "paused":
+    print("Mode: paused — passive capture suspended. Run /board-resume to restore.")
+else:
+    print("Mode: passive — capturing findings quietly each turn. Run /pm-start to promote them, or /worker-start --discipline tdd to build.")
+PY
+)"
+if [ -n "${mode_line}" ]; then
+  echo "${mode_line}"
+  echo ""
+fi
+
 for i in "${!BOARD_PATHS[@]}"; do
   BOARD_DIR="${BOARD_PATHS[$i]}"
   LABEL="${PROJECT_LABELS[$i]:-project}"
