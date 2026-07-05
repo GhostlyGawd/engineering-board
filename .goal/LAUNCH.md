@@ -44,10 +44,36 @@ public artifacts.
 | **Self-hosted plugin marketplace** | Already live — users run `/plugin marketplace add GhostlyGawd/engineering-board`. Nothing to submit. | done |
 | **awesome-claude-code** (hesreallyhim) | Use "Recommend a new resource" → opens a pre-filled issue (do **not** open a PR). Highest-signal free channel for the exact audience. | **[human]** |
 | **Claude community marketplace** | `claude plugin validate` (passes clean) then submit at `platform.claude.com/plugins/submit` (Console) or `claude.ai/admin-settings/directory/submissions/plugins/new`. Pinned to a commit SHA after review. | **[human]** |
-| **Official MCP Registry** | Publish the server package; add `mcpName`; `mcp-publisher init → login github → publish` a `server.json`; namespace `io.github.ghostlygawd/engineering-board`. Auto-syndicates into PulseMCP/mcp.so. | **[human]** |
-| **Smithery** | `smithery mcp publish` (needs `smithery.yaml` + account/API key). | **[human]** |
+| **Official MCP Registry** | Manifest ready: [`mcp-server/server.json`](../mcp-server/server.json) (namespace `io.github.ghostlygawd/engineering-board`). See the command block below. Auto-syndicates into PulseMCP/mcp.so. | **[human]** |
+| **Smithery** | Config ready: [`mcp-server/smithery.yaml`](../mcp-server/smithery.yaml). `smithery mcp publish` (needs account/API key). | **[human]** |
 | **Glama / PulseMCP / mcp.so** | Auto-crawl the official registry + GitHub; claim the listing after it appears. | mostly automatic |
 | **awesome-mcp-servers** (punkpeye) | Open a PR adding the entry in the list's format. | **[human]** |
+
+### Prepared MCP-server artifacts (this run) — exact publish steps
+
+The server ships from the repo tree (it shells out to sibling `hooks/scripts/`),
+so the registry package is an **MCP bundle** (`.mcpb`), built and version-locked
+to `plugin.json`. All three configs are validated by the MCP test suite.
+
+```sh
+# 1. Build the bundle (server + hook scripts + manifest.json); prints its sha256.
+bash mcp-server/build-mcpb.sh          # → dist/engineering-board-mcp.mcpb
+
+# 2. Attach the bundle to the GitHub Release for the tag (after the tag is pushed
+#    — see §3), then set packages[0].fileSha256 in mcp-server/server.json to the
+#    sha the build printed.
+
+# 3. Publish to the official MCP Registry from mcp-server/.
+cd mcp-server
+mcp-publisher login github
+mcp-publisher publish                  # reads server.json
+
+# 4. Smithery (separate account/API key):
+smithery mcp publish                   # reads smithery.yaml
+```
+
+Repo topics/description/social-preview (§1) and the tag push (§3) remain the
+human prerequisites; nothing above can run until the release tag exists.
 
 ## 5. Announcement drafts (brand voice — confident, plain, no hype)
 

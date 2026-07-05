@@ -14,6 +14,15 @@ increases.
   records the ranked, dependency-ordered plan (release → distribution → retention
   UX → community → learnings surfacing) with a decided-"no" on premature paywalls,
   so the post-launch work is deliberate.
+- **MCP distribution artifacts** (roadmap Lever 2). Three publish-ready, version-locked
+  configs for the MCP server: [`mcp-server/server.json`](mcp-server/server.json) (official
+  MCP Registry manifest, namespace `io.github.ghostlygawd/engineering-board`),
+  [`mcp-server/manifest.json`](mcp-server/manifest.json) + [`mcp-server/build-mcpb.sh`](mcp-server/build-mcpb.sh)
+  (a `.mcpb` bundle that packages the server with the hook scripts it shells out to),
+  and [`mcp-server/smithery.yaml`](mcp-server/smithery.yaml) (Smithery stdio launch). All
+  three are validated against `plugin.json` by the MCP test suite (98 checks) so they cannot
+  drift, and `.goal/LAUNCH.md` §4 now carries the exact `mcp-publisher` / `smithery` publish
+  commands. The build output (`dist/`) is a release asset, gitignored.
 
 ## [1.3.0] — 2026-07-05
 
