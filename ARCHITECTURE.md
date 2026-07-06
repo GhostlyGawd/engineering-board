@@ -32,7 +32,7 @@ engineering-board/
 ├── LICENSE                         # MIT
 ├── .mcp.json                       # Bundles the MCP server at the plugin root
 ├── agents/                         # 8 agent definitions (Claude Code subagents)
-├── commands/                       # 12 slash commands
+├── commands/                       # 13 slash commands
 ├── hooks/
 │   ├── hooks.json                  # 4 hook events wired
 │   ├── stop-hook-procedure.md      # Canonical Stop procedure (passive/PM/worker)
@@ -80,10 +80,11 @@ The `needs:` state machine: `tdd → review → validate → resolved`. The Stop
 
 ---
 
-## 4. Commands (`commands/`) — 12 total
+## 4. Commands (`commands/`) — 13 total
 
 | Command | Group | Purpose |
 |---|---|---|
+| `/board-run <entry-id>` | Pipeline | Drive ONE bug/feature end-to-end (`tdd → review → validate`) in this session under claim lock — the Conductor's inner loop (RFC 0001 slice 1). Bounded (5 rounds), passive-only, no mode file. |
 | `/board-setup [project]` | Lifecycle | One-command onboarding: infers the project name, delegates to `/board-init`, runs the permission self-check, prints the 3-line ready summary. Idempotent; leaves the session passive. |
 | `/board-init <project> [affects-prefix]` | Lifecycle | Scaffold `engineering-board/<project>/` (committed by default; `--private` for the one-line full-tree opt-out) + append to `BOARD-ROUTER.md`. Idempotent. |
 | `/board-rebuild [project]` | Lifecycle | Regenerate `BOARD.md` + `GRAPH.yml` deterministically from entry files. Runs auto-resolve terminal pass. Cheap to run after any entry mutation. |
