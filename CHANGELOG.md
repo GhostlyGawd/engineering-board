@@ -9,6 +9,17 @@ increases.
 
 ## [Unreleased]
 
+### Changed
+- **One consolidation engine** (IMPROVEMENTS #12, eb-self B014, RFC 0002's
+  `merge` verdict). The `consolidator` agent no longer re-implements the
+  promotion algorithm in prose — it is now a thin dispatcher over the canonical
+  `board-consolidate.sh` engine (which owns parsing, the reject filter, anchor
+  verification, T2b supersession, promotion writes, and the audit log). The
+  agent keeps the two things only an LLM can do: drafting Done-when criteria
+  for newly promoted entries and reporting the run as the same JSON contract
+  (plus a T2b spot-audit that reports — never repairs — engine violations).
+  Every future hardening fix now lands in exactly one place.
+
 ### Added
 - **Multi-client story proven and documented** (IMPROVEMENTS #10, eb-self Q001).
   A new CI suite spawns two independent MCP server processes on one board and

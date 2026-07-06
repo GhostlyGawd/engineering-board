@@ -3,10 +3,10 @@ id: B014
 type: bug
 title: Two implementations of scratch->live promotion with no stated canonical engine
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P2
 affects: agents/consolidator.md
-needs: tdd
+needs: done
 pattern: [duplication]
 ---
 
