@@ -591,6 +591,97 @@ def suite_distribution():
           % (pinned, rebuilt_sha))
 
 
+def suite_multiclient():
+    """Two independent MCP server processes drive ONE board (eb-self Q001).
+
+    This is the multi-client differentiator (README VP5) made empirical: the
+    same on-disk board, two stdio server instances (as Claude Code + Claude
+    Desktop would spawn), racing for the same entry's claim. Exactly one must
+    win; the loser must see clean contention; after the winner releases, the
+    loser must be able to acquire.
+    """
+    print("\n== Suite 4: multi-client — two servers, one board (Q001) ==")
+    tmp = tempfile.mkdtemp(prefix="eb-mcp-multi-")
+    procs = []
+
+    def spawn():
+        pr = subprocess.Popen(
+            ["python3", SERVER_PATH],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            text=True, bufsize=1,
+            env=dict(os.environ, CLAUDE_PROJECT_DIR=tmp),
+        )
+        procs.append(pr)
+
+        def rpc(method, params, _id=[0]):
+            _id[0] += 1
+            pr.stdin.write(json.dumps({"jsonrpc": "2.0", "id": _id[0],
+                                       "method": method, "params": params}) + "\n")
+            pr.stdin.flush()
+            line = pr.stdout.readline()
+            if not line:
+                raise Failure("multiclient: server died; stderr=%r" % pr.stderr.read())
+            return json.loads(line)
+
+        r = rpc("initialize", {"protocolVersion": "2025-06-18", "capabilities": {}})
+        assert "result" in r
+        pr.stdin.write(json.dumps({"jsonrpc": "2.0",
+                                   "method": "notifications/initialized"}) + "\n")
+        pr.stdin.flush()
+
+        def call(tool, args):
+            r = rpc("tools/call", {"name": tool, "arguments": args})
+            return json.loads(r["result"]["content"][0]["text"])
+
+        return call
+
+    try:
+        a = spawn()
+        b = spawn()
+
+        a("board_init", {"project": "shared"})
+        made = a("board_create_entry", {
+            "project": "shared", "type": "bug", "title": "raced entry",
+            "priority": "P2", "affects": "shared/x", "done_when": ["x"]})
+        eid = made["id"]
+
+        # Client B sees the entry client A created (same board, no cache).
+        got = b("board_get_entry", {"project": "shared", "entry_id": eid})
+        check(got.get("frontmatter", {}).get("id") == eid,
+              "client B reads the entry client A created")
+
+        ra = a("board_claim", {"project": "shared", "entry_id": eid,
+                               "session_id": "client-a"})
+        rb = b("board_claim", {"project": "shared", "entry_id": eid,
+                               "session_id": "client-b"})
+        codes = sorted([ra.get("exit_code"), rb.get("exit_code")])
+        check(codes == [0, 1],
+              "concurrent claims: exactly one acquired (0) and one contended (1)",
+              "got %s" % codes)
+
+        winner, loser = (a, b) if ra.get("exit_code") == 0 else (b, a)
+        wsid = "client-a" if ra.get("exit_code") == 0 else "client-b"
+        lsid = "client-b" if wsid == "client-a" else "client-a"
+        rel = winner("board_release", {"project": "shared", "entry_id": eid,
+                                       "session_id": wsid})
+        check(rel.get("exit_code") == 0, "winner releases its claim cleanly")
+        r2 = loser("board_claim", {"project": "shared", "entry_id": eid,
+                                   "session_id": lsid})
+        check(r2.get("exit_code") == 0,
+              "loser acquires after release (no stuck lock)")
+    finally:
+        for pr in procs:
+            try:
+                pr.stdin.close()
+            except Exception:
+                pass
+            try:
+                pr.wait(timeout=5)
+            except Exception:
+                pr.kill()
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def main():
     if not os.path.isfile(VALIDATE_SCRIPT):
         print("MISSING validate script: %s" % VALIDATE_SCRIPT, file=sys.stderr)
@@ -603,6 +694,7 @@ def main():
         suite_stdio(tmp1)
         suite_lifecycle(mod, tmp2)
         suite_distribution()
+        suite_multiclient()
     except Failure as e:
         print("\n  [FAIL] %s" % e, file=sys.stderr)
         print("\nRESULT: FAIL (%d checks passed before failure)" % len(PASSED), file=sys.stderr)
