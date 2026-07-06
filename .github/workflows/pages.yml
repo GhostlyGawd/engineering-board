@@ -2,7 +2,9 @@ name: pages
 
 # Publishes the landing page by syncing docs/{index.html,assets,.nojekyll}
 # to the gh-pages branch, which GitHub Pages serves (branch-deploy mode —
-# the site auto-enabled when gh-pages was first pushed).
+# the site auto-enabled when gh-pages was first pushed). Also publishes the
+# committed eb-self board view as /board.html — the live public roadmap
+# (IMPROVEMENTS.md #3): every /board-view refresh merged to main updates it.
 #
 # Why not actions/deploy-pages? The workflow GITHUB_TOKEN on this repo cannot
 # create or manage the Pages site via the API ("Resource not accessible by
@@ -17,6 +19,7 @@ on:
       - "docs/index.html"
       - "docs/assets/**"
       - "docs/.nojekyll"
+      - "engineering-board/eb-self/board.html"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -40,6 +43,7 @@ jobs:
           SHA=$(git rev-parse --short HEAD)
           SITE=$(mktemp -d)
           cp -r docs/index.html docs/assets docs/.nojekyll "$SITE"/
+          cp engineering-board/eb-self/board.html "$SITE"/board.html
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout --orphan gh-pages
