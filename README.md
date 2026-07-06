@@ -62,17 +62,16 @@ Install from this repo's own marketplace:
 /plugin install engineering-board
 ```
 
-Then scaffold a board, once per project:
+Then run the one-command setup (scaffolds the board with smart defaults and
+checks the pipeline's permissions in a single step):
 
 ```
-/board-init <project> [affects-prefix]
+/board-setup
 ```
 
-Grant the pipeline's permissions once, so it runs without prompting on every step:
-
-```
-/board-install-permissions
-```
+Prefer explicit control? `/board-init <project> [affects-prefix]` scaffolds with
+your own names, and `/board-install-permissions` manages the permission
+allowlist on its own — `/board-setup` simply composes the two.
 
 **Now you have a board. Here's how the first value shows up — no further setup:**
 
@@ -124,7 +123,7 @@ Installing the plugin auto-registers the same server via the repo-root [`.mcp.js
 | **PM** | `/pm-start` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` |
 | **Worker** | `/worker-start --discipline <tdd\|review\|validate>` | claim-acquire → `tdd-builder` / `code-reviewer` / `validator` → claim-release |
 
-**Commands (11)** — `/board-init`, `/board-rebuild`, `/board-graph`, `/board-view`, `/board-pause`, `/board-resume`, `/pm-start`, `/worker-start`, `/board-install-permissions`, `/board-claim-release`, `/board-migrate`.
+**Commands (12)** — `/board-setup`, `/board-init`, `/board-rebuild`, `/board-graph`, `/board-view`, `/board-pause`, `/board-resume`, `/pm-start`, `/worker-start`, `/board-install-permissions`, `/board-claim-release`, `/board-migrate`.
 
 **Agents (8)** — `board-manager` (router over the 4 skills); the PM pipeline `finding-extractor` → `consolidator` → `tidier` → `learnings-curator`; the Worker pipeline `tdd-builder` / `code-reviewer` / `validator` (the validator is strictly read-only).
 

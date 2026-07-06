@@ -3,10 +3,10 @@ id: F002
 type: feature
 title: Onboarding wizard (/board-setup) that collapses install->value to one step
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P2
 affects: commands/board-setup.md
-needs: tdd
+needs: done
 pattern: [onboarding]
 ---
 
