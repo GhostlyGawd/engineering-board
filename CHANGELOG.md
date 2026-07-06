@@ -10,6 +10,12 @@ increases.
 ## [Unreleased]
 
 ### Added
+- **The live public board** (IMPROVEMENTS.md #3). `pages.yml` now publishes the
+  committed `engineering-board/eb-self/board.html` to the site as
+  [`/board.html`](https://ghostlygawd.github.io/engineering-board/board.html) —
+  the product's own roadmap, rendered by its own `/board-view`, republished on
+  every merge to `main`. The README hero and Community section link it (replacing
+  the "open it locally to render" apology).
 - **One-click release workflow** — [`.github/workflows/release.yml`](.github/workflows/release.yml)
   (workflow_dispatch, or any `v*` tag push) automates the whole release chain the
   sandbox cannot perform itself: create the annotated tag at a given main sha
