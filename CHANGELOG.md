@@ -9,6 +9,16 @@ increases.
 
 ## [Unreleased]
 
+## [1.5.0] — 2026-07-06
+
+The IMPROVEMENTS.md release: all 14 opportunities from the product-discovery
+pass, built in priority order (PRs #67–#76) — the live public board, the
+honest-feedback bundle, dark-mode/token and banner polish, viewer affordances +
+landing refresh, Done-when drafting at promotion, `/board-setup` onboarding,
+the weekly adoption snapshot, the CI-proven multi-client story, the single
+consolidation engine, and `/board-run` (the Conductor's inner loop). Resolves
+eb-self B006, B008, B009, B014, B030, F002, and Q001.
+
 ### Added
 - **`/board-run <entry-id>` — the Conductor's inner loop, shipped early**
   (IMPROVEMENTS #13 slice 1; resolves eb-self B006). Drive ONE bug/feature
