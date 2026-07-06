@@ -1,159 +1,142 @@
-# IMPROVEMENTS — product discovery pass (2026-07-06)
+# IMPROVEMENTS — product discovery pass v2 (2026-07-06, post-1.5.0)
 
-_Discovery only; nothing here is implemented. Every idea cites evidence from this
-repo. Generated from a fresh 12-lens audit (two independent design/UX audits of
-the HTML artifacts and command microcopy, plus the live `eb-self` backlog and a
-verification pass on each headline claim)._
+_Discovery only; nothing in this report is implemented. Every idea cites evidence
+from this repo. **v1 of this report (same date) was built in full and shipped as
+[v1.5.0](https://github.com/GhostlyGawd/engineering-board/releases/tag/v1.5.0)
+(PRs #67–#77)** — this v2 pass re-audits the repo as it now stands: the residual
+open backlog, the findings from the v1 design audits that were deliberately not
+taken, and the new opportunities the v1 ships created._
 
 ## 1. Product snapshot
 
 engineering-board turns a committed markdown tree (`engineering-board/<project>/`)
-into a kanban board that AI agents run themselves: a Stop-hook pipeline passively
-captures findings from every Claude Code session, a PM mode promotes them into
-validated board entries, and a Worker mode drives entries through a
-`tdd → review → validate` state machine with atomic claim-locking — all state
-committed, diffable, and reviewed in the same PRs as code ("the board is the
-database"). It ships as a Claude Code plugin and a zero-dependency MCP server,
-released at v1.4.0 with a live landing page and an official MCP Registry listing.
-The current journey: install from the repo marketplace → `/board-init` →
-passive capture surfaces a first finding in ~5 minutes (`EB-CAPTURE-SUMMARY`
-line) → `/pm-start` promotes it → a fresh session's `/worker-start` builds it.
-The audience is solo agentic developers, small team leads, and OSS maintainers
-(`.goal/POSITIONING.md`). Underused assets: the Pages deploy pipeline only
-publishes the landing page, the `/board-view` HTML viewer is invisible outside a
-local clone, and Learnings (`L###`) — the stated moat — reach users on only two
-of the surfaces that could carry them.
+into a kanban board AI agents run themselves: passive per-turn capture, a PM mode
+that promotes findings into validated entries **with drafted Done-when criteria**,
+a Worker mode for batch discipline runs, and — since 1.5.0 — `/board-run`, which
+drives one entry `tdd → review → validate` in a single session under claim lock.
+It ships as a Claude Code plugin (13 commands, one-command `/board-setup`
+onboarding) and a zero-dependency MCP server (11 tools, CI-proven multi-client),
+released and listed on the official MCP Registry at 1.5.0. The journey is now:
+install → `/board-setup` → first capture announced on the turn it happens →
+`/pm-start` promotes → `/board-run` builds — with the roadmap public at the
+[live board](https://ghostlygawd.github.io/engineering-board/board.html) and
+adoption tracked weekly into a committed `docs/metrics.csv`. Underused assets
+today: the metrics data has no visible surface, the MCP side has no onboarding
+twin, and the Conductor's inner loop exists while its supervisor is still a
+draft RFC.
 
 ## 2. Opportunity map
 
 | | **Low effort (S)** | **Medium (M)** | **Large (L)** |
 |---|---|---|---|
-| **High impact** | #1 sentinel/feedback pass · #3 publish the live board · #11 fail-loudly cluster | #4 Done-when synthesis · #9 `/board-setup` wizard | #13 Conductor |
-| **Med impact** | #2 dark-mode badge + tokens · #5 reclaim visibility · #6 banner readability · #14 traffic snapshot | #7 landing refresh · #8 viewer affordances · #12 single consolidation engine | |
-| **Lower / focused** | | #10 multi-client story (Q001) | |
+| **High impact** | #1 token dedup + drift lint | #8 `board_setup` MCP twin · #9 board-run driver script | #12 Conductor supervisor |
+| **Med impact** | #2 viewer type floor · #3 B057 count fix · #4 metrics surface · #5 good-first-issue seeding | #10 F003 remainder (PM-summary learnings) · #11 terminal demo pipeline | |
+| **Lower / focused** | #6 B021 code-reviewer rename | #7 B020 migrate split + B022 pipeline honesty | |
 
 ## 3. Top 5 quick wins (~a day or less each)
 
-1. **#3 Publish the live board** — one path added to an existing workflow turns the committed `board.html` into a public, always-current roadmap the README currently apologizes for.
-2. **#1 Sentinel & feedback pass** — every raw `<<EB-*>>` token a user can see gets a plain-language companion line; the flagship loop stops looking like debug output.
-3. **#11 Fail-loudly cluster (B008+B009)** — the two known silent-failure paths (corrupt mode file, missing python3) start telling the user what happened.
-4. **#2 Dark-mode blocked badge + token upstreaming** — a measured 2.96:1 contrast failure in the product's best demo artifact, plus the viewer minting colors the brand tokens should own.
-5. **#6 Banner readability** — the first screen every session sees loses its wall-of-text line, gains an empty-state hint and a sigil legend.
+1. **#1 Token dedup + drift lint** — delete the dead third token copy and add a check so the landing page's inline token mirror can never silently diverge from `brand/tokens.css`.
+2. **#3 B057 scratch-count fix** — the banner's headline number undercounts multi-finding blocks; a counting bug in the product's most-seen line.
+3. **#4 Surface the metrics** — `docs/metrics.csv` accrues weekly rows nobody can see; link it from the landing footer and README Community section as "adoption data, public like everything else."
+4. **#2 Viewer type floor** — raise the 0.58–0.68rem micro-type in the board view to a readable floor; the live board is now a public surface.
+5. **#5 Seed good-first-issues** — CONTRIBUTING.md points newcomers at a `good first issue` label that has zero issues behind it; open 3–5 from the open P3s.
 
 ## 4. Top 3 big bets
 
-1. **#13 The Conductor (RFC 0001)** — an orchestrator that drives entries across all three disciplines without per-session restarts; subsumes the largest documented UX friction (B006) and is the demo that sells the product.
-2. **#9 `/board-setup` onboarding wizard (F002 + B030)** — collapses install→value from 4 commands + a 17-line permission paste into one command with smart defaults.
-3. **#12 Single consolidation engine (B014)** — the promotion path exists twice (agent prompt + shell script) with duplicated supersession logic; merging them removes the product's biggest correctness-drift risk.
+1. **#12 Conductor supervisor (RFC 0001, the remaining half)** — `/board-run` shipped the inner loop; the supervisor that schedules it across sessions is now a much smaller build than the original RFC scoped.
+2. **#8 + #9 MCP onboarding parity + testable run-driver** — a `board_setup` MCP tool (named in F002's own spec, never built) and extracting `/board-run`'s claim/loop mechanics into a deterministic script so the pipeline's flagship command gains real test coverage (per Learning L001).
+3. **#11 Real terminal demo pipeline** — the original launch-spec item still unshipped: a scripted asciinema→GIF of `/board-setup → capture → /pm-start → /board-run` beats the static SVG for conversion.
 
 ## 5. Full opportunity list
 
-### #1 — Plain-language companions for every user-visible sentinel
-- **Tag/lens:** FIX · feedback & state
-- **Evidence:** `hooks/stop-hook-procedure.md:68` ends the passive turn with a raw `<<EB-PASSIVE-DONE>>` as the final message; `:113` emits `<<EB-WORKER-NOTHING-TO-DO>>` with no translation; while paused, every turn emits bare `<<EB-PASSIVE-PAUSED>>` (`commands/board-pause.md:83`). The sentinels are load-bearing (the Stop-hook loop guard greps them — `tests/modes/stop-hook-mode-routing.sh` pins all 10), so they cannot be removed.
-- **Proposal:** keep every sentinel byte-exact, but require a plain-language line alongside each user-visible one: "Nothing captured this turn." / "No tdd tasks left — worker is idle." / a quiet paused indicator. Also verify the `/board-resolve` next-action string added in 1.4.0 matches how the skill is actually invoked (`README.md:131` lists it as a skill, not a command).
-- **Why it matters:** the autonomous loop is the product's core; today its per-turn output reads as internal debug tokens.
-- **Effort:** S · **Impact:** High · **Risks:** modes-suite pins the literal tokens — edits must be additive prose (pattern already proven in 1.3.0/1.4.0).
+### #1 — One token source: delete the dead copy, lint the mirror
+- **Tag/lens:** FIX · fixes & felt debt
+- **Evidence:** `docs/assets/tokens.css` is committed but referenced by nothing (verified: 0 matches for `assets/tokens.css` in `docs/index.html`, which uses its own inline `:root` mirror at `docs/index.html:30-57`); `brand/tokens.css:1-3` declares itself the "single source of truth". Three divergent copies (brand file, inline mirror, dead file) — the v1 audit flagged it (MED); the 1.5.0 work added tokens (`--eb-danger`, `--eb-card`) to `brand/tokens.css` and the viewer but the landing mirror grows staler with each such change.
+- **Proposal:** delete `docs/assets/tokens.css`; add a small test that parses the inline `:root` block in `index.html` and asserts every shared variable's value matches `brand/tokens.css` (pure python3, fits the suite).
+- **Why it matters:** the brand's core claim is "tokens single-source"; today it demonstrably isn't, and drift lands on the public page first.
+- **Effort:** S · **Impact:** High (trust/consistency) · **Risks:** none — dead file plus an additive check.
 
-### #2 — Dark-mode blocked badge + upstream the viewer's colors into tokens
-- **Tag/lens:** FIX · UI & beauty
-- **Evidence:** `hooks/scripts/board-view.sh:280` hardcodes `.badge.blocked{color:#B23A2E}` with no dark override — measured **2.96:1** on the dark background (needs 4.5:1). The viewer also mints `--eb-card` values (`:239,246,251`) that don't exist in `brand/tokens.css`, and `docs/index.html:146-147` hardcodes code-block colors; `docs/assets/tokens.css` is a third, unreferenced token copy.
-- **Proposal:** add `--eb-card` and `--eb-danger` (light+dark) to `brand/tokens.css`, use them in the viewer, add the dark-mode blocked color, and delete or actually reference `docs/assets/tokens.css`.
-- **Why it matters:** the viewer is the committed demo artifact; an unreadable "blocked" badge in dark mode (most developers' default) undercuts the "premium through restraint" brand claim.
-- **Effort:** S · **Impact:** Med · **Risks:** viewer output is byte-deterministic and pinned by `tests/view/` — regenerate `eb-self/board.html` in the same change.
+### #2 — Readable type floor in the board view
+- **Tag/lens:** IMPROVE · UI & beauty
+- **Evidence:** `hooks/scripts/board-view.sh` still ships `font-size:.58rem` (`.conf`), three `.62rem` (`.tag`, `.lapplies`, rec), `.66rem`, `.68rem` — ~9px text, flagged MED in the v1 audit and deliberately not taken then. The view is now the public `/board.html`.
+- **Proposal:** raise the floor to ~0.7rem across `.conf`/`.tag`/`.lapplies`/`.rec`/`.kind`; regenerate the committed board.
+- **Effort:** S · **Impact:** Med · **Risks:** slight card-height growth; determinism test unaffected.
 
-### #3 — Publish the live board (the roadmap becomes a URL)
-- **Tag/lens:** NEW · community & synergy
-- **Evidence:** `.github/workflows/pages.yml:17-19` syncs only `docs/{index.html,assets,.nojekyll}` to Pages; `README.md:23` links the committed `board.html` with the apology "(open it locally to render)"; the README's Community section already names the eb-self board as the public roadmap.
-- **Proposal:** add `engineering-board/eb-self/board.html` to the pages sync (e.g. served at `/board.html`), link it from the README hero and the landing page. Every `/board-view` refresh on `main` updates the public roadmap automatically.
-- **Why it matters:** "our roadmap is run by the product" becomes a clickable proof instead of a claim; every share of the link demos the product. Cheapest community/viral surface available.
-- **Effort:** S · **Impact:** High · **Risks:** none significant — static HTML, already committed, already XSS-escaped.
+### #3 — B057: the banner's scratch count undercounts
+- **Tag/lens:** FIX · feedback & state (open board entry, P3)
+- **Evidence:** eb-self B057 — `count_scratch_findings` undercounts multi-finding blocks, so the SessionStart line ("N un-promoted session file(s)") can misstate the real pending volume; documented as a "labeled status lower-bound" since C9.
+- **Proposal:** count findings, not blocks, in the counting helper; assert with a two-findings-in-one-block fixture.
+- **Why it matters:** 1.5.0 made per-turn feedback honest; the last knowingly-wrong number on the banner should follow.
+- **Effort:** S · **Impact:** Med · **Risks:** none.
 
-### #4 — Consolidator writes real Done-when criteria, not a TODO placeholder
-- **Tag/lens:** FIX · helpfulness & synergy
-- **Evidence:** `hooks/scripts/board-consolidate.sh:365` writes `<!-- TODO — define completion criteria. -->` into every promoted bug/feature/question; `agents/validator.md:63` declares `cannot_proceed` for entries lacking a usable `## Done when`. Auto-promoted findings therefore flow into the worker pipeline pre-stalled unless a human hand-edits each entry.
-- **Proposal:** the consolidator agent (an LLM with the finding's title + evidence in hand) drafts one or two concrete, testable Done-when bullets at promotion time; the deterministic script keeps the placeholder only as a fallback. The PM turn summary counts entries still carrying the placeholder.
-- **Why it matters:** closes the gap between "captured" and "workable" — the pipeline's headline promise — without any new surface.
-- **Effort:** M · **Impact:** High · **Risks:** LLM-drafted criteria vary in quality; mitigate with the existing untrusted-data framing and by marking drafted criteria as such.
+### #4 — Make the adoption data visible
+- **Tag/lens:** NEW · synergy (metrics workflow + landing page)
+- **Evidence:** `.github/workflows/metrics.yml` appends weekly rows to `docs/metrics.csv`, but no surface links it — the landing footer (`docs/index.html:271+`) links Releases/Registry/Live board, not the data; README's Community section likewise.
+- **Proposal:** add "Adoption data (CSV)" to the landing footer + README Community list now; once ≥8 rows exist, render a tiny sparkline on the landing page from the same file (no third-party scripts).
+- **Why it matters:** "public adoption data" is an on-brand trust signal that costs one link today.
+- **Effort:** S · **Impact:** Med · **Risks:** none for the link; sparkline waits for data.
 
-### #5 — Make stale-claim reclamation visible
-- **Tag/lens:** IMPROVE · feedback & trust
-- **Evidence:** `hooks/scripts/board-claim-reclaim-stale.sh:141` `rm -rf`s another session's claim; output is JSON consumed by the hook (`:146-151`), never surfaced. The owner is archived to `_reclaimed.log` but the user is never told a claim was force-taken.
-- **Proposal:** when the worker path reclaims a claim, add one plain line to the turn output ("Reclaimed a stale claim on B017 from an inactive session — details in `_claims/_reclaimed.log`").
-- **Why it matters:** it's the product's only destructive-ish automatic action; invisible destruction erodes exactly the trust the committed-state model is selling.
-- **Effort:** S · **Impact:** Med · **Risks:** none — additive output.
+### #5 — Seed the good-first-issue funnel
+- **Tag/lens:** IMPROVE · community
+- **Evidence:** `CONTRIBUTING.md` ("Look for issues labelled **good first issue**") points at a label with zero issues behind it; the open P3s (B016/B020/B021/B057) are exactly first-contribution-sized and already have reproductions and Done-whens on the board.
+- **Proposal:** open 3–5 GitHub issues mirroring those board entries (linking each to its committed entry file), label them, and note in each that the board entry is the source of truth.
+- **Why it matters:** the contribution path exists on paper only; the first outside PR never comes without a first issue to grab.
+- **Effort:** S · **Impact:** Med · **Risks:** issue/board dual-tracking — mitigate by declaring the board entry canonical in each issue body.
 
-### #6 — Banner readability pass
-- **Tag/lens:** IMPROVE · user friendliness
-- **Evidence:** `hooks/scripts/board-session-start.sh:166` packs four sentences + two code paths + an MCP aside into one un-wrapped line; `:83` empty state prints bare `(none)` with no next action; `:245` prints internal notation (`L004 [high / x3]`, `[BFQO]` sigils) with no legend; `:256` closes with a directive addressed to the model, not the user.
-- **Proposal:** one-line scratch summary with details on a second indented line; `(none)` → "No open items yet — findings are captured automatically; run /pm-start to promote them."; expand sigils on first use; reword or drop the model-directive line.
-- **Why it matters:** this is the first thing every session shows; it currently front-loads jargon at the exact moment a new user is deciding whether the product is comprehensible.
-- **Effort:** S · **Impact:** Med · **Risks:** `tests/session-start/` pins some strings — extend, don't break.
+### #6 — B021: rename `code-reviewer`
+- **Tag/lens:** IMPROVE · friendliness (open board entry, P3)
+- **Evidence:** eb-self B021 + RFC 0002 ("keep (rename)"): the agent name collides with the harness's `/code-review`, and its frontmatter lists Write/Edit despite a no-writes review contract.
+- **Proposal:** rename to `review-worker` (or similar), narrow tools, keep a compatibility note; update the worker procedure + `/board-run` dispatch tables and the pinned lint strings together.
+- **Effort:** S · **Impact:** Low–Med · **Risks:** several pins reference the name — one coordinated sweep (L005).
 
-### #7 — Landing-page refresh: show what shipped
-- **Tag/lens:** IMPROVE · reach & UI
-- **Evidence:** `docs/index.html` never states a version or links Releases (`:271-278`), doesn't link the MCP Registry listing it now has (`:252-264`), names `/board-view` only in a footnote (`:233`) and never shows the Learnings panel (the moat); `#demo-status` swaps text with no `aria-live` (`:187,309`); at ≤640px all nav anchors vanish with no menu (`:87`); only a dark `theme-color` (`:10`).
-- **Proposal:** version pill linking Releases; "Listed on the MCP Registry" link; a viewer screenshot (or live `/board.html` link per #3) featuring the Learnings panel; `aria-live="polite"` on the demo status; keep nav anchors as a wrapped row on mobile; add a light `theme-color` variant.
-- **Why it matters:** the page still sells the 1.2.0 story; the credibility artifacts that exist now (releases, registry, viewer) are its best conversion evidence.
-- **Effort:** S–M · **Impact:** Med–High · **Risks:** re-run the Lighthouse mirror check after edits (loop convention).
+### #7 — B020 + B022: migrate split and pipeline honesty
+- **Tag/lens:** IMPROVE · UX & flows (open board entries, P3)
+- **Evidence:** B020 — `/board-migrate` bundles the v0.3.0 data migration and the 1.1.0 relocate under one verb; B022 — `nothing_to_test` / `nothing_to_review` still advance the entry (a worker can wave an entry through by declaring nothing to do).
+- **Proposal:** split migrate into explicit modes (`--data`, `--relocate`, both documented in the usage string); make `nothing_to_*` route to `cannot_proceed` semantics (skip, don't advance) with a lint pin.
+- **Effort:** M · **Impact:** Med (trust in the state machine) · **Risks:** B022 changes worker-loop behavior — needs the orchestration loop tests updated in step.
 
-### #8 — Viewer affordances: click-through, freshness, scale
-- **Tag/lens:** IMPROVE · engagement
-- **Evidence:** `hooks/scripts/board-view.sh:134-141` renders cards as plain `<div>`s — no link to the entry's markdown file the script already knows; no generation stamp anywhere (deliberate byte-determinism, `:4-6`) so readers can't judge freshness; the eb-self board's Done column renders 52 cards flat; `.affects` uses `word-break:break-all` (ugly mid-word breaks); no `@media print`.
-- **Proposal:** wrap each card id in an `<a>` to its `.md` (relative link works on GitHub and Pages); an opt-in `--stamp` that footers the git short-sha (keeps default deterministic); collapse the Done column beyond ~10 with a count; `overflow-wrap:anywhere`; a small print block.
-- **Why it matters:** the viewer graduates from screenshot to working surface — especially once it's public (#3).
-- **Effort:** M · **Impact:** Med · **Risks:** determinism test must keep passing for the default mode.
+### #8 — `board_setup` MCP twin (onboarding parity)
+- **Tag/lens:** NEW · helpfulness & reach
+- **Evidence:** F002's own spec named "`/board-setup [project]` (mirror `board_setup` MCP tool)"; the command shipped in 1.5.0, the tool did not (verified: 0 matches for `board_setup` in `mcp-server/engineering_board_mcp.py`). MCP-only users (Claude Desktop) still onboard by calling `board_init` with the right arguments themselves.
+- **Proposal:** a 12th tool composing `board_init` with the repo-basename default and returning the same 3-line ready summary (minus the plugin-only permission check, which doesn't apply to MCP clients).
+- **Why it matters:** the registry listing is now the discovery front door; the first tool an MCP user reaches for should be the one-command start.
+- **Effort:** M · **Impact:** High for the MCP funnel · **Risks:** tool count 11→12 ripples through README/ARCHITECTURE/registry description — coherence sweep required (Track D discipline).
 
-### #9 — `/board-setup` onboarding wizard
-- **Tag/lens:** NEW · onboarding (F002 + B030 on the board)
-- **Evidence:** F002 entry: today's path is 4 manual commands + a ~17-line `claude config add` paste (B030: "6-step copy-paste loop… cannot be completed inside the session") before the pipeline runs unprompted. `commands/board-init.md:19` blocks on a missing project name that the repo directory basename could default (`:9` already derives a default prefix the same way).
-- **Proposal:** per F002's own spec: `/board-setup [project]` infers the project from the repo dir, runs board-init with defaults, runs the permission self-check (prints the paste block only if needed), and ends with a 3-line "you're ready + next action" summary. Fold the smart-default into `/board-init` regardless.
-- **Why it matters:** time-to-first-value is the retention cliff the improvement loop measured; this is the designed fix, still unbuilt.
-- **Effort:** M · **Impact:** High · **Risks:** F002's kill criteria apply — if the permission paste is irreducible, demote to a board-init epilogue.
+### #9 — Make `/board-run` deterministically testable
+- **Tag/lens:** IMPROVE · fixes & felt debt (applies Learning L001)
+- **Evidence:** `commands/board-run.md` is prose the model executes; its only coverage is the structural lint (`tests/orchestration/board-run-command.sh`, 18 assertions). Learning L001 ("ship every deterministic guard with a test that drives its real fixtures and call-sites") is the board's own top lesson, and the claim/loop mechanics (acquire → rounds → transition → release) are exactly the deterministic part.
+- **Proposal:** extract those mechanics into `hooks/scripts/board-run-driver.sh` (acquire, apply a supplied `suggested_next_needs`, heartbeat, release, round bound) that the command dispatches — then drive it in tests with stubbed agent outputs, the same pattern `board-mode-guard.sh` used to make mode transitions testable.
+- **Effort:** M · **Impact:** High (the flagship command gains real regression coverage) · **Risks:** keep the command's prose thin so the lint and the script can't drift apart.
 
-### #10 — Prove and document the multi-client story (Q001)
-- **Tag/lens:** NEW · reach
-- **Evidence:** Q001 on the board: "does driving one board from Claude Code + Claude Desktop simultaneously work?" — a listed differentiator (README VP5) that has never been exercised; the claim currently rests on the shared on-disk format alone.
-- **Proposal:** run the experiment (two clients, one board, concurrent claims), fix what breaks, then document it as a README section with the locking behavior users should expect.
-- **Effort:** M · **Impact:** Med · **Risks:** may surface real locking edge cases (that's the point).
+### #10 — F003 remainder: learnings in the PM-pass summary
+- **Tag/lens:** IMPROVE · retention (open board entry, F003 partial)
+- **Evidence:** F003's board annotation: "session-end PM-summary surfacing deferred". The 1.5.0 PM summary line (`PM pass: N promoted…`, stop-hook step (f)) now exists as the natural carrier — the deferral predates it.
+- **Proposal:** when the PM pass promotes entries whose `affects`/`pattern` match an existing Learning's `applies_to`/`pattern_tag`, append one line: `Related learning: L004 — a denylist is never done.` (reuse the SessionStart matching logic).
+- **Why it matters:** the moat surfaces at the exact moment new work enters the board — the third and last of F003's named moments.
+- **Effort:** M · **Impact:** Med · **Risks:** false-positive matches train users to ignore it — keep the SessionStart medium+-confidence filter.
 
-### #11 — Fail-loudly cluster: mode file + python3 preflight
-- **Tag/lens:** FIX · feedback & state (B008 + B009 on the board)
-- **Evidence:** B008: a corrupt/truncated `session-mode.json` silently un-pauses/reverts to passive (the Stop procedure's `(pre)` step routes unparseable files to EXTRACTOR by design — `hooks/stop-hook-procedure.md:26-30` — with no warning emitted); B009: `board-consolidate.sh` silently no-ops when `python3` is missing, losing the turn's promotions.
-- **Proposal:** unparseable-but-present mode file → one warning line ("session-mode.json was unreadable — treating this session as passive; run /pm-start to re-enter PM"); consolidate script preflights `python3` and fails with a named remedy.
-- **Why it matters:** both are documented silent-data-loss shapes; the improvement loop's own L-series learnings say honest failure beats silent fallback.
-- **Effort:** S · **Impact:** Med–High · **Risks:** fail-open for an *absent* file is correct and must be preserved; only the corrupt-file case changes messaging.
+### #11 — Real terminal demo (asciinema → GIF)
+- **Tag/lens:** NEW · reach & engagement
+- **Evidence:** no `.gif`/`.cast` anywhere under `docs/` (verified); the animated `board-demo.svg` is a hand-built illustration, not the product running. The original launch spec's "animated demo of the real product" item was scope-cut in C1 (BLOCKERS B1: no nested interactive sessions in the sandbox) and never revisited — but 1.5.0's `/board-setup` + `/board-run` make the demo script itself only four commands long now.
+- **Proposal:** a documented, repeatable demo script (`docs/demo/record.sh`) that a human runs once locally with asciinema, plus the conversion step; embed the GIF above the SVG in the README.
+- **Effort:** M (mostly scripting + one human recording session) · **Impact:** Med–High for conversion · **Risks:** recording needs a real interactive session — the script preparation is automatable, the capture is not (same boundary as BLOCKERS B1; say so).
 
-### #12 — One consolidation engine (B014)
-- **Tag/lens:** IMPROVE · fixes & felt debt
-- **Evidence:** B014 on the board + RFC 0002's `merge` verdict: the `consolidator` agent prompt and `hooks/scripts/board-consolidate.sh` implement the same promotion algorithm twice (same supersession language, same disposition vocabulary). Every hardening fix (e.g. the C7 flatten-every-field work) has had to be applied to both.
-- **Proposal:** make the script the single engine; the agent becomes a thin dispatcher that interprets its JSON — RFC 0002 already decided the direction.
-- **Why it matters:** double-maintenance of the security-critical promotion path is the likeliest future source of a drift bug the red-team then finds.
-- **Effort:** M–L · **Impact:** Med–High · **Risks:** the smoke suite pins consolidation behavior end-to-end — good; that's the safety net.
-
-### #13 — The Conductor (RFC 0001)
+### #12 — The Conductor supervisor (RFC 0001, remaining half)
 - **Tag/lens:** NEW · engagement & retention (big bet)
-- **Evidence:** `docs/rfcs/0001-symphony-conductor.md` (Draft, design complete, dependency shipped in 1.1.0); B006 documents the friction it removes ("advancing one entry through tdd→review→validate requires two session restarts"), now mitigated but not solved by the 1.3.0 mode banner.
-- **Proposal:** build the bounded first slice: an orchestrator that spawns one worker session per discipline round and advances a single entry end-to-end unattended, posting its trail to the entry.
-- **Why it matters:** "commit a bug to markdown and a PR appears" is the demo that earns stars; it's also the natural paid tier in the recorded monetization direction (RFC 0003).
-- **Effort:** L · **Impact:** High · **Risks:** needs infrastructure beyond a single sandbox session (the RFC's §10 seams); explicitly out of scope for autonomous container runs so far.
-
-### #14 — Signal capture without surveillance: weekly traffic snapshot
-- **Tag/lens:** NEW · retention measurement
-- **Evidence:** zero instrumentation anywhere (verified: no analytics in `docs/index.html`); the improvement loop's own charter (`.goal/NEXT_GOAL_IMPROVEMENT_LOOP.md`, rule 7) requires "instrumented channels awaiting real users," and none exist. GitHub's traffic API (stars, clones, views, release-asset downloads) is available to a scheduled workflow with the default token.
-- **Proposal:** a weekly Action appends a one-row snapshot (stars, clones, unique views, `.mcpb` downloads) to a committed `docs/metrics.csv` — the board-is-the-database philosophy applied to the product's own adoption data. Optionally a Plausible-class script on the landing page if finer grain is ever wanted.
-- **Why it matters:** post-launch decisions (what to build next, whether distribution worked) currently have no feedback signal at all.
-- **Effort:** S · **Impact:** Med · **Risks:** traffic API needs a scheduled workflow with repo scope — verify the default token suffices; keep the data public/honest.
+- **Evidence:** `docs/rfcs/0001-symphony-conductor.md` (Draft) minus what 1.5.0 already shipped: `/board-run` is the RFC's inner drive loop, claim-locked and bounded. What remains is the supervisor — pick the next entry, spawn/resume a session, run `/board-run`, repeat — which is now expressible as a scheduler over an existing command rather than a new execution model.
+- **Proposal:** slice 2: a `--next` mode (`/board-run --next` picks the highest-priority workable entry itself); slice 3: the cross-session scheduler (Claude Code web triggers/cron driving `/board-run --next` per session), with the RFC's evidence-posting seams resolved then.
+- **Why it matters:** "commit a bug to markdown and a PR appears" remains the demo that earns adoption, and the recorded open-core direction (RFC 0003) prices the hosted version of exactly this.
+- **Effort:** L (slice 2: M) · **Impact:** High · **Risks:** the RFC's §10 seams (credentials, round boundaries) apply from slice 3 on; slice 2 has none of them.
 
 ## 6. Suggested sequence — if only three ship first
 
-1. **#3 Publish the live board** — smallest change, largest new surface: the public roadmap URL makes every other improvement visible and shareable, and it compounds with #7 and #8.
-2. **#1 + #11 as one "honest feedback" PR** — sentinel companions plus the two silent-failure fixes; together they make the core loop's output trustworthy, which is the precondition for anyone relying on it daily.
-3. **#4 Done-when synthesis** — the highest-leverage functional fix: it converts the capture pipeline's output from "stalled drafts" into "workable entries," which is the product's actual promise.
+1. **#1 token dedup + drift lint** — smallest change that protects the brand's core "single source" claim on the most public surface; unblocks confident future token work.
+2. **#9 board-run driver script** — the flagship command is the product's new center of gravity; giving it deterministic coverage before building `--next` (#12 slice 2) on top of it is the L001 lesson applied forward.
+3. **#8 `board_setup` MCP twin** — the registry listing is now live distribution; parity onboarding converts the traffic it brings.
 
 ---
 
-_All 14 items trace to a file/line or a live board entry; nothing here is
-hypothetical. Items #2/#5/#6/#7/#8 derive from two independent design audits run
-for this pass (dark-mode contrast measured at 2.96:1; sentinel/microcopy findings
-verified against the pinned test surface)._
+_All 12 items trace to a file/line, an open board entry, or a verified absence;
+nothing is hypothetical. Items #1/#2 revisit v1 audit findings deliberately not
+taken then; #3/#5/#6/#7/#10 come from the live residual backlog; #8/#9/#11/#12
+are the follow-on opportunities the 1.5.0 ships created._
