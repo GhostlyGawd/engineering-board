@@ -16,7 +16,7 @@ You are creating the `engineering-board/` scaffold this plugin's hooks and skill
 
 ### Step 1 — Validate inputs
 
-- If `$1` (project name) is empty, ask the user for one and stop. Project names should be kebab-case (e.g. `navigator`, `retail-workflow`).
+- If `$1` (project name) is empty, **default it to the repository directory's basename** (basename of `$CLAUDE_PROJECT_DIR`), lowercased with any character outside `[a-z0-9-]` replaced by `-` — a smart default beats a dead stop. State the inferred name in the Step 7 report; only ask the user and stop if the sanitized basename comes out empty. Project names should be kebab-case (e.g. `navigator`, `retail-workflow`).
 - Confirm you're in the project root — the directory where `engineering-board/` should live (typically the repo root, alongside `.git/`). If the current working directory looks wrong (e.g. a home dir), confirm with the user before creating files.
 - Check whether `--private` appears in `$ARGUMENTS`; it is a flag (not the project name or affects-prefix) that changes the `.gitignore` guidance in Step 6.
 

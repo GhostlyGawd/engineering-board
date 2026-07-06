@@ -10,6 +10,16 @@ increases.
 ## [Unreleased]
 
 ### Added
+- **`/board-setup` — one-command onboarding** (IMPROVEMENTS #9; eb-self F002 +
+  B030). Infers the project name from the repo directory, delegates scaffolding
+  to the `/board-init` procedure (never re-implements it), runs the permission
+  self-check and prints the paste block only when rules are missing (permission
+  install stays interactive by design — no settings edits), and ends with a
+  3-line "you're ready" summary, leaving the session in passive capture.
+  `/board-init` itself gains the same smart default (repo-basename project name
+  instead of a dead-stop). README Quickstart now leads with `/board-setup`;
+  command count 11 → 12 across README/ARCHITECTURE. New orchestration lint
+  (`board-setup-command.sh`, 9 assertions) pins the composing contract.
 - **Promoted entries arrive workable — Done-when criteria drafted at promotion**
   (IMPROVEMENTS #4). The consolidator wrote a literal
   `<!-- TODO -- define completion criteria. -->` into every promoted entry while

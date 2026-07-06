@@ -3,10 +3,10 @@ id: B030
 type: bug
 title: Permission-install delivery is a 6-step copy-paste loop, undiscoverable from onboarding
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P2
 affects: commands/board-install-permissions.md
-needs: tdd
+needs: done
 pattern: [onboarding, delivery-friction]
 ---
 

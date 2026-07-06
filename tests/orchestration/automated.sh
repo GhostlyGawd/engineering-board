@@ -57,6 +57,7 @@ SUBTESTS=(
   "subagent-fixtures.sh"
   "board-init-command.sh"
   "board-relocate.sh"
+  "board-setup-command.sh"
 )
 
 for st in "${SUBTESTS[@]}"; do
