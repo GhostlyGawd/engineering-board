@@ -10,6 +10,13 @@ increases.
 ## [Unreleased]
 
 ### Added
+- **Weekly adoption snapshot** (IMPROVEMENTS #14). A scheduled workflow
+  ([`metrics.yml`](.github/workflows/metrics.yml)) appends one row per week to
+  a committed [`docs/metrics.csv`](docs/metrics.csv) — stars, forks, 14-day
+  clone/view traffic, and `.mcpb` release-asset downloads — all from GitHub's
+  own API. No trackers, no third-party analytics; the board-is-the-database
+  philosophy applied to the product's own adoption data. Idempotent per day;
+  dispatchable on demand.
 - **`/board-setup` — one-command onboarding** (IMPROVEMENTS #9; eb-self F002 +
   B030). Infers the project name from the repo directory, delegates scaffolding
   to the `/board-init` procedure (never re-implements it), runs the permission

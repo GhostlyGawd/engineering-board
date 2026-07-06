@@ -1,0 +1,72 @@
+# metrics.yml — weekly adoption snapshot (IMPROVEMENTS #14).
+#
+# The board-is-the-database philosophy applied to the product's own adoption
+# data: one CSV row per week appended to docs/metrics.csv — stars, forks,
+# 14-day clone/view traffic, and .mcpb release-asset downloads. No trackers,
+# no third-party analytics; everything comes from GitHub's own API and the
+# data is public in the repo.
+#
+# This workflow is the one sanctioned direct-push-to-main writer: the change is
+# a single deterministic CSV row produced by CI itself (no code paths), and a
+# weekly bookkeeping PR would be pure noise. Everything else still lands via PR.
+
+name: metrics
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"   # Mondays 06:17 UTC (off the whole-hour spike)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: metrics
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Append this week's row to docs/metrics.csv
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          R="$GITHUB_REPOSITORY"
+          DATE="$(date -u +%Y-%m-%d)"
+
+          REPO_JSON="$(gh api "repos/$R")"
+          STARS="$(echo "$REPO_JSON"  | python3 -c 'import json,sys; print(json.load(sys.stdin)["stargazers_count"])')"
+          FORKS="$(echo "$REPO_JSON"  | python3 -c 'import json,sys; print(json.load(sys.stdin)["forks_count"])')"
+
+          # Traffic endpoints need push access; the workflow token has it here.
+          # Tolerate failures (e.g. permissions change) with empty cells rather
+          # than a dead workflow.
+          CLONES="$(gh api "repos/$R/traffic/clones"  --jq '"\(.count),\(.uniques)"' 2>/dev/null || echo ",")"
+          VIEWS="$(gh api  "repos/$R/traffic/views"   --jq '"\(.count),\(.uniques)"' 2>/dev/null || echo ",")"
+
+          DL="$(gh api "repos/$R/releases" --paginate \
+                --jq '[.[].assets[] | select(.name | endswith(".mcpb")) | .download_count] | add // 0' 2>/dev/null || echo "")"
+
+          CSV="docs/metrics.csv"
+          if [ ! -f "$CSV" ]; then
+            echo "date,stars,forks,clones_14d,unique_clones_14d,views_14d,unique_views_14d,mcpb_downloads" > "$CSV"
+          fi
+          # Idempotent per day: skip if today's row already exists.
+          if grep -q "^$DATE," "$CSV"; then
+            echo "row for $DATE already present — nothing to do"
+            exit 0
+          fi
+          echo "$DATE,$STARS,$FORKS,$CLONES,$VIEWS,$DL" >> "$CSV"
+          tail -3 "$CSV"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$CSV"
+          git commit -m "metrics: weekly adoption snapshot $DATE"
+          git push origin main
