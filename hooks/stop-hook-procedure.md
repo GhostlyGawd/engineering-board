@@ -86,7 +86,7 @@ PM mode runs a pre-flight pass that refreshes claim heartbeats on behalf of live
 
 (e) **PM-tidier bumps the PM session's `last_seen` in the registry (v0.2.3).** After step (c) returns, run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-bump.sh <session_id>` to refresh this PM session's liveness signal. Non-fatal on failure — log and continue.
 
-(f) Emit exactly `<<EB-PM-CONTINUE>>` on its own line, followed on the next line by a one-line plain summary of what the PM pass did (e.g. `PM pass: N finding(s) promoted, board tidied.` — use the consolidator's returned counts; `0 promoted` is a normal outcome, say it plainly). Then stop.
+(f) Emit exactly `<<EB-PM-CONTINUE>>` on its own line, followed on the next line by a one-line plain summary of what the PM pass did (e.g. `PM pass: N finding(s) promoted, board tidied.` — use the consolidator's returned counts; `0 promoted` is a normal outcome, say it plainly). If any open `bugs/` or `features/` entry still contains the placeholder `<!-- TODO -- define completion criteria. -->` (check with Grep), append `— M entr(ies) still need Done-when criteria before a worker can build them.` to the summary (IMPROVEMENTS #4). Then stop.
 
 Per-step failure semantics:
 - The (pre) pre-flight is best-effort: a non-zero exit is logged but does NOT trigger `<<EB-PM-FAIL>>` — the rest of the PM pipeline still runs.

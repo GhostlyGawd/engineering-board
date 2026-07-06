@@ -69,6 +69,13 @@ check_grep "$CONSOLIDATOR" "E" "^model: inherit$"                "consolidator.m
 check_grep "$CONSOLIDATOR" "E" "^tools:"                         "consolidator.md frontmatter: tools list present"
 check_grep "$CONSOLIDATOR" "E" "^color:"                         "consolidator.md frontmatter: color present"
 
+# IMPROVEMENTS #4 — promoted entries must arrive workable: the body must carry
+# the Done-when drafting rule (concrete testable bullets from the finding's own
+# text, marked as drafted, TODO-placeholder fallback only when too thin).
+check_grep "$CONSOLIDATOR" "F" "Done-when drafting rule"          "consolidator.md body: Done-when drafting rule present"
+check_grep "$CONSOLIDATOR" "F" "drafted at promotion"             "consolidator.md body: drafted-at-promotion marker documented"
+check_grep "$CONSOLIDATOR" "F" "TODO -- define completion criteria" "consolidator.md body: thin-finding placeholder fallback kept"
+
 # Required tools for consolidator (reads, writes entries, runs bash scripts)
 TOOLS_LINE_C="$(grep -E "^tools:" "$CONSOLIDATOR" || true)"
 for tool in Read Write Edit Bash Grep Glob; do

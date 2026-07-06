@@ -10,6 +10,16 @@ increases.
 ## [Unreleased]
 
 ### Added
+- **Promoted entries arrive workable — Done-when criteria drafted at promotion**
+  (IMPROVEMENTS #4). The consolidator wrote a literal
+  `<!-- TODO -- define completion criteria. -->` into every promoted entry while
+  the validator refuses entries without usable criteria — so auto-promoted
+  findings arrived pre-stalled. The consolidator now drafts 1–2 concrete,
+  testable Done-when bullets derived only from the finding's own title/evidence,
+  marked `<!-- drafted at promotion — refine before building -->` (placeholder
+  fallback kept for findings too thin to draft from; untrusted-data framing
+  applies). The PM turn summary appends "M entr(ies) still need Done-when
+  criteria" when placeholders remain. Three new agent-lint assertions.
 - **Viewer affordances** (IMPROVEMENTS #8). `/board-view` entry cards now **link
   to their markdown sources** (relative by default; `--link-base <url>` /
   `EB_VIEW_LINK_BASE` prefixes an absolute base so hosted copies click through —
