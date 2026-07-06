@@ -10,6 +10,12 @@ increases.
 ## [Unreleased]
 
 ### Added
+- **Multi-client story proven and documented** (IMPROVEMENTS #10, eb-self Q001).
+  A new CI suite spawns two independent MCP server processes on one board and
+  races them for the same entry's claim: exactly one acquires, the other sees
+  clean contention, and the loser acquires after release — the VP5 "same board
+  from Claude Code + Claude Desktop" claim is now empirical, not aspirational.
+  MCP suite 99 → 103 checks; behavior documented in `mcp-server/README.md`.
 - **Weekly adoption snapshot** (IMPROVEMENTS #14). A scheduled workflow
   ([`metrics.yml`](.github/workflows/metrics.yml)) appends one row per week to
   a committed [`docs/metrics.csv`](docs/metrics.csv) — stars, forks, 14-day

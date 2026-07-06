@@ -107,6 +107,18 @@ file). Beyond cloning the repo, two packaged channels are prepared:
 `server.json`, `manifest.json`, and `smithery.yaml` are version-locked to
 `plugin.json` and validated by the MCP test suite so they cannot silently drift.
 
+## Multi-client: two clients, one board
+
+Driving the same board from two MCP clients simultaneously (e.g. Claude Code
+and Claude Desktop) is supported and CI-proven (eb-self Q001): the test suite
+spawns two independent server processes on one board and races them for the
+same entry's claim — exactly one acquires (`exit_code 0`), the other sees clean
+contention (`exit_code 1`), and after the winner releases, the loser can
+acquire. There is no cache layer to go stale: every read hits the same
+committed markdown, and locking is the plugin's atomic `mkdir` claim protocol.
+Use distinct `session_id`s per client (each client's claims are owned by its
+session id).
+
 ## Tests
 
 ```sh

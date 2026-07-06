@@ -17,7 +17,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 - F003 P3 | [F003-surface-matched-learnings-at-the-moment-of-need-](features/F003-surface-matched-learnings-at-the-moment-of-need-.md) (partial — 1.4.0 viewer Learnings panel done + SessionStart already surfaces matched learnings; session-end PM-summary surfacing deferred, PR-body injection kill-gated to the Conductor)
 
 ### Questions
-- Q001 | [Q001-does-driving-one-board-from-claude-code--claude-](questions/Q001-does-driving-one-board-from-claude-code--claude-.md)
 
 ### Learnings
 - L001 | [Ship every deterministic guard with a test that drives its real fixtures and call-sites](learnings/L001-guards-need-tests-that-drive-real-callsites.md)
