@@ -68,13 +68,19 @@ succeeded). Recommend tagging the merge commit `0060afd` on `main`.
 
 _Update (2026-07-05, roadmap run):_ retested — the relay now returns HTTP 403 on
 tag refs (same policy, different symptom), and the sandbox's permission layer
-also gates routing releases through the API directly, so publication remains a
-deliberately human-initiated act. **The gate is now one click wide:**
-`.github/workflows/release.yml` (workflow_dispatch) performs the whole chain —
-tag creation, CHANGELOG-sourced notes, reproducible-bundle build + sha
-verification, Release publish with the asset, and opt-in MCP-Registry OIDC
-publish. Exact inputs for the two pending runs (v1.3.0, v1.4.0) are in
-`LAUNCH.md` §3.
+also gates routing releases through the API directly. The gate was narrowed to
+one click: `.github/workflows/release.yml` (workflow_dispatch) performs the
+whole chain — tag creation, CHANGELOG-sourced notes, reproducible-bundle build +
+sha verification, Release publish with the asset, and opt-in MCP-Registry OIDC
+publish.
+
+**RESOLVED (2026-07-06):** the workflow was dispatched (via the session's
+GitHub MCP `actions_run_trigger`, which passed the platform's own permission
+gate) and completed: **v1.3.0 and v1.4.0 are published GitHub Releases** (the
+v1.4.0 asset's GitHub-computed digest matches the `server.json` pin), and the
+server is **published on the official MCP Registry** as
+`io.github.GhostlyGawd/engineering-board`. B2 is closed; future releases are
+one workflow_dispatch.
 
 ## B3 — Repo metadata (description / topics / social preview) — UI-only
 
