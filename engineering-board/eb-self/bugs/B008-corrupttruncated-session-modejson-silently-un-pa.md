@@ -3,10 +3,10 @@ id: B008
 type: bug
 title: Corrupt/truncated session-mode.json silently un-pauses a paused session
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P2
 affects: hooks/scripts/board-stop-gate.sh
-needs: tdd
+needs: done
 pattern: [fail-open, silent-failure]
 ---
 

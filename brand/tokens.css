@@ -26,9 +26,11 @@
   --eb-text-faint:  #6C717A;  /* tertiary   4.66:1 on paper                   */
   --eb-bg:          var(--eb-paper);
   --eb-surface:     var(--eb-paper-2);
+  --eb-card:        #FFFFFF;  /* elevated card on light (viewer cards)        */
   --eb-border:      var(--eb-line);
   --eb-link:        var(--eb-accent);
   --eb-on-accent:   var(--eb-paper);   /* text on an accent fill (5.15:1)     */
+  --eb-danger:      #B23A2E;  /* blocked/destructive — 5.63:1 on paper        */
 
   /* ---- Type ---------------------------------------------------------------- */
   --eb-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
@@ -88,9 +90,11 @@
     --eb-text-faint: #83888F;   /*  4.93:1 on ink   */
     --eb-bg:         var(--eb-ink);
     --eb-surface:    var(--eb-ink-2);
+    --eb-card:       #23262D;   /* elevated card on dark (viewer cards) */
     --eb-border:     var(--eb-line-dark);
     --eb-link:       var(--eb-accent-dark);
     --eb-on-accent:  var(--eb-ink);   /* ink on amber fill (8.5:1) */
+    --eb-danger:     #E4685A;   /* blocked/destructive — 5.38:1 on ink */
   }
 }
 
@@ -100,7 +104,9 @@
   --eb-text-faint: #83888F;
   --eb-bg:         var(--eb-ink);
   --eb-surface:    var(--eb-ink-2);
+  --eb-card:       #23262D;
   --eb-border:     var(--eb-line-dark);
   --eb-link:       var(--eb-accent-dark);
   --eb-on-accent:  var(--eb-ink);
+  --eb-danger:     #E4685A;
 }

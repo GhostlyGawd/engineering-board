@@ -128,6 +128,12 @@ fi
 # The Q/O lane header no longer claims to include Learnings.
 echo "$OUT" | grep -qF 'Questions · Observations<' && pass "Q/O lane header no longer lists Learnings" || fail "Q/O lane header not updated"
 
+# IMPROVEMENTS #2: the blocked badge uses the --eb-danger token, and the dark
+# roots override it (the hardcoded #B23A2E measured 2.96:1 on the dark bg).
+echo "$OUT" | grep -qF '.badge.blocked{color:var(--eb-danger)}' && pass "blocked badge uses --eb-danger token" || fail "blocked badge still hardcoded"
+DARKS=$(echo "$OUT" | grep -o -- '--eb-danger:#E4685A' | wc -l | tr -d ' ')
+[ "$DARKS" = "2" ] && pass "dark roots override --eb-danger (both blocks)" || fail "dark --eb-danger override missing (found $DARKS of 2)"
+
 # Determinism: two renders are byte-identical.
 A="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
 B="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"

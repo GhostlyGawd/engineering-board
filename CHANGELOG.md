@@ -10,6 +10,18 @@ increases.
 ## [Unreleased]
 
 ### Fixed
+- **The viewer's "blocked" badge is readable in dark mode** (IMPROVEMENTS #2).
+  `.badge.blocked` hardcoded `#B23A2E`, which measures **2.96:1** on the dark
+  background (needs 4.5:1). The color is now the new `--eb-danger` token —
+  `#B23A2E` on light (5.63:1), `#E4685A` on dark (5.38:1) — defined in
+  `brand/tokens.css` alongside a new `--eb-card`, so the viewer stops minting
+  colors the brand doesn't own. Two new `tests/view/` assertions;
+  `eb-self/board.html` regenerated.
+- **SessionStart banner readability** (IMPROVEMENTS #6). The scratch-entries
+  wall-of-text is now a one-line headline with details indented beneath; the
+  empty board state says what happens next instead of bare `(none)`; a one-line
+  legend explains the `B/F/Q/O` sigils and priority codes on first sight; and the
+  closing routing line reads as status rather than an internal directive.
 - **Every user-visible sentinel now carries a plain-language companion**
   (IMPROVEMENTS #1). The Stop procedure pairs `<<EB-PASSIVE-DONE>>` with
   "Nothing captured this turn." when zero findings landed, `<<EB-PASSIVE-PAUSED>>`

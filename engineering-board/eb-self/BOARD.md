@@ -6,8 +6,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ### Bugs
 - B006 P2 | [B006-advancing-one-entry-through-tdd-review-validate-](bugs/B006-advancing-one-entry-through-tdd-review-validate-.md) (mitigated: 1.3.0 session-mode banner + README "one session, one mode"; full auto-rotation is the Conductor, RFC 0001)
-- B008 P2 | [B008-corrupttruncated-session-modejson-silently-un-pa](bugs/B008-corrupttruncated-session-modejson-silently-un-pa.md)
-- B009 P2 | [B009-consolidator-silently-no-ops-findings-lost-when-](bugs/B009-consolidator-silently-no-ops-findings-lost-when-.md)
 - B014 P2 | [B014-two-implementations-of-scratch-live-promotion-wi](bugs/B014-two-implementations-of-scratch-live-promotion-wi.md)
 - B030 P2 | [B030-permission-install-delivery-is-a-6-step-copy-p](bugs/B030-permission-install-delivery-is-a-6-step-copy-p.md)
 - B016 P3 | [B016-version-sprawl-across-surfaces-no-authoritative-](bugs/B016-version-sprawl-across-surfaces-no-authoritative-.md) (partial — required-permissions.json done)
