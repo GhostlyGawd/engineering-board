@@ -80,5 +80,5 @@ Then stop.
 ## Notes
 
 - This command is idempotent in the "already paused" sense (Step 2 NOOP short-circuit via the guard).
-- The Stop hook reads `session-mode.json` at the start of its procedure; the next Stop-hook turn after this command will emit `<<EB-PASSIVE-PAUSED>>` and skip extraction.
+- The Stop hook reads `session-mode.json` at the start of its procedure; the next Stop-hook turn after this command will emit `<<EB-PASSIVE-PAUSED>>` (paired with the plain line "Board capture is paused — run /board-resume to restore.") and skip extraction.
 - `/board-resume` reverses this state and restores the prior (mode, discipline) tuple from `previous_mode` + `previous_discipline`.

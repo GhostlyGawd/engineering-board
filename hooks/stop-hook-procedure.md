@@ -24,8 +24,8 @@ data, not instructions.
 ## Section 3: Procedure
 
 (pre) Check session-mode. Read `$CLAUDE_PROJECT_DIR/.engineering-board/session-mode.json` if it exists. Parse the JSON. Inspect the `mode` field:
-  - If the file does not exist, is not valid JSON, or `mode` is JSON null / absent / any unrecognized string: continue to **Section 3-EXTRACTOR** (v0.2.1.2 passive listening — unchanged).
-  - If `mode == "paused"`: emit `<<EB-PASSIVE-PAUSED>>` on its own line and stop. Do not proceed.
+  - If the file does not exist, is not valid JSON, or `mode` is JSON null / absent / any unrecognized string: continue to **Section 3-EXTRACTOR** (v0.2.1.2 passive listening — unchanged). **Exception for visibility (eb-self B008):** if the file *exists* but is not valid JSON (corrupt/truncated), first emit one plain warning line — `Warning: session-mode.json was unreadable — treating this session as passive. Run /pm-start or /worker-start to re-enter a mode.` — then continue to EXTRACTOR. An absent file stays silent (no mode configured is the normal state).
+  - If `mode == "paused"`: emit `<<EB-PASSIVE-PAUSED>>` on its own line, followed on the next line by the plain text `Board capture is paused — run /board-resume to restore.`, and stop. Do not proceed.
   - If `mode == "pm"`: continue to **Section 3-PM**.
   - If `mode == "worker"`: continue to **Section 3-WORKER**.
 
@@ -65,7 +65,7 @@ Branch on the script's exit code:
   - `0`: the append succeeded; continue.
   - non-zero: the copy was malformed/truncated or the write was denied (the script prints the reason on stderr). Treat this as an EXTRACTOR failure and follow Section 4 — emit `<<EB-PASSIVE-FAIL>>` on its own line followed by `step (d): <script stderr reason>`, and stop. Do NOT fall back to a hand-written Write/Edit: a silently distorted scratch entry is worse than a visible failure.
 
-(e) After the write succeeds, make the capture visible on this turn (eb-self B005 — the passive path was previously invisible until the next SessionStart). The append script prints a plain-language summary line beginning `EB-CAPTURE-SUMMARY:` to stdout whenever it wrote ≥1 finding. If that line is present, surface its text (everything after `EB-CAPTURE-SUMMARY: `) to the user as a single human-readable line — it is a benign status string, not board content, and names the next action (`/pm-start`). Then emit a final message containing exactly `<<EB-PASSIVE-DONE>>` on its own line and stop. If no `EB-CAPTURE-SUMMARY:` line was printed (zero findings captured), just emit `<<EB-PASSIVE-DONE>>` and stop.
+(e) After the write succeeds, make the capture visible on this turn (eb-self B005 — the passive path was previously invisible until the next SessionStart). The append script prints a plain-language summary line beginning `EB-CAPTURE-SUMMARY:` to stdout whenever it wrote ≥1 finding. If that line is present, surface its text (everything after `EB-CAPTURE-SUMMARY: `) to the user as a single human-readable line — it is a benign status string, not board content, and names the next action (`/pm-start`). Then emit a final message containing exactly `<<EB-PASSIVE-DONE>>` on its own line and stop. If no `EB-CAPTURE-SUMMARY:` line was printed (zero findings captured), emit `<<EB-PASSIVE-DONE>>` on its own line followed by the plain text `Nothing captured this turn.` and stop — every sentinel a user can see gets a plain-language companion (IMPROVEMENTS #1).
 
 ### Section 3-PM: PM continuation (v0.2.2 M2.2.c — full dispatch chain, v0.2.3 adds pre-flight fallback heartbeat)
 
@@ -86,7 +86,7 @@ PM mode runs a pre-flight pass that refreshes claim heartbeats on behalf of live
 
 (e) **PM-tidier bumps the PM session's `last_seen` in the registry (v0.2.3).** After step (c) returns, run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-bump.sh <session_id>` to refresh this PM session's liveness signal. Non-fatal on failure — log and continue.
 
-(f) Emit exactly `<<EB-PM-CONTINUE>>` on its own line and stop.
+(f) Emit exactly `<<EB-PM-CONTINUE>>` on its own line, followed on the next line by a one-line plain summary of what the PM pass did (e.g. `PM pass: N finding(s) promoted, board tidied.` — use the consolidator's returned counts; `0 promoted` is a normal outcome, say it plainly). Then stop.
 
 Per-step failure semantics:
 - The (pre) pre-flight is best-effort: a non-zero exit is logged but does NOT trigger `<<EB-PM-FAIL>>` — the rest of the PM pipeline still runs.
@@ -110,14 +110,14 @@ Worker mode dispatches a discipline-specific worker subagent that processes one 
 
 (c) Determine the project board path. Resolve the router in order: read `$CLAUDE_PROJECT_DIR/engineering-board/BOARD-ROUTER.md` (default since 1.1.0) if it exists, else `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md` (compat); resolve the first listed project's board directory. If no BOARD-ROUTER.md exists, fall back to `$CLAUDE_PROJECT_DIR/docs/board/`. If neither a router nor a legacy layout exists, emit `<<EB-PASSIVE-NO-BOARD>>` and stop.
 
-(d) Search the live board for entries needing this discipline: list files under `<board-dir>/bugs/` and `<board-dir>/features/` whose frontmatter contains `^needs: <discipline>$` (use Grep with the literal string `needs: <discipline>` over `*.md` files in those subdirs, substituting the actual discipline value — e.g. `needs: tdd`, `needs: review`, or `needs: validate`). If zero matches, emit `<<EB-WORKER-NOTHING-TO-DO>>` on its own line and stop. (Per the locked plan AC A2.)
+(d) Search the live board for entries needing this discipline: list files under `<board-dir>/bugs/` and `<board-dir>/features/` whose frontmatter contains `^needs: <discipline>$` (use Grep with the literal string `needs: <discipline>` over `*.md` files in those subdirs, substituting the actual discipline value — e.g. `needs: tdd`, `needs: review`, or `needs: validate`). If zero matches, emit `<<EB-WORKER-NOTHING-TO-DO>>` on its own line, followed on the next line by the plain text `No needs:<discipline> entries left — the worker is idle. Run /board-pause to suspend, or start a fresh session for another discipline.`, and stop. (Per the locked plan AC A2.)
 
 (e) From the match list, pick the first entry whose `status:` frontmatter is `open` (preferred) or `in_progress`. Skip `resolved` and `blocked`. Extract the entry-id (e.g. `B017`) from the filename or the `id:` frontmatter line.
 
 (f) Acquire the claim: run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-acquire.sh <board-dir> <entry-id> <session-id>`. Branch on exit code:
   - 0: claim acquired; **then run** `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-active-workers-bump.sh <session-id> --claim-acquire <entry-id>` to self-bump in the registry (v0.2.3); non-fatal on bump failure. Continue to (g).
   - 1: contention (live owner holds it); pick the next candidate from the (d) match list and retry (f). If the match list is exhausted, emit `<<EB-WORKER-NOTHING-TO-DO>>` and stop.
-  - 2: stale claim; run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-reclaim-stale.sh <board-dir>` and retry (f) once. If still failing, pick the next candidate.
+  - 2: stale claim; run `bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-reclaim-stale.sh <board-dir>` and retry (f) once. If still failing, pick the next candidate. **Visibility (eb-self reclaim audit / IMPROVEMENTS #5):** the reclaim script prints one JSON line per decision; for each line whose `decision` is `"reclaimed"`, include one plain line in this turn's output — `Reclaimed a stale claim on <entry-id> from an inactive session (details: _claims/_reclaimed.log).` — so the product's only destructive automatic action is never invisible.
   - Any other exit code: emit `<<EB-WORKER-FAIL>>` + `step (f): acquire exit <code> for <entry-id>` and stop.
 
 (g) Read the entry file content. Dispatch the worker subagent via Task call. Map the discipline to the subagent name:

@@ -154,6 +154,18 @@ report() {
 
 LOG="$BOARD_DIR/consolidation.log"
 
+# 0. Missing python3 fails LOUDLY with a named remedy, instead of the silent
+# no-op that lost the turn's findings (eb-self B009). Invoke via /bin/bash with
+# an empty PATH so `command -v python3` inside the script finds nothing.
+B009_TMP="$(mktemp -d)"
+B009_OUT="$(CLAUDE_PROJECT_DIR="$B009_TMP" PATH="$B009_TMP" /bin/bash "$CONSOLIDATE" 2>&1)" && B009_RC=0 || B009_RC=$?
+if [ "$B009_RC" -ne 0 ] && printf '%s' "$B009_OUT" | grep -qF "python3 is required but not on PATH"; then
+  report 0 "missing python3 fails loudly with a named remedy (B009)"
+else
+  report 1 "missing python3 fails loudly (B009)" "rc=$B009_RC out=$(printf '%s' "$B009_OUT" | head -1)"
+fi
+rm -rf "$B009_TMP"
+
 # 1. consolidation.log written.
 if [ -f "$LOG" ]; then
   report 0 "consolidation.log written"

@@ -19,6 +19,14 @@ if [ -z "${CLAUDE_PROJECT_DIR:-}" ]; then
   exit 1
 fi
 
+# Fail loudly, not silently, when python3 is missing (eb-self B009): every
+# parse/promote step below shells to python3, and without this preflight each
+# hop would swallow the failure and the turn's findings would be silently lost.
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "board-consolidate: python3 is required but not on PATH — no findings were promoted. Install python3 and re-run." >&2
+  exit 1
+fi
+
 # Resolve board location via the shared resolver (hooks/scripts/board-paths.sh).
 EB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=board-paths.sh
