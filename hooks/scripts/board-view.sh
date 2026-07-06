@@ -236,19 +236,19 @@ read -r -d '' HEAD <<'HTML' || true
   --eb-paper:#FAF9F5;--eb-paper-2:#F1F0EA;--eb-ink:#17191E;--eb-ink-2:#1E2127;
   --eb-line:#E3E1D9;--eb-line-dark:#2A2D34;--eb-accent:#9A5B00;--eb-accent-dark:#E6A94E;
   --eb-text:#17191E;--eb-text-muted:#5B6068;
-  --eb-bg:var(--eb-paper);--eb-surface:var(--eb-paper-2);--eb-card:#FFFFFF;
+  --eb-bg:var(--eb-paper);--eb-surface:var(--eb-paper-2);--eb-card:#FFFFFF;--eb-danger:#B23A2E;
   --eb-border:var(--eb-line);--eb-accent-cur:var(--eb-accent);
   --eb-font-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   --eb-font-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --eb-text:#ECEBE6;--eb-text-muted:#9EA3AB;--eb-bg:var(--eb-ink);
-  --eb-surface:var(--eb-ink-2);--eb-card:#23262D;--eb-border:var(--eb-line-dark);
+  --eb-surface:var(--eb-ink-2);--eb-card:#23262D;--eb-danger:#E4685A;--eb-border:var(--eb-line-dark);
   --eb-accent-cur:var(--eb-accent-dark);
 }}
 :root[data-theme="dark"]{
   --eb-text:#ECEBE6;--eb-text-muted:#9EA3AB;--eb-bg:var(--eb-ink);
-  --eb-surface:var(--eb-ink-2);--eb-card:#23262D;--eb-border:var(--eb-line-dark);
+  --eb-surface:var(--eb-ink-2);--eb-card:#23262D;--eb-danger:#E4685A;--eb-border:var(--eb-line-dark);
   --eb-accent-cur:var(--eb-accent-dark);
 }
 *{box-sizing:border-box}
@@ -277,7 +277,7 @@ body{margin:0;background:var(--eb-bg);color:var(--eb-text);font-family:var(--eb-
 .prio{font-size:.62rem;font-weight:700;font-family:var(--eb-font-mono);border-radius:4px;padding:.05rem .3rem;
   color:var(--eb-accent-cur);border:1px solid var(--eb-accent-cur)}
 .badge{font-size:.6rem;font-family:var(--eb-font-mono)}
-.badge.blocked{color:#B23A2E}
+.badge.blocked{color:var(--eb-danger)}
 .empty{color:var(--eb-text-muted);text-align:center;font-size:.8rem;padding:.4rem 0}
 .lane-h{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--eb-text-muted);margin:1.4rem 0 .5rem}
 .lane{list-style:none;margin:0;padding:0;display:grid;gap:.3rem}

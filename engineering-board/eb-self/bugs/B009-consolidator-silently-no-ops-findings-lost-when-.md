@@ -3,10 +3,10 @@ id: B009
 type: bug
 title: Consolidator silently no-ops (findings lost) when python3 is broken/absent
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P2
 affects: hooks/scripts/board-consolidate.sh
-needs: tdd
+needs: done
 pattern: [silent-failure]
 ---
 

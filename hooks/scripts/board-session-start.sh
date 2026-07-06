@@ -87,9 +87,12 @@ for i in "${!BOARD_PATHS[@]}"; do
 
   echo "[ ${LABEL} ] — ${open_count} open item(s):"
   if [ -n "${open_items}" ]; then
+    # One-line legend so the entry sigils are readable on first sight
+    # (IMPROVEMENTS #6: B=bug F=feature Q=question O=observation, P0-P3 = priority).
+    echo "  (B=bug F=feature Q=question O=observation · P0 highest priority)"
     echo "${open_items}"
   else
-    echo "  (none)"
+    echo "  (none yet — findings are captured automatically as you work; run /pm-start to promote them to the board)"
   fi
   echo ""
 
@@ -173,11 +176,13 @@ PY
     # Count *.md files directly under _sessions/ (exclude _archive/ subdir)
     scratch_count=$(find "${SCRATCH_DIR}" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
     if [ "${scratch_count}" -gt 0 ]; then
-      echo "  SCRATCH ENTRIES — ${scratch_count} un-promoted session file(s) in _sessions/. Plugin session files consolidate on real session end (or run \`bash \$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-consolidate.sh\` now). MCP inbox files (\`mcp-*.md\`) are promoted with the MCP \`board_create_entry\` tool — the consolidator leaves them untouched."
+      # Keep the headline scannable (IMPROVEMENTS #6); details on follow-up lines.
+      echo "  SCRATCH ENTRIES — ${scratch_count} un-promoted session file(s) waiting in _sessions/."
+      echo "    They consolidate automatically on session end; to promote now: \`bash \$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-consolidate.sh\`."
       while IFS= read -r scratch_file; do
         session_id=$(basename "${scratch_file}" .md)
         case "${session_id}" in
-          mcp-*) echo "    ${session_id}  (MCP inbox — promote via board_create_entry)" ;;
+          mcp-*) echo "    ${session_id}  (MCP inbox — promote with the MCP \`board_create_entry\` tool; the consolidator leaves it untouched)" ;;
           *)     echo "    ${session_id}" ;;
         esac
       done < <(find "${SCRATCH_DIR}" -maxdepth 1 -type f -name "*.md" 2>/dev/null | sort)
@@ -263,4 +268,6 @@ PY
   fi
 done
 
-echo "Real-time routing active: route findings to the correct project board as they surface — do not batch."
+# Reads as status to the user while still carrying the routing instruction the
+# orchestrating model needs (findings go to the right board as they surface).
+echo "Findings route to the correct project board in real time as they surface (not batched at session end)."
