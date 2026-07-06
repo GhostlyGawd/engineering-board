@@ -22,17 +22,21 @@ submissions); everything is prepared so each is a copy-paste step.
   `docs/{index.html,assets,.nojekyll}` → `gh-pages` on every push to `main`.
   No Settings action needed.
 
-## 3. Release **[human — one click in the Actions tab]**
+## 3. Release — **DONE (published 2026-07-06 via the release workflow)**
 
 The sandbox can't push tags or call the release API (BLOCKERS B2), but
 [`.github/workflows/release.yml`](../.github/workflows/release.yml) now automates
 the entire chain once a human initiates it. **Actions → release → Run workflow**,
 twice:
 
-| Run | `tag` | `sha` | `publish_registry` |
-|---|---|---|---|
-| 1 | `v1.3.0` | `b35cf7f877fef3746311286c92d6db3f581815ff` (PR #56 merge) | unchecked |
-| 2 | `v1.4.0` | `fd06488ccb2d88ee75475d5f9c5988cd01813843` (PR #61 merge) | **checked** |
+| Run | `tag` | Result |
+|---|---|---|
+| 1 | `v1.3.0` | **Published** — <https://github.com/GhostlyGawd/engineering-board/releases/tag/v1.3.0> (notes from CHANGELOG) |
+| 2 | `v1.4.0` | **Published** — <https://github.com/GhostlyGawd/engineering-board/releases/tag/v1.4.0> with `engineering-board-mcp.mcpb` (GitHub-computed digest matches the `server.json` pin) |
+| 3 | registry | **Published** to <https://registry.modelcontextprotocol.io> as `io.github.GhostlyGawd/engineering-board` via OIDC (workflow run #4); syndication to PulseMCP/Glama/mcp.so is automatic. Two validation fixes were required and are merged: description ≤ 100 chars (PR #63) and exact login-casing namespace (PR #64). |
+
+For future releases, the same workflow_dispatch (tag + sha + optional
+`publish_registry`) repeats the whole chain; historical inputs kept for reference:
 
 Each run: creates the annotated tag at that sha (never moves an existing one),
 verifies the tag matches `plugin.json` at that tree, extracts that version's
@@ -53,7 +57,7 @@ Equivalent from a clone with push rights: `git tag -a v1.3.0 b35cf7f -m … && g
 | **Self-hosted plugin marketplace** | Already live — users run `/plugin marketplace add GhostlyGawd/engineering-board`. Nothing to submit. | done |
 | **awesome-claude-code** (hesreallyhim) | Use "Recommend a new resource" → opens a pre-filled issue (do **not** open a PR). Highest-signal free channel for the exact audience. | **[human]** |
 | **Claude community marketplace** | `claude plugin validate` (passes clean) then submit at `platform.claude.com/plugins/submit` (Console) or `claude.ai/admin-settings/directory/submissions/plugins/new`. Pinned to a commit SHA after review. | **[human]** |
-| **Official MCP Registry** | Manifest ready: [`mcp-server/server.json`](../mcp-server/server.json) (namespace `io.github.ghostlygawd/engineering-board`). See the command block below. Auto-syndicates into PulseMCP/mcp.so. | **[human]** |
+| **Official MCP Registry** | **DONE (2026-07-06)** — published as `io.github.GhostlyGawd/engineering-board` via the release workflow's OIDC step. Auto-syndicates into PulseMCP/mcp.so. | done |
 | **Smithery** | Config ready: [`mcp-server/smithery.yaml`](../mcp-server/smithery.yaml). `smithery mcp publish` (needs account/API key). | **[human]** |
 | **Glama / PulseMCP / mcp.so** | Auto-crawl the official registry + GitHub; claim the listing after it appears. | mostly automatic |
 | **awesome-mcp-servers** (punkpeye) | Open a PR adding the entry in the list's format. | **[human]** |
