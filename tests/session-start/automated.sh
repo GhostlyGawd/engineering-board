@@ -160,7 +160,8 @@ else
   fail "T7: worker mode line missing or discipline wrong"
 fi
 
-# Corrupt mode file falls back to passive (fail-safe, not a crash).
+# Corrupt mode file falls back to passive (fail-safe, not a crash) — AND says so
+# (eb-self B008: fail-open must be visible, not silent).
 P8="$TMP/mode-corrupt"
 make_board "$P8"
 mkdir -p "$P8/.engineering-board"
@@ -170,6 +171,17 @@ if printf '%s\n' "$OUT8" | grep -qF "Mode: passive"; then
   pass "T8: corrupt session-mode.json falls back to passive line"
 else
   fail "T8: corrupt session-mode.json did not fall back cleanly"
+fi
+if printf '%s\n' "$OUT8" | grep -qF "was unreadable"; then
+  pass "T8b: corrupt session-mode.json surfaces a warning (B008 visibility)"
+else
+  fail "T8b: corrupt session-mode.json warning missing"
+fi
+# ...and an ABSENT mode file must NOT warn (absence is the normal state).
+if printf '%s\n' "$OUT5" | grep -qF "was unreadable"; then
+  fail "T8c: absent session-mode.json wrongly warns"
+else
+  pass "T8c: absent session-mode.json stays quiet (no false warning)"
 fi
 
 echo ""

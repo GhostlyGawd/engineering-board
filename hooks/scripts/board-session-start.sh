@@ -30,16 +30,26 @@ echo ""
 # time, so switching means starting a new session.
 MODE_FILE="${CLAUDE_PROJECT_DIR:-$PWD}/.engineering-board/session-mode.json"
 mode_line="$(python3 - "$MODE_FILE" <<'PY' 2>/dev/null || true
-import json, sys
+import json, os, sys
+corrupt = False
 try:
     with open(sys.argv[1], "r", encoding="utf-8") as f:
         d = json.load(f)
     mode = d.get("mode") if isinstance(d, dict) else None
     disc = d.get("discipline") if isinstance(d, dict) else None
-except Exception:
+    if not isinstance(d, dict):
+        corrupt = True
+except FileNotFoundError:
     mode, disc = None, None
+except Exception:
+    # The file EXISTS but is unreadable/unparseable — fail-open to passive is
+    # the safe routing default, but say so instead of silently dropping the
+    # user's mode (eb-self B008).
+    mode, disc, corrupt = None, None, True
 if isinstance(mode, str):
     mode = mode.strip()
+if corrupt:
+    print("Warning: .engineering-board/session-mode.json exists but was unreadable — treating this session as passive. Run /pm-start or /worker-start to re-enter a mode.")
 if mode == "pm":
     print("Mode: PM — findings promote to the board each turn. Start a fresh session to switch to worker or plain capture.")
 elif mode == "worker":

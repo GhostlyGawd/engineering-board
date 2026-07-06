@@ -9,6 +9,30 @@ increases.
 
 ## [Unreleased]
 
+### Fixed
+- **Every user-visible sentinel now carries a plain-language companion**
+  (IMPROVEMENTS #1). The Stop procedure pairs `<<EB-PASSIVE-DONE>>` with
+  "Nothing captured this turn." when zero findings landed, `<<EB-PASSIVE-PAUSED>>`
+  with "Board capture is paused — run /board-resume to restore.",
+  `<<EB-WORKER-NOTHING-TO-DO>>` with a worker-idle line naming the next action,
+  and `<<EB-PM-CONTINUE>>` with a one-line PM-pass summary (promoted counts,
+  "0 promoted" said plainly). Sentinels stay byte-exact (the loop guard greps
+  them); six new modes-suite pins cover the companions.
+- **Silent failures now announce themselves** (IMPROVEMENTS #11, eb-self
+  B008/B009). A *corrupt* `session-mode.json` still fail-opens to passive (safe
+  routing) but now emits a warning naming the recovery — in both the Stop
+  procedure and the SessionStart banner (an absent file stays quiet; two new
+  session-start assertions). `board-consolidate.sh` preflights `python3` and
+  exits loudly with a named remedy instead of silently losing the turn's
+  promotions (new smoke assertion).
+- **Stale-claim reclamation is visible** (IMPROVEMENTS #5). When the worker path
+  reclaims a stale claim (`rm -rf` of another session's lock), the turn output
+  now includes "Reclaimed a stale claim on <id> … (details: _claims/_reclaimed.log)"
+  — the product's only destructive automatic action is no longer invisible.
+- **`/board-migrate` dead-end names the next action**: the "no board layout
+  found" message now points fresh starts at `/board-init` (matching the
+  `/board-claim-release` microcopy gold standard).
+
 ### Added
 - **The live public board** (IMPROVEMENTS.md #3). `pages.yml` now publishes the
   committed `engineering-board/eb-self/board.html` to the site as

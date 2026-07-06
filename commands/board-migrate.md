@@ -62,7 +62,7 @@ If `BOARD-ROUTER.md` exists in `$CLAUDE_PROJECT_DIR/docs/boards/`, read its tabl
 - If `project` was given on the command line, filter to that row.
 - Otherwise include all rows.
 
-If no router exists, target the legacy `$CLAUDE_PROJECT_DIR/docs/board/` if it exists; otherwise print `No board layout found at docs/boards/ or docs/board/.` and stop.
+If no router exists, target the legacy `$CLAUDE_PROJECT_DIR/docs/board/` if it exists; otherwise print `No board layout found at docs/boards/ or docs/board/ — nothing to migrate. If you're starting fresh, run /board-init <project> instead.` and stop.
 
 ### Step 3 — Dispatch the migrate script
 

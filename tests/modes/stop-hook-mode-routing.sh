@@ -162,6 +162,16 @@ check_proc "procedure: EXTRACTOR step (c) ASSISTANT MESSAGE delim" "---ASSISTANT
 check_proc "procedure: EXTRACTOR step (d) iso timestamp comment"  '<!-- <iso8601> -->'
 check_proc "procedure: EXTRACTOR step (e) emit PASSIVE-DONE"      "<<EB-PASSIVE-DONE>>"
 
+# IMPROVEMENTS #1/#11 — plain-language companions + fail-loudly visibility.
+# Every user-visible sentinel must carry a human-readable line, and the
+# corrupt-mode-file / reclaim paths must announce themselves.
+check_proc "procedure: zero-findings plain companion"             "Nothing captured this turn."
+check_proc "procedure: paused plain companion"                    "Board capture is paused"
+check_proc "procedure: corrupt session-mode warning (B008)"       "session-mode.json was unreadable"
+check_proc "procedure: worker idle plain companion"               "the worker is idle"
+check_proc "procedure: PM pass plain summary"                     "PM pass:"
+check_proc "procedure: stale-reclaim visibility line"             "Reclaimed a stale claim"
+
 # Section 3-PM (M2.2.c — full dispatch chain).
 check_proc "procedure: Section 3-PM present"                      "Section 3-PM:"
 check_proc "procedure: PM reuses EXTRACTOR steps"                 "Section 3-EXTRACTOR steps"
