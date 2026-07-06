@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
-  "name": "io.github.ghostlygawd/engineering-board",
+  "name": "io.github.GhostlyGawd/engineering-board",
   "description": "A git-committed kanban board your AI agents run and remember - 11 MCP tools over stdio.",
   "repository": {
     "url": "https://github.com/GhostlyGawd/engineering-board",

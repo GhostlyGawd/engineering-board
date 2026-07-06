@@ -533,8 +533,8 @@ def suite_distribution():
     check(server.get("version") == plugin_ver,
           "server.json version matches plugin.json",
           "%s != %s" % (server.get("version"), plugin_ver))
-    check(server.get("name") == "io.github.ghostlygawd/engineering-board",
-          "server.json uses the reverse-DNS registry namespace")
+    check(server.get("name") == "io.github.GhostlyGawd/engineering-board",
+          "server.json uses the reverse-DNS registry namespace (exact login casing)")
     pkgs = server.get("packages") or []
     check(len(pkgs) == 1 and pkgs[0].get("version") == plugin_ver,
           "server.json package version matches plugin.json")
