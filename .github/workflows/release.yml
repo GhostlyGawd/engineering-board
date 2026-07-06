@@ -1,0 +1,162 @@
+# release.yml — one-click release automation.
+#
+# Two entry points:
+#   1. workflow_dispatch (Actions tab → release → Run workflow): give it a tag
+#      (e.g. v1.4.0) and the commit SHA it should point at. The workflow creates
+#      the annotated tag, extracts that version's CHANGELOG section as release
+#      notes, builds the reproducible .mcpb bundle, verifies its sha256 against
+#      the pin in mcp-server/server.json, and publishes the GitHub Release with
+#      the bundle attached. Optionally (opt-in input) it then publishes the
+#      server to the official MCP Registry using GitHub OIDC — no stored secret.
+#   2. Pushing a v* tag from a clone runs the same release steps for that tag
+#      (registry publish stays dispatch-only).
+#
+# Everything here is idempotent: an existing tag is reused (never moved), an
+# existing release short-circuits, and the bundle build is byte-reproducible so
+# re-runs produce the identical asset.
+
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to create/release (e.g. v1.4.0)"
+        required: true
+        type: string
+      sha:
+        description: "Commit SHA the tag points at (must be on main)"
+        required: true
+        type: string
+      publish_registry:
+        description: "Also publish to the official MCP Registry (OIDC)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write   # create tag ref + release
+  id-token: write   # OIDC for mcp-publisher (registry publish)
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag + sha
+        id: resolve
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.tag }}"
+            SHA="${{ inputs.sha }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+            SHA="$(git rev-list -n 1 "$TAG")"
+          fi
+          case "$TAG" in v[0-9]*) ;; *) echo "tag '$TAG' must look like v1.2.3" >&2; exit 1;; esac
+          git merge-base --is-ancestor "$SHA" origin/main \
+            || { echo "sha $SHA is not on main" >&2; exit 1; }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Create tag if missing (dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.resolve.outputs.tag }}"
+          SHA="${{ steps.resolve.outputs.sha }}"
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "tag $TAG already exists on origin — reusing (tags are never moved)"
+          else
+            git -c user.name="github-actions[bot]" \
+                -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+                tag -a "$TAG" "$SHA" -m "engineering-board $TAG"
+            git push origin "refs/tags/$TAG"
+          fi
+
+      - name: Check out the tagged tree
+        run: git checkout --detach "${{ steps.resolve.outputs.sha }}"
+
+      - name: Verify tag matches the manifest version
+        run: |
+          set -euo pipefail
+          MANIFEST_VER="$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")"
+          [ "$MANIFEST_VER" = "${{ steps.resolve.outputs.version }}" ] \
+            || { echo "plugin.json at this sha is $MANIFEST_VER, not ${{ steps.resolve.outputs.version }}" >&2; exit 1; }
+
+      - name: Extract release notes from CHANGELOG
+        run: |
+          set -euo pipefail
+          python3 - "${{ steps.resolve.outputs.version }}" > /tmp/notes.md <<'PY'
+          import re, sys
+          version = sys.argv[1]
+          text = open("CHANGELOG.md", encoding="utf-8").read()
+          m = re.search(
+              r"^## \[%s\][^\n]*\n(.*?)(?=^## \[|\Z)" % re.escape(version),
+              text, re.M | re.S)
+          if not m:
+              sys.exit("no CHANGELOG section for [%s]" % version)
+          sys.stdout.write(m.group(1).strip() + "\n")
+          PY
+          echo "--- notes ---"; head -30 /tmp/notes.md
+
+      - name: Build the .mcpb bundle (reproducible) and verify its pinned sha
+        id: bundle
+        run: |
+          set -euo pipefail
+          # Only versions whose server.json pins a real sha ship a bundle
+          # (1.3.0 predates the bundle; its server.json holds a placeholder).
+          PIN="$(python3 -c "import json; print(json.load(open('mcp-server/server.json'))['packages'][0].get('fileSha256',''))" 2>/dev/null || echo "")"
+          if ! echo "$PIN" | grep -qE '^[0-9a-f]{64}$'; then
+            echo "no real fileSha256 pinned at this version — skipping bundle asset"
+            echo "attach=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          OUT="$(bash mcp-server/build-mcpb.sh)"
+          echo "$OUT"
+          BUILT="$(echo "$OUT" | sed -n 's/^sha256: //p')"
+          [ "$BUILT" = "$PIN" ] \
+            || { echo "built sha $BUILT != pinned $PIN — refusing to publish a mismatched asset" >&2; exit 1; }
+          echo "attach=true" >> "$GITHUB_OUTPUT"
+
+      - name: Publish the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.resolve.outputs.tag }}"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "release $TAG already exists — leaving it untouched"
+            exit 0
+          fi
+          ASSET=""
+          [ "${{ steps.bundle.outputs.attach }}" = "true" ] && ASSET="dist/engineering-board-mcp.mcpb"
+          gh release create "$TAG" $ASSET \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "engineering-board $TAG" \
+            --notes-file /tmp/notes.md
+
+      - name: Publish to the official MCP Registry (OIDC, opt-in)
+        if: github.event_name == 'workflow_dispatch' && inputs.publish_registry
+        continue-on-error: true
+        working-directory: mcp-server
+        run: |
+          set -euo pipefail
+          OS="$(uname -s | tr '[:upper:]' '[:lower:]')"; ARCH="$(uname -m)"
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_${OS}_${ARCH}.tar.gz" | tar xz mcp-publisher \
+          || { # asset naming fallback: look the download URL up via the API
+            URL="$(curl -fsSL https://api.github.com/repos/modelcontextprotocol/registry/releases/latest \
+              | python3 -c "import json,sys; a=json.load(sys.stdin)['assets']; print(next(x['browser_download_url'] for x in a if 'publisher' in x['name'] and '$OS' in x['name'] and ('$ARCH' in x['name'] or 'amd64' in x['name'])))")"
+            curl -fsSL "$URL" | tar xz mcp-publisher
+          }
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
+          echo "published to registry.modelcontextprotocol.io — syndication to PulseMCP/Glama/mcp.so follows automatically"
