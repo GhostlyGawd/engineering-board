@@ -9,6 +9,17 @@ increases.
 
 ## [Unreleased]
 
+### Added
+- **One-click release workflow** — [`.github/workflows/release.yml`](.github/workflows/release.yml)
+  (workflow_dispatch, or any `v*` tag push) automates the whole release chain the
+  sandbox cannot perform itself: create the annotated tag at a given main sha
+  (never moving an existing tag), verify the tag matches `plugin.json` at that
+  tree, extract that version's CHANGELOG section as the release notes, build the
+  reproducible `.mcpb` bundle and refuse to publish on a sha mismatch with the
+  `server.json` pin, publish the GitHub Release with the asset, and — opt-in —
+  publish to the official MCP Registry via GitHub OIDC (no stored secret).
+  Exact dispatch inputs for v1.3.0 / v1.4.0 live in `.goal/LAUNCH.md` §3.
+
 ### Changed
 - **The `.mcpb` bundle is now byte-reproducible** (launch prep). `build-mcpb.sh`
   zips via python3 `zipfile` with fixed timestamps + permissions (no `zip` CLI

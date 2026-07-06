@@ -22,20 +22,29 @@ submissions); everything is prepared so each is a copy-paste step.
   `docs/{index.html,assets,.nojekyll}` → `gh-pages` on every push to `main`.
   No Settings action needed.
 
-## 3. Release **[human — from a clone with push rights]**
+## 3. Release **[human — one click in the Actions tab]**
 
-The RC tag exists locally but the sandbox git relay can't push tags (BLOCKERS B2):
+The sandbox can't push tags or call the release API (BLOCKERS B2), but
+[`.github/workflows/release.yml`](../.github/workflows/release.yml) now automates
+the entire chain once a human initiates it. **Actions → release → Run workflow**,
+twice:
 
-```sh
-git tag -a v1.2.0-rc.1 <merge-sha> -m "engineering-board v1.2.0-rc.1 — dual distribution (plugin + MCP)"
-git push origin v1.2.0-rc.1
-```
+| Run | `tag` | `sha` | `publish_registry` |
+|---|---|---|---|
+| 1 | `v1.3.0` | `b35cf7f877fef3746311286c92d6db3f581815ff` (PR #56 merge) | unchecked |
+| 2 | `v1.4.0` | `fd06488ccb2d88ee75475d5f9c5988cd01813843` (PR #61 merge) | **checked** |
 
-Then publish a GitHub Release from the tag. **Release notes** (brand voice — plain,
-no hype): paste the `## [1.2.0]` section of [`CHANGELOG.md`](../CHANGELOG.md). Headline:
-*"1.2.0 — the board goes dual: a zero-dependency MCP server alongside the Claude Code plugin."*
-Promote `rc.1` → `1.2.0` once the plugin + MCP install paths are verified from the
-public artifacts.
+Each run: creates the annotated tag at that sha (never moves an existing one),
+verifies the tag matches `plugin.json` at that tree, extracts that version's
+CHANGELOG section as the release notes, builds the reproducible `.mcpb` bundle
+and refuses to publish if its sha doesn't match the `server.json` pin (1.4.0
+only — 1.3.0 predates the bundle and auto-skips), and publishes the GitHub
+Release with the asset. Run 2's `publish_registry` additionally publishes to the
+official MCP Registry via GitHub OIDC (no stored secret; syndicates to
+PulseMCP/Glama/mcp.so). Pushing a `v*` tag from a clone triggers the same
+release steps.
+
+Equivalent from a clone with push rights: `git tag -a v1.3.0 b35cf7f -m … && git push origin v1.3.0` (the tag-push trigger runs the rest).
 
 ## 4. Distribution submissions (channel map from POSITIONING.md)
 
@@ -58,6 +67,10 @@ timestamps), so `packages[0].fileSha256` in `server.json` is **already pinned**
 to the exact sha the build produces — and the MCP test suite fails if they drift.
 No manual sha copy-paste step.
 
+**Preferred path: §3's release workflow does all of this** — bundle build, sha
+verification, asset upload, and (run 2) the OIDC registry publish. The manual
+equivalent, for a clone:
+
 ```sh
 # 1. Build the bundle. It is byte-reproducible: the sha it prints already equals
 #    packages[0].fileSha256 in mcp-server/server.json (CI-verified).
@@ -71,7 +84,7 @@ cd mcp-server
 mcp-publisher login github
 mcp-publisher publish                  # reads server.json
 
-# 4. Smithery (separate account/API key):
+# 4. Smithery (separate account/API key) — NOT covered by the workflow:
 smithery mcp publish                   # reads smithery.yaml
 ```
 

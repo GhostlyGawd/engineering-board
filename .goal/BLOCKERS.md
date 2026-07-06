@@ -66,6 +66,16 @@ _Post-merge update (2026-07-04):_ retested after PR #18 merged — tag refs are
 still rejected by the relay (branch refs are allowed: the `gh-pages` push
 succeeded). Recommend tagging the merge commit `0060afd` on `main`.
 
+_Update (2026-07-05, roadmap run):_ retested — the relay now returns HTTP 403 on
+tag refs (same policy, different symptom), and the sandbox's permission layer
+also gates routing releases through the API directly, so publication remains a
+deliberately human-initiated act. **The gate is now one click wide:**
+`.github/workflows/release.yml` (workflow_dispatch) performs the whole chain —
+tag creation, CHANGELOG-sourced notes, reproducible-bundle build + sha
+verification, Release publish with the asset, and opt-in MCP-Registry OIDC
+publish. Exact inputs for the two pending runs (v1.3.0, v1.4.0) are in
+`LAUNCH.md` §3.
+
 ## B3 — Repo metadata (description / topics / social preview) — UI-only
 
 The GitHub MCP toolset exposes no repository-update endpoint (only
