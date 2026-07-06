@@ -19,6 +19,12 @@ bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-view.sh" ${1:-} $([ "$ARGUMENTS" !
 - With no arguments it renders **every** project the router resolves.
 - With a project name it renders just that board.
 - `--stdout` prints the HTML instead of writing `board.html`.
+- `--link-base <url>` prefixes entry-card links with an absolute base (e.g. a
+  GitHub blob URL) so a *hosted* copy of `board.html` clicks through to the
+  entry sources; without it, links are relative (they resolve locally and in
+  the GitHub file view). Also settable via the `EB_VIEW_LINK_BASE` env var.
+- `--stamp` appends a "Generated from `<git short-sha>`" line to the footer —
+  opt-in because it deliberately breaks the default byte-determinism.
 
 The script writes `engineering-board/<project>/board.html` — a **single
 self-contained file** (all CSS inlined, no network, no JavaScript required). It

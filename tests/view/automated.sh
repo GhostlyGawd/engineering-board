@@ -134,6 +134,39 @@ echo "$OUT" | grep -qF '.badge.blocked{color:var(--eb-danger)}' && pass "blocked
 DARKS=$(echo "$OUT" | grep -o -- '--eb-danger:#E4685A' | wc -l | tr -d ' ')
 [ "$DARKS" = "2" ] && pass "dark roots override --eb-danger (both blocks)" || fail "dark --eb-danger override missing (found $DARKS of 2)"
 
+# IMPROVEMENTS #8: entry cards link to their markdown sources.
+echo "$OUT" | grep -q '<a class="cid" href="bugs/B001.md">B001</a>' && pass "card id links to its entry file (relative)" || fail "card link missing"
+LB="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout --link-base "https://ex.test/base/" 2>/dev/null)"
+echo "$LB" | grep -q 'href="https://ex.test/base/bugs/B001.md"' && pass "--link-base prefixes card links" || fail "--link-base not applied"
+
+# IMPROVEMENTS #8: Done column collapses beyond 10 resolved entries.
+for i in $(seq 10 22); do
+  mk "bugs/B0${i}.md" <<EOF
+---
+id: B0${i}
+type: bug
+title: resolved filler ${i}
+discovered: 2026-07-04
+status: resolved
+priority: P3
+affects: src/f.py
+needs: validate
+---
+## Done when
+- x
+EOF
+done
+BIG="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
+echo "$BIG" | grep -q 'more resolved</summary>' && pass "Done column collapses beyond 10 (details/summary)" || fail "Done collapse missing"
+
+# IMPROVEMENTS #8: --stamp adds a freshness line; default stays deterministic.
+ST="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout --stamp 2>/dev/null)"
+echo "$ST" | grep -q 'Generated from <code>' && pass "--stamp adds a freshness footer" || fail "--stamp missing"
+echo "$OUT" | grep -q 'Generated from <code>' && fail "default output leaks a stamp (breaks determinism)" || pass "default output has no stamp"
+
+# Print styles exist.
+echo "$OUT" | grep -q '@media print' && pass "print styles present" || fail "print styles missing"
+
 # Determinism: two renders are byte-identical.
 A="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
 B="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
