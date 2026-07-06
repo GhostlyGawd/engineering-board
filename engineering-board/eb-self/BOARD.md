@@ -5,7 +5,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 ## Open
 
 ### Bugs
-- B006 P2 | [B006-advancing-one-entry-through-tdd-review-validate-](bugs/B006-advancing-one-entry-through-tdd-review-validate-.md) (mitigated: 1.3.0 session-mode banner + README "one session, one mode"; full auto-rotation is the Conductor, RFC 0001)
 - B016 P3 | [B016-version-sprawl-across-surfaces-no-authoritative-](bugs/B016-version-sprawl-across-surfaces-no-authoritative-.md) (partial — required-permissions.json done)
 - B020 P3 | [B020-board-migrate-is-two-unrelated-operations-under-](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
 - B021 P3 | [B021-code-reviewer-name-collides-with-code-review-and](bugs/B021-code-reviewer-name-collides-with-code-review-and.md)

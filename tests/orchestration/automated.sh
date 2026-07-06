@@ -58,6 +58,7 @@ SUBTESTS=(
   "board-init-command.sh"
   "board-relocate.sh"
   "board-setup-command.sh"
+  "board-run-command.sh"
 )
 
 for st in "${SUBTESTS[@]}"; do

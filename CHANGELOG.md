@@ -9,6 +9,16 @@ increases.
 
 ## [Unreleased]
 
+### Added
+- **`/board-run <entry-id>` — the Conductor's inner loop, shipped early**
+  (IMPROVEMENTS #13 slice 1; resolves eb-self B006). Drive ONE bug/feature
+  end-to-end (`tdd → review → validate`) in a single session under claim lock —
+  no per-discipline session restarts. Bounded (max 5 rounds, heartbeat between
+  rounds, claim always released), passive-sessions-only, writes no mode file;
+  reuses the worker procedure's dispatch format and needs-transition rule
+  verbatim. The cross-session always-on supervisor remains RFC 0001. Command
+  count 12 → 13; new orchestration lint (`board-run-command.sh`, 18 assertions).
+
 ### Changed
 - **One consolidation engine** (IMPROVEMENTS #12, eb-self B014, RFC 0002's
   `merge` verdict). The `consolidator` agent no longer re-implements the

@@ -3,10 +3,10 @@ id: B006
 type: bug
 title: Advancing one entry through tdd->review->validate requires two session restarts
 discovered: 2026-07-04
-status: open
+status: resolved
 priority: P2
 affects: commands/worker-start.md
-needs: tdd
+needs: done
 pattern: [ux-friction]
 ---
 
