@@ -7,7 +7,8 @@
   <meta name="description" content="A git-committed kanban board your AI agents run and remember. A Claude Code plugin and MCP server: multi-agent coordination, atomic claim-locking, and durable cross-session memory — all as committed markdown in your repo.">
   <link rel="canonical" href="https://ghostlygawd.github.io/engineering-board/">
   <meta name="keywords" content="claude code plugin, mcp server, task board, git-committed kanban, multi-agent coordination, ai agent memory, autonomous software engineering, agent claim locking, cross-session agent memory, markdown kanban, claude code orchestration, tdd agent pipeline">
-  <meta name="theme-color" content="#17191E">
+  <meta name="theme-color" content="#FAF9F5" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#17191E" media="(prefers-color-scheme: dark)">
 
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website">
@@ -84,7 +85,7 @@
     .nav-links a:hover{color:var(--eb-text);text-decoration:none}
     .theme-btn{background:none;border:1px solid var(--eb-border);color:var(--eb-text-muted);
       border-radius:var(--eb-radius-pill);padding:.3rem .7rem;font:inherit;font-size:.8rem;cursor:pointer}
-    @media(max-width:640px){.nav-links a:not(.ghlink){display:none}}
+    @media(max-width:640px){.nav-links{flex-wrap:wrap;justify-content:flex-end;gap:.5rem .8rem}.nav-links a{font-size:.78rem}}
 
     /* ===== Hero ===== */
     .hero{padding:5rem 0 3rem;text-align:center}
@@ -167,6 +168,7 @@
         <a href="#why">Why</a>
         <a href="#compare">Compare</a>
         <a href="#install">Install</a>
+        <a href="board.html">Live board</a>
         <a class="ghlink" href="https://github.com/GhostlyGawd/engineering-board">GitHub</a>
         <button class="theme-btn" id="theme" type="button" aria-label="Toggle color theme">Theme</button>
       </nav>
@@ -185,7 +187,7 @@
 
       <div class="demo" aria-label="Interactive board demo">
         <div class="demo-head">
-          <span class="label" id="demo-status">a finding, promoted through the state machine</span>
+          <span class="label" id="demo-status" role="status" aria-live="polite">a finding, promoted through the state machine</span>
           <button class="btn btn-ghost" id="play" type="button" style="padding:.4rem .9rem">▸ Play</button>
         </div>
         <div class="cols">
@@ -203,7 +205,7 @@
         <p class="sub reveal">Competitors force a choice: a board that's <em>visible but dumb</em>, or coordination that's <em>smart but hidden in a database</em>. engineering-board refuses the trade-off.</p>
         <div class="vp">
           <div class="card2 reveal"><h3>Visible, diffable state</h3><p>Your agents' board is committed markdown — cards, an index, a graph — reviewed in the same PRs as code.</p><p class="proof">engineering-board/ · BOARD.md · GRAPH.yml</p></div>
-          <div class="card2 reveal"><h3>Durable memory</h3><p>Recurring lessons promote into committed Learning entries (L###) that survive session boundaries.</p><p class="proof">learnings-curator → learnings/L###</p></div>
+          <div class="card2 reveal"><h3>Durable memory</h3><p>Recurring lessons promote into committed Learning entries (L###) that survive session boundaries — surfaced at session start and in a dedicated Learnings panel on <a href="board.html">the board view</a>.</p><p class="proof">learnings-curator → learnings/L###</p></div>
           <div class="card2 reveal"><h3>Collision-free agents</h3><p>Atomic claim-locking lets multiple worker agents run in parallel without stepping on each other.</p><p class="proof">board-claim-acquire.sh · tested</p></div>
           <div class="card2 reveal"><h3>Autonomous pipeline</h3><p>Findings flow through a tdd → review → validate state machine, driven by the Stop hook.</p><p class="proof">tdd-builder · code-reviewer · validator</p></div>
           <div class="card2 reveal"><h3>Runs where you are — and everywhere else</h3><p>A native Claude Code plugin and an MCP server (11 tools) over the same board format.</p><p class="proof">.mcp.json · protocol 2025-06-18</p></div>
@@ -230,7 +232,7 @@
             </tbody>
           </table>
         </div>
-        <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Where they're better: Backlog.md is the category leader (~5.9k★) with a polished standalone CLI and TUI; Agent-MCP ships a live dashboard. engineering-board answers visualization with <code>/board-view</code> — a committed, offline, zero-dep HTML board you browse on GitHub (no daemon, on-brand: the view is just another in-repo projection) — and bets on the four-way intersection, not any single feature.</p>
+        <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Where they're better: Backlog.md is the category leader (~5.9k★) with a polished standalone CLI and TUI; Agent-MCP ships a live dashboard. engineering-board answers visualization with <code>/board-view</code> — a committed, offline, zero-dep HTML board — <a href="board.html">see this repo's own live board</a>, republished on every merge (no daemon, on-brand: the view is just another in-repo projection) — and bets on the four-way intersection, not any single feature.</p>
       </div>
     </section>
 
@@ -273,6 +275,9 @@ claude mcp add engineering-board -- \
       <span>engineering-board · MIT licensed · <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/LICENSE">LICENSE</a></span>
       <span>
         <a href="https://github.com/GhostlyGawd/engineering-board">Repository</a> ·
+        <a href="board.html">Live board</a> ·
+        <a href="https://github.com/GhostlyGawd/engineering-board/releases">Releases</a> ·
+        <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">MCP Registry</a> ·
         <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/ARCHITECTURE.md">Architecture</a> ·
         <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELOG.md">Changelog</a>
       </span>

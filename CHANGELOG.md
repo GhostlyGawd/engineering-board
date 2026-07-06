@@ -9,6 +9,23 @@ increases.
 
 ## [Unreleased]
 
+### Added
+- **Viewer affordances** (IMPROVEMENTS #8). `/board-view` entry cards now **link
+  to their markdown sources** (relative by default; `--link-base <url>` /
+  `EB_VIEW_LINK_BASE` prefixes an absolute base so hosted copies click through —
+  the live `/board.html` links to the GitHub sources). The **Done column
+  collapses beyond 10** resolved entries behind a "+N more resolved" disclosure;
+  an opt-in `--stamp` flag adds a "Generated from `<sha>`" freshness footer
+  (default output stays byte-deterministic); `@media print` styles added;
+  `.affects` uses `overflow-wrap:anywhere` instead of mid-word `break-all`.
+  Six new `tests/view/` assertions (23 total).
+- **Landing page refresh** (IMPROVEMENTS #7). Nav + footer gain **Live board**,
+  **Releases**, and **MCP Registry** links; the durable-memory card and the
+  compare footnote showcase the viewer's Learnings panel; the demo status is
+  announced to screen readers (`role="status"` + `aria-live="polite"`); mobile
+  nav wraps instead of hiding its links; a light `theme-color` variant joins the
+  dark one.
+
 ### Fixed
 - **The viewer's "blocked" badge is readable in dark mode** (IMPROVEMENTS #2).
   `.badge.blocked` hardcoded `#B23A2E`, which measures **2.96:1** on the dark

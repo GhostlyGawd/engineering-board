@@ -26,13 +26,22 @@ EB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 PROJECT_FILTER=""
 TO_STDOUT=0
+STAMP=0
+LINK_BASE="${EB_VIEW_LINK_BASE:-}"
+EXPECT_LINK_BASE=0
 for arg in "$@"; do
+  if [ "${EXPECT_LINK_BASE}" -eq 1 ]; then
+    LINK_BASE="${arg}"; EXPECT_LINK_BASE=0; continue
+  fi
   case "${arg}" in
     --stdout) TO_STDOUT=1 ;;
+    --stamp) STAMP=1 ;;                    # opt-in freshness footer (breaks byte-determinism deliberately)
+    --link-base) EXPECT_LINK_BASE=1 ;;     # href prefix for entry cards (e.g. a GitHub blob URL)
     --*) echo "board-view: unknown flag ${arg}" >&2; exit 1 ;;
     *) PROJECT_FILTER="${arg}" ;;
   esac
 done
+export EB_VIEW_LINK_BASE="${LINK_BASE}"
 
 # Resolve board rows: "<label><TAB><abs-path>" per project.
 ROWS=()
@@ -51,6 +60,7 @@ render_one() {
 import os, re, sys, html, glob
 
 label, board_dir = sys.argv[1], sys.argv[2]
+LINK_BASE = os.environ.get("EB_VIEW_LINK_BASE", "")
 FM = re.compile(r"^---\s*\n(.*?)\n---", re.S)
 SUBDIRS = ["bugs", "features", "questions", "observations", "learnings"]
 
@@ -89,6 +99,7 @@ for sub in SUBDIRS:
         if not fm.get("id"):
             continue
         fm["_sub"] = sub
+        fm["_file"] = sub + "/" + os.path.basename(p)
         entries.append(fm)
 
 entries.sort(key=lambda e: e.get("id", ""))
@@ -131,9 +142,15 @@ def card_html(e):
         blocked = f'<span class="badge blocked">blocked{(" · " + esc(bb)) if bb else ""}</span>'
     tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in parse_list(e.get("pattern", "")))
     affects = f'<div class="affects">{esc(e.get("affects"))}</div>' if e.get("affects") else ""
+    # Card id links to the entry's markdown source (IMPROVEMENTS #8): relative
+    # by default (works locally and in the GitHub file view); --link-base / the
+    # EB_VIEW_LINK_BASE env prefixes an absolute base so hosted copies resolve.
+    cid = esc(e.get("id"))
+    href = esc(LINK_BASE + e["_file"]) if e.get("_file") else ""
+    cid_html = f'<a class="cid" href="{href}">{cid}</a>' if href else f'<span class="cid">{cid}</span>'
     return (
         f'<div class="card">'
-        f'<div class="cardhead"><span class="cid">{esc(e.get("id"))}</span>{prio}{blocked}</div>'
+        f'<div class="cardhead">{cid_html}{prio}{blocked}</div>'
         f'<div class="ctitle">{esc(e.get("title"))}</div>'
         f'{affects}'
         f'<div class="tags">{tags}</div>'
@@ -141,9 +158,17 @@ def card_html(e):
     )
 
 cols_html = []
+DONE_VISIBLE = 10  # Done column collapses beyond this (IMPROVEMENTS #8 — 50+ flat cards don't scale)
 for key, title, pred in COLUMNS:
     items = [e for e in entries if pred(e)]
-    body = "".join(card_html(e) for e in items) or '<div class="empty">—</div>'
+    if key == "done" and len(items) > DONE_VISIBLE:
+        head_cards = "".join(card_html(e) for e in items[:DONE_VISIBLE])
+        rest_cards = "".join(card_html(e) for e in items[DONE_VISIBLE:])
+        body = (head_cards
+                + f'<details class="more"><summary>+ {len(items) - DONE_VISIBLE} more resolved</summary>'
+                + rest_cards + "</details>")
+    else:
+        body = "".join(card_html(e) for e in items) or '<div class="empty">—</div>'
     cols_html.append(
         f'<div class="col"><div class="col-h">{esc(title)} '
         f'<span class="count">{len(items)}</span></div>{body}</div>'
@@ -164,9 +189,12 @@ def learning_card_html(e):
     )
     tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in tag_vals if t)
     tags_html = f'<div class="tags">{tags}</div>' if tags else ""
+    lcid = esc(e.get("id"))
+    lhref = esc(LINK_BASE + e["_file"]) if e.get("_file") else ""
+    lcid_html = f'<a class="cid" href="{lhref}">{lcid}</a>' if lhref else f'<span class="cid">{lcid}</span>'
     return (
         f'<div class="lcard">'
-        f'<div class="lhead"><span class="cid">{esc(e.get("id"))}</span>{conf_badge}{rec_badge}</div>'
+        f'<div class="lhead">{lcid_html}{conf_badge}{rec_badge}</div>'
         f'<div class="ltitle">{esc(e.get("title"))}</div>'
         f'{applies_html}{tags_html}'
         f'</div>'
@@ -269,8 +297,13 @@ body{margin:0;background:var(--eb-bg);color:var(--eb-text);font-family:var(--eb-
   padding:.55rem .6rem;margin-bottom:.5rem;box-shadow:0 1px 2px rgba(23,25,30,.05)}
 .cardhead{display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem}
 .cid{font-family:var(--eb-font-mono);font-size:.7rem;color:var(--eb-text-muted)}
+a.cid{text-decoration:none;border-bottom:1px dotted var(--eb-border)}
+a.cid:hover,a.cid:focus-visible{color:var(--eb-accent-cur);border-bottom-color:var(--eb-accent-cur)}
+details.more{margin-top:.35rem}
+details.more>summary{cursor:pointer;font-size:.72rem;font-family:var(--eb-font-mono);color:var(--eb-text-muted);padding:.3rem .2rem}
+details.more>summary:hover{color:var(--eb-accent-cur)}
 .ctitle{font-size:.85rem;line-height:1.35}
-.affects{font-family:var(--eb-font-mono);font-size:.68rem;color:var(--eb-text-muted);margin-top:.3rem;word-break:break-all}
+.affects{font-family:var(--eb-font-mono);font-size:.68rem;color:var(--eb-text-muted);margin-top:.3rem;overflow-wrap:anywhere}
 .tags{margin-top:.35rem;display:flex;flex-wrap:wrap;gap:.25rem}
 .tag{font-size:.62rem;font-family:var(--eb-font-mono);color:var(--eb-text-muted);
   border:1px solid var(--eb-border);border-radius:999px;padding:.05rem .4rem}
@@ -292,14 +325,30 @@ body{margin:0;background:var(--eb-bg);color:var(--eb-text);font-family:var(--eb-
 .rec{font-family:var(--eb-font-mono);font-size:.6rem;color:var(--eb-text-muted)}
 .lapplies{margin-top:.3rem;font-family:var(--eb-font-mono);font-size:.62rem;color:var(--eb-text-muted)}
 footer{max-width:80rem;margin:0 auto;color:var(--eb-text-muted);font-size:.72rem;font-family:var(--eb-font-mono);text-align:center}
+@media print{
+  :root{--eb-bg:#FFFFFF;--eb-surface:#FFFFFF;--eb-card:#FFFFFF;--eb-text:#000000;--eb-text-muted:#333333;--eb-border:#BBBBBB}
+  body{padding:0}
+  .card,.lcard{break-inside:avoid;box-shadow:none}
+  .cols{grid-template-columns:repeat(2,1fr)}
+  details.more{display:block}
+  details.more>summary{display:none}
+  details.more[open]>*,details.more>*{display:block}
+}
 </style>
 </head>
 <body>
 HTML
 
-FOOT='<footer>Generated by <code>/board-view</code> — a committed, offline projection of the board. The board is the database.</footer>
+STAMP_LINE=""
+if [ "${STAMP}" -eq 1 ]; then
+  # Opt-in freshness stamp (deliberately not default: default output stays
+  # byte-deterministic and safe to commit without churn).
+  GIT_SHA="$(git -C "${CLAUDE_PROJECT_DIR}" rev-parse --short HEAD 2>/dev/null || echo "unknown")"
+  STAMP_LINE=" Generated from <code>${GIT_SHA}</code>."
+fi
+FOOT="<footer>Generated by <code>/board-view</code> — a committed, offline projection of the board.${STAMP_LINE} The board is the database.</footer>
 </body>
-</html>'
+</html>"
 
 DOC="${HEAD}
 ${BODY}
