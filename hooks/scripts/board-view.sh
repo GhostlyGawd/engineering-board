@@ -135,7 +135,10 @@ def esc(s):
 
 def card_html(e):
     pr = e.get("priority", "")
-    prio = f'<span class="prio p{esc(pr[1:])}">{esc(pr)}</span>' if pr else ""
+    # P3 is the floor, not a rank — a grey "P3" pill on every low-priority card
+    # is chrome that conveys nothing (HIERARCHY F2). Render the pill only when it
+    # signals urgency (P0-P2); absence of a pill *is* the P3 signal.
+    prio = f'<span class="prio p{esc(pr[1:])}">{esc(pr)}</span>' if pr and pr.strip().upper() != "P3" else ""
     blocked = ""
     if e.get("status") == "blocked" or e.get("blocked_by"):
         bb = ", ".join(parse_list(e.get("blocked_by", "")))
@@ -266,6 +269,8 @@ read -r -d '' HEAD <<'HTML' || true
   --eb-text:#17191E;--eb-text-muted:#5B6068;
   --eb-bg:var(--eb-paper);--eb-surface:var(--eb-paper-2);--eb-card:#FFFFFF;--eb-danger:#B23A2E;
   --eb-border:var(--eb-line);--eb-accent-cur:var(--eb-accent);
+  --eb-fs-2xs:.6875rem;--eb-fs-xs:.75rem;--eb-fs-sm:.875rem;--eb-fs-base:1rem;--eb-fs-md:1.125rem;--eb-fs-lg:1.375rem;
+  --eb-dur-fast:150ms;--eb-ease-out:cubic-bezier(.16,1,.30,1);
   --eb-font-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   --eb-font-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
 }
@@ -280,24 +285,28 @@ read -r -d '' HEAD <<'HTML' || true
   --eb-accent-cur:var(--eb-accent-dark);
 }
 *{box-sizing:border-box}
+:focus-visible{outline:2px solid var(--eb-accent-cur);outline-offset:2px;border-radius:3px}
 body{margin:0;background:var(--eb-bg);color:var(--eb-text);font-family:var(--eb-font-sans);
-  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;padding:2rem 1.25rem}
+  font-size:var(--eb-fs-base);line-height:1.5;-webkit-font-smoothing:antialiased;padding:2rem 1.25rem}
 .board{max-width:80rem;margin:0 auto 2.5rem}
 .board-head{display:flex;align-items:baseline;gap:.75rem;margin:0 0 1rem}
-.board-head h1{font-size:1.5rem;margin:0;letter-spacing:-.02em}
+.board-head h1{font-size:var(--eb-fs-lg);margin:0;letter-spacing:-.02em}
 .summary{font-family:var(--eb-font-mono);font-size:.8rem;color:var(--eb-text-muted)}
 .cols{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
 @media (max-width:820px){.cols{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:520px){.cols{grid-template-columns:1fr}}
 .col{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:10px;padding:.6rem;min-height:3rem}
 /* Done is already-finished work: recede it so open, actionable cards win the
-   squint test. Hover restores full weight for scanning. */
-.col-done .card{opacity:.6;box-shadow:none}
-.col-done .card:hover,.col-done .card:focus-within{opacity:1}
-@media print{.col-done .card{opacity:1}}
+   squint test — via a muted title + flat card, NOT opacity. (opacity:.6
+   composited the card metadata to 2.69:1, below WCAG AA; muted text stays AA.)
+   Hover/focus restores full weight for scanning. */
+.col-done .card{box-shadow:none}
+.col-done .ctitle{color:var(--eb-text-muted);transition:color var(--eb-dur-fast) var(--eb-ease-out)}
+.col-done .card:hover .ctitle,.col-done .card:focus-within .ctitle{color:var(--eb-text)}
+@media print{.col-done .ctitle{color:var(--eb-text)}}
 .col-h{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--eb-text-muted);
   font-weight:600;margin:0 0 .5rem;display:flex;justify-content:space-between}
-.count{font-family:var(--eb-font-mono)}
+.count{font-family:var(--eb-font-mono);font-weight:600;color:var(--eb-text)}
 .card{background:var(--eb-card);border:1px solid var(--eb-border);border-radius:6px;
   padding:.55rem .6rem;margin-bottom:.5rem;box-shadow:0 1px 2px rgba(23,25,30,.05)}
 .cardhead{display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem}
@@ -307,33 +316,33 @@ a.cid:hover,a.cid:focus-visible{color:var(--eb-accent-cur);border-bottom-color:v
 details.more{margin-top:.35rem}
 details.more>summary{cursor:pointer;font-size:.72rem;font-family:var(--eb-font-mono);color:var(--eb-text-muted);padding:.3rem .2rem}
 details.more>summary:hover{color:var(--eb-accent-cur)}
-.ctitle{font-size:.85rem;line-height:1.35}
-.affects{font-family:var(--eb-font-mono);font-size:.68rem;color:var(--eb-text-muted);margin-top:.3rem;overflow-wrap:anywhere}
+.ctitle{font-size:var(--eb-fs-sm);line-height:1.35}
+.affects{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-text-muted);margin-top:.3rem;overflow-wrap:anywhere}
 .tags{margin-top:.35rem;display:flex;flex-wrap:wrap;gap:.25rem}
-.tag{font-size:.62rem;font-family:var(--eb-font-mono);color:var(--eb-text-muted);
+.tag{font-size:var(--eb-fs-2xs);font-family:var(--eb-font-mono);color:var(--eb-text-muted);
   border:1px solid var(--eb-border);border-radius:999px;padding:.05rem .4rem}
-.prio{font-size:.62rem;font-weight:700;font-family:var(--eb-font-mono);border-radius:4px;padding:.05rem .3rem;
+.prio{font-size:var(--eb-fs-2xs);font-weight:700;font-family:var(--eb-font-mono);border-radius:4px;padding:.05rem .3rem;
   color:var(--eb-text-muted);border:1px solid var(--eb-border)}
 .prio.p0{background:var(--eb-danger);border-color:var(--eb-danger);color:var(--eb-bg)}
 .prio.p1{background:var(--eb-accent-cur);border-color:var(--eb-accent-cur);color:var(--eb-bg)}
-.badge{font-size:.6rem;font-family:var(--eb-font-mono)}
+.badge{font-size:var(--eb-fs-2xs);font-family:var(--eb-font-mono)}
 .badge.blocked{color:var(--eb-danger)}
 .empty{color:var(--eb-text-muted);text-align:center;font-size:.8rem;padding:.4rem 0}
 .lane-h{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--eb-text-muted);margin:1.4rem 0 .5rem}
 /* Learnings are the durable-memory moat — give their heading real weight
    (full contrast, sentence case, larger) so it reads as a section, not a lane. */
-.lane-h-learn{font-size:1.05rem;text-transform:none;letter-spacing:-.01em;color:var(--eb-text);font-weight:600}
+.lane-h-learn{font-size:var(--eb-fs-md);text-transform:none;letter-spacing:-.01em;color:var(--eb-text);font-weight:600}
 .lane{list-style:none;margin:0;padding:0;display:grid;gap:.3rem}
 .lane li{font-size:.82rem;padding:.35rem .5rem;background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:6px}
-.kind{font-family:var(--eb-font-mono);font-size:.66rem;color:var(--eb-accent-cur);text-transform:uppercase;letter-spacing:.05em}
+.kind{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-accent-cur);text-transform:uppercase;letter-spacing:.05em}
 .learn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.5rem}
 .lcard{background:var(--eb-surface);border:1px solid var(--eb-border);border-left:3px solid var(--eb-accent-cur);border-radius:6px;padding:.5rem .6rem}
 .lcard .lhead{display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem}
 .ltitle{font-size:.82rem;line-height:1.3}
-.conf{font-family:var(--eb-font-mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;padding:.05rem .3rem;border-radius:3px;border:1px solid var(--eb-border);color:var(--eb-text-muted)}
+.conf{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);text-transform:uppercase;letter-spacing:.05em;padding:.05rem .3rem;border-radius:3px;border:1px solid var(--eb-border);color:var(--eb-text-muted)}
 .conf.high{color:var(--eb-accent-cur);border-color:var(--eb-accent-cur)}
-.rec{font-family:var(--eb-font-mono);font-size:.6rem;color:var(--eb-text-muted)}
-.lapplies{margin-top:.3rem;font-family:var(--eb-font-mono);font-size:.62rem;color:var(--eb-text-muted)}
+.rec{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
+.lapplies{margin-top:.3rem;font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
 footer{max-width:80rem;margin:0 auto;color:var(--eb-text-muted);font-size:.72rem;font-family:var(--eb-font-mono);text-align:center}
 @media print{
   :root{--eb-bg:#FFFFFF;--eb-surface:#FFFFFF;--eb-card:#FFFFFF;--eb-text:#000000;--eb-text-muted:#333333;--eb-border:#BBBBBB}

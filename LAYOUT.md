@@ -1,5 +1,12 @@
 # Spacing & Layout Audit
 
+> **Update (v1.6.0).** The board view now consumes the type + motion tokens
+> (adjacent to F1's token-adoption thesis), but the layout-specific fixes — the full
+> 4px spacing-scale snap (F1), one-container/breakpoint unification (F2), fluid lanes
+> (F4), and parent-composed gaps (F5) — are **deferred** to a dedicated pass: they
+> shift tuned spacing across ~40 declarations and warrant visual review. The
+> empty-lane whitespace (also HIERARCHY F4) rides with them.
+
 > Read-only pass; every gap has its pixels. Two headlines pull in opposite
 > directions: the **patch layer is empty** — no negative margins, no
 > absolute-position hacks, no `!important` anywhere (genuinely disciplined

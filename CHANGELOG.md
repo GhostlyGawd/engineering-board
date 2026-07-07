@@ -9,25 +9,71 @@ increases.
 
 ## [Unreleased]
 
-### Removed
-- **The dead third design-token copy** (`docs/assets/tokens.css`; HIERARCHY.md
-  Fix 8 / finding F7). Nothing linked it and it had already drifted from the
-  source of truth — it had dropped `--eb-card` and `--eb-danger`.
+## [1.6.0] — 2026-07-07
+
+Acts on all six design-audit reports (the goal-prompts _All Design briefs_
+playbook — `HIERARCHY.md`, `TYPOGRAPHY.md`, `COLOR.md`, `LAYOUT.md`, `STATES.md`,
+`BRAND-COHERENCE.md`), turning report-only findings into fixes across the two
+rendered surfaces, the token source, and the README diagram. Includes three
+accessibility (WCAG AA/UA-contrast) fixes; the board view stays a self-contained,
+byte-deterministic document.
+
+### Fixed
+- **Accessibility — dark-mode focus ring (STATES F1).** `:focus-visible` hardcoded
+  the light amber `#9A5B00`, which measures 2.79–2.97:1 on dark cards/surfaces —
+  below the 3:1 UI minimum. Both surfaces now switch the ring to `--eb-accent-dark`
+  in dark mode (7.3–8.5:1). `docs/index.html`, `hooks/scripts/board-view.sh` (the
+  board view previously had no unified focus ring at all).
+- **Accessibility — Done-column contrast (COLOR F2).** The `1.5.1` Done recede used
+  `opacity:.6`, which group-composited card metadata to 2.69:1 (light) / 3.06:1
+  (dark). Replaced with a muted-title + flat-card recede that stays AA; hover/focus
+  restores full weight. `hooks/scripts/board-view.sh`.
+- **Accessibility — tertiary text on the recessed surface (COLOR F3).**
+  `--eb-text-faint` is only 4.30:1 on `--eb-surface`; the compare-table headers,
+  `.no` cells, and value-prop `.proof` captions now step up to `--eb-text-muted`
+  (AA on surface). `docs/index.html`.
+- **Readable floor for board micro-text (TYPO F2).** Tags, priority, confidence,
+  recurrence, badges, and kind labels rendered at 9–10px; raised to the new 11px
+  `--eb-fs-2xs` floor. `hooks/scripts/board-view.sh`.
+- **Board type + base onto the token scale (TYPO F1/F3).** The board view defined no
+  `--eb-fs-*` and set a 15px body base off-token; it now declares the size tokens,
+  unifies the body to `--eb-fs-base` (16px), and routes its primary text roles
+  (board title, learnings heading, card title) through the scale.
+- **Install CTA differentiation (HIERARCHY F1).** The two install code blocks read as
+  equal options; the non-recommended (MCP) block now recedes onto the surface so the
+  recommended plugin path wins the squint. `docs/index.html`.
+- **Redundant P3 pills (HIERARCHY F2).** Every low-priority card wore an identical grey
+  "P3" pill; P3 is the floor, so the pill now renders only for P0–P2.
+  `hooks/scripts/board-view.sh`.
+- **Brand rule — no gradients (BRAND F2).** `docs/how-it-works.svg`'s header used an
+  indigo→violet gradient, contradicting `BRAND.md`'s "no gradient… anywhere"; replaced
+  with a solid ink header. No gradient remains in any shipped SVG.
 
 ### Added
-- **`tests/token-coherence.sh` — a design-token drift guard** (HIERARCHY.md
-  Fix 8 / finding F7, closing the visual-hierarchy audit's last open item).
-  `brand/tokens.css` is the single source of truth, hand-mirrored into the
-  landing page (`docs/index.html`) and the generated board view
-  (`hooks/scripts/board-view.sh`) — both zero-dependency, byte-deterministic
-  documents by design. Fully generating those inline blocks would need a build
-  step this project deliberately avoids; instead the new lint fails CI the moment
-  a token value a surface inlines diverges from the source (font-stack fallbacks,
-  which surfaces legitimately trim, are exempt) and re-checks the two dark blocks
-  within a file agree. The single source of truth is now enforced, not just
-  labelled. No version bump — this changes nothing install-facing (a test, docs,
-  and an unreferenced site asset; the plugin and `.mcpb` bundle are untouched).
+- **Interaction states (STATES F3/F4).** Landing buttons gain `:active` (pressed) and
+  `:disabled` styles; the board view gains a unified `:focus-visible` ring plus motion
+  tokens (`--eb-dur-fast`, `--eb-ease-out`) so its de-emphasis transitions instead of snapping.
+- **`--eb-fs-2xs` (0.6875rem / 11px)** — a dense-metadata floor token in
+  `brand/tokens.css`, consumed by the board view.
+- **Per-lane `count` weight (HIERARCHY F3).** The column count now carries weight + full
+  contrast so pile-ups read at a glance.
+- **`tests/token-coherence.sh` — a design-token drift guard** (originally HIERARCHY.md
+  Fix 8). `brand/tokens.css` is the single source of truth, hand-mirrored into the two
+  byte-deterministic surfaces; the lint fails CI the moment a mirrored token value
+  diverges (font-stack fallbacks exempt) and re-checks the two dark blocks agree.
   `run-all.sh` 14 → 15 sub-suites.
+
+### Removed
+- **The dead third design-token copy** (`docs/assets/tokens.css`; HIERARCHY.md Fix 8 /
+  finding F7). Nothing linked it and it had already drifted — it had dropped `--eb-card`
+  and `--eb-danger`.
+
+### Deferred (tracked in the reports)
+- Full rainbow→mono repaint of the explainer diagrams (`how-it-works.svg`,
+  `board-demo.svg`; BRAND F1 / COLOR F1) and their companion PNGs — a dedicated design
+  pass with visual review.
+- Full 4px spacing-scale adoption, fluid board lanes, and gap-ownership (LAYOUT
+  F1/F4/F5), plus the mid-tier board type-scale mapping (TYPO F1 remainder).
 
 ## [1.5.1] — 2026-07-07
 

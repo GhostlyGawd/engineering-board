@@ -1,5 +1,11 @@
 # Color & Contrast Audit
 
+> **Update — fixes applied (v1.6.0).** F2 (Done recede via muted color, not the
+> opacity that composited metadata to 2.69:1) and F3 (faint→muted on the recessed
+> surface) are **applied**. F1 is **partial** — the diagram's gradient is gone
+> (BRAND F2) but the full rainbow→mono repaint is **deferred**. F4/F5 (amber
+> overload; dead `--eb-accent-strong`) are **noted/deferred**.
+
 > Read-only pass. Every color carries its value + file; every ratio below is
 > **computed** (WCAG 2.x relative-luminance), not quoted from the brand deck.
 > Headline: the two UI surfaces are unusually token-disciplined and the token
