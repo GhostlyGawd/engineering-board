@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "engineering-board",
   "display_name": "engineering-board",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "The board is the database: a git-committed kanban board your AI agents run and remember. Eleven MCP tools over a committed markdown board.",
   "long_description": "A zero-dependency MCP server exposing the engineering-board plugin's markdown board as tools: scaffold boards, create/list/update entries, rebuild the index, capture findings, and claim/release entry locks \u2014 all against the exact on-disk format the plugin's hooks and skills expect. Pure python3, no third-party dependencies.",
   "author": {

@@ -73,6 +73,10 @@
     :root[data-theme="dark"] .eyebrow,@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .eyebrow{color:var(--eb-accent-dark)}}
     .muted{color:var(--eb-text-muted)}
     :focus-visible{outline:2px solid var(--eb-accent);outline-offset:2px;border-radius:3px}
+    /* Dark mode: the focus ring must switch to the light-on-dark accent — the
+       light amber only reaches 2.79:1 on dark cards (fails the 3:1 UI minimum). */
+    @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :focus-visible{outline-color:var(--eb-accent-dark)}}
+    :root[data-theme="dark"] :focus-visible{outline-color:var(--eb-accent-dark)}
 
     /* ===== Header ===== */
     header.nav{position:sticky;top:0;z-index:20;backdrop-filter:saturate(1.1) blur(8px);
@@ -98,6 +102,8 @@
     :root[data-theme="dark"] .btn-primary,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn-primary{background:var(--eb-accent-dark);color:var(--eb-ink)}}
     .btn-ghost{background:transparent;color:var(--eb-text);border-color:var(--eb-border)}
     .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
+    .btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
     @media(prefers-reduced-motion:reduce){.btn:hover{transform:none}}
 
     /* ===== Board demo ===== */
@@ -129,7 +135,7 @@
     .vp .card2{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:var(--eb-radius-lg);padding:1.5rem}
     .vp h3{font-size:var(--eb-fs-md);margin-bottom:.4rem}
     .vp p{margin:0;color:var(--eb-text-muted);font-size:var(--eb-fs-sm)}
-    .vp .proof{margin-top:.75rem;font-family:var(--eb-font-mono);font-size:.72rem;color:var(--eb-text-faint)}
+    .vp .proof{margin-top:.75rem;font-family:var(--eb-font-mono);font-size:.72rem;color:var(--eb-text-muted)}
     /* Lead differentiator anchors the section — spans two columns and carries a
        heavier heading so one card wins instead of five competing equally. */
     .vp .card2.lead{grid-column:span 2}
@@ -140,11 +146,11 @@
     table.cmp{width:100%;border-collapse:collapse;font-size:var(--eb-fs-sm)}
     table.cmp th,table.cmp td{padding:.6rem .5rem;border-bottom:1px solid var(--eb-border);text-align:center}
     table.cmp th:first-child,table.cmp td:first-child{text-align:left}
-    table.cmp thead th{color:var(--eb-text-faint);font-weight:600;font-size:.78rem}
+    table.cmp thead th{color:var(--eb-text-muted);font-weight:600;font-size:.78rem}
     table.cmp tr.us td{background:color-mix(in srgb,var(--eb-accent) 8%,transparent);font-weight:600}
     .yes{color:var(--eb-accent);font-weight:700}
     :root[data-theme="dark"] .yes,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .yes{color:var(--eb-accent-dark)}}
-    .no{color:var(--eb-text-faint)}
+    .no{color:var(--eb-text-muted)}
     .cmp-scroll{overflow-x:auto}
 
     .install{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
@@ -152,6 +158,10 @@
     .install .card2{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:var(--eb-radius-lg);padding:1.5rem}
     .install .card2.recommended{border-left:3px solid var(--eb-accent)}
     :root[data-theme="dark"] .install .card2.recommended,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .install .card2.recommended{border-left-color:var(--eb-accent-dark)}}
+    /* Demote the alternative path's code block (subtraction-first): the two dark
+       <pre> blocks read as two equal options, so the recommended path never wins
+       the squint. Recede the non-recommended block onto the surface. */
+    .install .card2:not(.recommended) pre{background:var(--eb-surface);color:var(--eb-text);border:1px solid var(--eb-border)}
     pre{background:var(--eb-ink);color:#ECEBE6;padding:.9rem 1rem;border-radius:var(--eb-radius-card);overflow-x:auto;font-size:.8rem;line-height:1.5;border:1px solid var(--eb-line-dark)}
     :root[data-theme="dark"] pre{background:#0F1114}
 

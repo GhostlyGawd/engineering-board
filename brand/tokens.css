@@ -38,6 +38,7 @@
   --eb-font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code",
                   Menlo, Consolas, monospace;
 
+  --eb-fs-2xs:  0.6875rem;  /* dense-metadata floor (11px) — tags, prio, conf   */
   --eb-fs-xs:   0.75rem;
   --eb-fs-sm:   0.875rem;
   --eb-fs-base: 1rem;

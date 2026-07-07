@@ -1,5 +1,11 @@
 # Interaction States & Motion Audit
 
+> **Update — all of F1–F5 applied (v1.6.0).** F1 (dark-mode focus ring →
+> `--eb-accent-dark`, the accessibility fix) on both surfaces; F2 (the board view
+> gains a unified `:focus-visible` ring); F3 (`:active` pressed) + F4 (`:disabled`)
+> on the landing buttons; F5 (board motion tokens `--eb-dur-fast`/`--eb-ease-out`,
+> de-snapping the Done transition).
+
 > Read-only pass; traced from real selectors and the landing page's JS, not a
 > design file. The product has **no forms** — no inputs, selects, toggles, or
 > textareas — so the error/success/loading half of the state matrix is N/A by

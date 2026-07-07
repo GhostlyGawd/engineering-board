@@ -1,5 +1,12 @@
 # Typography Audit
 
+> **Update — fixes applied (v1.6.0).** F2 **applied** — sub-11px micro-text raised
+> to the new `--eb-fs-2xs` (11px) floor. F1/F3 **applied in part** — the board view
+> now declares the `--eb-fs-*` scale, unifies its body to 16px (`--eb-fs-base`), and
+> routes its primary text roles through tokens. The mid-tier metadata mapping (F1
+> remainder), the landing raw-size snap (F5), and resolving the remaining
+> defined-but-unused tokens (F4) are **deferred**.
+
 > Read-only pass over the two rendered surfaces and the token source. Every
 > number below is measured and cited. The deliverable is a **smaller** system:
 > ~20 distinct UI font-sizes collapse onto a 10-step scale, and the type tokens

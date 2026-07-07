@@ -1,5 +1,11 @@
 # Brand Coherence Audit
 
+> **Update — fixes applied (v1.6.0).** F2 **applied** — the `how-it-works.svg`
+> header gradient is removed (solid ink); no gradient remains in any shipped SVG.
+> F1 (full diagram palette repaint) and F3–F6 (radius/stroke DNA, favicon reduction,
+> duplicate guard, amber theming) are **deferred** to a dedicated diagram/brand pass
+> — the diagrams are large and need visual review plus a companion-PNG re-render.
+
 > **Note on filename.** This brief's default output is `BRAND.md`, but that path
 > already holds the **brand identity document** (the deck / source of truth).
 > To avoid clobbering it, this audit is written to `BRAND-COHERENCE.md`; it

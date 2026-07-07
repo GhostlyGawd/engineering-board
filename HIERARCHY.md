@@ -1,5 +1,10 @@
 # Visual Hierarchy Audit
 
+> **Update — fixes applied (v1.6.0).** F1 (Install path demoted so the recommended
+> block wins), F2 (redundant P3 pill dropped), and F3 (count weighted) are
+> **applied**. F4 (empty-lane whitespace) is **deferred** to the Spacing & Layout
+> follow-up.
+
 > **Status — re-run (post-v1.5.1).** This replaces the original audit, whose
 > Fixes 1–8 all shipped: priority-pill weighting, the Done-column recede, the
 > two-column lead card, the Learnings "moat" heading, the hero-glow quieting,
