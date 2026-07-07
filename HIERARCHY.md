@@ -1,9 +1,9 @@
 # Visual Hierarchy Audit
 
-> **Status (v1.5.1):** Fixes 1–7 below were applied — see the CHANGELOG entry.
-> The screen table and findings describe the **pre-fix** state (the "actually
-> wins" column is what the audit found); each fix in §3 is annotated with its
-> outcome. Fix 8 (single token source) is deliberately deferred — see its note.
+> **Status:** Fixes 1–7 were applied in v1.5.1; Fix 8 (the token drift guard)
+> landed after and is currently unreleased — see the CHANGELOG. The screen table
+> and findings describe the **pre-fix** state (the "actually wins" column is what
+> the audit found); each fix in §3 is annotated with its outcome.
 
 Does each key screen direct attention to what the product needs seen? This audit
 ranks every screen's elements by the visual weight the **actual CSS** assigns,
@@ -154,10 +154,17 @@ Ranked by attention reclaimed per line of CSS.
 7. **Mark the plugin install as primary (F8).** ✅ **Applied.** The plugin
    `.card2.recommended` gets an accent left-border and a "start here" eyebrow;
    the MCP path stays quiet.
-8. **Collapse the token copies to one (F7).** ⏸ **Deferred.** Generating the
-   inline blocks from a single source needs a build step, which conflicts with
-   the deliberate zero-dependency, committed-and-byte-deterministic design of
-   these surfaces. Left for a separate decision rather than forced here.
+8. **Collapse the token copies to one (F7).** ✅ **Applied** (post-v1.5.1) — as a
+   *drift guard*, not codegen. Fully generating the inline blocks from a single
+   source needs a build step, which conflicts with the deliberate zero-dependency,
+   committed-and-byte-deterministic design of these surfaces. So instead of
+   forcing a build step: the dead, unreferenced third copy
+   (`docs/assets/tokens.css` — which had already dropped `--eb-card` /
+   `--eb-danger`) is deleted, and a new `tests/token-coherence.sh` fails CI if any
+   token value a surface mirror inlines diverges from `brand/tokens.css`
+   (font-stack fallbacks, which surfaces legitimately trim, are exempt). The
+   source of truth is now *enforced* rather than merely *labelled*, with no build
+   step added.
 
 ---
 
