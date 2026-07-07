@@ -1,5 +1,10 @@
 # Visual Hierarchy Audit
 
+> **Status (v1.5.1):** Fixes 1–7 below were applied — see the CHANGELOG entry.
+> The screen table and findings describe the **pre-fix** state (the "actually
+> wins" column is what the audit found); each fix in §3 is annotated with its
+> outcome. Fix 8 (single token source) is deliberately deferred — see its note.
+
 Does each key screen direct attention to what the product needs seen? This audit
 ranks every screen's elements by the visual weight the **actual CSS** assigns,
 then asks whether the intended focal point wins. Read-only pass; the only write
@@ -122,30 +127,37 @@ but the CSS gives them equal weight — the user must read both to learn which i
 
 Ranked by attention reclaimed per line of CSS.
 
-1. **Encode board priority; demote P2/P3 (F1, F6).** Add to `board-view.sh` CSS:
-   make `.prio.p0` a filled `--eb-danger` chip, `.prio.p1` a solid accent chip,
-   and **demote** `.prio.p2`/`.prio.p3` to a plain muted outline
-   (`color:var(--eb-text-muted);border-color:var(--eb-border)`). ~5 lines. Turns
-   severity back on *and* stops low-priority pills borrowing the accent.
-2. **Recede the Done column (F2).** CSS-only: dim resolved cards — target the
-   Done column's `.card` with `opacity:.62;box-shadow:none`. ~2 lines. Reclaims
-   the densest region for open work. (Deeper: lower `DONE_VISIBLE` from 10.)
-3. **Quiet the hero demo glow (F4).** Change `.card.live` `box-shadow` from the
-   amber glow to the quiet `var(--eb-shadow-card)`; keep a thin accent border.
-   1 line. Lets the Install CTA win the entry screen.
-4. **Promote the Install CTA (F4).** Bump `.btn-primary` to `--eb-fs-base` (16px)
-   and `padding:.85rem 1.5rem`, so the primary out-weighs both the ghost button
-   and the demo's Play. ~2 lines.
-5. **Give Learnings a real heading and lift it (F3).** Add a modifier on the
-   Learnings `.lane-h` — larger (`--eb-fs-md`), full-contrast `--eb-text`, drop
-   the uppercase-muted treatment — so the moat reads as a section, not a
-   footnote. Ideally emit it **before** the Done fold in `board-view.sh`.
-6. **Break the "Why" grid (F5).** Let the lead `.card2` span two columns or take
-   a larger `h3`/accent rule, so one differentiator anchors the section.
-7. **Mark the plugin install as primary (F8).** Give the plugin `.card2` the
-   accent left-border / a "recommended" eyebrow; leave MCP quiet.
-8. **Collapse the token copies to one (F7).** Longer-term: generate both inline
-   blocks from `brand/tokens.css` (or a shared partial) so emphasis can't drift.
+1. **Encode board priority; demote P2/P3 (F1, F6).** ✅ **Applied.** `.prio` base
+   is now a neutral muted outline (`--eb-text-muted` / `--eb-border`); `.prio.p0`
+   is a filled `--eb-danger` chip and `.prio.p1` a solid accent chip
+   (`board-view.sh`). Severity is legible at a squint; low-priority pills no
+   longer borrow the accent.
+2. **Recede the Done column (F2).** ✅ **Applied.** Columns now carry a
+   `col-<key>` class; `.col-done .card{opacity:.6;box-shadow:none}` dims resolved
+   work (restored on hover, unchanged in print). The finished pile stops
+   out-massing open work. (`DONE_VISIBLE` left at 10.)
+3. **Quiet the hero demo glow (F4).** ✅ **Applied.** `.card.live` `box-shadow`
+   changed from the amber glow to the quiet `var(--eb-shadow-card)` (both light
+   and dark), keeping only the thin accent border.
+4. **Promote the Install CTA (F4).** ✅ **Applied.** `.btn-primary` is now
+   `--eb-fs-base` with `padding:.85rem 1.5rem`; the flex row's `stretch` keeps
+   the ghost button aligned to its height, so the primary out-weighs both it and
+   the demo's Play.
+5. **Give Learnings a real heading (F3).** ✅ **Applied.** A `.lane-h-learn`
+   modifier gives the "Learnings · durable memory" heading `1.05rem`,
+   full-contrast `--eb-text`, sentence case. Combined with the Done-recede, the
+   moat reads as a section. (Kept its position below the active columns —
+   promoting it *above* To-do would bury actionable work.)
+6. **Break the "Why" grid (F5).** ✅ **Applied.** The lead "Visible, diffable
+   state" `.card2.lead` spans two columns with a larger `h3`/body, anchoring the
+   section; collapses to a single column under 520px.
+7. **Mark the plugin install as primary (F8).** ✅ **Applied.** The plugin
+   `.card2.recommended` gets an accent left-border and a "start here" eyebrow;
+   the MCP path stays quiet.
+8. **Collapse the token copies to one (F7).** ⏸ **Deferred.** Generating the
+   inline blocks from a single source needs a build step, which conflicts with
+   the deliberate zero-dependency, committed-and-byte-deterministic design of
+   these surfaces. Left for a separate decision rather than forced here.
 
 ---
 
