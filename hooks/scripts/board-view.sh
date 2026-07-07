@@ -170,7 +170,7 @@ for key, title, pred in COLUMNS:
     else:
         body = "".join(card_html(e) for e in items) or '<div class="empty">—</div>'
     cols_html.append(
-        f'<div class="col"><div class="col-h">{esc(title)} '
+        f'<div class="col col-{key}"><div class="col-h">{esc(title)} '
         f'<span class="count">{len(items)}</span></div>{body}</div>'
     )
 
@@ -204,7 +204,7 @@ learn_html = ""
 if LEARNINGS:
     cards = "".join(learning_card_html(e) for e in LEARNINGS)
     learn_html = (
-        '<h2 class="lane-h">Learnings · durable memory</h2>'
+        '<h2 class="lane-h lane-h-learn">Learnings · durable memory</h2>'
         f'<div class="learn-grid">{cards}</div>'
     )
 
@@ -290,6 +290,11 @@ body{margin:0;background:var(--eb-bg);color:var(--eb-text);font-family:var(--eb-
 @media (max-width:820px){.cols{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:520px){.cols{grid-template-columns:1fr}}
 .col{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:10px;padding:.6rem;min-height:3rem}
+/* Done is already-finished work: recede it so open, actionable cards win the
+   squint test. Hover restores full weight for scanning. */
+.col-done .card{opacity:.6;box-shadow:none}
+.col-done .card:hover,.col-done .card:focus-within{opacity:1}
+@media print{.col-done .card{opacity:1}}
 .col-h{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--eb-text-muted);
   font-weight:600;margin:0 0 .5rem;display:flex;justify-content:space-between}
 .count{font-family:var(--eb-font-mono)}
@@ -308,11 +313,16 @@ details.more>summary:hover{color:var(--eb-accent-cur)}
 .tag{font-size:.62rem;font-family:var(--eb-font-mono);color:var(--eb-text-muted);
   border:1px solid var(--eb-border);border-radius:999px;padding:.05rem .4rem}
 .prio{font-size:.62rem;font-weight:700;font-family:var(--eb-font-mono);border-radius:4px;padding:.05rem .3rem;
-  color:var(--eb-accent-cur);border:1px solid var(--eb-accent-cur)}
+  color:var(--eb-text-muted);border:1px solid var(--eb-border)}
+.prio.p0{background:var(--eb-danger);border-color:var(--eb-danger);color:var(--eb-bg)}
+.prio.p1{background:var(--eb-accent-cur);border-color:var(--eb-accent-cur);color:var(--eb-bg)}
 .badge{font-size:.6rem;font-family:var(--eb-font-mono)}
 .badge.blocked{color:var(--eb-danger)}
 .empty{color:var(--eb-text-muted);text-align:center;font-size:.8rem;padding:.4rem 0}
 .lane-h{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--eb-text-muted);margin:1.4rem 0 .5rem}
+/* Learnings are the durable-memory moat — give their heading real weight
+   (full contrast, sentence case, larger) so it reads as a section, not a lane. */
+.lane-h-learn{font-size:1.05rem;text-transform:none;letter-spacing:-.01em;color:var(--eb-text);font-weight:600}
 .lane{list-style:none;margin:0;padding:0;display:grid;gap:.3rem}
 .lane li{font-size:.82rem;padding:.35rem .5rem;background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:6px}
 .kind{font-family:var(--eb-font-mono);font-size:.66rem;color:var(--eb-accent-cur);text-transform:uppercase;letter-spacing:.05em}

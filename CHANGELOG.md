@@ -9,6 +9,41 @@ increases.
 
 ## [Unreleased]
 
+## [1.5.1] — 2026-07-07
+
+Visual-hierarchy pass acting on the `HIERARCHY.md` audit (PR #79): quiet what
+shouts so the intended focal point wins on each surface. Pure CSS/markup polish
+— no behavior, contract, or output-schema change; the board view stays a
+self-contained, byte-deterministic document.
+
+### Changed
+- **Board view (`/board-view`) — priority now carries visual weight.** Cards
+  emitted `class="prio p0…p3"` but the stylesheet defined only `.prio`, so a P0
+  looked identical to a P3. P0 is now a filled `--eb-danger` chip and P1 a solid
+  accent chip; P2/P3 are demoted to a neutral muted outline. Severity is legible
+  at a squint.
+- **Board view — the Done column recedes.** Resolved cards render at reduced
+  opacity with no shadow (full weight restored on hover; print unaffected), so
+  the finished pile no longer out-masses open, actionable work.
+- **Board view — the Learnings panel reads as a section, not a lane.** The
+  "Learnings · durable memory" heading gets full contrast, sentence case, and a
+  larger size, distinguishing the durable-memory moat from the
+  Questions/Observations lane.
+- **Landing page — the Install CTA out-weighs the demo.** The primary button
+  steps up to base type with more padding, and the hero demo's animated card
+  loses its amber glow (now the quiet card shadow), so the conversion action
+  wins the entry screen instead of the illustration.
+- **Landing page — one differentiator leads.** The "Visible, diffable state"
+  value-prop card spans two columns with a heavier heading, anchoring the "Why"
+  section instead of five co-equal cards competing.
+- **Landing page — the plugin install path is marked primary.** It gets an
+  accent left-border and a "start here" cue; the MCP path stays quiet.
+
+Deferred: collapsing the duplicated design-token blocks to a single build-time
+source (audit finding F7) would require a build step, which conflicts with the
+zero-dependency, committed-and-byte-deterministic design of these surfaces —
+left for a separate decision.
+
 ## [1.5.0] — 2026-07-06
 
 The IMPROVEMENTS.md release: all 14 opportunities from the product-discovery

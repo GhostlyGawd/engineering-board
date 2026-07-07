@@ -94,7 +94,7 @@
     .cta-row{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
     .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.2rem;border-radius:var(--eb-radius-pill);
       font-weight:600;font-size:var(--eb-fs-sm);border:1px solid transparent;cursor:pointer;transition:transform var(--eb-dur-fast) var(--eb-ease-out),background var(--eb-dur-fast)}
-    .btn-primary{background:var(--eb-accent);color:var(--eb-on-accent)}
+    .btn-primary{background:var(--eb-accent);color:var(--eb-on-accent);font-size:var(--eb-fs-base);padding:.85rem 1.5rem}
     :root[data-theme="dark"] .btn-primary,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn-primary{background:var(--eb-accent-dark);color:var(--eb-ink)}}
     .btn-ghost{background:transparent;color:var(--eb-text);border-color:var(--eb-border)}
     .btn:hover{transform:translateY(-1px)}
@@ -112,8 +112,8 @@
     .card{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:var(--eb-radius-sm);
       padding:.5rem .55rem;font-size:.78rem;box-shadow:var(--eb-shadow-card);margin-bottom:.4rem}
     .card .cid{font-family:var(--eb-font-mono);font-size:.68rem;color:var(--eb-text-muted)}
-    .card.live{border-color:var(--eb-accent);box-shadow:0 4px 14px rgba(154,91,0,.22)}
-    :root[data-theme="dark"] .card.live,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.live{border-color:var(--eb-accent-dark);box-shadow:0 4px 14px rgba(230,169,78,.22)}}
+    .card.live{border-color:var(--eb-accent);box-shadow:var(--eb-shadow-card)}
+    :root[data-theme="dark"] .card.live,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.live{border-color:var(--eb-accent-dark);box-shadow:var(--eb-shadow-card)}}
     .card.live .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--eb-accent);margin-right:.35rem;vertical-align:middle}
     :root[data-theme="dark"] .card.live .dot,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.live .dot{background:var(--eb-accent-dark)}}
     .card.moving{animation:settle var(--eb-dur-slow) var(--eb-ease-spring)}
@@ -130,6 +130,12 @@
     .vp h3{font-size:var(--eb-fs-md);margin-bottom:.4rem}
     .vp p{margin:0;color:var(--eb-text-muted);font-size:var(--eb-fs-sm)}
     .vp .proof{margin-top:.75rem;font-family:var(--eb-font-mono);font-size:.72rem;color:var(--eb-text-faint)}
+    /* Lead differentiator anchors the section — spans two columns and carries a
+       heavier heading so one card wins instead of five competing equally. */
+    .vp .card2.lead{grid-column:span 2}
+    .vp .card2.lead h3{font-size:var(--eb-fs-lg)}
+    .vp .card2.lead p{font-size:var(--eb-fs-base)}
+    @media(max-width:520px){.vp .card2.lead{grid-column:auto}}
 
     table.cmp{width:100%;border-collapse:collapse;font-size:var(--eb-fs-sm)}
     table.cmp th,table.cmp td{padding:.6rem .5rem;border-bottom:1px solid var(--eb-border);text-align:center}
@@ -144,6 +150,8 @@
     .install{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
     @media(max-width:720px){.install{grid-template-columns:1fr}.cols{grid-template-columns:repeat(2,1fr)}}
     .install .card2{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:var(--eb-radius-lg);padding:1.5rem}
+    .install .card2.recommended{border-left:3px solid var(--eb-accent)}
+    :root[data-theme="dark"] .install .card2.recommended,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .install .card2.recommended{border-left-color:var(--eb-accent-dark)}}
     pre{background:var(--eb-ink);color:#ECEBE6;padding:.9rem 1rem;border-radius:var(--eb-radius-card);overflow-x:auto;font-size:.8rem;line-height:1.5;border:1px solid var(--eb-line-dark)}
     :root[data-theme="dark"] pre{background:#0F1114}
 
@@ -204,7 +212,7 @@
         <h2 id="why-h" class="reveal">Why it's different</h2>
         <p class="sub reveal">Competitors force a choice: a board that's <em>visible but dumb</em>, or coordination that's <em>smart but hidden in a database</em>. engineering-board refuses the trade-off.</p>
         <div class="vp">
-          <div class="card2 reveal"><h3>Visible, diffable state</h3><p>Your agents' board is committed markdown — cards, an index, a graph — reviewed in the same PRs as code.</p><p class="proof">engineering-board/ · BOARD.md · GRAPH.yml</p></div>
+          <div class="card2 reveal lead"><h3>Visible, diffable state</h3><p>Your agents' board is committed markdown — cards, an index, a graph — reviewed in the same PRs as code. The board is the database.</p><p class="proof">engineering-board/ · BOARD.md · GRAPH.yml</p></div>
           <div class="card2 reveal"><h3>Durable memory</h3><p>Recurring lessons promote into committed Learning entries (L###) that survive session boundaries — surfaced at session start and in a dedicated Learnings panel on <a href="board.html">the board view</a>.</p><p class="proof">learnings-curator → learnings/L###</p></div>
           <div class="card2 reveal"><h3>Collision-free agents</h3><p>Atomic claim-locking lets multiple worker agents run in parallel without stepping on each other.</p><p class="proof">board-claim-acquire.sh · tested</p></div>
           <div class="card2 reveal"><h3>Autonomous pipeline</h3><p>Findings flow through a tdd → review → validate state machine, driven by the Stop hook.</p><p class="proof">tdd-builder · code-reviewer · validator</p></div>
@@ -241,8 +249,8 @@
         <h2 id="install-h" class="reveal">Install both ways</h2>
         <p class="sub reveal">One shared board format. Two thin adapters.</p>
         <div class="install">
-          <div class="card2 reveal">
-            <p class="eyebrow">Claude Code plugin</p>
+          <div class="card2 reveal recommended">
+            <p class="eyebrow">Claude Code plugin · start here</p>
             <pre><code>/plugin marketplace add GhostlyGawd/engineering-board
 /plugin install engineering-board
 

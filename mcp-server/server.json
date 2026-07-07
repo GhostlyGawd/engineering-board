@@ -6,14 +6,14 @@
     "url": "https://github.com/GhostlyGawd/engineering-board",
     "source": "github"
   },
-  "version": "1.5.0",
+  "version": "1.5.1",
   "websiteUrl": "https://ghostlygawd.github.io/engineering-board/",
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/GhostlyGawd/engineering-board/releases/download/v1.5.0/engineering-board-mcp.mcpb",
-      "version": "1.5.0",
-      "fileSha256": "fb98c635f0056ee6a1e7dbf26a0db46ad992b4e58b492bf0c39c2e91ccb5dd62",
+      "identifier": "https://github.com/GhostlyGawd/engineering-board/releases/download/v1.5.1/engineering-board-mcp.mcpb",
+      "version": "1.5.1",
+      "fileSha256": "ec9b93536e81b1d01d7ace066f2f0316ed67e70ea9718dd2354126af654c7abb",
       "transport": {
         "type": "stdio"
       },
