@@ -9,6 +9,26 @@ increases.
 
 ## [Unreleased]
 
+### Removed
+- **The dead third design-token copy** (`docs/assets/tokens.css`; HIERARCHY.md
+  Fix 8 / finding F7). Nothing linked it and it had already drifted from the
+  source of truth — it had dropped `--eb-card` and `--eb-danger`.
+
+### Added
+- **`tests/token-coherence.sh` — a design-token drift guard** (HIERARCHY.md
+  Fix 8 / finding F7, closing the visual-hierarchy audit's last open item).
+  `brand/tokens.css` is the single source of truth, hand-mirrored into the
+  landing page (`docs/index.html`) and the generated board view
+  (`hooks/scripts/board-view.sh`) — both zero-dependency, byte-deterministic
+  documents by design. Fully generating those inline blocks would need a build
+  step this project deliberately avoids; instead the new lint fails CI the moment
+  a token value a surface inlines diverges from the source (font-stack fallbacks,
+  which surfaces legitimately trim, are exempt) and re-checks the two dark blocks
+  within a file agree. The single source of truth is now enforced, not just
+  labelled. No version bump — this changes nothing install-facing (a test, docs,
+  and an unreferenced site asset; the plugin and `.mcpb` bundle are untouched).
+  `run-all.sh` 14 → 15 sub-suites.
+
 ## [1.5.1] — 2026-07-07
 
 Visual-hierarchy pass acting on the `HIERARCHY.md` audit (PR #79): quiet what
