@@ -9,6 +9,44 @@ increases.
 
 ## [Unreleased]
 
+Acts on the six **Experience Optimization** audit reports (the goal-prompts
+playbook — `COMPREHENSION.md`, `SHOWCASE.md`, `CRO.md`, `PROOF.md`,
+`ACTIVATION.md`, `RETENTION.md`) and the Fixer (`FIXLOG.md`). The
+highest-leverage, lowest-risk findings, shipped as copy/UX fixes across the
+public and first-run surfaces. Larger features (seed first-win demo, ungating
+the learnings loop, `/board-stats`) stay logged as follow-ups in `FIXLOG.md`.
+The user-facing command-output changes below reach installs at the next version
+bump (deferred here to keep the MCP `server.json` release-asset digest coherent).
+
+### Changed
+- **Landing (`docs/index.html`) — comprehension.** Hero names the audience and
+  leads single-agent, expands "MCP" to Model Context Protocol, states the board
+  fills itself, unpacks "the board is the database" as the concrete "no hidden
+  DB, just markdown," and adds a "why now" line.
+- **Landing — trust at the decision.** A credibility band (dogfooding · CI-green
+  · zero-dependency · MIT · MCP Registry), pain-first value cards, a "Free & MIT"
+  offer and a security cue at Install, a risk-reversal "no lock-in" line, a
+  trajectory reframe of the fairness note, and an honest pseudonymous maker note.
+- **Landing — friction & findability.** Fixed the MCP install dead-end (`git
+  clone` step), named Claude Code as a prerequisite, added copy-to-clipboard
+  buttons and `SoftwareApplication` JSON-LD, and captioned the demo as illustrative.
+- **README.** Gist-first "What it is" opening; defines "finding," expands MCP/TDD,
+  adds the `git clone` step and the Claude Code prerequisite, and a maker note.
+- **`/pm-start`** confirmation states plainly that findings promote when you end
+  your next turn (the Stop-hook trigger), replacing "Stop hook will route through
+  PM continuation."
+- **`/board-run`** stall reports point at the specific failing stage/note and the
+  next action, instead of a generic "inspect the entry's review notes."
+
+### Fixed
+- **`metrics.yml` / `docs/metrics.csv`.** The weekly snapshot committed the
+  traffic API's 403 error JSON verbatim; the collector now accepts only a strict
+  `<int>,<int>` shape (empty cells otherwise) and the committed row is cleaned.
+
+### Removed
+- **`docs/how-it-works.png`** — a 524 KB rendered copy of the SVG that no page
+  referenced; the SVG's `alt` text is now a full flow summary.
+
 ## [1.6.0] — 2026-07-07
 
 Acts on all six design-audit reports (the goal-prompts _All Design briefs_
