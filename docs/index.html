@@ -27,6 +27,22 @@
   <link rel="alternate icon" href="assets/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/favicon-180.png">
 
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "engineering-board",
+    "description": "A git-committed kanban board your AI agents run and remember. A Claude Code plugin and MCP server: multi-agent coordination, atomic claim-locking, and durable cross-session memory — all as committed markdown in your repo.",
+    "url": "https://ghostlygawd.github.io/engineering-board/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Cross-platform (Claude Code / MCP client)",
+    "license": "https://github.com/GhostlyGawd/engineering-board/blob/main/LICENSE",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "GhostlyGawd", "url": "https://github.com/GhostlyGawd" },
+    "sameAs": ["https://github.com/GhostlyGawd/engineering-board"]
+  }
+  </script>
+
   <style>
     /* ===== Design tokens — mirror of brand/tokens.css (single source) ===== */
     :root{
@@ -129,6 +145,14 @@
     .card.moving{animation:settle var(--eb-dur-slow) var(--eb-ease-spring)}
     @keyframes settle{0%{transform:translateY(-10px) scale(.98);opacity:.4}100%{transform:none;opacity:1}}
     @media(prefers-reduced-motion:reduce){.card.moving{animation:none}}
+    .demo-cap{margin:.7rem 0 0;text-align:center;font-size:.72rem;color:var(--eb-text-faint);font-family:var(--eb-font-mono)}
+    .demo-cap a{color:var(--eb-text-muted)}
+    .code-wrap{position:relative}
+    .copy-btn{position:absolute;top:.5rem;right:.5rem;font:inherit;font-size:.7rem;font-family:var(--eb-font-sans);
+      background:color-mix(in srgb,var(--eb-bg) 70%,transparent);color:var(--eb-text-muted);
+      border:1px solid var(--eb-border);border-radius:var(--eb-radius-sm);padding:.2rem .5rem;cursor:pointer;opacity:.85}
+    .copy-btn:hover{color:var(--eb-text);opacity:1}
+    .copy-btn:focus-visible{opacity:1}
 
     /* ===== Sections ===== */
     section{padding:4rem 0}
@@ -219,6 +243,7 @@
           <div class="col" data-state="validate"><div class="col-h">needs: validate</div></div>
           <div class="col" data-state="resolved"><div class="col-h">resolved</div></div>
         </div>
+        <p class="demo-cap">Illustrative animation of the pipeline · <a href="board.html">see the real board this repo runs →</a></p>
       </div>
 
       <p class="trustband">Built on its own board, <a href="board.html">in public</a> · <a href="https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml">CI-green</a> · zero-dependency · MIT · <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">on the MCP Registry</a></p>
@@ -371,6 +396,23 @@ claude mcp add engineering-board -- \
         if(reduce){ // reduced motion: jump straight to resolved
           clearTimeout(timer);place(card,"resolved",false);btn.disabled=false;btn.textContent="↻ Replay";
         }
+      });
+    })();
+
+    // Copy-to-clipboard buttons on the install code blocks.
+    (function(){
+      if(!navigator.clipboard) return;
+      document.querySelectorAll("pre").forEach(function(pre){
+        var wrap=document.createElement("div");wrap.className="code-wrap";
+        pre.parentNode.insertBefore(wrap,pre);wrap.appendChild(pre);
+        var btn=document.createElement("button");btn.className="copy-btn";btn.type="button";
+        btn.textContent="Copy";btn.setAttribute("aria-label","Copy code to clipboard");
+        wrap.appendChild(btn);
+        btn.addEventListener("click",function(){
+          navigator.clipboard.writeText(pre.innerText).then(function(){
+            btn.textContent="Copied";setTimeout(function(){btn.textContent="Copy";},1500);
+          });
+        });
       });
     })();
   </script>
