@@ -27,6 +27,22 @@
   <link rel="alternate icon" href="assets/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/favicon-180.png">
 
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "engineering-board",
+    "description": "A git-committed kanban board your AI agents run and remember. A Claude Code plugin and MCP server: multi-agent coordination, atomic claim-locking, and durable cross-session memory — all as committed markdown in your repo.",
+    "url": "https://ghostlygawd.github.io/engineering-board/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Cross-platform (Claude Code / MCP client)",
+    "license": "https://github.com/GhostlyGawd/engineering-board/blob/main/LICENSE",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "GhostlyGawd", "url": "https://github.com/GhostlyGawd" },
+    "sameAs": ["https://github.com/GhostlyGawd/engineering-board"]
+  }
+  </script>
+
   <style>
     /* ===== Design tokens — mirror of brand/tokens.css (single source) ===== */
     :root{
@@ -94,7 +110,11 @@
     /* ===== Hero ===== */
     .hero{padding:5rem 0 3rem;text-align:center}
     .hero h1{font-size:clamp(2rem,6vw,var(--eb-fs-4xl));max-width:16ch;margin:1rem auto .6rem}
-    .hero .tagline{font-size:var(--eb-fs-lg);color:var(--eb-text-muted);max-width:34ch;margin:0 auto 2rem}
+    .hero .tagline{font-size:var(--eb-fs-lg);color:var(--eb-text-muted);max-width:38ch;margin:0 auto .9rem}
+    .hero .whofor{font-size:var(--eb-fs-base);color:var(--eb-text-muted);max-width:44ch;margin:0 auto 2rem}
+    .hero .whofor strong{color:var(--eb-text)}
+    .trustband{margin:2.5rem auto 0;max-width:60rem;text-align:center;font-size:.8rem;color:var(--eb-text-faint);font-family:var(--eb-font-mono)}
+    .trustband a{color:var(--eb-text-muted)}
     .cta-row{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
     .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.2rem;border-radius:var(--eb-radius-pill);
       font-weight:600;font-size:var(--eb-fs-sm);border:1px solid transparent;cursor:pointer;transition:transform var(--eb-dur-fast) var(--eb-ease-out),background var(--eb-dur-fast)}
@@ -125,6 +145,14 @@
     .card.moving{animation:settle var(--eb-dur-slow) var(--eb-ease-spring)}
     @keyframes settle{0%{transform:translateY(-10px) scale(.98);opacity:.4}100%{transform:none;opacity:1}}
     @media(prefers-reduced-motion:reduce){.card.moving{animation:none}}
+    .demo-cap{margin:.7rem 0 0;text-align:center;font-size:.72rem;color:var(--eb-text-faint);font-family:var(--eb-font-mono)}
+    .demo-cap a{color:var(--eb-text-muted)}
+    .code-wrap{position:relative}
+    .copy-btn{position:absolute;top:.5rem;right:.5rem;font:inherit;font-size:.7rem;font-family:var(--eb-font-sans);
+      background:color-mix(in srgb,var(--eb-bg) 70%,transparent);color:var(--eb-text-muted);
+      border:1px solid var(--eb-border);border-radius:var(--eb-radius-sm);padding:.2rem .5rem;cursor:pointer;opacity:.85}
+    .copy-btn:hover{color:var(--eb-text);opacity:1}
+    .copy-btn:focus-visible{opacity:1}
 
     /* ===== Sections ===== */
     section{padding:4rem 0}
@@ -195,12 +223,13 @@
 
   <main>
     <section class="hero wrap" aria-labelledby="h1">
-      <p class="eyebrow">Claude Code plugin · MCP server</p>
+      <p class="eyebrow">For Claude Code · plugin &amp; MCP (Model Context Protocol) server</p>
       <h1 id="h1">A git-committed kanban board your AI agents run and remember.</h1>
-      <p class="tagline"><strong>The board is the database.</strong> Coordination, work-in-progress locks, and durable learnings — all committed markdown in your repo.</p>
+      <p class="tagline"><strong>The board is the database</strong> — no hidden DB, just markdown in your repo. Your agent captures the bugs and ideas it spots as it works, remembers them across sessions, and drives each one from a failing test to done.</p>
+      <p class="whofor">For anyone building with Claude Code — <strong>one agent today</strong>, collision-free across many when you scale. Findings capture themselves; you promote the ones worth keeping.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="#install">Install</a>
-        <a class="btn btn-ghost" href="https://github.com/GhostlyGawd/engineering-board">View on GitHub</a>
+        <a class="btn btn-primary" href="#install">Install — free &amp; MIT</a>
+        <a class="btn btn-ghost" href="board.html">See a live board it runs</a>
       </div>
 
       <div class="demo" aria-label="Interactive board demo">
@@ -214,17 +243,20 @@
           <div class="col" data-state="validate"><div class="col-h">needs: validate</div></div>
           <div class="col" data-state="resolved"><div class="col-h">resolved</div></div>
         </div>
+        <p class="demo-cap">Illustrative animation of the pipeline · <a href="board.html">see the real board this repo runs →</a></p>
       </div>
+
+      <p class="trustband">Built on its own board, <a href="board.html">in public</a> · <a href="https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml">CI-green</a> · zero-dependency · MIT · <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">on the MCP Registry</a></p>
     </section>
 
     <section id="why" aria-labelledby="why-h">
       <div class="wrap">
         <h2 id="why-h" class="reveal">Why it's different</h2>
-        <p class="sub reveal">Competitors force a choice: a board that's <em>visible but dumb</em>, or coordination that's <em>smart but hidden in a database</em>. engineering-board refuses the trade-off.</p>
+        <p class="sub reveal">Agents now do real multi-session work — and they forget everything between sessions and trip over each other in parallel. Competitors force a choice: a board that's <em>visible but dumb</em>, or coordination that's <em>smart but hidden in a database</em>. engineering-board refuses the trade-off.</p>
         <div class="vp">
           <div class="card2 reveal lead"><h3>Visible, diffable state</h3><p>Your agents' board is committed markdown — cards, an index, a graph — reviewed in the same PRs as code. The board is the database.</p><p class="proof">engineering-board/ · BOARD.md · GRAPH.yml</p></div>
-          <div class="card2 reveal"><h3>Durable memory</h3><p>Recurring lessons promote into committed Learning entries (L###) that survive session boundaries — surfaced at session start and in a dedicated Learnings panel on <a href="board.html">the board view</a>.</p><p class="proof">learnings-curator → learnings/L###</p></div>
-          <div class="card2 reveal"><h3>Collision-free agents</h3><p>Atomic claim-locking lets multiple worker agents run in parallel without stepping on each other.</p><p class="proof">board-claim-acquire.sh · tested</p></div>
+          <div class="card2 reveal"><h3>Durable memory</h3><p><strong>Your agent forgets everything between sessions.</strong> Recurring lessons promote into committed Learning entries (L###) that survive — surfaced at session start and in a dedicated Learnings panel on <a href="board.html">the board view</a>.</p><p class="proof">learnings-curator → learnings/L###</p></div>
+          <div class="card2 reveal"><h3>Collision-free agents</h3><p><strong>Two agents editing the same file clobber each other.</strong> Atomic claim-locking lets parallel worker agents run without stepping on each other.</p><p class="proof">board-claim-acquire.sh · tested</p></div>
           <div class="card2 reveal"><h3>Autonomous pipeline</h3><p>Findings flow through a tdd → review → validate state machine, driven by the Stop hook.</p><p class="proof">tdd-builder · code-reviewer · validator</p></div>
           <div class="card2 reveal"><h3>Runs where you are — and everywhere else</h3><p>A native Claude Code plugin and an MCP server (11 tools) over the same board format.</p><p class="proof">.mcp.json · protocol 2025-06-18</p></div>
         </div>
@@ -250,14 +282,14 @@
             </tbody>
           </table>
         </div>
-        <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Where they're better: Backlog.md is the category leader (~5.9k★) with a polished standalone CLI and TUI; Agent-MCP ships a live dashboard. engineering-board answers visualization with <code>/board-view</code> — a committed, offline, zero-dep HTML board — <a href="board.html">see this repo's own live board</a>, republished on every merge (no daemon, on-brand: the view is just another in-repo projection) — and bets on the four-way intersection, not any single feature.</p>
+        <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Where they're better: Backlog.md is the category leader (~5.9k★) with a polished standalone CLI and TUI; Agent-MCP ships a live dashboard. engineering-board answers visualization with <code>/board-view</code> — a committed, offline, zero-dep HTML board — <a href="board.html">see this repo's own live board</a>, republished on every merge (no daemon, on-brand: the view is just another in-repo projection) — and bets on the four-way intersection, not any single feature. Newer than the leaders and shipping fast: <a href="https://github.com/GhostlyGawd/engineering-board/releases">published releases</a>, a <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELOG.md">live changelog</a>, and every feature built on the board above.</p>
       </div>
     </section>
 
     <section id="install" aria-labelledby="install-h">
       <div class="wrap">
         <h2 id="install-h" class="reveal">Install both ways</h2>
-        <p class="sub reveal">One shared board format. Two thin adapters.</p>
+        <p class="sub reveal">Free &amp; MIT. Requires <a href="https://claude.com/claude-code">Claude Code</a> (also free). One shared board format, two thin adapters.</p>
         <div class="install">
           <div class="card2 reveal recommended">
             <p class="eyebrow">Claude Code plugin · start here</p>
@@ -270,9 +302,12 @@
           </div>
           <div class="card2 reveal">
             <p class="eyebrow">MCP server (any client)</p>
-            <pre><code># Claude Code
+            <pre><code># clone the repo, then point python3 at the server:
+git clone https://github.com/GhostlyGawd/engineering-board
+
+# Claude Code
 claude mcp add engineering-board -- \
-  python3 /path/to/engineering-board/mcp-server/engineering_board_mcp.py
+  python3 "$(pwd)/engineering-board/mcp-server/engineering_board_mcp.py"
 
 # Claude Desktop: claude_desktop_config.json
 "mcpServers": {
@@ -284,13 +319,14 @@ claude mcp add engineering-board -- \
             <p class="muted" style="font-size:.8rem">Pure python3, zero dependencies. 11 tools over stdio.</p>
           </div>
         </div>
+        <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Uninstall any time — the board stays as plain markdown in your repo, so there's no lock-in. And it's built for untrusted input: scratch content is treated as data, never instructions, and hardened against prompt injection (<a href="https://github.com/GhostlyGawd/engineering-board/blob/main/SECURITY.md">security posture</a>).</p>
       </div>
     </section>
   </main>
 
   <footer>
     <div class="wrap">
-      <span>engineering-board · MIT licensed · <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/LICENSE">LICENSE</a></span>
+      <span>Built in the open by <a href="https://github.com/GhostlyGawd">@GhostlyGawd</a> · a solo, MIT-licensed project · <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/LICENSE">LICENSE</a></span>
       <span>
         <a href="https://github.com/GhostlyGawd/engineering-board">Repository</a> ·
         <a href="board.html">Live board</a> ·
@@ -360,6 +396,23 @@ claude mcp add engineering-board -- \
         if(reduce){ // reduced motion: jump straight to resolved
           clearTimeout(timer);place(card,"resolved",false);btn.disabled=false;btn.textContent="↻ Replay";
         }
+      });
+    })();
+
+    // Copy-to-clipboard buttons on the install code blocks.
+    (function(){
+      if(!navigator.clipboard) return;
+      document.querySelectorAll("pre").forEach(function(pre){
+        var wrap=document.createElement("div");wrap.className="code-wrap";
+        pre.parentNode.insertBefore(wrap,pre);wrap.appendChild(pre);
+        var btn=document.createElement("button");btn.className="copy-btn";btn.type="button";
+        btn.textContent="Copy";btn.setAttribute("aria-label","Copy code to clipboard");
+        wrap.appendChild(btn);
+        btn.addEventListener("click",function(){
+          navigator.clipboard.writeText(pre.innerText).then(function(){
+            btn.textContent="Copied";setTimeout(function(){btn.textContent="Copy";},1500);
+          });
+        });
       });
     })();
   </script>

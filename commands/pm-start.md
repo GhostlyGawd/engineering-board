@@ -74,7 +74,7 @@ Pass the empty string `""` for the discipline argument (PM has no discipline). I
 Print exactly:
 
 ```
-Engineering board: PM mode active. Stop hook will route through PM continuation each turn. Run /board-pause to suspend, or end the session normally to consolidate.
+Engineering board: PM mode is on. Nothing promotes yet — findings become real board cards when you END YOUR NEXT TURN (just finish your next reply). Keep working normally; each turn you end, new findings consolidate onto the board. Run /board-pause to suspend.
 ```
 
 Then stop.

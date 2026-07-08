@@ -27,7 +27,9 @@ _A finding is captured, promoted, and driven through `tdd → review → validat
 
 ## What it is
 
-engineering-board turns a committed markdown tree — `engineering-board/<project>/` — into an autonomous, multi-agent software-engineering board. Findings are captured passively from every session, promoted to the live board via deterministic consolidation, and worked through a `tdd → review → validate` state machine with atomic claim-locking. Coordination state, work-in-progress locks, and durable learnings all live as markdown in your repo — no hidden database, no external service, no daemon. It ships as a native Claude Code plugin **and**, as of 1.2.0, a zero-dependency MCP server.
+**engineering-board is a to-do board your Claude Code agent fills in and works through by itself** — saved as plain markdown in your repo, not a hidden database. As it works, your agent jots down the bugs and ideas it spots (its _findings_ — bugs, features, questions, observations); you promote the ones worth keeping into real cards; then agents drive each card from a failing test → review → validated. It remembers what it learns across sessions, and several agents can work in parallel without colliding. Solo today; collision-free at scale.
+
+Under the hood: engineering-board turns a committed markdown tree — `engineering-board/<project>/` — into an autonomous, multi-agent software-engineering board. Findings are captured passively from every session, promoted to the live board via deterministic consolidation, and worked through a `tdd → review → validate` (test-first) state machine with atomic claim-locking. Coordination state, work-in-progress locks, and durable learnings all live as markdown in your repo — no hidden database, no external service, no daemon. It ships as a native Claude Code plugin **and**, as of 1.2.0, a zero-dependency MCP (Model Context Protocol) server.
 
 ### Why it's different
 
@@ -52,7 +54,7 @@ The market splits into two camps: **visible-but-dumb** git-markdown boards (no l
 
 ## Quickstart
 
-Two paths. The plugin gives you the full autonomous pipeline inside Claude Code; the MCP server exposes the board to any MCP client.
+Two paths. The plugin gives you the full autonomous pipeline inside Claude Code (requires [Claude Code](https://claude.com/claude-code), free); the MCP server exposes the board to any MCP client.
 
 ### Plugin (Claude Code)
 
@@ -89,7 +91,9 @@ allowlist on its own — `/board-setup` simply composes the two.
 Register the zero-dependency `python3` server with the Claude Code CLI:
 
 ```sh
-claude mcp add engineering-board -- python3 /abs/path/to/engineering-board/mcp-server/engineering_board_mcp.py
+# clone the repo, then point python3 at the server
+git clone https://github.com/GhostlyGawd/engineering-board
+claude mcp add engineering-board -- python3 "$(pwd)/engineering-board/mcp-server/engineering_board_mcp.py"
 ```
 
 Or add it to Claude Desktop's `claude_desktop_config.json`:
@@ -111,7 +115,7 @@ Installing the plugin auto-registers the same server via the repo-root [`.mcp.js
 
 <div align="center">
 
-<img src="docs/how-it-works.svg" alt="How engineering-board works" width="720">
+<img src="docs/how-it-works.svg" alt="How engineering-board works: a five-step flow — you and your AI assistant chat, a Note-Taker (finding-extractor) captures findings, a Project Manager (consolidator + tidier) sorts them into bugs/features/questions/observations, a Build Team (builder · reviewer · validator) drives each through test → review → double-check → done, and a numbered-ticket system keeps parallel workers from grabbing the same task — all as plain text inside your project." width="720">
 
 </div>
 
@@ -197,6 +201,7 @@ Full guide: **[CONTRIBUTING.md](CONTRIBUTING.md)**. Please also read our **[Code
 - **Bugs & features** → [open an issue](https://github.com/GhostlyGawd/engineering-board/issues/new/choose) (guided templates).
 - **Security** → report privately via [Security Advisories](https://github.com/GhostlyGawd/engineering-board/security/advisories/new); see **[SECURITY.md](SECURITY.md)** for the posture (untrusted-data model + a red-teamed injection corpus).
 - **Roadmap** → the honest, live backlog is the product's own board — **[view it live](https://ghostlygawd.github.io/engineering-board/board.html)** — sourced from [`engineering-board/eb-self/`](engineering-board/eb-self/BOARD.md), plus [`docs/rfcs/0003-productization-roadmap.md`](docs/rfcs/0003-productization-roadmap.md). We run our own board.
+- **Who builds this** → a solo, open-source project by [@GhostlyGawd](https://github.com/GhostlyGawd), built in the open on its own board.
 - **Support the project** → [GitHub Sponsors](https://github.com/sponsors/GhostlyGawd).
 
 ## License

@@ -44,14 +44,20 @@ jobs:
           STARS="$(echo "$REPO_JSON"  | python3 -c 'import json,sys; print(json.load(sys.stdin)["stargazers_count"])')"
           FORKS="$(echo "$REPO_JSON"  | python3 -c 'import json,sys; print(json.load(sys.stdin)["forks_count"])')"
 
-          # Traffic endpoints need push access; the workflow token has it here.
-          # Tolerate failures (e.g. permissions change) with empty cells rather
-          # than a dead workflow.
-          CLONES="$(gh api "repos/$R/traffic/clones"  --jq '"\(.count),\(.uniques)"' 2>/dev/null || echo ",")"
-          VIEWS="$(gh api  "repos/$R/traffic/views"   --jq '"\(.count),\(.uniques)"' 2>/dev/null || echo ",")"
+          # Traffic endpoints need elevated access the workflow token may lack;
+          # they can 403 with "Resource not accessible by integration". NEVER let
+          # an error body or partial value leak into the CSV — accept only a
+          # strict "<int>,<int>" shape, otherwise write empty cells. (Without this
+          # the 403 JSON blob was landing verbatim in the snapshot.)
+          valid_pair() { printf '%s' "$1" | grep -qE '^[0-9]+,[0-9]+$'; }
+          CLONES="$(gh api "repos/$R/traffic/clones" --jq '"\(.count),\(.uniques)"' 2>/dev/null || true)"
+          valid_pair "$CLONES" || CLONES=","
+          VIEWS="$(gh api  "repos/$R/traffic/views"  --jq '"\(.count),\(.uniques)"' 2>/dev/null || true)"
+          valid_pair "$VIEWS" || VIEWS=","
 
           DL="$(gh api "repos/$R/releases" --paginate \
-                --jq '[.[].assets[] | select(.name | endswith(".mcpb")) | .download_count] | add // 0' 2>/dev/null || echo "")"
+                --jq '[.[].assets[] | select(.name | endswith(".mcpb")) | .download_count] | add // 0' 2>/dev/null || echo "0")"
+          printf '%s' "$DL" | grep -qE '^[0-9]+$' || DL="0"
 
           CSV="docs/metrics.csv"
           if [ ! -f "$CSV" ]; then
