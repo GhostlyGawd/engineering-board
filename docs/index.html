@@ -94,7 +94,9 @@
     /* ===== Hero ===== */
     .hero{padding:5rem 0 3rem;text-align:center}
     .hero h1{font-size:clamp(2rem,6vw,var(--eb-fs-4xl));max-width:16ch;margin:1rem auto .6rem}
-    .hero .tagline{font-size:var(--eb-fs-lg);color:var(--eb-text-muted);max-width:34ch;margin:0 auto 2rem}
+    .hero .tagline{font-size:var(--eb-fs-lg);color:var(--eb-text-muted);max-width:38ch;margin:0 auto .9rem}
+    .hero .whofor{font-size:var(--eb-fs-base);color:var(--eb-text-muted);max-width:44ch;margin:0 auto 2rem}
+    .hero .whofor strong{color:var(--eb-text)}
     .cta-row{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
     .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.2rem;border-radius:var(--eb-radius-pill);
       font-weight:600;font-size:var(--eb-fs-sm);border:1px solid transparent;cursor:pointer;transition:transform var(--eb-dur-fast) var(--eb-ease-out),background var(--eb-dur-fast)}
@@ -195,12 +197,13 @@
 
   <main>
     <section class="hero wrap" aria-labelledby="h1">
-      <p class="eyebrow">Claude Code plugin · MCP server</p>
+      <p class="eyebrow">For Claude Code · plugin &amp; MCP (Model Context Protocol) server</p>
       <h1 id="h1">A git-committed kanban board your AI agents run and remember.</h1>
-      <p class="tagline"><strong>The board is the database.</strong> Coordination, work-in-progress locks, and durable learnings — all committed markdown in your repo.</p>
+      <p class="tagline"><strong>The board is the database</strong> — no hidden DB, just markdown in your repo. Your agent captures the bugs and ideas it spots as it works, remembers them across sessions, and drives each one from a failing test to done.</p>
+      <p class="whofor">For anyone building with Claude Code — <strong>one agent today</strong>, collision-free across many when you scale. Findings capture themselves; you promote the ones worth keeping.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="#install">Install</a>
-        <a class="btn btn-ghost" href="https://github.com/GhostlyGawd/engineering-board">View on GitHub</a>
+        <a class="btn btn-primary" href="#install">Install — free &amp; MIT</a>
+        <a class="btn btn-ghost" href="board.html">See a live board it runs</a>
       </div>
 
       <div class="demo" aria-label="Interactive board demo">
@@ -220,7 +223,7 @@
     <section id="why" aria-labelledby="why-h">
       <div class="wrap">
         <h2 id="why-h" class="reveal">Why it's different</h2>
-        <p class="sub reveal">Competitors force a choice: a board that's <em>visible but dumb</em>, or coordination that's <em>smart but hidden in a database</em>. engineering-board refuses the trade-off.</p>
+        <p class="sub reveal">Agents now do real multi-session work — and they forget everything between sessions and trip over each other in parallel. Competitors force a choice: a board that's <em>visible but dumb</em>, or coordination that's <em>smart but hidden in a database</em>. engineering-board refuses the trade-off.</p>
         <div class="vp">
           <div class="card2 reveal lead"><h3>Visible, diffable state</h3><p>Your agents' board is committed markdown — cards, an index, a graph — reviewed in the same PRs as code. The board is the database.</p><p class="proof">engineering-board/ · BOARD.md · GRAPH.yml</p></div>
           <div class="card2 reveal"><h3>Durable memory</h3><p>Recurring lessons promote into committed Learning entries (L###) that survive session boundaries — surfaced at session start and in a dedicated Learnings panel on <a href="board.html">the board view</a>.</p><p class="proof">learnings-curator → learnings/L###</p></div>
