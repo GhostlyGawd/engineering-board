@@ -60,8 +60,8 @@ Always release the claim (even on failure): `bash "$CLAUDE_PLUGIN_ROOT/hooks/scr
 
 Final report, one of:
 - `Entry <id> validated in N round(s) — run /board-resolve <id> to close it.` (reached `needs: resolved`)
-- `Entry <id> stopped at needs:<value> — <subagent notes>. Fix the blocker and re-run /board-run <id>.` (cannot_proceed / null transition)
-- `Entry <id> still at needs:<value> after 5 rounds — the state machine is cycling; inspect the entry's review notes before re-running.` (bound hit)
+- `Entry <id> stopped at needs:<value>. The <discipline> agent reported: <subagent notes>. Address that specific point in the entry (or the code it names), then re-run /board-run <id>.` (cannot_proceed / null transition)
+- `Entry <id> still at needs:<value> after 5 rounds — the fix keeps failing the same stage. Open the entry's latest Review/Validation note to see which check is failing, fix that one thing, then re-run /board-run <id> (or /board-resolve <id> if it's actually done).` (bound hit)
 
 ## Notes
 
