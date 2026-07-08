@@ -19,7 +19,9 @@ and what was fixed/skipped. Never rewrite past sessions._
   in v1.5.1/v1.6.0). **Deferred residual that overlaps this run:** the
   explainer-diagram rainbow→brand recolor (COLOR F1 / BRAND-COHERENCE) — same asset
   as SHOWCASE F4 (`HOLD-A4` below); do once, together.
-- **Scope chosen:** ⏳ **AWAITING OPERATOR DECISION — no codebase files changed yet.**
+- **Scope chosen:** **Everything** (operator, 2026-07-08). Executed the safely-buildable
+  findings as commits (below); architectural/asset/feature findings skipped-and-logged
+  per Phase 3.6 with follow-ups. Suite green (15/15) after every commit.
 
 > **State of this session:** Phase 1 (collect) and Phase 2 (present + map
 > dependencies) are complete below. Per the brief, **nothing in the product code
@@ -136,6 +138,65 @@ focused session; FIX-27 especially), and both HOLD sets (need design assets / A/
 
 ---
 
-_Awaiting the operator's scope decision. No product files have been modified. On
-answer: create the commits in plan order, run `tests/run-all.sh` after each, and
-append the `Fixed` / `Skipped` / `Follow-ups` sections below._
+### Build plan executed (scope: Everything)
+
+Themed commits (overlapping findings that edit the same copy were merged, per
+"merge duplicates"); one coherent commit per theme, `tests/run-all.sh` green after
+each. Order: landing → README → media → command copy → metrics.
+
+| # | Commit | Theme |
+|---|---|---|
+| 1 | `5b5315a` | landing hero — who/what/how comprehension |
+| 2 | `1d1c237` | landing trust-at-decision + offer + security |
+| 3 | `73d7451` | landing install friction (copy buttons, JSON-LD, caption) |
+| 4 | `e13761d` | README comprehension + trust mirror |
+| 5 | `0cc0e61` | media hygiene (delete PNG, fix alt) |
+| 6 | `c744b56` | command copy (`/pm-start`, `/board-run`) |
+| 7 | `4c6c935` | defuse `metrics.csv` 403-blob landmine |
+| 8 | `eb00948` | CHANGELOG `[Unreleased]` (no version bump — see Skipped) |
+
+### Fixed
+
+| id | Commit | How verified |
+|---|---|---|
+| FIX-1/2/3/5/7 | `5b5315a` | landing hero renders; `token-coherence` green (no `--eb-*` tokens touched); tag balance checked |
+| FIX-9/10/11/12/13 | `1d1c237` | trust band + pain cards + install trust row + maker note in `docs/index.html`; suite green |
+| FIX-14/15 | `1d1c237`,`e13761d` | `git clone` step + Claude Code prerequisite on both landing and README |
+| FIX-16/17/19 | `73d7451` | JSON-LD parses (validated); copy-button JS added; demo captioned; suite green |
+| FIX-4/6/8 | `e13761d` | README "What it is" gist-first, defines "finding", expands MCP/TDD; counts unchanged |
+| FIX-18 | `0cc0e61` | `how-it-works.png` removed (confirmed unreferenced repo-wide); SVG alt rewritten |
+| FIX-23 | `c744b56` | `/pm-start` names the end-a-turn trigger; `command-frontmatter` + `modes` suites green |
+| FIX-24 | `c744b56` | `/board-run` stall guidance specific; `board-run-command` pins intact; suite green |
+| FIX-29 | `4c6c935` | `metrics.yml` sanitizes to strict `<int>,<int>`; committed row cleaned to `0,0,,,,,11` |
+
+### Skipped (logged per Phase 3.6 — outside safe mechanical scope)
+
+| id | Reason |
+|---|---|
+| **FIX-20** (board.html self-framing / rename `eb-self`) | Touches the `view`-suite output surface; the label comes from `BOARD-ROUTER.md`, so a safe rename needs care. Deferred to the in-product-copy pass. |
+| **FIX-21** (SessionStart mode copy) | `board-session-start.sh` output is covered by the `session-start` suite; reword needs test-aware edits. |
+| **FIX-22** (first-capture confirmation) | Changes Stop-hook behavior/output; `stop-hook-procedure.md` carries many pinned `modes`-suite tokens. Own session. |
+| **FIX-25** (SessionStart/board.html accrual line) | A feature needing correct counts + tests, not a copy edit. |
+| **FIX-26** (seed sample entry + `/board-run SAMPLE`) | The seed must be a self-contained toy target the real pipeline can build/validate; bigger than reported — needs design + a test. |
+| **FIX-27** (ungate the learnings loop) | Architecturally significant: changes Stop-hook routing and moves `tests/modes/*` + `stop-hook-procedure.md` pinned tokens. Its own RFC-scoped session. |
+| **FIX-28** (`/board-stats`) | New command — own session. |
+| **FIX-30** (mode-persistence TTL/reset) | Behavior change to hooks. |
+| **Version bump** | User-facing command output changed, but the MCP `server.json` pins a released `.mcpb` download URL + `fileSha256` that only `release.yml` can update atomically (build → hash → publish); hand-bumping would claim 1.6.1 while pointing at the 1.6.0 asset. Logged under `[Unreleased]`; the bump rides the maintainer's next release. |
+| **HOLD-A1/A2/A3/A5** (real board screenshot, PR-diff image, capture GIF, outcome visuals) | Need authentic design/capture I can't produce mechanically as durable assets. |
+| **HOLD-A4** (recolor `how-it-works.svg`) | ~40 hand-placed rainbow/slate fills → brand mono ramp needs visual preview; overlaps the deferred COLOR F1 / BRAND-COHERENCE residual — do once in a design pass. |
+
+### Follow-ups (revealed during the fixes)
+
+1. **Cut a release to ship the command-copy UX** — the `/pm-start` + `/board-run`
+   text changes are live in the repo but reach installs only on the next version
+   bump; run `release.yml` (which re-pins `server.json`'s version + `.mcpb` digest).
+2. **The in-product-copy pass** (FIX-20/21/22/25) — a focused session that edits
+   `board-session-start.sh` + `board-view.sh` test-aware, so the comprehension and
+   retention gains land inside the product, not just the marketing.
+3. **The two "one changes"** (FIX-26 seed first-win, FIX-27 ungate learnings) — the
+   highest-leverage activation + retention bets; each deserves its own designed,
+   tested session (FIX-27 is RFC-scoped).
+4. **The design-asset pass** (HOLD-A1–A5) — real screenshots + a recolored diagram,
+   best merged with the deferred COLOR/BRAND residuals (see `state.md`).
+5. **Roadmap synthesis** — fetch goal-prompts brief 28 to merge all six reports +
+   these follow-ups into one sequenced plan.
