@@ -9,14 +9,17 @@ increases.
 
 ## [Unreleased]
 
+## [1.6.1] — 2026-07-08
+
 Acts on the six **Experience Optimization** audit reports (the goal-prompts
 playbook — `COMPREHENSION.md`, `SHOWCASE.md`, `CRO.md`, `PROOF.md`,
 `ACTIVATION.md`, `RETENTION.md`) and the Fixer (`FIXLOG.md`). The
 highest-leverage, lowest-risk findings, shipped as copy/UX fixes across the
 public and first-run surfaces. Larger features (seed first-win demo, ungating
 the learnings loop, `/board-stats`) stay logged as follow-ups in `FIXLOG.md`.
-The user-facing command-output changes below reach installs at the next version
-bump (deferred here to keep the MCP `server.json` release-asset digest coherent).
+This release carries the user-facing `/pm-start` + `/board-run` command-output
+changes to installs, with the MCP `server.json` bundle digest re-pinned in
+lockstep (`fff4f4b3…`).
 
 ### Changed
 - **Landing (`docs/index.html`) — comprehension.** Hero names the audience and
