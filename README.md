@@ -115,7 +115,7 @@ Installing the plugin auto-registers the same server via the repo-root [`.mcp.js
 
 <div align="center">
 
-<img src="docs/how-it-works.svg" alt="How engineering-board works" width="720">
+<img src="docs/how-it-works.svg" alt="How engineering-board works: a five-step flow — you and your AI assistant chat, a Note-Taker (finding-extractor) captures findings, a Project Manager (consolidator + tidier) sorts them into bugs/features/questions/observations, a Build Team (builder · reviewer · validator) drives each through test → review → double-check → done, and a numbered-ticket system keeps parallel workers from grabbing the same task — all as plain text inside your project." width="720">
 
 </div>
 
