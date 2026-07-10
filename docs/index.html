@@ -179,7 +179,17 @@
     .yes{color:var(--eb-accent);font-weight:700}
     :root[data-theme="dark"] .yes,@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .yes{color:var(--eb-accent-dark)}}
     .no{color:var(--eb-text-muted)}
+    /* Partial sits between yes and no: muted like .no but weighted, so the eye
+       reads three levels without a third hue (token stays theme-aware). */
+    .partial{color:var(--eb-text-muted);font-weight:600}
     .cmp-scroll{overflow-x:auto}
+
+    /* Compact FAQ block under the value-prop grid (mirror of .vp .card2). */
+    .faq{margin-top:1rem;background:var(--eb-surface);border:1px solid var(--eb-border);
+      border-radius:var(--eb-radius-lg);padding:1.5rem}
+    .faq h3{font-size:var(--eb-fs-md);margin-bottom:.4rem}
+    .faq p{margin:0;color:var(--eb-text-muted);font-size:var(--eb-fs-sm)}
+    .faq strong{color:var(--eb-text)}
 
     .install{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
     @media(max-width:720px){.install{grid-template-columns:1fr}.cols{grid-template-columns:repeat(2,1fr)}}
@@ -214,6 +224,7 @@
         <a href="#why">Why</a>
         <a href="#compare">Compare</a>
         <a href="#install">Install</a>
+        <a href="https://github.com/GhostlyGawd/engineering-board#readme">Docs</a>
         <a href="board.html">Live board</a>
         <a class="ghlink" href="https://github.com/GhostlyGawd/engineering-board">GitHub</a>
         <button class="theme-btn" id="theme" type="button" aria-label="Toggle color theme">Theme</button>
@@ -246,13 +257,13 @@
         <p class="demo-cap">Illustrative animation of the pipeline · <a href="board.html">see the real board this repo runs →</a></p>
       </div>
 
-      <p class="trustband">Built on its own board, <a href="board.html">in public</a> · <a href="https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml">CI-green</a> · zero-dependency · MIT · <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">on the MCP Registry</a></p>
+      <p class="trustband">Built on its own board, <a href="board.html">in public</a> · <a href="https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml">CI-green</a> · zero-dependency · MIT · <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">on the MCP Registry</a> · <a href="https://github.com/GhostlyGawd/engineering-board/releases">releases since 2026-06</a></p>
     </section>
 
     <section id="why" aria-labelledby="why-h">
       <div class="wrap">
         <h2 id="why-h" class="reveal">Why it's different</h2>
-        <p class="sub reveal">Agents now do real multi-session work — and they forget everything between sessions and trip over each other in parallel. Competitors force a choice: a board that's <em>visible but dumb</em>, or coordination that's <em>smart but hidden in a database</em>. engineering-board refuses the trade-off.</p>
+        <p class="sub reveal">Agents now do real multi-session work — and they forget everything between sessions and trip over each other in parallel. The field still forces a choice: a board that's <em>visible but dumb</em>, or memory and coordination that's <em>smart but opaque</em> — kept in a database, or in <code>~/.claude</code> outside your repo. engineering-board refuses the trade-off.</p>
         <div class="vp">
           <div class="card2 reveal lead"><h3>Visible, diffable state</h3><p>Your agents' board is committed markdown — cards, an index, a graph — reviewed in the same PRs as code. The board is the database.</p><p class="proof">engineering-board/ · BOARD.md · GRAPH.yml</p></div>
           <div class="card2 reveal"><h3>Durable memory</h3><p><strong>Your agent forgets everything between sessions.</strong> Recurring lessons promote into committed Learning entries (L###) that survive — surfaced at session start and in a dedicated Learnings panel on <a href="board.html">the board view</a>.</p><p class="proof">learnings-curator → learnings/L###</p></div>
@@ -260,29 +271,33 @@
           <div class="card2 reveal"><h3>Autonomous pipeline</h3><p>Findings flow through a tdd → review → validate state machine, driven by the Stop hook.</p><p class="proof">tdd-builder · code-reviewer · validator</p></div>
           <div class="card2 reveal"><h3>Runs where you are — and everywhere else</h3><p>A native Claude Code plugin and an MCP server (11 tools) over the same board format.</p><p class="proof">.mcp.json · protocol 2025-06-18</p></div>
         </div>
+        <div class="faq reveal">
+          <h3>Why not Claude Code's built-in Tasks?</h3>
+          <p>Use both. Native Tasks are good personal tracking — they persist across sessions, support dependencies, and come with a Ctrl+T board. But they live in <code>~/.claude/tasks/</code>, per-user and per-machine, outside the repo: invisible in PRs, invisible to teammates, with no capture pipeline, no review states, no committed learnings. engineering-board is the <strong>repo's</strong> shared, reviewable board. Keep native Tasks for in-session personal tracking; the board holds the project's durable, team-visible state.</p>
+        </div>
       </div>
     </section>
 
     <section id="compare" style="background:var(--eb-surface)" aria-labelledby="cmp-h">
       <div class="wrap">
         <h2 id="cmp-h" class="reveal">Nobody else occupies the intersection</h2>
-        <p class="sub reveal">Honest comparison. Every competitor is linked; traction figures are snapshots.</p>
+        <p class="sub reveal">Honest comparison against the real 2026 field. Competitors are linked; traction figures are snapshots (2026-07-10) that drift.</p>
         <div class="cmp-scroll reveal">
           <table class="cmp">
             <thead><tr>
-              <th>Tool</th><th>Git-committed board</th><th>Durable memory</th><th>Atomic multi-agent locking</th><th>Claude-native</th><th>MCP</th>
+              <th>Tool</th><th>State is PR-reviewable markdown in your repo</th><th>Durable memory</th><th>Atomic claim-locking</th><th>Passive per-turn capture</th><th>Opinionated tdd→review→validate pipeline</th><th>Published team-visible board</th>
             </tr></thead>
             <tbody>
-              <tr class="us"><td>engineering-board</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
-              <tr><td><a href="https://github.com/MrLesk/Backlog.md">Backlog.md</a></td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">CLI</td><td class="yes">Yes</td></tr>
-              <tr><td><a href="https://github.com/rinadelph/Agent-MCP">Agent-MCP</a></td><td class="no">RAG DB</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td></tr>
-              <tr><td><a href="https://github.com/eyalzh/kanban-mcp">kanban-mcp</a></td><td class="no">SQLite</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td></tr>
-              <tr><td><a href="https://github.com/shinpr/claude-code-workflows">claude-code-workflows</a></td><td class="no">Ephemeral</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td><td class="no">No</td></tr>
-              <tr><td><a href="https://paddo.dev/blog/flux-kanban-for-ai-agents/">Flux</a></td><td class="no">Side branch</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td></tr>
+              <tr class="us"><td>engineering-board</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+              <tr><td><a href="https://github.com/gastownhall/beads">beads</a> · ~25k★</td><td class="partial">Partial</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="partial">Partial</td><td class="no">No</td><td class="no">No</td></tr>
+              <tr><td><a href="https://github.com/MrLesk/Backlog.md">Backlog.md</a> · ~6k★</td><td class="yes">Yes</td><td class="no">No</td><td class="partial">Partial</td><td class="no">No</td><td class="partial">Partial</td><td class="yes">Yes</td></tr>
+              <tr><td><a href="https://github.com/eyaltoledano/claude-task-master">Task Master</a> · ~27.8k★</td><td class="partial">Partial</td><td class="no">No</td><td class="partial">Partial</td><td class="no">No</td><td class="partial">Partial</td><td class="no">No</td></tr>
+              <tr><td>Claude Code native Tasks</td><td class="no">No</td><td class="partial">Partial</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="partial">Partial</td></tr>
+              <tr><td><a href="https://github.com/thedotmack/claude-mem">claude-mem</a></td><td class="no">No</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Where they're better: Backlog.md is the category leader (~5.9k★) with a polished standalone CLI and TUI; Agent-MCP ships a live dashboard. engineering-board answers visualization with <code>/board-view</code> — a committed, offline, zero-dep HTML board — <a href="board.html">see this repo's own live board</a>, republished on every merge (no daemon, on-brand: the view is just another in-repo projection) — and bets on the four-way intersection, not any single feature. Newer than the leaders and shipping fast: <a href="https://github.com/GhostlyGawd/engineering-board/releases">published releases</a>, a <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELOG.md">live changelog</a>, and every feature built on the board above.</p>
+        <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Where they're better: <a href="https://github.com/gastownhall/beads">beads</a> is the memory-and-claims leader at real scale — <code>bd remember</code>/<code>bd prime</code> and atomic claims are its headline (its state lives in a Dolt DB with JSONL export, hence Partial); <a href="https://github.com/MrLesk/Backlog.md">Backlog.md</a> has the richest task model and the broadest install channels, with a local TUI + web board; <a href="https://github.com/eyaltoledano/claude-task-master">Task Master</a> owns PRD→tasks decomposition; native Tasks persist across sessions but stay in <code>~/.claude/tasks/</code>, per-user. engineering-board bets on the whole row — reviewable in-repo state, captured passively each turn, driven through an opinionated pipeline, and <a href="board.html">published as this repo's own live board</a>, republished on every merge. Newer and smaller than these leaders, shipping fast: <a href="https://github.com/GhostlyGawd/engineering-board/releases">published releases</a> and a <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELOG.md">live changelog</a>. The earlier field this table compared against (kanban-mcp, Flux, Agent-MCP, claude-code-workflows) is dormant or stalled; that research is archived in <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/.goal/POSITIONING.md">.goal/POSITIONING.md</a>.</p>
       </div>
     </section>
 

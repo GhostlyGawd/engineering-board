@@ -18,6 +18,8 @@ _The board is the database._
 [![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
 [![MCP](https://img.shields.io/badge/MCP-server-171719.svg)](mcp-server/README.md)
+[![GitHub stars](https://img.shields.io/github/stars/GhostlyGawd/engineering-board)](https://github.com/GhostlyGawd/engineering-board/stargazers)
+[![Last release](https://img.shields.io/github/release-date/GhostlyGawd/engineering-board?label=last%20release&color=E6A94E)](https://github.com/GhostlyGawd/engineering-board/releases)
 
 <img src="docs/board-demo.svg" alt="A finding is captured, promoted to the board, and driven through the tdd → review → validate pipeline to done — every step committed markdown." width="720">
 
@@ -33,12 +35,16 @@ Under the hood: engineering-board turns a committed markdown tree — `engineeri
 
 ### Why it's different
 
-The market splits into two camps: **visible-but-dumb** git-markdown boards (no locking, no memory) and **smart-but-opaque** MCP coordination servers (locks and memory, but hidden in a database). engineering-board is the four-way intersection neither camp reaches:
+The market splits into two camps: **visible-but-dumb** git-markdown boards (no locking, no capture pipeline) and **smart-but-opaque** memory-and-coordination engines (real memory, real claims — but kept in a Dolt or SQLite database, or in `~/.claude/` outside your repo). The 2026 field made the smart camp genuinely smart — beads ships durable memory and atomic claims as its headline, and Claude Code itself now ships built-in Tasks — but neither camp crossed the divide. engineering-board is the intersection neither camp reaches:
 
 - **git-committed, human-visible board** — reviewed in the same PRs as your code
 - **durable cross-session memory** — recurring lessons promote into committed `Learning` entries
 - **atomic multi-agent claim-locking** — parallel worker agents never collide
 - **native to Claude Code** — plus an MCP server for any MCP client
+
+### Why not Claude Code's built-in Tasks?
+
+Use both — they solve different problems. Native Tasks are genuinely good personal tracking: they persist across sessions, support dependencies, and come with a Ctrl+T board. But they live in `~/.claude/tasks/` — per-user and per-machine, outside the repo — so they're invisible in PRs and invisible to your teammates. They also have no capture pipeline, no review states, and no committed learnings. engineering-board is the **repo's** board: shared, PR-reviewable state that travels with the code and outlives any one user's machine. Keep native Tasks for in-session personal tracking; put the project's durable, team-visible state on the board — the two compose.
 
 ## Value props
 
@@ -156,20 +162,20 @@ Eleven tools, all backed by the same on-disk format the plugin's hooks and skill
 
 ## Comparison
 
-Honest and cited; traction figures are live snapshots (2026-07-04) that drift.
+Honest and cited; traction figures are live snapshots (2026-07-10) that drift.
 
-| | git-committed board? | durable memory? | atomic multi-agent locking? | Claude-native? | MCP? |
-|---|:---:|:---:|:---:|:---:|:---:|
-| **engineering-board** | Yes | Yes | Yes | Yes | Yes |
-| [Backlog.md](https://github.com/MrLesk/Backlog.md) · ~5.9k★ | Yes | No | No | No | Yes |
-| [Agent-MCP](https://github.com/rinadelph/Agent-MCP) · ~1.3k★ | No (RAG DB) | Yes (opaque) | Yes | No | Yes |
-| [kanban-mcp](https://github.com/eyalzh/kanban-mcp) · ~40★ | No (SQLite) | No | No | No | Yes |
-| [claude-code-workflows](https://github.com/shinpr/claude-code-workflows) · ~536★ | No (ephemeral) | No | No | Yes | No |
-| [Flux](https://paddo.dev/blog/flux-kanban-for-ai-agents/) · early | No (side-branch SQLite/JSON) | No | No | No | Yes |
+| | State is PR-reviewable markdown in your repo | Durable memory | Atomic claim-locking | Passive per-turn capture | Opinionated tdd→review→validate pipeline | Published team-visible board |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **engineering-board** | Yes | Yes | Yes | Yes | Yes | Yes |
+| [beads](https://github.com/gastownhall/beads) · ~25k★ | Partial — Dolt DB + JSONL export | Yes — `bd remember` / `bd prime` | Yes — `bd update --claim` | Partial — `discovered-from` links | No | No — community UIs |
+| [Backlog.md](https://github.com/MrLesk/Backlog.md) · ~6k★ | Yes | No | Partial — task-id locking | No | Partial — review checkpoints | Yes — local TUI + web |
+| [Task Master](https://github.com/eyaltoledano/claude-task-master) · ~27.8k★ | Partial — repo JSON, no merge story | No | Partial — file lock | No | Partial — TDD autopilot | No |
+| Claude Code native Tasks | No — `~/.claude/tasks/` | Partial — subagent `MEMORY.md`, per-user | No | No | No | Partial — Ctrl+T, terminal-only, per-user |
+| [claude-mem](https://github.com/thedotmack/claude-mem) | No — SQLite + Chroma | Yes | No | Yes — hook-based | No | No |
 
-No competitor combines all four traits engineering-board owns — git-committed board + durable memory + atomic locking + Claude-native — now with MCP as the fifth.
+Every one of these leads a column somewhere; none occupies the whole row. engineering-board's row is the product: reviewable state **and** memory **and** claims **and** passive capture **and** an opinionated pipeline **and** a published board — each ordinary alone, unduplicated together.
 
-**Where they're better (fairness note):** [Backlog.md](https://github.com/MrLesk/Backlog.md) is the category leader by a wide margin, with a polished Kanban UI and broad install channels (npm/Homebrew/Nix/Bun); [Agent-MCP](https://github.com/rinadelph/Agent-MCP) ships a richer RAG knowledge-graph and a live dashboard. engineering-board is younger and not yet on a public marketplace — install it from this repo's marketplace.
+**Where they're better (fairness note):** [beads](https://github.com/gastownhall/beads) is the memory-and-claims leader at real scale — `bd remember`/`bd prime` and atomic claims are its headline, not a side feature; [Backlog.md](https://github.com/MrLesk/Backlog.md) has the richest task model (comments, DoD checklists, fuzzy search) and the broadest install channels; [Task Master](https://github.com/eyaltoledano/claude-task-master) owns PRD→tasks decomposition (1.5M+ npm downloads). engineering-board is younger and smaller than all three, and not yet on a public marketplace — install it from this repo's marketplace. The field this table compared against before 2026 (kanban-mcp, Flux, Agent-MCP, claude-code-workflows) is dormant or stalled; that earlier research is archived in [`.goal/POSITIONING.md`](.goal/POSITIONING.md).
 
 ## Architecture
 
