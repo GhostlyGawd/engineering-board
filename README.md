@@ -25,6 +25,10 @@ _The board is the database._
 
 _A finding is captured, promoted, and driven through `tdd → review → validate` to done — see **[this repo's own live board](https://ghostlygawd.github.io/engineering-board/board.html)** (the HTML `/board-view` generates, republished on every merge), every step markdown you can diff._
 
+<img src="docs/assets/board-screenshot.png" alt="Screenshot of this repo's real rendered board: a search input, type/priority/status filter chips, and kanban columns — to do, review, validate, done — populated with entry cards." width="720">
+
+_the real thing — this repo's own board, as `/board-view` renders it_
+
 </div>
 
 ## What it is
