@@ -379,6 +379,59 @@ else
   report 1 "consolidate flattens promoted title (B052)" "no promoted B001 file under $FLATBOARD/bugs/ (stderr: $(cat "$TMP/flat.stderr"))"
 fi
 
+# --- C7 regression: parent/child rows in BOARD.md ----------------------------
+# rebuild renders an entry with `parent:` as an indented child row ("  ↳ B002")
+# under its parent. board-index-check.sh counted only top-level "- B###" rows,
+# so the first board with a parent/child pair tripped a false corruption flag
+# (files=2, board_rows=1). Isolated fixture board: one parent, one child; both
+# open; index-check must exit 0.
+KIDPROJ="$TMP/parent-child-project"
+KIDBOARD="$KIDPROJ/docs/boards/kids"
+mkdir -p "$KIDBOARD/bugs" "$KIDPROJ/.engineering-board"
+cat > "$KIDPROJ/docs/boards/BOARD-ROUTER.md" <<'EOF'
+# Board Router
+
+| project | path | affects prefix |
+|---------|------|----------------|
+| kids | docs/boards/kids/ | kids/ |
+EOF
+cat > "$KIDBOARD/bugs/B001-parent-bug.md" <<'EOF'
+---
+id: B001
+type: bug
+status: open
+priority: P1
+---
+
+# parent bug
+EOF
+cat > "$KIDBOARD/bugs/B002-child-bug.md" <<'EOF'
+---
+id: B002
+type: bug
+status: open
+priority: P2
+parent: B001
+---
+
+# child bug
+EOF
+cat > "$KIDBOARD/BOARD.md" <<'EOF'
+# kids — Board
+
+## Open
+
+- B001 P1 | [parent bug](bugs/B001-parent-bug.md)
+  ↳ B002 P2 | [child bug](bugs/B002-child-bug.md)
+EOF
+printf '# kids — Archive\n' > "$KIDBOARD/ARCHIVE.md"
+if CLAUDE_PROJECT_DIR="$KIDPROJ" bash "$INDEX_CHECK" > "$TMP/kids.stdout" 2> "$TMP/kids.stderr"; then
+  report 0 "board-index-check.sh counts C7 child rows (parent/child board exit 0)"
+else
+  KIDS_EXIT=$?
+  report 1 "board-index-check.sh counts C7 child rows (parent/child board exit 0)" "exit=$KIDS_EXIT; stderr=$(head -3 "$TMP/kids.stderr" | tr '\n' ' ')"
+fi
+
 # --- Final tally -------------------------------------------------------------
 echo ""
 echo "================================================================"

@@ -1,369 +1,373 @@
-# IMPROVEMENTS — product discovery pass v3 (2026-07-08): the engine audit
+# IMPROVEMENTS — product discovery pass v4 (2026-07-10): the competitive parity audit
 
-_Discovery only; nothing here is implemented. Every idea cites a file/line, an
-open board entry, or a verified absence — no hypotheticals._
+_Discovery only; nothing here is implemented. Every idea cites repo evidence or a
+live-fetched competitor source (all competitor facts fetched 2026-07-10; traction
+figures are snapshots and drift)._
 
-**Why this pass is different.** v1 (14 opportunities, all shipped as
-[v1.5.0](https://github.com/GhostlyGawd/engineering-board/releases/tag/v1.5.0))
-and v2, plus the 6 Experience-Optimization reports, the 6 Design reports, and
-[`ROADMAP.md`](ROADMAP.md), audited **every UX, marketing, and visual surface**.
-All of them named the same blind spot in the same words:
+## What changed since v3
 
-> _"Nothing audits the **engine** — the ~20 `hooks/scripts/*.sh` + `python3` + the
-> MCP server — for correctness, debt, or performance… Run a BUGS / technical-debt
-> audit of the shell+python engine next — it would change the technical half of
-> this roadmap the most."_ — ROADMAP.md §1
+v3 (2026-07-08) audited the **engine** — the coordination core under the product's
+guarantees (E1–E13; headline: only claim-acquire is concurrency-safe). Those
+findings stand and are *not* repeated here; E1–E4 remain the prerequisite for any
+multi-agent claim this report leans on.
 
-**This is that audit.** It reads the coordination core the product's guarantees
-rest on: the claim-locking scripts, the consolidation engine, the MCP server
-(1457 lines), and the SessionStart/Stop wiring. The headline: the product markets
-**"collision-free parallel agents"** (VP3) and **"two servers, one board"** (Q001),
-but only *one* path — acquiring a claim — is actually concurrency-safe. **Creating,
-mutating, and reclaiming** board state are unsynchronized, non-atomic, or use the
-wrong staleness signal. And the product's own five committed Learnings (L001–L005)
-each have fresh violations in the engine.
+**This pass looks outward for the first time since 2026-07-04.** The mission:
+compare engineering-board's **marketing presentation** and **product experience**
+against top competitors, find the table-stakes gaps, then sharpen differentiation.
+Four parallel research passes (a Backlog.md deep-dive; Task Master / Vibe Kanban /
+beads; remaining rivals + new-entrant discovery; a marketing table-stakes benchmark
+across category leaders) produced one overriding conclusion:
 
-The known board backlog (B016/B020/B021/B022/B057/F003) is **excluded** — every
-item below is new.
+> **The field we compare ourselves against no longer exists.** Our README/landing
+> comparison (built 2026-07-04) is aimed at the small end of a market whose top end
+> moved: Claude Code shipped **native persistent Tasks + subagent memory**
+> (commoditizing raw task CRUD), **beads** (~25k★) now ships durable memory *and*
+> atomic claims as its headline, **Task Master** (~28k★, 1.5M npm downloads) became
+> a company, **vibe-kanban** (~27k★) is *sunsetting*, and our table's named rivals
+> (kanban-mcp 40★, Flux 92★, Agent-MCP) are dormant or stalled. Meanwhile every
+> distribution/proof table-stake in the category — one-command install, download
+> badges, a launch moment — is still missing on our side.
+
+The board backlog and prior roadmaps (ROADMAP.md RM-1…17, v3's E1–E13) are
+excluded except where a competitor finding *changes their priority* — noted inline.
 
 ## 1. Product snapshot
 
 engineering-board is a git-committed markdown kanban board that Claude Code agents
-fill in and work through themselves: a Stop hook passively captures *findings*
-(bugs/features/questions/observations) each turn to a scratch inbox; PM mode
-consolidates them into validated entry files; Worker mode (and `/board-run`) drives
-each entry through a `tdd → review → validate` state machine under an atomic
-`mkdir`-based claim lock; and recurring lessons promote into durable `Learning`
-entries. It ships as a Claude Code plugin (13 commands, 8 agents, 4 skills, 23
-scripts) **and** a zero-dependency `python3` MCP server (13 tools), on the official
-MCP Registry. It is young and fast-moving — 71 commits since 2026-07-04, now
-v1.6.1. The whole thesis is **"the board is the database"**: coordination state,
-locks, and memory are all committed markdown, reviewed in the same PRs as code —
-which makes engine correctness the product's foundation, not an implementation
-detail. The self-hosted board (`engineering-board/eb-self/`, 61 bugs) proves the
-loop works; this audit asks whether it works **under the concurrency it sells**.
+fill in and work through themselves: a Stop hook passively captures findings each
+turn, PM mode consolidates them into validated entries, worker mode drives each
+entry through a `tdd → review → validate` state machine under an atomic claim
+lock, and recurring lessons promote into durable `Learning` entries. It ships as a
+Claude Code plugin (13 commands, 8 agents, 4 skills) and a zero-dependency python3
+MCP server (11 tools) on the official MCP Registry, with a static, byte-deterministic
+HTML board view republished to GitHub Pages on every merge. The thesis — **"the
+board is the database"** — is plain markdown in the repo, reviewed in the same PRs
+as code. It is v1.6.1, solo-built, dogfooded on its own live board. Its market sits
+between git-markdown boards (Backlog.md), agent-memory substrates (beads,
+claude-mem), AI task decomposers (Task Master), and — since January 2026 —
+Claude Code's own built-in Tasks.
 
-## 2. Opportunity map (impact × effort)
+## 2. The field, refreshed (who actually matters now)
+
+| Competitor | Traction (2026-07-10) | What it is | Threat to our claims |
+|---|---|---|---|
+| **Claude Code native Tasks + memory** (Anthropic, Jan–Feb 2026) | built into the host | Persistent tasks w/ dependencies, Ctrl+T board, `~/.claude/tasks/` cross-session; per-subagent `MEMORY.md` | Commoditizes raw task CRUD + memory-lite for our exact audience — **the** positioning question |
+| **beads** (gastownhall, Yegge) | ~25k★, v1.1.0 Jul 2026, explosive | Git-versioned (Dolt) graph issue tracker as **agent memory**: `bd remember`/`bd prime`, atomic `--claim`, hash ids, `discovered-from` links, `bd ready` | Direct overlap on memory, claims, and even passive capture — our most substantive feature rival |
+| **Task Master → Hamster** | ~27.8k★, 1.5M+ npm downloads | PRD→tasks decomposition, complexity analysis, research mode, TDD autopilot, 36 MCP tools, 10 editors | Owns the "structure for AI" intake lane; file-locking since Jan 2026 |
+| **Backlog.md** (MrLesk) | ~6k★, v1.47.1 Jun 2026, very active | Markdown-native tasks + terminal/web kanban + MCP; milestones, comments, DoD checklists, fuzzy search, stats overview | Closest overall shape; wins on task-model richness, install channels, UI |
+| **claude-mem** (thedotmack) | very large, v13 Jul 2026 | Hook-based per-session capture → compress → re-inject; Stop-hook capture like ours | The incumbent in hook-based passive memory capture |
+| **vibe-kanban** (Bloop) | ~27.3k★ — **sunsetting** (Apr 2026) | GUI orchestrator, worktree-per-task | Exit validates the category's danger and frees positioning room |
+| Gas Town / Claude Flow / spec-kit | 16k–119k★ | Orchestrators / spec-driven upstream | Adjacent, not board rivals — integration targets |
+| Agent-MCP · Flux · kanban-mcp · claude-code-workflows | 1.3k / 92 / 40 / 628★ | Our current README comparison set | Stalled, tiny, dormant, or non-overlapping — **no longer the field** |
+
+**Where we already meet or beat table stakes** (no action needed): acceptance
+criteria (`Done when` ≈ Backlog.md AC/DoD), priorities + dependencies
+(`priority`/`blocked_by`), archive/drafts (scratch inbox), local-first/offline/
+zero-config (`/board-setup`), dogfooding proof (the live board — only Backlog.md
+matches this), honest changelog + releases, MCP Registry listing, a security
+posture (SECURITY.md + injection corpus) ahead of every rival checked.
+
+**Marketing table stakes across category leaders** (benchmark of Backlog.md, Task
+Master, vibe-kanban, Claude Flow, beads, CCPM): motion above the fold ✅ we have it;
+copy-paste install blocks ✅; comparison table ✅ (rare — most leaders skip it);
+**stars/downloads/version badges with real counts — we have none**; **one-command
+install (npx/uvx-class) — ours needs `git clone`**; **a launch moment (Show HN
+254pts for Backlog.md, 195 for vibe-kanban, Yegge's essay for beads) — we have
+none**; **registry breadth (Smithery, awesome-lists) — prepared in
+`.goal/LAUNCH.md` but never executed**.
+
+## 3. Opportunity map (impact × effort)
 
 | | **Low effort (S)** | **Medium (M)** | **Large (L)** |
 |---|---|---|---|
-| **High impact** | E4 server-hang + lock-leak · E5 SessionStart O(tree) | E1 lock+atomic mutation · E2 id-alloc race · E3 reclaim-across-machines · E6 one counter | — |
-| **Med impact** | E9 input-handling sweep · E10 lifecycle-blind status | E7 consolidation integrity · E11 whole-board re-parse · E12 coordination observability · E13 failure-interaction tests | — |
-| **Focused** | E8 frontmatter round-trip fixes | — | — |
+| **High impact** | C2 native-Tasks answer · C9 proof badges | C1 comparison rebuild · C3 one-command install · C6 memory-story parity · C11 launch kit | — |
+| **Med impact** | C4 board search/filter · C5 ready queue · C10 registry breadth | C7 entry-model parity pack · C8 non-Claude onboarding · C12 stats + coordination surface | — |
+| **Focused** | C13 llms.txt + docs entry | — | — |
 
-## 3. Top 5 quick wins (~a day or less each)
+## 4. Top 5 quick wins (~a day or less each)
 
-1. **E4a — give the MCP claim/release calls a `subprocess` timeout.** One wedged or
-   slow (OneDrive) claim script currently hangs the single-threaded server for
-   *every* client, forever. One keyword.
-2. **E5 — prune the SessionStart `in_progress` scan.** It re-introduces the exact
-   O(tree) 10s-hook-timeout the adjacent code already fixed once, and double-counts
-   after any `/board-migrate`.
-3. **E9 — the input-handling straggler sweep (their own L005).** Three lone sites
-   diverge from the safe pattern used everywhere else: a path interpolated into
-   python source (fails open), an unanchored id `grep`, and the one deprecated
-   `utcnow()`. Fix the class + add lint rules so they can't recur.
-4. **E6 — one shared scratch counter.** Two implementations disagree and neither
-   counts findings (that's B057). Dedupe to one helper — fix it at the class, not
-   the site.
-5. **E10 — lifecycle-aware status lines (their own L002).** Stop telling users to
-   "investigate root cause" on patterns whose bugs are already resolved, and stop
-   flagging a healthy board as corrupt after a learning is promoted.
+1. **C2 — answer "why not Claude Code's built-in Tasks?"** The single question every
+   2026 visitor now asks first, and no surface answers it. One positioning block.
+2. **C9 — proof badges.** Stars + release-cadence badges in README, numeric liveness
+   on the landing trustband. Every leader has this; absence reads as abandonment.
+3. **C4 — client-side search/filter in `board.html`.** ~60 lines of vanilla JS in
+   the existing static page — parity with Backlog.md's filters without a daemon.
+4. **C5 — a deterministic "ready" queue.** beads' `bd ready` is its most-loved
+   command; ours is one derived filter away (we already parse `blocked_by`).
+5. **C10 — execute the prepared registry submissions.** `smithery.yaml` exists;
+   `.goal/LAUNCH.md` §2 lists the awesome-list/marketplace steps. Mostly human-action
+   items — the report flags them as *still* undone three releases later.
 
-## 4. Top 3 big bets
+## 5. Top 3 big bets
 
-1. **Make "collision-free / two servers, one board" actually true (E1 + E2 + E3 +
-   E4).** Enforce the claim lock on the *mutating* tools, write entries atomically,
-   serialize id allocation, and fix reclamation for the multi-machine + MCP-only
-   scenarios it was built for. This is the foundation the Conductor supervisor
-   (ROADMAP RM-15) will stand on — shipping more autonomy on top of an unlocked
-   mutation path multiplies the blast radius.
-2. **One coordination-state engine, and surface it (E6 + E10 + E12).** Collapse the
-   divergent counters/formatters/status-readers into a single source, then add a
-   **Coordination** panel to `/board-view` (twin of the Learnings panel) over data
-   that already exists (`_claims/`, `_reclaimed.log`, `active-workers.json`).
-   Observability is the product's *stated* open differentiator vs the headless
-   sibling systems (state.md, Conductor thread) — today it's logged but invisible.
-3. **Test the failure interactions, then extend (E13 + RM-16).** The coordination
-   tests validate happy paths in isolation; none exercises acquire↔reclaim
-   together, the mtime-vs-content divergence, or a concurrent-create race. Apply the
-   board's own top Learning (L001, "ship every guard with a test that drives its
-   real call-sites") to the core **before** RM-4 (ungate the loop) and RM-15 build
-   more on it.
+1. **Reposition for the 2026 field (C1 + C2).** Rebuild the comparison and the
+   "why different" story around beads, Backlog.md, Task Master, claude-mem, and
+   native Tasks — the honest-comparison franchise is the brand; today it's honest
+   about a field that's gone. The surviving open lane (per the post-native-Tasks
+   analyses) is exactly ours: **the repo-committed, PR-reviewable, team-visible
+   board + opinionated pipeline** — but it must be claimed against the real rivals.
+2. **Collapse install friction to one command and widen the funnel (C3 + C8).**
+   PyPI/uvx (and optionally npm) for the MCP server, per-client setup for Codex/
+   Gemini/Cursor, `AGENTS.md` emission at init. The category's gold standard is
+   `npx vibe-kanban`; ours is `git clone` + an absolute path.
+3. **Win the memory story on a hardened core (C6, gated on v3's E1–E4).** beads'
+   tagline is literally "a memory upgrade for your coding agent." We have the more
+   auditable memory design (committed markdown Learnings) — but it's gated behind
+   PM-mode ceremony (ROADMAP RM-4) and has no explicit `remember` affordance. Ship
+   `board_remember` + the ungated loop and the differentiation writes itself.
 
-## 5. Full opportunity list
+## 6. Full opportunity list
 
-### E1 — Mutating tools don't hold the claim lock, and entry writes aren't atomic
-- **Tag/lens:** FIX · fixes & felt debt / concurrency
-- **Evidence:** `board_update_entry` (`mcp-server/engineering_board_mcp.py:751-823`)
-  never references `_claims`/owner/lock (verified) and rewrites the entry with a
-  truncating `open(path, "w")` (`:822-823`) — no temp-file + `os.replace`, no
-  `fsync`. `board_create_entry:654` and `rebuild_board` (`:915`) do the same for
-  entry files and `BOARD.md`. The claim scripts guard *who works* an entry; nothing
-  guards *who writes* it.
-- **Failure scenario:** (a) *Lost update* — two clients (or a worker holding the
-  B001 claim + any other writer) both read B001, both write; the second clobbers the
-  first's appended section. Holding a `board_claim` does **not** prevent this — no
-  mutating tool consults the lock, so the claim gives *false* mutual exclusion for
-  edits. (b) *Torn write* — a crash or ENOSPC between truncate and full write leaves
-  the entry file (the source of truth) empty/partial, and it vanishes from `BOARD.md`
-  on the next rebuild.
-- **Proposal:** mutators acquire/verify the entry's claim (or a short-lived write
-  lock) before writing; write via temp file + `os.replace` (atomic) + `fsync`. The
-  `mkdir`-lock idiom already exists in `board-active-workers-register.sh:79` — reuse
-  it.
-- **Why it matters:** this is the core "collision-free" guarantee (VP3) and the
-  "two servers, one board" story (Q001). The entry file *is* the database.
-- **Effort:** M · **Impact:** High · **Risks:** keep the single-client path fast;
-  add the lock/atomicity tests per L001.
+### C1 — Rebuild the comparison story around the real field
+- **Tag/lens:** FIX · marketing / trust
+- **Evidence:** `README.md:157-172` and `docs/index.html:266-286` compare against
+  kanban-mcp (~40★, no activity since 2025), Flux (92★, no releases), Agent-MCP
+  (stalled since Sep 2025), claude-code-workflows — while omitting beads (~25k★),
+  Task Master (~27.8k★), claude-mem, and native Tasks entirely (verified: zero
+  mentions repo-wide). The "durable memory: **No**" column is now false-by-omission —
+  beads ships `bd remember`/`bd prime`/decay as its headline; its `bd update --claim`
+  is atomic claim-locking; its `discovered-from` links are passive-capture-adjacent.
+- **Proposal:** new comparison rows: beads, Backlog.md (keep), Task Master, native
+  Claude Tasks, claude-mem; new columns that carve *our* ground: "state is
+  PR-reviewable markdown" (beads: Dolt DB + JSONL export; native Tasks:
+  `~/.claude/tasks/`, outside the repo), "opinionated tdd→review→validate pipeline",
+  "published team-visible board". Keep the fairness note — it's the franchise.
+- **Why it matters:** the honest-comparison table is our most distinctive marketing
+  move (the benchmark found most leaders don't dare compare). Aim it at the real
+  leaders or it curdles from honesty into misdirection.
+- **Effort:** S-M · **Impact:** High · **Risks:** the new table concedes more cells —
+  that's the point; honesty against giants reads stronger than dominance over ghosts.
 
-### E2 — Entry-id allocation is unsynchronized → duplicate ids under concurrent creation
-- **Tag/lens:** FIX · concurrency
-- **Evidence:** `next_id` is "max existing + 1" with no lock in **both** the MCP
-  server (`engineering_board_mcp.py:387-404`, called at `:559`) and the plugin
-  consolidator (`hooks/scripts/board-consolidate.sh:193`). The only create-time
-  guard is `os.path.isfile(path)` (`:652`), keyed on `id+slug`, not the id.
-  `find_entry` returns the **first** id match (`:380-384`), and `load_entries`
-  silently drops unreadable files (`:365`, which can also make `next_id` under-count).
-- **Failure scenario:** two `board_create_entry(type=bug)` calls on the same board
-  (the advertised multi-client model) both compute `B058`; different titles →
-  different filenames → both pass the `isfile` check → **two entries share id B058**.
-  Every id-keyed operation then silently targets only one of them: a claim on
-  `_claims/B058/` locks both, `blocked_by: B058` is ambiguous, supersession
-  mis-groups.
-- **Proposal:** serialize allocate→write under the `mkdir` lock, or allocate the id
-  by atomically `mkdir`-ing it (claims already prove this primitive works); make
-  `find_entry` assert uniqueness and warn on collision.
-- **Effort:** M · **Impact:** High · **Risks:** low.
+### C2 — Answer "why not Claude Code's native Tasks?" everywhere positioning lives
+- **Tag/lens:** NEW · marketing / positioning
+- **Evidence:** Claude Code v2.1.16+ (Jan 2026) ships persistent tasks with
+  dependencies, a Ctrl+T board, cross-session state in `~/.claude/tasks/`, opt-in
+  shared lists; v2.1.33 adds per-subagent `MEMORY.md`. Grep of README/landing/
+  BRAND/ARCHITECTURE: no mention (verified 2026-07-10). Post-native-Tasks analyses
+  (paddo.dev "From Beads to Tasks") conclude raw task CRUD has no moat and
+  third parties must differentiate on richer, team-visible surfaces.
+- **Proposal:** a short "vs the built-in Tasks" block (README + landing FAQ): native
+  Tasks are **per-user, per-machine, outside the repo** — invisible in PRs, invisible
+  to teammates, no capture pipeline, no review states, no committed learnings.
+  engineering-board is the **repo's** shared board. Position native Tasks as the
+  on-ramp we compose with, not deny.
+- **Why it matters:** it's the first objection in every 2026 evaluation; silence
+  reads as either ignorance or evasion, and we have a genuinely good answer.
+- **Effort:** S · **Impact:** High · **Risks:** none material; keep tone additive.
 
-### E3 — Stale-claim reclamation is broken for the distributed + MCP scenarios it exists for
-- **Tag/lens:** FIX · concurrency
-- **Evidence (one cluster, three bugs):**
-  1. **Wrong signal.** `reclaim-stale` decides staleness from `heartbeat.txt`
-     **mtime** (`board-claim-reclaim-stale.sh:94`), but `acquire` decides it from the
-     ISO timestamp *inside* `heartbeat.txt` (`board-claim-acquire.sh:113-128`).
-     `heartbeat.sh` writes content + mtime together (`:33-34`), so they agree **only
-     on a single machine**. Under cloud sync (OneDrive/Dropbox — the exact scenario
-     the bumped thresholds target), a file's local mtime is its *sync-down time on
-     the reclaimer's machine*, not when the owner heartbeated → dead claims are kept
-     far too long; a live owner whose heartbeats are slow to sync can look stale.
-  2. **Missing heartbeat = permanent lock.** `acquire` treats a missing/empty
-     `heartbeat.txt` as stale → exit 2 (`:107-110`); `reclaim` treats it as
-     `no_heartbeat_skipped` and **keeps** it (`:84-91`). The caller loops
-     acquire→reclaim→acquire (`stop-hook-procedure.md:120`) and never removes it, so
-     the entry is **permanently unclaimable**. Trigger: the acquirer is killed
-     between its two separate writes — `owner.txt` then `heartbeat.txt`
-     (`acquire.sh:140-146`).
-  3. **No reclaim path through MCP.** There is no `board_reclaim` tool, and a
-     pure-MCP client (Claude Desktop) runs none of the SessionStart hooks that
-     reclaim; `tool_board_claim` maps exit 2 → `"stale"` and stops
-     (`engineering_board_mcp.py:1052`). A stale claim is a **permanent dead-end** via
-     MCP.
-- **Proposal:** reclaim should parse the heartbeat **content** timestamp (one source
-  of staleness truth, matching acquire); treat missing/empty heartbeat as reclaimable
-  (mirror acquire); add a `board_reclaim` tool or auto-reclaim on `rc==2` inside
-  `tool_board_claim`.
-- **Why it matters:** VP3 + the cloud-sync feature + the MCP funnel all depend on
-  reclamation, and it's wrong in precisely their scenarios.
-- **Effort:** M · **Impact:** High · **Risks:** reclaim is destructive — gate on the
-  acquire↔reclaim interaction test (E13/L001).
+### C3 — One-command install: publish the MCP server to PyPI (uvx-able)
+- **Tag/lens:** IMPROVE · reach / onboarding
+- **Evidence:** the server is a single zero-dependency python3 file
+  (`mcp-server/engineering_board_mcp.py`, 1457 lines) — ideally shaped for PyPI.
+  Yet the documented path (`README.md:93-96`, `docs/index.html:305-310`) is
+  `git clone` + an absolute path — the highest-friction install in the entire
+  cohort benchmarked. Category standard: `npx vibe-kanban`, `npm i -g backlog.md`,
+  `brew install beads`, Task Master's one-click MCP button.
+- **Proposal:** publish `engineering-board-mcp` to PyPI; install becomes
+  `claude mcp add engineering-board -- uvx engineering-board-mcp` (one line, no
+  clone, no path). Wire the version into the existing release workflow
+  (`release.yml`) beside the `.mcpb` asset; add the PyPI badge (feeds C9). Optional
+  follow-up: an npm wrapper for `npx` parity.
+- **Why it matters:** install friction is the top-of-funnel; every competitor
+  audit (our own CRO.md included) has flagged it, and the field's bar is one command.
+- **Effort:** M · **Impact:** High · **Risks:** version-coherence — `server.json`/
+  `manifest.json`/`plugin.json` are digest-pinned in lockstep (`tests/version-coherence.sh`);
+  extend the check rather than bypassing it.
 
-### E4 — Coordination writes can hang or wedge the whole system
-- **Tag/lens:** FIX · reliability / concurrency
-- **Evidence:** (a) the MCP `subprocess.run` for claim/release has **no `timeout=`**
-  (`engineering_board_mcp.py:1060`, `:1083`) and the stdio loop is single-threaded
-  (`:1435`) — one wedged/slow child blocks *all* clients indefinitely. (b) the
-  `active-workers` `mkdir`-lock has **no stale-lock breaker**
-  (`board-active-workers-register.sh:79-86`, `-bump.sh`, `-cleanup.sh:42`): a writer
-  SIGKILLed between `mkdir "$LOCK_DIR"` and its `trap … rmdir` leaks the lock with no
-  age check, so every later register/bump/cleanup fails after 5×0.1s **forever** —
-  worker-liveness + heartbeat tracking silently dies project-wide until someone
-  manually `rmdir`s it.
-- **Failure scenario:** board on a stalled network/OneDrive mount → `board_claim`
-  never returns → server stops answering every client; or a timed-out PM turn leaks
-  the registry lock → no worker is ever tracked again.
-- **Proposal:** add `timeout=` to the two `subprocess.run` calls (S); add an
-  mtime-based stale-lock breaker to the active-workers lock, mirroring the claim
-  staleness logic.
-- **Effort:** S · **Impact:** Med-High · **Risks:** low.
+### C4 — Client-side search + filters in `board.html`
+- **Tag/lens:** NEW · UX / UI
+- **Evidence:** `hooks/scripts/board-view.sh` renders a static, read-only page — no
+  search, no filter (verified: flags are only `--stdout/--stamp/--link-base`). The
+  self-hosted board already has 61+ bug cards. Backlog.md ships fuzzy search +
+  label/status filters + keyboard shortcuts (web UI v1.45); its TUI filters by
+  milestone; beads filters by label/assignee/status.
+- **Proposal:** embed ~60 lines of vanilla JS in the generated page: a search box
+  (title/id/affects/pattern) plus type/priority/status chips, all client-side —
+  zero dependencies, still byte-deterministic, no daemon. The published GitHub
+  Pages board gets it for free.
+- **Why it matters:** the live board is our proof asset and our "richer surface"
+  bet; at 60+ cards it's already past comfortable scanning.
+- **Effort:** S-M · **Impact:** Med-High · **Risks:** keep the no-JS fallback (page
+  currently works with JS disabled; filters should degrade gracefully).
 
-### E5 — SessionStart re-introduces the O(tree) hook-timeout it already fixed once
-- **Tag/lens:** FIX · performance
-- **Evidence:** `board-session-start.sh:100` runs
-  `grep -rl "^status: in_progress" "$BOARD_DIR" --include=*.md` over the **whole
-  tree**, while the blocking-map python 30 lines below deliberately skips
-  `_sessions/`, `_archive/`, `_claims/`, `_migrate-snapshot/` (`:128-129`) —
-  precisely because of the documented 1200-entry/15s blowout past the 10s hook
-  timeout (`:112-118`). After `/board-migrate --apply`,
-  `_migrate-snapshot/pre-migrate/` holds a full copy of every entry, so (a) each real
-  `in_progress` entry is reported **twice** (with a snapshot path), and (b) the scan
-  re-reads the doubled tree plus all `_sessions/` JSON on every SessionStart. The
-  pattern-cluster `grep -r` at `:163` is unpruned too.
-- **Proposal:** apply the same skip-dir prune to both greps.
-- **Effort:** S · **Impact:** Med (SessionStart is the most-seen surface, on a
-  timeout budget) · **Risks:** low.
+### C5 — A deterministic "ready" work queue
+- **Tag/lens:** NEW · helpfulness / smart defaults
+- **Evidence:** worker selection skips only the *manual* `status: blocked`
+  (`hooks/stop-hook-procedure.md:115`); nothing derives blockedness from
+  `blocked_by` pointing at unresolved entries, and `board_list_entries` filters
+  only `project/type/status/needs` (`mcp-server/engineering_board_mcp.py`) — no
+  unblocked-work query. beads' `bd ready` (deterministic, ~10ms, offline) is its
+  flagship agent affordance; Task Master added `--ready`/`--blocking` in v0.42.
+- **Proposal:** a `ready` filter (entries whose `blocked_by` targets are all
+  resolved) in `board_list_entries` + a `ready:` count in `board_status`, and make
+  worker/`/board-run` selection consume it. SessionStart already computes the
+  blocking map in one python pass (`board-session-start.sh`) — reuse that logic.
+- **Why it matters:** it upgrades `blocked_by` from decoration to coordination —
+  and prevents workers claiming entries that can't actually proceed.
+- **Effort:** S-M · **Impact:** Med-High · **Risks:** semantics for dangling ids —
+  follow the existing validator's treatment.
 
-### E6 — Two divergent scratch counters, neither counting findings (B057 is the symptom)
-- **Tag/lens:** FIX/IMPROVE · synergy / feedback & state
-- **Evidence:** `board-session-start.sh:177` counts **files** (`find … | wc -l`,
-  labeled "session file(s)"); the MCP `count_scratch_findings`
-  (`engineering_board_mcp.py:1017`) counts `## ` headers + `<!-- ts -->` comment
-  lines — but one plugin-written block is a single `<!-- ts -->` comment carrying a
-  multi-element `findings` array, so it counts 1 for N findings (**this is B057**).
-  Two implementations, two answers, and neither equals the true finding count.
-- **Proposal (their own L005 — "fix the class across every site at once"):** one
-  shared counter that parses each block's `findings` array, called by both the banner
-  and `board_status`. Fixes B057 in one place and removes the drift permanently.
-  (Refines board RM-2/B057 by attacking the duplication, not one site.)
-- **Effort:** S-M · **Impact:** Med · **Risks:** low.
+### C6 — Win the memory story: `board_remember` + the ungated learnings loop
+- **Tag/lens:** IMPROVE · retention / differentiation
+- **Evidence:** beads: `bd remember "insight"` + `bd prime` (inject into prompts) +
+  semantic decay — marketed as "a memory upgrade for your coding agent"; claude-mem
+  captures per-session via the same Stop-hook mechanism we use and re-injects
+  automatically. Ours: Learnings promote only via PM-mode consolidation
+  (RETENTION R1 / ROADMAP RM-4 — "the moat is gated behind the mode dance") and
+  there is no explicit remember affordance in the 11 MCP tools or 13 commands
+  (verified tool list, `engineering_board_mcp.py`).
+- **Proposal:** (a) `board_remember` MCP tool + `/board-remember` command writing a
+  learning-candidate directly (bypassing recurrence-≥3 for explicit user intent);
+  (b) execute RM-4 (auto-consolidate outside PM mode) so the loop accrues for
+  everyone; (c) say "memory" out loud in marketing — our Learnings are the *only*
+  PR-reviewable, plain-markdown agent memory in the field (beads: Dolt; claude-mem:
+  SQLite+Chroma).
+- **Why it matters:** memory is the category's hottest claim and we hold the most
+  auditable implementation of it — currently our least-accessible feature.
+- **Effort:** M · **Impact:** High · **Risks:** RM-4 is architecturally hot — land
+  v3's E-series hardening + RM-16 first (same gating ROADMAP already imposes).
 
-### E7 — Consolidation data-integrity: lossy supersession + a parse→archive window
-- **Tag/lens:** IMPROVE · fixes & felt debt
-- **Evidence:** (a) supersession archives the earlier of two same-`(type, affects)`
-  findings whenever the later's title is **strictly longer**
-  (`board-consolidate.sh:308-321`; intended and tested — `tests/smoke/automated.sh:10`,
-  `tests/orchestration/pm-loop.sh:104`). Title length is a weak proxy for
-  "supersedes": two genuinely distinct bugs in the same file, one with a longer
-  title, and the real shorter-titled bug is **silently archived** (only *differing*
-  affects is safeguarded, T2b). (b) findings appended to a session file after the
-  parse (`:248`) but before the Stage-5 archive move (`:394-410`) are archived
-  **unpromoted** — silent loss; same root cause as E2 (no consolidation lock).
-- **Proposal:** require a stronger supersession signal (an explicit `supersedes:`
-  field, or high title/affects overlap — not length), or at minimum surface
-  `archived_superseded` on the banner the way reclaims are surfaced; take the
-  consolidation lock (E2) to close the archive window.
-- **Effort:** M · **Impact:** Med · **Risks:** changing supersession touches tested
-  behavior — update the AC + fixtures in step.
+### C7 — Entry-model parity pack: comments + parent/subtask links
+- **Tag/lens:** NEW · product / collaboration
+- **Evidence:** entry frontmatter supports `id/type/title/status/priority/affects/
+  needs/pattern/blocked_by` (sample: `engineering-board/eb-self/bugs/*.md`) — no
+  comments, no parent/child. Backlog.md added task comments with authorship
+  (v1.46.0, Jun 2026) and has parent tasks; Task Master has subtasks; beads has
+  hierarchical hash ids (`bd-a3f8.1`) and threaded messages.
+- **Proposal:** (a) a `## Comments` body convention + `board_update_entry` comment
+  append (author + timestamp — trivially diffable); (b) a `parent:` frontmatter
+  field rendered as grouping in BOARD.md/board.html. Skip milestones/sprints for
+  now — no evidence of need at current board scale.
+- **Why it matters:** multi-agent *and* human-in-the-loop review both want a place
+  to talk on the card; today the only channel is editing prose sections.
+- **Effort:** M · **Impact:** Med · **Risks:** schema additions touch
+  `board-validate-entry.sh` + rebuild + view — one coherent PR, per L005.
 
-### E8 — Frontmatter round-trip corruptions
-- **Tag/lens:** FIX · fixes & felt debt
-- **Evidence:** (a) `_parse_scalar` treats **any** `[...]` value as a list
-  (`engineering_board_mcp.py:300-306`), so a title `[URGENT]` round-trips to
-  `["URGENT"]` and `rebuild_board` renders `[['URGENT']](…)` in `BOARD.md` (`:849`)
-  — verified. (b) a missing closing `---` makes `parse_frontmatter` return `{}`
-  (`:287`), so `id`/`type`/`status` are lost and the entry drops out of
-  `find_entry`/`board_status`/`BOARD.md`. (c) a pre-existing duplicate frontmatter
-  key is re-emitted **twice** after any update (order loop `:799-802` doesn't dedupe).
-  (d) non-UTF-8 entry bytes are read with `errors="replace"` then fully rewritten
-  (`:751`, `:822`), permanently corrupting the original on any update — even a
-  status-only change.
-- **Proposal:** quote scalars that look like lists on write (or only list-parse
-  known list fields); tolerate a missing closing fence; dedupe keys on re-emit;
-  preserve bytes (or refuse to rewrite an undecodable file).
-- **Effort:** S-M · **Impact:** Med · **Risks:** low.
+### C8 — Non-Claude agent onboarding: per-client setup + `AGENTS.md` emission
+- **Tag/lens:** IMPROVE · reach
+- **Evidence:** Backlog.md generates CLAUDE.md/AGENTS.md/GEMINI.md/Copilot files
+  (`backlog agents --update-instructions`) and documents one-line MCP setup for
+  Claude Code, Codex, Gemini CLI, Kiro; beads ships `bd setup <tool>` for 9+
+  clients and auto-creates `AGENTS.md`. Our `mcp-server/README.md` documents Claude
+  Code and Claude Desktop only, and `board_init` emits no agent-instruction file
+  for non-hook clients (verified tool schema).
+- **Proposal:** `board_init`/`board_setup` optionally emit an `AGENTS.md` stanza
+  (how to capture findings, claim, and update entries via the MCP tools — the
+  hook-free protocol); add Codex CLI / Gemini CLI / Cursor setup blocks to the MCP
+  README and landing install card.
+- **Why it matters:** VP5 ("runs everywhere else") is currently documentation-deep
+  only for Claude surfaces; the MCP funnel is our only non-Claude growth channel.
+- **Effort:** S-M · **Impact:** Med-High · **Risks:** keep the emitted stanza short
+  and pointer-like; it must not drift from the tool schemas (add a lint).
 
-### E9 — Input-handling stragglers (their own L005, not yet applied)
-- **Tag/lens:** FIX · friendliness / robustness
-- **Evidence:** (a) `board-stop-gate.sh:24-31` interpolates the board path into
-  python **source** (`json.load(open('$MODE_FILE'))`) — the *only* script that does
-  this instead of passing `argv` (compare `board-session-start.sh:32`); a project
-  path with an apostrophe (`/…/Rhen's board/…`) is a SyntaxError, swallowed by
-  `2>/dev/null || true`, so `MODE` is empty and the paused gate **fails open**.
-  (b) `board-validate-entry.sh:127` uses an unanchored `grep -q "${entry_id}"`, so
-  `B1` matches `B12`/`B100` — the "index must list this id" guard silently no-ops for
-  any id that is a prefix of another. (c) `datetime.utcnow()` is the lone deprecated
-  timestamp call, at `board-claim-acquire.sh:68` (all 9 other sites use
-  `datetime.now(timezone.utc)`); `tests/crosscompat-lint.sh` doesn't catch it.
-- **Proposal:** one sweep — `argv` not interpolation; anchor the id grep; `utcnow` →
-  `now(timezone.utc)`; add crosscompat-lint rules for `utcnow` and python-source
-  path-interpolation so the class can't recur.
-- **Effort:** S · **Impact:** Low-Med · **Risks:** low.
+### C9 — Proof badges + liveness counters on README and landing
+- **Tag/lens:** FIX · marketing / proof
+- **Evidence:** `README.md:15-20` badges: website, license, version, tests, plugin,
+  MCP — **no stars, no downloads, no release cadence**; `docs/index.html:249`
+  trustband has zero numbers. Benchmark: every leader shows version + downloads +
+  stars (Backlog.md, Task Master, beads, Claude Flow), and leaders restate counts
+  in prose ("25k+ stars, 1.5M+ downloads" — tryhamster.com).
+- **Proposal:** add GitHub stars + latest-release(+date) badges now; PyPI/npm
+  downloads badges after C3; trustband gains "N releases · vX.Y.Z (Mon YYYY)".
+  At small absolute numbers, *cadence* is the honest proof — lead with it.
+- **Why it matters:** the 30-second outsider scan currently finds no liveness
+  signal at all; in this category that reads as abandonware.
+- **Effort:** S · **Impact:** Med (multiplies every other marketing asset) ·
+  **Risks:** none.
 
-### E10 — Lifecycle-blind status surfaces (their own L002, not yet applied)
-- **Tag/lens:** FIX · feedback & state
-- **Evidence:** (a) the SessionStart "SYSTEMIC PATTERNS (3+ open entries)" cluster
-  (`board-session-start.sh:163-166`) never filters `status:`, but resolved entries
-  stay in place — so a pattern last seen across long-closed bugs is reported as an
-  active cluster telling the user to "investigate root cause before fixing" already
-  done work. (b) `board-index-check.sh:39` counts `learnings/` files against `- L###`
-  `BOARD.md` rows, but `board-curate-learnings.sh` writes a learning file **without**
-  a `BOARD.md` row → a healthy board can be flagged corrupt (PLAUSIBLE — confirm by
-  promoting a learning then running `board-index-check.sh`). (c) `board-consolidate.sh`
-  documents exit 2 ("partial — some scratch deferred") but never emits it —
-  `EXIT_CODE=0` is set once and never reassigned (`:92`, `:415`), so callers branching
-  on partial promotion never see it.
-- **Proposal:** filter `status: resolved` in the pattern grep; make the learnings
-  invariant match how the curator actually writes; capture the per-board python exit
-  into `EXIT_CODE`.
-- **Effort:** S · **Impact:** Low-Med · **Risks:** low.
+### C10 — Execute the prepared registry/listing breadth
+- **Tag/lens:** IMPROVE · distribution
+- **Evidence:** `mcp-server/smithery.yaml` has existed since v1.4.0; `.goal/LAUNCH.md`
+  lists prepared submissions (Claude community marketplace, awesome-claude-code,
+  awesome-mcp-servers) — none executed three releases later. Backlog.md/Task
+  Master/beads each appear on 3–5 registries + multiple awesome-lists; even
+  dormant kanban-mcp outranks us in directory search because of syndication.
+- **Proposal:** publish to Smithery; file the awesome-claude-code issue and the
+  awesome-mcp-servers PR; submit the community-marketplace form. Flag clearly:
+  these are mostly **human-account actions** — the repo work is done.
+- **Why it matters:** directories are where MCP users actually search; our only
+  listing (MCP Registry) syndicates to some but not the highest-traffic lists.
+- **Effort:** S (human) · **Impact:** Med · **Risks:** none.
 
-### E11 — Whole-board re-parse on every MCP entry call
-- **Tag/lens:** IMPROVE · performance
-- **Evidence:** `board_update_entry` calls `find_entry` (reads **all** entries via
-  `load_entries`), then re-opens and re-reads the target file (`:751`, discarding the
-  copy `find_entry` already parsed), then `rebuild_board` reads all files a third time
-  (`:825`). `board_get_entry` likewise does an O(n) scan + a re-read. ~2× full-board
-  reads per update, which also widens the E1 TOCTOU window.
-- **Proposal:** have `find_entry` return the parsed entry (it already has `_path` +
-  parsed frontmatter) and reuse it; drop the redundant re-read.
-- **Effort:** M · **Impact:** Low-Med (scales with board size) · **Risks:** low.
+### C11 — Launch kit: Show HN + the "after vibe-kanban" wedge
+- **Tag/lens:** NEW · community / growth
+- **Evidence:** every comparable's audience traces to one launch moment: Backlog.md
+  Show HN (254 pts), vibe-kanban Show HN (195 pts), beads via Yegge's essay +
+  thread. We have none (no HN/Reddit/PH footprint found). Timely wedge: vibe-kanban
+  (~27k★) announced sunset Apr 2026 — "standalone agent-kanban GUIs died; the board
+  that lives in your repo doesn't need a company to survive" is a true, resonant
+  line (we are MIT, zero-dep, no server).
+- **Proposal:** prepare the launch asset pack: the Show HN draft (lede: "the board
+  is the database"), the real-screenshot + demo GIF assets (this *is* ROADMAP
+  RM-10/RM-11 — competitor evidence upgrades their priority), and a short "where
+  vibe-kanban users land" comparison page. Launch after C1/C2/C3/C9 so the landing
+  survives the traffic's 30-second scan.
+- **Why it matters:** distribution is our widest gap vs. every leader, and launch
+  moments are how this category's winners all got their start.
+- **Effort:** S-M (assets; the post itself is a human action) · **Impact:** High
+  variance · **Risks:** launching before C1/C2 lands the traffic on a stale story.
 
-### E12 — The coordination story is logged but invisible — and observability is the stated bet
-- **Tag/lens:** NEW · synergy / engagement
-- **Evidence:** reclaim writes `_claims/_reclaimed.log` (`board-claim-reclaim-stale.sh:130-135`),
-  surfaced **only** as a transient turn-line (`stop-hook-procedure.md:120`) — never in
-  `board-view.sh`, `board_status`, or metrics. The raw data already exists on disk:
-  `_claims/` (who holds what), `_reclaimed.log`, `active-workers.json`,
-  `consolidation.log`, `tidy.log`. state.md's Conductor thread states the product's
-  open differentiator vs the headless sibling systems is **observability** — yet the
-  one destructive automatic action (reclaiming another session's lock) and the whole
-  multi-agent coordination picture are invisible after the turn they happen.
-- **Proposal:** a **Coordination** panel in `/board-view` (twin of the existing
-  Learnings panel) + a `board_status` field: current claims, recent
-  reclaims/contention, active workers. Pure read over data that already exists.
-- **Effort:** M · **Impact:** Med · **Risks:** low.
+### C12 — Stats + coordination surface (the "richer surface" bet, consolidated)
+- **Tag/lens:** IMPROVE · engagement / synergy
+- **Evidence:** Backlog.md ships `backlog overview` (project-health TUI dashboard);
+  beads v1.1.0 added `bd metrics`. Ours: no stats surface (ROADMAP RM-6 already
+  proposes `/board-stats`); coordination state is logged but invisible (v3's E12:
+  `_claims/`, `_reclaimed.log`, `active-workers.json` never rendered). The
+  post-native-Tasks analyses name team-visible dashboards as the surviving
+  third-party lane — and our published board is already that surface.
+- **Proposal:** one pass, two panels on `board.html` + `/board-view`: **Stats**
+  (open/resolved by type, resolution velocity, learnings count — RM-6) and
+  **Coordination** (current claims, recent reclaims, active workers — E12). Pure
+  reads over data that already exists on disk.
+- **Why it matters:** converts the live board from a static index into the
+  observable, team-visible dashboard the field's survivors differentiate on.
+- **Effort:** M · **Impact:** Med · **Risks:** low — read-only.
 
-### E13 — The coordination tests validate the happy path, not the failure interactions (their own L001)
-- **Tag/lens:** IMPROVE · fixes & felt debt / test-coverage
-- **Evidence:** `tests/claims/` covers an acquire race (`race-acquire.sh`, 20 iters),
-  heartbeat refresh (`heartbeat-refresh.sh` — which hand-builds the claim dir and
-  asserts *mtime* advances, validating the very signal E3.1 mis-uses), reclaim
-  fixture classification (`reclaim-stale.sh`), release owner-check, and
-  OneDrive-detection. **None** exercises acquire↔reclaim on the same claim (E3.2
-  livelock), the mtime-vs-content divergence (E3.1), or a concurrent-create race
-  (E2). `/board-run` has only a structural lint (IMPROVEMENTS #9 / RM-16). L001 —
-  "ship every deterministic guard with a test that drives its real fixtures and
-  call-sites" — is the board's own top Learning.
-- **Proposal:** add interaction tests (acquire → delete `heartbeat.txt` → assert
-  reclaim removes it and re-acquire succeeds; two-process create race asserts distinct
-  ids); extract `/board-run`'s claim/loop into a testable driver (RM-16), which also
-  de-risks RM-4 and RM-15.
-- **Effort:** M · **Impact:** Med (regression safety for E1–E4) · **Risks:** low.
+### C13 — `llms.txt` + a docs entry point above the fold
+- **Tag/lens:** NEW · reach / friendliness
+- **Evidence:** beads, vibe-kanban, and Task Master all publish `llms.txt` /
+  agent-consumable docs; leaders put "Read the docs" as a hero CTA (Task Master,
+  vibe-kanban). Our landing's docs links live in the footer (`docs/index.html:327-338`);
+  no `llms.txt` exists (verified).
+- **Proposal:** generate `docs/llms.txt` (product summary + README + MCP tool
+  reference, plain text) in the pages sync; add a "Docs" link beside "Live board"
+  in the landing nav. For a product whose *users are agents*, agent-readable docs
+  are on-brand table stakes.
+- **Effort:** S · **Impact:** Low-Med · **Risks:** none.
 
-## 6. The pattern worth naming: five Learnings, five fresh violations
+## 7. Ideas generated and cut (so they stay cut)
 
-The board has earned five committed Learnings. The engine — audited here for the
-first time — violates each one in a place the prior surface-level passes never
-reached. This is the strongest signal that the *next* structural investment is
-internalizing these in the core, not adding features on top:
+PRD parsing / task expansion (Task Master's lane — our intake thesis is *capture,
+not spec*; compose, don't compete) · a live web server / drag-drop UI (contradicts
+the no-daemon, committed-artifact stance that survived vibe-kanban's death) · a TUI
+(large surface, off-thesis) · milestones/sprints (no evidence of need at current
+scale) · Dolt/SQLite storage (the antithesis) · Discord (premature below ~2k★;
+Discussions suffice — Backlog.md agrees) · Ed25519 agent identities (niche) ·
+cross-branch state resolution (niche) · `onStatusChange` shell hook (generic) ·
+one-click Cursor deep-link (sequenced after C3) · token-cost table (fold into docs
+later).
 
-| Learning | Fresh engine violation found here |
-|---|---|
-| **L001** — guards need tests at their real call-sites | E13: claim guards tested in isolation; acquire↔reclaim + create-race untested |
-| **L002** — invariants must respect the open-vs-resolved lifecycle | E10a: systemic-pattern count includes resolved entries; E10b learnings invariant |
-| **L003** — the newest surface carries the most risk | The MCP multi-client surface (newest) holds the worst concurrency bugs: E1, E2, E3.3, E4a |
-| **L004** — a denylist is never done | (Reject-filter corpus is strong — no new bypass found; the one clean pass this round) |
-| **L005** — fix an input-handling class across every site at once | E9: three lone stragglers (source-interpolation, unanchored grep, `utcnow`) + E6 two divergent counters |
+## 8. Suggested sequence — if only three ship first
 
-## 7. Suggested sequence — if only three ship first
+1. **C1 + C2 — tell the truth about 2026 (one PR).** The comparison rebuild and the
+   native-Tasks answer are the same job: repositioning against the real field. It
+   is cheap, it is urgent (every day the current table stands, the honesty
+   franchise erodes), and everything else — launch, badges, funnel — lands on top
+   of this story.
+2. **C3 (+C9) — one-command install with proof attached.** PyPI/uvx collapses the
+   worst funnel step in the cohort; the badges ride along in the same release.
+3. **C11 — the launch, prepared then fired.** Assets (real screenshot, GIF — RM-10/11)
+   plus the Show HN draft and the vibe-kanban-wedge page; fire only after 1 and 2
+   are live so the traffic converts.
 
-1. **E4 + E5 (the quick, high-impact reliability wins).** A `subprocess` timeout, an
-   active-workers stale-lock breaker, and a pruned SessionStart grep remove two
-   silent-wedge failure modes and a latent hook-timeout — hours of work, no
-   architectural risk, immediate trust.
-2. **E1 + E2 + E3 (make the marketed guarantee true).** Enforce the claim lock on
-   mutation, write atomically, serialize id allocation, and fix reclamation for the
-   multi-machine + MCP scenarios. This is the coordination core; everything
-   autonomous the roadmap wants (RM-4 ungate, RM-15 Conductor) compounds on it.
-3. **E13 + RM-16 (lock the wins in).** Add the failure-interaction tests and extract
-   the `/board-run` driver **before** building more automation — the board's own L001
-   applied to its own core. E6/E10/E12 follow as the coordination-state cleanup +
-   observability layer.
+Product-depth work (C4, C5, C6, C7, C8, C12) then proceeds behind the repositioned
+story — with C6 still gated on v3's E1–E4 engine hardening, exactly as ROADMAP
+already sequences RM-4.
 
 ---
 
-_Report only — no code changed. **Which items should I build?** My recommendation:
-take E4 + E5 immediately (a half-day, pure trust), then scope E1–E3 as the "harden
-the coordination core" milestone that must land before the Conductor supervisor
-(RM-15). The surface-level roadmap (ROADMAP.md RM-1…RM-17) and this engine audit are
-complementary halves — E1–E3 are the missing prerequisite under RM-4 and RM-15._
+_Report only — no product code changed. **Which items should I build?** My
+recommendation: C1+C2 immediately (one honest-repositioning PR), C9 the same day,
+then C3 as the next release's headline. C11's launch kit is the highest-leverage
+use of the month after that — and the engine work (v3 E1–E4) remains the
+prerequisite under everything multi-agent._

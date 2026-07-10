@@ -131,6 +131,24 @@ if [ -n "${entry_id}" ] && [ -f "${board_dir}/BOARD.md" ]; then
   fi
 fi
 
+# C7: `parent:` is an accepted optional key on any entry type. A dangling
+# parent id (no entry file carries that id) is a WARNING, not an error — same
+# policy as blocked_by: archives remove files, so a typo'd or archived parent
+# must stay visible but must never freeze the entry.
+parent_id=$(echo "${frontmatter}" | grep "^parent:" | awk '{print $2}' || true)
+if [ -n "${parent_id}" ]; then
+  parent_found=0
+  for sub in bugs features questions observations learnings; do
+    if grep -qs "^id: ${parent_id}\$" "${board_dir}/${sub}/"*.md 2>/dev/null; then
+      parent_found=1
+      break
+    fi
+  done
+  if [ "${parent_found}" -eq 0 ]; then
+    echo "Warning: parent ${parent_id} in ${file_path} has no matching entry on this board (dangling parent — accepted, not an error)" >&2
+  fi
+fi
+
 if [ ${#errors[@]} -gt 0 ]; then
   echo "Board entry validation errors in ${file_path}:" >&2
   for err in "${errors[@]}"; do

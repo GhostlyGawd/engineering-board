@@ -69,7 +69,11 @@ PY
 )
     fi
 
-    row_count=$(grep -c "^- ${prefix}[0-9]" "${BOARD_MD}" 2>/dev/null || true)
+    # Open rows come in two shapes: top-level entries ("- B001 ...") and C7
+    # child rows rendered indented under their parent ("  ↳ B002 ...").
+    # Both are open entries and must both count, or the first parent/child
+    # board trips a false corruption flag.
+    row_count=$(grep -cE "^(- |  ↳ )${prefix}[0-9]" "${BOARD_MD}" 2>/dev/null || true)
     row_count="${row_count:-0}"
 
     if [ "${file_count}" != "${row_count}" ]; then

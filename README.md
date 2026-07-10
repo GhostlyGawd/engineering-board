@@ -14,14 +14,20 @@ _The board is the database._
 
 [![Website](https://img.shields.io/badge/website-ghostlygawd.github.io-E6A94E.svg)](https://ghostlygawd.github.io/engineering-board/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.6.1-E6A94E.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.7.0-E6A94E.svg)](CHANGELOG.md)
 [![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
 [![MCP](https://img.shields.io/badge/MCP-server-171719.svg)](mcp-server/README.md)
+[![GitHub stars](https://img.shields.io/github/stars/GhostlyGawd/engineering-board)](https://github.com/GhostlyGawd/engineering-board/stargazers)
+[![Last release](https://img.shields.io/github/release-date/GhostlyGawd/engineering-board?label=last%20release&color=E6A94E)](https://github.com/GhostlyGawd/engineering-board/releases)
 
 <img src="docs/board-demo.svg" alt="A finding is captured, promoted to the board, and driven through the tdd → review → validate pipeline to done — every step committed markdown." width="720">
 
 _A finding is captured, promoted, and driven through `tdd → review → validate` to done — see **[this repo's own live board](https://ghostlygawd.github.io/engineering-board/board.html)** (the HTML `/board-view` generates, republished on every merge), every step markdown you can diff._
+
+<img src="docs/assets/board-screenshot.png" alt="Screenshot of this repo's real rendered board: a search input, type/priority/status filter chips, and kanban columns — to do, review, validate, done — populated with entry cards." width="720">
+
+_the real thing — this repo's own board, as `/board-view` renders it_
 
 </div>
 
@@ -33,12 +39,16 @@ Under the hood: engineering-board turns a committed markdown tree — `engineeri
 
 ### Why it's different
 
-The market splits into two camps: **visible-but-dumb** git-markdown boards (no locking, no memory) and **smart-but-opaque** MCP coordination servers (locks and memory, but hidden in a database). engineering-board is the four-way intersection neither camp reaches:
+The market splits into two camps: **visible-but-dumb** git-markdown boards (no locking, no capture pipeline) and **smart-but-opaque** memory-and-coordination engines (real memory, real claims — but kept in a Dolt or SQLite database, or in `~/.claude/` outside your repo). The 2026 field made the smart camp genuinely smart — beads ships durable memory and atomic claims as its headline, and Claude Code itself now ships built-in Tasks — but neither camp crossed the divide. engineering-board is the intersection neither camp reaches:
 
 - **git-committed, human-visible board** — reviewed in the same PRs as your code
 - **durable cross-session memory** — recurring lessons promote into committed `Learning` entries
 - **atomic multi-agent claim-locking** — parallel worker agents never collide
 - **native to Claude Code** — plus an MCP server for any MCP client
+
+### Why not Claude Code's built-in Tasks?
+
+Use both — they solve different problems. Native Tasks are genuinely good personal tracking: they persist across sessions, support dependencies, and come with a Ctrl+T board. But they live in `~/.claude/tasks/` — per-user and per-machine, outside the repo — so they're invisible in PRs and invisible to your teammates. They also have no capture pipeline, no review states, and no committed learnings. engineering-board is the **repo's** board: shared, PR-reviewable state that travels with the code and outlives any one user's machine. Keep native Tasks for in-session personal tracking; put the project's durable, team-visible state on the board — the two compose.
 
 ## Value props
 
@@ -88,10 +98,15 @@ allowlist on its own — `/board-setup` simply composes the two.
 
 ### MCP server
 
-Register the zero-dependency `python3` server with the Claude Code CLI:
+Register the zero-dependency `python3` server with the Claude Code CLI — one line from PyPI (available with the v1.7.0 release; the clone below works today):
 
 ```sh
-# clone the repo, then point python3 at the server
+claude mcp add engineering-board -- uvx engineering-board-mcp
+```
+
+Fallback — run it from a clone:
+
+```sh
 git clone https://github.com/GhostlyGawd/engineering-board
 claude mcp add engineering-board -- python3 "$(pwd)/engineering-board/mcp-server/engineering_board_mcp.py"
 ```
@@ -102,14 +117,14 @@ Or add it to Claude Desktop's `claude_desktop_config.json`:
 {
   "mcpServers": {
     "engineering-board": {
-      "command": "python3",
-      "args": ["/abs/path/to/engineering-board/mcp-server/engineering_board_mcp.py"]
+      "command": "uvx",
+      "args": ["engineering-board-mcp"]
     }
   }
 }
 ```
 
-Installing the plugin auto-registers the same server via the repo-root [`.mcp.json`](.mcp.json) (resolved through `${CLAUDE_PLUGIN_ROOT}`), so no separate step is needed when the plugin is installed. Full config reference: [`mcp-server/README.md`](mcp-server/README.md).
+Works with any MCP client — setup blocks for **Codex CLI**, **Gemini CLI**, and **Cursor** are in [`mcp-server/README.md`](mcp-server/README.md). Installing the plugin auto-registers the same server via the repo-root [`.mcp.json`](.mcp.json) (resolved through `${CLAUDE_PLUGIN_ROOT}`), so no separate step is needed when the plugin is installed.
 
 ## Feature tour
 
@@ -128,7 +143,7 @@ Installing the plugin auto-registers the same server via the repo-root [`.mcp.js
 | **PM** | `/pm-start` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` |
 | **Worker** | `/worker-start --discipline <tdd\|review\|validate>` | claim-acquire → `tdd-builder` / `code-reviewer` / `validator` → claim-release |
 
-**Commands (13)** — `/board-setup`, `/board-run`, `/board-init`, `/board-rebuild`, `/board-graph`, `/board-view`, `/board-pause`, `/board-resume`, `/pm-start`, `/worker-start`, `/board-install-permissions`, `/board-claim-release`, `/board-migrate`.
+**Commands (14)** — `/board-setup`, `/board-run`, `/board-init`, `/board-rebuild`, `/board-graph`, `/board-view`, `/board-remember`, `/board-pause`, `/board-resume`, `/pm-start`, `/worker-start`, `/board-install-permissions`, `/board-claim-release`, `/board-migrate`.
 
 **Agents (8)** — `board-manager` (router over the 4 skills); the PM pipeline `finding-extractor` → `consolidator` → `tidier` → `learnings-curator`; the Worker pipeline `tdd-builder` / `code-reviewer` / `validator` (the validator is strictly read-only).
 
@@ -138,38 +153,39 @@ Installing the plugin auto-registers the same server via the repo-root [`.mcp.js
 
 ## The MCP tools
 
-Eleven tools, all backed by the same on-disk format the plugin's hooks and skills expect. Locking is not reimplemented — `board_claim` / `board_release` shell out to the plugin's existing claim scripts.
+12 tools, all backed by the same on-disk format the plugin's hooks and skills expect. Locking is not reimplemented — `board_claim` / `board_release` shell out to the plugin's existing claim scripts.
 
 | Tool | What it does |
 |---|---|
-| `board_init` | Scaffold a project board (router row, `BOARD.md`, `ARCHIVE.md`, subdirs). Idempotent. |
+| `board_init` | Scaffold a project board (router row, `BOARD.md`, `ARCHIVE.md`, subdirs). Idempotent. Optional `agents_md` (default true) writes a marker-fenced usage block into the repo's `AGENTS.md` for hook-less agents. |
 | `board_list_projects` | List projects from `BOARD-ROUTER.md` (id, path, affects prefix). |
-| `board_create_entry` | Create a valid entry with correct frontmatter + body sections; allocate the next id; rebuild the index. |
-| `board_list_entries` | List entries with parsed frontmatter; filters `project` / `type` / `status` / `needs`. |
+| `board_create_entry` | Create a valid entry with correct frontmatter + body sections; allocate the next id; rebuild the index. Optional `parent` links a subtask to an existing entry. |
+| `board_list_entries` | List entries with parsed frontmatter; filters `project` / `type` / `status` / `needs` / `ready` (`ready: true` = the deterministic ready queue — open entries whose existing blockers are all resolved). |
 | `board_get_entry` | Full markdown of one entry by id, plus parsed frontmatter. |
-| `board_update_entry` | Update frontmatter and/or append a body section; validate the status transition; rebuild the index. |
+| `board_update_entry` | Update frontmatter (incl. `parent`) and/or append a body section; validate the status transition; rebuild the index. Optional `comment: {author, text}` appends a server-timestamped line under `## Comments`. |
 | `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files. Idempotent. |
 | `board_capture_finding` | Append a finding to the scratch inbox `_sessions/mcp-<UTC-date>.md`. |
 | `board_claim` | Acquire an entry lock (shells out to `board-claim-acquire.sh`). |
 | `board_release` | Release an entry lock (shells out to `board-claim-release.sh`). |
-| `board_status` | Overview: per-type open counts, `in_progress` / `blocked` ids, un-promoted scratch count. |
+| `board_remember` | Save a durable insight straight to `learnings/L###` (`source: remember`), bypassing the curator's recurrence threshold. |
+| `board_status` | Overview: per-type open counts, `in_progress` / `blocked` ids, the ready queue + dangling-blocker warnings, un-promoted scratch count. |
 
 ## Comparison
 
-Honest and cited; traction figures are live snapshots (2026-07-04) that drift.
+Honest and cited; traction figures are live snapshots (2026-07-10) that drift.
 
-| | git-committed board? | durable memory? | atomic multi-agent locking? | Claude-native? | MCP? |
-|---|:---:|:---:|:---:|:---:|:---:|
-| **engineering-board** | Yes | Yes | Yes | Yes | Yes |
-| [Backlog.md](https://github.com/MrLesk/Backlog.md) · ~5.9k★ | Yes | No | No | No | Yes |
-| [Agent-MCP](https://github.com/rinadelph/Agent-MCP) · ~1.3k★ | No (RAG DB) | Yes (opaque) | Yes | No | Yes |
-| [kanban-mcp](https://github.com/eyalzh/kanban-mcp) · ~40★ | No (SQLite) | No | No | No | Yes |
-| [claude-code-workflows](https://github.com/shinpr/claude-code-workflows) · ~536★ | No (ephemeral) | No | No | Yes | No |
-| [Flux](https://paddo.dev/blog/flux-kanban-for-ai-agents/) · early | No (side-branch SQLite/JSON) | No | No | No | Yes |
+| | State is PR-reviewable markdown in your repo | Durable memory | Atomic claim-locking | Passive per-turn capture | Opinionated tdd→review→validate pipeline | Published team-visible board |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **engineering-board** | Yes | Yes | Yes | Yes | Yes | Yes |
+| [beads](https://github.com/gastownhall/beads) · ~25k★ | Partial — Dolt DB + JSONL export | Yes — `bd remember` / `bd prime` | Yes — `bd update --claim` | Partial — `discovered-from` links | No | No — community UIs |
+| [Backlog.md](https://github.com/MrLesk/Backlog.md) · ~6k★ | Yes | No | Partial — task-id locking | No | Partial — review checkpoints | Yes — local TUI + web |
+| [Task Master](https://github.com/eyaltoledano/claude-task-master) · ~27.8k★ | Partial — repo JSON, no merge story | No | Partial — file lock | No | Partial — TDD autopilot | No |
+| Claude Code native Tasks | No — `~/.claude/tasks/` | Partial — subagent `MEMORY.md`, per-user | No | No | No | Partial — Ctrl+T, terminal-only, per-user |
+| [claude-mem](https://github.com/thedotmack/claude-mem) | No — SQLite + Chroma | Yes | No | Yes — hook-based | No | No |
 
-No competitor combines all four traits engineering-board owns — git-committed board + durable memory + atomic locking + Claude-native — now with MCP as the fifth.
+Every one of these leads a column somewhere; none occupies the whole row. engineering-board's row is the product: reviewable state **and** memory **and** claims **and** passive capture **and** an opinionated pipeline **and** a published board — each ordinary alone, unduplicated together.
 
-**Where they're better (fairness note):** [Backlog.md](https://github.com/MrLesk/Backlog.md) is the category leader by a wide margin, with a polished Kanban UI and broad install channels (npm/Homebrew/Nix/Bun); [Agent-MCP](https://github.com/rinadelph/Agent-MCP) ships a richer RAG knowledge-graph and a live dashboard. engineering-board is younger and not yet on a public marketplace — install it from this repo's marketplace.
+**Where they're better (fairness note):** [beads](https://github.com/gastownhall/beads) is the memory-and-claims leader at real scale — `bd remember`/`bd prime` and atomic claims are its headline, not a side feature; [Backlog.md](https://github.com/MrLesk/Backlog.md) has the richest task model (comments, DoD checklists, fuzzy search) and the broadest install channels; [Task Master](https://github.com/eyaltoledano/claude-task-master) owns PRD→tasks decomposition (1.5M+ npm downloads). engineering-board is younger and smaller than all three, and not yet on a public marketplace — install it from this repo's marketplace. The field this table compared against before 2026 (kanban-mcp, Flux, Agent-MCP, claude-code-workflows) is dormant or stalled; that earlier research is archived in [`.goal/POSITIONING.md`](.goal/POSITIONING.md).
 
 ## Architecture
 
@@ -181,14 +197,14 @@ Directional and honest — the items below are designed, not shipped.
 
 - **Conductor** ([`docs/rfcs/0001-symphony-conductor.md`](docs/rfcs/0001-symphony-conductor.md), Draft) — an always-on deterministic orchestrator that drives the board to PRs across sessions with no human in the loop. **Slice 1 shipped:** `/board-run <entry-id>` is its inner loop — one entry driven `tdd → review → validate` in a single session under claim lock. The cross-session supervisor remains the RFC; not built.
 - **Consolidation research** ([`docs/research/agentic-ecosystem/`](docs/research/agentic-ecosystem/)) — comparing the agentic systems in this ecosystem toward one product. Feeds a future PRD.
-- **Broader distribution** — submission to the Claude community marketplace, the official MCP Registry, and awesome-lists is prepared; see [`.goal/POSITIONING.md`](.goal/POSITIONING.md) §2.
+- **Broader distribution** — live on the official [MCP Registry](https://registry.modelcontextprotocol.io/?search=engineering-board) (`io.github.GhostlyGawd/engineering-board`); submissions to the Claude community marketplace and awesome-lists are prepared, see [`.goal/POSITIONING.md`](.goal/POSITIONING.md) §2.
 
 ## Contributing
 
 The test suite is bash + python3 only, no install step:
 
 ```sh
-bash tests/run-all.sh   # 14 suites
+bash tests/run-all.sh   # 16 suites
 ```
 
 Cross-compat rules for any new `hooks/scripts/*.sh` (pinned by `tests/crosscompat-lint.sh`): shebang exactly `#!/usr/bin/env bash`; no `date -d` / `date -j -f`; no `jq`; no drive letters — use `python3` for JSON and timestamps. Version bumps must touch both `.claude-plugin/plugin.json` and `marketplace.json` in lockstep. Develop on a branch and land changes via PR — never push to `main` directly.

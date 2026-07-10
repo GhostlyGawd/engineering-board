@@ -14,7 +14,7 @@ hooks, skills, agents, and the board format fit together — read
 The whole test suite is `bash` + `python3` only, with **no install step**:
 
 ```sh
-bash tests/run-all.sh   # 14 suites
+bash tests/run-all.sh   # 16 suites
 ```
 
 That command is the merge gate. A change lands when it is green and stays green.

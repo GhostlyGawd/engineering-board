@@ -57,7 +57,7 @@ fi
 render_one() {
   # render_one <label> <board-dir>  -> HTML on stdout
   python3 - "$1" "$2" <<'PY'
-import os, re, sys, html, glob
+import os, re, sys, html, glob, json
 
 label, board_dir = sys.argv[1], sys.argv[2]
 LINK_BASE = os.environ.get("EB_VIEW_LINK_BASE", "")
@@ -133,6 +133,24 @@ LEARNINGS.sort(key=lambda e: (
 def esc(s):
     return html.escape(str(s or ""))
 
+def search_text(e):
+    # C4: lowercase haystack for client-side substring search — id, title,
+    # affects, pattern tags (+ learnings' pattern_tag). Escaped at emit time.
+    parts = [e.get("id", ""), e.get("title", ""), e.get("affects", "")]
+    parts += parse_list(e.get("pattern", ""))
+    if str(e.get("pattern_tag", "")).strip():
+        parts.append(str(e["pattern_tag"]).strip())
+    return " ".join(str(p) for p in parts if p).lower()
+
+def data_attrs(e):
+    # C4: the attributes the embedded filter JS keys on. Everything here is
+    # board content — untrusted data — so it all goes through esc().
+    typ = e["_sub"][:-1]  # bugs -> bug, learnings -> learning, ...
+    pr = (e.get("priority") or "").strip().lower()
+    st = (e.get("status") or "").strip().lower()
+    return (f' data-type="{esc(typ)}" data-priority="{esc(pr)}"'
+            f' data-status="{esc(st)}" data-search="{esc(search_text(e))}"')
+
 def card_html(e):
     pr = e.get("priority", "")
     # P3 is the floor, not a rank — a grey "P3" pill on every low-priority card
@@ -143,6 +161,10 @@ def card_html(e):
     if e.get("status") == "blocked" or e.get("blocked_by"):
         bb = ", ".join(parse_list(e.get("blocked_by", "")))
         blocked = f'<span class="badge blocked">blocked{(" · " + esc(bb)) if bb else ""}</span>'
+    # C7: child entries carry `parent: <id>` — a small muted-outline badge
+    # (the P2/P3 pill register) pointing at the parent; no layout re-nesting.
+    parent = str(e.get("parent", "")).strip()
+    pbadge = f'<span class="badge parent">↳ {esc(parent)}</span>' if parent else ""
     tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in parse_list(e.get("pattern", "")))
     affects = f'<div class="affects">{esc(e.get("affects"))}</div>' if e.get("affects") else ""
     # Card id links to the entry's markdown source (IMPROVEMENTS #8): relative
@@ -152,8 +174,8 @@ def card_html(e):
     href = esc(LINK_BASE + e["_file"]) if e.get("_file") else ""
     cid_html = f'<a class="cid" href="{href}">{cid}</a>' if href else f'<span class="cid">{cid}</span>'
     return (
-        f'<div class="card">'
-        f'<div class="cardhead">{cid_html}{prio}{blocked}</div>'
+        f'<div class="card"{data_attrs(e)}>'
+        f'<div class="cardhead">{cid_html}{prio}{pbadge}{blocked}</div>'
         f'<div class="ctitle">{esc(e.get("title"))}</div>'
         f'{affects}'
         f'<div class="tags">{tags}</div>'
@@ -196,7 +218,7 @@ def learning_card_html(e):
     lhref = esc(LINK_BASE + e["_file"]) if e.get("_file") else ""
     lcid_html = f'<a class="cid" href="{lhref}">{lcid}</a>' if lhref else f'<span class="cid">{lcid}</span>'
     return (
-        f'<div class="lcard">'
+        f'<div class="lcard"{data_attrs(e)}>'
         f'<div class="lhead">{lcid_html}{conf_badge}{rec_badge}</div>'
         f'<div class="ltitle">{esc(e.get("title"))}</div>'
         f'{applies_html}{tags_html}'
@@ -217,7 +239,7 @@ if OTHER:
     for e in OTHER:
         kind = e["_sub"][:-1]  # question / observation
         rows.append(
-            f'<li><span class="cid">{esc(e.get("id"))}</span> '
+            f'<li{data_attrs(e)}><span class="cid">{esc(e.get("id"))}</span> '
             f'<span class="kind">{esc(kind)}</span> {esc(e.get("title"))}</li>'
         )
     other_html = (
@@ -225,14 +247,141 @@ if OTHER:
         f'<ul class="lane">{"".join(rows)}</ul>'
     )
 
+# --- C12 Stats panel: pure derivation from the entries parsed above. -------
+def stats_panel_html():
+    rows = []
+    for sub in ("bugs", "features", "questions", "observations"):
+        subset = [e for e in entries if e["_sub"] == sub]
+        if not subset:
+            continue
+        op = sum(1 for e in subset if e.get("status") != "resolved")
+        rows.append(
+            f'<li><span class="stat-k">{esc(sub)}</span> '
+            f'<span class="stat-v">{op} open · {len(subset) - op} resolved</span></li>'
+        )
+    learn_total = sum(1 for e in entries if e["_sub"] == "learnings")
+    rows.append(
+        f'<li><span class="stat-k">learnings</span> '
+        f'<span class="stat-v">{learn_total}</span></li>'
+    )
+    # Top 3 pattern tags among open entries (pattern list + learnings'
+    # pattern_tag — the same tag surface the cards render). Stable order:
+    # count desc, then tag name — keeps the output byte-deterministic.
+    counts = {}
+    for e in entries:
+        if e.get("status") == "resolved":
+            continue
+        tag_vals = parse_list(e.get("pattern", ""))
+        if str(e.get("pattern_tag", "")).strip():
+            tag_vals.append(str(e["pattern_tag"]).strip())
+        for t in tag_vals:
+            if t:
+                counts[t] = counts.get(t, 0) + 1
+    top = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:3]
+    tags_html = ""
+    if top:
+        tags = "".join(f'<span class="tag">{esc(t)} ×{c}</span>' for t, c in top)
+        tags_html = f'<li class="stat-tags"><span class="stat-k">top patterns</span><span class="tags">{tags}</span></li>'
+    return (
+        '<section class="panel"><h2 class="lane-h">Stats</h2>'
+        f'<ul class="stat-list">{"".join(rows)}{tags_html}</ul></section>'
+    )
+
+# --- C12 Coordination panel: claims, reclaims, active workers. --------------
+# These are runtime artifacts (absent on a fresh checkout, possibly mid-write
+# or garbled) — every read is failure-proof: any missing/unparseable input
+# degrades to its empty state, never a render failure. All content shown is
+# untrusted data and goes through esc().
+def coordination_panel_html():
+    claims_dir = os.path.join(board_dir, "_claims")
+    claim_rows = []
+    try:
+        names = sorted(
+            n for n in os.listdir(claims_dir)
+            if not n.startswith("_") and os.path.isdir(os.path.join(claims_dir, n))
+        )
+    except Exception:
+        names = []
+    for name in names:
+        owner = ""
+        try:
+            with open(os.path.join(claims_dir, name, "owner.txt"), "r",
+                      encoding="utf-8", errors="replace") as f:
+                for ln in f.read().splitlines():
+                    if ln.startswith("session_id:"):
+                        owner = ln.partition(":")[2].strip()
+                        break
+        except Exception:
+            pass
+        owner_html = f' — <code>{esc(owner)}</code>' if owner else ""
+        claim_rows.append(f'<li><span class="cid">{esc(name)}</span>{owner_html}</li>')
+
+    reclaim_rows = []
+    try:
+        with open(os.path.join(claims_dir, "_reclaimed.log"), "r",
+                  encoding="utf-8", errors="replace") as f:
+            lines = f.read().splitlines()
+    except Exception:
+        lines = []
+    parsed = []
+    for ln in lines:
+        ln = ln.strip()
+        if not ln:
+            continue
+        try:
+            rec = json.loads(ln)
+        except Exception:
+            continue  # malformed lines are skipped, never fatal
+        if isinstance(rec, dict):
+            parsed.append(rec)
+    for rec in parsed[-5:]:
+        eid = str(rec.get("entry_id", "") or "?")
+        at = str(rec.get("reclaimed_at", "") or "")
+        reclaim_rows.append(f'<li class="reclaim">{esc(eid)} · {esc(at)}</li>')
+
+    worker_rows = []
+    reg = os.path.join(os.environ.get("CLAUDE_PROJECT_DIR", ""),
+                       ".engineering-board", "active-workers.json")
+    try:
+        with open(reg, "r", encoding="utf-8", errors="replace") as f:
+            data = json.load(f)
+        if not isinstance(data, list):
+            data = []
+    except Exception:
+        data = []
+    for w in data:
+        if not isinstance(w, dict):
+            continue
+        mode = str(w.get("mode", "") or "?")
+        disc = str(w.get("discipline") or "").strip()
+        sid = str(w.get("session_id", "") or "")[:12]
+        label_w = mode + (f" · {disc}" if disc else "")
+        worker_rows.append(f'<li><span class="kind">{esc(label_w)}</span> <code>{esc(sid)}</code></li>')
+
+    def block(title, rows, empty):
+        body = "".join(rows) if rows else f'<li class="empty-line">{empty}</li>'
+        return f'<h3 class="coord-h">{title}</h3><ul class="coord-list">{body}</ul>'
+
+    return (
+        '<section class="panel"><h2 class="lane-h">Coordination</h2>'
+        + block("Claims", claim_rows, "no active claims")
+        + block("Recent reclaims", reclaim_rows, "no recent reclaims")
+        + block("Active workers", worker_rows, "no active workers")
+        + '</section>'
+    )
+
+panels_html = f'<div class="panels">{stats_panel_html()}{coordination_panel_html()}</div>'
+
 open_ct = sum(1 for e in entries if e["_sub"] in ("bugs", "features") and e.get("status") != "resolved")
 sys.stdout.write(
     f'<section class="board">'
     f'<div class="board-head"><h1>{esc(label)}</h1>'
     f'<span class="summary">{open_ct} open · {len(entries)} total</span></div>'
     f'<div class="cols">{"".join(cols_html)}</div>'
+    f'<div class="no-match" hidden>No entries match the current search and filters.</div>'
     f'{learn_html}'
     f'{other_html}'
+    f'{panels_html}'
     f'</section>'
 )
 PY
@@ -344,7 +493,39 @@ details.more>summary:hover{color:var(--eb-accent-cur)}
 .rec{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
 .lapplies{margin-top:.3rem;font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
 footer{max-width:80rem;margin:0 auto;color:var(--eb-text-muted);font-size:.72rem;font-family:var(--eb-font-mono);text-align:center}
+/* C4 — search + filter controls. Shipped `hidden`; the embedded JS un-hides
+   them on load, so a no-JS render is exactly the pre-C4 static page. */
+.controls{max-width:80rem;margin:0 auto 1.25rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.controls .search{flex:1 1 16rem;min-width:12rem;background:var(--eb-card);color:var(--eb-text);
+  border:1px solid var(--eb-border);border-radius:8px;padding:.45rem .7rem;
+  font-family:var(--eb-font-sans);font-size:var(--eb-fs-sm)}
+.controls .search::placeholder{color:var(--eb-text-muted)}
+.chips{display:flex;flex-wrap:wrap;gap:.25rem}
+.chip{font-size:var(--eb-fs-2xs);font-family:var(--eb-font-mono);color:var(--eb-text-muted);
+  background:transparent;border:1px solid var(--eb-border);border-radius:999px;padding:.15rem .55rem;cursor:pointer;
+  transition:color var(--eb-dur-fast) var(--eb-ease-out),border-color var(--eb-dur-fast) var(--eb-ease-out)}
+.chip:hover{color:var(--eb-accent-cur);border-color:var(--eb-accent-cur)}
+.chip[aria-pressed="true"]{background:var(--eb-accent-cur);border-color:var(--eb-accent-cur);color:var(--eb-bg);font-weight:700}
+.f-hide{display:none !important}
+.no-match{color:var(--eb-text-muted);font-size:.82rem;text-align:center;padding:.8rem 0;
+  border:1px dashed var(--eb-border);border-radius:8px;margin-top:.6rem}
+/* C7 — parent badge: the muted-outline pill register (like P2 pills). */
+.badge.parent{color:var(--eb-text-muted);border:1px solid var(--eb-border);border-radius:4px;padding:.05rem .3rem}
+/* C12 — Stats + Coordination panels. */
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));gap:.7rem;margin-top:1.4rem}
+.panel{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:10px;padding:.6rem .8rem;margin:0}
+.panel .lane-h{margin:.2rem 0 .5rem}
+.stat-list,.coord-list{list-style:none;margin:0 0 .4rem;padding:0;display:grid;gap:.25rem}
+.stat-list li{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.82rem}
+.stat-k{color:var(--eb-text-muted);font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);text-transform:uppercase;letter-spacing:.05em}
+.stat-v{font-family:var(--eb-font-mono);font-size:var(--eb-fs-xs)}
+.stat-tags .tags{margin-top:0;justify-content:flex-end}
+.coord-h{font-size:var(--eb-fs-2xs);text-transform:uppercase;letter-spacing:.08em;color:var(--eb-text-muted);font-weight:600;margin:.5rem 0 .25rem}
+.coord-list li{font-size:var(--eb-fs-xs);font-family:var(--eb-font-mono);overflow-wrap:anywhere}
+.coord-list code{font-family:var(--eb-font-mono);color:var(--eb-text-muted)}
+.empty-line{color:var(--eb-text-muted)}
 @media print{
+  .controls{display:none}
   :root{--eb-bg:#FFFFFF;--eb-surface:#FFFFFF;--eb-card:#FFFFFF;--eb-text:#000000;--eb-text-muted:#333333;--eb-border:#BBBBBB}
   body{padding:0}
   .card,.lcard{break-inside:avoid;box-shadow:none}
@@ -358,6 +539,96 @@ footer{max-width:80rem;margin:0 auto;color:var(--eb-text-muted);font-size:.72rem
 <body>
 HTML
 
+# C4 controls: static markup shipped `hidden` (a no-JS page stays exactly the
+# pre-C4 render); the script below un-hides them on load. All static — the
+# document stays byte-deterministic.
+read -r -d '' CONTROLS <<'HTML' || true
+<div class="controls" id="eb-controls" hidden>
+<input id="eb-search" class="search" type="search" placeholder="Search id, title, affects, pattern — press /" aria-label="Search board entries">
+<div class="chips" role="group" aria-label="Filter by type">
+<button type="button" class="chip" data-fgroup="type" data-fval="bug" aria-pressed="false">B</button>
+<button type="button" class="chip" data-fgroup="type" data-fval="feature" aria-pressed="false">F</button>
+<button type="button" class="chip" data-fgroup="type" data-fval="question" aria-pressed="false">Q</button>
+<button type="button" class="chip" data-fgroup="type" data-fval="observation" aria-pressed="false">O</button>
+<button type="button" class="chip" data-fgroup="type" data-fval="learning" aria-pressed="false">L</button>
+</div>
+<div class="chips" role="group" aria-label="Filter by priority">
+<button type="button" class="chip" data-fgroup="priority" data-fval="p0" aria-pressed="false">P0</button>
+<button type="button" class="chip" data-fgroup="priority" data-fval="p1" aria-pressed="false">P1</button>
+<button type="button" class="chip" data-fgroup="priority" data-fval="p2" aria-pressed="false">P2</button>
+<button type="button" class="chip" data-fgroup="priority" data-fval="p3" aria-pressed="false">P3</button>
+</div>
+<div class="chips" role="group" aria-label="Filter by status">
+<button type="button" class="chip" data-fgroup="status" data-fval="open" aria-pressed="false">open</button>
+<button type="button" class="chip" data-fgroup="status" data-fval="in_progress" aria-pressed="false">in_progress</button>
+<button type="button" class="chip" data-fgroup="status" data-fval="blocked" aria-pressed="false">blocked</button>
+<button type="button" class="chip" data-fgroup="status" data-fval="resolved" aria-pressed="false">resolved</button>
+</div>
+</div>
+HTML
+
+# C4 filter script: vanilla JS, no deps, no network, fully static text (no
+# interpolation — determinism is untouched). It only reads the data-* values
+# the renderer emitted through esc(), and never writes markup back into the
+# page, so board content cannot inject through this path.
+read -r -d '' SCRIPT <<'HTML' || true
+<script>
+(function () {
+  'use strict';
+  var controls = document.getElementById('eb-controls');
+  if (!controls) { return; }
+  controls.hidden = false;
+  var search = document.getElementById('eb-search');
+  var chips = Array.prototype.slice.call(controls.querySelectorAll('.chip'));
+  var items = Array.prototype.slice.call(document.querySelectorAll('[data-search]'));
+  function active(group) {
+    var out = [];
+    chips.forEach(function (ch) {
+      if (ch.getAttribute('data-fgroup') === group && ch.getAttribute('aria-pressed') === 'true') {
+        out.push(ch.getAttribute('data-fval'));
+      }
+    });
+    return out;
+  }
+  function apply() {
+    var q = (search.value || '').toLowerCase();
+    var ty = active('type'), pr = active('priority'), st = active('status');
+    var filtering = q !== '' || ty.length > 0 || pr.length > 0 || st.length > 0;
+    items.forEach(function (el) {
+      var ok = (q === '' || (el.getAttribute('data-search') || '').indexOf(q) !== -1) &&
+        (ty.length === 0 || ty.indexOf(el.getAttribute('data-type')) !== -1) &&
+        (pr.length === 0 || pr.indexOf(el.getAttribute('data-priority')) !== -1) &&
+        (st.length === 0 || st.indexOf(el.getAttribute('data-status')) !== -1);
+      el.classList.toggle('f-hide', !ok);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('details.more'), function (d) {
+      if (filtering) { d.setAttribute('open', ''); } else { d.removeAttribute('open'); }
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('section.board'), function (sec) {
+      var msg = sec.querySelector('.no-match');
+      if (!msg) { return; }
+      msg.hidden = !filtering || !!sec.querySelector('[data-search]:not(.f-hide)');
+    });
+  }
+  chips.forEach(function (ch) {
+    ch.addEventListener('click', function () {
+      ch.setAttribute('aria-pressed', ch.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      apply();
+    });
+  });
+  search.addEventListener('input', apply);
+  document.addEventListener('keydown', function (ev) {
+    var t = ev.target;
+    var tag = (t && t.tagName) ? t.tagName.toLowerCase() : '';
+    if (ev.key === '/' && tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
+      ev.preventDefault();
+      search.focus();
+    }
+  });
+})();
+</script>
+HTML
+
 STAMP_LINE=""
 if [ "${STAMP}" -eq 1 ]; then
   # Opt-in freshness stamp (deliberately not default: default output stays
@@ -366,10 +637,12 @@ if [ "${STAMP}" -eq 1 ]; then
   STAMP_LINE=" Generated from <code>${GIT_SHA}</code>."
 fi
 FOOT="<footer>Generated by <code>/board-view</code> — a committed, offline projection of the board.${STAMP_LINE} The board is the database.</footer>
+${SCRIPT}
 </body>
 </html>"
 
 DOC="${HEAD}
+${CONTROLS}
 ${BODY}
 ${FOOT}"
 

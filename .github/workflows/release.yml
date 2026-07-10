@@ -35,6 +35,11 @@ on:
         required: false
         type: boolean
         default: false
+      publish_pypi:
+        description: "Also publish the MCP server to PyPI (trusted publishing)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # create tag ref + release
@@ -43,6 +48,9 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.resolve.outputs.sha }}
+      version: ${{ steps.resolve.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -160,3 +168,46 @@ jobs:
           ./mcp-publisher login github-oidc
           ./mcp-publisher publish
           echo "published to registry.modelcontextprotocol.io — syndication to PulseMCP/Glama/mcp.so follows automatically"
+
+  # Publish engineering-board-mcp to PyPI via trusted publishing (OIDC — no
+  # stored secret; the PyPI project's trusted publisher must be configured for
+  # this repo + workflow + environment, a one-time human step tracked in
+  # .goal/LAUNCH.md §7e). Runs only after the GitHub Release succeeds, against
+  # the exact tagged tree.
+  pypi:
+    needs: release
+    # Opt-in (like the registry publish) and re-run-safe: publishing is
+    # irreversible and a re-dispatched tag would otherwise 400 on a duplicate
+    # upload after the release job short-circuits.
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_pypi
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write   # OIDC for PyPI trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release.outputs.sha }}
+
+      - name: Verify pyproject version matches the tag
+        run: |
+          set -euo pipefail
+          PKG_VER="$(python3 -c "
+          import re
+          text = open('mcp-server/pyproject.toml', encoding='utf-8').read()
+          m = re.search(r'^version\s*=\s*\"([^\"]+)\"', text, re.M)
+          print(m.group(1) if m else '')
+          ")"
+          [ "$PKG_VER" = "${{ needs.release.outputs.version }}" ] \
+            || { echo "pyproject.toml is $PKG_VER, not ${{ needs.release.outputs.version }} — refusing to publish" >&2; exit 1; }
+
+      - name: Build sdist + wheel
+        working-directory: mcp-server
+        run: pipx run build
+
+      - name: Publish to PyPI (trusted publishing)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: mcp-server/dist/
+          skip-existing: true

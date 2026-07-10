@@ -26,6 +26,7 @@
 #   13. subagent-fixtures.sh        — v0.3.2 subagent contract lint (Output contract heading + load-bearing keys + JSON parse)
 #   14. board-init-command.sh       — 1.1.0 /board-init engineering-board/ scaffold + .gitignore structural lint
 #   15. board-relocate.sh           — 1.1.0 /board-migrate --relocate move + router rewrite + idempotency
+#   18. board-remember.sh           — C6 explicit learning capture: script-vs-MCP equivalence + index-check green
 #
 # Usage:
 #   bash tests/orchestration/automated.sh                # auto-detect plugin root
@@ -59,6 +60,7 @@ SUBTESTS=(
   "board-relocate.sh"
   "board-setup-command.sh"
   "board-run-command.sh"
+  "board-remember.sh"
 )
 
 for st in "${SUBTESTS[@]}"; do

@@ -1,0 +1,90 @@
+# engineering-board
+
+> A git-committed kanban board your AI agents run and remember. The board is
+> the database: coordination state, work-in-progress locks, and durable
+> learnings live as plain markdown inside your repo — no hidden DB, no external
+> service, no daemon. Ships as a Claude Code plugin and as a zero-dependency
+> MCP server (12 tools over stdio, protocol 2025-06-18).
+
+## What it is
+
+engineering-board turns a committed markdown tree (engineering-board/<project>/)
+into an autonomous, multi-agent software-engineering board:
+
+- Findings (bugs, features, questions, observations) are captured passively
+  from every Claude Code session by a Stop hook.
+- A PM pipeline consolidates findings into real board entries, deterministically.
+- Worker agents drive each entry through a tdd -> review -> validate state
+  machine under atomic (mkdir-based) claim locking, so parallel agents never
+  collide.
+- Recurring lessons promote into committed Learning entries (L###) that survive
+  session boundaries; board_remember / /board-remember saves one on demand.
+- BOARD.md (the index) and board.html (a themed kanban view with search,
+  filters, stats, and coordination panels) are regenerated deterministically.
+
+Who it's for: developers running Claude Code (or any MCP client) who want their
+agents' task state and memory to be repo-committed, PR-reviewable, and shared
+with the team — instead of per-user state in ~/.claude/ or a local database.
+
+How it differs from the 2026 field (beads, Backlog.md, Task Master, Claude
+Code's built-in Tasks, claude-mem): it is the intersection — PR-reviewable
+markdown state AND durable memory AND atomic claim-locking AND passive per-turn
+capture AND an opinionated pipeline AND a published team-visible board.
+
+## Install
+
+Claude Code plugin (full autonomous pipeline; requires Claude Code, free):
+
+    /plugin marketplace add GhostlyGawd/engineering-board
+    /plugin install engineering-board
+    /board-setup
+
+MCP server, primary path — one line from PyPI (available with the v1.7.0 release):
+
+    claude mcp add engineering-board -- uvx engineering-board-mcp
+
+MCP server, fallback — run from a clone:
+
+    git clone https://github.com/GhostlyGawd/engineering-board
+    claude mcp add engineering-board -- python3 "$(pwd)/engineering-board/mcp-server/engineering_board_mcp.py"
+
+Works with any MCP client — Codex CLI, Gemini CLI, Cursor, Claude Desktop
+config blocks:
+https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
+
+## MCP tools (12)
+
+- board_init: scaffold a project board; optional agents_md writes a usage block
+  into the repo's AGENTS.md for hook-less agents.
+- board_list_projects: list projects from BOARD-ROUTER.md.
+- board_create_entry: create a validated entry, allocate the next id, rebuild
+  the index; optional parent links a subtask.
+- board_list_entries: list entries; filters project/type/status/needs/ready
+  (ready = open with all existing blockers resolved).
+- board_get_entry: full markdown + parsed frontmatter of one entry.
+- board_update_entry: update frontmatter (status, needs, priority, blocked_by,
+  parent), append a section, or append a timestamped comment.
+- board_rebuild: deterministically regenerate BOARD.md.
+- board_capture_finding: append a finding to the scratch inbox _sessions/.
+- board_claim: acquire an entry's atomic claim lock.
+- board_release: release an entry's claim lock.
+- board_remember: save a durable insight straight to learnings/ (bypasses the
+  curator's recurrence threshold).
+- board_status: open counts, in_progress/blocked ids, the ready queue,
+  dangling-blocker warnings, un-promoted scratch count.
+
+## Key links
+
+- Repository: https://github.com/GhostlyGawd/engineering-board
+- README (full docs): https://github.com/GhostlyGawd/engineering-board#readme
+- Landing page: https://ghostlygawd.github.io/engineering-board/
+- Live board (this repo's own, republished on every merge):
+  https://ghostlygawd.github.io/engineering-board/board.html
+- MCP server reference: https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
+- PyPI package: https://pypi.org/project/engineering-board-mcp/
+- MCP Registry entry (io.github.GhostlyGawd/engineering-board):
+  https://registry.modelcontextprotocol.io/?search=engineering-board
+- Changelog: https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELOG.md
+- Architecture: https://github.com/GhostlyGawd/engineering-board/blob/main/ARCHITECTURE.md
+- Security posture: https://github.com/GhostlyGawd/engineering-board/blob/main/SECURITY.md
+- License: MIT

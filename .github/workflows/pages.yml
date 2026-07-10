@@ -1,6 +1,6 @@
 name: pages
 
-# Publishes the landing page by syncing docs/{index.html,assets,.nojekyll}
+# Publishes the landing page by syncing docs/{index.html,assets,.nojekyll,llms.txt}
 # to the gh-pages branch, which GitHub Pages serves (branch-deploy mode —
 # the site auto-enabled when gh-pages was first pushed). Also publishes the
 # committed eb-self board view as /board.html — the live public roadmap
@@ -19,6 +19,7 @@ on:
       - "docs/index.html"
       - "docs/assets/**"
       - "docs/.nojekyll"
+      - "docs/llms.txt"
       - "engineering-board/eb-self/board.html"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
@@ -42,7 +43,7 @@ jobs:
           set -euo pipefail
           SHA=$(git rev-parse --short HEAD)
           SITE=$(mktemp -d)
-          cp -r docs/index.html docs/assets docs/.nojekyll "$SITE"/
+          cp -r docs/index.html docs/assets docs/.nojekyll docs/llms.txt "$SITE"/
           cp engineering-board/eb-self/board.html "$SITE"/board.html
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

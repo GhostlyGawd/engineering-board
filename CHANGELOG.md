@@ -9,6 +9,90 @@ increases.
 
 ## [Unreleased]
 
+## [1.7.0] — 2026-07-10
+
+The competitive-parity release: acts on the 2026 field audit (`IMPROVEMENTS.md`
+v4, C1–C13). Repositions the comparison story around the real 2026 field
+(beads, Backlog.md, Task Master, native Claude Code Tasks, claude-mem), ships
+the explicit memory affordance (`board_remember` / `/board-remember`), a
+deterministic ready queue, entry comments + parent/subtask grouping, AGENTS.md
+emission for hook-less agents, board-view search/filters and Stats/Coordination
+panels, PyPI packaging (the `uvx` one-command install), and a launch kit. The
+MCP server grows from 11 to 12 tools; the plugin from 13 to 14 commands. The
+`server.json` bundle digest is re-pinned in lockstep.
+
+### Added
+- **`board_remember` MCP tool + `/board-remember` command (C6).** Save a durable
+  insight straight to `learnings/L###-<slug>.md` (frontmatter `source: remember`)
+  and rebuild the index — explicit user intent bypasses the learnings-curator's
+  recurrence-≥3 threshold. Script and MCP paths produce identical files (proven
+  by an equivalence test); `hooks/scripts/board-remember.sh` is the plugin twin.
+- **Deterministic ready queue (C5).** `board_list_entries` gains `ready: true`
+  (open AND every existing `blocked_by` target resolved; dangling blocker ids
+  warn, never block) and `board_status` reports `ready` (capped at 20) +
+  `dangling_blockers`. Worker-mode entry selection prefers unblocked entries.
+- **Comments + parent (C7).** `board_update_entry` gains `comment: {author,
+  text}` (server-timestamped, single-line, appended under `## Comments`);
+  `board_create_entry`/`board_update_entry` accept `parent:` for subtask
+  grouping — `BOARD.md` renders child rows indented (`↳`) under their parent,
+  `board.html` shows a `↳ <parent-id>` badge, and the validator accepts the key
+  (a dangling parent warns, never fails).
+- **AGENTS.md emission (C8).** `board_init` gains `agents_md` (default true):
+  writes/updates a marker-fenced block in the repo's `AGENTS.md` telling
+  hook-less MCP agents how to drive the board. Idempotent; never touches
+  content outside the markers.
+- **PyPI packaging (C3).** New `mcp-server/pyproject.toml` (package
+  `engineering-board-mcp`, console script → `engineering_board_mcp:main`, zero
+  runtime deps); `release.yml` gains a `pypi` job publishing sdist + wheel via
+  PyPI trusted publishing (OIDC, no stored secrets). The MCP install becomes
+  one line: `claude mcp add engineering-board -- uvx engineering-board-mcp`.
+- **Board view: search + filters (C4).** `board.html` gains a client-side
+  search input (id, title, affects, pattern tags) and type/priority/status
+  filter chips — vanilla JS embedded in the page, controls hidden without JS,
+  `/` focuses search. Output stays byte-deterministic.
+- **Board view: Stats + Coordination panels (C12).** Per-type open/resolved
+  counts, learnings total, top open `pattern:` tags; current claims, recent
+  reclaims, and active workers with graceful empty states (runtime artifacts
+  never fail the render; all read content escaped).
+- **`docs/llms.txt` (C13).** Plain-text LLM-readable summary (what it is,
+  install paths, the 12-tool list, key links), published by `pages.yml`; the
+  landing nav gains a Docs link.
+- **Launch kit (C11) + submissions (C10).** `docs/launch/show-hn.md`,
+  `docs/launch/after-vibe-kanban.md`, and ready-to-paste submission blocks in
+  `.goal/LAUNCH.md` §7 (awesome-claude-code, awesome-mcp-servers, Smithery,
+  community marketplace, PyPI trusted-publisher one-time setup).
+- **Real board screenshot.** `docs/assets/board-screenshot.png` — the actual
+  rendered board — embedded in the README and the landing page.
+- **`tests/docs-coherence.sh`.** New suite asserting the tool count stated in
+  `README.md`, `docs/index.html`, and `mcp-server/README.md` equals the actual
+  tool count in the server source, and the README command count equals
+  `commands/*.md` — counts can never silently drift again.
+
+### Changed
+- **Comparison story rebuilt for the 2026 field (C1).** README and landing
+  tables now compare against beads, Backlog.md, Task Master, native Claude Code
+  Tasks, and claude-mem with truthful, cited cells; the dormant pre-2026 field
+  is archived in `.goal/POSITIONING.md`.
+- **"Why not Claude Code's built-in Tasks?" (C2).** Both surfaces answer the
+  first question every 2026 visitor asks: native Tasks are per-user/per-machine
+  in `~/.claude/tasks/`; the board is the repo's shared, PR-reviewable state —
+  the two compose.
+- **Proof badges + liveness (C9).** README gains stars + release-date badges;
+  the landing trustband gains a live releases link.
+- **Per-client MCP setup (C8).** `mcp-server/README.md` documents Codex CLI,
+  Gemini CLI, and Cursor alongside Claude Code/Desktop; `uvx` is the primary
+  install path everywhere with the clone fallback kept.
+- **Version coherence extended.** `tests/version-coherence.sh` now also locks
+  `mcp-server/pyproject.toml` to `plugin.json`.
+
+### Fixed
+- **`board-index-check.sh` counted only top-level rows.** C7 child rows
+  (`  ↳ B002 …`) were invisible to the row-count regex, so the first board with
+  a parent/child pair tripped a false corruption flag; the count now accepts
+  both row shapes (regression-tested in the smoke suite).
+- **README roadmap claimed the MCP Registry submission was still "prepared"** —
+  it is live as `io.github.GhostlyGawd/engineering-board`.
+
 ## [1.6.1] — 2026-07-08
 
 Acts on the six **Experience Optimization** audit reports (the goal-prompts
