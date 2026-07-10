@@ -127,6 +127,20 @@ def require(params, name):
     return val
 
 
+def atomic_write(path, content):
+    """Write `content` to `path` via a temp file + os.replace.
+
+    The contracted pattern for every NEW write path added in the C-series run
+    (IMPROVEMENTS v3 E1): a crash mid-write can never leave a truncated file.
+    Pre-existing truncating writes are intentionally left as-is (out of scope
+    for this run). os.replace also replaces a symlink at `path` rather than
+    writing through it."""
+    tmp = "%s.tmp.%d" % (path, os.getpid())
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(content)
+    os.replace(tmp, path)
+
+
 # ---------------------------------------------------------------------------
 # Router / board-dir resolution
 # ---------------------------------------------------------------------------
@@ -384,6 +398,40 @@ def find_entry(board_dir, entry_id):
     return None
 
 
+def compute_ready(entries):
+    """C5 shared ready semantics over one board's parsed entries.
+
+    An entry is _ready_ iff `status: open` AND every id in `blocked_by` that
+    resolves to an existing entry has `status: resolved`. Dangling blocker ids
+    (no matching entry — e.g. archived, or a typo) do NOT block, but are
+    reported as `{entry, missing}` warnings: archives remove files, so a
+    typo'd id must not silently freeze an entry forever — but it must stay
+    visible. Returns (sorted ready id list, dangling warning list)."""
+    by_id = {}
+    for e in entries:
+        eid = e.get("id")
+        if eid:
+            by_id[eid] = e
+    ready = []
+    dangling = []
+    for e in entries:
+        status = e.get("status")
+        if status == "resolved":
+            continue
+        blockers = e.get("blocked_by") or []
+        if isinstance(blockers, str):
+            blockers = [blockers]
+        missing = sorted(b for b in blockers if b not in by_id)
+        if missing:
+            dangling.append({"entry": e.get("id", ""), "missing": missing})
+        if status != "open":
+            continue  # in_progress / blocked / no-status entries are never ready
+        if all(by_id[b].get("status") == "resolved"
+               for b in blockers if b in by_id):
+            ready.append(e.get("id", ""))
+    return sorted(ready), sorted(dangling, key=lambda w: w["entry"])
+
+
 def next_id(board_dir, entry_type):
     """Allocate the next zero-padded id for a type (max existing + 1)."""
     prefix = TYPE_PREFIX[entry_type]
@@ -432,6 +480,56 @@ ARCHIVE_SKELETON = (
     "# {project} — Archive\n\n"
     "Resolved entries. Newest at the top.\n"
 )
+
+# C8: marker-fenced AGENTS.md block. board_init writes/updates ONLY what sits
+# between the markers; content outside them is never touched. The block tells
+# a hook-less MCP client (Codex, Gemini CLI, Cursor, ...) how to work the
+# board with the MCP tools alone.
+AGENTS_MD_START = "<!-- engineering-board:start -->"
+AGENTS_MD_END = "<!-- engineering-board:end -->"
+AGENTS_MD_BLOCK = (
+    AGENTS_MD_START + "\n"
+    "## engineering-board\n"
+    "\n"
+    "This repo tracks its work on a markdown board under `engineering-board/`\n"
+    "(bugs, features, questions, observations, learnings — one file per entry).\n"
+    "`BOARD.md` is a derived index; never edit it by hand, the tools rebuild it.\n"
+    "If you can call the engineering-board MCP tools, use the board:\n"
+    "\n"
+    "- Capture findings as you notice them: `board_capture_finding` (project, kind, title).\n"
+    "- List actionable work: `board_list_entries` with `ready: true`.\n"
+    "- Claim an entry BEFORE working on it: `board_claim` (project, entry_id, session_id).\n"
+    "- Record progress on the entry: `board_update_entry` (status, needs, comment).\n"
+    "- Promote a finding to a real entry: `board_create_entry`.\n"
+    "- Save a durable insight: `board_remember` (project, insight).\n"
+    "- When done: `board_update_entry` to the new status, then `board_release`.\n"
+    "\n"
+    "Read one entry with `board_get_entry`; get an overview with `board_status`.\n"
+    + AGENTS_MD_END + "\n"
+)
+
+
+def upsert_agents_md(root):
+    """Create or idempotently refresh the marker-fenced block in
+    <root>/AGENTS.md. Returns 'created' | 'updated' | 'unchanged'. New write
+    path -> atomic (temp file + os.replace)."""
+    path = os.path.join(root, "AGENTS.md")
+    if not os.path.isfile(path):
+        atomic_write(path, AGENTS_MD_BLOCK)
+        return "created"
+    with open(path, "r", encoding="utf-8", errors="replace") as f:
+        text = f.read()
+    start = text.find(AGENTS_MD_START)
+    end = text.find(AGENTS_MD_END)
+    if start != -1 and end != -1 and end >= start:
+        new = (text[:start] + AGENTS_MD_BLOCK.rstrip("\n")
+               + text[end + len(AGENTS_MD_END):])
+    else:
+        new = text.rstrip("\n") + "\n\n" + AGENTS_MD_BLOCK
+    if new == text:
+        return "unchanged"
+    atomic_write(path, new)
+    return "updated"
 
 
 def tool_board_init(params):
@@ -504,6 +602,16 @@ def tool_board_init(params):
         created.append("engineering-board/%s/ARCHIVE.md" % project)
     else:
         existed.append("engineering-board/%s/ARCHIVE.md" % project)
+
+    # C8: AGENTS.md marker block for hook-less MCP clients (default on).
+    if params.get("agents_md", True):
+        action = upsert_agents_md(root)
+        if action == "created":
+            created.append("AGENTS.md")
+        elif action == "updated":
+            created.append("AGENTS.md (block updated)")
+        else:
+            existed.append("AGENTS.md (block current)")
 
     return {
         "project": project,
@@ -647,6 +755,17 @@ def tool_board_create_entry(params):
             src_lines = ["- %s" % s for s in derived_from]
         body = "## Takeaway\n\n%s\n\n## Sources\n\n%s" % (takeaway.rstrip(), "\n".join(src_lines))
 
+    # C7: optional parent link (any entry type). A dangling parent id is a
+    # WARNING in the response, never an error — same policy as blocked_by.
+    warnings = []
+    parent = params.get("parent")
+    if parent:
+        parent = _oneline(str(parent))
+        fields.append(("parent", parent))
+        if not find_entry(bd, parent):
+            warnings.append("parent %s not found on this board (dangling — "
+                            "accepted, entry is not blocked by it)" % parent)
+
     content = serialize_frontmatter(fields) + "\n\n" + body.rstrip() + "\n"
 
     if os.path.isfile(path):
@@ -657,13 +776,16 @@ def tool_board_create_entry(params):
     # Rebuild the index so the new id appears in BOARD.md (validation requires it).
     rebuild_board(bd, project)
 
-    return {
+    result = {
         "id": eid,
         "type": entry_type,
         "title": title,
         "file": os.path.relpath(path, root),
         "status": dict(fields).get("status", "(none)"),
     }
+    if warnings:
+        result["warnings"] = warnings
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -679,6 +801,7 @@ def tool_board_list_entries(params):
     want_type = params.get("type")
     want_status = params.get("status")
     want_needs = params.get("needs")
+    want_ready = bool(params.get("ready"))
 
     if want_project:
         targets = [(want_project, ensure_board_exists(root, want_project))]
@@ -687,10 +810,20 @@ def tool_board_list_entries(params):
         targets = [(r["project"], resolve_board_row(root, r)) for r in rows]
 
     result = []
+    dangling = []
     for project, bd in targets:
         if not os.path.isdir(bd):
             continue
-        for e in load_entries(bd):
+        entries = load_entries(bd)
+        ready_ids = None
+        if want_ready:
+            ready_ids, board_dangling = compute_ready(entries)
+            ready_ids = set(ready_ids)
+            for w in board_dangling:
+                w = dict(w)
+                w["project"] = project
+                dangling.append(w)
+        for e in entries:
             etype = e.get("type", "")
             if want_type and etype != want_type:
                 continue
@@ -698,11 +831,17 @@ def tool_board_list_entries(params):
                 continue
             if want_needs and e.get("needs") != want_needs:
                 continue
+            if ready_ids is not None and e.get("id") not in ready_ids:
+                continue
             fm = _public_fm(e)
             fm["project"] = project
             fm["file"] = os.path.relpath(e["_path"], root)
             result.append(fm)
-    return {"count": len(result), "entries": result}
+    out = {"count": len(result), "entries": result}
+    if want_ready:
+        # Warnings, not blockers (C5): dangling blocker ids kept visible.
+        out["dangling_blockers"] = dangling
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -793,6 +932,18 @@ def tool_board_update_entry(params):
         fm["blocked_by"] = new_blocked if isinstance(new_blocked, list) else [new_blocked]
         changes.append("blocked_by=%s" % fmt_list(fm["blocked_by"]))
 
+    # C7: parent link. Validated transition-free; dangling id -> warning in
+    # the response, not an error (same policy as blocked_by).
+    warnings = []
+    new_parent = params.get("parent")
+    if new_parent is not None:
+        new_parent = _oneline(str(new_parent))
+        fm["parent"] = new_parent
+        changes.append("parent=%s" % new_parent)
+        if not find_entry(bd, new_parent):
+            warnings.append("parent %s not found on this board (dangling — "
+                            "accepted, entry is not blocked by it)" % new_parent)
+
     # Rebuild frontmatter preserving order then appending any new keys.
     field_pairs = []
     seen = set()
@@ -803,6 +954,20 @@ def tool_board_update_entry(params):
     for k, v in fm.items():
         if k not in seen:
             field_pairs.append((k, v))
+
+    # C7: comment append. Section `## Comments` is created once, then appended
+    # to; each comment is one line `- **<author>** <UTC ISO8601>: <text>` with
+    # author/text flattened so they can never span lines. Timestamp is
+    # computed server-side.
+    comment = params.get("comment")
+    if comment is not None:
+        if not isinstance(comment, dict) or not comment.get("author") or not comment.get("text"):
+            raise ToolError("comment requires 'author' and 'text'")
+        author = _oneline(comment["author"])
+        ctext = _oneline(comment["text"])
+        line = "- **%s** %s: %s" % (author, now_utc_iso(), ctext)
+        body = _append_comment_line(body, line)
+        changes.append("comment by %s" % author)
 
     append_section = params.get("append_section")
     if append_section:
@@ -824,12 +989,40 @@ def tool_board_update_entry(params):
 
     rebuild_board(bd, project)
 
-    return {
+    result = {
         "id": entry_id,
         "project": project,
         "file": os.path.relpath(e["_path"], root),
         "changes": changes,
     }
+    if warnings:
+        result["warnings"] = warnings
+    return result
+
+
+def _append_comment_line(body, line):
+    """Append one comment line to the body's `## Comments` section, creating
+    the section at the end of the body when missing (C7)."""
+    lines = body.split("\n")
+    idx = None
+    for i, ln in enumerate(lines):
+        if ln.strip() == "## Comments":
+            idx = i
+            break
+    if idx is None:
+        return body.rstrip("\n") + "\n\n## Comments\n\n" + line + "\n"
+    # Section ends at the next `## ` heading or EOF; insert before any
+    # trailing blank lines so comments stay contiguous and ordered.
+    end = len(lines)
+    for j in range(idx + 1, len(lines)):
+        if lines[j].startswith("## "):
+            end = j
+            break
+    k = end
+    while k > idx + 1 and lines[k - 1].strip() == "":
+        k -= 1
+    lines.insert(k, line)
+    return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
@@ -868,6 +1061,49 @@ def _open_line_simple(e):
     return "- %s | [%s](%s/%s)" % (eid, title, sub, fname)
 
 
+def _order_with_children(sorted_entries):
+    """C7: yield (entry, is_child) rendering order for one Open-section group.
+
+    An entry whose `parent:` names another entry in the SAME group renders
+    directly under that parent (children sorted by id); everything else keeps
+    the group's normal sort order. A child whose parent is missing or lives in
+    another group renders as a normal row. Cycles (which never reach a
+    top-level row) fall back to normal rows so no entry is ever dropped —
+    output stays deterministic for a given entry set."""
+    ids = {e.get("id"): e for e in sorted_entries if e.get("id")}
+    kids = {}
+    top = []
+    for e in sorted_entries:
+        p = e.get("parent")
+        if p and p in ids and p != e.get("id"):
+            kids.setdefault(p, []).append(e)
+        else:
+            top.append(e)
+    out = []
+    emitted = set()
+
+    def emit(e, as_child):
+        eid = e.get("id")
+        if eid in emitted:
+            return
+        emitted.add(eid)
+        out.append((e, as_child))
+        for c in sorted(kids.get(eid, []), key=lambda x: x.get("id", "")):
+            emit(c, True)
+
+    for e in top:
+        emit(e, False)
+    for e in sorted_entries:  # cycle leftovers
+        if e.get("id") not in emitted:
+            emit(e, False)
+    return out
+
+
+def _indent_child(line):
+    """Turn a normal `- ...` open line into the C7 child row (`  ↳ ...`)."""
+    return "  ↳ " + line[2:] if line.startswith("- ") else "  ↳ " + line
+
+
 def build_open_section(board_dir):
     """Return the sorted list of Open-section lines (may be empty)."""
     entries = load_entries(board_dir)
@@ -899,16 +1135,21 @@ def build_open_section(board_dir):
         return sorted(lst, key=lambda e: e.get("id", ""))
 
     lines = []
-    for e in by_prio_id(bugs):
-        lines.append(_open_line_bug_feature(e))
-    for e in by_prio_id(feats):
-        lines.append(_open_line_bug_feature(e))
-    for e in by_id(questions):
-        lines.append(_open_line_simple(e))
-    for e in by_id(observations):
-        lines.append(_open_line_simple(e))
-    for e in by_id(learnings):
-        lines.append(_open_line_simple(e))
+    for e, as_child in _order_with_children(by_prio_id(bugs)):
+        line = _open_line_bug_feature(e)
+        lines.append(_indent_child(line) if as_child else line)
+    for e, as_child in _order_with_children(by_prio_id(feats)):
+        line = _open_line_bug_feature(e)
+        lines.append(_indent_child(line) if as_child else line)
+    for e, as_child in _order_with_children(by_id(questions)):
+        line = _open_line_simple(e)
+        lines.append(_indent_child(line) if as_child else line)
+    for e, as_child in _order_with_children(by_id(observations)):
+        line = _open_line_simple(e)
+        lines.append(_indent_child(line) if as_child else line)
+    for e, as_child in _order_with_children(by_id(learnings)):
+        line = _open_line_simple(e)
+        lines.append(_indent_child(line) if as_child else line)
     return lines
 
 
@@ -1014,6 +1255,85 @@ def tool_board_capture_finding(params):
     }
 
 
+# ---------------------------------------------------------------------------
+# board_remember — explicit learning capture (C6)
+# ---------------------------------------------------------------------------
+def render_remember_learning(lid, title, insight, context, discovered):
+    """Render the learning file for an explicit remember.
+
+    Shape mirrors what hooks/scripts/board-curate-learnings.sh produces
+    (frontmatter keys + `## Takeaway` / `## Sources` / `## When this applies`
+    sections) with `source: remember` in place of the curator's `pattern_tag`.
+    MUST stay byte-identical with the twin renderer embedded in
+    hooks/scripts/board-remember.sh — tests/orchestration/board-remember.sh
+    asserts script-vs-MCP output equivalence (modulo id/timestamp)."""
+    applies = context.rstrip() if context.strip() else (
+        "Scope not yet established — recorded from an explicit user remember; "
+        "cross-reference when the topic recurs.")
+    return (
+        "---\n"
+        "id: %s\n"
+        "type: learning\n"
+        "subtype: finding\n"
+        "title: %s\n"
+        "discovered: %s\n"
+        "confidence: medium\n"
+        "recurrence: 1\n"
+        "derived_from: [user]\n"
+        "source: remember\n"
+        "---\n"
+        "\n"
+        "## Takeaway\n"
+        "\n"
+        "%s\n"
+        "\n"
+        "## Sources\n"
+        "\n"
+        "- user: explicit remember capture on %s\n"
+        "\n"
+        "## When this applies\n"
+        "\n"
+        "%s\n"
+    ) % (lid, title, discovered, insight.rstrip(), discovered, applies)
+
+
+def tool_board_remember(params):
+    project = require(params, "project")
+    insight = require(params, "insight")
+    context = str(params.get("context") or "")
+    root = resolve_root(params)
+    bd = ensure_board_exists(root, project)
+
+    # Reuse the shared max+1 allocator. The check-then-write race between two
+    # concurrent writers is the known/tracked E2 issue — do NOT fork a second
+    # allocator here; when E2 is fixed, this call site inherits the fix.
+    lid = next_id(bd, "learning")
+    title = _oneline(insight)
+    slug = slugify(title)
+    fname = "%s-%s.md" % (lid, slug)
+    ldir = os.path.join(bd, "learnings")
+    os.makedirs(ldir, exist_ok=True)
+    path = os.path.join(ldir, fname)
+    if os.path.isfile(path):
+        raise ToolError("learning file already exists: %s" % path)
+
+    discovered = today_utc()
+    content = render_remember_learning(lid, title, str(insight), context, discovered)
+    atomic_write(path, content)
+
+    # Same BOARD.md treatment as any other new entry: rebuild the derived
+    # index so board-index-check.sh stays green.
+    rebuild_board(bd, project)
+
+    return {
+        "id": lid,
+        "project": project,
+        "title": title,
+        "file": os.path.relpath(path, root),
+        "source": "remember",
+    }
+
+
 def count_scratch_findings(board_dir):
     """Count un-promoted scratch findings across _sessions/*.md.
 
@@ -1116,11 +1436,16 @@ def status_for_board(project, board_dir):
             in_progress.append(e.get("id", ""))
         elif status == "blocked":
             blocked.append(e.get("id", ""))
+    ready_ids, dangling = compute_ready(entries)
     return {
         "project": project,
         "open_counts": open_counts,
         "in_progress": sorted(in_progress),
         "blocked": sorted(blocked),
+        # C5: deterministic ready queue (capped at 20) + dangling-blocker
+        # warnings ({entry, missing}) — see compute_ready for the semantics.
+        "ready": ready_ids[:20],
+        "dangling_blockers": dangling,
         "unpromoted_scratch": count_scratch_findings(board_dir),
     }
 
@@ -1150,12 +1475,13 @@ _ROOT_PROP = {"type": "string",
 TOOLS = [
     {
         "name": "board_init",
-        "description": "Scaffold a project board: create engineering-board/BOARD-ROUTER.md (or append a row), the project board dir, BOARD.md, ARCHIVE.md, and the five entry-type subdirs with .gitkeep. Idempotent — never clobbers an existing file.",
+        "description": "Scaffold a project board: create engineering-board/BOARD-ROUTER.md (or append a row), the project board dir, BOARD.md, ARCHIVE.md, and the five entry-type subdirs with .gitkeep. Also writes/refreshes a marker-fenced usage block in <root>/AGENTS.md for hook-less MCP clients (agents_md, default true; content outside the markers is never touched). Idempotent — never clobbers an existing file.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "project": {"type": "string", "description": "Project name (kebab-case), e.g. 'navigator'."},
                 "affects_prefix": {"type": "string", "description": "affects: prefix routed to this board. Defaults to '<project>/'."},
+                "agents_md": {"type": "boolean", "description": "Write/refresh the <!-- engineering-board:start/end --> block in <root>/AGENTS.md (idempotent; preserves everything outside the markers). Default true."},
                 "root": _ROOT_PROP,
             },
             "required": ["project"],
@@ -1197,6 +1523,7 @@ TOOLS = [
                 "sources": {"type": "array", "items": {"type": "string"}, "description": "Learning only: source lines for '## Sources' (defaults to derived_from)."},
                 "applies_to": {"type": "array", "items": {"type": "string"}, "description": "Learning only: paths/components where this applies."},
                 "pattern_tag": {"type": "string", "description": "Learning only: original pattern: tag retained for cross-reference."},
+                "parent": {"type": "string", "description": "Optional parent entry id (e.g. 'F012') for subtask grouping. A dangling id is accepted with a warning in the response (it never blocks the entry)."},
                 "body": {"type": "string", "description": "Free-form body (used as the section content when done_when/takeaway are not given)."},
                 "discovered": {"type": "string", "description": "Discovery date YYYY-MM-DD. Defaults to today (UTC)."},
                 "root": _ROOT_PROP,
@@ -1207,7 +1534,7 @@ TOOLS = [
     },
     {
         "name": "board_list_entries",
-        "description": "List board entries with parsed frontmatter. Filters: project, type, status, needs.",
+        "description": "List board entries with parsed frontmatter. Filters: project, type, status, needs, ready. ready=true keeps only entries that are status:open with every existing blocked_by target resolved (dangling blocker ids do not block; they are returned in dangling_blockers as warnings).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -1215,6 +1542,7 @@ TOOLS = [
                 "type": {"type": "string", "enum": ["bug", "feature", "question", "observation", "learning"]},
                 "status": {"type": "string", "enum": VALID_STATUS},
                 "needs": {"type": "string", "enum": VALID_NEEDS},
+                "ready": {"type": "boolean", "description": "true: only ready entries — status open AND every blocked_by id that resolves to an existing entry is resolved. Adds a dangling_blockers warning list to the result."},
                 "root": _ROOT_PROP,
             },
         },
@@ -1236,7 +1564,7 @@ TOOLS = [
     },
     {
         "name": "board_update_entry",
-        "description": "Update frontmatter fields (status, needs, priority, blocked_by) and/or append a body section to an entry, then rebuild BOARD.md. Validates status transitions minimally.",
+        "description": "Update frontmatter fields (status, needs, priority, blocked_by, parent), append a timestamped comment, and/or append a body section to an entry, then rebuild BOARD.md. Validates status transitions minimally.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -1246,6 +1574,16 @@ TOOLS = [
                 "needs": {"type": "string", "enum": VALID_NEEDS},
                 "priority": {"type": "string", "enum": VALID_PRIORITY},
                 "blocked_by": {"type": "array", "items": {"type": "string"}},
+                "parent": {"type": "string", "description": "Parent entry id for subtask grouping. A dangling id is accepted with a warning in the response."},
+                "comment": {
+                    "type": "object",
+                    "description": "Append '- **<author>** <UTC ISO8601>: <text>' to the entry's '## Comments' section (section created on first comment; text flattened to one line; timestamp computed server-side).",
+                    "properties": {
+                        "author": {"type": "string", "description": "Comment author (e.g. session or agent name)."},
+                        "text": {"type": "string", "description": "Comment text (single line; newlines are flattened)."},
+                    },
+                    "required": ["author", "text"],
+                },
                 "append_section": {
                     "type": "object",
                     "description": "Append a markdown section to the body.",
@@ -1321,8 +1659,23 @@ TOOLS = [
         "handler": tool_board_release,
     },
     {
+        "name": "board_remember",
+        "description": "Save a durable insight straight to <board>/learnings/ as L###-<slug>.md (frontmatter source: remember) and rebuild BOARD.md. Explicit user intent bypasses the curator's recurrence-≥3 promotion threshold — use for 'remember this' moments worth keeping across sessions.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project": {"type": "string", "description": "Target project (must already be board_init'd)."},
+                "insight": {"type": "string", "description": "The durable lesson to remember (becomes the title and '## Takeaway')."},
+                "context": {"type": "string", "description": "Optional: when/where the insight applies (becomes '## When this applies')."},
+                "root": _ROOT_PROP,
+            },
+            "required": ["project", "insight"],
+        },
+        "handler": tool_board_remember,
+    },
+    {
         "name": "board_status",
-        "description": "Board overview: per-type open counts, in_progress ids, blocked ids, and un-promoted scratch count. Optionally scoped to one project.",
+        "description": "Board overview: per-type open counts, in_progress ids, blocked ids, the deterministic ready queue (open entries whose existing blockers are all resolved, capped at 20) with dangling-blocker warnings, and un-promoted scratch count. Optionally scoped to one project.",
         "inputSchema": {
             "type": "object",
             "properties": {

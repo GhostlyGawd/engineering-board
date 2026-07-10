@@ -115,7 +115,7 @@ def suite_stdio(tmp_repo):
         expected = {"board_init", "board_list_projects", "board_create_entry",
                     "board_list_entries", "board_get_entry", "board_update_entry",
                     "board_rebuild", "board_capture_finding", "board_claim",
-                    "board_release", "board_status"}
+                    "board_release", "board_status", "board_remember"}
         check(expected <= names, "tools/list exposes all expected tools",
               "missing: %s" % (expected - names))
         for t in tools:
@@ -516,6 +516,351 @@ def suite_lifecycle(mod, tmp_repo):
 
 
 # ---------------------------------------------------------------------------
+# Suite: C5 — deterministic ready queue
+# ---------------------------------------------------------------------------
+def suite_ready(mod):
+    """Shared C5 semantics: ready iff status: open AND every blocked_by id that
+    resolves to an existing entry has status: resolved. Dangling blocker ids do
+    not block but are surfaced as warnings."""
+    print("\n== Suite: C5 ready queue ==")
+    root = tempfile.mkdtemp(prefix="eb-mcp-ready-")
+    try:
+        mod.tool_board_init({"project": "rdy", "root": root})
+
+        # Q001 open (blocker for B002); Q002 resolved (blocker for B003).
+        mod.tool_board_create_entry({
+            "project": "rdy", "root": root, "type": "question",
+            "title": "Open blocker question", "done_when": ["answered"]})
+        mod.tool_board_create_entry({
+            "project": "rdy", "root": root, "type": "question",
+            "title": "Resolved blocker question", "done_when": ["answered"]})
+        mod.tool_board_update_entry({"project": "rdy", "root": root,
+                                     "entry_id": "Q002", "status": "resolved"})
+
+        # B001: open, no blockers -> ready.
+        mod.tool_board_create_entry({
+            "project": "rdy", "root": root, "type": "bug",
+            "title": "No blockers", "priority": "P1", "affects": "rdy/a",
+            "done_when": ["x"]})
+        # B002: open, blocked_by open Q001 -> NOT ready.
+        mod.tool_board_create_entry({
+            "project": "rdy", "root": root, "type": "bug",
+            "title": "Blocked by open question", "priority": "P1",
+            "affects": "rdy/b", "blocked_by": ["Q001"], "done_when": ["x"]})
+        # B003: open, blocked_by resolved Q002 -> ready.
+        mod.tool_board_create_entry({
+            "project": "rdy", "root": root, "type": "bug",
+            "title": "Blocked by resolved question", "priority": "P1",
+            "affects": "rdy/c", "blocked_by": ["Q002"], "done_when": ["x"]})
+        # B004: open, blocked_by dangling X999 -> ready + warning.
+        mod.tool_board_create_entry({
+            "project": "rdy", "root": root, "type": "bug",
+            "title": "Dangling blocker", "priority": "P1",
+            "affects": "rdy/d", "blocked_by": ["X999"], "done_when": ["x"]})
+        # B005: in_progress, no blockers -> never ready.
+        mod.tool_board_create_entry({
+            "project": "rdy", "root": root, "type": "bug",
+            "title": "Already in progress", "priority": "P1",
+            "affects": "rdy/e", "status": "in_progress", "done_when": ["x"]})
+
+        lst = mod.tool_board_list_entries({"project": "rdy", "root": root,
+                                           "ready": True})
+        ids = sorted(e["id"] for e in lst["entries"])
+        check(ids == ["B001", "B003", "B004", "Q001"],
+              "ready filter: open+unblocked, resolved-blocker, dangling-blocker "
+              "and open question are ready", str(ids))
+        check("B002" not in ids, "ready filter: entry with an open blocker is not ready")
+        check("B005" not in ids, "ready filter: in_progress entry is never ready")
+        dang = lst.get("dangling_blockers") or []
+        check(any(w.get("entry") == "B004" and "X999" in w.get("missing", [])
+                  for w in dang),
+              "ready filter surfaces the dangling-blocker warning", json.dumps(dang))
+
+        # ready combines with other filters.
+        lst2 = mod.tool_board_list_entries({"project": "rdy", "root": root,
+                                            "ready": True, "type": "bug"})
+        ids2 = sorted(e["id"] for e in lst2["entries"])
+        check(ids2 == ["B001", "B003", "B004"],
+              "ready filter composes with type filter", str(ids2))
+
+        # board_status: ready ids + dangling_blockers warnings.
+        st = mod.tool_board_status({"project": "rdy", "root": root})["boards"][0]
+        check(st.get("ready") == ["B001", "B003", "B004", "Q001"],
+              "board_status.ready lists ready ids sorted", json.dumps(st.get("ready")))
+        check(any(w.get("entry") == "B004" and w.get("missing") == ["X999"]
+                  for w in st.get("dangling_blockers", [])),
+              "board_status.dangling_blockers reports {entry, missing}",
+              json.dumps(st.get("dangling_blockers")))
+
+        # cap: board_status.ready is capped at 20.
+        cap_root = tempfile.mkdtemp(prefix="eb-mcp-readycap-")
+        mod.tool_board_init({"project": "cap", "root": cap_root})
+        for i in range(22):
+            mod.tool_board_create_entry({
+                "project": "cap", "root": cap_root, "type": "bug",
+                "title": "bulk %02d" % i, "priority": "P2",
+                "affects": "cap/x", "done_when": ["x"]})
+        stc = mod.tool_board_status({"project": "cap", "root": cap_root})["boards"][0]
+        check(len(stc.get("ready", [])) == 20,
+              "board_status.ready is capped at 20", str(len(stc.get("ready", []))))
+        shutil.rmtree(cap_root, ignore_errors=True)
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+
+
+# ---------------------------------------------------------------------------
+# Suite: C6 — board_remember
+# ---------------------------------------------------------------------------
+def suite_remember(mod):
+    """board_remember writes a curator-shaped learning file directly
+    (source: remember), rebuilds BOARD.md, and keeps board-index-check.sh
+    green. Explicit user intent bypasses the recurrence->=3 threshold."""
+    print("\n== Suite: C6 board_remember ==")
+    root = tempfile.mkdtemp(prefix="eb-mcp-remember-")
+    index_check = os.path.join(PLUGIN_ROOT, "hooks", "scripts", "board-index-check.sh")
+    try:
+        mod.tool_board_init({"project": "mem", "root": root})
+
+        r = mod.tool_board_remember({
+            "project": "mem", "root": root,
+            "insight": "Always flush the buffer before close",
+            "context": "Applies to every buffered writer in exporters."})
+        check(r["id"] == "L001", "first remember allocates L001", r.get("id"))
+        check(r.get("source") == "remember", "result carries source=remember")
+        lpath = os.path.join(root, r["file"])
+        check(os.path.isfile(lpath), "learning file exists", r["file"])
+        with open(lpath, encoding="utf-8") as f:
+            text = f.read()
+        fm, body = mod.parse_frontmatter(text)
+        check(fm.get("source") == "remember", "frontmatter has source: remember")
+        check(fm.get("type") == "learning" and fm.get("subtype") == "finding",
+              "frontmatter type=learning subtype=finding", json.dumps(fm))
+        for key in ("confidence", "recurrence", "derived_from", "discovered"):
+            check(key in fm, "frontmatter has %s" % key)
+        check("## Takeaway" in body and "## Sources" in body
+              and "## When this applies" in body,
+              "body carries the curator-shaped sections")
+        rc, err = run_validate(lpath, root)
+        check(rc == 0, "remember-produced learning passes board-validate-entry.sh", err)
+
+        # BOARD.md treatment matches the curator/rebuild convention (L row).
+        with open(os.path.join(root, "engineering-board", "mem", "BOARD.md")) as f:
+            bmd = f.read()
+        check("- L001 | [" in bmd, "BOARD.md gained the L001 open row", bmd)
+
+        # index-check stays green after a remember.
+        proc = subprocess.run(["bash", index_check], capture_output=True, text=True,
+                              env=dict(os.environ, CLAUDE_PROJECT_DIR=root))
+        check(proc.returncode == 0, "board-index-check.sh green post-remember",
+              proc.stderr + proc.stdout)
+
+        # second remember allocates the next id.
+        r2 = mod.tool_board_remember({"project": "mem", "root": root,
+                                      "insight": "Second durable insight"})
+        check(r2["id"] == "L002", "second remember allocates L002", r2.get("id"))
+
+        # missing insight -> ToolError.
+        try:
+            mod.tool_board_remember({"project": "mem", "root": root})
+            raise Failure("expected ToolError for remember without insight")
+        except mod.ToolError:
+            ok("board_remember rejects a missing insight")
+
+        # newline in insight cannot inject frontmatter (title is flattened).
+        r3 = mod.tool_board_remember({
+            "project": "mem", "root": root,
+            "insight": "sneaky\nstatus: resolved\nmalicious: yes"})
+        with open(os.path.join(root, r3["file"]), encoding="utf-8") as f:
+            t3 = f.read()
+        fm3, _ = mod.parse_frontmatter(t3)
+        check("malicious" not in fm3,
+              "remember title newline cannot inject frontmatter keys")
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+
+
+# ---------------------------------------------------------------------------
+# Suite: C7 — comments + parent
+# ---------------------------------------------------------------------------
+def suite_comments_parent(mod):
+    print("\n== Suite: C7 comments + parent ==")
+    root = tempfile.mkdtemp(prefix="eb-mcp-c7-")
+    try:
+        mod.tool_board_init({"project": "fam", "root": root})
+
+        # parent round-trip on create.
+        mod.tool_board_create_entry({
+            "project": "fam", "root": root, "type": "bug",
+            "title": "Parent bug", "priority": "P2", "affects": "fam/a",
+            "done_when": ["x"]})
+        r = mod.tool_board_create_entry({
+            "project": "fam", "root": root, "type": "bug",
+            "title": "Child bug", "priority": "P0", "affects": "fam/b",
+            "parent": "B001", "done_when": ["x"]})
+        check(not r.get("warnings"), "existing parent produces no warning",
+              json.dumps(r.get("warnings")))
+        got = mod.tool_board_get_entry({"project": "fam", "root": root,
+                                        "entry_id": "B002"})
+        check(got["frontmatter"].get("parent") == "B001",
+              "parent round-trips through create -> get")
+        rc, err = run_validate(os.path.join(root, got["file"]), root)
+        check(rc == 0, "entry with parent passes board-validate-entry.sh", err)
+
+        # dangling parent -> warning in response, NOT an error; validator warns
+        # on stderr but still exits 0.
+        rd = mod.tool_board_create_entry({
+            "project": "fam", "root": root, "type": "bug",
+            "title": "Orphan child", "priority": "P3", "affects": "fam/c",
+            "parent": "F999", "done_when": ["x"]})
+        check(any("F999" in w for w in rd.get("warnings", [])),
+              "dangling parent create returns a warning", json.dumps(rd))
+        rc, err = run_validate(os.path.join(root, rd["file"]), root)
+        check(rc == 0, "dangling parent is accepted by the validator (warn, not fail)", err)
+        check("parent" in err.lower() and "F999" in err,
+              "validator warns about the dangling parent on stderr", err)
+
+        # parent settable via update, dangling -> warning.
+        ru = mod.tool_board_update_entry({"project": "fam", "root": root,
+                                          "entry_id": "B003", "parent": "B001"})
+        check(any("parent=B001" in c for c in ru["changes"]),
+              "board_update_entry sets parent")
+        check(not ru.get("warnings"), "update to an existing parent: no warning")
+        ru2 = mod.tool_board_update_entry({"project": "fam", "root": root,
+                                           "entry_id": "B003", "parent": "Q404"})
+        check(any("Q404" in w for w in ru2.get("warnings", [])),
+              "update to a dangling parent returns a warning", json.dumps(ru2))
+        mod.tool_board_update_entry({"project": "fam", "root": root,
+                                     "entry_id": "B003", "parent": "B001"})
+
+        # BOARD.md: children render indented under the parent, sorted by id,
+        # deterministic across rebuilds.
+        mod.tool_board_rebuild({"project": "fam", "root": root})
+        bmd_path = os.path.join(root, "engineering-board", "fam", "BOARD.md")
+        with open(bmd_path) as f:
+            bmd1 = f.read()
+        mod.tool_board_rebuild({"project": "fam", "root": root})
+        with open(bmd_path) as f:
+            bmd2 = f.read()
+        check(bmd1 == bmd2, "rebuild with parents is byte-deterministic")
+        lines = [ln for ln in bmd1.split("\n")]
+        pidx = next(i for i, ln in enumerate(lines) if ln.startswith("- B001 "))
+        check(lines[pidx + 1].startswith("  ↳ B002 ")
+              and lines[pidx + 2].startswith("  ↳ B003 "),
+              "children render as '  ↳ ' rows directly under the parent, id-sorted",
+              "\n".join(lines[pidx:pidx + 3]))
+
+        # a child whose parent is missing / lives in another section renders as
+        # a normal row.
+        mod.tool_board_create_entry({
+            "project": "fam", "root": root, "type": "question",
+            "title": "Cross-section parent?", "done_when": ["x"]})
+        rx = mod.tool_board_create_entry({
+            "project": "fam", "root": root, "type": "bug",
+            "title": "Question-parented bug", "priority": "P3",
+            "affects": "fam/d", "parent": "Q001", "done_when": ["x"]})
+        with open(bmd_path) as f:
+            bmd3 = f.read()
+        check("\n- %s " % rx["id"] in bmd3,
+              "child with an other-section parent renders as a normal row", bmd3)
+
+        # comment: creates the section once, appends thereafter, single line,
+        # UTC ISO8601, server-side timestamp.
+        import re as _re
+        mod.tool_board_update_entry({
+            "project": "fam", "root": root, "entry_id": "B001",
+            "comment": {"author": "alice", "text": "first note"}})
+        md = mod.tool_board_get_entry({"project": "fam", "root": root,
+                                       "entry_id": "B001"})["markdown"]
+        check(md.count("## Comments") == 1, "first comment creates ## Comments once")
+        check(_re.search(r"^- \*\*alice\*\* \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z: first note$",
+                         md, _re.M) is not None,
+              "comment line format '- **author** <UTC ISO8601>: text'", md)
+        mod.tool_board_update_entry({
+            "project": "fam", "root": root, "entry_id": "B001",
+            "comment": {"author": "bob", "text": "second\nnote with\nnewlines"}})
+        md2 = mod.tool_board_get_entry({"project": "fam", "root": root,
+                                        "entry_id": "B001"})["markdown"]
+        check(md2.count("## Comments") == 1,
+              "second comment appends to the existing section (created once)")
+        check(_re.search(r"^- \*\*bob\*\* \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z: second note with newlines$",
+                         md2, _re.M) is not None,
+              "comment text is sanitized to a single line", md2)
+        a_pos = md2.find("- **alice**")
+        b_pos = md2.find("- **bob**")
+        check(0 < a_pos < b_pos, "comments append in order")
+        rc, err = run_validate(
+            os.path.join(root, mod.tool_board_get_entry(
+                {"project": "fam", "root": root, "entry_id": "B001"})["file"]), root)
+        check(rc == 0, "entry with comments still passes validation", err)
+
+        # malformed comment -> ToolError.
+        try:
+            mod.tool_board_update_entry({"project": "fam", "root": root,
+                                         "entry_id": "B001", "comment": {"author": "x"}})
+            raise Failure("expected ToolError for comment without text")
+        except mod.ToolError:
+            ok("comment without text is rejected")
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+
+
+# ---------------------------------------------------------------------------
+# Suite: C8 — AGENTS.md emission on board_init
+# ---------------------------------------------------------------------------
+def suite_agents_md(mod):
+    print("\n== Suite: C8 AGENTS.md emission ==")
+    root = tempfile.mkdtemp(prefix="eb-mcp-agents-")
+    try:
+        # created when absent (default agents_md=true).
+        mod.tool_board_init({"project": "ag", "root": root})
+        ap = os.path.join(root, "AGENTS.md")
+        check(os.path.isfile(ap), "board_init creates AGENTS.md by default")
+        with open(ap, encoding="utf-8") as f:
+            t1 = f.read()
+        check("<!-- engineering-board:start -->" in t1
+              and "<!-- engineering-board:end -->" in t1,
+              "AGENTS.md carries the marker fence")
+        for tool_name in ("board_capture_finding", "board_claim",
+                          "board_update_entry", "board_create_entry"):
+            check(tool_name in t1, "AGENTS.md block mentions %s" % tool_name)
+
+        # idempotent re-init: byte-stable.
+        mod.tool_board_init({"project": "ag", "root": root})
+        with open(ap, encoding="utf-8") as f:
+            t2 = f.read()
+        check(t1 == t2, "re-init leaves AGENTS.md byte-identical")
+
+        # pre-existing content outside the markers is preserved.
+        pre_root = tempfile.mkdtemp(prefix="eb-mcp-agents2-")
+        pre_path = os.path.join(pre_root, "AGENTS.md")
+        with open(pre_path, "w", encoding="utf-8") as f:
+            f.write("# My agents\n\nHand-written guidance stays.\n")
+        mod.tool_board_init({"project": "ag", "root": pre_root})
+        with open(pre_path, encoding="utf-8") as f:
+            t3 = f.read()
+        check("Hand-written guidance stays." in t3,
+              "content outside the markers is preserved")
+        check("<!-- engineering-board:start -->" in t3,
+              "block appended to a pre-existing AGENTS.md")
+        mod.tool_board_init({"project": "ag", "root": pre_root})
+        with open(pre_path, encoding="utf-8") as f:
+            t4 = f.read()
+        check(t3 == t4, "re-init on a pre-existing AGENTS.md is idempotent")
+        check(t4.count("<!-- engineering-board:start -->") == 1,
+              "exactly one marker block after repeated inits")
+        shutil.rmtree(pre_root, ignore_errors=True)
+
+        # opt-out.
+        off_root = tempfile.mkdtemp(prefix="eb-mcp-agents3-")
+        mod.tool_board_init({"project": "ag", "root": off_root, "agents_md": False})
+        check(not os.path.exists(os.path.join(off_root, "AGENTS.md")),
+              "agents_md=false suppresses AGENTS.md")
+        shutil.rmtree(off_root, ignore_errors=True)
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 def suite_distribution():
@@ -693,8 +1038,16 @@ def main():
     try:
         suite_stdio(tmp1)
         suite_lifecycle(mod, tmp2)
-        suite_distribution()
+        suite_ready(mod)
+        suite_remember(mod)
+        suite_comments_parent(mod)
+        suite_agents_md(mod)
         suite_multiclient()
+        # Distribution runs LAST: its fileSha256 pin intentionally trips on any
+        # server/hooks-script change until the release coherence pass re-pins
+        # via build-mcpb.sh — running it last keeps that expected drift from
+        # masking real feature-suite failures above.
+        suite_distribution()
     except Failure as e:
         print("\n  [FAIL] %s" % e, file=sys.stderr)
         print("\nRESULT: FAIL (%d checks passed before failure)" % len(PASSED), file=sys.stderr)

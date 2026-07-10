@@ -14,6 +14,7 @@
       "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-relocate.sh:*)",
       "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-permission-self-check.sh)",
       "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-view.sh:*)",
+      "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-remember.sh:*)",
       "SlashCommand(/pm-start)",
       "SlashCommand(/worker-start --discipline tdd)",
       "SlashCommand(/worker-start --discipline review)",
