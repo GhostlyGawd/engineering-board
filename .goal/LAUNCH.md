@@ -138,3 +138,102 @@ human prerequisites; nothing above can run until the release tag exists.
 - [ ] `/plugin marketplace add` + `/plugin install` in a fresh interactive
       session (BLOCKERS B1 — needs a human session).
 - [ ] Social preview shows on a shared repo link (after §1 upload — B3).
+
+## 7. Submissions — ready to fire (prepared 2026-07-10)
+
+The four §4 channels still marked **[human]**, now as ready-to-paste blocks.
+Each block: the exact text, the URL to paste it at, and the human account action
+it needs. Facts checked against the repo at v1.6.1 (heading to 1.7.0 this
+release); the texts below are version-agnostic so they stay pasteable. Fire
+these only after the current release is tagged and live on `main`.
+
+### 7a. awesome-claude-code — "Recommend a new resource" issue
+
+- **Where:** <https://github.com/hesreallyhim/awesome-claude-code> → open a new
+  issue with the **"Recommend a new resource"** template (issue, **not** a PR —
+  their vetting is issue-driven). Fill the template's fields with the values
+  below; if field names have drifted, map by meaning.
+- **Human action:** GitHub account — open the issue, respond to the automated
+  vetting/maintainer follow-up.
+- **Paste values:**
+  - **Resource name:** `engineering-board`
+  - **Link:** `https://github.com/GhostlyGawd/engineering-board`
+  - **Category:** the plugins/tooling category the form offers (it is a Claude
+    Code plugin + MCP server; pick the plugin option where present)
+  - **Author:** `GhostlyGawd` (`https://github.com/GhostlyGawd`)
+  - **Description:**
+    > The board is the database — a git-committed kanban board your AI agents
+    > run and remember. A Stop hook passively captures findings each session,
+    > PM mode promotes them to a live board, and worker agents drive each card
+    > through a tdd → review → validate pipeline under atomic claim-locking.
+    > Recurring lessons promote into committed Learning entries. Everything is
+    > plain markdown in your repo — no hidden DB, no server. Ships as a Claude
+    > Code plugin and a zero-dependency MCP server; dogfooded on its own live
+    > board: https://ghostlygawd.github.io/engineering-board/board.html
+
+### 7b. awesome-mcp-servers — PR entry line
+
+- **Where:** <https://github.com/punkpeye/awesome-mcp-servers> → fork, add the
+  line below to the closest project/task-management or developer-tools section
+  (alphabetical within the section), open a PR. Before submitting, check the
+  list's legend and mirror its current emoji markers — the line below uses
+  🐍 (Python) and 🏠 (local/self-hosted) per their convention.
+- **Human action:** GitHub account — fork, PR, respond to maintainer review.
+- **Paste line (their `- [owner/repo](link) marks - description` format):**
+
+  ```markdown
+  - [GhostlyGawd/engineering-board](https://github.com/GhostlyGawd/engineering-board) 🐍 🏠 - Git-committed markdown kanban board that AI agents fill in and work through themselves: passive finding capture, atomic claim-locking for parallel agents, and durable cross-session learnings — all plain markdown in your repo, no database.
+  ```
+
+### 7c. Smithery — publish the MCP server
+
+- **Where:** <https://smithery.ai/new> (docs: <https://smithery.ai/docs/build/publish>).
+  The config has shipped in-repo since v1.4.0: [`mcp-server/smithery.yaml`](../mcp-server/smithery.yaml)
+  (container runtime, stdio, optional `projectDir` → `CLAUDE_PROJECT_DIR`).
+- **Human action:** Smithery account + API key (this is the one channel §3's
+  release workflow does **not** cover).
+- **Steps:**
+
+  ```sh
+  # from a clone of main at the current release tag
+  cd mcp-server
+  smithery login          # needs the Smithery API key
+  smithery mcp publish    # reads smithery.yaml
+  ```
+
+  Then on the Smithery listing page: confirm the description matches the repo
+  tagline ("The board is the database — a git-committed kanban board your AI
+  agents run and remember."), and that the repo link and MIT license show.
+  Re-run `smithery mcp publish` on future releases (add it as a step beside §3's
+  workflow-dispatch runs).
+
+### 7d. Claude community marketplace — plugin submission form
+
+- **Where:** `https://platform.claude.com/plugins/submit` (Console) or
+  `https://claude.ai/admin-settings/directory/submissions/plugins/new`
+  (Team/Enterprise admin). Reviewed + safety-screened; the accepted listing is
+  pinned to a commit SHA.
+- **Human action:** Claude account with Console (or Team/Enterprise admin)
+  access — submit the form, track the review.
+- **Pre-flight (already verified clean in §6, re-run at the release tag):**
+
+  ```sh
+  claude plugin validate
+  ```
+
+- **Form field values:**
+  - **Plugin name:** `engineering-board`
+  - **Repository:** `https://github.com/GhostlyGawd/engineering-board`
+  - **Marketplace file:** `.claude-plugin/marketplace.json` (repo root; users
+    can already self-serve via `/plugin marketplace add GhostlyGawd/engineering-board`)
+  - **Commit SHA to pin:** the commit the current release tag points at
+    (`git rev-parse <tag>` — reviewers pin to it)
+  - **Website:** `https://ghostlygawd.github.io/engineering-board/`
+  - **Description:**
+    > The board is the database — a git-committed kanban board your AI agents
+    > run and remember. Passive finding capture each session, a tdd → review →
+    > validate worker pipeline, atomic claim-locking for parallel agents, and
+    > durable Learning entries — all committed markdown, reviewable in the same
+    > PRs as your code. MIT; also available as a zero-dependency MCP server.
+  - **Support contact:** the repo's Issues page
+    (`https://github.com/GhostlyGawd/engineering-board/issues`)
