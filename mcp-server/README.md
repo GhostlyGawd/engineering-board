@@ -46,7 +46,7 @@ All 12 tools from the spec are implemented; none were dropped.
 
 The server is published to PyPI as
 [`engineering-board-mcp`](https://pypi.org/project/engineering-board-mcp/)
-(published from v1.7.0), so the primary install is one `uvx` line — no clone,
+(available with the v1.7.0 release), so the primary install is one `uvx` line — no clone,
 no absolute path. The clone path still works everywhere and is the fallback.
 
 > **Note (PyPI installs):** `board_claim` / `board_release` shell out to the
@@ -57,7 +57,7 @@ no absolute path. The clone path still works everywhere and is the fallback.
 ### Claude Code (CLI)
 
 ```sh
-# primary — uvx (published from v1.7.0)
+# primary — uvx (available with the v1.7.0 release)
 claude mcp add engineering-board -- uvx engineering-board-mcp
 ```
 

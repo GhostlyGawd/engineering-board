@@ -23,8 +23,9 @@ ROOT="${1:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 PLUGIN_JSON="$ROOT/.claude-plugin/plugin.json"
 MARKETPLACE_JSON="$ROOT/.claude-plugin/marketplace.json"
 PYPROJECT_TOML="$ROOT/mcp-server/pyproject.toml"
+README_MD="$ROOT/README.md"
 
-for f in "$PLUGIN_JSON" "$MARKETPLACE_JSON" "$PYPROJECT_TOML"; do
+for f in "$PLUGIN_JSON" "$MARKETPLACE_JSON" "$PYPROJECT_TOML" "$README_MD"; do
   if [ ! -f "$f" ]; then
     echo "version-coherence: MISSING $f" >&2
     exit 1
@@ -36,15 +37,20 @@ if ! command -v python3 >/dev/null 2>&1; then
   exit 1
 fi
 
-RESULT="$(python3 - "$PLUGIN_JSON" "$MARKETPLACE_JSON" "$PYPROJECT_TOML" <<'PY'
+# Capture without aborting on a nonzero python exit, so the FAIL diagnostic the
+# python block prints is actually echoed instead of set -e killing us silently.
+set +e
+RESULT="$(python3 - "$PLUGIN_JSON" "$MARKETPLACE_JSON" "$PYPROJECT_TOML" "$README_MD" <<'PY'
 import json, re, sys
-plugin_path, marketplace_path, pyproject_path = sys.argv[1], sys.argv[2], sys.argv[3]
+plugin_path, marketplace_path, pyproject_path, readme_path = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 with open(plugin_path, "r", encoding="utf-8") as f:
     plugin = json.load(f)
 with open(marketplace_path, "r", encoding="utf-8") as f:
     market = json.load(f)
 with open(pyproject_path, "r", encoding="utf-8") as f:
     pyproject_text = f.read()
+with open(readme_path, "r", encoding="utf-8") as f:
+    readme_text = f.read()
 
 plugin_name    = plugin.get("name", "")
 plugin_version = plugin.get("version", "")
@@ -71,22 +77,40 @@ if market_version != plugin_version:
     sys.exit(1)
 
 # pyproject.toml (C3 PyPI package) must be in the same lockstep. Parsed with a
-# regex, not tomllib (3.11+): the version key is the first `version = "..."`
-# top-level assignment inside [project] — matching the repo's python floor.
-pm = re.search(r'^version\s*=\s*"([^"]+)"\s*$', pyproject_text, re.M)
+# regex, not tomllib (3.11+): matching the repo's python floor. Scope to the
+# [project] table so a decoy `version =` under [build-system]/[tool.*] can't be
+# read instead of the real package version.
+project_section = re.search(
+    r'(?ms)^\[project\]\s*$(.*?)(?=^\[|\Z)', pyproject_text)
+if not project_section:
+    print("FAIL pyproject.toml has no [project] table")
+    sys.exit(1)
+pm = re.search(r'^version\s*=\s*"([^"]+)"\s*$', project_section.group(1), re.M)
 if not pm:
-    print(f"FAIL pyproject.toml has no parseable version = \"...\" line")
+    print(f"FAIL pyproject.toml [project] has no parseable version = \"...\" line")
     sys.exit(1)
 pyproject_version = pm.group(1)
 if pyproject_version != plugin_version:
-    print(f"FAIL version mismatch: plugin.json={plugin_version!r} vs pyproject.toml={pyproject_version!r}")
+    print(f"FAIL version mismatch: plugin.json={plugin_version!r} vs pyproject.toml [project]={pyproject_version!r}")
     sys.exit(1)
 
-print(f"OK plugin={plugin_name} version={plugin_version} (marketplace.json + pyproject.toml in lockstep)")
+# README version badge must match too (the shields badge drifts silently — it is
+# the version a human reads first, and nothing else pins it).
+bm = re.search(r'img\.shields\.io/badge/version-([0-9][^-]*)-', readme_text)
+if not bm:
+    print("FAIL README.md has no parseable version badge")
+    sys.exit(1)
+readme_version = bm.group(1)
+if readme_version != plugin_version:
+    print(f"FAIL version mismatch: plugin.json={plugin_version!r} vs README badge={readme_version!r}")
+    sys.exit(1)
+
+print(f"OK plugin={plugin_name} version={plugin_version} (marketplace.json + pyproject.toml + README badge in lockstep)")
 sys.exit(0)
 PY
 )"
 EXIT=$?
+set -e
 
 echo "$RESULT"
 exit "$EXIT"

@@ -182,7 +182,14 @@
     /* Partial sits between yes and no: muted like .no but weighted, so the eye
        reads three levels without a third hue (token stays theme-aware). */
     .partial{color:var(--eb-text-muted);font-weight:600}
-    .cmp-scroll{overflow-x:auto}
+    .cmp-scroll{overflow-x:auto;max-width:100%}
+    /* Mobile overflow guard: grid/flex items default to min-width:auto, which
+       refuses to shrink below their content's intrinsic width — long unbreakable
+       lines in the install <pre> blocks (clone URL, mcp-add command) then force
+       the whole page wide. min-width:0 lets the card shrink so its own <pre>
+       (overflow-x:auto) scrolls internally instead of pushing the body. */
+    .install .card2,.vp .card2,.code-wrap{min-width:0}
+    .code-wrap,pre{max-width:100%}
 
     /* Compact FAQ block under the value-prop grid (mirror of .vp .card2). */
     .faq{margin-top:1rem;background:var(--eb-surface);border:1px solid var(--eb-border);
@@ -321,7 +328,7 @@
           </div>
           <div class="card2 reveal">
             <p class="eyebrow">MCP server (any client)</p>
-            <pre><code># one line from PyPI (published from v1.7.0)
+            <pre><code># one line from PyPI (available with the v1.7.0 release)
 claude mcp add engineering-board -- uvx engineering-board-mcp
 
 # fallback — run from a clone:

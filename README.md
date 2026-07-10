@@ -98,7 +98,7 @@ allowlist on its own — `/board-setup` simply composes the two.
 
 ### MCP server
 
-Register the zero-dependency `python3` server with the Claude Code CLI — one line from PyPI (published from v1.7.0):
+Register the zero-dependency `python3` server with the Claude Code CLI — one line from PyPI (available with the v1.7.0 release; the clone below works today):
 
 ```sh
 claude mcp add engineering-board -- uvx engineering-board-mcp

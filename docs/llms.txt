@@ -39,7 +39,7 @@ Claude Code plugin (full autonomous pipeline; requires Claude Code, free):
     /plugin install engineering-board
     /board-setup
 
-MCP server, primary path — one line from PyPI (published from v1.7.0):
+MCP server, primary path — one line from PyPI (available with the v1.7.0 release):
 
     claude mcp add engineering-board -- uvx engineering-board-mcp
 

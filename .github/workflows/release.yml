@@ -35,6 +35,11 @@ on:
         required: false
         type: boolean
         default: false
+      publish_pypi:
+        description: "Also publish the MCP server to PyPI (trusted publishing)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # create tag ref + release
@@ -171,6 +176,10 @@ jobs:
   # the exact tagged tree.
   pypi:
     needs: release
+    # Opt-in (like the registry publish) and re-run-safe: publishing is
+    # irreversible and a re-dispatched tag would otherwise 400 on a duplicate
+    # upload after the release job short-circuits.
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_pypi
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -201,3 +210,4 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: mcp-server/dist/
+          skip-existing: true
