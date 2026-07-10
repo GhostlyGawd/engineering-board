@@ -176,6 +176,121 @@ B="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
 CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo >/dev/null 2>&1
 [ -f "$P/engineering-board/demo/board.html" ] && pass "write mode creates board.html" || fail "board.html not written"
 
+# ---------------------------------------------------------------------------
+# C4 — client-side search + filters (controls hidden without JS; vanilla JS).
+# ---------------------------------------------------------------------------
+echo "$OUT" | grep -q '<div class="controls" id="eb-controls" hidden>' && pass "C4: controls markup present and hidden in static HTML" || fail "C4: controls markup missing or not hidden"
+echo "$OUT" | grep -q 'id="eb-search"' && pass "C4: search input present" || fail "C4: search input missing"
+if echo "$OUT" | grep -q 'data-fgroup="type"' && echo "$OUT" | grep -q 'data-fval="p0"' && echo "$OUT" | grep -q 'data-fval="resolved"'; then
+  pass "C4: type/priority/status filter chips present"
+else
+  fail "C4: filter chips missing"
+fi
+echo "$OUT" | grep -q '<script>' && pass "C4: embedded JS block present" || fail "C4: JS block missing"
+echo "$OUT" | grep -qF "key === '/'" && pass "C4: '/' focuses search (keydown handler)" || fail "C4: slash-focus handler missing"
+# Cards carry the data attributes the filter needs.
+if echo "$OUT" | grep -q 'data-type="bug"' && echo "$OUT" | grep -q 'data-priority="p1"' && echo "$OUT" | grep -q 'data-status="open"'; then
+  pass "C4: cards carry data-type/data-priority/data-status"
+else
+  fail "C4: card data attributes missing"
+fi
+echo "$OUT" | grep -q 'data-search="b001 todo card' && pass "C4: cards carry lowercase searchable text (id + title)" || fail "C4: data-search missing"
+echo "$OUT" | grep -q 'class="no-match" hidden' && pass "C4: empty-state message present (hidden by default)" || fail "C4: empty-state div missing"
+# The searchable text of the XSS title must still be escaped in the attribute.
+echo "$OUT" | grep -qF 'data-search="b001 todo card &lt;script&gt;' && pass "C4: data-search escapes untrusted title text" || fail "C4: data-search not escaped"
+
+# ---------------------------------------------------------------------------
+# C7 (view part) — parent badge on child cards.
+# ---------------------------------------------------------------------------
+mk features/F001.md <<'EOF'
+---
+id: F001
+type: feature
+title: child feature under a bug
+discovered: 2026-07-04
+status: open
+priority: P2
+affects: src/d.py
+needs: tdd
+parent: B001
+---
+## Done when
+- x
+EOF
+PARENT_OUT="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
+echo "$PARENT_OUT" | grep -qF '<span class="badge parent">↳ B001</span>' && pass "C7: parent badge rendered on a parent-carrying card" || fail "C7: parent badge missing"
+echo "$OUT" | grep -qF 'badge parent' && fail "C7: parent badge leaks onto cards without parent" || pass "C7: no parent badge without parent frontmatter"
+
+# ---------------------------------------------------------------------------
+# C12 — Stats panel (pure derivation from parsed entries).
+# Fixture at this point: bugs = B001 open, B002 open, B003 + B010..B022 resolved
+# (14 resolved); features = F001 open; questions = Q001 open; learnings = L001.
+# ---------------------------------------------------------------------------
+echo "$PARENT_OUT" | grep -qF '>Stats</h2>' && pass "C12: stats panel header present" || fail "C12: stats panel missing"
+echo "$PARENT_OUT" | grep -qF 'bugs</span> <span class="stat-v">2 open · 14 resolved' && pass "C12: per-type bug counts correct" || fail "C12: bug counts wrong"
+echo "$PARENT_OUT" | grep -qF 'features</span> <span class="stat-v">1 open · 0 resolved' && pass "C12: per-type feature counts correct" || fail "C12: feature counts wrong"
+echo "$PARENT_OUT" | grep -qF 'learnings</span> <span class="stat-v">1</span>' && pass "C12: learnings total correct" || fail "C12: learnings total wrong"
+echo "$PARENT_OUT" | grep -qF 'alpha ×1' && pass "C12: top pattern tags among open entries surfaced" || fail "C12: top pattern tags missing"
+
+# ---------------------------------------------------------------------------
+# C12 — Coordination panel: graceful empty states without runtime artifacts.
+# ---------------------------------------------------------------------------
+echo "$PARENT_OUT" | grep -qF '>Coordination</h2>' && pass "C12: coordination panel header present" || fail "C12: coordination panel missing"
+if echo "$PARENT_OUT" | grep -qF 'no active claims' && echo "$PARENT_OUT" | grep -qF 'no recent reclaims' && echo "$PARENT_OUT" | grep -qF 'no active workers'; then
+  pass "C12: coordination empty states (no _claims / log / registry)"
+else
+  fail "C12: coordination empty states missing"
+fi
+
+# Coordination with a real claim dir: owner + entry id shown, escaped.
+mkdir -p "$P/engineering-board/demo/_claims/B001"
+cat > "$P/engineering-board/demo/_claims/B001/owner.txt" <<'EOF'
+session_id: sess-abc123 <b>evil</b>
+timestamp: 2026-07-04T00:00:00Z
+cwd: /tmp/x
+EOF
+# _reclaimed.log: one malformed line (skipped, not fatal) + one valid line.
+cat > "$P/engineering-board/demo/_claims/_reclaimed.log" <<'EOF'
+this is not json {{{
+{"reclaimed_at": "2026-07-03T12:00:00Z", "entry_id": "B002", "reason": "stale_no_heartbeat", "age_sec": 999.0, "stale_threshold_sec": 600, "owner_info": "session_id: old-sess"}
+EOF
+# Active-workers registry (project-level runtime state).
+mkdir -p "$P/.engineering-board"
+cat > "$P/.engineering-board/active-workers.json" <<'EOF'
+[{"session_id": "worker-1234567890", "started_at": "2026-07-04T00:00:00Z", "last_seen": "2026-07-04T00:05:00Z", "mode": "worker", "discipline": "tdd", "cwd": "/tmp/x", "claim_ids_held": ["B001"], "paused": false}]
+EOF
+COORD="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
+[ -n "$COORD" ] && pass "C12: render survives runtime artifacts present" || fail "C12: render failed with runtime artifacts"
+if echo "$COORD" | grep -qF 'B001' && echo "$COORD" | grep -qF 'sess-abc123'; then
+  pass "C12: current claim shows entry id + owner"
+else
+  fail "C12: claim owner/id not rendered"
+fi
+echo "$COORD" | grep -qF '<b>evil</b>' && fail "C12: owner.txt content injected raw (XSS)" || pass "C12: claim owner content is HTML-escaped"
+echo "$COORD" | grep -qF 'B002 · 2026-07-03T12:00:00Z' && pass "C12: valid reclaim line rendered (entry id + time)" || fail "C12: reclaim line missing"
+echo "$COORD" | grep -qF 'this is not json' && fail "C12: malformed reclaim line leaked into output" || pass "C12: malformed reclaimed.log line skipped, not fatal"
+if echo "$COORD" | grep -qF 'worker-1234' && echo "$COORD" | grep -qF '>worker' ; then
+  pass "C12: active worker rendered (mode + session)"
+else
+  fail "C12: active worker missing"
+fi
+
+# Garbled runtime files must never fail the render.
+echo 'garbage{{{' > "$P/.engineering-board/active-workers.json"
+echo 'not even close' > "$P/engineering-board/demo/_claims/B001/owner.txt"
+GARBLED="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"; RC=$?
+if [ "$RC" -eq 0 ] && echo "$GARBLED" | grep -q '<!doctype html>'; then
+  pass "C12: garbled owner.txt + registry degrade gracefully (render still ok)"
+else
+  fail "C12: garbled runtime files broke the render (rc=$RC)"
+fi
+echo "$GARBLED" | grep -qF 'no active workers' && pass "C12: garbled registry falls back to empty state" || fail "C12: garbled registry not treated as empty"
+
+# Byte-determinism holds with coordination data in the input tree.
+C1="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
+C2="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
+[ "$C1" = "$C2" ] && pass "C12: byte-deterministic with claims/reclaims/workers present" || fail "C12: non-deterministic with coordination data"
+
 echo ""
 echo "================================================================"
 echo "board-view: $PASS pass, $FAIL fail"
