@@ -1,19 +1,19 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
   "name": "io.github.GhostlyGawd/engineering-board",
-  "description": "A git-committed kanban board your AI agents run and remember - 11 MCP tools over stdio.",
+  "description": "A git-committed kanban board your AI agents run and remember - 12 MCP tools over stdio.",
   "repository": {
     "url": "https://github.com/GhostlyGawd/engineering-board",
     "source": "github"
   },
-  "version": "1.6.1",
+  "version": "1.7.0",
   "websiteUrl": "https://ghostlygawd.github.io/engineering-board/",
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/GhostlyGawd/engineering-board/releases/download/v1.6.1/engineering-board-mcp.mcpb",
-      "version": "1.6.1",
-      "fileSha256": "3dbea277f7f6fd09dbadc61a97a5c2b9993e8b26e8dd292298dfac20d1e1f45f",
+      "identifier": "https://github.com/GhostlyGawd/engineering-board/releases/download/v1.7.0/engineering-board-mcp.mcpb",
+      "version": "1.7.0",
+      "fileSha256": "67231a9d11a05df3f55fbedb24946dc468171cbb9680589d6959e1dcf0d0691d",
       "transport": {
         "type": "stdio"
       },

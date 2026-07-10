@@ -1803,8 +1803,16 @@ def serve_stdio(stdin=None, stdout=None):
             stdout.flush()
 
 
-if __name__ == "__main__":
+def main():
+    """Console-script entry point (PyPI package `engineering-board-mcp`).
+
+    Same behavior as running the file directly: the stdio JSON-RPC loop,
+    exiting quietly when the client closes the pipe."""
     try:
         serve_stdio()
     except (BrokenPipeError, KeyboardInterrupt):
         pass
+
+
+if __name__ == "__main__":
+    main()

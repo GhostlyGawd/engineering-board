@@ -1,0 +1,46 @@
+# pyproject.toml — PyPI packaging for the engineering-board MCP server (C3).
+#
+# The server is a single zero-dependency python3 module, so the package is a
+# single py-module next to this file. Publishing makes the install one line:
+#
+#     claude mcp add engineering-board -- uvx engineering-board-mcp
+#
+# Version is locked to .claude-plugin/plugin.json (enforced by
+# tests/version-coherence.sh). Release publishing runs via PyPI trusted
+# publishing in .github/workflows/release.yml (no stored secrets).
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "engineering-board-mcp"
+version = "1.7.0"
+description = "Zero-dependency MCP server for engineering-board: a git-committed kanban board your AI agents run and remember."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "Acadia" }]
+keywords = ["mcp", "mcp-server", "kanban", "multi-agent", "agentic-workflow", "claude-code"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development",
+]
+# Zero runtime dependencies — the server implements MCP stdio/JSON-RPC directly.
+dependencies = []
+
+[project.urls]
+Homepage = "https://ghostlygawd.github.io/engineering-board/"
+Repository = "https://github.com/GhostlyGawd/engineering-board"
+Documentation = "https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md"
+Changelog = "https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELOG.md"
+
+[project.scripts]
+engineering-board-mcp = "engineering_board_mcp:main"
+
+[tool.setuptools]
+py-modules = ["engineering_board_mcp"]

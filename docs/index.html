@@ -269,7 +269,7 @@
           <div class="card2 reveal"><h3>Durable memory</h3><p><strong>Your agent forgets everything between sessions.</strong> Recurring lessons promote into committed Learning entries (L###) that survive — surfaced at session start and in a dedicated Learnings panel on <a href="board.html">the board view</a>.</p><p class="proof">learnings-curator → learnings/L###</p></div>
           <div class="card2 reveal"><h3>Collision-free agents</h3><p><strong>Two agents editing the same file clobber each other.</strong> Atomic claim-locking lets parallel worker agents run without stepping on each other.</p><p class="proof">board-claim-acquire.sh · tested</p></div>
           <div class="card2 reveal"><h3>Autonomous pipeline</h3><p>Findings flow through a tdd → review → validate state machine, driven by the Stop hook.</p><p class="proof">tdd-builder · code-reviewer · validator</p></div>
-          <div class="card2 reveal"><h3>Runs where you are — and everywhere else</h3><p>A native Claude Code plugin and an MCP server (11 tools) over the same board format.</p><p class="proof">.mcp.json · protocol 2025-06-18</p></div>
+          <div class="card2 reveal"><h3>Runs where you are — and everywhere else</h3><p>A native Claude Code plugin and an MCP server (12 tools) over the same board format.</p><p class="proof">.mcp.json · protocol 2025-06-18</p></div>
         </div>
         <div class="faq reveal">
           <h3>Why not Claude Code's built-in Tasks?</h3>
@@ -321,21 +321,22 @@
           </div>
           <div class="card2 reveal">
             <p class="eyebrow">MCP server (any client)</p>
-            <pre><code># clone the repo, then point python3 at the server:
-git clone https://github.com/GhostlyGawd/engineering-board
+            <pre><code># one line from PyPI (published from v1.7.0)
+claude mcp add engineering-board -- uvx engineering-board-mcp
 
-# Claude Code
+# fallback — run from a clone:
+git clone https://github.com/GhostlyGawd/engineering-board
 claude mcp add engineering-board -- \
   python3 "$(pwd)/engineering-board/mcp-server/engineering_board_mcp.py"
 
 # Claude Desktop: claude_desktop_config.json
 "mcpServers": {
   "engineering-board": {
-    "command": "python3",
-    "args": ["/path/to/mcp-server/engineering_board_mcp.py"]
+    "command": "uvx",
+    "args": ["engineering-board-mcp"]
   }
 }</code></pre>
-            <p class="muted" style="font-size:.8rem">Pure python3, zero dependencies. 11 tools over stdio.</p>
+            <p class="muted" style="font-size:.8rem">Pure python3, zero dependencies. 12 tools over stdio. Works with any MCP client — Codex, Gemini CLI, Cursor: <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md">setup blocks</a>.</p>
           </div>
         </div>
         <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Uninstall any time — the board stays as plain markdown in your repo, so there's no lock-in. And it's built for untrusted input: scratch content is treated as data, never instructions, and hardened against prompt injection (<a href="https://github.com/GhostlyGawd/engineering-board/blob/main/SECURITY.md">security posture</a>).</p>

@@ -237,3 +237,23 @@ these only after the current release is tagged and live on `main`.
     > PRs as your code. MIT; also available as a zero-dependency MCP server.
   - **Support contact:** the repo's Issues page
     (`https://github.com/GhostlyGawd/engineering-board/issues`)
+
+### 7e. PyPI — trusted publisher (one-time setup for `engineering-board-mcp`)
+
+- **Where:** <https://pypi.org/manage/account/publishing/> ("Add a new pending
+  publisher" — works before the project's first release).
+- **Human action:** PyPI account — register the pending trusted publisher, then
+  run (or re-run) the release workflow. No API token or repo secret is needed;
+  the `pypi` job in `.github/workflows/release.yml` authenticates via GitHub
+  OIDC and publishes `mcp-server/` (sdist + wheel) after the GitHub Release
+  succeeds.
+- **Pending-publisher form values:**
+  - **PyPI project name:** `engineering-board-mcp`
+  - **Owner:** `GhostlyGawd`
+  - **Repository name:** `engineering-board`
+  - **Workflow name:** `release.yml`
+  - **Environment name:** `pypi`
+- **Also:** create the matching `pypi` environment in the repo (GitHub Settings
+  → Environments → New environment → `pypi`; no secrets, optionally restrict to
+  protected tags). The first successful `pypi` job run creates the PyPI project
+  and makes `uvx engineering-board-mcp` live (docs say "published from v1.7.0").

@@ -27,29 +27,90 @@ the current working directory, and can be overridden per-call with a `root` argu
 
 | Tool | What it does |
 |------|--------------|
-| `board_init` | Scaffold a project board (router row, `BOARD.md`, `ARCHIVE.md`, 5 subdirs + `.gitkeep`). Idempotent — never clobbers. |
+| `board_init` | Scaffold a project board (router row, `BOARD.md`, `ARCHIVE.md`, 5 subdirs + `.gitkeep`). Idempotent — never clobbers. Optional `agents_md` (default true) writes a marker-fenced usage block into the repo's `AGENTS.md` for hook-less agents. |
 | `board_list_projects` | List projects from `BOARD-ROUTER.md` (id, path, affects prefix). |
-| `board_create_entry` | Create a valid entry (bug/feature/question/observation/learning) with correct frontmatter + required body sections, allocate the next zero-padded id, rebuild the index. Output passes `board-validate-entry.sh`. |
-| `board_list_entries` | List entries with parsed frontmatter; filters: `project`, `type`, `status`, `needs`. |
+| `board_create_entry` | Create a valid entry (bug/feature/question/observation/learning) with correct frontmatter + required body sections, allocate the next zero-padded id, rebuild the index. Output passes `board-validate-entry.sh`. Optional `parent` links a subtask to an existing entry. |
+| `board_list_entries` | List entries with parsed frontmatter; filters: `project`, `type`, `status`, `needs`, `ready`. `ready: true` is the deterministic ready queue — open entries whose existing `blocked_by` targets are all resolved (dangling ids warn, never block). |
 | `board_get_entry` | Full markdown of one entry by id (+ parsed frontmatter). |
-| `board_update_entry` | Update frontmatter (`status`, `needs`, `priority`, `blocked_by`) and/or append a body section; validate the status transition; rebuild the index. |
-| `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files (P0→P3 ordering, `⊘ Q###` when blocked, resolved omitted). Idempotent. |
+| `board_update_entry` | Update frontmatter (`status`, `needs`, `priority`, `blocked_by`, `parent`) and/or append a body section; validate the status transition; rebuild the index. Optional `comment: {author, text}` appends a server-timestamped line to the entry's `## Comments` section. |
+| `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files (P0→P3 ordering, `⊘ Q###` when blocked, `↳` child rows under parents, resolved omitted). Idempotent. |
 | `board_capture_finding` | Append a finding to the scratch inbox `_sessions/mcp-<UTC-date>.md`. |
 | `board_claim` | Acquire an entry lock (shells out to `board-claim-acquire.sh`; 0=acquired, 1=contended, 2=stale). |
 | `board_release` | Release an entry lock (shells out to `board-claim-release.sh`; 0=released, 3=owner mismatch/missing, 4=retries exhausted). |
-| `board_status` | Overview: per-type open counts, `in_progress` ids, `blocked` ids, un-promoted scratch count. |
+| `board_remember` | Save a durable insight straight to `learnings/L###-<slug>.md` (`source: remember`) and rebuild the index — explicit intent bypasses the curator's recurrence-≥3 threshold. |
+| `board_status` | Overview: per-type open counts, `in_progress` ids, `blocked` ids, the ready queue (capped at 20) with dangling-blocker warnings, un-promoted scratch count. |
 
-All 11 tools from the spec are implemented; none were dropped.
+All 12 tools from the spec are implemented; none were dropped.
 
 ## Configuration
+
+The server is published to PyPI as
+[`engineering-board-mcp`](https://pypi.org/project/engineering-board-mcp/)
+(published from v1.7.0), so the primary install is one `uvx` line — no clone,
+no absolute path. The clone path still works everywhere and is the fallback.
+
+> **Note (PyPI installs):** `board_claim` / `board_release` shell out to the
+> plugin's `hooks/scripts/board-claim-*.sh`, which the PyPI package does not
+> ship; on a PyPI install those two tools return a clean error unless the
+> plugin (or a repo clone) is present. All other tools are self-contained.
 
 ### Claude Code (CLI)
 
 ```sh
-claude mcp add engineering-board -- python3 /abs/path/to/engineering-board/mcp-server/engineering_board_mcp.py
+# primary — uvx (published from v1.7.0)
+claude mcp add engineering-board -- uvx engineering-board-mcp
 ```
 
-Replace `/abs/path/to/engineering-board` with the absolute path to this repo.
+Fallback — run from a clone:
+
+```sh
+git clone https://github.com/GhostlyGawd/engineering-board
+claude mcp add engineering-board -- python3 "$(pwd)/engineering-board/mcp-server/engineering_board_mcp.py"
+```
+
+### Codex CLI
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.engineering-board]
+command = "uvx"
+args = ["engineering-board-mcp"]
+```
+
+Or one line: `codex mcp add engineering-board -- uvx engineering-board-mcp`.
+
+### Gemini CLI
+
+Add to `~/.gemini/settings.json` (or per-project `.gemini/settings.json`):
+
+```json
+{
+  "mcpServers": {
+    "engineering-board": {
+      "command": "uvx",
+      "args": ["engineering-board-mcp"]
+    }
+  }
+}
+```
+
+Or one line: `gemini mcp add engineering-board uvx engineering-board-mcp`.
+
+### Cursor
+
+Add to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` in the project:
+
+```json
+{
+  "mcpServers": {
+    "engineering-board": {
+      "command": "uvx",
+      "args": ["engineering-board-mcp"]
+    }
+  }
+}
+```
 
 ### Claude Desktop
 
@@ -60,12 +121,15 @@ Add to `claude_desktop_config.json` (macOS:
 {
   "mcpServers": {
     "engineering-board": {
-      "command": "python3",
-      "args": ["/abs/path/to/engineering-board/mcp-server/engineering_board_mcp.py"]
+      "command": "uvx",
+      "args": ["engineering-board-mcp"]
     }
   }
 }
 ```
+
+(Clone fallback: `"command": "python3"`, `"args":
+["/abs/path/to/engineering-board/mcp-server/engineering_board_mcp.py"]`.)
 
 ### Bundled with the plugin (automatic)
 
@@ -89,18 +153,20 @@ No separate install step is needed when the plugin is installed.
 ## Distribution channels
 
 The server ships from this repo tree (it shells out to sibling
-`hooks/scripts/board-claim-*.sh` for locking, so it is not a standalone single
-file). Beyond cloning the repo, two packaged channels are prepared:
+`hooks/scripts/board-claim-*.sh` for locking; every other tool is
+self-contained). Beyond cloning the repo, the packaged channels:
 
+- **PyPI (`engineering-board-mcp`)** — the uvx one-liner above. Published from
+  v1.7.0 by the release workflow via PyPI trusted publishing (OIDC, no stored
+  secret); [`pyproject.toml`](pyproject.toml) is the package manifest.
 - **MCP bundle (`.mcpb`)** — `bash mcp-server/build-mcpb.sh` produces
   `dist/engineering-board-mcp.mcpb`, a self-contained bundle (server + the hook
   scripts it calls + [`manifest.json`](manifest.json)) for one-click install in
   MCP-bundle-aware clients. The bundle is a release asset, not committed source.
-- **MCP Registry** — [`server.json`](server.json) is the registry manifest
-  (namespace `io.github.ghostlygawd/engineering-board`), pointing at the `.mcpb`
-  release asset. Publishing is a human step (`mcp-publisher`), tracked in
-  [`.goal/LAUNCH.md`](../.goal/LAUNCH.md) §4; once published it auto-syndicates to
-  PulseMCP / Glama / mcp.so.
+- **MCP Registry — live** — published as
+  [`io.github.GhostlyGawd/engineering-board`](https://registry.modelcontextprotocol.io/?search=engineering-board);
+  [`server.json`](server.json) is the registry manifest, pointing at the `.mcpb`
+  release asset. Listings auto-syndicate to PulseMCP / Glama / mcp.so.
 - **Smithery** — [`smithery.yaml`](smithery.yaml) describes the stdio launch for
   `smithery mcp publish`.
 
