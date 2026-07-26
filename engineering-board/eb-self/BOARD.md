@@ -9,7 +9,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 - B020 P3 | [B020-board-migrate-is-two-unrelated-operations-under-](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
 - B021 P3 | [B021-code-reviewer-name-collides-with-code-review-and](bugs/B021-code-reviewer-name-collides-with-code-review-and.md)
 - B022 P3 | [B022-nothingtotest--nothingtoreview-still-advance-the](bugs/B022-nothingtotest--nothingtoreview-still-advance-the.md)
-- B057 P3 | [B057-count-scratch-findings-undercounts-multi-find](bugs/B057-count-scratch-findings-undercounts-multi-find.md)
 
 ### Features
 - F003 P3 | [F003-surface-matched-learnings-at-the-moment-of-need-](features/F003-surface-matched-learnings-at-the-moment-of-need-.md) (partial — 1.4.0 viewer Learnings panel done + SessionStart already surfaces matched learnings; session-end PM-summary surfacing deferred, PR-body injection kill-gated to the Conductor)
