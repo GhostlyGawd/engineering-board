@@ -1,602 +1,708 @@
 # Engineering Board Product Evolution Spec
 
-_Status: Living direction draft — Gate 1 (no implementation authorized)_
+_Status: Authoritative living product direction — Gate 1 accepted in principle;
+implementation remains gated_
 _Started: 2026-07-27_
+_Last direction revision: 2026-07-27_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
 _Current live baseline: `main` at `4ee6c5239e152b20c4c2a07ef0c4d4fceefa48f3`_
 _Portfolio context: inventory-only; audit source `GhostlyGawd/repo-audit` at
 `907f0759f9d08f478cd5384ad88e50963f1af79a`_
 
-## 1. How to use this document
+## 1. Authority and use
 
-This is the durable workpad for deciding the next product shape before building
-it. Update it as decisions are made. Do not treat proposed commands, interfaces,
-or milestones as shipped behavior until the owner approves the implementation
-contract and the corresponding code, tests, current-truth documentation, and
-evidence land together.
+This document is the central source of truth for Engineering Board product
+direction. It records the product thesis, accepted boundaries, sequencing,
+open decisions, and the contract that future implementation plans must serve.
+Update it as product decisions are made instead of relying on chat memory.
 
-Decision states used below:
+Authority and precedence:
 
-- **Active direction** — the current recommendation, subject to owner revision.
-- **Accepted** — explicitly approved by the owner.
-- **Open** — a material choice still awaiting owner direction.
-- **Deferred** — intentionally not part of the next implementation milestone.
+1. The product owner's latest explicit decision.
+2. This living product-direction spec.
+3. An approved milestone implementation contract.
+4. `ROADMAP.md`, RFCs, audits, and dated research as planning evidence.
+
+This document governs intended direction, not claims about shipped behavior.
+Current code, tests, command contracts, and current-truth documentation govern
+what the released product does today. Proposed behavior must not be advertised
+as shipped until its implementation, tests, documentation, and evidence land
+together.
+
+Decision states:
+
+- **Accepted** — explicitly chosen product direction.
+- **Active recommendation** — recommended, but still revisable by the owner.
+- **Open** — a material product choice is unresolved.
+- **Deferred** — deliberately outside the next milestone.
 - **Rejected** — considered and deliberately excluded.
 
-This draft does not supersede the existing
-[`ROADMAP.md`](../ROADMAP.md) or
-[`RFC 0003`](rfcs/0003-productization-roadmap.md) until Gate 1 is accepted.
-Those documents remain evidence and planning inputs.
+No product implementation begins until an implementation contract for the
+selected milestone is approved.
 
 ## 2. Decision ledger
 
 | Decision | State | Current direction |
 |---|---|---|
-| Product outcome | Active direction | Make Engineering Board the easiest way for an AI coding agent to notice, finish, prove, and remember repository work. |
-| Implementation boundary | Accepted by current request | Write and revise this spec only. Do not implement product behavior until the owner says the contract is ready to build. |
-| Product identity | Active direction | Keep committed Markdown, human-visible diffs, local-first operation, deterministic validation, atomic claims, and the `tdd → review → validate` quality loop. |
-| Competitor adoption rule | Active direction | Adopt mechanisms that improve activation, next-action clarity, human control, or compounding memory. Do not copy another product's storage model or feature breadth. |
-| Default capture policy | Active direction | Capture automatically; promote explicitly through a foreground action. Do not silently turn every scratch finding into committed project state. |
-| Session modes | Active direction | Keep PM and Worker modes as advanced batch controls, but remove them from the default first-run and single-entry workflow. |
-| Resolution authority | Active direction | Validation may recommend closure; final `status: resolved` remains an explicit user or explicitly authorized command action. |
-| Database or hosted service | Deferred | No Dolt/SQLite migration, hosted control plane, daemon, account system, or cloud sync in the next milestones. |
-| Cross-session Conductor | Deferred | RFC 0001's persistent supervisor remains a later option, not the next required product step. |
-| Team dashboard and monetization | Deferred | Do not build until the single-repository activation and retention loop is proven. |
-| Pending PR #93 | Independent | The B057 fix and 1.7.1 release preparation remain a separate open PR and are not part of this spec branch. |
+| Central product-direction source | Accepted | This document is authoritative for product direction. Roadmaps, RFCs, audits, and earlier prose cannot silently override it. |
+| Primary product outcome | Accepted | Turn accumulated engineering findings into visible, clustered graph memory that helps agents recognize recurring and cross-domain root causes, avoid repeated band-aid fixes, and make better decisions in later sessions. |
+| Product substrate | Accepted | Pattern intelligence is the substrate. Capture, execution, TDD, review, and validation support and improve that intelligence; they are not the primary product identity. |
+| Durable state | Accepted | Preserve repository-owned, human-readable Markdown as the canonical evidence and knowledge record. |
+| Derived graph | Accepted | Generate machine-readable relationships, clusters, and retrieval views from canonical repository state. Derived artifacts must remain explainable from source evidence. |
+| SQLite | Active recommendation | Do not replace Markdown. Consider SQLite only as a disposable, locally rebuildable analysis index after measured scale or query needs justify it. |
+| Epistemic boundary | Active recommendation | Separate observed evidence, deterministic relationships, inferred root-cause candidates, confirmed conclusions, and durable learnings. Never present a cluster as proof of causation. |
+| Default capture policy | Active recommendation | Capture automatically; promote explicitly through a foreground action. Automatic capture does not silently become committed project truth. |
+| Verification loop | Accepted | Keep `tdd → review → validate` as an optional, falsifiable fix-verification and feedback mechanism. Do not make it the required first experience or the headline value. |
+| Claims and resolution | Active recommendation | Preserve atomic claims. Validation may recommend closure; final resolution remains an explicit user or explicitly authorized action. |
+| Session modes | Active recommendation | Keep PM and Worker modes as advanced batch controls, not required concepts in the default pattern-memory workflow. |
+| Cross-repository intelligence | Deferred | Prove repository-local pattern intelligence before designing aggregation across repositories. |
+| Hosted service or required database | Deferred | No hosted control plane, daemon, account system, cloud sync, or required database in the next milestones. |
+| Structured planning bridge | Deferred | PRD decomposition remains a possible later input path, not the product substrate. |
+| Cross-session Conductor | Deferred | RFC 0001's persistent supervisor is not the next required product step. |
+| Team dashboard and monetization | Deferred | Do not build until repository-local intelligence has demonstrated repeatable value. |
+| Pending PR #93 | Independent | The B057 fix and 1.7.1 release preparation remain separate from this direction branch. |
 
 ## 3. Product thesis
 
-Engineering Board is not primarily a task tracker. It is a repository-owned
-engineering control loop:
+Engineering Board is a repository-owned pattern-intelligence system for
+engineering agents.
+
+Its core value is not that it can move a task through a build loop. Its core
+value is that it accumulates findings across turns and sessions, connects
+symptoms that would otherwise remain isolated, and makes recurring or
+cross-domain failure patterns visible early enough for an agent to investigate
+the shared cause.
 
 ```text
-notice work
-  → capture evidence
-  → promote reviewed project state
-  → identify ready work
-  → claim without collision
-  → implement
-  → review
-  → validate
-  → resolve explicitly
-  → retain and resurface the lesson
+encounter a symptom
+  → capture the finding and provenance
+  → promote reviewed repository evidence
+  → normalize failure patterns and affected domains
+  → connect related findings in a graph
+  → detect recurring and cross-domain clusters
+  → propose an evidence-linked root-cause hypothesis
+  → surface it when an agent is making a relevant decision
+  → fix the system rather than each symptom
+  → feed the outcome back into confidence and durable learning
 ```
 
-The combination is the product. Individual steps overlap with other tools, but
-the complete visible loop is the differentiator.
+The Markdown board is the visible memory. The graph is the connective memory.
+The pattern-analysis and retrieval layer is the intelligence multiplier.
+Verification closes the feedback loop by showing whether the inferred cause
+and chosen fix were actually correct.
 
-### Non-negotiable properties
+### The job to be done
 
-1. **The repository owns the durable state.** A fresh agent can reconstruct the
-   board from versioned files without an external service.
-2. **Humans can inspect meaningful diffs.** Project state must not become an
-   opaque database export.
-3. **Automatic capture does not equal automatic commitment.** Promotion is a
-   review boundary unless the owner later approves an explicit opt-in policy.
-4. **Quality gates remain falsifiable.** TDD, review, and validation must leave
-   inspectable evidence and may regress an entry to an earlier stage.
-5. **Claims remain atomic.** Convenience features must not weaken collision
-   prevention.
-6. **The default path is simple; advanced automation is discoverable.** New
-   users should not need to understand hooks, mode files, disciplines, or
-   orchestration internals to complete one entry.
-7. **Plugin and MCP clients share semantics.** Client adapters may differ, but
-   they must not invent incompatible board behavior.
+> When engineering findings accumulate over time, help the next agent see the
+> system-level pattern that no individual chat contains, with enough provenance
+> to act on it without trusting an opaque conclusion.
 
-## 4. Current workflow and present problems
+### Product promise
 
-### Actors today
+Engineering Board should help an agent answer:
 
-| Actor | Current responsibility |
-|---|---|
-| User | Supplies intent, decides which findings become project work, approves consequential actions, and explicitly resolves validated entries. |
-| Interactive agent | Works in the current session, invokes commands/tools, and explains board state. |
-| Stop-hook controller | Routes a turn into passive, PM, paused, or Worker behavior based on `session-mode.json`. |
-| Discipline workers | Perform bounded TDD, review, or validation work and suggest the next `needs:` state. |
-| Repository files | Authoritative board, claim, archive, scratch, and learning state. |
+1. What has been observed?
+2. Which findings appear related, even across different components?
+3. What recurring failure pattern connects them?
+4. Is there a plausible shared root cause, and what evidence supports it?
+5. What prior fixes or learnings apply here?
+6. What root-level investigation or action should happen next?
+7. Did the eventual fix validate or weaken the hypothesis?
 
-### Observed problems
+## 4. Non-negotiable properties
 
-1. **Capture visibility shipped, but the product story still describes the old
-   silent behavior.** The Stop procedure now surfaces the append helper's
-   `EB-CAPTURE-SUMMARY`, while the README still tells users to inspect
-   `_sessions/` for confirmation. The remaining problem is documentation drift
-   and ensuring the receipt stays concise and reliable.
-2. **The best behavior appears too late.** Watching an agent drive a card
-   through the quality loop requires real work, promotion, mode knowledge, and
-   sometimes a fresh session.
-3. **The normal path exposes orchestration internals.** PM and Worker are useful
-   batch primitives, but onboarding presents them as required product concepts.
-4. **Ready work exists but is not the primary interaction.** The MCP server can
-   compute a deterministic ready queue, yet plugin users must already know an
-   entry ID and command.
-5. **Promotion is gated behind PM mode.** Casual users can accumulate scratch
-   without ever creating the durable board state that powers later value.
-6. **The visual board reports state better than it directs action.** Resolved
-   history can dominate; single-letter filters are opaque; cards do not lead
-   with the next executable action.
-7. **The learning loop is underfed and under-explained.** Learnings are curated
-   in PM mode and surfaced at SessionStart, but users may never generate enough
-   durable state to reach the compounding loop.
-8. **Core setup semantics are not fully adapter-parallel.** The plugin exposes
-   `/board-setup`; MCP exposes lower-level `board_init`.
+1. **Canonical evidence stays visible.** A human or fresh agent can inspect
+   meaningful Markdown, provenance, diffs, and history without a special
+   database client.
+2. **Derived intelligence is explainable.** Every edge, cluster, hypothesis,
+   and learning links back to the findings or rules that produced it.
+3. **Evidence and inference remain distinct.** Similarity is not causation.
+   Root-cause candidates carry confidence and status rather than masquerading
+   as facts.
+4. **Memory compounds across sessions.** Useful findings do not disappear with
+   chat context, and resolved cases continue to inform later work.
+5. **Cross-domain connections are first-class.** Shared failure modes may
+   connect different files, subsystems, or workflows even when their surface
+   symptoms differ.
+6. **The system resists vocabulary fragmentation.** Pattern aliases and
+   normalization prevent equivalent concepts from becoming disconnected tags.
+7. **Repository state is portable and local-first.** A required service,
+   account, or opaque binary store is not a prerequisite for correct behavior.
+8. **Automatic capture is not automatic belief.** Promotion and interpretation
+   retain review boundaries appropriate to their authority.
+9. **Verification improves memory.** Fix outcomes may strengthen, weaken, split,
+   merge, or retire a hypothesis or learning.
+10. **Automation fails visibly.** A corrupt cache, failed rebuild, unsupported
+    adapter, or uncertain inference produces an explicit limitation, not false
+    confidence.
 
-These problems are documented in the dated
-[`ACTIVATION.md`](../ACTIVATION.md),
-[`RETENTION.md`](../RETENTION.md), and
-[`COMPREHENSION.md`](../COMPREHENSION.md) audits. They are historical evidence,
-not automatically current implementation truth.
+## 5. What exists today
 
-## 5. Competitive design inputs
+The current product already contains important pieces of this direction:
 
-The goal is selective adoption, not convergence.
+| Layer | Current behavior | Limitation |
+|---|---|---|
+| Finding capture | Stop-hook extraction appends evidence-backed scratch findings and surfaces a capture receipt. | Pattern metadata is not assigned until intake/promotion, so captured evidence does not immediately participate in analysis. |
+| Canonical board | Promoted bugs, features, questions, observations, and learnings are readable Markdown with frontmatter. | The board is optimized around entry lifecycle more than knowledge connectivity. |
+| Pattern vocabulary | Intake asks agents to reuse kebab-case failure-mode tags and apply them broadly. | Free-form exact strings fragment easily; aliases, hierarchy, and semantic equivalence are not represented. |
+| Structural graph | `/board-graph` defines nodes, explicit relationships, shared-pattern, shared-affects, shared-tag edges, topology, and typed findings in `GRAPH.yml`. | The graph builder is a command procedure rather than a shared deterministic executable engine. Exact tags and path prefixes miss semantically related cross-domain symptoms. |
+| Cluster surfacing | Intake and triage flag a pattern at 2+ occurrences; SessionStart warns at 3+ open occurrences. | Thresholds and presentation differ. Counts identify recurrence but do not explain cluster evidence or competing hypotheses. |
+| Learning curation | At 3+ resolved entries sharing an exact pattern, the curator creates a source-linked Learning and raises confidence by recurrence. | Curation runs through PM mode, treats recurrence count as the main confidence signal, and does not learn from failed fixes or rejected causal hypotheses. |
+| Context retrieval | SessionStart shows up to three medium/high-confidence learnings filtered by `applies_to` and current directory. | Retrieval is path-centric and does not surface relevant live clusters, root-cause candidates, or the reason a cross-domain match matters. |
+| Resolution feedback | Resolution archives pattern tags and can cascade across pattern/affects neighbors. | A resolution does not yet record whether the suspected root cause was confirmed, whether the fix held, or which cluster interpretation changed. |
+| Quality workflow | Worker mode can drive `tdd → review → validate`, retain claims, and ask for explicit resolution. | This strong implementation loop dominates the current story even though it is downstream of the intelligence benefit. |
 
-| Source | What it does especially well | Adopt or adapt | Do not import |
+The product does not need a new identity invented from scratch. It needs to
+connect and elevate mechanisms it already partially owns.
+
+## 6. Epistemic model
+
+Pattern intelligence is only valuable if agents can tell what is known from
+what is inferred.
+
+| Layer | Meaning | Authority | Durable form |
 |---|---|---|---|
-| [Beads](https://github.com/gastownhall/beads) | Makes `ready → claim → close` and persistent memory first-class; supports large dependency graphs and multi-agent sync. | Make ready work and the recommended next action first-class. Prime agents with concise workflow context. Surface remembered knowledge at the moment of work. | Dolt storage, sync complexity, database-first inspection, graph breadth not required by the current consumer. |
-| [Backlog.md](https://github.com/MrLesk/Backlog.md) | Gives humans rich Markdown tasks, acceptance criteria, comments, and an actionable browser UI. | Elevate the existing `## Done when` contract in cards and execution. Make the board easier to scan and act from. Preserve human review checkpoints. | A general-purpose project-management suite, mutable hosted UI, milestones/settings breadth, or duplicated task schema. |
-| [Task Master](https://github.com/eyaltoledano/claude-task-master) | Turns PRDs into tasks, recommends the next task, expands work, and offers research-assisted planning. | Provide one obvious next-work action. Later evaluate spec-to-parent/subtask decomposition using Engineering Board's existing hierarchy. Keep tool exposure lean. | Provider/model configuration, research-provider surface area, or PRD decomposition in the first activation milestone. |
-| [Claude Code Tasks](https://code.claude.com/docs/en/interactive-mode#task-list) | Provides a zero-install personal checklist integrated into the active coding session. | Compose rather than compete: use native Tasks for ephemeral session planning and promote durable discoveries to Engineering Board. | Reimplementing the session checklist or treating user-local task files as shared repository state. |
+| Observation | A symptom, constraint, result, or user report with provenance. | Captured evidence; reviewed at promotion. | Canonical Markdown finding/entry. |
+| Relationship fact | An explicit dependency, contradiction, shared exact pattern, shared affected prefix, or other reproducible relation. | Deterministic rule or explicit author. | Derived graph edge with source/rule reference. |
+| Candidate cluster | A reproducible grouping that crosses a configured threshold. | Deterministic clustering engine. | Rebuildable derived graph record. |
+| Root-cause hypothesis | An interpretation explaining why cluster members may share a cause. | Agent-generated proposal with cited members, confidence, alternatives, and falsifier. | Proposed insight; durable only when retained through an explicit policy. |
+| Confirmed finding | A hypothesis supported by investigation or fix outcome. | Explicit resolution/investigation evidence. | Canonical Markdown update with provenance. |
+| Learning | A reusable conclusion with scope, recurrence, confidence, and source cases. | Explicit remember action or approved deterministic curation policy. | Canonical Markdown learning. |
 
-### Comparative product position
+Required state transitions:
 
-| Need | Best fit today |
-|---|---|
-| Personal checklist inside one Claude Code session | Claude Code Tasks |
-| Large distributed dependency graph and agent coordination | Beads |
-| Rich human-and-agent Markdown project management | Backlog.md |
-| PRD decomposition and task expansion | Task Master |
-| Automatically discovered, repository-visible engineering work driven through a quality pipeline and retained as repo knowledge | Engineering Board |
+```text
+evidence
+  → deterministic relation/cluster
+  → proposed hypothesis
+  → confirmed | weakened | rejected | split | merged
+  → contextual learning
+```
 
-Engineering Board should become easier, not broader. It loses its reason to
-exist if it turns into a weaker clone of any row above.
+A candidate may remain unresolved indefinitely. Rejection is useful memory and
+must prevent the same weak explanation from being repeatedly proposed without
+new evidence.
 
-## 6. Proposed direction: retain, append, replace, revise
+## 7. Storage architecture: Markdown, graph, and SQLite
+
+### Decision
+
+Use a layered model:
+
+```text
+Canonical write model        Derived read models
+---------------------        -------------------
+Markdown entries      ────→  GRAPH.yml / graph records
+Markdown learnings    ────→  cluster and retrieval views
+Markdown decisions    ────→  optional local SQLite index later
+Git history           ────→  regenerated caches
+```
+
+Markdown remains authoritative. Generated graph or database artifacts are
+disposable read models. If every derived artifact is deleted, the product must
+be able to reconstruct the same logical intelligence from canonical files.
+
+### Tradeoff
+
+| Property | Markdown only | SQLite as authority | Recommended layered model |
+|---|---|---|---|
+| Human inspection and review | Excellent | Poor without tooling | Excellent |
+| Git diffs and merge recovery | Excellent | Binary and conflict-prone | Canonical diffs remain excellent |
+| Portability and zero-service use | Excellent | Requires schema/tooling | Excellent; index optional |
+| Transactions and referential integrity | Manual | Strong | Canonical writes remain explicit; index can validate |
+| Large scans, joins, ranking, and aggregation | Degrades with corpus size | Strong | SQLite can accelerate only when justified |
+| Full-text and compound queries | Awkward | Strong | Optional index serves advanced queries |
+| Corruption recovery | Source files are directly recoverable | Depends on backup/migrations | Delete and rebuild derived state |
+| Agent readability | Direct | Tool-mediated | Direct evidence plus efficient query tools |
+| Trust and explainability | High | Can become opaque | High if every result links to source |
+
+### Why not migrate now
+
+At the current product stage, SQLite would improve query mechanics more than
+user value. It would not by itself solve tag fragmentation, causal inference,
+cluster explanation, contextual retrieval, or feedback from fix outcomes.
+Those are the actual intelligence gaps.
+
+Adding a database now would create schema migration, cache invalidation,
+cross-platform packaging, corruption recovery, and Git-ignore behavior before
+a measured workload proves they are needed. Nothing in the current
+repository-local consumer fails because SQLite is absent.
+
+### Adoption trigger for an optional SQLite index
+
+Evaluate a derived SQLite index only when at least one is demonstrated:
+
+1. A representative large-board benchmark cannot meet an approved interactive
+   latency target by parsing canonical files and generated graph records.
+2. Required cluster, history, or retrieval queries cannot be expressed
+   reliably in the current read model.
+3. Incremental recomputation is required to keep analysis usable at a measured
+   corpus size.
+
+Any SQLite proposal must prove:
+
+- deletion and deterministic rebuild from canonical Markdown;
+- logically equivalent query and cluster results with and without the index;
+- source provenance for every returned result;
+- no committed binary database or database merge workflow;
+- schema versioning and forward recovery;
+- corrupt or stale index detection with safe self-rebuild;
+- cross-platform packaging and performance evidence;
+- no dependency on SQLite for reading, editing, reviewing, or recovering the
+  board.
+
+SQLite is therefore a future optimization candidate, not a product-direction
+migration.
+
+## 8. Competitive position
+
+Engineering Board should selectively absorb useful interaction patterns from
+adjacent products while preserving its distinct job.
+
+| Source | Strength to learn from | Apply to Engineering Board | Boundary |
+|---|---|---|---|
+| [Beads](https://github.com/gastownhall/beads) | Durable agent memory, graph queries, ready work, and multi-agent coordination. | Make graph memory and contextual retrieval first-class; provide concise next investigation/action. | Do not adopt database-first authority or distributed sync before a current consumer requires it. |
+| [Backlog.md](https://github.com/MrLesk/Backlog.md) | Rich, inspectable Markdown tasks and human-friendly browsing. | Keep evidence, hypotheses, acceptance criteria, and learning provenance easy to read and review. | Do not become a general-purpose project-management suite. |
+| [Task Master](https://github.com/eyaltoledano/claude-task-master) | PRD decomposition and recommended-next workflows. | Later accept structured plans as one finding source and make the next investigation obvious. | Planning breadth is not the intelligence substrate. |
+| Claude Code Tasks | Frictionless in-session checklist. | Compose with it: ephemeral steps remain session-local; durable discoveries enter Engineering Board. | Do not rebuild a personal checklist. |
+
+The differentiator is:
+
+> Evidence-visible, repository-owned, clustered engineering memory that helps
+> agents connect symptoms across time and domains, form inspectable root-cause
+> hypotheses, and learn from what actually fixed them.
+
+## 9. Retain, append, replace, revise
 
 ### Retain
 
-- Committed Markdown as authoritative durable state.
-- Scratch inbox as the automatic-capture buffer.
-- Explicit promotion as the commitment/review boundary.
-- Existing entry IDs, hierarchy, `blocked_by`, priorities, and `## Done when`.
-- Deterministic ready-queue semantics.
-- Atomic claim acquisition, heartbeat, stale reclamation, and release.
-- `tdd → review → validate` transitions with allowed regressions.
-- Explicit final resolution and archival provenance.
+- Canonical Markdown entries, learnings, and Git history.
+- Automatic scratch capture with evidence anchors.
+- Explicit promotion as the commitment boundary.
+- `pattern`, `affects`, relationships, source IDs, and resolution provenance.
+- Deterministic graph facts and typed findings.
 - Local-first operation with no required service.
+- Atomic claims, blockers, priorities, hierarchy, and `## Done when`.
+- Explicit final resolution.
+- TDD, review, and validation as available proof mechanisms.
 
 ### Append
 
-1. **A guided, disposable first-win experience.**
-2. **A foreground promote action** that does not require PM mode.
-3. **A next-work action** that chooses from the deterministic ready queue and
-   explains its choice.
-4. **Consistent capture-receipt semantics** that preserve the shipped
-   confirmation, prevent noise, and describe it accurately on every surface.
-5. **Local value accrual** showing resolved entries, retained learnings, and
-   context-relevant learnings.
-6. **Adapter parity** for the direct setup/promote/next workflow.
+1. A normalized pattern vocabulary with aliases and stable pattern identity.
+2. A shared deterministic graph builder below plugin and MCP adapters.
+3. Candidate clusters that explain membership, signals, thresholds, and
+   cross-domain reach.
+4. An on-demand interpretation layer that proposes root-cause hypotheses with
+   evidence, alternatives, confidence, and falsifiers.
+5. Durable feedback recording whether an investigation or fix confirmed,
+   weakened, rejected, split, or merged a hypothesis.
+6. Context retrieval that surfaces relevant live clusters and learnings when an
+   agent is investigating or changing related code.
+7. Foreground promotion and analysis that do not require persistent PM mode.
+8. A visible pattern-memory view showing how current findings connect to prior
+   cases.
+9. Evaluation fixtures that measure useful cross-domain connection and false
+   positives, not only file/schema conformance.
 
 ### Replace
 
-1. Replace the documented default
-   `setup → passive wait → PM mode → end turn → fresh session → run`
-   with
-   `setup → guided first win → normal work → promote → next → run`.
-2. Replace “know an entry ID first” with “show me the best ready entry and why.”
-3. Replace opaque first-run mode language with value language. Modes remain in
-   advanced documentation.
-4. Replace visually dominant resolved history with an action-first default view.
+1. Replace the headline
+   `capture → tdd → review → validate`
+   story with
+   `capture → connect → recognize → investigate root cause → learn`.
+2. Replace the first-win build demo with a pattern-intelligence demo: several
+   apparently separate findings reveal a shared, evidence-linked cause.
+3. Replace exact-string recurrence as the whole intelligence model with a
+   layered model of normalized patterns, explicit relations, topology, and
+   bounded semantic interpretation.
+4. Replace raw recurrence counts as confidence with evidence quality, diversity
+   of domains, investigation outcomes, counter-evidence, and recurrence.
+5. Replace “show me a card” as the primary board question with “what systemic
+   pattern needs attention, and why?”
 
 ### Revise
 
-1. Revise `/board-setup` so it is the single canonical setup instruction on
-   every product surface.
-2. Revise `/board-run` completion so it presents the exact validation outcome
-   and explicit resolve action without implying that validation silently closes
-   project work.
-3. Revise SessionStart to lead with ready work, pending promotion, and relevant
-   retained knowledge; demote implementation terminology.
-4. Revise the HTML board to prioritize ready/open work, use named filters, and
-   expose copyable next actions.
-5. Revise learning curation so the direct workflow can feed it without requiring
-   a persistent PM-mode session.
+1. Revise `/board-graph` from a prompt-level procedure into a tested shared
+   engine with stable output semantics.
+2. Revise SessionStart to prioritize active systemic patterns, relevant
+   clusters, unresolved hypotheses, and applicable learnings.
+3. Revise learning curation to consume direct promotion/resolution feedback,
+   not only PM turns and exact resolved-tag counts.
+4. Revise the HTML board into an evidence-to-pattern view while retaining
+   action and lifecycle visibility.
+5. Revise promotion so pattern assignment and normalization are inspectable
+   and correctable.
+6. Revise TDD/review/validation messaging so it demonstrates how a root-cause
+   fix was verified and how that outcome updates memory.
+7. Revise plugin and MCP adapters to expose the same graph, cluster, and
+   evidence semantics without promising unsupported autonomous execution.
 
-## 7. Target user journeys
+## 10. Target journeys
 
-### 7.1 First install and first win
-
-Target:
+### 10.1 First win
 
 ```text
 install
   → /board-setup
-  → choose "try a guided sample"
-  → watch one bounded sample move through tdd → review → validate
-  → see exactly what changed
+  → load a bounded sample containing three symptoms in different domains
+  → capture/promote the findings
+  → generate the graph
+  → see the shared pattern and why each finding belongs
+  → inspect the proposed common root cause and its uncertainty
   → remove or retain the sample explicitly
-  → receive the normal daily-work instruction
 ```
 
-Outcome:
+Success is not watching a card change columns. Success is seeing a connection
+that would have been missed in three isolated chats.
 
-- One session.
-- No required restart.
-- No PM or Worker terminology.
-- No real project work required before the product can demonstrate value.
-- No leftover demo content without an explicit user choice.
+The demo may optionally show a fix and validation afterward, but the
+intelligence insight must be independently understandable.
 
-The exact demo containment model remains open in §12.
-
-### 7.2 Normal daily loop
-
-Target:
+### 10.2 Normal work
 
 ```text
 work normally
-  → first real capture receives one quiet confirmation
-  → /board-promote
-  → user reviews the promotion summary
-  → /board-next
-  → recommended ready entry + reason + Done-when summary
-  → explicit run
-  → tdd → review → validate
-  → explicit resolve
-  → learning curation and value accrual refresh
+  → receive a quiet capture confirmation
+  → promote reviewed findings
+  → normalize and connect them
+  → surface a new or strengthened cluster
+  → inspect member evidence and root-cause candidate
+  → choose a root investigation or fix
+  → validate the result
+  → update hypothesis and learning confidence
 ```
 
-The user may still choose PM or Worker mode for repeated batch processing.
+Singleton findings remain useful evidence. The system must not manufacture a
+cluster merely to appear intelligent.
 
-### 7.3 Returning to a repository
+### 10.3 Returning to a repository
 
-Target SessionStart hierarchy:
+SessionStart should prioritize:
 
-1. Safety or recovery warnings.
-2. In-progress or claimed work.
-3. Best ready action.
-4. Pending scratch promotion.
-5. Relevant retained learnings and accrual.
-6. Current advanced mode, if one is active.
+1. Safety, recovery, or stale-derived-state warnings.
+2. Active high-impact systemic clusters and newly changed evidence.
+3. In-progress investigations and claims.
+4. Context-relevant root-cause hypotheses and learnings.
+5. Pending scratch promotion.
+6. Best ready action when action is requested.
+7. Advanced mode state, if active.
 
-### 7.4 Non-Claude MCP client
+### 10.4 Inspecting an insight
 
-Target:
-
-- Initialize with the same smart defaults as `/board-setup`.
-- Capture and promote without requiring Claude hooks.
-- Query the same ready recommendation.
-- Claim and update through the same state and safety rules.
-- Receive explicit recommended actions rather than plugin-only prose.
-- Never claim access to the autonomous Claude Code discipline agents when the
-  client adapter cannot provide them.
-
-## 8. Proposed capability milestones
-
-Milestones are ordered by user value and dependency, not by feature count.
-
-### Milestone A — Visible first win
-
-**Purpose:** Prove the product works before asking the user to learn its operating
-model.
-
-Candidate capabilities:
-
-- Canonical `/board-setup` guidance across landing page, README, and plugin.
-- A guided, isolated sample path.
-- Preserve and document the shipped one-line capture receipt; define and test
-  its anti-noise behavior.
-- Immediate board visibility after setup/demo.
-- Measured first-win evidence recorded in a dated report.
-
-If omitted, evaluators still encounter a blank board and must supply real work
-before seeing the product's strongest behavior.
-
-### Milestone B — Direct daily loop
-
-**Purpose:** Let ordinary users turn captured evidence into completed work
-without persistent modes.
-
-Candidate commands, names provisional:
+An agent or human can move from:
 
 ```text
-/board-promote
-/board-next
-/board-run <entry-id>
-/board-resolve <entry-id>
+cluster
+  → member findings
+  → source evidence
+  → relationship reasons
+  → hypothesis and alternatives
+  → prior attempted fixes
+  → confirmation or rejection evidence
+  → reusable learning
 ```
 
-Required semantics:
+No conclusion should be a dead-end summary without drill-down.
 
-- `/board-promote` performs a bounded foreground consolidation and reports
-  created, rejected, deduplicated, and still-pending findings.
-- `/board-next` selects only deterministic ready work, explains blockers and
-  priority ordering, summarizes `## Done when`, and does not start work without
-  explicit authorization.
-- `/board-run` retains claim ownership and bounded rounds.
-- Resolution remains explicit.
-- PM and Worker modes remain available as advanced batch controls.
+## 11. Product milestones
 
-If omitted, the product continues to expose its orchestration primitives as
-normal user workflow.
+Milestones are ordered by the product's intelligence value.
 
-### Milestone C — Actionable board and visible memory
+### Milestone A — Pattern-intelligence first win
 
-**Purpose:** Make the board answer “what should happen next?” and make retained
-value visible on every return.
+**Purpose:** Demonstrate the unique product value in one session.
 
-Candidate capabilities:
+Candidate scope:
 
-- Default board view shows ready/open work; resolved history is collapsed or
-  separately selected.
-- Filters use full names and accessible labels.
-- Each actionable card exposes the next command or structured action.
-- Board and SessionStart show resolved count, learning count, and context matches.
-- Matched learnings explain why they apply and link to their source entries.
-- Learning curation runs from the direct promote/resolve lifecycle, not only PM
-  mode.
-- `/board-stats` or an equivalent `board_status` expansion derives local value
-  without telemetry.
+- A bounded cross-domain sample with a known shared failure pattern.
+- Canonical `/board-setup` guidance.
+- Foreground sample capture/promotion without PM-mode ceremony.
+- Graph and cluster output with member evidence and relationship reasons.
+- A root-cause candidate clearly labeled as an inference.
+- Explicit, fingerprinted sample cleanup or retention.
+- A real visual showing evidence → cluster → root-cause candidate.
 
-If omitted, the product retains value but fails to make that value legible or
-actionable.
+If omitted, the first experience continues to showcase workflow mechanics
+instead of the product's intelligence advantage.
 
-### Milestone D — Structured planning bridge
+### Milestone B — Reliable finding-to-graph pipeline
 
-**State: Deferred candidate.**
+**Purpose:** Ensure real findings become trustworthy, connected memory.
 
-**Purpose:** Evaluate Task Master-like decomposition without turning Engineering
-Board into a general planning suite.
+Candidate scope:
 
-Possible bounded capability:
+- Foreground promotion outside PM mode.
+- Pattern normalization and alias handling.
+- Stable pattern IDs while preserving readable labels.
+- Shared deterministic graph engine used by plugin and MCP paths.
+- Unified cluster thresholds and typed output.
+- Provenance and correction path for pattern assignments and edges.
+- Incremental rebuild contract without adopting a required database.
 
-- Convert one approved specification section into a parent entry and small
-  child entries using the existing `parent` relationship.
-- Require explicit review before writing.
-- Preserve source links and `## Done when`.
-- Do not perform web research, model-provider configuration, or autonomous
-  backlog expansion.
+If omitted, intelligence remains dependent on exact free-form tags and
+adapter-specific prompt execution.
 
-This milestone starts only after A–C have evidence and the owner confirms that
-spec decomposition is a current Engineering Board user need.
+### Milestone C — Cross-domain root-cause intelligence
 
-## 9. Provisional command and adapter model
+**Purpose:** Turn structural clusters into useful, bounded engineering
+interpretation.
 
-This is directional, not yet an implementation contract.
+Candidate scope:
 
-| User intent | Claude plugin | MCP/shared semantic | Notes |
-|---|---|---|---|
-| Smart setup | `/board-setup` | Add `board_setup` or extend `board_init` with a clearly versioned setup profile | One canonical outcome; avoid two subtly different initializations. |
-| Review and promote inbox | `/board-promote` | `board_promote` | Distinct write authority justifies a distinct action. |
-| Find best ready work | `/board-next` | Extend `board_status` with `recommended_next` before adding another read tool | Keep MCP tool exposure lean. |
-| Run one entry | `/board-run <id>` | Adapter capability-dependent | Core transition rules shared; autonomous agent dispatch must not be falsely promised to unsupported clients. |
-| Show accrued value | `/board-stats` or SessionStart/board view | Extend `board_status` | Derived locally from repository state. |
+- Cluster ranking using recurrence, domain diversity, severity, recency, and
+  evidence quality.
+- On-demand hypothesis generation with cited members.
+- Alternative hypotheses and explicit falsifiers.
+- Confirm, weaken, reject, split, and merge feedback states.
+- Negative memory so rejected explanations are not recycled without new
+  evidence.
+- Pattern-focused HTML and command views.
 
-Shared deterministic behavior should live below the adapters. Plugin commands
-and MCP tools should compose it rather than restate ordering, filtering,
-promotion, or safety rules independently.
+If omitted, Engineering Board can count and group patterns but cannot reliably
+help an agent reason from symptoms toward a shared cause.
 
-## 10. State and authority invariants
+### Milestone D — Contextual retrieval and outcome learning
 
-| State or decision | Authority | Required behavior |
-|---|---|---|
-| Scratch finding | Capture adapter | Append evidence without presenting it as committed project truth. |
-| Promotion | User or explicitly invoked foreground/batch action | Validate, reject unsafe/unsupported findings, deduplicate, write entries, and report outcomes. |
-| Ready selection | Deterministic board rules | Respect unresolved blockers, status, priority, and claim availability; explain the selection. |
-| Claim | Atomic claim subsystem | Exactly one live owner; stale reclamation remains explicit and observable. |
-| Discipline transition | Bounded worker result applied by controller | Only allowed `needs:` transitions; failures may leave or regress state. |
-| Resolution | User or explicitly authorized resolve action | Preserve provenance, rebuild indexes/views, then feed learning curation. |
-| Learning | Explicit remember action or deterministic curator | Preserve source entry links, recurrence, confidence, and applicability. |
-| Demo artifacts | Guided demo controller | Bounded to an approved location; inventory before cleanup; no silent deletion of user-authored or modified data. |
+**Purpose:** Deliver accumulated intelligence at the decision where it changes
+agent behavior.
 
-## 11. Outcome-level acceptance criteria
+Candidate scope:
 
-### Activation
+- Retrieval based on current files, task intent, patterns, graph neighbors, and
+  prior outcomes—not only current working directory.
+- SessionStart and on-demand surfacing of relevant clusters and learnings.
+- Resolution feedback that updates hypothesis and learning confidence.
+- Source-linked explanation of why a memory applies.
+- Value reporting based on useful resurfacing and confirmed systemic fixes, not
+  vanity counts.
 
-1. A fresh user can reach a visibly validated sample in one session and under
-   three minutes of user-directed interaction, excluding model execution time.
-2. The guided path requires no mode switch, restart, or pre-existing finding.
-3. The user can identify every file the demo created and can remove the bounded
-   demo without affecting unrelated work.
-4. The existing capture receipt remains concise and truthful; zero-finding
-   turns and repeated captures follow an explicitly tested anti-noise policy.
+If omitted, the repository may contain strong memory that the acting agent
+still fails to use.
 
-### Daily operation
+### Milestone E — Execution ergonomics and planning bridge
 
-5. A user with pending scratch can promote it immediately without entering PM
-   mode.
-6. A user can ask for the next ready entry without knowing an ID.
-7. The recommendation is deterministic for the same board state and explains
-   priority, readiness, blockers, and `## Done when`.
-8. No command begins implementation or resolves an entry merely because the user
-   asked to inspect the next action.
-9. A single-entry run preserves atomic claim and bounded transition behavior.
+**State: Deferred until A–D are proven.**
 
-### Return and retention
+Possible work:
 
-10. SessionStart and the HTML board expose pending promotion, best ready work,
-    resolved count, retained learning count, and relevant learning matches
-    without network access.
-11. Direct promote/resolve usage can feed learning curation without PM mode.
-12. Every surfaced learning links to inspectable repository evidence and states
-    why it applies.
+- One obvious next investigation or action.
+- Direct `/board-run` and explicit resolve ergonomics.
+- Action-first lifecycle presentation alongside the pattern view.
+- Approved-spec decomposition into existing entry hierarchy.
 
-### Compatibility and trust
+The quality loop remains valuable here as a way to prove a systemic fix and
+feed the result back into memory. It does not lead the roadmap.
 
-13. Existing boards require no destructive migration for Milestones A–C.
-14. Plugin and MCP paths produce semantically equivalent setup, promotion, and
-    ready-selection results where both advertise support.
-15. Unsupported adapter capabilities return an explicit limitation instead of a
-    false success.
-16. README, landing page, command docs, MCP docs, architecture, examples,
-    visuals, versions, and tests are reconciled in the same behavior change.
+## 12. Outcome acceptance
 
-## 12. Open decisions
+### Pattern-intelligence value
 
-### O1 — Demo containment
+1. Given a fixture with three surface-different findings in distinct affected
+   domains and one known shared failure mode, the system produces one
+   evidence-linked candidate cluster containing all three.
+2. The same canonical input produces logically identical nodes, edges,
+   clusters, and relationship reasons.
+3. An agent can explain why each member belongs using repository evidence,
+   without relying on hidden chat state.
+4. A fixture containing merely similar language but unrelated causes is not
+   forced into the same durable conclusion.
+5. A singleton remains a singleton without fabricated confidence.
 
-Options:
+### Root-cause trust
 
-1. Copy a tiny fixture into an isolated repository subdirectory, create a
-   labeled sample entry, then offer fingerprinted cleanup.
-2. Create a separate sample project under `engineering-board/` and never touch
-   source files.
-3. Replay a recorded pipeline without executing real work.
+6. A root-cause output is labeled as proposed until evidence confirms it.
+7. Every hypothesis identifies supporting members, counter-evidence or
+   alternatives, confidence basis, and at least one falsifier.
+8. Rejected hypotheses remain queryable and are not proposed again without
+   materially new evidence.
+9. Confirmed fix outcomes strengthen the relevant learning; failed or partial
+   fixes weaken or split it.
+10. A user can correct a pattern, edge, cluster interpretation, or learning
+    without editing an opaque cache.
 
-Recommendation: option 1 if it can prove safe containment and exact cleanup;
-otherwise option 2. Option 3 is safer but weakens the first-win proof.
+### Memory and retrieval
 
-### O2 — Promotion review boundary
+11. A later session working in a different domain receives a relevant prior
+    cluster when its current symptom shares the underlying failure pattern.
+12. Surfaced memory states why it applies and links to canonical source cases.
+13. Deleting derived graph/index artifacts loses no canonical evidence and a
+    rebuild restores equivalent logical results.
+14. The system reports stale, corrupt, or unavailable derived analysis instead
+    of silently presenting incomplete intelligence.
 
-Options:
+### Compatibility and boundaries
 
-1. `/board-promote` writes all accepted findings and prints a summary.
-2. `/board-promote` previews findings and requires a second confirmation.
-3. Passive mode auto-promotes high-confidence findings.
+15. Existing Markdown boards require no destructive migration.
+16. Plugin and MCP adapters return semantically equivalent graph facts where
+    both advertise support.
+17. No read or recommendation request begins code execution, commits a
+    hypothesis, or resolves work without the appropriate explicit authority.
+18. TDD, review, and validation remain usable but are not required to experience
+    pattern discovery.
+19. README, setup, examples, architecture, visuals, security/privacy,
+    versions, tests, and dated evidence are reconciled with each shipped
+    milestone.
 
-Recommendation: option 1 for the first direct workflow, with `--dry-run` or
-preview support. Defer auto-promotion until real usage demonstrates that its
-noise and trust costs are acceptable.
+## 13. Open decisions
 
-### O3 — Next-action execution
+### O1 — Pattern normalization
 
 Options:
 
-1. `/board-next` only recommends.
-2. `/board-next --run` recommends, asks for explicit confirmation, then composes
-   `/board-run`.
-3. `/board-next` immediately runs by default.
+1. Curated canonical pattern IDs with readable aliases.
+2. Free-form tags plus embedding/semantic similarity at query time.
+3. A hybrid: canonical IDs for durable memory and bounded semantic suggestions
+   for proposed aliases or links.
 
-Recommendation: option 2. It supports the short path without turning an
-inspection request into code mutation.
+Recommendation: option 3. Exact canonical identity keeps durable results
+deterministic; semantic suggestions can discover cross-domain equivalence but
+must remain reviewable before becoming durable.
 
-### O4 — Final resolution
-
-Options:
-
-1. Keep `/board-resolve` separate.
-2. After successful validation, `/board-run` asks whether to resolve now.
-3. Successful validation automatically resolves.
-
-Recommendation: option 2, while preserving option 1 for non-interactive use.
-Reject option 3 unless the owner explicitly changes the human-resolution
-boundary.
-
-### O5 — Advanced modes
+### O2 — Hypothesis authority
 
 Options:
 
-1. Keep PM and Worker modes unchanged but move them to advanced docs.
-2. Deprecate them after the direct workflow proves equivalent.
-3. Remove them immediately.
+1. All root-cause hypotheses remain ephemeral unless explicitly confirmed.
+2. Proposed hypotheses may be saved durably with `proposed` status and evidence,
+   but only investigation/fix outcomes can confirm them.
+3. High-confidence clusters automatically become confirmed learnings.
 
-Recommendation: option 1 through Milestones A–C. Revisit only with usage and
-compatibility evidence.
+Recommendation: option 2. Durable proposals prevent repeated rediscovery while
+preserving the distinction between useful inference and established knowledge.
+Reject option 3.
 
-## 13. Alternatives and tradeoffs
+### O3 — Cluster model
 
-### Do nothing
+Options:
 
-The current engine remains capable and differentiated, but activation friction,
-mode ceremony, and invisible accrual continue to suppress adoption and
-retention.
+1. Exact pattern recurrence only.
+2. One global similarity score.
+3. Typed signals—explicit relationships, normalized pattern, affected domain,
+   temporal recurrence, evidence semantics, and outcome history—with each
+   contribution exposed.
 
-### Copy Beads' architecture
+Recommendation: option 3. A single opaque score would make false positives hard
+to diagnose and weaken trust.
 
-This would improve graph queries and distributed sync but sacrifice the core
-human-reviewable Markdown proposition and introduce migration and operational
-complexity without a proven current consumer. Rejected for the next milestones.
+### O4 — First-win fixture
 
-### Turn the HTML board into a full Backlog.md-style editor
+The sample must contain different surface symptoms and affected domains that
+share a verifiable root pattern. The owner still needs to approve the exact
+scenario and containment/cleanup model before implementation.
 
-This would improve manual task management but adds a mutable application surface,
-write security, concurrency semantics, and broad PM expectations. The next board
-revision should remain an action-oriented renderer.
+### O5 — SQLite trigger and latency target
 
-### Lead with Task Master-style PRD decomposition
+The layered storage direction is set; the numeric corpus and interactive
+latency threshold that would justify an optional SQLite index remains open.
+Benchmark the file/graph implementation first rather than inventing a threshold
+without evidence.
 
-This could improve upfront planning, but it does not repair the current
-capture-to-value gap. Deferred behind activation, direct operation, and visible
-memory.
+### O6 — Promotion boundary
 
-### Build the Conductor first
+Recommendation: a foreground promote action writes validated findings, reports
+created/rejected/deduplicated outcomes, and offers a preview. Silent
+auto-promotion remains deferred.
 
-This adds asynchronous continuity but makes an already complex operating model
-larger before the foreground loop is easy to understand. Deferred.
+### O7 — Resolution and learning feedback
 
-## 14. Explicit non-goals for Milestones A–C
+Recommendation: after verification, offer an explicit resolve action that also
+records the hypothesis outcome. Do not silently convert successful validation
+into confirmed causation.
 
-- Replacing Markdown with a database.
+## 14. Alternatives
+
+### Keep emphasizing the build loop
+
+This proves engineering discipline but underuses the accumulated corpus. Many
+tools can run tests and reviews; the unique advantage is recognizing patterns
+that a stateless agent misses. Rejected as the primary product story.
+
+### Use Markdown only forever
+
+This preserves simplicity, but an absolute ban on derived indexing could become
+costly at large corpus sizes. Keep Markdown authoritative while allowing a
+measured, disposable accelerator later.
+
+### Make SQLite authoritative now
+
+This improves transactions and querying but weakens direct inspection, Git
+diffs, recovery, and zero-tool portability before scale evidence exists.
+Rejected.
+
+### Use an LLM to directly generate the graph
+
+This may discover semantic connections but makes topology unstable and hard to
+reproduce. Keep deterministic graph facts separate from bounded semantic
+interpretation.
+
+### Copy a general task or planning product
+
+This adds breadth while diluting the root-cause memory job. Continue composing
+with session tasks and planning tools instead.
+
+## 15. Explicit non-goals for Milestones A–D
+
+- Replacing canonical Markdown with SQLite or another database.
+- Committing a binary database as collaboration state.
 - A hosted service, login, organization model, billing, or cloud sync.
 - Cross-repository aggregation.
 - A general-purpose project-management suite.
-- A new model-provider or research-provider configuration system.
-- Reimplementing Claude Code's personal Tasks UI.
-- Automatic code execution from a read-only “what next?” request.
-- Silent auto-resolution.
-- Silent auto-promotion by default.
+- Reimplementing a personal session checklist.
+- Autonomous code execution from a read-only insight request.
+- Treating semantic similarity as confirmed causation.
+- Silent confirmation, resolution, or auto-promotion.
 - Removing advanced modes before compatibility evidence exists.
 - Implementing RFC 0001's persistent supervisor.
 
-## 15. Preliminary documentation-impact contract
+## 16. Documentation and behavior alignment
 
-When implementation is eventually approved, each behavior item must map to its
-implementation, tests, current-truth docs, examples, visuals, and dated
-evidence. Historical audits stay intact and receive a superseding dated report.
-
-| Contract item | Normative level | Implementation | Test/evidence | Docs/example | Current status |
+| Contract item | Normative level | Current implementation | Test/evidence | Documentation disposition | Status |
 |---|---|---|---|---|---|
-| Living product direction | Proposed | None | Owner review of this spec | This file; `ROADMAP.md` link | Documentation-only addition |
-| Guided first win | Proposed required for Milestone A | Not implemented; capture receipt already exists | Future timed clean-repo journey and receipt-noise tests | Future README/setup/landing/demo visual updates | Proposed journey plus documentation-only drift |
-| Current capture confirmation | Required current truth | `hooks/stop-hook-procedure.md`; `hooks/scripts/board-scratch-append.sh` | `tests/scratch/append.sh`; `tests/modes/stop-hook-mode-routing.sh` | README corrected to describe the shipped non-empty receipt | Documentation-only drift repaired |
-| Canonical smart setup instruction | Required current truth | `commands/board-setup.md` | `tests/orchestration/board-setup-command.sh` | Landing install snippet corrected from `/board-init my-project` to `/board-setup` | Documentation-only drift repaired |
-| Foreground promotion | Proposed required for Milestone B | Not implemented | Future promotion lifecycle and rejection matrix | Future command, README, MCP, architecture docs | Proposed, no current-behavior claim |
-| Deterministic next action | Proposed required for Milestone B | Ready queue exists; interaction does not | Future ordering/explanation/authorization tests | Future command, MCP, board-view, README docs | Implementation-defined gap |
-| Actionable board | Proposed required for Milestone C | Current renderer is read-only | Future rendering and accessibility evidence | Future visual and board-view docs | Proposed revision |
-| Visible memory accrual | Proposed required for Milestone C | Partial SessionStart learning display exists | Future derived-count and relevance tests | Future README, board-view, retention evidence | Recommended gap |
-| Other current product behavior | Required current truth | Unchanged by this spec | Existing tests remain authoritative for current code | Architecture and command docs reviewed as unaffected because this change does not alter behavior | Reviewed and unaffected |
-| Versions/releases/security | Required current truth | Unchanged by this spec | No release or live validation claimed | CHANGELOG, manifests, SECURITY reviewed as unaffected | Reviewed and unaffected |
+| Product-direction authority | Accepted | No runtime behavior | Owner decision recorded here | This file; `ROADMAP.md` precedence note | Direction aligned |
+| Pattern-intelligence substrate | Accepted direction | Partial capture, pattern, graph, curation, retrieval, and resolution mechanisms | Dated implementation review; existing graph and curator contract tests | This file defines future direction without claiming completion | Recommended gaps recorded |
+| Canonical Markdown | Accepted | Entry and learning Markdown is current durable state | Existing intake, rebuild, resolve, and curation tests | Architecture direction documented here | Aligned |
+| Derived graph | Accepted direction | `/board-graph` prompt contract; no shared executable graph engine | `tests/orchestration/board-graph-command.sh` checks the command contract | Current limitation stated explicitly | Implementation-defined gap |
+| SQLite | Optional future accelerator | Not implemented or required | Future benchmark and rebuild-equivalence proof required | Migration explicitly rejected; adoption trigger recorded | Deferred optimization |
+| Current capture confirmation | Required current truth | Stop procedure and append helper surface a non-empty receipt | `tests/scratch/append.sh`; mode-routing tests | README was corrected in this branch | Documentation-only drift repaired |
+| Canonical setup instruction | Required current truth | `/board-setup` is the plugin setup path | Setup command test | Landing page was corrected in this branch | Documentation-only drift repaired |
+| TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped | Existing mode and orchestration tests | Current behavior remains documented; future positioning changes only when shipped surfaces are revised | Reviewed and unaffected |
+| MCP behavior | Required current truth | Current tools unchanged | Existing MCP tests remain authoritative | Proposed semantic parity is not claimed shipped | Reviewed and unaffected |
+| Security, privacy, versions, releases | Required current truth | No change | No release or live product claim | SECURITY, manifests, and changelog remain unchanged | Reviewed and unaffected |
+| Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
-## 16. Approval gates
+## 17. Gate 2: next implementation contract
 
-### Gate 1 — Direction
+The next build contract should cover Milestone A only:
 
-Before producing the file-level build contract, the owner must approve or revise:
+1. exact cross-domain sample and known root pattern;
+2. sample containment, preservation, and fingerprinted cleanup;
+3. canonical finding inputs and expected graph/cluster output;
+4. inference labeling and drill-down interaction;
+5. plugin and applicable MCP surface;
+6. deterministic and semantic false-positive fixtures;
+7. visual evidence;
+8. current-truth documentation updates;
+9. commit, draft PR, and no-merge boundary.
 
-- the product thesis and non-negotiables;
-- the retain/append/replace/revise boundary;
-- Milestones A–C and the deferral of Milestone D;
-- the authority invariants;
-- the five open decisions.
+The owner must approve that file-level contract before implementation begins.
 
-### Gate 2 — Implementation contract
-
-After Gate 1, expand the accepted first milestone into:
-
-- exact command and MCP contracts;
-- shared component/file responsibilities;
-- state transitions and compatibility behavior;
-- failure, retry, cleanup, and security behavior;
-- deterministic acceptance-test matrix;
-- documentation and visual update map;
-- delivery path and PR boundary.
-
-No product implementation begins until the owner explicitly approves Gate 2.
-
-## 17. Research sources
+## 18. Research and evidence
 
 Current product evidence:
 
-- [`2026-07-27 spec validation`](evidence/2026-07-27-product-evolution-spec-validation.md)
+- [`2026-07-27 pattern-intelligence direction evidence`](evidence/2026-07-27-pattern-intelligence-direction.md)
+- [`2026-07-27 initial spec validation`](evidence/2026-07-27-product-evolution-spec-validation.md)
 - [`README.md`](../README.md)
+- [`ROADMAP.md`](../ROADMAP.md)
 - [`ACTIVATION.md`](../ACTIVATION.md)
 - [`RETENTION.md`](../RETENTION.md)
 - [`COMPREHENSION.md`](../COMPREHENSION.md)
-- [`ROADMAP.md`](../ROADMAP.md)
-- [`RFC 0003`](rfcs/0003-productization-roadmap.md)
-- [`commands/board-setup.md`](../commands/board-setup.md)
-- [`commands/board-run.md`](../commands/board-run.md)
-- [`mcp-server/README.md`](../mcp-server/README.md)
+- [`commands/board-graph.md`](../commands/board-graph.md)
+- [`skills/board-intake/SKILL.md`](../skills/board-intake/SKILL.md)
+- [`skills/board-triage/SKILL.md`](../skills/board-triage/SKILL.md)
+- [`hooks/scripts/board-curate-learnings.sh`](../hooks/scripts/board-curate-learnings.sh)
+- [`hooks/scripts/board-session-start.sh`](../hooks/scripts/board-session-start.sh)
 
 External product references, reviewed 2026-07-26–27:
 

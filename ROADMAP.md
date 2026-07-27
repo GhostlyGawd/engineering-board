@@ -4,10 +4,11 @@ _Synthesis, not re-auditing (2026-07-08). Merges every audit report at repo root
 into one deduplicated, dependency-aware, sequenced roadmap. Every item traces to a
 source report — no new findings are smuggled in._
 
-> **Active direction draft (2026-07-27):**
-> [`docs/PRODUCT_EVOLUTION_SPEC.md`](docs/PRODUCT_EVOLUTION_SPEC.md) is the living
-> Gate 1 proposal for the next product shape. It does not supersede this ranked
-> roadmap until the owner accepts the direction and open decisions.
+> **Authoritative product direction (2026-07-27):**
+> [`docs/PRODUCT_EVOLUTION_SPEC.md`](docs/PRODUCT_EVOLUTION_SPEC.md) is the
+> central source of truth for product direction. This roadmap is an execution
+> and historical-planning input; when it conflicts with a newer decision in the
+> product spec, the product spec wins.
 
 **Scope note:** this roadmap carries only the **open** work. Items already shipped
 are excluded (IMPROVEMENTS.md's 14 — built; the design batch's headline fixes —
