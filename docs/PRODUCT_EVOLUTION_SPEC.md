@@ -1,7 +1,8 @@
 # Engineering Board Product Evolution Spec
 
-_Status: Authoritative living product direction — Gate 1 accepted; Milestone A
-Gate 2 contract in review; implementation remains gated_
+_Status: Authoritative living product direction — Gate 1 and Milestone A Gate 2
+accepted; Milestone A implemented on the direction branch, pending review and
+merge_
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-27_
 _Product owner: GhostlyGawd_
@@ -63,6 +64,7 @@ selected milestone is approved.
 | Cross-session Conductor | Deferred | RFC 0001's persistent supervisor is not the next required product step. |
 | Team dashboard and monetization | Deferred | Do not build until repository-local intelligence has demonstrated repeatable value. |
 | Pending PR #93 | Independent | The B057 fix and 1.7.1 release preparation remain separate from this direction branch. |
+| Milestone A delivery | Accepted and implemented | The contained synthetic `/board-demo`, deterministic demo graph engine, proposed-hypothesis contract, real evidence view, cleanup boundary, tests, and dated validation are implemented on the direction branch. Merge, release, tag, and deployment remain separately authorized actions. |
 
 ## 3. Product thesis
 
@@ -414,7 +416,8 @@ Milestones are ordered by the product's intelligence value.
 
 **Purpose:** Demonstrate the unique product value in one session.
 
-Candidate scope:
+**Implementation state:** complete on the direction branch; pending review and
+merge. The delivered scope is:
 
 - A bounded cross-domain sample with a known shared failure pattern.
 - Canonical `/board-setup` guidance.
@@ -664,21 +667,22 @@ with session tasks and planning tools instead.
 | Contract item | Normative level | Current implementation | Test/evidence | Documentation disposition | Status |
 |---|---|---|---|---|---|
 | Product-direction authority | Accepted | No runtime behavior | Owner decision recorded here | This file; `ROADMAP.md` precedence note | Direction aligned |
-| Pattern-intelligence substrate | Accepted direction | Partial capture, pattern, graph, curation, retrieval, and resolution mechanisms | Dated implementation review; existing graph and curator contract tests | This file defines future direction without claiming completion | Recommended gaps recorded |
-| Hypothesis authority | Accepted direction | No durable hypothesis type exists | Owner approval and Milestone A contract evidence | This file distinguishes proposed, confirmed, and rejected knowledge | Implementation-defined gap |
+| Pattern-intelligence substrate | Accepted direction | Existing production capture/pattern/graph/curation plus contained Milestone A evidence → cluster → proposed-hypothesis first win | Existing graph/curator tests; Milestone A orchestration, graph, hypothesis, integration, and live-validation evidence | README and landing page now lead with pattern intelligence while distinguishing demo scope from production behavior | Milestone A aligned; production generalization remains Milestone B/C |
+| Hypothesis authority | Accepted direction | Demo hypotheses persist as Markdown with `status: proposed`; schema and `board-insights` prohibit confirmation | Hypothesis contract tests and dated live validation | Proposed, confirmed, and rejected authority transitions are explicit | Milestone A aligned |
 | Canonical Markdown | Accepted | Entry and learning Markdown is current durable state | Existing intake, rebuild, resolve, and curation tests | Architecture direction documented here | Aligned |
-| Derived graph | Accepted direction | `/board-graph` prompt contract; no shared executable graph engine | `tests/orchestration/board-graph-command.sh` checks the command contract | Current limitation stated explicitly | Implementation-defined gap |
+| Derived graph | Accepted direction | `/board-graph` remains the production prompt contract; `board-graph-build.py` is the executable engine used by the contained demo and accepts explicit board paths | Existing command contract plus graph-engine and integration tests | Demo scope and production limitation stated explicitly | Milestone A aligned; shared production integration remains Milestone B |
 | SQLite | Optional future accelerator | Not implemented or required | Future benchmark and rebuild-equivalence proof required | Migration explicitly rejected; adoption trigger recorded | Deferred optimization |
 | Current capture confirmation | Required current truth | Stop procedure and append helper surface a non-empty receipt | `tests/scratch/append.sh`; mode-routing tests | README was corrected in this branch | Documentation-only drift repaired |
 | Canonical setup instruction | Required current truth | `/board-setup` is the plugin setup path | Setup command test | Landing page was corrected in this branch | Documentation-only drift repaired |
-| TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped | Existing mode and orchestration tests | Current behavior remains documented; future positioning changes only when shipped surfaces are revised | Reviewed and unaffected |
+| TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped and unchanged | Existing mode and orchestration tests | Repositioned as optional falsifiable verification feedback, not the headline or required first experience | Behavior unchanged; messaging aligned |
 | MCP behavior | Required current truth | Current tools unchanged | Existing MCP tests remain authoritative | Proposed semantic parity is not claimed shipped | Reviewed and unaffected |
-| Security, privacy, versions, releases | Required current truth | No change | No release or live product claim | SECURITY, manifests, and changelog remain unchanged | Reviewed and unaffected |
+| Security, privacy, versions, releases | Required current truth | Demo adds a contained synthetic run and manifest-verified cleanup; manifests and release state unchanged | Negative containment/tamper tests and dated live validation | SECURITY and changelog updated; no version, release, or deployment claim | Behavior and docs aligned; release unaffected |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
-## 17. Gate 2 draft: Milestone A implementation contract
+## 17. Gate 2 accepted: Milestone A implementation contract
 
-_State: Draft for owner review. No implementation authorized._
+_State: Accepted by the product owner on 2026-07-27 and implemented on the
+direction branch. Review/merge remains pending._
 
 ### 17.1 Milestone purpose
 
@@ -939,12 +943,10 @@ Milestone A does not:
 - add cross-repository aggregation or a hosted service;
 - merge, release, tag, or deploy without separate owner authorization.
 
-Implementation delivery, if approved, is a focused branch and draft PR with
-code, tests, current-truth documentation, a real visual, and dated evidence.
-The current product-direction PR remains a documentation review surface.
-
-The owner must explicitly approve this Gate 2 contract before implementation
-begins.
+Implementation delivery is this focused branch and draft PR with code, tests,
+current-truth documentation, a real visual, and dated evidence. The owner's
+approval authorized implementation and push to the draft PR; it did not
+authorize merge, release, tag, or deployment.
 
 ## 18. Research and evidence
 
@@ -952,6 +954,7 @@ Current product evidence:
 
 - [`2026-07-27 pattern-intelligence direction evidence`](evidence/2026-07-27-pattern-intelligence-direction.md)
 - [`2026-07-27 Milestone A contract evidence`](evidence/2026-07-27-milestone-a-contract.md)
+- [`2026-07-27 Milestone A implementation validation`](evidence/2026-07-27-milestone-a-implementation-validation.md)
 - [`2026-07-27 initial spec validation`](evidence/2026-07-27-product-evolution-spec-validation.md)
 - [`README.md`](../README.md)
 - [`ROADMAP.md`](../ROADMAP.md)

@@ -4,8 +4,9 @@
 #
 # /board-setup is a composing command: it must infer a default project name,
 # reuse the /board-init procedure (never re-implement it), run the permission
-# self-check without editing settings, and end with the 3-line ready summary,
-# leaving the session passive. This lint pins that contract.
+# self-check without editing settings, and end with the readiness summary plus
+# an optional pattern-intelligence first win, leaving the session passive. This
+# lint pins that contract.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -39,6 +40,14 @@ grep -q "never edits your settings" "$CMD" \
 grep -q "Board ready:" "$CMD" && grep -q "Capture is on:" "$CMD" && grep -q "Pipeline permissions:" "$CMD" \
   && report 0 "3-line ready summary present" \
   || report 1 "3-line ready summary present"
+
+grep -qF "Try the pattern-intelligence sample: /board-demo" "$CMD" \
+  && report 0 "optional pattern-intelligence first win present" \
+  || report 1 "optional pattern-intelligence first win present"
+
+grep -qF "setup never starts it automatically" "$CMD" \
+  && report 0 "setup does not auto-run the demo" \
+  || report 1 "setup does not auto-run the demo"
 
 grep -q "stays in \*\*passive\*\* mode" "$CMD" \
   && report 0 "leaves the session passive (no mode file)" \

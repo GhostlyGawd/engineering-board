@@ -1,22 +1,30 @@
 # engineering-board
 
-> A git-committed kanban board your AI agents run and remember. The board is
-> the database: coordination state, work-in-progress locks, and durable
-> learnings live as plain markdown inside your repo — no hidden DB, no external
-> service, no daemon. Ships as a Claude Code plugin and as a zero-dependency
-> MCP server (12 tools over stdio, protocol 2025-06-18).
+> A repository-owned pattern-intelligence system for engineering agents.
+> Findings, hypotheses, and learnings live as visible Markdown evidence;
+> deterministic graph views connect recurring signals across domains so agents
+> can investigate shared root causes instead of repeatedly patching symptoms.
+> No hidden database, external service, or daemon. Ships as a Claude Code
+> plugin and zero-dependency MCP server (12 tools over stdio, protocol
+> 2025-06-18).
 
 ## What it is
 
 engineering-board turns a committed markdown tree (engineering-board/<project>/)
-into an autonomous, multi-agent software-engineering board:
+into durable, correctable engineering memory:
 
 - Findings (bugs, features, questions, observations) are captured passively
   from every Claude Code session by a Stop hook.
+- Exact patterns and affected domains form explainable graph edges and clusters.
+  Graph structure is deterministic; agent-authored causal interpretations remain
+  separate, evidence-cited hypotheses.
+- The contained /board-demo sample shows three cross-domain symptoms becoming
+  cluster C001 and a proposed H001 with alternatives and a falsifier. It uses
+  synthetic local data only and prints manifest-verified cleanup.
 - A PM pipeline consolidates findings into real board entries, deterministically.
 - Worker agents drive each entry through a tdd -> review -> validate state
-  machine under atomic (mkdir-based) claim locking, so parallel agents never
-  collide.
+  machine under atomic claim locking when fix verification is useful. This is a
+  supporting proof loop, not the required first experience.
 - Recurring lessons promote into committed Learning entries (L###) that survive
   session boundaries; board_remember / /board-remember saves one on demand.
 - BOARD.md (the index) and board.html (a themed kanban view with search,
@@ -27,9 +35,10 @@ agents' task state and memory to be repo-committed, PR-reviewable, and shared
 with the team — instead of per-user state in ~/.claude/ or a local database.
 
 How it differs from the 2026 field (beads, Backlog.md, Task Master, Claude
-Code's built-in Tasks, claude-mem): it is the intersection — PR-reviewable
-markdown state AND durable memory AND atomic claim-locking AND passive per-turn
-capture AND an opinionated pipeline AND a published team-visible board.
+Code's built-in Tasks, claude-mem): its center is evidence-linked cross-domain
+pattern intelligence over repository-visible state. Durable memory, atomic
+claims, passive capture, verification, and a published board support that
+substrate.
 
 ## Install
 
@@ -38,6 +47,7 @@ Claude Code plugin (full autonomous pipeline; requires Claude Code, free):
     /plugin marketplace add GhostlyGawd/engineering-board
     /plugin install engineering-board
     /board-setup
+    /board-demo
 
 MCP server, primary path — one line from PyPI (available with the v1.7.0 release):
 

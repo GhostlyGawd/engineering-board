@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "patterns": [
     {
       "tool": "Bash",
@@ -65,6 +65,11 @@
       "tool": "Bash",
       "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-view.sh:*",
       "rationale": "/board-view: generate the self-contained HTML board view (board.html)"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-demo.sh:*",
+      "rationale": "/board-demo: create, interpret, render, inspect, or clean one contained synthetic pattern-intelligence run"
     },
     {
       "tool": "Bash",

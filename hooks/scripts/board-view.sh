@@ -11,6 +11,8 @@
 #   bash board-view.sh [project] [--stdout]
 #     project   optional; when omitted, renders every board the router resolves.
 #     --stdout  print HTML to stdout instead of writing board.html.
+#   bash board-view.sh --demo-dir <run-dir> [--stdout]
+#     render the contained pattern-intelligence demo to pattern-intelligence.html.
 #
 # Exit codes: 0 ok; 1 no board layout / bad args.
 set -euo pipefail
@@ -29,19 +31,209 @@ TO_STDOUT=0
 STAMP=0
 LINK_BASE="${EB_VIEW_LINK_BASE:-}"
 EXPECT_LINK_BASE=0
+DEMO_DIR=""
+EXPECT_DEMO_DIR=0
 for arg in "$@"; do
   if [ "${EXPECT_LINK_BASE}" -eq 1 ]; then
     LINK_BASE="${arg}"; EXPECT_LINK_BASE=0; continue
+  fi
+  if [ "${EXPECT_DEMO_DIR}" -eq 1 ]; then
+    DEMO_DIR="${arg}"; EXPECT_DEMO_DIR=0; continue
   fi
   case "${arg}" in
     --stdout) TO_STDOUT=1 ;;
     --stamp) STAMP=1 ;;                    # opt-in freshness footer (breaks byte-determinism deliberately)
     --link-base) EXPECT_LINK_BASE=1 ;;     # href prefix for entry cards (e.g. a GitHub blob URL)
+    --demo-dir) EXPECT_DEMO_DIR=1 ;;
     --*) echo "board-view: unknown flag ${arg}" >&2; exit 1 ;;
     *) PROJECT_FILTER="${arg}" ;;
   esac
 done
 export EB_VIEW_LINK_BASE="${LINK_BASE}"
+
+if [ "${EXPECT_DEMO_DIR}" -eq 1 ]; then
+  echo "board-view: --demo-dir requires a path" >&2
+  exit 1
+fi
+
+render_demo() {
+  python3 - "$1" <<'PY'
+import glob
+import html
+import json
+import os
+import re
+import sys
+
+run_dir = os.path.realpath(sys.argv[1])
+graph_path = os.path.join(run_dir, "graph.json")
+hypothesis_paths = sorted(glob.glob(os.path.join(run_dir, "hypotheses", "H*.md")))
+if not os.path.isfile(graph_path):
+    raise SystemExit("board-view: demo graph.json missing")
+if len(hypothesis_paths) != 1:
+    raise SystemExit("board-view: demo requires exactly one H### hypothesis")
+
+with open(graph_path, "r", encoding="utf-8") as handle:
+    graph = json.load(handle)
+clusters = graph.get("topology", {}).get("clusters", [])
+if len(clusters) != 1:
+    raise SystemExit("board-view: demo requires exactly one cluster")
+cluster = clusters[0]
+
+with open(hypothesis_paths[0], "r", encoding="utf-8") as handle:
+    hypothesis_text = handle.read()
+
+FM = re.compile(r"^---\s*\n(.*?)\n---\s*\n?", re.S)
+match = FM.match(hypothesis_text)
+if not match:
+    raise SystemExit("board-view: hypothesis frontmatter missing")
+
+frontmatter = {}
+for line in match.group(1).splitlines():
+    if ":" not in line:
+        continue
+    key, value = line.split(":", 1)
+    value = value.strip()
+    if value.startswith('"') and value.endswith('"'):
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError:
+            pass
+    frontmatter[key.strip()] = value
+
+sections = {}
+current = None
+for line in hypothesis_text[match.end():].splitlines():
+    if line.startswith("## "):
+        current = line[3:].strip()
+        sections[current] = []
+    elif current is not None:
+        sections[current].append(line)
+
+def section(name):
+    lines = sections.get(name, [])
+    return "\n".join(lines).strip()
+
+def esc(value):
+    return html.escape(str(value or ""))
+
+def list_field(value):
+    text = str(value or "").strip()
+    if text.startswith("[") and text.endswith("]"):
+        return [item.strip().strip("'\"") for item in text[1:-1].split(",") if item.strip()]
+    return [text] if text else []
+
+def bullet_items(text):
+    return [line[2:].strip() for line in text.splitlines() if line.startswith("- ")]
+
+nodes = graph.get("nodes", {})
+cards = []
+for node_id in cluster.get("members", []):
+    node = nodes.get(node_id, {})
+    source = node.get("source", "")
+    cards.append(
+        '<article class="finding">'
+        f'<div class="finding-top"><a href="{esc(source)}">{esc(node_id)}</a>'
+        f'<span>{esc(node.get("affects"))}</span></div>'
+        f'<h2>{esc(node.get("title"))}</h2>'
+        f'<p class="signal">shared pattern · {esc(", ".join(node.get("pattern", [])))}</p>'
+        '</article>'
+    )
+
+evidence = bullet_items(section("Supporting evidence"))
+alternatives = bullet_items(section("Alternative explanations"))
+evidence_html = "".join(f"<li>{esc(item)}</li>" for item in evidence)
+alternatives_html = "".join(f"<li>{esc(item)}</li>" for item in alternatives)
+domains = " · ".join(cluster.get("affected_domains", []))
+patterns = " · ".join(cluster.get("patterns", []))
+
+document = f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engineering Board pattern-intelligence sample</title>
+<style>
+html{{--paper:#faf9f5;--ink:#17191e;--muted:#5b6068;--line:#dedbd1;--surface:#fff;
+--accent:#9a5b00;--accent-soft:#fff3df;--blue:#31577a;--green:#346b4c}}
+*{{box-sizing:border-box}}body{{margin:0;background:var(--paper);color:var(--ink);
+font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}}
+main{{max-width:1160px;margin:0 auto;padding:48px 28px 72px}}
+.eyebrow{{font:700 12px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}}
+h1{{font-size:clamp(34px,5vw,62px);line-height:1.03;letter-spacing:-.045em;max-width:850px;margin:10px 0 14px}}
+.lead{{font-size:18px;color:var(--muted);max-width:760px;margin:0 0 36px}}
+.meta{{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}}.pill{{border:1px solid var(--line);
+border-radius:999px;padding:5px 10px;font:12px ui-monospace,monospace;background:var(--surface)}}
+.findings{{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}}
+.finding{{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;min-height:180px}}
+.finding-top{{display:flex;justify-content:space-between;gap:12px;font:12px ui-monospace,monospace;color:var(--muted)}}
+.finding-top a{{color:var(--blue);font-weight:700}}.finding h2{{font-size:18px;line-height:1.25;margin:22px 0 18px}}
+.signal{{font:12px ui-monospace,monospace;color:var(--accent);margin:0}}
+.connector{{display:grid;place-items:center;height:64px;color:var(--muted);font:12px ui-monospace,monospace}}
+.connector:before{{content:"";display:block;width:1px;height:32px;background:var(--line);margin-bottom:5px}}
+.cluster{{background:var(--ink);color:#fff;border-radius:14px;padding:24px 26px;display:grid;
+grid-template-columns:110px 1fr auto;gap:22px;align-items:center}}
+.cluster-id{{font:700 28px ui-monospace,monospace;color:#e6a94e}}.cluster h2{{margin:0 0 5px;font-size:24px}}
+.cluster p{{margin:0;color:#c7c8c9}}.density{{font:12px ui-monospace,monospace;color:#c7c8c9;text-align:right}}
+.hypothesis{{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent);
+border-radius:12px;padding:26px}}.hypothesis-head{{display:flex;align-items:center;gap:12px;flex-wrap:wrap}}
+.status{{font:700 11px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;
+color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:5px 9px}}
+.hypothesis h2{{font-size:27px;letter-spacing:-.02em;margin:10px 0}}.root{{font-size:18px;max-width:900px}}
+.columns{{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}}
+.columns h3,.falsifier h3{{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}}
+ul{{padding-left:20px}}.falsifier{{margin-top:18px;border-top:1px solid var(--line);padding-top:12px}}
+footer{{margin-top:30px;color:var(--muted);font:12px ui-monospace,monospace}}
+@media(max-width:760px){{.findings,.columns{{grid-template-columns:1fr}}.cluster{{grid-template-columns:1fr}}.density{{text-align:left}}}}
+@media(prefers-color-scheme:dark){{html{{--paper:#17191e;--ink:#f4f1e8;--muted:#a8abb0;--line:#34373d;
+--surface:#22252b;--accent:#e6a94e;--accent-soft:#3a2d18;--blue:#8bb8e0}}.cluster{{background:#0e0f12;color:#fff}}}}
+</style>
+</head>
+<body>
+<main>
+<p class="eyebrow">Engineering Board · synthetic first-win sample</p>
+<h1>Three symptoms. One systemic investigation.</h1>
+<p class="lead">Visible Markdown evidence becomes deterministic graph structure, then a separate proposed root-cause hypothesis. Correlation stays distinct from confirmation.</p>
+<div class="meta"><span class="pill">3 findings</span><span class="pill">3 domains</span>
+<span class="pill">1 candidate cluster</span><span class="pill">status: proposed</span></div>
+<section class="findings">{"".join(cards)}</section>
+<div class="connector">deterministic shared signal</div>
+<section class="cluster">
+<div class="cluster-id">{esc(cluster.get("id"))}</div>
+<div><h2>{esc(patterns)}</h2><p>{esc(domains)}</p></div>
+<div class="density">density {esc(cluster.get("density"))}<br>3 / 3 edges</div>
+</section>
+<section class="hypothesis">
+<div class="hypothesis-head"><span class="eyebrow">Root-cause hypothesis</span><span class="status">{esc(frontmatter.get("status"))}</span></div>
+<h2>{esc(frontmatter.get("title"))}</h2>
+<p class="root">{esc(section("Proposed root cause"))}</p>
+<div class="columns"><div><h3>Supporting evidence</h3><ul>{evidence_html}</ul></div>
+<div><h3>Alternative explanations</h3><ul>{alternatives_html}</ul></div></div>
+<div class="falsifier"><h3>Falsifier</h3><p>{esc(section("Falsifier"))}</p></div>
+</section>
+<footer>Generated from this run's graph.json and H001 Markdown · local, static, no network · synthetic evidence</footer>
+</main>
+</body>
+</html>
+"""
+sys.stdout.write(document)
+PY
+}
+
+if [ -n "${DEMO_DIR}" ]; then
+  if [ ! -d "${DEMO_DIR}" ]; then
+    echo "board-view: demo directory not found: ${DEMO_DIR}" >&2
+    exit 1
+  fi
+  DEMO_DOC="$(render_demo "${DEMO_DIR}")"
+  if [ "${TO_STDOUT}" -eq 1 ]; then
+    printf '%s\n' "${DEMO_DOC}"
+  else
+    printf '%s\n' "${DEMO_DOC}" > "${DEMO_DIR}/pattern-intelligence.html"
+    echo "board-view: wrote ${DEMO_DIR}/pattern-intelligence.html"
+  fi
+  exit 0
+fi
 
 # Resolve board rows: "<label><TAB><abs-path>" per project.
 ROWS=()

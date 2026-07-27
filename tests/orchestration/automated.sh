@@ -27,6 +27,10 @@
 #   14. board-init-command.sh       — 1.1.0 /board-init engineering-board/ scaffold + .gitignore structural lint
 #   15. board-relocate.sh           — 1.1.0 /board-migrate --relocate move + router rewrite + idempotency
 #   18. board-remember.sh           — C6 explicit learning capture: script-vs-MCP equivalence + index-check green
+#   19. board-demo-command.sh       — /board-demo containment and authority contract
+#   20. board-graph-engine.sh       — executable positive/negative graph fixtures
+#   21. hypothesis-contract.sh      — proposed hypothesis persistence + rendering
+#   22. integration first-win       — full contained journey + tamper cleanup refusal
 #
 # Usage:
 #   bash tests/orchestration/automated.sh                # auto-detect plugin root
@@ -61,6 +65,10 @@ SUBTESTS=(
   "board-setup-command.sh"
   "board-run-command.sh"
   "board-remember.sh"
+  "board-demo-command.sh"
+  "board-graph-engine.sh"
+  "hypothesis-contract.sh"
+  "../integration/pattern-intelligence-first-win.sh"
 )
 
 for st in "${SUBTESTS[@]}"; do

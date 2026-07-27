@@ -3,24 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>engineering-board — the board is the database</title>
-  <meta name="description" content="A git-committed kanban board your AI agents run and remember. A Claude Code plugin and MCP server: multi-agent coordination, atomic claim-locking, and durable cross-session memory — all as committed markdown in your repo.">
+  <title>engineering-board — pattern intelligence for engineering agents</title>
+  <meta name="description" content="Git-committed engineering memory that connects recurring findings across domains into explainable clusters and bounded root-cause hypotheses. Claude Code plugin and MCP server.">
   <link rel="canonical" href="https://ghostlygawd.github.io/engineering-board/">
-  <meta name="keywords" content="claude code plugin, mcp server, task board, git-committed kanban, multi-agent coordination, ai agent memory, autonomous software engineering, agent claim locking, cross-session agent memory, markdown kanban, claude code orchestration, tdd agent pipeline">
+  <meta name="keywords" content="claude code plugin, mcp server, engineering pattern intelligence, root cause analysis, git-committed memory, multi-agent coordination, ai agent memory, evidence graph, agent claim locking, cross-session agent memory, markdown knowledge graph">
   <meta name="theme-color" content="#FAF9F5" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#17191E" media="(prefers-color-scheme: dark)">
 
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="engineering-board — the board is the database">
-  <meta property="og:description" content="A git-committed kanban board your AI agents run and remember. Claude Code plugin + MCP server.">
+  <meta property="og:title" content="engineering-board — pattern intelligence for engineering agents">
+  <meta property="og:description" content="Connect recurring engineering findings into explainable clusters and evidence-linked root-cause investigations — all as visible repository memory.">
   <meta property="og:url" content="https://ghostlygawd.github.io/engineering-board/">
   <meta property="og:image" content="https://ghostlygawd.github.io/engineering-board/assets/social-preview.png">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="640">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="engineering-board — the board is the database">
-  <meta name="twitter:description" content="A git-committed kanban board your AI agents run and remember. Claude Code plugin + MCP server.">
+  <meta name="twitter:title" content="engineering-board — pattern intelligence for engineering agents">
+  <meta name="twitter:description" content="Visible repository memory that connects recurring findings into explainable root-cause investigations.">
   <meta name="twitter:image" content="https://ghostlygawd.github.io/engineering-board/assets/social-preview.png">
 
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -242,27 +242,18 @@
   <main>
     <section class="hero wrap" aria-labelledby="h1">
       <p class="eyebrow">For Claude Code · plugin &amp; MCP (Model Context Protocol) server</p>
-      <h1 id="h1">A git-committed kanban board your AI agents run and remember.</h1>
-      <p class="tagline"><strong>The board is the database</strong> — no hidden DB, just markdown in your repo. Your agent captures the bugs and ideas it spots as it works, remembers them across sessions, and drives each one from a failing test to done.</p>
-      <p class="whofor">For anyone building with Claude Code — <strong>one agent today</strong>, collision-free across many when you scale. Findings capture themselves; you promote the ones worth keeping.</p>
+      <h1 id="h1">Find the shared root cause your agents would otherwise miss.</h1>
+      <p class="tagline"><strong>The board is the memory</strong> — visible Markdown evidence in your repo becomes an explainable pattern graph, then a clearly bounded investigation candidate. No hidden database, service, or daemon.</p>
+      <p class="whofor">For engineering agents that need to learn across sessions and domains instead of repeatedly patching symptoms in one-off chats.</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="#install">Install — free &amp; MIT</a>
         <a class="btn btn-ghost" href="board.html">See a live board it runs</a>
       </div>
 
-      <div class="demo" aria-label="Interactive board demo">
-        <div class="demo-head">
-          <span class="label" id="demo-status" role="status" aria-live="polite">a finding, promoted through the state machine</span>
-          <button class="btn btn-ghost" id="play" type="button" style="padding:.4rem .9rem">▸ Play</button>
-        </div>
-        <div class="cols">
-          <div class="col" data-state="tdd"><div class="col-h">needs: tdd</div></div>
-          <div class="col" data-state="review"><div class="col-h">needs: review</div></div>
-          <div class="col" data-state="validate"><div class="col-h">needs: validate</div></div>
-          <div class="col" data-state="resolved"><div class="col-h">resolved</div></div>
-        </div>
-        <p class="demo-cap">Illustrative animation of the pipeline · <a href="board.html">see the real board this repo runs →</a></p>
-      </div>
+      <figure class="demo" aria-label="Pattern-intelligence demo result">
+        <img src="assets/pattern-intelligence-demo.png" alt="Three synthetic findings across hooks, board-view, and MCP connect into deterministic cluster C001 and a separate proposed root-cause hypothesis with cited evidence, an alternative explanation, and a falsifier." width="1440" height="1500" style="display:block;max-width:100%;height:auto;border-radius:var(--eb-radius-card)">
+        <figcaption class="demo-cap">Real output from the contained <code>/board-demo</code> sample · correlation remains separate from confirmation</figcaption>
+      </figure>
 
       <p class="trustband">Built on its own board, <a href="board.html">in public</a> · <a href="https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml">CI-green</a> · zero-dependency · MIT · <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">on the MCP Registry</a> · <a href="https://github.com/GhostlyGawd/engineering-board/releases">releases since 2026-06</a></p>
     </section>
@@ -270,12 +261,12 @@
     <section id="why" aria-labelledby="why-h">
       <div class="wrap">
         <h2 id="why-h" class="reveal">Why it's different</h2>
-        <p class="sub reveal">Agents now do real multi-session work — and they forget everything between sessions and trip over each other in parallel. The field still forces a choice: a board that's <em>visible but dumb</em>, or memory and coordination that's <em>smart but opaque</em> — kept in a database, or in <code>~/.claude</code> outside your repo. engineering-board refuses the trade-off.</p>
+        <p class="sub reveal">One-off chats hide recurrence. Bugs in worker routing, a renderer, and an API can look unrelated even when they reflect the same duplicated contract. engineering-board accumulates the evidence, makes the connecting signal visible, and asks agents to investigate one systemic explanation without pretending correlation proves causation.</p>
         <div class="vp">
-          <div class="card2 reveal lead"><h3>Visible, diffable state</h3><p>Your agents' board is committed markdown — cards, an index, a graph — reviewed in the same PRs as code. The board is the database.</p><p class="proof">engineering-board/ · BOARD.md · GRAPH.yml</p></div>
-          <div class="card2 reveal"><h3>Durable memory</h3><p><strong>Your agent forgets everything between sessions.</strong> Recurring lessons promote into committed Learning entries (L###) that survive — surfaced at session start and in a dedicated Learnings panel on <a href="board.html">the board view</a>.</p><p class="proof">learnings-curator → learnings/L###</p></div>
+          <div class="card2 reveal lead"><h3>Evidence-linked pattern intelligence</h3><p>Findings become typed nodes and explainable edges. Cross-domain clusters keep their member evidence visible, giving the next agent context that no single chat contained.</p><p class="proof">Markdown evidence → GRAPH.yml → proposed hypothesis</p></div>
+          <div class="card2 reveal"><h3>Durable, correctable memory</h3><p>Evidence, proposed explanations, rejected explanations, and confirmed learnings remain distinct. Repository-owned Markdown survives sessions and stays reviewable in the same PRs as code.</p><p class="proof">B### · H### · L###</p></div>
           <div class="card2 reveal"><h3>Collision-free agents</h3><p><strong>Two agents editing the same file clobber each other.</strong> Atomic claim-locking lets parallel worker agents run without stepping on each other.</p><p class="proof">board-claim-acquire.sh · tested</p></div>
-          <div class="card2 reveal"><h3>Autonomous pipeline</h3><p>Findings flow through a tdd → review → validate state machine, driven by the Stop hook.</p><p class="proof">tdd-builder · code-reviewer · validator</p></div>
+          <div class="card2 reveal"><h3>Falsifiable verification</h3><p>The optional tdd → review → validate loop can test a chosen explanation and return proof to the memory system. It is supporting feedback, not the required first experience.</p><p class="proof">tdd-builder · code-reviewer · validator</p></div>
           <div class="card2 reveal"><h3>Runs where you are — and everywhere else</h3><p>A native Claude Code plugin and an MCP server (12 tools) over the same board format.</p><p class="proof">.mcp.json · protocol 2025-06-18</p></div>
         </div>
         <div class="faq reveal">
@@ -292,19 +283,19 @@
         <div class="cmp-scroll reveal">
           <table class="cmp">
             <thead><tr>
-              <th>Tool</th><th>State is PR-reviewable markdown in your repo</th><th>Durable memory</th><th>Atomic claim-locking</th><th>Passive per-turn capture</th><th>Opinionated tdd→review→validate pipeline</th><th>Published team-visible board</th>
+              <th>Tool</th><th>State is PR-reviewable markdown in your repo</th><th>Durable memory</th><th>Evidence-linked cross-domain pattern intelligence</th><th>Atomic claim-locking</th><th>Passive per-turn capture</th><th>Published team-visible board</th>
             </tr></thead>
             <tbody>
               <tr class="us"><td>engineering-board</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
-              <tr><td><a href="https://github.com/gastownhall/beads">beads</a> · ~25k★</td><td class="partial">Partial</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="partial">Partial</td><td class="no">No</td><td class="no">No</td></tr>
-              <tr><td><a href="https://github.com/MrLesk/Backlog.md">Backlog.md</a> · ~6k★</td><td class="yes">Yes</td><td class="no">No</td><td class="partial">Partial</td><td class="no">No</td><td class="partial">Partial</td><td class="yes">Yes</td></tr>
-              <tr><td><a href="https://github.com/eyaltoledano/claude-task-master">Task Master</a> · ~27.8k★</td><td class="partial">Partial</td><td class="no">No</td><td class="partial">Partial</td><td class="no">No</td><td class="partial">Partial</td><td class="no">No</td></tr>
+              <tr><td><a href="https://github.com/gastownhall/beads">beads</a> · ~25k★</td><td class="partial">Partial</td><td class="yes">Yes</td><td class="partial">Partial</td><td class="yes">Yes</td><td class="partial">Partial</td><td class="no">No</td></tr>
+              <tr><td><a href="https://github.com/MrLesk/Backlog.md">Backlog.md</a> · ~6k★</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="partial">Partial</td><td class="no">No</td><td class="yes">Yes</td></tr>
+              <tr><td><a href="https://github.com/eyaltoledano/claude-task-master">Task Master</a> · ~27.8k★</td><td class="partial">Partial</td><td class="no">No</td><td class="no">No</td><td class="partial">Partial</td><td class="no">No</td><td class="no">No</td></tr>
               <tr><td>Claude Code native Tasks</td><td class="no">No</td><td class="partial">Partial</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="partial">Partial</td></tr>
-              <tr><td><a href="https://github.com/thedotmack/claude-mem">claude-mem</a></td><td class="no">No</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td></tr>
+              <tr><td><a href="https://github.com/thedotmack/claude-mem">claude-mem</a></td><td class="no">No</td><td class="yes">Yes</td><td class="partial">Partial</td><td class="no">No</td><td class="yes">Yes</td><td class="no">No</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Where they're better: <a href="https://github.com/gastownhall/beads">beads</a> is the memory-and-claims leader at real scale — <code>bd remember</code>/<code>bd prime</code> and atomic claims are its headline (its state lives in a Dolt DB with JSONL export, hence Partial); <a href="https://github.com/MrLesk/Backlog.md">Backlog.md</a> has the richest task model and the broadest install channels, with a local TUI + web board; <a href="https://github.com/eyaltoledano/claude-task-master">Task Master</a> owns PRD→tasks decomposition; native Tasks persist across sessions but stay in <code>~/.claude/tasks/</code>, per-user. engineering-board bets on the whole row — reviewable in-repo state, captured passively each turn, driven through an opinionated pipeline, and <a href="board.html">published as this repo's own live board</a>, republished on every merge. Newer and smaller than these leaders, shipping fast: <a href="https://github.com/GhostlyGawd/engineering-board/releases">published releases</a> and a <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELOG.md">live changelog</a>. The earlier field this table compared against (kanban-mcp, Flux, Agent-MCP, claude-code-workflows) is dormant or stalled; that research is archived in <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/.goal/POSITIONING.md">.goal/POSITIONING.md</a>.</p>
+        <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Where they're better: <a href="https://github.com/gastownhall/beads">beads</a> is the memory-and-claims leader at real scale; <a href="https://github.com/MrLesk/Backlog.md">Backlog.md</a> has the richest task model and broadest install channels; <a href="https://github.com/eyaltoledano/claude-task-master">Task Master</a> owns PRD→tasks decomposition; native Tasks are excellent personal session tracking; claude-mem provides deep automatic recall. engineering-board adopts those strengths selectively around a different center: accumulated, PR-reviewable engineering evidence should reveal cross-domain patterns and improve the next agent's root-cause judgment. Newer and smaller than these leaders, with <a href="https://github.com/GhostlyGawd/engineering-board/releases">published releases</a> and a <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELOG.md">live changelog</a>.</p>
         <figure class="reveal" style="margin:2rem auto 0;max-width:60rem;background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:var(--eb-radius-lg);padding:1.25rem;box-shadow:var(--eb-shadow-card)">
           <img src="assets/board-screenshot.png" alt="Screenshot of this repo's real rendered board: a search input, type/priority/status filter chips, and kanban columns — to do, review, validate, done — populated with entry cards." loading="lazy" width="1280" height="800" style="display:block;max-width:100%;height:auto;border-radius:var(--eb-radius-card);border:1px solid var(--eb-border)">
           <figcaption style="margin:.7rem 0 0;text-align:center;font-size:.72rem;color:var(--eb-text-faint);font-family:var(--eb-font-mono)">the real thing — this repo's own board, as <code>/board-view</code> renders it · <a href="board.html">open it live</a></figcaption>
@@ -323,7 +314,10 @@
 /plugin install engineering-board
 
 # then, in a project:
-/board-setup</code></pre>
+/board-setup
+
+# optional contained first win:
+/board-demo</code></pre>
             <p class="muted" style="font-size:.8rem">Installing the plugin also registers the MCP server via the bundled <code>.mcp.json</code>.</p>
           </div>
           <div class="card2 reveal">
@@ -390,6 +384,7 @@ claude mcp add engineering-board -- \
 
     // Interactive board demo — a card promoted through the state machine.
     (function(){
+      if(!document.getElementById("play")) return;
       var states=["tdd","review","validate","resolved"];
       var cols={};states.forEach(function(s){cols[s]=document.querySelector('.col[data-state="'+s+'"]')});
       var status=document.getElementById("demo-status");

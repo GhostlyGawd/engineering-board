@@ -1,0 +1,9 @@
+{
+  "schema_version": "1",
+  "synthetic": true,
+  "title": "Duplicated lifecycle contract across adapters",
+  "expected_pattern": "duplicated-state-contract",
+  "expected_members": ["B001", "B002", "B003"],
+  "expected_domains": ["board-view", "hooks", "mcp-server"],
+  "expected_hypothesis": "Lifecycle semantics are duplicated across the worker, renderer, and MCP adapter instead of being consumed from one shared contract."
+}

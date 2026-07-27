@@ -9,6 +9,43 @@ increases.
 
 ## [Unreleased]
 
+### Added
+
+- **Pattern-intelligence first win.** `/board-demo` creates a contained synthetic
+  run in `.engineering-board/demo/pattern-intelligence/`, connects three
+  surface-different symptoms into one deterministic cross-domain cluster, asks
+  `board-insights` for an evidence-cited candidate explanation, persists it only
+  as `status: proposed`, and renders a real static evidence → cluster →
+  hypothesis view. The output includes alternatives, a falsifier, and an exact
+  manifest-verified cleanup command.
+- **Executable deterministic graph core.** `board-graph-build.py` reads explicit
+  Markdown board paths and emits typed nodes, explainable edges, stable connected
+  components, and structural findings without runtime dependencies. Milestone A
+  integrates it only with the contained demo; general production command and MCP
+  convergence remains future work.
+- **Hypothesis authority contract and regression coverage.**
+  `hypothesis-schema.md`, the read-only `board-insights` protocol, focused
+  graph/lifecycle/authority tests, and a live disposable-consumer integration
+  test keep deterministic correlation separate from agent inference and
+  confirmation.
+
+### Changed
+
+- **Pattern intelligence is now the product story.** README, landing page,
+  architecture, security posture, and the living product spec now lead with
+  accumulated findings → explainable clusters → bounded root-cause
+  investigation. The existing `tdd → review → validate` loop remains available
+  as optional falsifiable verification feedback rather than the required first
+  experience.
+
+### Security
+
+- **Contained demo cleanup.** Run ids and resolved paths are contained beneath
+  the demo root; links/reparse points, unexpected files, missing files, and hash
+  changes all cause cleanup refusal. The demo uses synthetic local data only and
+  does not change real boards, settings, credentials, git state, modes, or
+  network state.
+
 ## [1.7.1] — 2026-07-26
 
 Patch release correcting MCP board-status counts for plugin-captured scratch
