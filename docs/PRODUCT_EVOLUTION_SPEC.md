@@ -1,7 +1,7 @@
 # Engineering Board Product Evolution Spec
 
-_Status: Authoritative living product direction — Gate 1 accepted in principle;
-implementation remains gated_
+_Status: Authoritative living product direction — Gate 1 accepted; Milestone A
+Gate 2 contract in review; implementation remains gated_
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-27_
 _Product owner: GhostlyGawd_
@@ -51,7 +51,8 @@ selected milestone is approved.
 | Durable state | Accepted | Preserve repository-owned, human-readable Markdown as the canonical evidence and knowledge record. |
 | Derived graph | Accepted | Generate machine-readable relationships, clusters, and retrieval views from canonical repository state. Derived artifacts must remain explainable from source evidence. |
 | SQLite | Active recommendation | Do not replace Markdown. Consider SQLite only as a disposable, locally rebuildable analysis index after measured scale or query needs justify it. |
-| Epistemic boundary | Active recommendation | Separate observed evidence, deterministic relationships, inferred root-cause candidates, confirmed conclusions, and durable learnings. Never present a cluster as proof of causation. |
+| Epistemic boundary | Accepted | Separate observed evidence, deterministic relationships, inferred root-cause candidates, confirmed conclusions, and durable learnings. Never present a cluster as proof of causation. |
+| Hypothesis authority | Accepted | Root-cause hypotheses may be stored durably with `status: proposed` and evidence. Only explicit investigation or fix outcomes may confirm them. Rejected hypotheses remain durable negative knowledge. |
 | Default capture policy | Active recommendation | Capture automatically; promote explicitly through a foreground action. Automatic capture does not silently become committed project truth. |
 | Verification loop | Accepted | Keep `tdd → review → validate` as an optional, falsifiable fix-verification and feedback mechanism. Do not make it the required first experience or the headline value. |
 | Claims and resolution | Active recommendation | Preserve atomic claims. Validation may recommend closure; final resolution remains an explicit user or explicitly authorized action. |
@@ -544,7 +545,7 @@ feed the result back into memory. It does not lead the roadmap.
     versions, tests, and dated evidence are reconciled with each shipped
     milestone.
 
-## 13. Open decisions
+## 13. Accepted and open decisions
 
 ### O1 — Pattern normalization
 
@@ -559,7 +560,9 @@ Recommendation: option 3. Exact canonical identity keeps durable results
 deterministic; semantic suggestions can discover cross-domain equivalence but
 must remain reviewable before becoming durable.
 
-### O2 — Hypothesis authority
+### A1 — Hypothesis authority
+
+**State: Accepted 2026-07-27.**
 
 Options:
 
@@ -568,9 +571,10 @@ Options:
    but only investigation/fix outcomes can confirm them.
 3. High-confidence clusters automatically become confirmed learnings.
 
-Recommendation: option 2. Durable proposals prevent repeated rediscovery while
+Decision: option 2. Durable proposals prevent repeated rediscovery while
 preserving the distinction between useful inference and established knowledge.
-Reject option 3.
+Option 3 is rejected: confidence never converts correlation into confirmed
+causation without outcome evidence.
 
 ### O3 — Cluster model
 
@@ -661,6 +665,7 @@ with session tasks and planning tools instead.
 |---|---|---|---|---|---|
 | Product-direction authority | Accepted | No runtime behavior | Owner decision recorded here | This file; `ROADMAP.md` precedence note | Direction aligned |
 | Pattern-intelligence substrate | Accepted direction | Partial capture, pattern, graph, curation, retrieval, and resolution mechanisms | Dated implementation review; existing graph and curator contract tests | This file defines future direction without claiming completion | Recommended gaps recorded |
+| Hypothesis authority | Accepted direction | No durable hypothesis type exists | Owner approval and Milestone A contract evidence | This file distinguishes proposed, confirmed, and rejected knowledge | Implementation-defined gap |
 | Canonical Markdown | Accepted | Entry and learning Markdown is current durable state | Existing intake, rebuild, resolve, and curation tests | Architecture direction documented here | Aligned |
 | Derived graph | Accepted direction | `/board-graph` prompt contract; no shared executable graph engine | `tests/orchestration/board-graph-command.sh` checks the command contract | Current limitation stated explicitly | Implementation-defined gap |
 | SQLite | Optional future accelerator | Not implemented or required | Future benchmark and rebuild-equivalence proof required | Migration explicitly rejected; adoption trigger recorded | Deferred optimization |
@@ -671,27 +676,282 @@ with session tasks and planning tools instead.
 | Security, privacy, versions, releases | Required current truth | No change | No release or live product claim | SECURITY, manifests, and changelog remain unchanged | Reviewed and unaffected |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
-## 17. Gate 2: next implementation contract
+## 17. Gate 2 draft: Milestone A implementation contract
 
-The next build contract should cover Milestone A only:
+_State: Draft for owner review. No implementation authorized._
 
-1. exact cross-domain sample and known root pattern;
-2. sample containment, preservation, and fingerprinted cleanup;
-3. canonical finding inputs and expected graph/cluster output;
-4. inference labeling and drill-down interaction;
-5. plugin and applicable MCP surface;
-6. deterministic and semantic false-positive fixtures;
-7. visual evidence;
-8. current-truth documentation updates;
-9. commit, draft PR, and no-merge boundary.
+### 17.1 Milestone purpose
 
-The owner must approve that file-level contract before implementation begins.
+> Give a new user one bounded, trustworthy experience in which three
+> surface-different engineering symptoms across separate domains become one
+> evidence-linked systemic investigation candidate—proving the product's
+> intelligence advantage before introducing its operating model.
+
+### 17.2 Demonstration scenario
+
+The built-in sample models lifecycle-contract drift across three adapters:
+
+| Entry | Surface symptom | Affected domain |
+|---|---|---|
+| `B001` | A worker does not select an entry that should be eligible for review. | `hooks/` worker routing |
+| `B002` | The HTML board renders the same lifecycle state in the wrong lane. | `hooks/scripts/board-view.sh` |
+| `B003` | MCP ready-work output omits the same class of eligible entry. | `mcp-server/` |
+
+The canonical normalized pattern is `duplicated-state-contract`.
+
+The expected candidate cluster contains all three findings because the
+independent adapters interpret one lifecycle contract separately. The expected
+proposed hypothesis is:
+
+> Lifecycle semantics are duplicated across the worker, renderer, and MCP
+> adapter instead of being consumed from one shared contract.
+
+The sample is synthetic and labeled as such. It must not imply these are
+currently open production bugs.
+
+### 17.3 User interaction contract
+
+Proposed command:
+
+```text
+/board-demo
+/board-demo --clean <run-id>
+```
+
+`/board-setup` remains the canonical setup command and ends with one optional
+next step:
+
+```text
+Try the pattern-intelligence sample: /board-demo
+```
+
+`/board-demo` must:
+
+1. create a run-scoped workspace under
+   `.engineering-board/demo/pattern-intelligence/<run-id>/`;
+2. copy only the three labeled sample entries and required templates;
+3. record a manifest containing relative paths and content hashes before any
+   analysis;
+4. build deterministic graph facts from the sample;
+5. show the candidate cluster, member evidence, relationship reasons, and
+   affected domains;
+6. create one evidence-linked `status: proposed` hypothesis;
+7. show at least one alternative explanation and one falsifier;
+8. render a local static visual and print its path;
+9. report the exact cleanup command and that modified files will be preserved.
+
+The command must not:
+
+- initialize or edit the user's real board;
+- modify a board router, source file, settings file, or Git configuration;
+- start PM/Worker mode;
+- run code-generation or fix the synthetic issue;
+- require an additional network service, service credentials, SQLite, or a
+  hosted control plane beyond the already-active agent runtime;
+- confirm the proposed root cause.
+
+### 17.4 Data contract
+
+The deterministic graph retains the existing `GRAPH.yml` concepts and adds
+stable cluster identity plus exposed signal provenance:
+
+```yaml
+clusters:
+  - id: C001
+    members: [B001, B002, B003]
+    patterns: [duplicated-state-contract]
+    affected_domains: [hooks, board-view, mcp-server]
+    signals:
+      - kind: shared-pattern
+        value: duplicated-state-contract
+        members: [B001, B002, B003]
+    density: 1.0
+```
+
+The interpreted result is separate Markdown:
+
+```yaml
+---
+id: H001
+type: hypothesis
+status: proposed
+title: Lifecycle semantics are duplicated across adapters
+cluster_id: C001
+patterns: [duplicated-state-contract]
+confidence: medium
+derived_from: [B001, B002, B003]
+affected_domains: [hooks, board-view, mcp-server]
+created: YYYY-MM-DD
+last_evaluated: YYYY-MM-DD
+---
+```
+
+Required hypothesis sections:
+
+- `## Proposed root cause`
+- `## Supporting evidence`
+- `## Alternative explanations`
+- `## Falsifier`
+- `## Outcome history`
+
+Authority rules:
+
+- Graph nodes, edges, cluster membership, and signal values are deterministic
+  derived facts.
+- `H001` is an agent interpretation and must remain `proposed`.
+- Recurrence or confidence alone cannot change it to `confirmed`.
+- Confirmation requires an explicit cited investigation or fix outcome.
+- Rejection preserves the hypothesis and appends the rejecting evidence.
+- A correction changes canonical sample/finding state, then rebuilds derived
+  graph state; generated files are never hand-edited as authority.
+
+### 17.5 State, preservation, and cleanup
+
+| Condition | Meaning | Required behavior |
+|---|---|---|
+| No prior demo run | Clean start | Create a unique run directory and manifest. |
+| Complete unchanged run exists | Repeat request | Reuse or create a new run without overwriting the prior run; report which occurred. |
+| Prior run is modified | User or external process changed demo content | Preserve it, create a new run, and report why cleanup is withheld. |
+| Graph generation fails | Derived analysis is incomplete | Keep canonical sample entries, emit a typed failure, and do not create a hypothesis or claim success. |
+| Hypothesis generation fails | Structural result exists but interpretation does not | Show the graph result, label interpretation unavailable, and preserve the run for inspection/retry. |
+| Cleanup manifest matches | All targets retain recorded identity and hashes | Remove only the exact run directory and report the removed paths. |
+| Cleanup fingerprint differs | Content or scope changed | Refuse deletion, preserve the run, and identify mismatches. |
+
+Demo cleanup is the only destructive boundary in Milestone A. It is limited to
+one manifest-owned run directory. It never follows symlinks or reparse points,
+never expands to the parent demo root, and never deletes an unmanifested path.
+
+### 17.6 Component and file responsibilities
+
+Proposed implementation map:
+
+- `commands/board-demo.md`: user-facing orchestration, report contract, and
+  failure semantics.
+- `commands/board-setup.md`: add only the optional demo next step.
+- `hooks/scripts/board-demo.sh`: create the contained run, copy fixtures,
+  fingerprint artifacts, invoke deterministic analysis, and perform bounded
+  cleanup.
+- `hooks/scripts/board-graph-build.py`: shared deterministic parser and graph
+  builder for explicit board paths. Milestone A integrates it with the demo;
+  real-board modifying commands remain unchanged until Milestone B.
+- `skills/board-insights/SKILL.md`: interpret a completed cluster into the
+  hypothesis schema without changing deterministic graph facts.
+- `skills/board-intake/references/hypothesis-schema.md`: normative hypothesis
+  fields, sections, states, and authority rules.
+- `references/demo/pattern-intelligence/`: the three synthetic canonical
+  entries and expected scenario metadata.
+- `hooks/scripts/board-view.sh`: render the demo's evidence → cluster →
+  hypothesis drill-down without adding mutation controls.
+- `tests/fixtures/pattern-intelligence/`: positive, negative, malformed, and
+  cleanup-tamper fixtures.
+- `tests/orchestration/board-demo-command.sh`: pin command scope, containment,
+  and visible output.
+- `tests/orchestration/board-graph-engine.sh`: execute deterministic graph and
+  cluster fixtures.
+- `tests/orchestration/hypothesis-contract.sh`: validate epistemic state and
+  required provenance.
+- `tests/integration/pattern-intelligence-first-win.sh`: exercise the complete
+  contained journey, retry, and cleanup.
+
+The graph engine must consume the existing entry schema rather than create a
+parallel task model. Milestone A may add graph fields needed by the sample, but
+must not silently change real-board command behavior.
+
+### 17.7 Failure and security contract
+
+- Malformed sample or graph input → non-zero typed error naming the exact
+  relative file; no partial success claim.
+- Missing Python runtime → explicit prerequisite error; no package installation.
+- Analysis timeout or interpreter failure → preserve the run and print a safe
+  retry command.
+- Hypothesis output missing required citations or sections → reject the output
+  as invalid and leave deterministic graph results available.
+- Path escape, symlink, reparse point, manifest expansion, or unexpected file →
+  refuse cleanup.
+- Existing user data under the selected run path → never overwrite; allocate a
+  new run ID.
+- Captured visual and evidence → synthetic data only; no usernames, absolute
+  personal paths, tokens, repository secrets, or private findings.
+- Demo scripts make no network calls and perform no credential reads, settings
+  writes, repository commits, or automatic browser launch. Interpretation uses
+  only the already-active agent runtime.
+
+### 17.8 Acceptance-test matrix
+
+| Area | Required proof |
+|---|---|
+| Positive cluster | Three sample entries produce exactly three nodes, three `shared-pattern` edges, one cluster, three affected domains, and stable membership. |
+| Determinism | Repeated analysis of unchanged canonical sample input produces logically identical graph output, excluding documented volatile timestamps. |
+| Cross-domain value | The rendered explanation identifies three distinct domains and traces the shared pattern to all member entries. |
+| Hypothesis authority | Output is `status: proposed`, cites `B001`–`B003`, includes an alternative and falsifier, and cannot auto-confirm from confidence. |
+| Negative fixture | Surface-similar entries without a shared supported signal do not become one durable cluster or hypothesis. |
+| Singleton fixture | One finding remains isolated and produces no fabricated systemic hypothesis. |
+| Malformed input | A bad entry produces an explicit error and no success/hypothesis artifact. |
+| No real-board mutation | Before/after hashes for the router, real board, source tree, settings, and Git configuration are unchanged. |
+| Retry | A failed interpretation can retry from preserved deterministic graph state without recopying or mutating canonical sample entries. |
+| Cleanup success | An unchanged run is removed completely using only its manifest. |
+| Cleanup tamper | Modified, extra, linked, or reparse-point content causes cleanup refusal and preservation. |
+| No extra service dependency | With outbound access denied to demo scripts, the journey succeeds using local files and the already-active agent runtime. |
+| Visual truth | Static visual is generated from the actual demo result, contains the three evidence nodes and proposed hypothesis, and is captured with provenance and alt text. |
+| Existing regression suite | Current setup, graph command, view, permissions, docs, token, security, and orchestration tests remain green. |
+
+### 17.9 Live validation
+
+1. Run the demo in a disposable local Git repository with no existing board.
+2. Record elapsed user-directed interaction separately from model execution
+   time.
+3. Deny outbound access to demo scripts and verify the exact graph,
+   proposed-hypothesis label, drill-down, and negative checks.
+4. Initialize a real board beside the demo and prove its hashes do not change.
+5. Tamper with one demo file and prove cleanup refuses.
+6. Restore or create a clean run, execute cleanup, and verify only that run was
+   removed.
+7. Capture a sanitized static visual from the observed output.
+8. Append dated evidence; do not rewrite historical reports.
+
+### 17.10 Documentation-impact contract
+
+When implemented:
+
+| Surface | Required disposition |
+|---|---|
+| This product spec | Mark Milestone A contract accepted and later record shipped evidence without rewriting the decision history. |
+| README and quickstart | Lead the optional first win with pattern intelligence; keep current behavior claims accurate. |
+| Landing page | Show the evidence → cluster → proposed-hypothesis outcome only after live validation. |
+| Command docs | Add `/board-demo`; revise `/board-setup` optional next step; document cleanup and offline boundaries. |
+| Architecture | Document canonical Markdown, deterministic graph facts, interpreted hypotheses, and authority transitions. |
+| MCP docs | State unaffected unless an equivalent demo/analysis surface actually ships. |
+| Security/privacy | Document contained synthetic data, no-extra-service behavior, path validation, and cleanup refusal conditions. |
+| Visuals | Add a real sanitized demo capture with date, source version, alt text, and provenance. |
+| Tests/evidence | Add the matrix above and a dated live-validation report. |
+| Versions/releases | Review at delivery; change only if the owner separately approves a release. |
+
+### 17.11 Non-goals and delivery boundary
+
+Milestone A does not:
+
+- analyze arbitrary real boards through the new engine by default;
+- normalize free-form production tags;
+- add semantic embeddings or SQLite;
+- confirm hypotheses;
+- change resolution, learning confidence, PM/Worker mode, claims, or MCP tools;
+- fix the synthetic root cause;
+- add cross-repository aggregation or a hosted service;
+- merge, release, tag, or deploy without separate owner authorization.
+
+Implementation delivery, if approved, is a focused branch and draft PR with
+code, tests, current-truth documentation, a real visual, and dated evidence.
+The current product-direction PR remains a documentation review surface.
+
+The owner must explicitly approve this Gate 2 contract before implementation
+begins.
 
 ## 18. Research and evidence
 
 Current product evidence:
 
 - [`2026-07-27 pattern-intelligence direction evidence`](evidence/2026-07-27-pattern-intelligence-direction.md)
+- [`2026-07-27 Milestone A contract evidence`](evidence/2026-07-27-milestone-a-contract.md)
 - [`2026-07-27 initial spec validation`](evidence/2026-07-27-product-evolution-spec-validation.md)
 - [`README.md`](../README.md)
 - [`ROADMAP.md`](../ROADMAP.md)
