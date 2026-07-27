@@ -1,7 +1,7 @@
 # Engineering Board Product Evolution Spec
 
-_Status: Authoritative living product direction — Gate 1 and Milestone A Gate 2
-accepted; Milestone A shipped in the v1.8.0 release_
+_Status: Authoritative living product direction — Milestone A shipped in
+v1.8.0; Milestone B Gate 1 accepted and Gate 2 proposed_
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-27_
 _Product owner: GhostlyGawd_
@@ -64,6 +64,10 @@ selected milestone is approved.
 | Team dashboard and monetization | Deferred | Do not build until repository-local intelligence has demonstrated repeatable value. |
 | B057 prerequisite | Landed | PR #93's scratch-finding count fix landed before Milestone A and is included in v1.8.0. The superseded 1.7.1 preparation was folded into the combined feature release instead of publishing two adjacent versions. |
 | Milestone A delivery | Accepted and shipped | The contained synthetic `/board-demo`, deterministic demo graph engine, proposed-hypothesis contract, real evidence view, cleanup boundary, tests, and dated validation ship in v1.8.0. |
+| Milestone B direction | Gate 1 accepted | Make real findings from every supported intake path converge into trustworthy, normalized, provenance-linked graph memory before adding richer root-cause reasoning. |
+| Stable pattern identity | Accepted for Milestone B | Add repository-owned `P###` pattern records with readable labels and aliases. Preserve legacy free-form labels as evidence and compatibility input; do not let semantic suggestions silently become canonical identity. |
+| Foreground promotion | Accepted for Milestone B | Preview captured findings and their proposed pattern assignments, then require an explicit apply action. PM mode may retain its already-authorized batch behavior but must use the same promotion core. |
+| Adapter parity | Accepted for Milestone B | Plugin and MCP surfaces must consume the same zero-dependency parser, pattern resolver, and deterministic graph engine and return semantically equivalent facts. |
 
 ## 3. Product thesis
 
@@ -432,7 +436,8 @@ instead of the product's intelligence advantage.
 
 **Purpose:** Ensure real findings become trustworthy, connected memory.
 
-Candidate scope:
+**Direction state:** Gate 1 accepted by the product owner on 2026-07-27.
+The proposed Gate 2 implementation contract is in section 18.
 
 - Foreground promotion outside PM mode.
 - Pattern normalization and alias handling.
@@ -548,19 +553,6 @@ feed the result back into memory. It does not lead the roadmap.
 
 ## 13. Accepted and open decisions
 
-### O1 — Pattern normalization
-
-Options:
-
-1. Curated canonical pattern IDs with readable aliases.
-2. Free-form tags plus embedding/semantic similarity at query time.
-3. A hybrid: canonical IDs for durable memory and bounded semantic suggestions
-   for proposed aliases or links.
-
-Recommendation: option 3. Exact canonical identity keeps durable results
-deterministic; semantic suggestions can discover cross-domain equivalence but
-must remain reviewable before becoming durable.
-
 ### A1 — Hypothesis authority
 
 **State: Accepted 2026-07-27.**
@@ -577,7 +569,24 @@ preserving the distinction between useful inference and established knowledge.
 Option 3 is rejected: confidence never converts correlation into confirmed
 causation without outcome evidence.
 
-### O3 — Cluster model
+### A2 — Pattern normalization
+
+**State: Accepted for Milestone B on 2026-07-27.**
+
+Options:
+
+1. Curated canonical pattern IDs with readable aliases.
+2. Free-form tags plus embedding/semantic similarity at query time.
+3. A hybrid: canonical IDs for durable memory and bounded semantic suggestions
+   for proposed aliases or links.
+
+Decision: option 3. Exact canonical identity keeps durable results
+deterministic; semantic suggestions can discover cross-domain equivalence but
+must remain reviewable before becoming durable.
+
+### A3 — Cluster model
+
+**State: Accepted for Milestone B on 2026-07-27.**
 
 Options:
 
@@ -587,14 +596,16 @@ Options:
    temporal recurrence, evidence semantics, and outcome history—with each
    contribution exposed.
 
-Recommendation: option 3. A single opaque score would make false positives hard
+Decision: option 3. A single opaque score would make false positives hard
 to diagnose and weaken trust.
 
-### O4 — First-win fixture
+### A4 — First-win fixture
 
-The sample must contain different surface symptoms and affected domains that
-share a verifiable root pattern. The owner still needs to approve the exact
-scenario and containment/cleanup model before implementation.
+**State: Accepted, implemented, and shipped in v1.8.0.**
+
+The sample contains different surface symptoms and affected domains that share
+the verifiable `duplicated-state-contract` pattern. Its containment and cleanup
+model are pinned by the accepted Milestone A contract and dated evidence.
 
 ### O5 — SQLite trigger and latency target
 
@@ -603,9 +614,11 @@ latency threshold that would justify an optional SQLite index remains open.
 Benchmark the file/graph implementation first rather than inventing a threshold
 without evidence.
 
-### O6 — Promotion boundary
+### A5 — Promotion boundary
 
-Recommendation: a foreground promote action writes validated findings, reports
+**State: Accepted for Milestone B on 2026-07-27.**
+
+Decision: a foreground promote action writes validated findings, reports
 created/rejected/deduplicated outcomes, and offers a preview. Silent
 auto-promotion remains deferred.
 
@@ -669,6 +682,7 @@ with session tasks and planning tools instead.
 | Hypothesis authority | Accepted direction | Demo hypotheses persist as Markdown with `status: proposed`; schema and `board-insights` prohibit confirmation | Hypothesis contract tests and dated live validation | Proposed, confirmed, and rejected authority transitions are explicit | Milestone A aligned |
 | Canonical Markdown | Accepted | Entry and learning Markdown is current durable state | Existing intake, rebuild, resolve, and curation tests | Architecture direction documented here | Aligned |
 | Derived graph | Accepted direction | `/board-graph` remains the production prompt contract; `board-graph-build.py` is the executable engine used by the contained demo and accepts explicit board paths | Existing command contract plus graph-engine and integration tests | Demo scope and production limitation stated explicitly | Milestone A aligned; shared production integration remains Milestone B |
+| Milestone B reliable pipeline | Gate 1 accepted; Gate 2 proposed | No Milestone B runtime behavior yet; current real-board paths retain free-form labels and adapter-specific implementations | Proposed deterministic matrix in section 18; implementation evidence not yet available | This spec records the proposed contract without advertising it as shipped | Awaiting Gate 2 implementation approval |
 | SQLite | Optional future accelerator | Not implemented or required | Future benchmark and rebuild-equivalence proof required | Migration explicitly rejected; adoption trigger recorded | Deferred optimization |
 | Current capture confirmation | Required current truth | Stop procedure and append helper surface a non-empty receipt | `tests/scratch/append.sh`; mode-routing tests | README was corrected in this branch | Documentation-only drift repaired |
 | Canonical setup instruction | Required current truth | `/board-setup` is the plugin setup path | Setup command test | Landing page was corrected in this branch | Documentation-only drift repaired |
@@ -946,10 +960,389 @@ current-truth documentation, a real visual, and dated evidence. The owner
 separately authorized merge, release, tag, publication, and deployment on
 2026-07-27; v1.8.0 is the resulting delivery boundary.
 
-## 18. Research and evidence
+## 18. Gate 2 proposed: Milestone B implementation contract
+
+_State: Gate 1 accepted by the product owner on 2026-07-27. This Gate 2
+contract is proposed and must be explicitly approved before implementation._
+
+### 18.1 Milestone purpose
+
+> Make every supported real-finding path converge on the same trustworthy,
+> explainable pattern graph so later root-cause reasoning is based on durable
+> evidence rather than exact free-form tags or adapter-specific behavior.
+
+Milestone B is the production generalization of the v1.8.0 first win. It does
+not add more ambitious interpretation. It makes the evidence-to-graph substrate
+reliable enough for Milestone C to interpret.
+
+### 18.2 Canonical pattern and entry contract
+
+Canonical evidence remains repository-owned Markdown. Each reviewed pattern
+gets one stable record under the owning board:
+
+```text
+engineering-board/<project>/patterns/P001-duplicated-state-contract.md
+```
+
+```yaml
+---
+id: P001
+type: pattern
+status: active
+label: duplicated-state-contract
+aliases: [duplicate-state-contract, split-state-contract]
+created: YYYY-MM-DD
+---
+```
+
+Required pattern-record sections:
+
+- `## Definition` — the failure mode, independent of product area;
+- `## Inclusion evidence` — what is sufficient to assign the pattern;
+- `## Exclusions` — nearby symptoms that do not establish the pattern;
+- `## History` — label, alias, merge, retirement, and correction events.
+
+Pattern IDs are allocated from the highest existing `P###` in that board and
+are never reused. Labels and aliases normalize by Unicode case folding,
+whitespace/hyphen folding, and surrounding-space removal. A normalized label
+or alias may resolve to only one active pattern. Renaming a label does not
+change its ID. A merged record remains durable with `status: merged` and
+`merged_into: P###`; it is never deleted or silently reused.
+
+Entry frontmatter gains an optional canonical assignment:
+
+```yaml
+pattern: [split-state-contract]
+pattern_ids: [P001]
+```
+
+The two fields have different authority:
+
+- `pattern` preserves readable wording supplied or observed at intake and
+  remains backward-compatible input.
+- `pattern_ids` records the reviewed canonical assignment used for durable
+  graph identity.
+- the current display label comes from the `P###` record, not from rewriting
+  every historical entry.
+- assignment and correction reasons are appended to the entry's
+  `## Pattern history`; generated graph files are never edited as authority.
+
+Resolution precedence is:
+
+1. an explicit valid `pattern_ids` assignment;
+2. an exact unique match from a `pattern` label to a registry label or alias;
+3. an exact normalized legacy label represented as
+   `legacy:<normalized-label>`.
+
+The third form preserves existing exact-label clustering without pretending an
+unreviewed label is a canonical pattern. It must be surfaced in typed
+`unresolved_patterns` output. Unknown labels never auto-create `P###` records.
+Semantic or agent-authored alias suggestions may appear in a preview, but only
+an explicit apply action may write them.
+
+No destructive migration is required. Existing boards with no `patterns/`
+directory or `pattern_ids` fields continue to build using the legacy fallback.
+
+### 18.3 User interaction and adapter contract
+
+#### Plugin commands
+
+```text
+/board-promote [project] [--session <session-id>]
+/board-promote [project] --apply <plan-id>
+
+/board-pattern <project> list
+/board-pattern <project> create <label> [--alias <label> ...]
+/board-pattern <project> alias <P###> <label>
+/board-pattern <project> assign <entry-id> <P###> [--reason "<text>"]
+/board-pattern <project> correct <entry-id> --replace <P###|legacy-label> \
+  --with <P###> --reason "<text>"
+/board-pattern <mutation...> --apply <plan-id>
+
+/board-graph [project] [--full]
+```
+
+`/board-promote` previews by default. The preview includes selected scratch
+IDs, target board, duplicate disposition, proposed entry type, pattern
+resolution, proposed new pattern records, rejection/defer reasons, and a
+content-bound `plan_id`. It performs no canonical write.
+
+`--apply <plan-id>` is valid only for the unchanged scratch inputs, router,
+target entry set, pattern registry, and next-ID state included in that plan.
+The command emits a typed per-finding receipt and rebuilds `BOARD.md` and
+`GRAPH.yml` after successful canonical writes. A direct user request to promote
+is apply authority; otherwise the interactive agent must show the preview and
+obtain approval.
+
+PM mode retains its already-authorized per-turn promotion behavior, but its
+consolidator must invoke the same planner, validator, pattern resolver, writer,
+and receipt model. It may not retain a separate promotion implementation.
+
+`/board-pattern` is read-only for `list` and preview-first for every mutation.
+`correct` preserves the prior assignment and reason in Markdown history.
+
+`/board-graph` uses the shared engine in automatic incremental mode. `--full`
+ignores and replaces only the disposable cache. Both modes must produce the
+same logical graph from the same canonical source snapshot.
+
+#### MCP surface
+
+Milestone B adds three tools:
+
+| Tool | Contract |
+|---|---|
+| `board_promote_findings` | Preview or apply captured scratch findings using the same content-bound plan and per-finding receipt as `/board-promote`. |
+| `board_patterns` | List patterns or preview/apply create, alias, assign, and correct operations using the same registry rules as `/board-pattern`. |
+| `board_graph` | Build or return the typed deterministic graph using the shared full/incremental engine. |
+
+Existing `board_create_entry` and `board_update_entry` accept `pattern_ids`,
+validate them against the selected board, and return pattern-resolution
+warnings. Existing `pattern` input remains supported. Existing tool behavior
+outside pattern handling remains compatible.
+
+Plugin and MCP outputs need not use identical presentation, but they must agree
+on canonical IDs, normalized labels, unresolved labels, nodes, edges, clusters,
+relationship reasons, source fingerprints, and typed failure codes.
+
+### 18.4 State, authority, and preservation
+
+| Condition | Meaning | Authoritative owner | Required behavior | Preservation |
+|---|---|---|---|---|
+| Scratch captured | Evidence exists but is not canonical project truth | Scratch file plus capture provenance | Include in foreground preview; do not graph as a live entry | Keep until applied, explicitly rejected, or manually retained |
+| Promotion previewed | A deterministic write proposal exists | Content-bound plan | Return plan and warnings; write nothing canonical | Preserve scratch and current board |
+| Promotion applied | Explicit authority accepted the unchanged plan | Entry and pattern Markdown | Write each idempotent finding once, record receipt, rebuild derived views | Archive processed scratch only after its canonical write is verified |
+| Pattern unresolved | A readable label has no reviewed registry identity | Entry `pattern` field | Preserve legacy exact-label behavior and expose unresolved status | Never invent or silently persist a `P###` |
+| Pattern assigned | Entry cites a valid active `P###` | Entry `pattern_ids` plus pattern record | Use stable ID for graph identity and expose assignment provenance | Preserve observed label and history |
+| Pattern corrected | Reviewed assignment changed | Entry and its appended history | Replace the canonical reference only through an explicit plan | Preserve old ID, reason, timestamp, and actor/source |
+| Pattern merged | Two canonical identities are intentionally unified | Durable source and target pattern records | Resolve the old ID to `merged_into` and expose that resolution | Never delete or reuse the old record |
+| Graph current | Derived source fingerprint matches canonical inputs | Canonical Markdown snapshot | Serve graph facts | Cache may be deleted and rebuilt |
+| Graph stale or invalid | Inputs changed or parsing failed | Canonical Markdown remains authoritative | Return typed stale/invalid state; do not claim current intelligence | Preserve last good graph and all canonical evidence |
+
+Canonical precedence is entry and pattern Markdown, followed by the generated
+`GRAPH.yml`, followed by the disposable local cache. A cache, graph, or command
+receipt can never override canonical Markdown.
+
+Promotion apply and pattern mutation are the only new durable-write
+boundaries. Graph build and graph retrieval are read-only with respect to
+canonical evidence.
+
+### 18.5 Deterministic graph and incremental rebuild contract
+
+The production graph schema adds:
+
+- `schema_version`;
+- `source_fingerprint` over sorted canonical relative paths and content hashes;
+- per-node `pattern_ids`, resolved display labels, original labels, resolution
+  kind, and source field;
+- typed `unresolved_patterns`;
+- `pattern_id` and source-entry/field provenance on `shared-pattern` edges;
+- a deterministic cluster `fingerprint` derived from sorted member IDs,
+  relationship kinds, and canonical pattern identities;
+- `build_mode: full|incremental` as diagnostic metadata, not graph meaning.
+
+Existing display IDs such as `C001` remain ordered presentation identifiers.
+Consumers that need continuity use the cluster fingerprint.
+
+Incremental state lives only at:
+
+```text
+.engineering-board/cache/graph/<project>/state.json
+```
+
+It stores schema version, source fingerprints, and parsed per-file facts. It
+contains no evidence unavailable from canonical Markdown and must be ignored
+by Git. Incremental rebuild may reuse unchanged parsed facts, but global edges,
+clusters, findings, and output ordering are recomputed deterministically from
+the complete logical entry set.
+
+The engine writes candidate graph and cache files to same-directory temporary
+paths, rechecks the canonical source fingerprint, and atomically replaces
+derived outputs only when the snapshot is unchanged. A concurrent source
+change returns `source_changed` and preserves the prior graph/cache.
+
+For identical canonical inputs:
+
+- full and incremental builds must have identical logical graph content;
+- deleting the cache and rebuilding must recover the same logical graph;
+- only documented volatile metadata such as `generated_at` and diagnostic
+  `build_mode` may differ;
+- plugin and MCP adapters must return the same source fingerprint and graph
+  facts.
+
+No SQLite, embedding store, network service, or required package dependency is
+introduced.
+
+### 18.6 Component and file responsibilities
+
+- `mcp-server/engineering_board_core.py` — new zero-dependency shared core for
+  entry parsing, pattern-registry parsing and normalization, source
+  fingerprinting, graph construction, incremental-state validation, promotion
+  planning, and typed domain errors. It contains no MCP or Claude-specific
+  presentation.
+- `mcp-server/engineering_board_mcp.py` — retain JSON-RPC transport and tool
+  schemas; delegate graph, pattern, direct-entry pattern handling, and
+  promotion behavior to the shared core.
+- `mcp-server/pyproject.toml` — package both the MCP adapter and shared core
+  without adding a runtime dependency.
+- `hooks/scripts/board-graph-build.py` — become the thin CLI adapter over the
+  shared graph core while retaining the explicit-board-path contract used by
+  the demo.
+- `hooks/scripts/board-intake.py` — new local CLI adapter for deterministic
+  create, promote-plan/apply, and pattern-plan/apply operations.
+- `hooks/scripts/board-consolidate.sh` — retain Stop-hook/transcript framing and
+  PM authority, but delegate validation, deduplication, pattern resolution,
+  canonical writes, and receipts to the shared intake core.
+- `commands/board-promote.md` — foreground preview/apply interaction, authority,
+  typed receipt, retry, and preservation behavior.
+- `commands/board-pattern.md` — pattern registry, alias, assignment, and
+  correction interaction without opaque-cache editing.
+- `commands/board-graph.md` — shared-engine invocation, incremental/full
+  behavior, typed output, and unresolved-pattern reporting.
+- `skills/board-intake/SKILL.md` — use the deterministic intake adapter after
+  duplicate review instead of independently serializing canonical files.
+- `skills/board-intake/references/frontmatter-schema.md` — define
+  `pattern_ids`, legacy `pattern` semantics, and `## Pattern history`.
+- `references/required-permissions.json` and plugin metadata — add only the
+  command/script permissions and discovery entries required by the new
+  surfaces.
+- `tests/orchestration/board-pattern-registry.sh` — registry normalization,
+  uniqueness, stable identity, merge, assignment, and correction contracts.
+- `tests/orchestration/board-promote-command.sh` — preview/apply authority,
+  plan-fingerprint, deduplication, preservation, and typed receipt contracts.
+- `tests/orchestration/board-graph-engine.sh` — real-board registry resolution,
+  provenance, unresolved compatibility, cluster fingerprint, and
+  full/incremental equivalence.
+- `mcp-server/test_mcp_server.py` — MCP schemas, pattern CRUD plans, promotion,
+  graph parity, compatibility, and typed failures.
+- `tests/integration/real-pattern-pipeline.sh` — complete three-path real-board
+  journey and correction/rebuild sequence.
+
+Implementation may adjust mechanical module boundaries after repository
+mapping, but it may not create a second parser, resolver, graph algorithm, or
+canonical data model. Any boundary change that affects authority, compatibility,
+or the user contract reopens alignment.
+
+### 18.7 Failure, retry, and security contract
+
+- Invalid pattern ID, duplicate normalized label/alias, merge cycle, malformed
+  pattern record, or conflicting assignment → typed validation error naming
+  only safe relative paths; no canonical or derived partial write.
+- Changed or expired plan inputs → `plan_stale`; write nothing and return a
+  fresh-preview instruction.
+- Duplicate scratch provenance already promoted → idempotent `already_applied`
+  receipt; never allocate another entry.
+- One finding fails during a multi-finding apply → report per-finding results,
+  preserve every unverified scratch finding, and make retry idempotent from the
+  durable receipt. Never claim all-or-nothing atomicity across files.
+- Missing Python → explicit prerequisite error; never install packages.
+- Cache missing, corrupt, stale, or from another schema version → discard only
+  the cache and perform a full rebuild.
+- Canonical source changes during analysis → `source_changed`; preserve the
+  last good derived output and retry from a fresh snapshot.
+- Graph input invalid → name the safe relative source and preserve the last
+  good graph; do not emit a partial replacement.
+- Path escape, symlink, junction, or reparse point in a mutation or cache path
+  → refuse the operation.
+- Scratch and entry contents remain untrusted data. Existing injection,
+  transcript-anchor, one-line serialization, and HTML-escaping defenses remain
+  mandatory and must cover the new shared paths.
+- No graph read, alias suggestion, or preview may mutate canonical state,
+  resolve an entry, confirm a hypothesis, execute code, commit, push, or access
+  credentials.
+- Receipts and dated evidence must exclude secrets, transcript bodies,
+  usernames, and absolute personal paths.
+
+### 18.8 Deterministic acceptance-test matrix
+
+| Area | Required proof |
+|---|---|
+| Three-path convergence | One plugin direct intake, one foreground scratch promotion, and one MCP-created entry using three approved aliases resolve to the same `P###` and one evidence-linked cross-domain cluster. |
+| Pattern identity | Changing the canonical label preserves `P###`, memberships, and cluster fingerprint while updating the displayed label. |
+| Alias uniqueness | Case/whitespace/hyphen-equivalent labels or aliases cannot map to two active pattern records. |
+| Legacy compatibility | A board with only existing `pattern` labels and no registry builds successfully, retains exact-label clustering, and reports `legacy:` unresolved identities. |
+| Unknown-label authority | An unmatched or semantic suggestion appears in preview/output but creates no pattern record or canonical assignment without apply authority. |
+| Assignment provenance | Every canonical shared-pattern edge identifies the pattern ID and the member entry fields that support it. |
+| Correction | Replacing a bad assignment updates only the intended canonical Markdown and derived relationships, preserves history, and removes the stale edge after rebuild. |
+| Merge preservation | A merged pattern ID resolves to its durable target without deleting the old record or duplicating cluster membership. |
+| Adapter parity | Plugin and MCP builds from the same snapshot return equal source fingerprints, normalized pattern facts, edges, clusters, and typed findings. |
+| Full/incremental equivalence | Full build, unchanged incremental build, one-file incremental build, and cache-deleted rebuild produce equal logical graphs. |
+| Determinism | Repeated builds have stable ordering, edge provenance, pattern identity, and cluster fingerprints apart from documented volatile metadata. |
+| Concurrent change | A canonical edit between scan and replace returns `source_changed` and leaves the prior graph/cache intact. |
+| Preview/apply | Preview writes nothing; unchanged apply succeeds once; changed inputs make the plan stale; retry cannot duplicate an entry. |
+| Promotion outcomes | Created, deduplicated, rejected, deferred, and already-applied findings receive explicit typed receipts and only verified applied scratch is archived. |
+| Malformed input | Invalid entries, registry records, caches, and plans fail closed without partial canonical or graph replacements. |
+| Security regression | Hostile scratch/frontmatter strings remain data, path/link escapes are refused, and rendered output stays escaped. |
+| No extra infrastructure | The complete pipeline works with outbound access denied, no database, and only the supported Python runtime. |
+| Existing behavior | Current intake, PM/Worker modes, setup, view, resolve, claims, demo, MCP, permissions, security, documentation, and release-tree tests remain green. |
+
+### 18.9 Live validation
+
+1. Create a disposable local repository using the released setup path.
+2. Create one real fixture entry through direct plugin intake, capture and
+   foreground-promote a second, and create a third through MCP.
+3. Use distinct readable aliases approved in one `P###` record and verify one
+   cross-domain cluster with source-linked relationship reasons.
+4. Compare plugin and MCP graph results from the same source fingerprint.
+5. Rename the canonical display label, correct one assignment, and verify
+   identity continuity plus the expected edge change.
+6. Compare full, incremental, and cache-deleted rebuilds.
+7. Change a canonical file during a controlled build and verify refusal to
+   replace the prior graph.
+8. Deny outbound access to the scripts and verify the journey remains local.
+9. Capture a sanitized terminal or static graph view generated from the actual
+   result, with source commit, date, alt text, and provenance.
+10. Remove only the disposable validation repository and append dated evidence;
+    preserve prior Milestone A and release reports unchanged.
+
+### 18.10 Documentation-impact contract
+
+When implemented:
+
+| Surface | Required disposition |
+|---|---|
+| This product spec | Mark Gate 2 accepted, then record implementation and release state without rewriting decision history. |
+| Entry/pattern schemas | Document `P###` records, `pattern_ids`, legacy fallback, precedence, corrections, and merge preservation. |
+| README and setup | Show real finding-to-graph value and the foreground promote path without making PM/Worker mode mandatory. |
+| Plugin command docs | Add promote/pattern contracts and update graph behavior, permissions, failure, and retry guidance. |
+| MCP docs and manifests | Document the three tools, extended entry/update fields, tool count, packaging, and semantic parity only after tests pass. |
+| Architecture | Replace adapter-specific graph/promotion descriptions with the shared-core, canonical/derived, cache, and authority model. |
+| Security/privacy | Document preview/apply authority, untrusted-data handling, path containment, receipts, cache contents, and local-only behavior. |
+| Visuals | Add a real sanitized graph/terminal capture if user-facing output changes; preserve the v1.8.0 synthetic demo provenance. |
+| Changelog and versions | Record behavior in Unreleased; coordinate versions and release claims only at the actual release boundary. |
+| Tests/evidence | Add the matrix above and a dated live-validation report; keep volatile totals and run results out of timeless prose. |
+| Historical reports | Preserve Milestone A and v1.8.0 evidence as historical state and append superseding Milestone B observations. |
+
+README, landing-page, setup, examples, architecture, security, MCP metadata,
+visuals, and release claims must each be updated or recorded as reviewed and
+unaffected in the implementation change. A passing path or keyword test does
+not establish semantic alignment.
+
+### 18.11 Non-goals and delivery boundary
+
+Milestone B does not:
+
+- generate, rank, confirm, reject, split, or merge root-cause hypotheses;
+- add embeddings or an autonomous semantic-similarity authority;
+- replace Markdown or require SQLite;
+- aggregate across repositories;
+- add a hosted service, daemon, login, organization, billing, or cloud sync;
+- turn read-only graph requests into code execution or project mutation;
+- silently promote captures, create aliases, assign patterns, or resolve work;
+- redesign the pattern-focused HTML experience planned for Milestone C;
+- remove PM/Worker modes or change the TDD/review/validate state machine;
+- implement the persistent supervisor from RFC 0001.
+
+After explicit Gate 2 approval, implementation proceeds on a focused branch
+with code, deterministic tests, current-truth documentation, sanitized live
+evidence, and a reviewed PR. Existing owner authorization permits merge and a
+suitable versioned release after the full contract and release gates pass; it
+does not permit weakening this contract or advertising unvalidated behavior.
+
+## 19. Research and evidence
 
 Current product evidence:
 
+- [`2026-07-27 Milestone B contract evidence`](evidence/2026-07-27-milestone-b-contract.md)
 - [`2026-07-27 v1.8.0 release validation`](evidence/2026-07-27-v1.8.0-release-validation.md)
 - [`2026-07-27 pattern-intelligence direction evidence`](evidence/2026-07-27-pattern-intelligence-direction.md)
 - [`2026-07-27 Milestone A contract evidence`](evidence/2026-07-27-milestone-a-contract.md)
