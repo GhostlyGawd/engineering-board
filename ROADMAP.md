@@ -4,6 +4,11 @@ _Synthesis, not re-auditing (2026-07-08). Merges every audit report at repo root
 into one deduplicated, dependency-aware, sequenced roadmap. Every item traces to a
 source report — no new findings are smuggled in._
 
+> **Active direction draft (2026-07-27):**
+> [`docs/PRODUCT_EVOLUTION_SPEC.md`](docs/PRODUCT_EVOLUTION_SPEC.md) is the living
+> Gate 1 proposal for the next product shape. It does not supersede this ranked
+> roadmap until the owner accepts the direction and open decisions.
+
 **Scope note:** this roadmap carries only the **open** work. Items already shipped
 are excluded (IMPROVEMENTS.md's 14 — built; the design batch's headline fixes —
 v1.5.1/v1.6.0; the Experience Optimization safe fixes — PR #87). The pool is the
