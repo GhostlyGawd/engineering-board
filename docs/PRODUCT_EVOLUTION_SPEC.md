@@ -1,13 +1,12 @@
 # Engineering Board Product Evolution Spec
 
 _Status: Authoritative living product direction — Gate 1 and Milestone A Gate 2
-accepted; Milestone A implemented on the direction branch, pending review and
-merge_
+accepted; Milestone A shipped in the v1.8.0 release_
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-27_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
-_Current live baseline: `main` at `4ee6c5239e152b20c4c2a07ef0c4d4fceefa48f3`_
+_Release: `v1.8.0`_
 _Portfolio context: inventory-only; audit source `GhostlyGawd/repo-audit` at
 `907f0759f9d08f478cd5384ad88e50963f1af79a`_
 
@@ -63,8 +62,8 @@ selected milestone is approved.
 | Structured planning bridge | Deferred | PRD decomposition remains a possible later input path, not the product substrate. |
 | Cross-session Conductor | Deferred | RFC 0001's persistent supervisor is not the next required product step. |
 | Team dashboard and monetization | Deferred | Do not build until repository-local intelligence has demonstrated repeatable value. |
-| Pending PR #93 | Independent | The B057 fix and 1.7.1 release preparation remain separate from this direction branch. |
-| Milestone A delivery | Accepted and implemented | The contained synthetic `/board-demo`, deterministic demo graph engine, proposed-hypothesis contract, real evidence view, cleanup boundary, tests, and dated validation are implemented on the direction branch. Merge, release, tag, and deployment remain separately authorized actions. |
+| B057 prerequisite | Landed | PR #93's scratch-finding count fix landed before Milestone A and is included in v1.8.0. The superseded 1.7.1 preparation was folded into the combined feature release instead of publishing two adjacent versions. |
+| Milestone A delivery | Accepted and shipped | The contained synthetic `/board-demo`, deterministic demo graph engine, proposed-hypothesis contract, real evidence view, cleanup boundary, tests, and dated validation ship in v1.8.0. |
 
 ## 3. Product thesis
 
@@ -416,8 +415,7 @@ Milestones are ordered by the product's intelligence value.
 
 **Purpose:** Demonstrate the unique product value in one session.
 
-**Implementation state:** complete on the direction branch; pending review and
-merge. The delivered scope is:
+**Implementation state:** shipped in v1.8.0. The delivered scope is:
 
 - A bounded cross-domain sample with a known shared failure pattern.
 - Canonical `/board-setup` guidance.
@@ -676,13 +674,13 @@ with session tasks and planning tools instead.
 | Canonical setup instruction | Required current truth | `/board-setup` is the plugin setup path | Setup command test | Landing page was corrected in this branch | Documentation-only drift repaired |
 | TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped and unchanged | Existing mode and orchestration tests | Repositioned as optional falsifiable verification feedback, not the headline or required first experience | Behavior unchanged; messaging aligned |
 | MCP behavior | Required current truth | Current tools unchanged | Existing MCP tests remain authoritative | Proposed semantic parity is not claimed shipped | Reviewed and unaffected |
-| Security, privacy, versions, releases | Required current truth | Demo adds a contained synthetic run and manifest-verified cleanup; manifests and release state unchanged | Negative containment/tamper tests and dated live validation | SECURITY and changelog updated; no version, release, or deployment claim | Behavior and docs aligned; release unaffected |
+| Security, privacy, versions, releases | Required current truth | Demo adds a contained synthetic run and manifest-verified cleanup; coordinated manifests identify v1.8.0 | Negative containment/tamper tests, full release-tree suite, bundle checksum, and dated live/release validation | SECURITY, changelog, architecture, setup, manifests, and release evidence aligned | v1.8.0 aligned |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
 
 _State: Accepted by the product owner on 2026-07-27 and implemented on the
-direction branch. Review/merge remains pending._
+direction branch; shipped in v1.8.0._
 
 ### 17.1 Milestone purpose
 
@@ -944,9 +942,9 @@ Milestone A does not:
 - merge, release, tag, or deploy without separate owner authorization.
 
 Implementation delivery is this focused branch and draft PR with code, tests,
-current-truth documentation, a real visual, and dated evidence. The owner's
-approval authorized implementation and push to the draft PR; it did not
-authorize merge, release, tag, or deployment.
+current-truth documentation, a real visual, and dated evidence. The owner
+separately authorized merge, release, tag, publication, and deployment on
+2026-07-27; v1.8.0 is the resulting delivery boundary.
 
 ## 18. Research and evidence
 

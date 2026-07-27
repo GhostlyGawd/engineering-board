@@ -22,7 +22,7 @@ lockstep), so security fixes ship in a version bump — run the latest release.
 
 | Version | Supported |
 |---|---|
-| Current minor (1.7.x) | Yes |
+| Current minor (1.8.x) | Yes |
 | Older | No — please upgrade |
 
 ## Security posture
