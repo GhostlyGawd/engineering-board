@@ -950,6 +950,7 @@ separately authorized merge, release, tag, publication, and deployment on
 
 Current product evidence:
 
+- [`2026-07-27 v1.8.0 release validation`](evidence/2026-07-27-v1.8.0-release-validation.md)
 - [`2026-07-27 pattern-intelligence direction evidence`](evidence/2026-07-27-pattern-intelligence-direction.md)
 - [`2026-07-27 Milestone A contract evidence`](evidence/2026-07-27-milestone-a-contract.md)
 - [`2026-07-27 Milestone A implementation validation`](evidence/2026-07-27-milestone-a-implementation-validation.md)
