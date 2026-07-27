@@ -25,6 +25,10 @@ bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-view.sh" ${1:-} $([ "$ARGUMENTS" !
   the GitHub file view). Also settable via the `EB_VIEW_LINK_BASE` env var.
 - `--stamp` appends a "Generated from `<git short-sha>`" line to the footer —
   opt-in because it deliberately breaks the default byte-determinism.
+- `--demo-dir <run-dir>` is an internal `/board-demo` integration surface. It
+  reads that run's `graph.json` and proposed hypothesis Markdown, writes
+  `pattern-intelligence.html`, and never opens a browser. Normal users should
+  invoke `/board-demo`, which validates and reports the contained run.
 
 The script writes `engineering-board/<project>/board.html` — a **single
 self-contained file** (all CSS inlined, no network, no JavaScript required). It
@@ -53,3 +57,5 @@ just re-run it anytime (it's safe and deterministic).
   edits entries or `BOARD.md`.
 - Treats board content as data — it escapes all entry text into HTML, so a
   crafted title cannot inject markup into the view.
+- Demo rendering is a separate static evidence → cluster → hypothesis layout;
+  it does not alter normal Kanban output or accept arbitrary output paths.

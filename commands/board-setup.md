@@ -1,5 +1,5 @@
 ---
-description: One-command onboarding — scaffold the board with smart defaults, check permissions, and print a 3-line "you're ready" summary. Composes /board-init + the permission self-check; leaves the session in passive capture mode. Idempotent.
+description: One-command onboarding — scaffold the board with smart defaults, check permissions, and print a concise "you're ready" summary plus the optional pattern-intelligence demo. Composes /board-init + the permission self-check; leaves the session in passive capture mode. Idempotent.
 argument-hint: [project-name]
 ---
 
@@ -33,7 +33,7 @@ bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-permission-self-check.sh"
 
 Do NOT edit any settings file yourself — permission installation is interactive by design.
 
-### Step 4 — Report (exactly three lines + the mode line)
+### Step 4 — Report (three readiness lines + one optional first-win line)
 
 Print:
 
@@ -41,6 +41,7 @@ Print:
 Board ready: engineering-board/<project>/ (<scaffolded fresh | already set up>).
 Capture is on: findings from every session land in _sessions/ automatically — run /pm-start to promote them.
 Pipeline permissions: <installed | N missing — paste block above>.
+Try the pattern-intelligence sample: /board-demo
 ```
 
 The session stays in **passive** mode (no mode file is written). Do not start PM or Worker mode from this command.
@@ -49,3 +50,4 @@ The session stays in **passive** mode (no mode file is written). Do not start PM
 
 - Idempotent: re-running detects the existing board and re-checks permissions; nothing is clobbered.
 - This is the Quickstart's first command; `/board-init` remains available for explicit control (multiple projects, custom affects-prefixes, `--private`).
+- `/board-demo` is optional and writes only to the hidden run-scoped `.engineering-board/demo/` area; setup never starts it automatically.

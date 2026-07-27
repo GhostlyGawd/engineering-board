@@ -8,22 +8,22 @@
 
 # engineering-board
 
-**A git-committed kanban board your AI agents run and remember.**
+**Git-committed pattern memory that helps AI agents find the root cause.**
 
 _The board is the database._
 
 [![Website](https://img.shields.io/badge/website-ghostlygawd.github.io-E6A94E.svg)](https://ghostlygawd.github.io/engineering-board/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.7.1-E6A94E.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.8.0-E6A94E.svg)](CHANGELOG.md)
 [![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
 [![MCP](https://img.shields.io/badge/MCP-server-171719.svg)](mcp-server/README.md)
 [![GitHub stars](https://img.shields.io/github/stars/GhostlyGawd/engineering-board)](https://github.com/GhostlyGawd/engineering-board/stargazers)
 [![Last release](https://img.shields.io/github/release-date/GhostlyGawd/engineering-board?label=last%20release&color=E6A94E)](https://github.com/GhostlyGawd/engineering-board/releases)
 
-<img src="docs/board-demo.svg" alt="A finding is captured, promoted to the board, and driven through the tdd → review → validate pipeline to done — every step committed markdown." width="720">
+<img src="docs/assets/pattern-intelligence-demo.png" alt="Three synthetic findings from worker routing, the board renderer, and MCP ready-work output connect into cluster C001 and a proposed root-cause hypothesis, with supporting evidence, an alternative explanation, and a falsifier." width="720">
 
-_A finding is captured, promoted, and driven through `tdd → review → validate` to done — see **[this repo's own live board](https://ghostlygawd.github.io/engineering-board/board.html)** (the HTML `/board-view` generates, republished on every merge), every step markdown you can diff._
+_Three surface-different symptoms become one evidence-linked systemic investigation candidate. Run `/board-demo` to reproduce the contained synthetic sample locally._
 
 <img src="docs/assets/board-screenshot.png" alt="Screenshot of this repo's real rendered board: a search input, type/priority/status filter chips, and kanban columns — to do, review, validate, done — populated with entry cards." width="720">
 
@@ -33,16 +33,17 @@ _the real thing — this repo's own board, as `/board-view` renders it_
 
 ## What it is
 
-**engineering-board is a to-do board your Claude Code agent fills in and works through by itself** — saved as plain markdown in your repo, not a hidden database. As it works, your agent jots down the bugs and ideas it spots (its _findings_ — bugs, features, questions, observations); you promote the ones worth keeping into real cards; then agents drive each card from a failing test → review → validated. It remembers what it learns across sessions, and several agents can work in parallel without colliding. Solo today; collision-free at scale.
+**engineering-board is a repository-owned pattern-intelligence system for engineering agents.** It records bugs, features, questions, and observations as visible Markdown evidence; connects recurring signals into a deterministic graph; and gives agents durable context for investigating shared root causes across domains instead of repeatedly patching symptoms in isolation.
 
-Under the hood: engineering-board turns a committed markdown tree — `engineering-board/<project>/` — into an autonomous, multi-agent software-engineering board. Findings are captured passively from every session, promoted to the live board via deterministic consolidation, and worked through a `tdd → review → validate` (test-first) state machine with atomic claim-locking. Coordination state, work-in-progress locks, and durable learnings all live as markdown in your repo — no hidden database, no external service, no daemon. It ships as a native Claude Code plugin **and**, as of 1.2.0, a zero-dependency MCP (Model Context Protocol) server.
+Markdown remains the canonical, PR-reviewable record. `BOARD.md`, `GRAPH.yml`, and the HTML views are rebuildable projections over that evidence—not a competing source of truth. Proposed root-cause hypotheses stay visibly separate from deterministic graph facts and cannot become confirmed knowledge without investigation or fix evidence. Passive capture, atomic multi-agent claims, and the optional `tdd → review → validate` loop support that memory by collecting and testing evidence; they are not the product's headline.
 
 ### Why it's different
 
-The market splits into two camps: **visible-but-dumb** git-markdown boards (no locking, no capture pipeline) and **smart-but-opaque** memory-and-coordination engines (real memory, real claims — but kept in a Dolt or SQLite database, or in `~/.claude/` outside your repo). The 2026 field made the smart camp genuinely smart — beads ships durable memory and atomic claims as its headline, and Claude Code itself now ships built-in Tasks — but neither camp crossed the divide. engineering-board is the intersection neither camp reaches:
+The market splits into two camps: **visible-but-shallow** git-markdown boards and **smart-but-opaque** memory-and-coordination engines whose useful state lives in a database or outside the repo. engineering-board joins the strengths of both and adds an explicit evidence → graph → hypothesis boundary:
 
-- **git-committed, human-visible board** — reviewed in the same PRs as your code
-- **durable cross-session memory** — recurring lessons promote into committed `Learning` entries
+- **git-committed evidence and memory** — reviewed in the same PRs as your code
+- **cross-domain pattern graph** — recurring signals become explainable clusters with member evidence
+- **bounded agent interpretation** — root-cause candidates cite evidence and remain `proposed`
 - **atomic multi-agent claim-locking** — parallel worker agents never collide
 - **native to Claude Code** — plus an MCP server for any MCP client
 
@@ -52,13 +53,13 @@ Use both — they solve different problems. Native Tasks are genuinely good pers
 
 ## Value props
 
-**VP1 — Visible, diffable coordination state.** Your agents' board is committed markdown, reviewed in the same PRs as code. Every entry is validated on write (frontmatter + index) by `board-validate-entry.sh`; the index and structural graph are regenerated deterministically by `/board-rebuild` and `/board-graph`.
+**VP1 — Root-cause intelligence from accumulated findings.** Bugs that look unrelated in one-off chats can cluster through shared patterns and affected domains. Every cluster keeps the evidence trail and edge reason visible, so agents can investigate the systemic cause instead of guessing.
 
-**VP2 — Durable cross-session memory.** Recurring lessons promote into committed `Learning` entries (`L###`) that survive session boundaries. The `learnings-curator` scans resolved entries and promotes `pattern:` tags with recurrence ≥ 3 via `board-curate-learnings.sh`. Idempotent.
+**VP2 — Visible, durable memory.** Canonical findings, hypotheses, and learnings are plain Markdown in the repo. Deterministic graph and visual projections are rebuildable. Recurring lessons promote into committed `Learning` entries (`L###`) that survive session boundaries.
 
 **VP3 — Collision-free parallel agents.** Atomic `mkdir`-based claim-locking with heartbeat, stale reclamation, and cloud-sync detection lets multiple worker agents run without stepping on each other (`board-claim-acquire/release/reclaim-stale.sh`, tested under `tests/claims/`).
 
-**VP4 — Autonomous build pipeline.** Findings flow through a `tdd → review → validate` state machine driven by the Stop hook. Worker mode dispatches `tdd-builder` / `code-reviewer` / `validator` on each entry's `needs:` state and writes back the suggested next step.
+**VP4 — Falsifiable verification feedback.** When a fix is ready, the optional `tdd → review → validate` state machine can test the proposed explanation and feed the result back into durable memory.
 
 **VP5 — Runs where you already are, and everywhere else.** A native Claude Code plugin (commands, agents, hooks, skills) **and** an MCP server exposing the same board format to any MCP client — Claude Desktop, Claude Code, or your own.
 
@@ -82,23 +83,38 @@ checks the pipeline's permissions in a single step):
 /board-setup
 ```
 
+To see the product's pattern-intelligence loop before using real project data:
+
+```
+/board-demo
+```
+
+The command creates a contained synthetic run under
+`.engineering-board/demo/pattern-intelligence/`, connects three findings from
+different domains into a deterministic cluster, and asks the agent for one
+evidence-cited hypothesis. The result stays `status: proposed` and includes an
+alternative explanation and falsifier. The report prints the exact
+manifest-verified cleanup command; modified runs are preserved rather than
+deleted.
+
 Prefer explicit control? `/board-init <project> [affects-prefix]` scaffolds with
 your own names, and `/board-install-permissions` manages the permission
 allowlist on its own — `/board-setup` simply composes the two.
 
-**Now you have a board. Here's how the first value shows up — no further setup:**
+**Now you have a board. Here's how real project memory accumulates:**
 
-1. **Capture is automatic.** Just work in Claude Code as usual. When a turn ends, the Stop hook quietly extracts any bug/feature/question/observation you or the agent surfaced and writes it to the board's scratch inbox at `engineering-board/<project>/_sessions/`. You don't run anything — capture is a passive side effect. (Peek at that folder to confirm it's working.)
+1. **Capture is automatic.** Just work in Claude Code as usual. When a turn ends, the Stop hook extracts any bug/feature/question/observation you or the agent surfaced and writes it to the board's scratch inbox at `engineering-board/<project>/_sessions/`. You don't run anything — when at least one finding is captured, a one-line summary confirms the count and names `/pm-start` as the next action.
 2. **Promote when you're ready.** Run `/pm-start`, then end a turn: the PM pipeline consolidates the scratch findings into real, committed board entries under `engineering-board/<project>/bugs/` (etc.) and updates `BOARD.md`. That's your first entry on the board.
-3. **Let an agent work it.** Start a **fresh Claude Code session** (see the mode note below), run `/worker-start --discipline tdd`, then end a turn: a worker claims a `needs: tdd` entry and drives it through the `tdd → review → validate` pipeline. (To drive one entry through **all three disciplines right here**, run `/board-run <entry-id>` instead — worker mode is the batch tool.)
+3. **Inspect patterns before fixing symptoms.** Run `/board-graph` and `/board-view` to expose recurring signals, connected entries, and cross-domain structure. The production graph remains deterministic; interpreted root-cause hypotheses are kept separate from graph facts.
+4. **Verify a chosen fix when useful.** Start a fresh Claude Code session, run `/worker-start --discipline tdd`, then end a turn. A worker claims a `needs: tdd` entry and drives it through the optional `tdd → review → validate` proof loop. To drive one entry through all three disciplines in one session, use `/board-run <entry-id>`.
 
 > **One session, one mode.** `/pm-start` and `/worker-start` set a *session mode* (stored in `.engineering-board/session-mode.json`). A session holds one mode at a time, so switching from PM to Worker — or back to passive capture — is done by starting a new session, not by running the other command mid-session (it will decline and tell you to restart). On Claude Code web each session is a fresh clone, so a new session starts clean; on a local install the mode file persists on disk, so to return to plain passive capture, start a new session and, if it still shows a mode, delete `.engineering-board/session-mode.json`. The `SessionStart` banner prints the current mode so you always know where you are.
 
-**What to expect (measured, following only this page):** first captured finding in ~5 minutes from install; first promoted board entry in ~10–15 minutes once you run `/pm-start`. The capture in step 1 is deliberately quiet — if you want a visible confirmation, look in `_sessions/`, or run `/board-view` to open a themed visual Kanban of the board (or `/board-rebuild` to refresh the markdown `BOARD.md` index). Full mode reference is the [feature tour](#feature-tour) below.
+**What to expect (measured, following only this page):** first captured finding in ~5 minutes from install; first promoted board entry in ~10–15 minutes once you run `/pm-start`. A successful non-empty capture prints a one-line confirmation; run `/board-view` to open a themed visual Kanban of the board (or `/board-rebuild` to refresh the markdown `BOARD.md` index). Full mode reference is the [feature tour](#feature-tour) below.
 
 ### MCP server
 
-Register the zero-dependency `python3` server with the Claude Code CLI — one line from PyPI (available with the v1.7.0 release; the clone below works today):
+Register the zero-dependency `python3` server with the Claude Code CLI — one line from PyPI:
 
 ```sh
 claude mcp add engineering-board -- uvx engineering-board-mcp
@@ -143,11 +159,11 @@ Works with any MCP client — setup blocks for **Codex CLI**, **Gemini CLI**, an
 | **PM** | `/pm-start` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` |
 | **Worker** | `/worker-start --discipline <tdd\|review\|validate>` | claim-acquire → `tdd-builder` / `code-reviewer` / `validator` → claim-release |
 
-**Commands (14)** — `/board-setup`, `/board-run`, `/board-init`, `/board-rebuild`, `/board-graph`, `/board-view`, `/board-remember`, `/board-pause`, `/board-resume`, `/pm-start`, `/worker-start`, `/board-install-permissions`, `/board-claim-release`, `/board-migrate`.
+**Commands (15)** — `/board-setup`, `/board-demo`, `/board-run`, `/board-init`, `/board-rebuild`, `/board-graph`, `/board-view`, `/board-remember`, `/board-pause`, `/board-resume`, `/pm-start`, `/worker-start`, `/board-install-permissions`, `/board-claim-release`, `/board-migrate`.
 
 **Agents (8)** — `board-manager` (router over the 4 skills); the PM pipeline `finding-extractor` → `consolidator` → `tidier` → `learnings-curator`; the Worker pipeline `tdd-builder` / `code-reviewer` / `validator` (the validator is strictly read-only).
 
-**Skills (4)** — `board-intake`, `board-triage`, `board-resolve`, `board-consolidate`, sharing the `references/auto-resolve-pass.md` protocol.
+**Skills (5)** — `board-intake`, `board-triage`, `board-resolve`, `board-consolidate`, and `board-insights`. `board-insights` interprets deterministic cluster facts but can only write evidence-cited `proposed` hypotheses.
 
 **Hooks (4 events)** — `SessionStart` (board view), `PostToolUse(Write)` (entry validation), `UserPromptSubmit` (routing reminder), `Stop` (mode-routed orchestrator).
 
@@ -174,22 +190,22 @@ Works with any MCP client — setup blocks for **Codex CLI**, **Gemini CLI**, an
 
 Honest and cited; traction figures are live snapshots (2026-07-10) that drift.
 
-| | State is PR-reviewable markdown in your repo | Durable memory | Atomic claim-locking | Passive per-turn capture | Opinionated tdd→review→validate pipeline | Published team-visible board |
+| | State is PR-reviewable markdown in your repo | Durable memory | Evidence-linked cross-domain pattern intelligence | Atomic claim-locking | Passive per-turn capture | Published team-visible board |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | **engineering-board** | Yes | Yes | Yes | Yes | Yes | Yes |
-| [beads](https://github.com/gastownhall/beads) · ~25k★ | Partial — Dolt DB + JSONL export | Yes — `bd remember` / `bd prime` | Yes — `bd update --claim` | Partial — `discovered-from` links | No | No — community UIs |
-| [Backlog.md](https://github.com/MrLesk/Backlog.md) · ~6k★ | Yes | No | Partial — task-id locking | No | Partial — review checkpoints | Yes — local TUI + web |
-| [Task Master](https://github.com/eyaltoledano/claude-task-master) · ~27.8k★ | Partial — repo JSON, no merge story | No | Partial — file lock | No | Partial — TDD autopilot | No |
+| [beads](https://github.com/gastownhall/beads) · ~25k★ | Partial — Dolt DB + JSONL export | Yes — `bd remember` / `bd prime` | Partial — links and durable memory, not an evidence → cluster → bounded-hypothesis view | Yes — `bd update --claim` | Partial — `discovered-from` links | No — community UIs |
+| [Backlog.md](https://github.com/MrLesk/Backlog.md) · ~6k★ | Yes | No | No | Partial — task-id locking | No | Yes — local TUI + web |
+| [Task Master](https://github.com/eyaltoledano/claude-task-master) · ~27.8k★ | Partial — repo JSON, no merge story | No | No | Partial — file lock | No | No |
 | Claude Code native Tasks | No — `~/.claude/tasks/` | Partial — subagent `MEMORY.md`, per-user | No | No | No | Partial — Ctrl+T, terminal-only, per-user |
-| [claude-mem](https://github.com/thedotmack/claude-mem) | No — SQLite + Chroma | Yes | No | Yes — hook-based | No | No |
+| [claude-mem](https://github.com/thedotmack/claude-mem) | No — SQLite + Chroma | Yes | Partial — semantic retrieval without repo-visible evidence graph | No | Yes — hook-based | No |
 
-Every one of these leads a column somewhere; none occupies the whole row. engineering-board's row is the product: reviewable state **and** memory **and** claims **and** passive capture **and** an opinionated pipeline **and** a published board — each ordinary alone, unduplicated together.
+Every one of these leads a column somewhere. engineering-board's distinctive bet is that accumulated, reviewable findings should increase agent intelligence: visible evidence **and** deterministic graph structure **and** explicitly bounded root-cause hypotheses, with claims, capture, and verification supporting that substrate.
 
 **Where they're better (fairness note):** [beads](https://github.com/gastownhall/beads) is the memory-and-claims leader at real scale — `bd remember`/`bd prime` and atomic claims are its headline, not a side feature; [Backlog.md](https://github.com/MrLesk/Backlog.md) has the richest task model (comments, DoD checklists, fuzzy search) and the broadest install channels; [Task Master](https://github.com/eyaltoledano/claude-task-master) owns PRD→tasks decomposition (1.5M+ npm downloads). engineering-board is younger and smaller than all three, and not yet on a public marketplace — install it from this repo's marketplace. The field this table compared against before 2026 (kanban-mcp, Flux, Agent-MCP, claude-code-workflows) is dormant or stalled; that earlier research is archived in [`.goal/POSITIONING.md`](.goal/POSITIONING.md).
 
 ## Architecture
 
-The board is human-visible markdown (cards, a `BOARD.md` index, a `GRAPH.yml` structural graph, a `BOARD-ROUTER.md`), not a hidden database. Everything runs on vanilla Claude Code primitives — hooks, slash commands, subagents, `Task()` dispatch — plus `bash` + `python3`. Zero runtime package dependencies. Full contributor-facing map: [`ARCHITECTURE.md`](ARCHITECTURE.md).
+The canonical record is human-visible Markdown (cards, hypotheses, learnings, and `BOARD-ROUTER.md`). `BOARD.md`, `GRAPH.yml`, JSON analysis output, and HTML are deterministic or reproducible derived views. No SQLite file is required or committed; a future SQLite index is allowed only if measured query needs justify a disposable, rebuildable accelerator. Everything runs on vanilla Claude Code primitives plus `bash` + `python3`, with zero runtime package dependencies. Full contributor-facing map: [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Roadmap
 

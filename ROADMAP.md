@@ -4,6 +4,12 @@ _Synthesis, not re-auditing (2026-07-08). Merges every audit report at repo root
 into one deduplicated, dependency-aware, sequenced roadmap. Every item traces to a
 source report — no new findings are smuggled in._
 
+> **Authoritative product direction (2026-07-27):**
+> [`docs/PRODUCT_EVOLUTION_SPEC.md`](docs/PRODUCT_EVOLUTION_SPEC.md) is the
+> central source of truth for product direction. This roadmap is an execution
+> and historical-planning input; when it conflicts with a newer decision in the
+> product spec, the product spec wins.
+
 **Scope note:** this roadmap carries only the **open** work. Items already shipped
 are excluded (IMPROVEMENTS.md's 14 — built; the design batch's headline fixes —
 v1.5.1/v1.6.0; the Experience Optimization safe fixes — PR #87). The pool is the
