@@ -1338,7 +1338,9 @@ def count_scratch_findings(board_dir):
     """Count un-promoted scratch findings across _sessions/*.md.
 
     Counts `## ` finding headers written by board_capture_finding plus
-    `<!-- ts -->` JSON blocks written by the plugin's board-scratch-append.sh.
+    each finding inside the `<!-- ts -->` JSON blocks written by the plugin's
+    board-scratch-append.sh. Malformed blocks retain the historical fallback
+    count of one so status remains conservative and never fails closed.
     """
     sess = os.path.join(board_dir, "_sessions")
     if not os.path.isdir(sess):
@@ -1349,11 +1351,26 @@ def count_scratch_findings(board_dir):
             continue
         try:
             with open(os.path.join(sess, fname), "r", encoding="utf-8", errors="replace") as f:
+                pending_plugin_block = False
                 for line in f:
+                    if pending_plugin_block:
+                        pending_plugin_block = False
+                        try:
+                            block = json.loads(line)
+                        except (TypeError, ValueError):
+                            total += 1
+                        else:
+                            findings = block.get("findings") if isinstance(block, dict) else None
+                            if isinstance(findings, list):
+                                total += len(findings)
+                                continue
+                            total += 1
                     if line.startswith("## "):
                         total += 1
                     elif line.startswith("<!-- ") and line.rstrip().endswith("-->"):
-                        total += 1
+                        pending_plugin_block = True
+                if pending_plugin_block:
+                    total += 1
         except OSError:
             continue
     return total

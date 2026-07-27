@@ -490,6 +490,33 @@ def suite_lifecycle(mod, tmp_repo):
     check(st2["boards"][0]["unpromoted_scratch"] == 1, "status counts 1 unpromoted scratch",
           str(st2["boards"][0]["unpromoted_scratch"]))
 
+    # B057: plugin scratch blocks count each finding in their JSON array.
+    # Keep MCP headers additive, count an empty findings array as zero, and
+    # preserve the historical one-count fallback for malformed plugin blocks.
+    b57_root = tempfile.mkdtemp()
+    mod.tool_board_init({"project": "b57", "root": b57_root})
+    mod.tool_board_capture_finding(
+        {"project": "b57", "root": b57_root, "kind": "observation",
+         "title": "MCP-captured finding"})
+    b57_bd = mod.board_dir_for(b57_root, "b57")
+    b57_sessions = os.path.join(b57_bd, "_sessions")
+    b57_plugin_scratch = os.path.join(b57_sessions, "plugin-session.md")
+    with open(b57_plugin_scratch, "w", encoding="utf-8") as f:
+        f.write("<!-- 2026-07-26T12:00:00Z -->\n")
+        f.write(json.dumps({"schema_version": "0.2.1", "findings": [
+            {"title": "first"}, {"title": "second"}, {"title": "third"},
+        ]}) + "\n")
+        f.write("<!-- 2026-07-26T12:01:00Z -->\n")
+        f.write(json.dumps({"schema_version": "0.2.1", "findings": []}) + "\n")
+        f.write("<!-- 2026-07-26T12:02:00Z -->\n")
+        f.write("{malformed-json\n")
+    b57_status = mod.tool_board_status({"project": "b57", "root": b57_root})
+    b57_count = b57_status["boards"][0]["unpromoted_scratch"]
+    check(b57_count == 5,
+          "status counts every plugin-block finding with safe malformed fallback (B057)",
+          "got %d" % b57_count)
+    shutil.rmtree(b57_root, ignore_errors=True)
+
     # board_claim / board_release round-trip via real scripts
     cl = mod.tool_board_claim({"project": "atlas", "root": root, "entry_id": "B001",
                                "session_id": "sess-test-1"})

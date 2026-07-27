@@ -9,6 +9,23 @@ increases.
 
 ## [Unreleased]
 
+## [1.7.1] — 2026-07-26
+
+Patch release correcting MCP board-status counts for plugin-captured scratch
+blocks and keeping the reproducible release bundle metadata in lockstep.
+
+### Fixed
+- **`board_status` undercounted multi-finding plugin captures.** The MCP
+  server now counts every item in a scratch block's `findings` array, keeps
+  MCP-style `## ` captures additive, treats empty arrays as zero, and retains
+  a conservative count of one for malformed blocks instead of failing status.
+  Lifecycle coverage pins all four cases.
+
+### Changed
+- **MCP release metadata.** Plugin, marketplace, PyPI, MCP bundle, README badge,
+  and registry versions advance together to `1.7.1`; the reproducible `.mcpb`
+  checksum is re-pinned for the release workflow.
+
 ## [1.7.0] — 2026-07-10
 
 The competitive-parity release: acts on the 2026 field audit (`IMPROVEMENTS.md`
