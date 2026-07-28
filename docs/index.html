@@ -267,7 +267,7 @@
           <div class="card2 reveal"><h3>Durable, correctable memory</h3><p>Evidence, proposed explanations, rejected explanations, and confirmed learnings remain distinct. Repository-owned Markdown survives sessions and stays reviewable in the same PRs as code.</p><p class="proof">B### · H### · L###</p></div>
           <div class="card2 reveal"><h3>Collision-free agents</h3><p><strong>Two agents editing the same file clobber each other.</strong> Atomic claim-locking lets parallel worker agents run without stepping on each other.</p><p class="proof">board-claim-acquire.sh · tested</p></div>
           <div class="card2 reveal"><h3>Falsifiable verification</h3><p>The optional tdd → review → validate loop can test a chosen explanation and return proof to the memory system. It is supporting feedback, not the required first experience.</p><p class="proof">tdd-builder · code-reviewer · validator</p></div>
-          <div class="card2 reveal"><h3>Runs where you are — and everywhere else</h3><p>A native Claude Code plugin and an MCP server (12 tools) over the same board format.</p><p class="proof">.mcp.json · protocol 2025-06-18</p></div>
+          <div class="card2 reveal"><h3>Stable, correctable pattern memory</h3><p>Canonical P### identities keep clusters stable across label changes and aliases. Foreground preview/apply keeps promotion and corrections explicit.</p><p class="proof">Markdown evidence · P### identity · provenance-linked graph</p></div>
         </div>
         <div class="faq reveal">
           <h3>Why not Claude Code's built-in Tasks?</h3>
@@ -337,7 +337,7 @@ claude mcp add engineering-board -- \
     "args": ["engineering-board-mcp"]
   }
 }</code></pre>
-            <p class="muted" style="font-size:.8rem">Pure python3, zero dependencies. 12 tools over stdio. Works with any MCP client — Codex, Gemini CLI, Cursor: <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md">setup blocks</a>.</p>
+            <p class="muted" style="font-size:.8rem">Pure python3, zero dependencies. 15 tools over stdio. Works with any MCP client — Codex, Gemini CLI, Cursor: <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md">setup blocks</a>.</p>
           </div>
         </div>
         <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">Uninstall any time — the board stays as plain markdown in your repo, so there's no lock-in. And it's built for untrusted input: scratch content is treated as data, never instructions, and hardened against prompt injection (<a href="https://github.com/GhostlyGawd/engineering-board/blob/main/SECURITY.md">security posture</a>).</p>

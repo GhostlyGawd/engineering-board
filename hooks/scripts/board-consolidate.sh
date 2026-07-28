@@ -99,7 +99,7 @@ for BOARD_DIR in "${BOARD_DIRS[@]}"; do
   mkdir -p "${ARCHIVE_DIR}"
 
   python3 - "${BOARD_DIR}" "${CONSOLIDATION_LOG}" "${ARCHIVE_DIR}" "${TRANSCRIPT_PATH}" "${EB_SCRIPT_DIR}" <<'PY'
-import json, os, re, sys, datetime, shutil, glob, hashlib
+import json, os, re, sys, datetime, shutil, glob, hashlib, tempfile
 
 board_dir, log_path, archive_dir, transcript_path, script_dir = sys.argv[1:6]
 sessions_dir = os.path.join(board_dir, "_sessions")
@@ -325,62 +325,52 @@ for idx in list(archive_map.keys()):
     log_disposition(sid, f"archived_superseded_by_{archive_map[idx]}")
     keep_idx.discard(idx)
 
-# Stage 4 — promote survivors.
-today = datetime.date.today().isoformat()
-for idx in sorted(keep_idx):
-    sf, f = verified[idx]
-    sid = f.get("scratch_id") or "S-unknown"
-    ftype = f.get("type") or "observation"
-    subdir_name, prefix = type_subdir(ftype)
-    if subdir_name is None:
-        log_disposition(sid, "deferred_unknown_type")
-        continue
-    sub = os.path.join(board_dir, subdir_name)
-    os.makedirs(sub, exist_ok=True)
-    live_id = next_id(sub, prefix)
-    title = flatten(f.get("title")) or "(untitled finding)"
-    affects = f.get("affects")
-    affects_field = "" if affects in (None, "null") else flatten(affects)
-    tags = f.get("tags") or []
-    tags_field = "[" + ", ".join(flatten(t) for t in tags) + "]"
-    slug = slugify(title)
-    fname = f"{live_id}-{slug}.md"
-    fm_lines = [
-        "---",
-        f"id: {live_id}",
-        f"type: {ftype}",
-        f"title: {title}",
-        f"discovered: {flatten(f.get('discovered')) or today}",
-    ]
-    if affects_field:
-        fm_lines.append(f"affects: {affects_field}")
-    if ftype in ("bug", "feature"):
-        fm_lines.append("status: open")
-        fm_lines.append("priority: P2")
-    if ftype == "question":
-        fm_lines.append("status: open")
-    if tags:
-        fm_lines.append(f"tags: {tags_field}")
-    fm_lines.append("---")
-    body_lines = list(fm_lines) + [
-        "",
-        f"# {title}",
-        "",
-        f"Promoted from scratch entry `{sid}` on {today}.",
-        "",
-    ]
-    if ftype in ("bug", "feature", "question"):
-        body_lines += ["## Done when", "", "<!-- TODO — define completion criteria. -->", ""]
-    quote = f.get("evidence_quote") or ""
-    if quote:
-        body_lines += ["## Evidence", "", "> " + flatten(quote), ""]
+# Stage 4 — promote survivors through the shared planner/resolver/writer.
+# The temporary scratch file contains only findings that passed the PM
+# transcript and reject gates. Stage 5 retains ownership of the original
+# scratch-file archive lifecycle.
+kept_findings = [verified[idx][1] for idx in sorted(keep_idx)]
+if kept_findings:
+    core_dir = os.path.abspath(os.path.join(script_dir, "..", "..", "mcp-server"))
+    sys.path.insert(0, core_dir)
+    from pathlib import Path
+    from engineering_board_core import plan_promotion, apply_promotion
+    from engineering_board_mcp import rebuild_board
+
+    temp_path = None
     try:
-        with open(os.path.join(sub, fname), "w", encoding="utf-8") as f_out:
-            f_out.write("\n".join(body_lines))
-        append_board_index(board_dir, live_id, title)
-        log_disposition(sid, f"promoted_{live_id}")
-    except Exception as e:
-        log_disposition(sid, f"deferred_write_error", extra={"error": str(e)})
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            suffix=".md",
+            prefix=".pm-verified-",
+            dir=sessions_dir,
+            delete=False,
+        ) as temp:
+            json.dump({"findings": kept_findings}, temp, ensure_ascii=False)
+            temp.write("\n")
+            temp_path = temp.name
+        project = os.path.basename(os.path.normpath(board_dir))
+        session_name = os.path.basename(temp_path)
+        plan = plan_promotion(Path(board_dir), project, session_name)
+        apply_promotion(
+            Path(board_dir),
+            project,
+            session_name,
+            plan["plan_id"],
+            archive_sources=False,
+        )
+        rebuild_board(board_dir, project)
+    except Exception as exc:
+        for finding in kept_findings:
+            log_disposition(
+                finding.get("scratch_id") or "S-unknown",
+                "deferred_write_error",
+                extra={"error": flatten(exc)},
+            )
+    finally:
+        if temp_path and os.path.isfile(temp_path):
+            os.unlink(temp_path)
 
 # Stage 5 — GC: move PROCESSED scratch files to _archive.
 # A session file that yielded zero parsed findings is NOT archived — archiving

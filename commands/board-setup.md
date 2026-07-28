@@ -39,7 +39,7 @@ Print:
 
 ```
 Board ready: engineering-board/<project>/ (<scaffolded fresh | already set up>).
-Capture is on: findings from every session land in _sessions/ automatically — run /pm-start to promote them.
+Capture is on: findings land in _sessions/ automatically — run /board-promote <project> to preview them, or /pm-start for advanced batch mode.
 Pipeline permissions: <installed | N missing — paste block above>.
 Try the pattern-intelligence sample: /board-demo
 ```

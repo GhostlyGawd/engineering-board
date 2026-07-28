@@ -9,6 +9,10 @@
 | `status` | Yes for bugs/features/questions; optional for observations and learnings (set `resolved` to omit from `BOARD.md` after closing — see `skills/board-resolve/SKILL.md`) | `open`, `blocked`, `in_progress`, `resolved` | |
 | `title` | Yes | Short string | Present-tense for bugs/features; interrogative for questions; one-line takeaway for learnings |
 | `discovered` | Yes | `YYYY-MM-DD` | Date first observed |
+| `discovered_at` | Required for promoted entries | ISO-8601 UTC timestamp | Exact promotion/discovery ordering |
+| `pattern` | No | List of labels | Observed root-cause evidence. It can contain unresolved legacy labels. |
+| `pattern_ids` | No | `[P###, ...]` | Canonical pattern identities resolved through repository-owned pattern records. This field takes precedence for graph identity. |
+| `promoted_from` | Required for promoted entries | List of scratch IDs | Durable intake provenance and idempotency key. |
 
 ## Bug / Feature Additional Fields
 
@@ -18,7 +22,25 @@
 | `priority` | Yes | `P0`, `P1`, `P2`, `P3` | P0 = production down/data loss; P1 = broken output delivered; P2 = quality degraded; P3 = minor/cosmetic |
 | `affects` | Yes | Relative file path | The prompt, script, or module where the fix lands |
 | `blocked_by` | Conditional | `[Q###]` or `[Q###, Q###]` | Required when a question must be answered before this can be fixed |
-| `pattern` | No | `[tag1, tag2]` | Root cause pattern tags — free-form kebab-case strings encoding the failure mode (not the product area). Multiple tags per entry. Examples: `instruction-ambiguity`, `yaml-output`, `token-limit-scaling`, `silent-failure`. Used for systemic issue detection across entries. Apply to **all entry types**: bugs and features always; observations when the failure area is identifiable; questions when the investigation area is clear (even before the Finding is written). |
+| `pattern` | No | `[tag1, tag2]` | Observed root-cause labels. Preserve these labels as evidence. Resolve established labels and aliases to `pattern_ids`; do not create canonical identity from similarity alone. |
+
+## Canonical Pattern Record Fields
+
+Store each canonical record at `patterns/P###-<label>.md`.
+
+| Field | Required | Values | Notes |
+|---|---|---|---|
+| `id` | Yes | P### | Durable identity. Label changes do not change this ID. |
+| `type` | Yes | `pattern` | |
+| `status` | Yes | `active`, `merged`, `retired` | |
+| `label` | Yes | Normalized label | Current readable label. |
+| `aliases` | No | List of normalized labels | Each normalized label or alias belongs to only one pattern. |
+| `created` | Yes | `YYYY-MM-DD` | |
+| `merged_into` | Required when merged | P### | Must resolve to an existing non-cyclic record. |
+
+Pattern records include `## Definition`, `## Inclusion evidence`,
+`## Exclusions`, and `## History`. Entry assignment or correction history is
+appended under `## Pattern history`.
 
 ## Question Additional Fields
 

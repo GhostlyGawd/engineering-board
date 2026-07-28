@@ -1,12 +1,12 @@
 # Engineering Board Product Evolution Spec
 
 _Status: Authoritative living product direction — Milestone A shipped in
-v1.8.0; Milestone B Gate 1 accepted and Gate 2 proposed_
+v1.8.0; Milestone B implemented and validated for v1.9.0 release_
 _Started: 2026-07-27_
-_Last direction revision: 2026-07-27_
+_Last direction revision: 2026-07-28_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
-_Release: `v1.8.0`_
+_Release target: `v1.9.0`_
 _Portfolio context: inventory-only; audit source `GhostlyGawd/repo-audit` at
 `907f0759f9d08f478cd5384ad88e50963f1af79a`_
 
@@ -68,6 +68,7 @@ selected milestone is approved.
 | Stable pattern identity | Accepted for Milestone B | Add repository-owned `P###` pattern records with readable labels and aliases. Preserve legacy free-form labels as evidence and compatibility input; do not let semantic suggestions silently become canonical identity. |
 | Foreground promotion | Accepted for Milestone B | Preview captured findings and their proposed pattern assignments, then require an explicit apply action. PM mode may retain its already-authorized batch behavior but must use the same promotion core. |
 | Adapter parity | Accepted for Milestone B | Plugin and MCP surfaces must consume the same zero-dependency parser, pattern resolver, and deterministic graph engine and return semantically equivalent facts. |
+| Milestone B implementation | Implemented and validated | Section 18 is implemented for v1.9.0 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. Release publication remains an operational gate, not a product-direction change. |
 
 ## 3. Product thesis
 
@@ -681,14 +682,14 @@ with session tasks and planning tools instead.
 | Pattern-intelligence substrate | Accepted direction | Existing production capture/pattern/graph/curation plus contained Milestone A evidence → cluster → proposed-hypothesis first win | Existing graph/curator tests; Milestone A orchestration, graph, hypothesis, integration, and live-validation evidence | README and landing page now lead with pattern intelligence while distinguishing demo scope from production behavior | Milestone A aligned; production generalization remains Milestone B/C |
 | Hypothesis authority | Accepted direction | Demo hypotheses persist as Markdown with `status: proposed`; schema and `board-insights` prohibit confirmation | Hypothesis contract tests and dated live validation | Proposed, confirmed, and rejected authority transitions are explicit | Milestone A aligned |
 | Canonical Markdown | Accepted | Entry and learning Markdown is current durable state | Existing intake, rebuild, resolve, and curation tests | Architecture direction documented here | Aligned |
-| Derived graph | Accepted direction | `/board-graph` remains the production prompt contract; `board-graph-build.py` is the executable engine used by the contained demo and accepts explicit board paths | Existing command contract plus graph-engine and integration tests | Demo scope and production limitation stated explicitly | Milestone A aligned; shared production integration remains Milestone B |
-| Milestone B reliable pipeline | Gate 1 accepted; Gate 2 proposed | No Milestone B runtime behavior yet; current real-board paths retain free-form labels and adapter-specific implementations | Proposed deterministic matrix in section 18; implementation evidence not yet available | This spec records the proposed contract without advertising it as shipped | Awaiting Gate 2 implementation approval |
+| Derived graph | Accepted direction | One shared zero-dependency engine serves production plugin, PM, contained demo, and MCP adapters; canonical P### identities and legacy fallbacks produce source-linked graph facts | Existing graph suites plus the Milestone B pattern-pipeline matrix | Graph schema, cache authority, and adapter parity are current in command, MCP, architecture, and schema docs | Milestone B aligned |
+| Milestone B reliable pipeline | Implemented and validated | Stable P### records, foreground promotion, shared PM/MCP/plugin core, disposable cache, receipts, and graph provenance are implemented for v1.9.0 | `tests/orchestration/milestone-b-pattern-pipeline.sh`, full release-tree suite, and dated implementation evidence | Current-truth product, command, MCP, architecture, security, landing, and LLM docs updated | Release candidate validated |
 | SQLite | Optional future accelerator | Not implemented or required | Future benchmark and rebuild-equivalence proof required | Migration explicitly rejected; adoption trigger recorded | Deferred optimization |
 | Current capture confirmation | Required current truth | Stop procedure and append helper surface a non-empty receipt | `tests/scratch/append.sh`; mode-routing tests | README was corrected in this branch | Documentation-only drift repaired |
 | Canonical setup instruction | Required current truth | `/board-setup` is the plugin setup path | Setup command test | Landing page was corrected in this branch | Documentation-only drift repaired |
 | TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped and unchanged | Existing mode and orchestration tests | Repositioned as optional falsifiable verification feedback, not the headline or required first experience | Behavior unchanged; messaging aligned |
-| MCP behavior | Required current truth | Current tools unchanged | Existing MCP tests remain authoritative | Proposed semantic parity is not claimed shipped | Reviewed and unaffected |
-| Security, privacy, versions, releases | Required current truth | Demo adds a contained synthetic run and manifest-verified cleanup; coordinated manifests identify v1.8.0 | Negative containment/tamper tests, full release-tree suite, bundle checksum, and dated live/release validation | SECURITY, changelog, architecture, setup, manifests, and release evidence aligned | v1.8.0 aligned |
+| MCP behavior | Required current truth | Fifteen tools share canonical Markdown; pattern, promotion, and graph tools delegate to the same core as plugin adapters | MCP lifecycle tests plus the Milestone B adapter-parity matrix | MCP reference, manifests, package modules, and counts updated | Milestone B aligned |
+| Security, privacy, versions, releases | Required current truth | Preview/apply authority, linked-input refusal, source-change detection, disposable cache, and existing untrusted-data controls cover new paths; coordinated manifests identify v1.9.0 | Security regression suites, pattern matrix, full release-tree suite, reproducible bundle checksum, and dated implementation evidence | SECURITY, changelog, architecture, setup, manifests, and evidence aligned | v1.9.0 release candidate aligned |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -960,10 +961,11 @@ current-truth documentation, a real visual, and dated evidence. The owner
 separately authorized merge, release, tag, publication, and deployment on
 2026-07-27; v1.8.0 is the resulting delivery boundary.
 
-## 18. Gate 2 proposed: Milestone B implementation contract
+## 18. Gate 2 accepted: Milestone B implementation contract
 
-_State: Gate 1 accepted by the product owner on 2026-07-27. This Gate 2
-contract is proposed and must be explicitly approved before implementation._
+_State: Gate 1 accepted on 2026-07-27. Gate 2 accepted by the product owner on
+2026-07-28. Implemented and locally validated on 2026-07-28 for v1.9.0.
+Publication state is recorded in dated release evidence._
 
 ### 18.1 Milestone purpose
 
@@ -1205,17 +1207,16 @@ introduced.
 - `references/required-permissions.json` and plugin metadata — add only the
   command/script permissions and discovery entries required by the new
   surfaces.
-- `tests/orchestration/board-pattern-registry.sh` — registry normalization,
-  uniqueness, stable identity, merge, assignment, and correction contracts.
-- `tests/orchestration/board-promote-command.sh` — preview/apply authority,
-  plan-fingerprint, deduplication, preservation, and typed receipt contracts.
-- `tests/orchestration/board-graph-engine.sh` — real-board registry resolution,
-  provenance, unresolved compatibility, cluster fingerprint, and
-  full/incremental equivalence.
-- `mcp-server/test_mcp_server.py` — MCP schemas, pattern CRUD plans, promotion,
-  graph parity, compatibility, and typed failures.
-- `tests/integration/real-pattern-pipeline.sh` — complete three-path real-board
-  journey and correction/rebuild sequence.
+- `tests/orchestration/milestone-b-pattern-pipeline.sh` — consolidated
+  deterministic matrix for registry normalization, stable identity, aliases,
+  merge preservation, legacy fallback, preview/apply, promotion outcomes,
+  correction history, MCP/plugin parity, source-change refusal, link refusal,
+  and full/incremental/cache-deleted equivalence.
+- `tests/orchestration/board-graph-engine.sh` — retained executable positive,
+  negative, deterministic, and malformed-input graph fixtures.
+- `mcp-server/test_mcp_server.py` — retained full stdio, lifecycle,
+  compatibility, packaging, and typed-failure coverage; the shared matrix
+  invokes the new MCP tools against the same canonical snapshot as the CLI.
 
 Implementation may adjust mechanical module boundaries after repository
 mapping, but it may not create a second parser, resolver, graph algorithm, or
@@ -1332,16 +1333,17 @@ Milestone B does not:
 - remove PM/Worker modes or change the TDD/review/validate state machine;
 - implement the persistent supervisor from RFC 0001.
 
-After explicit Gate 2 approval, implementation proceeds on a focused branch
-with code, deterministic tests, current-truth documentation, sanitized live
-evidence, and a reviewed PR. Existing owner authorization permits merge and a
-suitable versioned release after the full contract and release gates pass; it
-does not permit weakening this contract or advertising unvalidated behavior.
+Implementation proceeded on a focused branch with code, deterministic tests,
+current-truth documentation, sanitized live evidence, and a reviewed PR.
+Existing owner authorization permits merge and a v1.9.0 release after the full
+contract and release gates pass. Publication does not weaken this contract or
+authorize unvalidated Milestone C behavior.
 
 ## 19. Research and evidence
 
 Current product evidence:
 
+- [`2026-07-28 Milestone B implementation validation`](evidence/2026-07-28-milestone-b-implementation-validation.md)
 - [`2026-07-27 Milestone B contract evidence`](evidence/2026-07-27-milestone-b-contract.md)
 - [`2026-07-27 v1.8.0 release validation`](evidence/2026-07-27-v1.8.0-release-validation.md)
 - [`2026-07-27 pattern-intelligence direction evidence`](evidence/2026-07-27-pattern-intelligence-direction.md)

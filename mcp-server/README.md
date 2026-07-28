@@ -3,8 +3,9 @@
 A zero-dependency [Model Context Protocol](https://modelcontextprotocol.io) server
 that exposes the `engineering-board` plugin's markdown board as MCP tools. It lets
 any MCP client (Claude Code, Claude Desktop, …) scaffold boards, create/list/update
-entries, rebuild the index, capture scratch findings, and claim/release entry locks —
-all against the exact on-disk format the plugin's hooks and skills expect.
+entries, preview and promote scratch findings, manage stable pattern identities,
+build the provenance-linked graph, and claim/release entry locks — all against
+the exact on-disk format the plugin's hooks and skills expect.
 
 ## Design constraints
 
@@ -33,6 +34,9 @@ the current working directory, and can be overridden per-call with a `root` argu
 | `board_list_entries` | List entries with parsed frontmatter; filters: `project`, `type`, `status`, `needs`, `ready`. `ready: true` is the deterministic ready queue — open entries whose existing `blocked_by` targets are all resolved (dangling ids warn, never block). |
 | `board_get_entry` | Full markdown of one entry by id (+ parsed frontmatter). |
 | `board_update_entry` | Update frontmatter (`status`, `needs`, `priority`, `blocked_by`, `parent`) and/or append a body section; validate the status transition; rebuild the index. Optional `comment: {author, text}` appends a server-timestamped line to the entry's `## Comments` section. |
+| `board_graph` | Build the deterministic typed graph from canonical entry and P### pattern Markdown, write `GRAPH.yml`, and reuse only a source-equivalent disposable cache. `full: true` bypasses the cache. |
+| `board_patterns` | List canonical pattern records or preview/apply create, alias, assign, and correction operations. Every mutation requires the unchanged content-bound plan id. |
+| `board_promote_findings` | Preview or apply captured scratch findings with typed created/deduplicated/rejected/already-applied outcomes, durable provenance, and idempotent receipts. |
 | `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files (P0→P3 ordering, `⊘ Q###` when blocked, `↳` child rows under parents, resolved omitted). Idempotent. |
 | `board_capture_finding` | Append a finding to the scratch inbox `_sessions/mcp-<UTC-date>.md`. |
 | `board_claim` | Acquire an entry lock (shells out to `board-claim-acquire.sh`; 0=acquired, 1=contended, 2=stale). |
@@ -40,7 +44,8 @@ the current working directory, and can be overridden per-call with a `root` argu
 | `board_remember` | Save a durable insight straight to `learnings/L###-<slug>.md` (`source: remember`) and rebuild the index — explicit intent bypasses the curator's recurrence-≥3 threshold. |
 | `board_status` | Overview: per-type open counts, `in_progress` ids, `blocked` ids, the ready queue (capped at 20) with dangling-blocker warnings, un-promoted scratch count. |
 
-All 12 tools from the spec are implemented; none were dropped.
+All 15 tools use the same canonical Markdown format. Pattern, promotion, and
+graph behavior delegates to the same zero-dependency core used by the plugin.
 
 ## Configuration
 
@@ -180,8 +185,10 @@ and Claude Desktop) is supported and CI-proven (eb-self Q001): the test suite
 spawns two independent server processes on one board and races them for the
 same entry's claim — exactly one acquires (`exit_code 0`), the other sees clean
 contention (`exit_code 1`), and after the winner releases, the loser can
-acquire. There is no cache layer to go stale: every read hits the same
-committed markdown, and locking is the plugin's atomic `mkdir` claim protocol.
+acquire. Canonical reads hit the same committed Markdown. The graph accelerator
+is disposable, source-fingerprinted, and ignored by Git; stale or corrupt cache
+state falls back to a full rebuild. Locking is the plugin's atomic `mkdir`
+claim protocol.
 Use distinct `session_id`s per client (each client's claims are owned by its
 session id).
 

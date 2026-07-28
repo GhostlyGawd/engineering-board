@@ -1,7 +1,7 @@
 {
   "name": "engineering-board",
-  "version": "1.8.0",
-  "description": "Git-committed pattern intelligence for engineering agents. Findings remain visible Markdown evidence, deterministic graph structure connects recurring signals across domains, and bounded hypotheses help agents investigate shared root causes without treating correlation as confirmation. Includes passive capture, durable learnings, atomic multi-agent claims, an optional tdd->review->validate proof loop, and a zero-dependency 12-tool MCP server over the same board format.",
+  "version": "1.9.0",
+  "description": "Git-committed pattern intelligence for engineering agents. Stable P### identities, explicit foreground promotion, and a deterministic provenance-linked graph connect recurring findings across domains while Markdown remains canonical. Includes passive capture, durable learnings, atomic claims, an optional tdd->review->validate proof loop, and a zero-dependency 15-tool MCP server over the same board format.",
   "author": {
     "name": "Acadia",
     "email": "rhen@acadia.io"

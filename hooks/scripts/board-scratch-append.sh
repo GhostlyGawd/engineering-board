@@ -168,7 +168,7 @@ if findings_n > 0:
     if len(labels) > 5:
         shown.append("… +%d more" % (len(labels) - 5))
     sys.stdout.write(
-        "EB-CAPTURE-SUMMARY: captured %d finding(s): %s — run /pm-start to promote them to the board.\n"
+        "EB-CAPTURE-SUMMARY: captured %d finding(s): %s — run /board-promote to preview them.\n"
         % (findings_n, "; ".join(shown))
     )
 PY

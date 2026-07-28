@@ -15,8 +15,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "engineering-board-mcp"
-version = "1.8.0"
-description = "Zero-dependency MCP server for engineering-board: a git-committed kanban board your AI agents run and remember."
+version = "1.9.0"
+description = "Zero-dependency MCP server for repository-owned engineering pattern intelligence."
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
@@ -43,4 +43,4 @@ Changelog = "https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELO
 engineering-board-mcp = "engineering_board_mcp:main"
 
 [tool.setuptools]
-py-modules = ["engineering_board_mcp"]
+py-modules = ["engineering_board_mcp", "engineering_board_core"]

@@ -5,7 +5,7 @@
 > deterministic graph views connect recurring signals across domains so agents
 > can investigate shared root causes instead of repeatedly patching symptoms.
 > No hidden database, external service, or daemon. Ships as a Claude Code
-> plugin and zero-dependency MCP server (12 tools over stdio, protocol
+> plugin and zero-dependency MCP server (15 tools over stdio, protocol
 > 2025-06-18).
 
 ## What it is
@@ -62,7 +62,7 @@ Works with any MCP client — Codex CLI, Gemini CLI, Cursor, Claude Desktop
 config blocks:
 https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
 
-## MCP tools (12)
+## MCP tools (15)
 
 - board_init: scaffold a project board; optional agents_md writes a usage block
   into the repo's AGENTS.md for hook-less agents.
@@ -74,6 +74,12 @@ https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
 - board_get_entry: full markdown + parsed frontmatter of one entry.
 - board_update_entry: update frontmatter (status, needs, priority, blocked_by,
   parent), append a section, or append a timestamped comment.
+- board_graph: build the deterministic provenance-linked pattern graph through
+  the shared full/incremental engine.
+- board_patterns: list patterns or preview/apply P### create, alias, assignment,
+  and correction operations.
+- board_promote_findings: preview/apply scratch promotion with a content-bound
+  plan, typed per-finding outcomes, and durable provenance.
 - board_rebuild: deterministically regenerate BOARD.md.
 - board_capture_finding: append a finding to the scratch inbox _sessions/.
 - board_claim: acquire an entry's atomic claim lock.
