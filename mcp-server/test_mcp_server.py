@@ -938,6 +938,8 @@ def suite_distribution():
         staged.append(("manifest.json", f.read()))
     with open(SERVER_PATH, "rb") as f:
         staged.append(("mcp-server/engineering_board_mcp.py", f.read()))
+    with open(os.path.join(HERE, "engineering_board_core.py"), "rb") as f:
+        staged.append(("mcp-server/engineering_board_core.py", f.read()))
     with open(os.path.join(HERE, "README.md"), "rb") as f:
         staged.append(("mcp-server/README.md", f.read()))
     scripts_dir = os.path.join(PLUGIN_ROOT, "hooks", "scripts")

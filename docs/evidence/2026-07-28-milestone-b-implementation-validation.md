@@ -7,9 +7,23 @@ source commit `1d910f8`. It supersedes the implementation-pending observations
 in the Milestone B contract evidence. It does not rewrite the v1.8.0 historical
 release record.
 
-The validated release candidate is v1.9.0. Repository-owned Markdown remains
+The validated implementation was first prepared as v1.9.0. Repository-owned Markdown remains
 canonical. SQLite, embeddings, hosted services, cross-repository aggregation,
 and Milestone C hypothesis reasoning are not part of this delivery.
+
+## Superseding publication-gate correction
+
+The first v1.9.0 release workflow created an annotated tag at the merged
+implementation commit, then failed before publication. The bundle builder
+correctly included `engineering_board_core.py`, but the in-process checksum
+test omitted that module and had pinned the checksum of an incomplete staged
+file list. No v1.9.0 GitHub Release, PyPI package, or MCP Registry version was
+published.
+
+The v1.9.1 correction makes the checksum test stage the exact same two Python
+modules as `build-mcpb.sh`, advances coordinated release metadata, and pins the
+actual bundle digest. v1.9.1 is the publication boundary. The Milestone B
+behavior and product scope are unchanged.
 
 ## Outcome
 
@@ -77,14 +91,21 @@ bash tests/orchestration/milestone-b-pattern-pipeline.sh
 milestone-b-pattern-pipeline: 15 checks passed
 ```
 
-The reproducible v1.9.0 MCP bundle digest is:
+The superseded in-process v1.9.0 test digest was:
 
 ```text
 409c0953c87bae4da06b8ad18c5bd0652a994603a0679518b5711cb8fb37ab62
 ```
 
-`mcp-server/server.json` pins this exact digest. The MCP suite rebuilt the
-bundle and matched the pinned value.
+That value omitted `engineering_board_core.py` from its staged test list and is
+not a publishable bundle digest. The corrected v1.9.1 digest is:
+
+```text
+f6b08bbecc60033e2ecdc04833800e0451f00434dfd1f4870efaa20d866bc819
+```
+
+`mcp-server/server.json` pins the corrected value. The MCP suite and
+`build-mcpb.sh` now stage the same files and must match before publication.
 
 ## Visual evidence
 
@@ -102,7 +123,7 @@ source commit `1d910f8`, test
 | Behavior and specification | Repaired. The central product spec records Milestone B as implemented and validated for v1.9.0 while preserving the accepted scope and historical decisions. |
 | Commands and setup | Repaired. `/board-promote`, `/board-pattern`, shared `/board-graph`, foreground capture guidance, permissions, and retry behavior are current. |
 | Schema and architecture | Repaired. P### records, `pattern_ids`, legacy precedence, correction history, shared-core boundaries, and disposable cache authority are documented. |
-| MCP and packaging | Repaired. Fifteen tools, two packaged Python modules, bundle contents, coordinated v1.9.0 manifests, and reproducible digest are current. |
+| MCP and packaging | Repaired and superseded by v1.9.1. Fifteen tools, two packaged Python modules, bundle/test content parity, coordinated manifests, and the reproducible digest are current. |
 | Security and privacy | Repaired. Preview/apply authority, linked-input refusal, source-change checks, cache boundaries, and untrusted-data handling cover new paths. |
 | Landing, LLM index, and visual | Repaired. Tool counts, stable-pattern messaging, and real sanitized fixture evidence are current. |
 | Historical v1.8.0 evidence | Reviewed and unaffected. Historical reports remain unchanged. |

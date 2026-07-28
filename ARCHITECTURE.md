@@ -2,7 +2,7 @@
 
 A complete structural map of the plugin: what every file does, how the pieces connect, and the lifecycle that ties them together. Companion to `README.md` (which is the install/usage surface).
 
-Current release line: **v1.9.0**. Canonical evidence, pattern identity, and durable memory are repository-owned Markdown. `BOARD.md`, `GRAPH.yml`, HTML, and `.engineering-board/cache/` are derived or disposable views. Milestone B adds stable P### pattern records, preview/apply foreground promotion, one shared parser/resolver/writer/graph core across plugin, PM, and MCP paths, and a 15-tool MCP server. The optional TDD/review/validate loop remains supporting verification behavior. See `CHANGELOG.md` for release history and `docs/PRODUCT_EVOLUTION_SPEC.md` for the authoritative product direction.
+Current release line: **v1.9.1**. Canonical evidence, pattern identity, and durable memory are repository-owned Markdown. `BOARD.md`, `GRAPH.yml`, HTML, and `.engineering-board/cache/` are derived or disposable views. Milestone B adds stable P### pattern records, preview/apply foreground promotion, one shared parser/resolver/writer/graph core across plugin, PM, and MCP paths, and a 15-tool MCP server. The optional TDD/review/validate loop remains supporting verification behavior. See `CHANGELOG.md` for release history and `docs/PRODUCT_EVOLUTION_SPEC.md` for the authoritative product direction.
 
 ---
 

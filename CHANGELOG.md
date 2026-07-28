@@ -9,9 +9,31 @@ increases.
 
 ## [Unreleased]
 
+## [1.9.1] — 2026-07-28
+
+The published Milestone B release. It includes the stable pattern pipeline
+described in 1.9.0 plus a release-gate packaging correction. The v1.9.0
+workflow created a tag but failed closed before publishing a GitHub Release,
+PyPI package, or MCP Registry version.
+
+### Added
+
+- Stable P### identities, explicit foreground promotion, provenance-linked
+  graph facts, source-equivalent disposable caching, shared plugin/PM/MCP core,
+  and the three new MCP tools from the 1.9.0 feature section.
+
+### Fixed
+
+- **Bundle-content parity.** The reproducible checksum test now stages
+  `engineering_board_core.py`, matching `build-mcpb.sh`. The v1.9.1 manifests
+  pin the checksum of the actual self-contained two-module bundle.
+
 ## [1.9.0] — 2026-07-28
 
-The reliable pattern-pipeline release. Real findings from foreground plugin
+The reliable pattern-pipeline implementation tag. Its publication workflow
+failed closed on the bundle-content mismatch corrected in v1.9.1, so no
+v1.9.0 GitHub Release, PyPI package, or MCP Registry version was published.
+Real findings from foreground plugin
 intake, PM consolidation, and MCP now converge on stable repository-owned
 pattern identity and one deterministic graph implementation.
 
