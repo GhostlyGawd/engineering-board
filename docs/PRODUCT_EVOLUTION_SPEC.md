@@ -1,13 +1,12 @@
 # Engineering Board Product Evolution Spec
 
 _Status: Authoritative living product direction — Milestone A shipped in
-v1.8.0; Milestone B shipped in v1.9.1; Milestone C implemented and
-worker-validated for v1.10.0_
+v1.8.0; Milestone B shipped in v1.9.1; Milestone C shipped in v1.10.0_
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-28_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
-_Current release boundary: `v1.9.1`_
+_Current release boundary: `v1.10.0`_
 _Portfolio context: inventory-only; audit source `GhostlyGawd/repo-audit` at
 `907f0759f9d08f478cd5384ad88e50963f1af79a`_
 
@@ -70,7 +69,7 @@ selected milestone is approved.
 | Foreground promotion | Accepted for Milestone B | Preview captured findings and their proposed pattern assignments, then require an explicit apply action. PM mode may retain its already-authorized batch behavior but must use the same promotion core. |
 | Adapter parity | Accepted for Milestone B | Plugin and MCP surfaces must consume the same zero-dependency parser, pattern resolver, and deterministic graph engine and return semantically equivalent facts. |
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release; v1.9.1 is the corrected publication boundary. |
-| Milestone C direction | Accepted and implemented; release pending | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view are worker-validated for v1.10.0. Section 19 remains the approved contract. |
+| Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 
 ## 3. Product thesis
 
@@ -458,8 +457,8 @@ adapter-specific prompt execution.
 interpretation.
 
 **Direction state:** Gate 1 and Gate 2 accepted by the product owner on
-2026-07-28. The approved section 19 contract is implemented and
-worker-validated for v1.10.0. Merge, publication, and closeout evidence remain.
+2026-07-28. The approved section 19 contract is implemented, validated, and
+shipped in v1.10.0.
 
 Implemented scope:
 
@@ -684,8 +683,8 @@ with session tasks and planning tools instead.
 | Contract item | Normative level | Current implementation | Test/evidence | Documentation disposition | Status |
 |---|---|---|---|---|---|
 | Product-direction authority | Accepted | No runtime behavior | Owner decision recorded here | This file; `ROADMAP.md` precedence note | Direction aligned |
-| Pattern-intelligence substrate | Accepted direction | Production capture, promotion, stable pattern identity, shared deterministic graph behavior, transparent cluster ranking, and durable H### lifecycle form one evidence-to-reasoning substrate | Existing graph/curator tests; Milestone A/B evidence; Milestone C lifecycle matrix | README, landing page, commands, normal view, and architecture distinguish ranking from confidence and proposals from confirmation | Milestones A–C worker-aligned |
-| Hypothesis authority | Accepted direction | Canonical H### records support proposed, weakened, confirmed, rejected, split, and merged states through evidence-gated preview/apply; negative memory blocks unchanged rejected claims | Hypothesis contract, Milestone C matrix, MCP suite, and full release tree | Schema, command, skill, security, architecture, and product docs aligned | Milestone C worker-validated |
+| Pattern-intelligence substrate | Accepted direction | Production capture, promotion, stable pattern identity, shared deterministic graph behavior, transparent cluster ranking, and durable H### lifecycle form one evidence-to-reasoning substrate | Existing graph/curator tests; Milestone A/B evidence; Milestone C lifecycle matrix and release validation | README, landing page, commands, normal view, and architecture distinguish ranking from confidence and proposals from confirmation | Milestones A–C shipped and aligned |
+| Hypothesis authority | Accepted direction | Canonical H### records support proposed, weakened, confirmed, rejected, split, and merged states through evidence-gated preview/apply; negative memory blocks unchanged rejected claims | Hypothesis contract, Milestone C matrix, MCP suite, full release tree, and v1.10.0 publication evidence | Schema, command, skill, security, architecture, and product docs aligned | Shipped in v1.10.0 |
 | Canonical Markdown | Accepted | Entry, pattern, hypothesis, and learning Markdown is durable state; graph, rankings, cache, and HTML remain derived | Intake, graph, hypothesis, rebuild, resolve, and curation tests | Architecture and storage boundary documented | Aligned |
 | Derived graph | Accepted direction | One shared zero-dependency engine serves production plugin, PM, contained demo, and MCP adapters; canonical P### identities and legacy fallbacks produce source-linked graph facts | Existing graph suites plus the Milestone B pattern-pipeline matrix | Graph schema, cache authority, and adapter parity are current in command, MCP, architecture, and schema docs | Milestone B aligned |
 | Milestone B reliable pipeline | Accepted and shipped | Stable P### records, foreground promotion, shared PM/MCP/plugin core, disposable cache, receipts, and graph provenance shipped in v1.9.1 | `tests/orchestration/milestone-b-pattern-pipeline.sh`, full release-tree suite, bundle-content parity, implementation evidence, and external release validation | Current-truth product, command, MCP, architecture, security, landing, and LLM docs updated | Shipped in v1.9.1 |
@@ -693,9 +692,9 @@ with session tasks and planning tools instead.
 | Current capture confirmation | Required current truth | Stop procedure and append helper surface a non-empty receipt | `tests/scratch/append.sh`; mode-routing tests | README was corrected in this branch | Documentation-only drift repaired |
 | Canonical setup instruction | Required current truth | `/board-setup` is the plugin setup path | Setup command test | Landing page was corrected in this branch | Documentation-only drift repaired |
 | TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped and unchanged | Existing mode and orchestration tests | Repositioned as optional falsifiable verification feedback, not the headline or required first experience | Behavior unchanged; messaging aligned |
-| MCP behavior | Required current truth | Seventeen tools share canonical Markdown; pattern, promotion, graph, ranking, and hypothesis tools delegate to the same core as plugin adapters | 166-check MCP lifecycle suite plus Milestone B/C adapter-parity matrices | MCP reference, manifests, package modules, and counts updated | v1.10.0 worker-validated |
-| Security, privacy, versions, releases | Required current truth | Content-bound hypothesis tokens, inventory and graph revalidation, one-file atomic writes, linked-input refusal, HTML escaping, and offline operation extend the existing controls; coordinated manifests identify v1.10.0 | Security suites, Milestone C matrix, full 16-suite release tree, and reproducible bundle checksum; publication checks pending | SECURITY, changelog, architecture, commands, manifests, visual, and dated implementation evidence aligned | Worker gates passed; publication and closeout pending |
-| Milestone C implementation contract | Accepted direction | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging implemented | Milestone C 15-check matrix, 166-check MCP suite, and 16/16 release-tree suites pass | Central spec, contract workpad, current-truth docs, real sanitized visual, and dated implementation evidence updated | Implemented and worker-validated; merge/release pending |
+| MCP behavior | Required current truth | Seventeen tools share canonical Markdown; pattern, promotion, graph, ranking, and hypothesis tools delegate to the same core as plugin adapters | 166-check MCP lifecycle suite plus Milestone B/C adapter-parity matrices; official registry version 1.10.0 active and latest | MCP reference, manifests, package modules, and counts updated | Shipped in v1.10.0 |
+| Security, privacy, versions, releases | Required current truth | Content-bound hypothesis tokens, inventory and graph revalidation, one-file atomic writes, linked-input refusal, HTML escaping, and offline operation extend the existing controls; coordinated manifests identify v1.10.0 | Security suites, Milestone C matrix, full 16-suite release tree, reproducible bundle checksum, merged-main CI, and external publication checks passed | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and release evidence aligned | Shipped and externally validated |
+| Milestone C implementation contract | Accepted and shipped | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging shipped | Milestone C 15-check matrix, 166-check MCP suite, 16/16 release-tree suites, merged-main CI, release workflow, and live-surface checks pass | Central spec, contract workpad, current-truth docs, real sanitized visual, implementation evidence, and v1.10.0 release validation updated | Shipped in v1.10.0 |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -1346,8 +1345,7 @@ contract or authorize unvalidated Milestone C behavior.
 ## 19. Gate 2 accepted: Milestone C implementation contract
 
 _State: Gate 1 and Gate 2 accepted by the product owner on 2026-07-28.
-Implemented and worker-validated for v1.10.0 on 2026-07-28. Merge,
-publication, and closeout evidence remain pending._
+Implemented, validated, and shipped as v1.10.0 on 2026-07-28._
 
 ### 19.1 Milestone purpose
 
@@ -1733,12 +1731,11 @@ The implementation change must update or substantively review:
 - changelog, coordinated versions, deterministic tests, and dated evidence;
 - historical v1.8.0 and v1.9.1 reports, which remain unchanged.
 
-The planned release boundary is v1.10.0 because Milestone C adds user-visible
-commands, canonical hypothesis behavior, HTML output, and MCP tools. Existing
-owner authorization permits commit, push, review, merge, tag, release,
-publication, and Pages deployment after the implementation and release gates
-pass. External publication evidence must land in a later closeout change and
-pass merged-main CI before the milestone is marked fully shipped.
+The release boundary is v1.10.0 because Milestone C adds user-visible commands,
+canonical hypothesis behavior, HTML output, and MCP tools. PR #101 merged the
+implementation. The v1.10.0 tag, GitHub Release, PyPI package, official MCP
+Registry record, and Pages deployment were then validated. The dated release
+report records the immutable digests, workflow runs, and live observations.
 
 ### 19.13 Explicit non-goals
 
@@ -1762,6 +1759,7 @@ authorize the deferred Milestone D or E scope.
 
 Current product evidence:
 
+- [`2026-07-28 v1.10.0 release validation`](evidence/2026-07-28-v1.10.0-release-validation.md)
 - [`2026-07-28 Milestone C implementation validation`](evidence/2026-07-28-milestone-c-implementation-validation.md)
 - [`2026-07-28 Milestone C contract workpad`](evidence/2026-07-28-milestone-c-contract.md)
 - [`2026-07-28 v1.9.1 release validation`](evidence/2026-07-28-v1.9.1-release-validation.md)

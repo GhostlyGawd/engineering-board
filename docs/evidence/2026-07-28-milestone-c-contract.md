@@ -5,8 +5,8 @@
 - Active outcome: turn deterministic clusters into useful, bounded root-cause
   intelligence for real boards.
 - Gate 1: accepted by the product owner on 2026-07-28.
-- Gate 2: accepted by the product owner on 2026-07-28; implementation is
-  worker-validated against central product spec section 19.
+- Gate 2: accepted by the product owner on 2026-07-28; implementation shipped
+  as v1.10.0 against central product spec section 19.
 - Canonical storage: repository-owned Markdown.
 - Derived state: deterministic graph, rank payloads, and HTML projections.
 - Explicitly deferred: SQLite, embeddings, hosted services, cross-repository
@@ -49,7 +49,7 @@ generalizes that bounded behavior to real boards and adds lifecycle memory.
 | Plugin and MCP parity | Required current product boundary | `/board-insights`, `/board-hypothesis`, `board_insights`, and `board_hypotheses` delegate to one core | Matrix compares CLI/MCP/shared results; 166-check MCP suite discovers all 17 tools and validates packaging | Command docs, README, MCP reference, architecture, llms, manifests | Worker-validated |
 | Pattern-intelligence HTML | Required user-visible proof | Normal `board-view.sh` renders ranked clusters, linked members, H### state, stale bindings, evidence, alternatives, and falsifiers without controls | Matrix proves escaped hypothesis content, stale label, and no mutation controls; 50-check view suite passes | `/board-view`; README and landing; real sanitized Milestone C SVG | Worker-validated |
 | Security and preservation | Required | Self-contained tokens bind graph, inventory, target bytes, request, and operation; apply revalidates under lock; linked records/payloads fail closed | Matrix exercises malformed evidence, stale input, repeated apply, closed proxies, escaping, and preserved history; full security suites pass | SECURITY, architecture, schema, product spec | Worker-validated |
-| Version, release, and closeout | Required at delivery | Manifests and package metadata set to v1.10.0; 17-tool/19-command counts align; reproducible MCPB digest pinned | 16/16 release-tree suites pass; bundle digest `59f5b4c4862e6abf0a2f7111086d4a5ffd47d360eab10d93a461524622ab77e7`; publication and merged-main gates remain | Changelog, manifests, implementation validation; later release report reserved | Worker complete; post-merge and closeout pending |
+| Version, release, and closeout | Required at delivery | Manifests and package metadata identify v1.10.0; 17-tool/19-command counts align; the reproducible MCPB digest is pinned | 16/16 release-tree suites, PR CI, merged-main CI, release workflow, bundle digest, and live publication checks pass | Changelog, manifests, implementation validation, and v1.10.0 release validation | Shipped and externally validated |
 | Historical Milestone A/B evidence | Required preservation | No behavior or historical file change proposed | Existing suites must remain green | Historical reports reviewed; no rewrite required because they remain dated truth | Reviewed and unaffected |
 
 No required conflict remains in the worker phase. The implementation evidence
@@ -61,15 +61,15 @@ checks prevent omission but do not substitute for semantic review.
 - Worker phase: complete. The deterministic matrix, targeted suites, full
   release tree, offline run, package reproducibility, sanitized visual, and
   documentation alignment passed.
-- Post-merge phase: merged-main CI, tag, GitHub Release, package publication,
-  MCP Registry publication, and Pages deployment.
-- Closeout phase: append external evidence in a new Markdown report, mark
-  Milestone C shipped, merge that report, and require fresh merged-main CI.
+- Post-merge phase: complete. Merged-main CI, the v1.10.0 tag, GitHub Release,
+  PyPI package, official MCP Registry version, and Pages deployment passed.
+- Closeout phase: complete after the release report and shipped-state updates
+  merge and fresh merged-main CI passes.
 
 ## Current handoff
 
-The next boundary is implementation PR review and green CI. After merge, the
-authorized release owner is this agent: verify merged-main CI, tag and publish
-v1.10.0, validate GitHub Release, PyPI, MCP Registry, and Pages, then append
-closeout evidence in a separate PR. A product-authority, security, or canonical
-data discovery reopens alignment before mutation.
+Milestone C is terminal and shipped as v1.10.0. The central spec now governs
+the next product decision. SQLite, embeddings, hosted services,
+cross-repository aggregation, automatic learning updates, SessionStart
+retrieval, and fix execution remain deferred. A new milestone requires a new
+accepted implementation contract.
