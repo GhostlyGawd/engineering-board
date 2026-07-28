@@ -1,12 +1,12 @@
 # Engineering Board Product Evolution Spec
 
 _Status: Authoritative living product direction — Milestone A shipped in
-v1.8.0; Milestone B implemented and validated for v1.9.1 release_
+v1.8.0; Milestone B shipped in v1.9.1_
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-28_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
-_Release target: `v1.9.1`_
+_Current release boundary: `v1.9.1`_
 _Portfolio context: inventory-only; audit source `GhostlyGawd/repo-audit` at
 `907f0759f9d08f478cd5384ad88e50963f1af79a`_
 
@@ -68,7 +68,7 @@ selected milestone is approved.
 | Stable pattern identity | Accepted for Milestone B | Add repository-owned `P###` pattern records with readable labels and aliases. Preserve legacy free-form labels as evidence and compatibility input; do not let semantic suggestions silently become canonical identity. |
 | Foreground promotion | Accepted for Milestone B | Preview captured findings and their proposed pattern assignments, then require an explicit apply action. PM mode may retain its already-authorized batch behavior but must use the same promotion core. |
 | Adapter parity | Accepted for Milestone B | Plugin and MCP surfaces must consume the same zero-dependency parser, pattern resolver, and deterministic graph engine and return semantically equivalent facts. |
-| Milestone B implementation | Implemented and validated | Section 18 is implemented for v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release; v1.9.1 is the corrected release boundary. |
+| Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release; v1.9.1 is the corrected publication boundary. |
 
 ## 3. Product thesis
 
@@ -679,17 +679,17 @@ with session tasks and planning tools instead.
 | Contract item | Normative level | Current implementation | Test/evidence | Documentation disposition | Status |
 |---|---|---|---|---|---|
 | Product-direction authority | Accepted | No runtime behavior | Owner decision recorded here | This file; `ROADMAP.md` precedence note | Direction aligned |
-| Pattern-intelligence substrate | Accepted direction | Existing production capture/pattern/graph/curation plus contained Milestone A evidence → cluster → proposed-hypothesis first win | Existing graph/curator tests; Milestone A orchestration, graph, hypothesis, integration, and live-validation evidence | README and landing page now lead with pattern intelligence while distinguishing demo scope from production behavior | Milestone A aligned; production generalization remains Milestone B/C |
+| Pattern-intelligence substrate | Accepted direction | Production capture, promotion, stable pattern identity, and shared deterministic graph behavior now generalize the contained Milestone A evidence → cluster first win | Existing graph/curator tests; Milestone A evidence; Milestone B pattern matrix and release validation | README and landing page lead with pattern intelligence and distinguish deterministic graph facts from proposed hypotheses | Milestones A and B aligned; interpretation remains Milestone C |
 | Hypothesis authority | Accepted direction | Demo hypotheses persist as Markdown with `status: proposed`; schema and `board-insights` prohibit confirmation | Hypothesis contract tests and dated live validation | Proposed, confirmed, and rejected authority transitions are explicit | Milestone A aligned |
 | Canonical Markdown | Accepted | Entry and learning Markdown is current durable state | Existing intake, rebuild, resolve, and curation tests | Architecture direction documented here | Aligned |
 | Derived graph | Accepted direction | One shared zero-dependency engine serves production plugin, PM, contained demo, and MCP adapters; canonical P### identities and legacy fallbacks produce source-linked graph facts | Existing graph suites plus the Milestone B pattern-pipeline matrix | Graph schema, cache authority, and adapter parity are current in command, MCP, architecture, and schema docs | Milestone B aligned |
-| Milestone B reliable pipeline | Implemented and validated | Stable P### records, foreground promotion, shared PM/MCP/plugin core, disposable cache, receipts, and graph provenance are implemented for v1.9.1 | `tests/orchestration/milestone-b-pattern-pipeline.sh`, full release-tree suite, bundle-content parity, and dated implementation evidence | Current-truth product, command, MCP, architecture, security, landing, and LLM docs updated | Corrected release candidate validated |
+| Milestone B reliable pipeline | Accepted and shipped | Stable P### records, foreground promotion, shared PM/MCP/plugin core, disposable cache, receipts, and graph provenance shipped in v1.9.1 | `tests/orchestration/milestone-b-pattern-pipeline.sh`, full release-tree suite, bundle-content parity, implementation evidence, and external release validation | Current-truth product, command, MCP, architecture, security, landing, and LLM docs updated | Shipped in v1.9.1 |
 | SQLite | Optional future accelerator | Not implemented or required | Future benchmark and rebuild-equivalence proof required | Migration explicitly rejected; adoption trigger recorded | Deferred optimization |
 | Current capture confirmation | Required current truth | Stop procedure and append helper surface a non-empty receipt | `tests/scratch/append.sh`; mode-routing tests | README was corrected in this branch | Documentation-only drift repaired |
 | Canonical setup instruction | Required current truth | `/board-setup` is the plugin setup path | Setup command test | Landing page was corrected in this branch | Documentation-only drift repaired |
 | TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped and unchanged | Existing mode and orchestration tests | Repositioned as optional falsifiable verification feedback, not the headline or required first experience | Behavior unchanged; messaging aligned |
 | MCP behavior | Required current truth | Fifteen tools share canonical Markdown; pattern, promotion, and graph tools delegate to the same core as plugin adapters | MCP lifecycle tests plus the Milestone B adapter-parity matrix | MCP reference, manifests, package modules, and counts updated | Milestone B aligned |
-| Security, privacy, versions, releases | Required current truth | Preview/apply authority, linked-input refusal, source-change detection, disposable cache, and existing untrusted-data controls cover new paths; coordinated manifests identify v1.9.1 | Security regression suites, pattern matrix, full release-tree suite, bundle-content parity, reproducible checksum, and dated implementation evidence | SECURITY, changelog, architecture, setup, manifests, and evidence aligned | v1.9.1 release candidate aligned |
+| Security, privacy, versions, releases | Required current truth | Preview/apply authority, linked-input refusal, source-change detection, disposable cache, and existing untrusted-data controls cover new paths; coordinated manifests identify v1.9.1 | Security regression suites, pattern matrix, full release-tree suite, bundle-content parity, reproducible checksum, implementation evidence, and external publication checks | SECURITY, changelog, architecture, setup, manifests, and evidence aligned | v1.9.1 release aligned |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -964,7 +964,7 @@ separately authorized merge, release, tag, publication, and deployment on
 ## 18. Gate 2 accepted: Milestone B implementation contract
 
 _State: Gate 1 accepted on 2026-07-27. Gate 2 accepted by the product owner on
-2026-07-28. Implemented and locally validated on 2026-07-28 for v1.9.1.
+2026-07-28. Implemented, validated, and shipped as v1.9.1 on 2026-07-28.
 Publication state is recorded in dated release evidence._
 
 ### 18.1 Milestone purpose
@@ -1333,16 +1333,15 @@ Milestone B does not:
 - remove PM/Worker modes or change the TDD/review/validate state machine;
 - implement the persistent supervisor from RFC 0001.
 
-Implementation proceeded on a focused branch with code, deterministic tests,
-current-truth documentation, sanitized live evidence, and a reviewed PR.
-Existing owner authorization permits merge and a v1.9.1 release after the full
-contract and release gates pass. Publication does not weaken this contract or
-authorize unvalidated Milestone C behavior.
+Implementation shipped through reviewed PRs #97 and #98. The v1.9.1 release
+passed the contract and publication gates. Publication does not weaken this
+contract or authorize unvalidated Milestone C behavior.
 
 ## 19. Research and evidence
 
 Current product evidence:
 
+- [`2026-07-28 v1.9.1 release validation`](evidence/2026-07-28-v1.9.1-release-validation.md)
 - [`2026-07-28 Milestone B implementation validation`](evidence/2026-07-28-milestone-b-implementation-validation.md)
 - [`2026-07-27 Milestone B contract evidence`](evidence/2026-07-27-milestone-b-contract.md)
 - [`2026-07-27 v1.8.0 release validation`](evidence/2026-07-27-v1.8.0-release-validation.md)
