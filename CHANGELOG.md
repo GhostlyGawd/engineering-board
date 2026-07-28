@@ -27,6 +27,8 @@ increases.
   the current manifest. The test remains valid after a version is prepared.
 - Prevented false board-view failures when `grep -q` closes a successful test
   pipeline before its writer completes.
+- Added an explicit release-refresh mode for approved changes that modify a
+  prepared bundle. Refresh preserves the release version and changelog section.
 
 ## [1.10.0] — 2026-07-28
 

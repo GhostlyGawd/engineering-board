@@ -3,7 +3,6 @@ description: Install the engineering-board plugin allowlist into your user-scope
 argument-hint: (no arguments)
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-install-permissions: install plugin allowlist
 

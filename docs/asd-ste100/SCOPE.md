@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Rewrite scope
 
 ## Included content

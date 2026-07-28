@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # CLAUDE.md
 
 Start every session by reading **[`state.md`](state.md)**: including its header,

@@ -3,7 +3,6 @@ description: Start a PM (project manager) session for the engineering board. Wri
 argument-hint: (no arguments)
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /pm-start: start PM mode
 

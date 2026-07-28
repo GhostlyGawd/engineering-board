@@ -1,10 +1,8 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
-# ASD-STE100 rewrite status
+# Controlled-English rewrite record
 
 This directory contains the evidence for the Engineering Board rewrite.
 
-The rewrite uses ASD-STE100 Issue 9 as its language standard. The local
+The rewrite used ASD-STE100 Issue 9 as its language reference. The local
 authorized PDF has this SHA-256 value:
 
 ```text
@@ -28,11 +26,16 @@ The content types are:
 - procedures;
 - safety information.
 
-## Release status
+## Owner decision
 
-`NOT RELEASED — COMPLIANCE CHECK INCOMPLETE`
+`OWNER APPROVED — FORMAL ASD-STE100 COMPLIANCE NOT CLAIMED`
 
-The following gates are open:
+The owner reviewed and approved the current controlled-English text on
+2026-07-28. The owner waived the two-reviewer process as a product-release
+condition.
+
+The project does not claim formal ASD-STE100 compliance, certification, or
+independent review. A future formal compliance claim still requires:
 
 1. The project terminology file does not have an authorized approval.
 2. The complete word ledger does not have a qualified review.
@@ -40,7 +43,8 @@ The following gates are open:
 4. A trained ASD-STE100 reviewer did not approve the final artifact digest.
 5. An authorized technical reviewer did not approve the final artifact digest.
 
-Automated checks do not close these gates.
+These items are formal-verification gaps. They do not block the owner-approved
+product release.
 
 ## Source authority
 
@@ -64,7 +68,7 @@ The rewrite must preserve:
 - `SCOPE.md` defines the files and the exclusions.
 - `PROJECT-TERMINOLOGY.yaml` is the project terminology register.
 - `WORKPAD.md` contains the one alignment table for this task.
-- `CORPUS-MANIFEST.tsv` binds each source file to its output file.
-- `VALIDATION.md` records the deterministic report and the open gates.
-
-Do not use the clean-output mode while a release gate is open.
+- `CORPUS-MANIFEST.tsv` preserves the pre-approval formal-review snapshot.
+- `VALIDATION.md` records the deterministic report and the owner decision.
+- `../evidence/2026-07-28-controlled-english-owner-approval.md` records the
+  superseding product-release decision.

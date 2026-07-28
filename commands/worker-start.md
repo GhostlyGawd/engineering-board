@@ -3,7 +3,6 @@ description: Start a Worker session for the engineering board with a specific di
 argument-hint: --discipline <tdd|review|validate>
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /worker-start: start Worker mode
 

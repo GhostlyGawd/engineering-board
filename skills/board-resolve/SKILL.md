@@ -4,7 +4,6 @@ description: Use this skill when the user asks to close or resolve an entry. Als
 version: 0.1.0
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Board Resolve
 

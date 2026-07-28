@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Manual smoke checks (v0.2.1)
 
 Two of the v0.2.1 surfaces can only be exercised inside a live Claude Code session because they depend on the Stop hook firing and on the SessionStart hook running at session boot. The deterministic surfaces are covered by `tests/smoke/automated.sh`: see that script for the 21-assertion battery covering consolidation, blocklist, supersession, anchor verification, audit, and index-check.

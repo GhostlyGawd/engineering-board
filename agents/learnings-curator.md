@@ -6,7 +6,6 @@ tools: Read, Bash, Grep, Glob
 color: magenta
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Learnings Curator (engineering-board v0.3.0)
 

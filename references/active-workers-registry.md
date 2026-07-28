@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Active workers registry (v0.2.3)
 
 Contract for `.engineering-board/active-workers.json`: the source of truth for which PM/Worker sessions are currently live.

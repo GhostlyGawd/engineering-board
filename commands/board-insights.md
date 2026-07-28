@@ -3,7 +3,6 @@ description: Rank deterministic finding clusters for root-cause investigation an
 argument-hint: <project-name> [--cluster <fingerprint>] [--limit <1-100>]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-insights: rank systemic investigations
 

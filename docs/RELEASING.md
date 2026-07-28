@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Release Engineering Board
 
 This document defines the current release policy for Engineering Board.
@@ -80,6 +78,22 @@ bash tests/run-all.sh
 Commit and push the prepared release. Merge it through the normal review
 process.
 
+If approved review changes modify the bundle after version preparation,
+preview a refresh:
+
+```bash
+python3 scripts/prepare-release.py <version> --refresh
+```
+
+Apply the refresh only when `<version>` is the current prepared version:
+
+```bash
+python3 scripts/prepare-release.py <version> --refresh --apply
+```
+
+Refresh does not create another changelog section. The default command
+continues to refuse the current version.
+
 ## Publish the release
 
 Run `.github/workflows/release.yml` after the release-preparation commit is on
@@ -125,6 +139,7 @@ Record:
 Do not modify an earlier release record. Add a superseding dated record when
 an observation changes.
 
-## Final status
+## Language status
 
-`NOT RELEASED — COMPLIANCE CHECK INCOMPLETE`
+The owner approved the current controlled-English text. Formal ASD-STE100
+verification is not a product-release requirement.

@@ -3,7 +3,6 @@ description: Generate a self-contained HTML view with ranked pattern intelligenc
 argument-hint: [project] [--stdout]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-view: render the board as HTML
 

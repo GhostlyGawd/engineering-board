@@ -3,7 +3,6 @@ name: release-engineering-board
 description: Prepare, verify, publish, and close an Engineering Board maintainer release. Use for repository maintenance when the owner asks to bump the product version, prepare a release, rebuild or pin the MCP bundle, update the changelog, create a release tag, publish to GitHub, PyPI, or the MCP Registry, or verify release alignment.
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Release Engineering Board
 
@@ -38,6 +37,11 @@ independently.
    ```
 
 8. Commit and push the release-preparation change.
+
+If approved review changes modify the prepared bundle, use `--refresh` with
+the current prepared version. Preview the refresh before you apply it. Refresh
+must not create another changelog section. Do not use refresh to change the
+target version.
 
 ## Publish the release
 
@@ -76,4 +80,5 @@ Stop the release if:
 - the target commit is not on `main`;
 - a required publication does not complete.
 
-Final status: `NOT RELEASED — COMPLIANCE CHECK INCOMPLETE`
+The owner approved the current controlled-English text. Do not claim formal
+ASD-STE100 compliance without a separate qualified verification.

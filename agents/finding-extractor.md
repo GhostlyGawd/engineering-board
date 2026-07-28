@@ -5,7 +5,6 @@ model: inherit
 tools: Read
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Finding Extractor (engineering-board v0.2.1.2)
 

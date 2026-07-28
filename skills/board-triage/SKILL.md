@@ -4,7 +4,6 @@ description: This skill should be used when the user asks "what's next", "what s
 version: 0.1.0
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Board Triage
 

@@ -3,7 +3,6 @@ description: Pause passive listening in this session. The Stop hook will bypass 
 argument-hint: (no arguments)
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-pause: suspend passive listening
 

@@ -3,7 +3,6 @@ description: Build a deterministic structural graph (GRAPH.yml) of all open boar
 argument-hint: [project-name] [--full]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-graph: build a deterministic structural graph of the live board
 

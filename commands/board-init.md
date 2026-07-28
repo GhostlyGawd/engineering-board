@@ -3,7 +3,6 @@ description: Initialize the engineering-board/ scaffold for a project. Creates B
 argument-hint: <project-name> [affects-prefix] [--private]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-init: scaffold a project board
 

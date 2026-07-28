@@ -3,7 +3,6 @@ description: Save a durable insight straight to the board's learnings/ as L###-<
 argument-hint: <insight> [-- <context>]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-remember: explicit learning capture
 

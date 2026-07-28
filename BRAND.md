@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Brand: engineering-board
 
 The identity is **premium through restraint**: a near-monochrome ink/paper base,

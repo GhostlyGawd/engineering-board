@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Contribute to Engineering Board
 
 Engineering Board includes a Claude Code plugin and a Model Context Protocol
@@ -108,6 +106,7 @@ or a draft pull request if you need information.
 
 Your contribution uses the project [MIT License](LICENSE).
 
-## Compliance status
+## Language status
 
-`NOT RELEASED — COMPLIANCE CHECK INCOMPLETE`
+The owner approved the current controlled-English text. The project does not
+claim formal ASD-STE100 compliance, certification, or independent review.

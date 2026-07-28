@@ -3,7 +3,6 @@ description: List canonical patterns or preview/apply create, alias, assign, and
 argument-hint: <project-name> <list|create|alias|assign|correct> [options] [--apply <plan-id>]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-pattern: manage canonical pattern identity
 

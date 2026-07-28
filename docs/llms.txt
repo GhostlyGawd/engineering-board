@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # engineering-board
 
 > A repository-owned pattern-intelligence system for engineering agents.

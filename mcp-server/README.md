@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # engineering-board MCP server
 
 A zero-dependency [Model Context Protocol](https://modelcontextprotocol.io) server

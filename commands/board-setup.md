@@ -3,7 +3,6 @@ description: Prepare the board, check permissions, and print a short readiness s
 argument-hint: [project-name]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-setup: one command from install to a working board
 

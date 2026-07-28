@@ -112,6 +112,31 @@ else
   fail "pinned MCP bundle checksum reproduces"
 fi
 
+printf "\n# approved review change\n" >> "$TMP/hooks/scripts/board-view.sh"
+if python3 "$ROOT/scripts/prepare-release.py" "$TARGET_VERSION" \
+    --root "$TMP" --date 2026-07-28 --refresh --apply --json \
+    > "$TMP/refreshed.json"; then
+  pass "prepared version refresh succeeds"
+else
+  fail "prepared version refresh succeeds"
+fi
+
+REFRESHED_PIN="$(python3 -c "import json; print(json.load(open('$TMP/mcp-server/server.json'))['packages'][0]['fileSha256'])")"
+REFRESHED_OUT="$(cd "$TMP" && bash mcp-server/build-mcpb.sh)"
+REFRESHED_BUILT="$(printf "%s\n" "$REFRESHED_OUT" | sed -n 's/^sha256: //p')"
+if [ "$REFRESHED_PIN" != "$PIN" ] && [ "$REFRESHED_PIN" = "$REFRESHED_BUILT" ]; then
+  pass "refresh pins the changed bundle checksum"
+else
+  fail "refresh pins the changed bundle checksum"
+fi
+
+SECTION_COUNT="$(grep -c "^## \\[$TARGET_VERSION\\]" "$TMP/CHANGELOG.md")"
+if [ "$SECTION_COUNT" = "1" ]; then
+  pass "refresh preserves one release section"
+else
+  fail "refresh preserves one release section"
+fi
+
 if python3 "$ROOT/scripts/prepare-release.py" "$TARGET_VERSION" \
     --root "$TMP" --date 2026-07-28 >/dev/null 2>&1; then
   fail "same version is refused"
@@ -124,6 +149,13 @@ if python3 "$ROOT/scripts/prepare-release.py" "v$TARGET_VERSION" \
   fail "invalid version is refused"
 else
   pass "invalid version is refused"
+fi
+
+if python3 "$ROOT/scripts/prepare-release.py" "${TARGET_VERSION%.*}.999" \
+    --root "$TMP" --date 2026-07-28 --refresh >/dev/null 2>&1; then
+  fail "refresh with another version is refused"
+else
+  pass "refresh with another version is refused"
 fi
 
 printf "\nrelease-preparation: %d pass, %d fail\n" "$PASS" "$FAIL"

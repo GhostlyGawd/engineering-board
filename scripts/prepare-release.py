@@ -96,13 +96,24 @@ def update_pyproject(text: str, current: str, target: str) -> str:
 
 
 def plan_text_changes(
-    root: Path, target: str, release_date: str, bundle_sha: str | None
+    root: Path,
+    target: str,
+    release_date: str,
+    bundle_sha: str | None,
+    *,
+    refresh: bool = False,
 ) -> tuple[str, dict[Path, str]]:
     """Return the current version and all prospective text changes."""
     plugin_path = root / ".claude-plugin" / "plugin.json"
     plugin = load_json(plugin_path)
     current = str(plugin.get("version", ""))
-    if parse_version(target) <= parse_version(current):
+    target_version = parse_version(target)
+    current_version = parse_version(current)
+    if refresh and target_version != current_version:
+        raise ReleaseError(
+            f"refresh target {target} must equal current version {current}"
+        )
+    if not refresh and target_version <= current_version:
         raise ReleaseError(
             f"target version {target} must be greater than current version {current}"
         )
@@ -165,8 +176,9 @@ def plan_text_changes(
     )
 
     changelog_path = root / "CHANGELOG.md"
-    changes[changelog_path] = update_changelog(
-        changelog_path.read_text(encoding="utf-8"), target, release_date
+    changelog = changelog_path.read_text(encoding="utf-8")
+    changes[changelog_path] = (
+        changelog if refresh else update_changelog(changelog, target, release_date)
     )
     return current, changes
 
@@ -181,10 +193,12 @@ def write_changes(changes: dict[Path, str]) -> None:
 
 
 def build_prospective_bundle(
-    root: Path, target: str, release_date: str
+    root: Path, target: str, release_date: str, *, refresh: bool = False
 ) -> tuple[str, dict[Path, str]]:
     """Build the bundle from a temporary tree with prospective versions."""
-    current, initial = plan_text_changes(root, target, release_date, None)
+    current, initial = plan_text_changes(
+        root, target, release_date, None, refresh=refresh
+    )
     with tempfile.TemporaryDirectory(prefix="engineering-board-release-") as temp:
         staged_root = Path(temp) / "repository"
         shutil.copytree(
@@ -211,7 +225,9 @@ def build_prospective_bundle(
         if not match:
             raise ReleaseError("prospective MCP bundle build returned no SHA-256")
         bundle_sha = match.group(1)
-    _, final = plan_text_changes(root, target, release_date, bundle_sha)
+    _, final = plan_text_changes(
+        root, target, release_date, bundle_sha, refresh=refresh
+    )
     return current, final
 
 
@@ -262,6 +278,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--apply", action="store_true", help="Write the previewed release changes."
     )
     parser.add_argument(
+        "--refresh",
+        action="store_true",
+        help=(
+            "Rebuild and pin the bundle for the current prepared version. "
+            "Do not create a changelog section."
+        ),
+    )
+    parser.add_argument(
         "--date",
         default=dt.datetime.now(dt.timezone.utc).date().isoformat(),
         help="Release date in YYYY-MM-DD format. Default: current UTC date.",
@@ -290,7 +314,9 @@ def main() -> int:
             raise ReleaseError("--date must use YYYY-MM-DD format") from exc
         if args.apply:
             require_clean_worktree(root)
-        current, changes = build_prospective_bundle(root, args.version, args.date)
+        current, changes = build_prospective_bundle(
+            root, args.version, args.date, refresh=args.refresh
+        )
         server = json.loads(changes[root / "mcp-server" / "server.json"])
         bundle_sha = server["packages"][0]["fileSha256"]
         if args.apply:
@@ -301,6 +327,7 @@ def main() -> int:
             "current_version": current,
             "target_version": args.version,
             "release_date": args.date,
+            "refresh": args.refresh,
             "bundle_sha256": bundle_sha,
             "changed_files": [
                 path.relative_to(root).as_posix() for path in sorted(changes)

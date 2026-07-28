@@ -6,7 +6,6 @@ tools: Read, Write, Edit, Bash, Grep, Glob
 color: blue
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Consolidator (engineering-board: dispatcher over the canonical engine)
 

@@ -3,7 +3,6 @@ description: Run the contained pattern-intelligence first-win: three synthetic c
 argument-hint: [--clean <run-id>]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-demo: see the pattern that one chat misses
 

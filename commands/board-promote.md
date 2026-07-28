@@ -3,7 +3,6 @@ description: Preview or apply foreground promotion of captured scratch findings 
 argument-hint: [project-name] [--session <scratch-file>] [--apply <plan-id>]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-promote: promote captured findings
 

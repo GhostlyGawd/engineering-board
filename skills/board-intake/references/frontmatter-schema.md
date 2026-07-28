@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Board Entry Frontmatter Schema
 
 ## Common Fields (all types)

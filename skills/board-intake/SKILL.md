@@ -4,7 +4,6 @@ description: This skill should be used when the user says "log this to the board
 version: 0.2.0
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Board Intake
 

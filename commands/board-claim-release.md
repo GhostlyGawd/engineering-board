@@ -3,7 +3,6 @@ description: Manually release a claim on an engineering-board entry. Useful when
 argument-hint: <entry-id>
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-claim-release: manual claim release
 

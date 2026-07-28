@@ -6,7 +6,6 @@ tools: Read, Bash, Grep, Glob
 color: orange
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Validator (engineering-board v0.2.2 M2.2.c)
 

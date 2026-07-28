@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Repository agent instructions
 
 ## Release work
@@ -16,4 +14,5 @@ change one versioned surface independently.
 Do not use the maintainer release skill in a repository that only installs the
 Engineering Board plugin.
 
-Final status: `NOT RELEASED — COMPLIANCE CHECK INCOMPLETE`
+The owner approved the current controlled-English text. Do not claim formal
+ASD-STE100 compliance without a separate qualified verification.

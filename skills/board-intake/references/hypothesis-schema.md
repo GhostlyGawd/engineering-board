@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Root-cause hypothesis schema
 
 Root-cause hypotheses are durable interpretations of deterministic cluster

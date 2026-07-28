@@ -4,7 +4,6 @@ description: Protocol for promoting `_sessions/` scratch entries to the live boa
 version: 0.1.0
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Board Consolidate
 

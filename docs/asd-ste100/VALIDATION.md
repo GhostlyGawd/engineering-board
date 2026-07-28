@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Rewrite validation
 
 ## Validation record
@@ -38,6 +36,18 @@ b59353dbb66914ba941285ef083dd36c49308e5fb0386b314e18302220134dd0
 `CORPUS-MANIFEST.tsv` binds each source file to its source and output Git
 blob. The fail-closed evidence run used the complete ordered text of these
 files.
+
+## Owner release decision
+
+On 2026-07-28, the owner reviewed and approved the controlled-English text.
+The owner waived the two-reviewer process as a product-release condition.
+
+The deterministic report below remains accurate historical evidence. It does
+not establish formal ASD-STE100 compliance. The project does not claim formal
+compliance, certification, or independent review.
+
+The owner-decision change removes draft banners from approved product text.
+Therefore, the historical review digest does not bind the released text.
 
 ## Deterministic report
 
@@ -82,7 +92,9 @@ The prepared MCP bundle has this SHA-256 value:
 aee407a0b239e55733eafff2d4b3d18ba4eff78c0cd86f42d64e594801ac932b
 ```
 
-## Required reviewer actions
+## Future formal-verification actions
+
+These actions are required only for a future formal compliance claim:
 
 1. Approve or correct each entry in `PROJECT-TERMINOLOGY.yaml`.
 2. Confirm the applicable company language requirements.
@@ -93,9 +105,9 @@ aee407a0b239e55733eafff2d4b3d18ba4eff78c0cd86f42d64e594801ac932b
 7. Obtain both approvals for the new digest.
 8. Run the full test suite after each correction.
 
-## Current review bundle
+## Historical review bundle
 
-The current review bundle includes the release policy, root agent
+The preserved review bundle includes the release policy, root agent
 instructions, maintainer release skill, and v1.10.1 README text. The corpus
 manifest records the source and output blob for each included file. The
 complete-text gate passed. The authorization record is bound to the verified
@@ -112,6 +124,6 @@ The board-view test used `pipefail` with `grep -q`. A successful early match
 could close the pipeline and report the writer's SIGPIPE as a failure. The
 test no longer uses `pipefail`. The content assertions are unchanged.
 
-## Final status
+## Final language status
 
-`NOT RELEASED — COMPLIANCE CHECK INCOMPLETE`
+`OWNER APPROVED — FORMAL ASD-STE100 COMPLIANCE NOT CLAIMED`

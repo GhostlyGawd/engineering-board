@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Auto-Resolve Terminal Pass: Shared Protocol
 
 Every board operation ends with this pass. The board is meant to be **constantly self-healing**: entries whose Done-when criteria are already satisfied should not sit at `status: open` waiting for someone to remember to close them. This protocol is invoked as the final step of `/board-intake`, `/board-triage`, `/board-resolve`, `/board-rebuild`, and `/board-consolidate`.

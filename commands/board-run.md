@@ -3,7 +3,6 @@ description: Drive ONE board entry end-to-end (tdd → review → validate) in t
 argument-hint: <entry-id>
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-run: drive one entry to resolved, here, now
 

@@ -3,7 +3,6 @@ description: List durable root-cause hypotheses or preview/apply evidence-cited 
 argument-hint: <project-name> <list|propose|evaluate|reopen|split|merge> [--apply <plan-token>]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-hypothesis: manage durable root-cause reasoning
 

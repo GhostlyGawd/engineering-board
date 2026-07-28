@@ -3,7 +3,6 @@ description: Apply or roll back the v0.2.x -> v0.3.0 board migration, or relocat
 argument-hint: --apply|--rollback|--status|--relocate [project]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-migrate: v0.2.x to v0.3.0 migration
 

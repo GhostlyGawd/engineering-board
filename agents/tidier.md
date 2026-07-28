@@ -6,7 +6,6 @@ tools: Read, Write, Edit, Bash, Grep, Glob
 color: cyan
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Tidier (engineering-board v0.2.2 M2.2.c)
 

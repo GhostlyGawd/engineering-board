@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 <div align="center">
 
 <picture>
@@ -317,6 +315,7 @@ GhostlyGawd maintains this open-source project.
 
 The project uses the [MIT License](LICENSE).
 
-## Compliance status
+## Language status
 
-`NOT RELEASED — COMPLIANCE CHECK INCOMPLETE`
+The owner approved the current controlled-English text. The project does not
+claim formal ASD-STE100 compliance, certification, or independent review.

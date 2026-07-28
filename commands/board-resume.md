@@ -3,7 +3,6 @@ description: Resume passive listening after /board-pause. Restores prior session
 argument-hint: (no arguments)
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-resume: re-enable passive listening
 

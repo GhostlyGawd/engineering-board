@@ -6,7 +6,6 @@ tools: Read, Write, Edit, Bash, Grep, Glob
 color: yellow
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Code Reviewer (engineering-board v0.2.2 M2.2.c)
 

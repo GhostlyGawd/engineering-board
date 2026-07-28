@@ -3,7 +3,6 @@ description: Regenerate BOARD.md and GRAPH.yml from the entry .md files on disk 
 argument-hint: [project-name]
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # /board-rebuild: regenerate BOARD.md and GRAPH.yml from the filesystem
 

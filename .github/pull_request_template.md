@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 <!--
 Thanks for the PR. Keep each section short. Delete a section only if it truly
 does not apply, and say why.

@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Engineering Board Product Evolution Spec
 
 _Status: Authoritative living product direction: Milestone A shipped in

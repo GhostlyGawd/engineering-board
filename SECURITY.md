@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Security policy
 
 ## Report a vulnerability
@@ -232,6 +230,7 @@ independent controls.
 These controls reduce risk. They do not guarantee that all malicious text is
 detected.
 
-## Compliance status
+## Language status
 
-`NOT RELEASED — COMPLIANCE CHECK INCOMPLETE`
+The owner approved the current controlled-English text. The project does not
+claim formal ASD-STE100 compliance, certification, or independent review.

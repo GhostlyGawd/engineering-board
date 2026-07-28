@@ -6,7 +6,6 @@ tools: Read, Write, Edit, Bash, Grep, Glob
 color: green
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # TDD Builder (engineering-board v0.2.2 M2.2.b)
 

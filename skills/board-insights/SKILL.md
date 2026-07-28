@@ -3,7 +3,6 @@ name: board-insights
 description: Interpret a ranked Engineering Board cluster into an evidence-linked proposed root-cause hypothesis. Use for /board-insights, /board-hypothesis, /board-demo, and questions about shared causes. Never confirms causation.
 ---
 
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Board Insights
 

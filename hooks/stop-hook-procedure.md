@@ -1,5 +1,3 @@
-> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
-
 # Engineering-Board Stop Hook Procedure (v0.2.2)
 
 This file is the canonical procedure for the engineering-board Stop hook.
