@@ -1,5 +1,5 @@
 ---
-description: Initialize the engineering-board/ scaffold for a project. Creates BOARD-ROUTER.md (or appends to it), the project board directory, BOARD.md, ARCHIVE.md, and the five entry-type subdirectories with starter templates. Prints the recommended .gitignore stanza (pass --private for a fully untracked board).
+description: Initialize the engineering-board/ scaffold for a project. Creates BOARD-ROUTER.md (or appends to it), the project board directory, BOARD.md, ARCHIVE.md, five entry-type directories, and the hypotheses directory. Prints the recommended .gitignore stanza (pass --private for a fully untracked board).
 argument-hint: <project-name> [affects-prefix] [--private]
 ---
 
@@ -45,8 +45,10 @@ Create:
 - `engineering-board/$1/questions/`
 - `engineering-board/$1/observations/`
 - `engineering-board/$1/learnings/` (v0.3.0 — populated by the `learnings-curator` PM subagent)
+- `engineering-board/$1/hypotheses/` (durable H### root-cause records)
 
-Add a `.gitkeep` file in each of the five entry-type subdirectories so they survive an empty git commit.
+Add a `.gitkeep` file in each entry-type subdirectory and `hypotheses/` so
+they survive an empty git commit.
 
 ### Step 4 — Create `engineering-board/$1/BOARD.md`
 
@@ -113,7 +115,7 @@ Initialized board for "$1":
   ✓ engineering-board/BOARD-ROUTER.md (added row)
   ✓ engineering-board/$1/BOARD.md
   ✓ engineering-board/$1/ARCHIVE.md
-  ✓ engineering-board/$1/{bugs,features,questions,observations,learnings}/
+  ✓ engineering-board/$1/{bugs,features,questions,observations,learnings,hypotheses}/
 
 Next: add the printed .gitignore stanza so runtime state stays out of git (board content itself is committed by default).
 The board-manager agent will now route findings affecting `${2:-$1/}` to this board automatically.

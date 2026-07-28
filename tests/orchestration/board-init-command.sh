@@ -76,8 +76,8 @@ check "router at engineering-board/BOARD-ROUTER.md"     "engineering-board/BOARD
 check "router path column uses engineering-board/\$1"   "| \$1 | engineering-board/\$1 |"
 check "framing: committed by default"                   "committed by default"
 
-# ── Five entry-type subdirs + .gitkeep ──────────────────────────────────────
-for sub in bugs features questions observations learnings; do
+# ── Canonical record subdirs + .gitkeep ─────────────────────────────────────
+for sub in bugs features questions observations learnings hypotheses; do
   check "scaffolds subdir: $sub/" "engineering-board/\$1/$sub/"
 done
 check "entry-type dirs get .gitkeep"                    ".gitkeep"

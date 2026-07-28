@@ -4,8 +4,9 @@ A zero-dependency [Model Context Protocol](https://modelcontextprotocol.io) serv
 that exposes the `engineering-board` plugin's markdown board as MCP tools. It lets
 any MCP client (Claude Code, Claude Desktop, …) scaffold boards, create/list/update
 entries, preview and promote scratch findings, manage stable pattern identities,
-build the provenance-linked graph, and claim/release entry locks — all against
-the exact on-disk format the plugin's hooks and skills expect.
+rank provenance-linked clusters, preserve durable root-cause hypotheses and
+rejected-claim memory, and claim/release entry locks — all against the exact
+on-disk format the plugin's hooks and skills expect.
 
 ## Design constraints
 
@@ -28,13 +29,15 @@ the current working directory, and can be overridden per-call with a `root` argu
 
 | Tool | What it does |
 |------|--------------|
-| `board_init` | Scaffold a project board (router row, `BOARD.md`, `ARCHIVE.md`, 5 subdirs + `.gitkeep`). Idempotent — never clobbers. Optional `agents_md` (default true) writes a marker-fenced usage block into the repo's `AGENTS.md` for hook-less agents. |
+| `board_init` | Scaffold a project board (router row, `BOARD.md`, `ARCHIVE.md`, five entry subdirs and `hypotheses/`, each with `.gitkeep`). Idempotent — never clobbers. Optional `agents_md` (default true) writes a marker-fenced usage block into the repo's `AGENTS.md` for hook-less agents. |
 | `board_list_projects` | List projects from `BOARD-ROUTER.md` (id, path, affects prefix). |
 | `board_create_entry` | Create a valid entry (bug/feature/question/observation/learning) with correct frontmatter + required body sections, allocate the next zero-padded id, rebuild the index. Output passes `board-validate-entry.sh`. Optional `parent` links a subtask to an existing entry. |
 | `board_list_entries` | List entries with parsed frontmatter; filters: `project`, `type`, `status`, `needs`, `ready`. `ready: true` is the deterministic ready queue — open entries whose existing `blocked_by` targets are all resolved (dangling ids warn, never block). |
 | `board_get_entry` | Full markdown of one entry by id (+ parsed frontmatter). |
 | `board_update_entry` | Update frontmatter (`status`, `needs`, `priority`, `blocked_by`, `parent`) and/or append a body section; validate the status transition; rebuild the index. Optional `comment: {author, text}` appends a server-timestamped line to the entry's `## Comments` section. |
 | `board_graph` | Build the deterministic typed graph from canonical entry and P### pattern Markdown, write `GRAPH.yml`, and reuse only a source-equivalent disposable cache. `full: true` bypasses the cache. |
+| `board_insights` | Rank graph clusters with transparent score components and return linked H### and rejected negative-memory references. The score is investigation priority, not causal confidence. |
+| `board_hypotheses` | List H### records or preview/apply propose, evaluate, reopen, split, and merge operations. Mutations require an unchanged self-contained plan token and cited evidence. |
 | `board_patterns` | List canonical pattern records or preview/apply create, alias, assign, and correction operations. Every mutation requires the unchanged content-bound plan id. |
 | `board_promote_findings` | Preview or apply captured scratch findings with typed created/deduplicated/rejected/already-applied outcomes, durable provenance, and idempotent receipts. |
 | `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files (P0→P3 ordering, `⊘ Q###` when blocked, `↳` child rows under parents, resolved omitted). Idempotent. |
@@ -44,8 +47,9 @@ the current working directory, and can be overridden per-call with a `root` argu
 | `board_remember` | Save a durable insight straight to `learnings/L###-<slug>.md` (`source: remember`) and rebuild the index — explicit intent bypasses the curator's recurrence-≥3 threshold. |
 | `board_status` | Overview: per-type open counts, `in_progress` ids, `blocked` ids, the ready queue (capped at 20) with dangling-blocker warnings, un-promoted scratch count. |
 
-All 15 tools use the same canonical Markdown format. Pattern, promotion, and
-graph behavior delegates to the same zero-dependency core used by the plugin.
+All 17 tools use the same canonical Markdown format. Pattern, promotion, graph,
+ranking, and hypothesis behavior delegates to the same zero-dependency core
+used by the plugin.
 
 ## Configuration
 

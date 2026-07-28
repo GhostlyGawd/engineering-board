@@ -41,9 +41,13 @@ if MODULE_DIR not in sys.path:
 from engineering_board_core import (
     GraphError as CoreError,
     apply_pattern_operation,
+    apply_hypothesis_plan,
     apply_promotion,
+    build_insights,
     build_graph_cached,
+    list_hypotheses,
     load_pattern_registry,
+    plan_hypothesis_operation,
     plan_pattern_operation,
     plan_promotion,
     resolve_entry_patterns,
@@ -87,6 +91,7 @@ TYPE_SUBDIR = {
 }
 PREFIX_TYPE = {v: k for k, v in TYPE_PREFIX.items()}
 SUBDIRS = ["bugs", "features", "questions", "observations", "learnings"]
+SCAFFOLD_SUBDIRS = SUBDIRS + ["hypotheses"]
 VALID_STATUS = ["open", "blocked", "in_progress", "resolved"]
 VALID_PRIORITY = ["P0", "P1", "P2", "P3"]
 VALID_NEEDS = ["tdd", "review", "validate"]
@@ -508,7 +513,7 @@ AGENTS_MD_BLOCK = (
     "## engineering-board\n"
     "\n"
     "This repo tracks its work on a markdown board under `engineering-board/`\n"
-    "(bugs, features, questions, observations, learnings — one file per entry).\n"
+    "(bugs, features, questions, observations, learnings, and hypotheses).\n"
     "`BOARD.md` is a derived index; never edit it by hand, the tools rebuild it.\n"
     "If you can call the engineering-board MCP tools, use the board:\n"
     "\n"
@@ -518,6 +523,8 @@ AGENTS_MD_BLOCK = (
     "- Record progress on the entry: `board_update_entry` (status, needs, comment).\n"
     "- Promote a finding to a real entry: `board_create_entry`.\n"
     "- Save a durable insight: `board_remember` (project, insight).\n"
+    "- Rank systemic investigations: `board_insights` (project).\n"
+    "- Preserve or evaluate a cited root-cause claim: preview/apply with `board_hypotheses`.\n"
     "- When done: `board_update_entry` to the new status, then `board_release`.\n"
     "\n"
     "Read one entry with `board_get_entry`; get an overview with `board_status`.\n"
@@ -592,7 +599,7 @@ def tool_board_init(params):
     os.makedirs(bd, exist_ok=True)
 
     # Subdirs + .gitkeep
-    for sub in SUBDIRS:
+    for sub in SCAFFOLD_SUBDIRS:
         sd = os.path.join(bd, sub)
         os.makedirs(sd, exist_ok=True)
         gk = os.path.join(sd, ".gitkeep")
@@ -1160,6 +1167,42 @@ def tool_board_patterns(params):
     return plan_pattern_operation(Path(bd), action, operation_params)
 
 
+def tool_board_insights(params):
+    project = require(params, "project")
+    root = resolve_root(params)
+    bd = ensure_board_exists(root, project)
+    limit = params.get("limit")
+    if limit is not None:
+        if isinstance(limit, bool) or not isinstance(limit, int):
+            raise ToolError("limit must be an integer")
+    return build_insights(
+        Path(bd),
+        project,
+        cluster_fingerprint=params.get("cluster_fingerprint"),
+        limit=limit,
+    )
+
+
+def tool_board_hypotheses(params):
+    project = require(params, "project")
+    root = resolve_root(params)
+    bd = ensure_board_exists(root, project)
+    action = str(params.get("action", "list"))
+    plan_token = params.get("apply")
+    if plan_token:
+        return apply_hypothesis_plan(Path(bd), project, str(plan_token))
+    if action == "list":
+        return list_hypotheses(Path(bd), project)
+    operation_params = {
+        key: value
+        for key, value in params.items()
+        if key not in {"root", "project", "action", "apply"}
+    }
+    return plan_hypothesis_operation(
+        Path(bd), project, action, operation_params
+    )
+
+
 def tool_board_promote_findings(params):
     project = require(params, "project")
     root = resolve_root(params)
@@ -1665,7 +1708,7 @@ _ROOT_PROP = {"type": "string",
 TOOLS = [
     {
         "name": "board_init",
-        "description": "Scaffold a project board: create engineering-board/BOARD-ROUTER.md (or append a row), the project board dir, BOARD.md, ARCHIVE.md, and the five entry-type subdirs with .gitkeep. Also writes/refreshes a marker-fenced usage block in <root>/AGENTS.md for hook-less MCP clients (agents_md, default true; content outside the markers is never touched). Idempotent — never clobbers an existing file.",
+        "description": "Scaffold a project board: create engineering-board/BOARD-ROUTER.md (or append a row), the project board dir, BOARD.md, ARCHIVE.md, five entry-type subdirs, and hypotheses/, each with .gitkeep. Also writes/refreshes a marker-fenced usage block in <root>/AGENTS.md for hook-less MCP clients (agents_md, default true; content outside the markers is never touched). Idempotent — never clobbers an existing file.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -1805,6 +1848,129 @@ TOOLS = [
             "required": ["project"],
         },
         "handler": tool_board_graph,
+    },
+    {
+        "name": "board_insights",
+        "description": "Rank deterministic graph clusters with exposed recurrence, domain-diversity, severity, relative-recency, and evidence-quality components. Returns existing hypothesis and rejected negative-memory references. The score is investigation priority, not causal confidence.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project": {"type": "string"},
+                "cluster_fingerprint": {
+                    "type": "string",
+                    "pattern": "^c-[0-9a-f]{16}$",
+                    "description": "Optional stable cluster fingerprint to inspect.",
+                },
+                "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                },
+                "root": _ROOT_PROP,
+            },
+            "required": ["project"],
+        },
+        "handler": tool_board_insights,
+    },
+    {
+        "name": "board_hypotheses",
+        "description": "List canonical H### root-cause hypotheses or preview/apply propose, evaluate, reopen, split, and merge operations. Every mutation requires the unchanged self-contained plan token returned by preview; rank or model confidence never confirms causation.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project": {"type": "string"},
+                "action": {
+                    "type": "string",
+                    "enum": [
+                        "list",
+                        "propose",
+                        "evaluate",
+                        "reopen",
+                        "split",
+                        "merge",
+                    ],
+                },
+                "hypothesis_id": {
+                    "type": "string",
+                    "pattern": "^H[0-9]{3,}$",
+                },
+                "cluster_fingerprint": {
+                    "type": "string",
+                    "pattern": "^c-[0-9a-f]{16}$",
+                },
+                "claim_key": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                },
+                "title": {"type": "string", "maxLength": 160},
+                "root_cause": {"type": "string", "maxLength": 2000},
+                "supporting_evidence": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "string"},
+                            "reason": {"type": "string", "maxLength": 400},
+                        },
+                        "required": ["id", "reason"],
+                    },
+                },
+                "alternatives": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 5,
+                    "items": {"type": "string", "maxLength": 400},
+                },
+                "counter_evidence": {
+                    "type": "array",
+                    "items": {"type": "string", "maxLength": 400},
+                },
+                "confidence": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"],
+                },
+                "confidence_basis": {"type": "string", "maxLength": 800},
+                "falsifier": {"type": "string", "maxLength": 800},
+                "supersedes": {
+                    "type": "array",
+                    "items": {"type": "string", "pattern": "^H[0-9]{3,}$"},
+                },
+                "status": {
+                    "type": "string",
+                    "enum": ["proposed", "confirmed", "weakened", "rejected"],
+                },
+                "evidence_ids": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                },
+                "reason": {"type": "string", "maxLength": 800},
+                "new_evidence_reason": {
+                    "type": "string",
+                    "maxLength": 800,
+                },
+                "claim_keys": {
+                    "type": "array",
+                    "minItems": 2,
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    },
+                },
+                "into": {"type": "string", "pattern": "^H[0-9]{3,}$"},
+                "actor": {
+                    "type": "string",
+                    "maxLength": 120,
+                    "description": "Required for every preview mutation; identifies the person or agent recorded in outcome history.",
+                },
+                "apply": {
+                    "type": "string",
+                    "description": "Self-contained plan token from an unchanged preview. No action fields are required when applying.",
+                },
+                "root": _ROOT_PROP,
+            },
+            "required": ["project"],
+        },
+        "handler": tool_board_hypotheses,
     },
     {
         "name": "board_patterns",

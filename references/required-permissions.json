@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "patterns": [
     {
       "tool": "Bash",
@@ -85,6 +85,11 @@
       "tool": "Bash",
       "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-graph-build.sh:*",
       "rationale": "/board-graph: deterministic canonical pattern graph with source-equivalent disposable cache"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-insights.sh:*",
+      "rationale": "/board-insights and /board-hypothesis: deterministic ranking plus content-bound hypothesis preview/apply"
     },
     {
       "tool": "SlashCommand",
