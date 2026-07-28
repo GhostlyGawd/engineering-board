@@ -1,3 +1,5 @@
+> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
+
 <!--
 Thanks for the PR. Keep each section short. Delete a section only if it truly
 does not apply, and say why.
@@ -27,7 +29,7 @@ finding does this resolve? e.g. eb-self B0XX / F0XX, or a GitHub issue number.
 - [ ] `.claude-plugin/plugin.json` bumped
 - [ ] `.claude-plugin/marketplace.json` bumped in lockstep
 - [ ] `CHANGELOG.md` updated under `[Unreleased]`
-- [ ] Not user-facing — no bump needed
+- [ ] Not user-facing: no bump needed
 
 ## Surface coherence
 

@@ -1,3 +1,5 @@
+> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
+
 # Board Entry Frontmatter Schema
 
 ## Common Fields (all types)
@@ -6,8 +8,8 @@
 |---|---|---|---|
 | `id` | Yes | B###, F###, Q###, O###, L### | Zero-padded 3 digits |
 | `type` | Yes | `bug`, `feature`, `question`, `observation`, `learning` | Lowercase |
-| `status` | Yes for bugs/features/questions; optional for observations and learnings (set `resolved` to omit from `BOARD.md` after closing — see `skills/board-resolve/SKILL.md`) | `open`, `blocked`, `in_progress`, `resolved` | |
-| `title` | Yes | Short string | Present-tense for bugs/features; interrogative for questions; one-line takeaway for learnings |
+| `status` | Yes for bugs/features/questions. optional for observations and learnings (set `resolved` to omit from `BOARD.md` after closing: see `skills/board-resolve/SKILL.md`) | `open`, `blocked`, `in_progress`, `resolved` | |
+| `title` | Yes | Short string | Present-tense for bugs/features. interrogative for questions. one-line takeaway for learnings |
 | `discovered` | Yes | `YYYY-MM-DD` | Date first observed |
 | `discovered_at` | Required for promoted entries | ISO-8601 UTC timestamp | Exact promotion/discovery ordering |
 | `pattern` | No | List of labels | Observed root-cause evidence. It can contain unresolved legacy labels. |
@@ -19,10 +21,10 @@
 | Field | Required | Values | Notes |
 |---|---|---|---|
 | `needs` | Conditional | `tdd`, `review`, `validate`, or absent | Set to `tdd` on intake for bug/feature entries. Workers transition this field via the Stop-hook orchestrator (tdd -> review -> validate -> resolved). Questions, observations, and learnings do not use this field. Users typically do not edit this directly. See locked-plan "needs: state machine". |
-| `priority` | Yes | `P0`, `P1`, `P2`, `P3` | P0 = production down/data loss; P1 = broken output delivered; P2 = quality degraded; P3 = minor/cosmetic |
+| `priority` | Yes | `P0`, `P1`, `P2`, `P3` | P0 = production down/data loss. P1 = broken output delivered. P2 = quality degraded. P3 = minor/cosmetic |
 | `affects` | Yes | Relative file path | The prompt, script, or module where the fix lands |
 | `blocked_by` | Conditional | `[Q###]` or `[Q###, Q###]` | Required when a question must be answered before this can be fixed |
-| `pattern` | No | `[tag1, tag2]` | Observed root-cause labels. Preserve these labels as evidence. Resolve established labels and aliases to `pattern_ids`; do not create canonical identity from similarity alone. |
+| `pattern` | No | `[tag1, tag2]` | Observed root-cause labels. Preserve these labels as evidence. Resolve established labels and aliases to `pattern_ids`. do not create canonical identity from similarity alone. |
 
 ## Canonical Pattern Record Fields
 
@@ -51,7 +53,7 @@ appended under `## Pattern history`.
 
 ## Observation Fields
 
-Observations have no required `priority`, `affects`, or `blocked_by` — they are run logs. `status` is optional: omit it while the observation is active reference data, or set `status: resolved` when closing the observation so `/board-rebuild` correctly omits it from `BOARD.md` (per `skills/board-resolve/SKILL.md` observation flow).
+Observations have no required `priority`, `affects`, or `blocked_by`: they are run logs. `status` is optional: omit it while the observation is active reference data, or set `status: resolved` when closing the observation so `/board-rebuild` correctly omits it from `BOARD.md` (per `skills/board-resolve/SKILL.md` observation flow).
 
 | Field | Required | Notes |
 |---|---|---|
@@ -62,36 +64,36 @@ Observations have no required `priority`, `affects`, or `blocked_by` — they ar
 
 ## Learning Fields (v0.3.0)
 
-Learnings are durable takeaways promoted from recurring patterns across resolved bugs/features. They are written by the `learnings-curator` PM subagent, not by users directly — but the schema is enforced on every Write to `learnings/*.md`.
+Learnings are durable takeaways promoted from recurring patterns across resolved bugs/features. They are written by the `learnings-curator` PM subagent, not by users directly: but the schema is enforced on every Write to `learnings/*.md`.
 
 | Field | Required | Values | Notes |
 |---|---|---|---|
 | `id` | Yes | L### | Zero-padded 3 digits |
 | `type` | Yes | `learning` | |
-| `subtype` | Yes | `pattern`, `finding`, `principle` | `pattern` = recurring failure mode; `finding` = single-source insight; `principle` = synthesised heuristic |
+| `subtype` | Yes | `pattern`, `finding`, `principle` | `pattern` = recurring failure mode. `finding` = single-source insight. `principle` = synthesised heuristic |
 | `title` | Yes | One-line takeaway | Present-tense, declarative, no question marks |
 | `discovered` | Yes | `YYYY-MM-DD` | First date the underlying pattern was observed |
-| `confidence` | Yes | `low`, `medium`, `high` | Curator-assigned; high requires recurrence ≥ 3 |
+| `confidence` | Yes | `low`, `medium`, `high` | Curator-assigned. high requires recurrence ≥ 3 |
 | `recurrence` | Yes | Integer ≥ 1 | Number of resolved entries this learning is derived from |
 | `derived_from` | Yes | `[B###, F###, ...]` | List of resolved entry IDs that surfaced this pattern |
-| `applies_to` | No | List of paths or component names | Where this learning is relevant; informs SessionStart filtering by cwd |
+| `applies_to` | No | List of paths or component names | Where this learning is relevant. informs SessionStart filtering by cwd |
 | `pattern_tag` | No | kebab-case string | The original `pattern:` tag from `derived_from` entries, retained for cross-reference |
-| `status` | No | `open`, `resolved` | Default omitted (active); `resolved` retires the learning from active surfacing |
+| `status` | No | `open`, `resolved` | Default omitted (active). `resolved` retires the learning from active surfacing |
 
-### Required Body Sections — Learning
+### Required Body Sections: Learning
 
-- `## Takeaway` — **required** — 1-3 sentences capturing the durable lesson.
-- `## Sources` — **required** — bulleted list of `derived_from` entries with their titles.
-- `## When this applies` — recommended — short prose on the conditions that surface this pattern.
+- `## Takeaway`: **required**: 1-3 sentences capturing the durable lesson.
+- `## Sources`: **required**: bulleted list of `derived_from` entries with their titles.
+- `## When this applies`: recommended: short prose on the conditions that surface this pattern.
 
 ## Priority Definitions
 
 | Level | Meaning |
 |---|---|
 | P0 | Production down, data loss, or a delivered output is completely missing |
-| P1 | Broken output delivered to client — wrong content, wrong format, critical field absent |
-| P2 | Output delivered but quality degraded — content present but suboptimal |
-| P3 | Minor or cosmetic — barely noticeable, no client impact |
+| P1 | Broken output delivered to client: wrong content, wrong format, critical field absent |
+| P2 | Output delivered but quality degraded: content present but suboptimal |
+| P3 | Minor or cosmetic: barely noticeable, no client impact |
 
 ## Status Transitions
 
@@ -106,20 +108,20 @@ Only one item should be `in_progress` per session.
 ## Required Body Sections by Type
 
 ### Bug
-- `## Done when` — **required** — exact verification criteria
-- `## Observed behavior` — recommended
-- `## Root cause hypothesis` — recommended
-- `## Fix direction` — recommended
+- `## Done when`: **required**: exact verification criteria
+- `## Observed behavior`: recommended
+- `## Root cause hypothesis`: recommended
+- `## Fix direction`: recommended
 
 ### Feature
-- `## Done when` — **required**
-- `## Motivation` — recommended
+- `## Done when`: **required**
+- `## Motivation`: recommended
 
 ### Question
-- `## Done when` — **required** — the binary answer or code location that closes this question
-- `## Why it matters` — recommended
-- `## Where to look` — recommended
-- `## Finding` — written when resolving (before status change)
+- `## Done when`: **required**: the binary answer or code location that closes this question
+- `## Why it matters`: recommended
+- `## Where to look`: recommended
+- `## Finding`: written when resolving (before status change)
 
 ### Observation
 - No `## Done when` required

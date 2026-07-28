@@ -1,3 +1,5 @@
+> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
+
 # Root-cause hypothesis schema
 
 Root-cause hypotheses are durable interpretations of deterministic cluster
@@ -37,7 +39,7 @@ Required fields:
 | `cluster_fingerprint` | `c-` plus 16 hex characters | Deterministic evidence cluster binding. |
 | `graph_source_fingerprint` | SHA-256 hex | Canonical graph-source state reviewed for this revision. |
 | `pattern_ids` | P### list | Canonical pattern identities represented by the cluster. |
-| `confidence` | `low`, `medium`, `high` | Strength of the current explanation; never confirmation authority. |
+| `confidence` | `low`, `medium`, `high` | Strength of the current explanation. never confirmation authority. |
 | `derived_from` | entry IDs | Canonical evidence inspected. |
 | `affected_domains` | list | Distinct engineering domains represented. |
 | `created` | date | Initial proposal date. |

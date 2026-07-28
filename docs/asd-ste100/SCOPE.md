@@ -17,6 +17,23 @@ The rewrite includes current project text in these surfaces:
 - the current test instructions for a human operator;
 - current help text and user-visible messages in executable files.
 
+The first active-instruction batch includes:
+
+- `ARCHITECTURE.md`;
+- `BRAND.md`;
+- `CLAUDE.md`;
+- `.github/pull_request_template.md`;
+- all Markdown files in `agents/`;
+- all Markdown files in `commands/`;
+- `hooks/stop-hook-procedure.md`;
+- `mcp-server/README.md`;
+- `references/active-workers-registry.md`;
+- `references/auto-resolve-pass.md`;
+- all Markdown files in `skills/`;
+- `tests/smoke/manual-checks.md`;
+- `docs/PRODUCT_EVOLUTION_SPEC.md`;
+- `docs/llms.txt`.
+
 ## Protected content
 
 The rewrite can change sentence construction. It must not change technical
@@ -52,6 +69,28 @@ The rewrite does not change these files:
 - adversarial and benign test fixtures;
 - generated board HTML;
 - machine data that has no user instructions.
+
+The rewrite also preserves these historical design and planning records:
+
+- `ACTIVATION.md`;
+- `BRAND-COHERENCE.md`;
+- `COLOR.md`;
+- `COMPREHENSION.md`;
+- `CRO.md`;
+- `HIERARCHY.md`;
+- `IMPROVEMENTS.md`;
+- `LAYOUT.md`;
+- `NEXT-PHASE.md`;
+- `PROOF.md`;
+- `RETENTION.md`;
+- `ROADMAP.md`;
+- `SHOWCASE.md`;
+- `STATES.md`;
+- `TYPOGRAPHY.md`;
+- `specs/`;
+- `docs/evidence/`;
+- `docs/research/`;
+- `docs/rfcs/`.
 
 These files are source records, legal text, test inputs, or generated output.
 A prose rewrite can invalidate their authority or their test purpose.

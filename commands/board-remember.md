@@ -3,7 +3,9 @@ description: Save a durable insight straight to the board's learnings/ as L###-<
 argument-hint: <insight> [-- <context>]
 ---
 
-# /board-remember — explicit learning capture
+> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
+
+# /board-remember: explicit learning capture
 
 Write one durable learning to the board right now, without waiting for the
 learnings curator's recurrence threshold. The learning file matches the
@@ -13,12 +15,12 @@ stay distinguishable.
 
 ## What to do
 
-### Step 1 — Parse arguments
+### Step 1: Parse arguments
 
 Split `$ARGUMENTS` on the first ` -- ` separator (space-dash-dash-space):
 
-- Everything before it is `<insight>` — the durable lesson to remember.
-- Everything after it (optional) is `<context>` — when/where the insight
+- Everything before it is `<insight>`: the durable lesson to remember.
+- Everything after it (optional) is `<context>`: when/where the insight
   applies.
 
 If `$ARGUMENTS` is empty or whitespace-only, print:
@@ -29,7 +31,7 @@ Usage: /board-remember <insight> [-- <context>]. No action taken.
 
 Then stop.
 
-### Step 2 — Run the remember script
+### Step 2: Run the remember script
 
 Run:
 
@@ -39,11 +41,11 @@ bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-remember.sh "<insight>" "<context>"
 
 (Omit the second argument when no context was given.) The script resolves the
 board via `hooks/scripts/board-paths.sh` (router order:
-`engineering-board/BOARD-ROUTER.md` → `docs/boards/BOARD-ROUTER.md` → legacy
+`engineering-board/BOARD-ROUTER.md` to `docs/boards/BOARD-ROUTER.md` to legacy
 `docs/board/`) and targets the first listed project's board. To target a
 different board, pass `--board-dir <board-dir>` as the first argument.
 
-### Step 3 — Report the result
+### Step 3: Report the result
 
 Handle exit codes:
 
@@ -61,10 +63,10 @@ Handle exit codes:
 ## Notes
 
 - The MCP twin is the `board_remember` tool (`project`, `insight`,
-  `context?`) — identical file output; use whichever surface you have.
+  `context?`): identical file output. use whichever surface you have.
 - Learnings written this way have `recurrence: 1` and
-  `confidence: medium`; the curator may later raise confidence when the same
+  `confidence: medium`. the curator may later raise confidence when the same
   pattern recurs across resolved entries.
-- The insight's first line becomes the entry title (newlines are flattened);
+- The insight's first line becomes the entry title (newlines are flattened).
   the full insight becomes `## Takeaway` and the context becomes
   `## When this applies`.

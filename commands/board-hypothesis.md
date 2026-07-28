@@ -3,7 +3,9 @@ description: List durable root-cause hypotheses or preview/apply evidence-cited 
 argument-hint: <project-name> <list|propose|evaluate|reopen|split|merge> [--apply <plan-token>]
 ---
 
-# /board-hypothesis — manage durable root-cause reasoning
+> DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
+
+# /board-hypothesis: manage durable root-cause reasoning
 
 Resolve the named project through `engineering-board/BOARD-ROUTER.md`, then
 `docs/boards/BOARD-ROUTER.md`. Use the resolved project path as `<board-dir>`.
