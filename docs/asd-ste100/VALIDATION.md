@@ -85,11 +85,13 @@ and project terms do not have qualified approvals.
 - The full test suite passed 17 of 17 groups.
 - Version coherence passed for v1.10.1.
 - The pinned MCP bundle checksum reproduced.
+- The release-preparation suite passed 11 checks, including prepared-version
+  refresh and unchanged-version refusal.
 
-The prepared MCP bundle has this SHA-256 value:
+The owner-approved, refreshed MCP bundle has this SHA-256 value:
 
 ```text
-aee407a0b239e55733eafff2d4b3d18ba4eff78c0cd86f42d64e594801ac932b
+199018f9f595413ce23c4bf74f62efe2345c71bf1c61fbced1da7d459c840ac6
 ```
 
 ## Future formal-verification actions
