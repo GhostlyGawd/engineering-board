@@ -64,11 +64,12 @@ selected milestone is approved.
 | Team dashboard and monetization | Deferred | Do not build until repository-local intelligence has demonstrated repeatable value. |
 | B057 prerequisite | Landed | PR #93's scratch-finding count fix landed before Milestone A and is included in v1.8.0. The superseded 1.7.1 preparation was folded into the combined feature release instead of publishing two adjacent versions. |
 | Milestone A delivery | Accepted and shipped | The contained synthetic `/board-demo`, deterministic demo graph engine, proposed-hypothesis contract, real evidence view, cleanup boundary, tests, and dated validation ship in v1.8.0. |
-| Milestone B direction | Gate 1 accepted | Make real findings from every supported intake path converge into trustworthy, normalized, provenance-linked graph memory before adding richer root-cause reasoning. |
+| Milestone B direction | Accepted and shipped | Make real findings from every supported intake path converge into trustworthy, normalized, provenance-linked graph memory before adding richer root-cause reasoning. |
 | Stable pattern identity | Accepted for Milestone B | Add repository-owned `P###` pattern records with readable labels and aliases. Preserve legacy free-form labels as evidence and compatibility input; do not let semantic suggestions silently become canonical identity. |
 | Foreground promotion | Accepted for Milestone B | Preview captured findings and their proposed pattern assignments, then require an explicit apply action. PM mode may retain its already-authorized batch behavior but must use the same promotion core. |
 | Adapter parity | Accepted for Milestone B | Plugin and MCP surfaces must consume the same zero-dependency parser, pattern resolver, and deterministic graph engine and return semantically equivalent facts. |
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release; v1.9.1 is the corrected publication boundary. |
+| Milestone C direction | Gate 1 accepted | Turn deterministic clusters into ranked, evidence-linked, explicitly proposed root-cause hypotheses with durable evaluation and negative memory. Section 19 contains the proposed Gate 2 implementation contract. |
 
 ## 3. Product thesis
 
@@ -437,8 +438,7 @@ instead of the product's intelligence advantage.
 
 **Purpose:** Ensure real findings become trustworthy, connected memory.
 
-**Direction state:** Gate 1 accepted by the product owner on 2026-07-27.
-The proposed Gate 2 implementation contract is in section 18.
+**Implementation state:** shipped in v1.9.1. The delivered scope is:
 
 - Foreground promotion outside PM mode.
 - Pattern normalization and alias handling.
@@ -456,7 +456,10 @@ adapter-specific prompt execution.
 **Purpose:** Turn structural clusters into useful, bounded engineering
 interpretation.
 
-Candidate scope:
+**Direction state:** Gate 1 accepted by the product owner on 2026-07-28.
+The proposed Gate 2 implementation contract is in section 19.
+
+Proposed scope:
 
 - Cluster ranking using recurrence, domain diversity, severity, recency, and
   evidence quality.
@@ -690,6 +693,7 @@ with session tasks and planning tools instead.
 | TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped and unchanged | Existing mode and orchestration tests | Repositioned as optional falsifiable verification feedback, not the headline or required first experience | Behavior unchanged; messaging aligned |
 | MCP behavior | Required current truth | Fifteen tools share canonical Markdown; pattern, promotion, and graph tools delegate to the same core as plugin adapters | MCP lifecycle tests plus the Milestone B adapter-parity matrix | MCP reference, manifests, package modules, and counts updated | Milestone B aligned |
 | Security, privacy, versions, releases | Required current truth | Preview/apply authority, linked-input refusal, source-change detection, disposable cache, and existing untrusted-data controls cover new paths; coordinated manifests identify v1.9.1 | Security regression suites, pattern matrix, full release-tree suite, bundle-content parity, reproducible checksum, implementation evidence, and external publication checks | SECURITY, changelog, architecture, setup, manifests, and evidence aligned | v1.9.1 release aligned |
+| Milestone C implementation contract | Proposed direction | No Milestone C production behavior is implemented | Evidence matrix specified in section 19.10; implementation evidence intentionally pending | Central spec and dated contract workpad record scope, authority, docs impact, and handoff | Gate 2 approval required |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -1337,10 +1341,426 @@ Implementation shipped through reviewed PRs #97 and #98. The v1.9.1 release
 passed the contract and publication gates. Publication does not weaken this
 contract or authorize unvalidated Milestone C behavior.
 
-## 19. Research and evidence
+## 19. Gate 2 proposed: Milestone C implementation contract
+
+_State: Gate 1 accepted by the product owner on 2026-07-28. Gate 2 is
+proposed and requires explicit implementation approval._
+
+### 19.1 Milestone purpose
+
+> Turn trustworthy structural clusters into ranked, inspectable root-cause
+> proposals that agents can evaluate over time without confusing correlation
+> with causation or repeating rejected explanations.
+
+Milestone B can show which findings are connected and why. The acting agent
+must still interpret every cluster from scratch, decide which cluster matters,
+and remember failed explanations in chat. Milestone C moves that work into a
+bounded product contract:
+
+```text
+canonical evidence
+  → deterministic graph
+  → transparent cluster ranking
+  → agent-authored proposal with exact citations
+  → explicit preview/apply
+  → confirmed | weakened | rejected | split | merged
+  → durable negative memory and outcome history
+```
+
+The user benefit is earlier recognition of a shared engineering cause, with
+enough visible evidence and counter-evidence to investigate the system instead
+of repeatedly patching symptoms.
+
+### 19.2 Comparative benefit and selected direction
+
+| Aspect | v1.9.1 behavior | Milestone C behavior | Why it matters |
+|---|---|---|---|
+| Cluster priority | The graph returns stable clusters in structural order. | A deterministic score exposes recurrence, domain diversity, severity, relative recency, and evidence quality separately. | Agents can inspect the highest-value systemic candidate first without treating the score as causal confidence. |
+| Interpretation | The contained demo can create one synthetic proposed hypothesis. Real boards require ad hoc chat reasoning. | `/board-insights` prepares a strict, evidence-complete proposal for one real cluster. | Useful reasoning becomes reproducible and repository-visible. |
+| Authority | Production graph facts are deterministic; no production hypothesis writer exists. | Proposal and evaluation mutations use content-bound preview/apply plans. Confirmation requires an explicit outcome-evidence action. | An agent cannot silently convert correlation into truth. |
+| Failed explanations | Rejection can be written manually but has no production query or suppression contract. | Rejected claim identities remain queryable and suppress unchanged reproposals. | Later sessions do not recycle a disproven explanation without new evidence. |
+| Inspection | The normal HTML view emphasizes entry lifecycle. | A read-only pattern-intelligence section shows ranked clusters, evidence, hypotheses, status, and stale bindings. | The accumulated intelligence is visible without reading graph serialization. |
+
+The current v1.9.1 behavior remains preferable for users who only need
+deterministic structure or do not want agent interpretation. `/board-graph`
+stays independent, offline, deterministic, and sufficient for that use case.
+
+Proposed items:
+
+| Item | Purpose | Capability or safety property | If omitted |
+|---|---|---|---|
+| Transparent ranking | Order clusters without hiding the basis | Reproducible investigation priority with exposed factors | Agents must rescan every cluster and may overvalue a large but low-quality group |
+| Canonical H### records | Keep one inspectable explanation and its evidence | Cross-session reasoning with stable identity and Git history | Root-cause reasoning remains disposable chat context |
+| Explicit evaluation and negative memory | Learn from investigation outcomes | Rejected explanations remain visible and unchanged reproposals are blocked | Later agents repeat disproven theories |
+| Shared plugin/MCP core | Give supported adapters the same facts and mutation rules | Adapter parity and one security boundary | Clients can disagree about status, stale evidence, or authority |
+| Pattern-intelligence view | Make ranked evidence and hypothesis state inspectable | Read-only, escaped visual drill-down | The core capability remains hidden behind YAML and Markdown scanning |
+
+Alternatives considered:
+
+1. Keep all interpretation ephemeral. This has the least implementation cost,
+   but it preserves repeated rediscovery and cannot provide negative memory.
+2. Generate deterministic hypothesis templates without agent interpretation.
+   This preserves reproducibility, but a template can restate graph structure;
+   it cannot responsibly infer a shared causal mechanism.
+3. Let a model write or confirm hypotheses directly. This is faster but
+   collapses the evidence, inference, and authority boundaries. It is rejected.
+4. Use deterministic ranking and validation around agent-authored proposals,
+   then require explicit apply and evaluation actions. This is the selected
+   direction because it adds useful interpretation while preserving visible
+   evidence and user authority.
+
+### 19.3 Deterministic cluster ranking
+
+The shared core adds a pure ranking function over the current graph. It does
+not call a model, write canonical state, or change topology.
+
+Each cluster receives a score from 0 through 100:
+
+| Component | Maximum | Rule |
+|---|---:|---|
+| Recurrence | 25 | `min(member_count, 5) × 5` |
+| Domain diversity | 25 | `min(distinct_affected_domains, 5) × 5` |
+| Severity | 20 | Highest member priority: P0=20, P1=15, P2=10, P3=5, absent=0 |
+| Relative recency | 15 | Newest valid member `discovered` date compared with the newest valid date in the corpus: 0–7 days=15, 8–30=10, 31–90=5, older or unknown=0 |
+| Evidence quality | 15 | `floor(10 × members_with_canonical_pattern_ids / member_count)` plus 5 when the cluster contains at least two distinct deterministic signal kinds |
+
+The result includes every component, input count, warning, and rule version.
+The score ranks investigation opportunities. It is not probability,
+confidence, severity authority, or evidence of causation. Ties sort by stable
+cluster fingerprint. Relative recency uses canonical dates, not the wall
+clock, so the same canonical input produces the same ranking.
+
+`GRAPH.yml` adds member `discovered` dates when present. It does not store
+rankings. Ranking remains a rebuildable read model returned at the point of
+use.
+
+### 19.4 Production hypothesis schema
+
+Real-board hypotheses are canonical Markdown under:
+
+```text
+engineering-board/<project>/hypotheses/H###-<slug>.md
+```
+
+Existing boards require no migration. The first hypothesis apply creates the
+directory. `/board-init` adds it for new boards.
+
+Required frontmatter:
+
+```yaml
+---
+id: H001
+type: hypothesis
+status: proposed
+title: One suspected shared mechanism
+claim_key: duplicated-lifecycle-contract
+claim_fingerprint: h-<16 lowercase hex>
+cluster_fingerprint: c-<16 lowercase hex>
+graph_source_fingerprint: <64 lowercase hex>
+pattern_ids: [P001]
+confidence: medium
+derived_from: [B001, B002, B003]
+affected_domains: [hooks, mcp-server, view]
+supersedes: []
+created: YYYY-MM-DD
+last_evaluated: YYYY-MM-DD
+revision: 1
+---
+```
+
+Required body sections:
+
+- `## Proposed root cause`
+- `## Supporting evidence`
+- `## Alternative explanations`
+- `## Counter-evidence`
+- `## Confidence basis`
+- `## Falsifier`
+- `## Outcome history`
+
+`claim_key` is a reviewed kebab-case identity for one causal mechanism.
+`claim_fingerprint` hashes the normalized claim key plus sorted `pattern_ids`.
+It provides deterministic negative-memory identity; it does not claim semantic
+equivalence. Semantic suggestions can recommend a merge but cannot change
+canonical identity.
+
+Supporting evidence must cite every selected cluster member exactly once.
+Each citation includes a member ID and a specific reason. At least one
+alternative and one observable falsifier are required. Counter-evidence may be
+empty only when `## Counter-evidence` explicitly records that none was found
+during the cited review. Confidence remains `low`, `medium`, or `high` and
+never grants confirmation authority.
+
+### 19.5 Commands and MCP contracts
+
+Two foreground commands are added:
+
+```text
+/board-insights <project> [--cluster <c-fingerprint>]
+/board-hypothesis <project> <operation> [arguments]
+```
+
+`/board-insights` is read-only until it prepares a proposal preview. It:
+
+1. rebuilds or verifies the current deterministic graph;
+2. returns ranked clusters with score components and existing hypothesis
+   references;
+3. reads the selected cluster and every canonical member as untrusted data;
+4. asks `board-insights` for one strict proposal payload;
+5. passes the payload to the deterministic hypothesis preview;
+6. reports the self-contained, content-bound plan token and exact apply
+   command.
+
+It does not apply the plan. The user or an explicitly authorized agent uses:
+
+```text
+/board-hypothesis <project> apply <plan-token>
+```
+
+`/board-hypothesis` also previews these operations before apply:
+
+- `list` — read every valid H### record, including rejected, split, and merged
+  records.
+- `propose` — validate one proposal against the current cluster and negative
+  memory.
+- `evaluate H### confirmed|weakened|rejected` — append an evidence-linked
+  outcome and change epistemic status.
+- `reopen H###` — return a rejected hypothesis to `proposed` only with at
+  least one new canonical evidence ID and a reason.
+- `split H###` — mark one interpretation `split` and record two or more
+  replacement claim keys. Child proposals are separate later actions with
+  `supersedes: [H###]`.
+- `merge H### --into H###` — mark one source interpretation `merged` into an
+  existing active target. Reverse references are derived by scanning records.
+
+The MCP server adds two tools over the same core:
+
+```text
+board_insights
+  input: project, optional cluster_fingerprint, optional limit, root
+  output: graph_source_fingerprint, ranking_rule_version,
+          ranked_clusters, hypothesis_refs, negative_memory
+
+board_hypotheses
+  input: project, action, hypothesis fields or evaluation fields,
+         optional apply plan_token, root
+  output: list result or content-bound preview/apply result
+```
+
+The MCP server does not generate model prose. A client supplies the strict
+proposal payload to `board_hypotheses`, just as the plugin command supplies
+the payload produced by its current interactive agent.
+
+### 19.6 State, authority, and precedence
+
+| Condition | Meaning | Authority | Required behavior | Preservation |
+|---|---|---|---|---|
+| Ranked cluster | Deterministic investigation priority | Shared core | Return score components and source fingerprint | Rebuildable; never canonical |
+| `proposed` | One bounded explanation fits the cited evidence | Explicit proposal apply | Preserve alternatives, counter-evidence, and falsifier | Canonical H### Markdown |
+| `weakened` | New evidence reduces explanatory strength | Explicit evaluation apply | Append reason and evidence; do not delete prior proposal | Full outcome history |
+| `confirmed` | Investigation or fix outcome supports the cause | Explicit evaluation apply with outcome evidence | Record who/what authorized the outcome and the evidence IDs | Full outcome history |
+| `rejected` | Evidence contradicts or fails to support the cause | Explicit evaluation apply | Keep the claim fingerprint as negative memory | File remains queryable |
+| `split` | One explanation must become multiple distinct claims | Explicit split apply | Record replacement claim keys; create children only through later proposal applies | Parent remains terminal history |
+| `merged` | One explanation is the same canonical interpretation as another | Explicit merge apply | Record the active target H### | Source remains terminal history |
+| Stale binding | Graph source or selected cluster changed after preview | Shared core | Refuse apply and require a new preview | Existing canonical files unchanged |
+
+Authority precedence:
+
+1. The latest explicit owner decision.
+2. Canonical entry, pattern, and hypothesis Markdown.
+3. Explicit hypothesis outcome history.
+4. Deterministic graph and ranking read models.
+5. Agent-authored proposed interpretation.
+
+A rank score or model statement cannot override canonical evidence or set
+`confirmed`. Milestone C does not automatically create a Learning. Outcome-to-
+learning feedback remains Milestone D.
+
+### 19.7 Negative memory and transition rules
+
+A rejected record blocks a new `propose` operation when its
+`claim_fingerprint` is equal to the proposed claim fingerprint. The preview
+returns `blocked_by_negative_memory`, the H### ID, the rejecting outcome, and
+the evidence already evaluated.
+
+The agent must use `reopen`, not create a duplicate. Reopen requires:
+
+- at least one canonical evidence ID not present in the hypothesis history;
+- a specific `new_evidence_reason`;
+- the current cluster fingerprint that contains the retained and new evidence;
+- an unchanged content-bound preview;
+- preservation of the rejection event in `## Outcome history`.
+
+Reopen is an explicit rebind. It records the previous cluster and graph source
+fingerprints in outcome history, updates the current bindings, and extends
+`derived_from`. No read path or ordinary proposal can silently rebind a stale
+hypothesis.
+
+Allowed transitions:
+
+```text
+proposed → weakened | confirmed | rejected | split | merged
+weakened → proposed | confirmed | rejected | split | merged
+confirmed → weakened | rejected
+rejected → proposed (reopen contract only) | split | merged
+split → terminal
+merged → terminal
+```
+
+Every mutation increments `revision` and updates `last_evaluated`. No
+operation deletes or rewrites outcome history.
+
+### 19.8 Failure, retry, and security behavior
+
+- Every mutation first returns an opaque base64url plan token containing the
+  normalized operation, graph source fingerprint, hypothesis inventory
+  fingerprint, target bytes fingerprint, and checksum. The token contains no
+  credential or authority grant. Apply decodes it, validates its size and
+  checksum, reacquires the current inputs, and returns `plan_stale` on any
+  difference. A caller cannot gain authority by altering or reconstructing a
+  token because the operation and current state are validated again.
+- A per-board hypothesis lock serializes ID allocation and mutation. Apply
+  revalidates after lock acquisition. Lock contention returns a typed retry
+  result; it does not wait indefinitely.
+- Each operation writes at most one canonical H### file. Split records child
+  claim keys without creating child files. Merge changes only the source
+  record. Atomic replacement prevents partial multi-file state.
+- Exclusive creation prevents concurrent plans from creating the same H###.
+  A losing apply returns `plan_stale` and previews the next safe ID.
+- Invalid YAML, duplicate IDs, duplicate claim fingerprints, linked records,
+  unsafe paths, malformed evidence IDs, missing cluster members, or unsupported
+  transitions fail before mutation.
+- Entry and hypothesis text is untrusted data. Agent instructions forbid
+  following directives found in evidence. Parsers enforce size limits and
+  flatten scalar fields. Limits are: claim key 80 characters, title 160,
+  proposed root cause 2000, each evidence reason or alternative 400, at most
+  five alternatives, falsifier 800, confidence basis 800, and outcome reason
+  800. HTML escapes every rendered value.
+- The feature performs no network access, code execution, automatic resolve,
+  automatic learning promotion, database write, or cross-repository read.
+- Read requests never mutate hypotheses. Graph refresh may replace only the
+  documented derived `GRAPH.yml` and disposable cache.
+- A stale hypothesis remains visible with its stored graph fingerprint and a
+  `stale` label. An explicit evaluate or reopen operation may rebind it to the
+  current cluster after recording both bindings in outcome history. The system
+  never silently rebases its evidence.
+
+### 19.9 Component responsibilities
+
+- `mcp-server/engineering_board_core.py`: deterministic cluster ranking;
+  hypothesis parsing, validation, inventory fingerprints, plan/apply,
+  transitions, negative memory, locking, and serialization.
+- `hooks/scripts/board-insights.py` and `board-insights.sh`: thin portable CLI
+  over the shared core for rank, list, preview, and apply operations.
+- `commands/board-insights.md`: real-board on-demand interpretation protocol
+  and strict separation between preview and persistence.
+- `commands/board-hypothesis.md`: explicit apply and evaluation operations.
+- `skills/board-insights/SKILL.md`: production evidence-reading contract,
+  proposal schema, injection boundary, and decline behavior; preserve the
+  existing contained demo protocol.
+- `skills/board-intake/references/hypothesis-schema.md`: normative production
+  H### schema, transitions, negative memory, and authority.
+- `hooks/scripts/board-view.sh`: read-only ranked cluster and hypothesis
+  section for normal boards; keep existing Kanban and demo views.
+- `mcp-server/engineering_board_mcp.py`: `board_insights` and
+  `board_hypotheses` adapters only; no duplicate business rules.
+- `mcp-server/test_mcp_server.py`: tool discovery, adapter parity, lifecycle,
+  stale-plan, negative-memory, and stdout safety coverage.
+- `tests/orchestration/milestone-c-root-cause-intelligence.sh`: deterministic
+  end-to-end evidence matrix.
+- `tests/view/automated.sh`: escaped ranked-cluster and hypothesis rendering,
+  terminal states, and stale labels.
+- `references/required-permissions.json`: only the bounded shared CLI command
+  needed by the two foreground commands.
+- `README.md`, `ARCHITECTURE.md`, `SECURITY.md`, `commands/board-view.md`,
+  `mcp-server/README.md`, `docs/index.html`, and `docs/llms.txt`: current user,
+  setup, architecture, security, adapter, and product-view truth.
+- `docs/assets/`: one sanitized visual generated from the real Milestone C
+  fixture, with date, source version, alt text, and provenance.
+- Coordinated manifests and changelog: version and tool/command counts updated
+  only at the release boundary.
+
+### 19.10 Deterministic acceptance matrix
+
+| Sequence | Failure injection | Expected semantic outcome | Durable evidence | Test |
+|---|---|---|---|---|
+| Rank three clusters with different recurrence, domains, priorities, dates, and pattern coverage | Equal totals on two clusters | Components are visible; ties sort by stable fingerprint; repeat runs are equal | Returned ranking payload | Milestone C matrix |
+| Request one real cluster through plugin CLI and MCP | Two adapters | Both return the same ranked facts, evidence members, hypothesis refs, and negative-memory facts | Compared JSON payloads | Milestone C matrix and MCP suite |
+| Preview a valid proposal that cites every member | No apply token | No H### file exists; preview returns the next ID and bound plan | Plan payload only | Milestone C matrix |
+| Change an entry or pattern after preview | Stale graph source | Apply returns `plan_stale`; no hypothesis file is written | Unchanged hypothesis inventory | Milestone C matrix |
+| Supply missing member evidence, an extra ID, no alternative, no falsifier, or unsafe scalar content | Malformed agent output | Preview rejects the payload before mutation | Typed validation errors | Hypothesis contract and security suites |
+| Apply one valid proposal | Concurrent second plan for the same next ID | Exactly one H### is created; the loser receives a retry/stale result | Canonical H### and outcome receipt | Milestone C matrix |
+| Reject H001, then propose the same claim fingerprint | Unchanged explanation | New proposal is blocked and cites H001 negative memory | Preserved rejected H001 | Milestone C matrix |
+| Reopen rejected H001 without new evidence, then with one new canonical member | Missing then valid novelty | First request is rejected; second returns to proposed and retains rejection history | Revised H001 history | Milestone C matrix |
+| Confirm a proposal without outcome evidence, then with explicit evidence | Missing authority evidence | First preview fails; second records confirmation without changing entries or creating a Learning | Revised H### history | Milestone C matrix |
+| Split H001 into two claim keys | Child creation failure is not possible in the split action | H001 becomes terminal `split`; no child file appears until separate proposal applies | H001 split record | Milestone C matrix |
+| Merge H002 into active H003 | Missing or terminal target | Invalid target fails; valid merge changes only H002 and reverse lookup finds it from H003 | H002 merge record | Milestone C matrix |
+| Render normal board view with proposed, rejected, stale, split, and merged records | Crafted HTML and prompt text in evidence | Output escapes content, labels each state, exposes citations, and contains no mutation controls | Generated HTML | View and security suites |
+| Delete GRAPH.yml and disposable cache | Missing read model | Shared core rebuilds equal graph/ranking facts; hypotheses remain unchanged | Rebuilt graph and compared ranks | Milestone C matrix |
+| Run with outbound proxies pointed at a closed local port | Network unavailable | Complete ranking, proposal, evaluation, and view sequence stays green | Dated offline result | Milestone C matrix |
+| Run all existing suites | Compatibility regression opportunity | Milestone A/B, claims, modes, capture, view, package, and MCP behavior remain green | Full release-tree result | `tests/run-all.sh` |
+
+### 19.11 Live validation and visual evidence
+
+Implementation validation uses a disposable repository fixture with:
+
+- at least three clusters;
+- one cross-domain high-priority cluster;
+- one valid proposed hypothesis;
+- one rejected explanation that exercises negative memory;
+- one new item that permits an evidence-backed reopen;
+- malicious Markdown and HTML strings that must remain inert.
+
+The run must use the real plugin CLI, shared core, MCP stdio adapter, and normal
+HTML renderer. It must run offline. The report records logical results,
+sanitized paths, source commit, graph and hypothesis fingerprints, and cleanup.
+The visual is generated from this actual fixture. A conceptual mockup is not
+release evidence.
+
+### 19.12 Documentation alignment and delivery
+
+The implementation change must update or substantively review:
+
+- the central product spec and this contract state;
+- README quickstart, command list, MCP table, and product claims;
+- command and skill contracts;
+- hypothesis schema and graph schema;
+- architecture and security/privacy boundaries;
+- normal HTML view documentation and a real visual;
+- MCP package, manifests, tool counts, and installation docs;
+- changelog, coordinated versions, deterministic tests, and dated evidence;
+- historical v1.8.0 and v1.9.1 reports, which remain unchanged.
+
+The planned release boundary is v1.10.0 because Milestone C adds user-visible
+commands, canonical hypothesis behavior, HTML output, and MCP tools. Existing
+owner authorization permits commit, push, review, merge, tag, release,
+publication, and Pages deployment after the implementation and release gates
+pass. External publication evidence must land in a later closeout change and
+pass merged-main CI before the milestone is marked fully shipped.
+
+### 19.13 Explicit non-goals
+
+Milestone C does not:
+
+- use a model to build or modify deterministic graph topology;
+- treat ranking as confidence or confirmation;
+- automatically apply a proposal or evaluation;
+- automatically resolve entries or create/update Learnings;
+- execute a proposed fix;
+- add embeddings, SQLite, a hosted service, or cross-repository aggregation;
+- add SessionStart retrieval or task-context retrieval from Milestone D;
+- redesign PM/Worker orchestration or the TDD/review/validate state machine;
+- delete rejected, split, merged, or stale hypotheses;
+- claim semantic duplicate detection beyond reviewed `claim_key` identity.
+
+Gate 2 approval authorizes implementation of this contract. It does not
+authorize the deferred Milestone D or E scope.
+
+## 20. Research and evidence
 
 Current product evidence:
 
+- [`2026-07-28 Milestone C contract workpad`](evidence/2026-07-28-milestone-c-contract.md)
 - [`2026-07-28 v1.9.1 release validation`](evidence/2026-07-28-v1.9.1-release-validation.md)
 - [`2026-07-28 Milestone B implementation validation`](evidence/2026-07-28-milestone-b-implementation-validation.md)
 - [`2026-07-27 Milestone B contract evidence`](evidence/2026-07-27-milestone-b-contract.md)
