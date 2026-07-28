@@ -5,7 +5,7 @@
 > deterministic graph views connect recurring signals across domains so agents
 > can investigate shared root causes instead of repeatedly patching symptoms.
 > No hidden database, external service, or daemon. Ships as a Claude Code
-> plugin and zero-dependency MCP server (15 tools over stdio, protocol
+> plugin and zero-dependency MCP server (17 tools over stdio, protocol
 > 2025-06-18).
 
 ## What it is
@@ -18,6 +18,9 @@ into durable, correctable engineering memory:
 - Exact patterns and affected domains form explainable graph edges and clusters.
   Graph structure is deterministic; agent-authored causal interpretations remain
   separate, evidence-cited hypotheses.
+- /board-insights ranks clusters with a versioned, transparent 0-100
+  investigation-priority score. /board-hypothesis preserves cited H### state,
+  alternatives, falsifiers, lineage, and rejected-claim negative memory.
 - The contained /board-demo sample shows three cross-domain symptoms becoming
   cluster C001 and a proposed H001 with alternatives and a falsifier. It uses
   synthetic local data only and prints manifest-verified cleanup.
@@ -27,8 +30,9 @@ into durable, correctable engineering memory:
   supporting proof loop, not the required first experience.
 - Recurring lessons promote into committed Learning entries (L###) that survive
   session boundaries; board_remember / /board-remember saves one on demand.
-- BOARD.md (the index) and board.html (a themed kanban view with search,
-  filters, stats, and coordination panels) are regenerated deterministically.
+- BOARD.md (the index) and board.html (ranked pattern intelligence plus a
+  themed Kanban with search, filters, stats, and coordination panels) are
+  regenerated deterministically.
 
 Who it's for: developers running Claude Code (or any MCP client) who want their
 agents' task state and memory to be repo-committed, PR-reviewable, and shared
@@ -62,7 +66,7 @@ Works with any MCP client — Codex CLI, Gemini CLI, Cursor, Claude Desktop
 config blocks:
 https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
 
-## MCP tools (15)
+## MCP tools (17)
 
 - board_init: scaffold a project board; optional agents_md writes a usage block
   into the repo's AGENTS.md for hook-less agents.
@@ -76,6 +80,10 @@ https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
   parent), append a section, or append a timestamped comment.
 - board_graph: build the deterministic provenance-linked pattern graph through
   the shared full/incremental engine.
+- board_insights: rank clusters with exposed score components and return linked
+  hypotheses and rejected negative-memory references.
+- board_hypotheses: list H### records or preview/apply evidence-cited proposal,
+  evaluation, reopen, split, and merge operations.
 - board_patterns: list patterns or preview/apply P### create, alias, assignment,
   and correction operations.
 - board_promote_findings: preview/apply scratch promotion with a content-bound

@@ -159,5 +159,7 @@ Print to chat: node count, edge count, cluster count, finding count, file path. 
 - **Determinism is the design.** No LLM in graph construction. Same input → same output. Trivially reproducible.
 - **Cheap to regenerate.** Safe to run on every modifying command. Pairs with `/board-rebuild` (which calls it after BOARD.md regen).
 - **Interpretation belongs downstream.** Future Claude sessions read `findings` and interpret in their own context. They have richer context than `/board-graph` does at build time.
-- **If you want LLM-synthesized prose insights**, that's a separate command (proposed: `/board-insights`) that's expensive and explicitly on-demand. Not this command.
+- **For prioritized interpretation**, use `/board-insights`. It ranks the
+  deterministic clusters and links durable H### records without changing graph
+  facts. Agent interpretation remains an explicit `/board-hypothesis` step.
 - **Staleness is impossible by construction** as long as `/board-rebuild` calls `/board-graph` after every entry change. The cache invalidation problem (B004) goes away.

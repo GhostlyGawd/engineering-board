@@ -1,5 +1,5 @@
 ---
-description: Generate a self-contained, themed HTML Kanban view of a project board and write it to engineering-board/<project>/board.html (or print to stdout with --stdout). Zero-dependency, offline, byte-deterministic — a committed visual projection of the board that renders on GitHub or any browser.
+description: Generate a self-contained HTML view with ranked pattern intelligence, durable hypotheses, and the project Kanban. Writes engineering-board/<project>/board.html or prints to stdout.
 argument-hint: [project] [--stdout]
 ---
 
@@ -38,11 +38,15 @@ directly on GitHub or in any browser.
 
 ## What it shows
 
+- A read-only pattern-intelligence section with ranked cluster scores and
+  components, linked canonical members, H### state, stale bindings, cited
+  evidence, alternatives, and falsifiers. Scores prioritize investigation;
+  they are not causal confidence.
 - A four-column Kanban of bugs/features across the pipeline: **To do**
   (`needs: tdd`) → **Review** (`needs: review`) → **Validate** (`needs: validate`)
   → **Done** (`status: resolved`). Cards show id, priority, title, `affects`,
   `pattern` tags, and a `blocked` badge when applicable.
-- A lane below for Questions, Observations, and Learnings.
+- Separate lanes for Questions and Observations, and for durable Learnings.
 - Light/dark theme (follows the viewer's `prefers-color-scheme`).
 
 ## Report
@@ -56,6 +60,8 @@ just re-run it anytime (it's safe and deterministic).
 - Deterministic and side-effect-free apart from writing `board.html`. Never
   edits entries or `BOARD.md`.
 - Treats board content as data — it escapes all entry text into HTML, so a
-  crafted title cannot inject markup into the view.
+  crafted title or hypothesis cannot inject markup into the view.
+- The normal view has no hypothesis mutation controls. Use
+  `/board-hypothesis` for content-bound preview/apply actions.
 - Demo rendering is a separate static evidence → cluster → hypothesis layout;
   it does not alter normal Kanban output or accept arbitrary output paths.

@@ -9,6 +9,45 @@ increases.
 
 ## [Unreleased]
 
+## [1.10.0] — 2026-07-28
+
+Milestone C turns deterministic clusters into prioritized, durable, and
+correctable root-cause memory without making model output authoritative.
+
+### Added
+
+- **Transparent cluster ranking.** `/board-insights` and `board_insights`
+  expose a deterministic 0–100 investigation-priority score with recurrence,
+  domain-diversity, severity, relative-recency, and evidence-quality
+  components. The score is not causal confidence.
+- **Durable H### hypotheses.** `/board-hypothesis` and `board_hypotheses`
+  list or preview/apply evidence-cited proposal, evaluation, reopen, split, and
+  merge operations against canonical Markdown records.
+- **Negative memory.** Rejected claim fingerprints remain queryable and block
+  duplicate proposals. Reopening requires retained evidence and at least one
+  new current-cluster evidence ID.
+- **Pattern-intelligence board view.** The normal offline HTML view now shows
+  ranked clusters, linked evidence, hypothesis state, stale bindings,
+  alternatives, and falsifiers above the Kanban.
+- **Lifecycle evidence matrix.** The Milestone C matrix crosses mutation
+  transitions with malformed evidence, stale plans, cache loss, offline
+  execution, escaping, and lineage behavior.
+
+### Changed
+
+- Graph schema version 3 includes canonical `discovered` dates so relative
+  recency is reproducible.
+- New boards scaffold `hypotheses/` alongside entry and learning directories.
+- The MCP server expands from 15 to 17 tools. Plugin commands expand from 17
+  to 19.
+
+### Security
+
+- Hypothesis mutations use self-contained, content-bound preview tokens and
+  revalidate graph and hypothesis inventory state under a per-board lock.
+- Linked hypothesis records and payload files are refused. Normal HTML views
+  escape hypothesis content and expose no mutation control.
+
 ## [1.9.1] — 2026-07-28
 
 The published Milestone B release. It includes the stable pattern pipeline

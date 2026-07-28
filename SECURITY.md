@@ -22,7 +22,7 @@ lockstep), so security fixes ship in a version bump — run the latest release.
 
 | Version | Supported |
 |---|---|
-| Current minor (1.9.x) | Yes |
+| Current minor (1.10.x) | Yes |
 | Older | No — please upgrade |
 
 ## Security posture
@@ -98,6 +98,18 @@ canonical or scratch inputs make the plan stale before a write. Pattern records,
 entry assignments, and receipts remain reviewable Markdown. Scratch, entry, and
 pattern content remains untrusted data throughout parsing.
 
+Hypothesis mutations use a self-contained content-bound preview token. Apply
+revalidates the canonical graph source and H### inventory before and after it
+acquires a per-board `mkdir` lock. It then atomically replaces one file inside
+the resolved `hypotheses/` directory. Linked hypothesis records, linked payload
+files, unsafe targets, malformed evidence IDs, duplicate claims, and stale
+plans fail closed. A rejected claim returns typed negative memory without an
+apply token. Reopen requires retained evidence plus at least one new evidence
+ID from the current cluster.
+
+The normal HTML view is read-only. It escapes hypothesis and entry content,
+links only to canonical source paths, and provides no mutation control.
+
 The graph cache under `.engineering-board/cache/` contains only rebuildable
 derived facts. It is ignored by Git and never overrides canonical Markdown.
 Missing, corrupt, stale, linked, or schema-incompatible cache state is discarded
@@ -121,7 +133,7 @@ junctions/reparse points, extra or missing files, and any hash mismatch, then
 removes only that exact run. A modified run is deliberately preserved for manual
 inspection rather than partially deleted. The hypothesis boundary is also
 defensive: the lifecycle core validates strict JSON, requires the exact cluster
-evidence ids, and can only persist `status: proposed`; generated interpretation
+evidence IDs, and can only persist `status: proposed`; generated interpretation
 cannot silently become confirmed knowledge.
 
 ---

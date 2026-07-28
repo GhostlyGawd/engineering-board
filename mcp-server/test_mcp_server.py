@@ -115,7 +115,9 @@ def suite_stdio(tmp_repo):
         expected = {"board_init", "board_list_projects", "board_create_entry",
                     "board_list_entries", "board_get_entry", "board_update_entry",
                     "board_rebuild", "board_capture_finding", "board_claim",
-                    "board_release", "board_status", "board_remember"}
+                    "board_release", "board_status", "board_remember",
+                    "board_graph", "board_patterns", "board_promote_findings",
+                    "board_insights", "board_hypotheses"}
         check(expected <= names, "tools/list exposes all expected tools",
               "missing: %s" % (expected - names))
         for t in tools:
@@ -194,7 +196,10 @@ def suite_lifecycle(mod, tmp_repo):
     check("engineering-board/atlas/BOARD.md" in r["created"], "board_init created BOARD.md",
           json.dumps(r["created"]))
     board_dir = os.path.join(root, "engineering-board", "atlas")
-    for sub in ["bugs", "features", "questions", "observations", "learnings"]:
+    for sub in [
+        "bugs", "features", "questions", "observations", "learnings",
+        "hypotheses",
+    ]:
         check(os.path.isfile(os.path.join(board_dir, sub, ".gitkeep")),
               "board_init created %s/.gitkeep" % sub)
     check(os.path.isfile(os.path.join(board_dir, "ARCHIVE.md")), "board_init created ARCHIVE.md")

@@ -5,8 +5,8 @@
 - Active outcome: turn deterministic clusters into useful, bounded root-cause
   intelligence for real boards.
 - Gate 1: accepted by the product owner on 2026-07-28.
-- Gate 2: proposed in section 19 of the central product spec; implementation
-  requires explicit approval.
+- Gate 2: accepted by the product owner on 2026-07-28; implementation is
+  worker-validated against central product spec section 19.
 - Canonical storage: repository-owned Markdown.
 - Derived state: deterministic graph, rank payloads, and HTML projections.
 - Explicitly deferred: SQLite, embeddings, hosted services, cross-repository
@@ -21,6 +21,7 @@ Repository context:
 repository: GhostlyGawd/engineering-board
 default_branch: main
 baseline_commit: ce47d4cfd62b463dee9715009fc3afa9b794c9e3
+implementation_base: 51be227d2d85fd6fb4c5498981514ac441f73181
 portfolio_status: inventory-only
 audit_source: GhostlyGawd/repo-audit@907f0759f9d08f478cd5384ad88e50963f1af79a
 ```
@@ -42,24 +43,24 @@ generalizes that bounded behavior to real boards and adds lifecycle memory.
 
 | Contract item | Normative level | Implementation | Test | Docs/example | Status |
 |---|---|---|---|---|---|
-| Transparent cluster ranking | Required for Milestone C | Shared-core rule proposed; no code change yet | Deterministic ranking and adapter parity cases specified in section 19.10 | Product spec section 19.3 | Gate 2 proposed |
-| Canonical production H### records | Required for Milestone C | Schema and directory contract proposed; no code change yet | Preview/apply, stale plan, exact citation, and concurrent-create cases specified | Product spec sections 19.4–19.8; hypothesis schema update pending implementation | Gate 2 proposed |
-| Evaluation and negative memory | Required for Milestone C | Transition and claim-fingerprint rules proposed; no code change yet | Reject/reproposal, reopen, confirm, split, and merge cases specified | Product spec sections 19.6–19.7 | Gate 2 proposed |
-| Plugin and MCP parity | Required current product boundary | Two commands and two MCP tools proposed over one shared core | CLI/MCP payload comparison and MCP lifecycle cases specified | Command, MCP, README, and architecture updates pending implementation | Gate 2 proposed |
-| Pattern-intelligence HTML | Required user-visible proof | Read-only normal-board section proposed; current Kanban and demo remain | State labels, stale binding, injection, and no-mutation-control cases specified | View docs and real sanitized visual pending implementation | Gate 2 proposed |
-| Security and preservation | Required | One-file atomic mutation, plan revalidation, lock, linked-input refusal, offline scope, and history preservation proposed | Failure and security sequences specified in section 19.10 | SECURITY and schema updates pending implementation | Gate 2 proposed |
-| Version, release, and closeout | Required at delivery | v1.10.0 proposed after green implementation gates | Full release tree, reproducible package, publication checks, and merged-main closeout CI required | Changelog, manifests, dated implementation evidence, and later release report pending | Gate 2 proposed |
+| Transparent cluster ranking | Required for Milestone C | `rank_clusters` and `build_insights` implement rule v1 over graph schema 3 | Milestone C matrix proves deterministic tie order, component output, CLI/MCP parity, cache deletion, and offline equivalence | Product spec 19.3; README; architecture; `/board-insights`; MCP and LLM docs | Worker-validated |
+| Canonical production H### records | Required for Milestone C | Shared core validates, serializes, lists, previews, locks, and atomically applies H### Markdown under `hypotheses/` | Matrix proves no-write preview, exact citations, malformed payload refusal, stale token refusal, single creation, and scaffold behavior | Product spec 19.4–19.8; production hypothesis schema; `/board-hypothesis`; init docs | Worker-validated |
+| Evaluation and negative memory | Required for Milestone C | Claim fingerprints, typed negative memory, evidence-gated evaluate/reopen, and split/merge lineage implemented | Matrix proves reject/block/reopen, confirm evidence gate and success, split without children, invalid merge, valid merge, and reverse lineage | Product spec 19.6–19.7; skill; schema; changelog | Worker-validated |
+| Plugin and MCP parity | Required current product boundary | `/board-insights`, `/board-hypothesis`, `board_insights`, and `board_hypotheses` delegate to one core | Matrix compares CLI/MCP/shared results; 166-check MCP suite discovers all 17 tools and validates packaging | Command docs, README, MCP reference, architecture, llms, manifests | Worker-validated |
+| Pattern-intelligence HTML | Required user-visible proof | Normal `board-view.sh` renders ranked clusters, linked members, H### state, stale bindings, evidence, alternatives, and falsifiers without controls | Matrix proves escaped hypothesis content, stale label, and no mutation controls; 50-check view suite passes | `/board-view`; README and landing; real sanitized Milestone C SVG | Worker-validated |
+| Security and preservation | Required | Self-contained tokens bind graph, inventory, target bytes, request, and operation; apply revalidates under lock; linked records/payloads fail closed | Matrix exercises malformed evidence, stale input, repeated apply, closed proxies, escaping, and preserved history; full security suites pass | SECURITY, architecture, schema, product spec | Worker-validated |
+| Version, release, and closeout | Required at delivery | Manifests and package metadata set to v1.10.0; 17-tool/19-command counts align; reproducible MCPB digest pinned | 16/16 release-tree suites pass; bundle digest `59f5b4c4862e6abf0a2f7111086d4a5ffd47d360eab10d93a461524622ab77e7`; publication and merged-main gates remain | Changelog, manifests, implementation validation; later release report reserved | Worker complete; post-merge and closeout pending |
 | Historical Milestone A/B evidence | Required preservation | No behavior or historical file change proposed | Existing suites must remain green | Historical reports reviewed; no rewrite required because they remain dated truth | Reviewed and unaffected |
 
-No required conflict exists in the proposed contract. Implementation evidence
-is intentionally pending. Path and keyword checks will prevent omission, but
-they will not substitute for semantic review.
+No required conflict remains in the worker phase. The implementation evidence
+is in `2026-07-28-milestone-c-implementation-validation.md`. Deterministic
+checks prevent omission but do not substitute for semantic review.
 
 ## Evidence phases
 
-- Worker phase: deterministic matrix, targeted suites, full release tree,
-  offline run, package reproducibility, sanitized visual, and documentation
-  alignment.
+- Worker phase: complete. The deterministic matrix, targeted suites, full
+  release tree, offline run, package reproducibility, sanitized visual, and
+  documentation alignment passed.
 - Post-merge phase: merged-main CI, tag, GitHub Release, package publication,
   MCP Registry publication, and Pages deployment.
 - Closeout phase: append external evidence in a new Markdown report, mark
@@ -67,6 +68,8 @@ they will not substitute for semantic review.
 
 ## Current handoff
 
-Required reviewer decision: approve or revise the Gate 2 contract in central
-spec section 19. If approved, resume from the implementation component map in
-section 19.9 and the evidence matrix in section 19.10.
+The next boundary is implementation PR review and green CI. After merge, the
+authorized release owner is this agent: verify merged-main CI, tag and publish
+v1.10.0, validate GitHub Release, PyPI, MCP Registry, and Pages, then append
+closeout evidence in a separate PR. A product-authority, security, or canonical
+data discovery reopens alignment before mutation.

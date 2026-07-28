@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
-"""Shared deterministic Engineering Board pattern and graph core.
+"""Shared deterministic Engineering Board pattern-intelligence core.
 
 The output is JSON-compatible YAML: JSON is a strict YAML 1.2 subset, which
 keeps the file dependency-free and lets every consumer parse it deterministically.
-Interpretation does not belong here; this module emits structural facts only.
+The core emits structural facts and validates explicit, evidence-cited
+hypothesis state. It does not generate causal prose or grant confirmation.
 """
 
 from __future__ import annotations
 
 import argparse
+import base64
 import datetime as dt
 import hashlib
 import json
 import os
 import re
 import sys
+import time
 import unicodedata
 from collections import Counter
 from pathlib import Path
@@ -29,9 +32,34 @@ HARD_RELATIONSHIPS = {
     "contradicts": "contradicts",
 }
 SAFE_ID = re.compile(r"^[BFOQ][0-9]+$")
+SAFE_EVIDENCE_ID = re.compile(r"^[BFLOQ][0-9]+$")
 SAFE_PATTERN_ID = re.compile(r"^P[0-9]{3,}$")
+SAFE_HYPOTHESIS_ID = re.compile(r"^H[0-9]{3,}$")
+SAFE_CLAIM_KEY = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+SAFE_CLUSTER_FINGERPRINT = re.compile(r"^c-[0-9a-f]{16}$")
+SAFE_CLAIM_FINGERPRINT = re.compile(r"^h-[0-9a-f]{16}$")
+SAFE_SOURCE_FINGERPRINT = re.compile(r"^[0-9a-f]{64}$")
 PATTERN_STATUSES = {"active", "merged", "retired"}
-GRAPH_SCHEMA_VERSION = "2"
+HYPOTHESIS_STATUSES = {
+    "proposed",
+    "confirmed",
+    "weakened",
+    "rejected",
+    "split",
+    "merged",
+}
+HYPOTHESIS_ACTIVE_STATUSES = {"proposed", "confirmed", "weakened"}
+HYPOTHESIS_SECTIONS = (
+    "Proposed root cause",
+    "Supporting evidence",
+    "Alternative explanations",
+    "Counter-evidence",
+    "Confidence basis",
+    "Falsifier",
+    "Outcome history",
+)
+GRAPH_SCHEMA_VERSION = "3"
+RANKING_RULE_VERSION = "1"
 PROMOTION_TYPES = {
     "bug": ("bugs", "B"),
     "feature": ("features", "F"),
@@ -1479,7 +1507,7 @@ def build_graph(
             "title": str(entry["title"]),
             "source": str(entry["_source"]),
         }
-        for key in ("priority", "status", "affects"):
+        for key in ("priority", "status", "affects", "discovered"):
             if entry.get(key):
                 node[key] = str(entry[key])
         for key in ("tags", "pattern"):
@@ -1578,6 +1606,1049 @@ def _utc_now() -> str:
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace(
         "+00:00", "Z"
     )
+
+
+def _bounded_text(
+    value: Any, field: str, maximum: int, *, required: bool = True
+) -> str:
+    text = "" if value is None else _oneline(value)
+    if required and not text:
+        raise GraphError(f"{field} is required")
+    if len(text) > maximum:
+        raise GraphError(f"{field} exceeds {maximum} characters")
+    return text
+
+
+def _parse_sections(body: str, source: str) -> dict[str, str]:
+    sections: dict[str, list[str]] = {}
+    current: str | None = None
+    for line in body.splitlines():
+        if line.startswith("## "):
+            current = line[3:].strip()
+            if current in sections:
+                raise GraphError(f"{source}: duplicate section {current!r}")
+            sections[current] = []
+        elif current is not None:
+            sections[current].append(line)
+        elif line.strip():
+            raise GraphError(f"{source}: content appears before the first section")
+    missing = [name for name in HYPOTHESIS_SECTIONS if name not in sections]
+    if missing:
+        raise GraphError(
+            f"{source}: missing required section(s): {', '.join(missing)}"
+        )
+    return {
+        name: "\n".join(lines).strip()
+        for name, lines in sections.items()
+    }
+
+
+def _hypothesis_inventory_fingerprint(
+    board_dir: Path, paths: list[Path] | None = None
+) -> str:
+    digest = hashlib.sha256()
+    hypotheses_dir = board_dir / "hypotheses"
+    if paths is None:
+        paths = (
+            sorted(hypotheses_dir.glob("H*.md"), key=lambda path: path.name)
+            if hypotheses_dir.is_dir()
+            else []
+        )
+    for path in paths:
+        relative = path.relative_to(board_dir).as_posix()
+        if path.is_symlink():
+            raise GraphError(f"{relative}: linked hypothesis record is not allowed")
+        digest.update(relative.encode("utf-8"))
+        digest.update(b"\0")
+        try:
+            digest.update(path.read_bytes())
+        except OSError as exc:
+            raise GraphError(f"{relative}: unable to read: {exc}") from exc
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def load_hypothesis_registry(board_dir: Path) -> dict[str, Any]:
+    """Load and validate canonical H### hypothesis records."""
+    board_dir = board_dir.resolve()
+    hypotheses_dir = board_dir / "hypotheses"
+    if hypotheses_dir.is_symlink():
+        raise GraphError("hypotheses: linked canonical directory is not allowed")
+    paths = (
+        sorted(hypotheses_dir.glob("*.md"), key=lambda path: path.name)
+        if hypotheses_dir.is_dir()
+        else []
+    )
+    by_id: dict[str, dict[str, Any]] = {}
+    by_claim: dict[str, list[str]] = {}
+    for path in paths:
+        relative = path.relative_to(board_dir).as_posix()
+        if path.is_symlink():
+            raise GraphError(f"{relative}: linked hypothesis record is not allowed")
+        try:
+            resolved = path.resolve(strict=True)
+            resolved.relative_to(hypotheses_dir.resolve())
+            text = path.read_text(encoding="utf-8")
+        except (OSError, ValueError) as exc:
+            raise GraphError(f"{relative}: unsafe or unreadable record: {exc}") from exc
+        frontmatter, body = parse_frontmatter(text, relative)
+        required = (
+            "id",
+            "type",
+            "status",
+            "title",
+            "claim_key",
+            "claim_fingerprint",
+            "cluster_fingerprint",
+            "graph_source_fingerprint",
+            "confidence",
+            "derived_from",
+            "created",
+            "last_evaluated",
+            "revision",
+        )
+        missing = [key for key in required if not frontmatter.get(key)]
+        if missing:
+            raise GraphError(
+                f"{relative}: missing required hypothesis field(s): "
+                + ", ".join(missing)
+            )
+        hypothesis_id = str(frontmatter["id"])
+        if not SAFE_HYPOTHESIS_ID.fullmatch(hypothesis_id):
+            raise GraphError(f"{relative}: unsafe hypothesis id {hypothesis_id!r}")
+        if hypothesis_id in by_id:
+            raise GraphError(f"{relative}: duplicate hypothesis id {hypothesis_id}")
+        if str(frontmatter["type"]) != "hypothesis":
+            raise GraphError(f"{relative}: type must be 'hypothesis'")
+        status = str(frontmatter["status"])
+        if status not in HYPOTHESIS_STATUSES:
+            raise GraphError(f"{relative}: invalid hypothesis status {status!r}")
+        claim_key = str(frontmatter["claim_key"])
+        if not SAFE_CLAIM_KEY.fullmatch(claim_key):
+            raise GraphError(f"{relative}: invalid claim_key {claim_key!r}")
+        claim_fingerprint = str(frontmatter["claim_fingerprint"])
+        if not SAFE_CLAIM_FINGERPRINT.fullmatch(claim_fingerprint):
+            raise GraphError(
+                f"{relative}: invalid claim_fingerprint {claim_fingerprint!r}"
+            )
+        cluster_fingerprint = str(frontmatter["cluster_fingerprint"])
+        if not SAFE_CLUSTER_FINGERPRINT.fullmatch(cluster_fingerprint):
+            raise GraphError(
+                f"{relative}: invalid cluster_fingerprint "
+                f"{cluster_fingerprint!r}"
+            )
+        graph_fingerprint = str(frontmatter["graph_source_fingerprint"])
+        if not SAFE_SOURCE_FINGERPRINT.fullmatch(graph_fingerprint):
+            raise GraphError(
+                f"{relative}: invalid graph_source_fingerprint"
+            )
+        confidence = str(frontmatter["confidence"])
+        if confidence not in {"low", "medium", "high"}:
+            raise GraphError(f"{relative}: invalid confidence {confidence!r}")
+        pattern_ids = sorted(set(_as_list(frontmatter.get("pattern_ids"))))
+        if any(not SAFE_PATTERN_ID.fullmatch(item) for item in pattern_ids):
+            raise GraphError(f"{relative}: invalid pattern_ids")
+        if claim_fingerprint != _claim_fingerprint(claim_key, pattern_ids):
+            raise GraphError(
+                f"{relative}: claim_fingerprint does not match claim_key "
+                "and pattern_ids"
+            )
+        derived_from = _as_list(frontmatter["derived_from"])
+        if not derived_from or any(
+            not SAFE_EVIDENCE_ID.fullmatch(item) for item in derived_from
+        ):
+            raise GraphError(f"{relative}: invalid derived_from evidence ids")
+        try:
+            revision = int(str(frontmatter["revision"]))
+        except ValueError as exc:
+            raise GraphError(f"{relative}: revision must be an integer") from exc
+        if revision < 1:
+            raise GraphError(f"{relative}: revision must be at least 1")
+        for date_field in ("created", "last_evaluated"):
+            if _valid_date(frontmatter[date_field]) is None:
+                raise GraphError(f"{relative}: invalid {date_field} date")
+        sections = _parse_sections(body, relative)
+        record = {
+            "id": hypothesis_id,
+            "source": relative,
+            "frontmatter": frontmatter,
+            "sections": sections,
+            "status": status,
+            "claim_key": claim_key,
+            "claim_fingerprint": claim_fingerprint,
+            "cluster_fingerprint": cluster_fingerprint,
+            "graph_source_fingerprint": graph_fingerprint,
+            "derived_from": sorted(set(derived_from)),
+            "text": text,
+        }
+        by_id[hypothesis_id] = record
+        by_claim.setdefault(claim_fingerprint, []).append(hypothesis_id)
+    duplicate_claims = {
+        fingerprint: ids
+        for fingerprint, ids in by_claim.items()
+        if len(ids) > 1
+    }
+    if duplicate_claims:
+        fingerprint, ids = sorted(duplicate_claims.items())[0]
+        raise GraphError(
+            "duplicate hypothesis claim fingerprint "
+            f"{fingerprint}: {', '.join(sorted(ids))}"
+        )
+    return {
+        "by_id": by_id,
+        "by_claim": {
+            fingerprint: sorted(ids)
+            for fingerprint, ids in sorted(by_claim.items())
+        },
+        "fingerprint": _hypothesis_inventory_fingerprint(board_dir, paths),
+    }
+
+
+def list_hypotheses(board_dir: Path, project: str) -> dict[str, Any]:
+    """Return public H### summaries with derived merge references."""
+    board_dir = board_dir.resolve()
+    graph = build_graph(board_dir, project, _utc_now(), build_mode="full")
+    registry = load_hypothesis_registry(board_dir)
+    merged_from: dict[str, list[str]] = {}
+    for hypothesis_id, record in registry["by_id"].items():
+        target = str(record["frontmatter"].get("merged_into") or "")
+        if target:
+            merged_from.setdefault(target, []).append(hypothesis_id)
+    hypotheses: list[dict[str, Any]] = []
+    cluster_fingerprints = {
+        str(cluster.get("fingerprint"))
+        for cluster in graph.get("topology", {}).get("clusters", [])
+    }
+    for hypothesis_id, record in sorted(registry["by_id"].items()):
+        frontmatter = record["frontmatter"]
+        hypotheses.append(
+            {
+                "id": hypothesis_id,
+                "status": record["status"],
+                "title": str(frontmatter["title"]),
+                "claim_key": record["claim_key"],
+                "claim_fingerprint": record["claim_fingerprint"],
+                "cluster_fingerprint": record["cluster_fingerprint"],
+                "graph_source_fingerprint": record[
+                    "graph_source_fingerprint"
+                ],
+                "pattern_ids": sorted(_as_list(frontmatter.get("pattern_ids"))),
+                "confidence": str(frontmatter["confidence"]),
+                "derived_from": record["derived_from"],
+                "affected_domains": sorted(
+                    _as_list(frontmatter.get("affected_domains"))
+                ),
+                "supersedes": sorted(_as_list(frontmatter.get("supersedes"))),
+                "split_claim_keys": sorted(
+                    _as_list(frontmatter.get("split_claim_keys"))
+                ),
+                "merged_into": frontmatter.get("merged_into"),
+                "merged_from": sorted(merged_from.get(hypothesis_id, [])),
+                "created": str(frontmatter["created"]),
+                "last_evaluated": str(frontmatter["last_evaluated"]),
+                "revision": int(str(frontmatter["revision"])),
+                "stale": (
+                    record["graph_source_fingerprint"]
+                    != graph["source_fingerprint"]
+                    or record["cluster_fingerprint"]
+                    not in cluster_fingerprints
+                ),
+                "source": record["source"],
+            }
+        )
+    return {
+        "project": project,
+        "graph_source_fingerprint": graph["source_fingerprint"],
+        "hypothesis_inventory_fingerprint": registry["fingerprint"],
+        "hypotheses": hypotheses,
+    }
+
+
+def _valid_date(value: Any) -> dt.date | None:
+    try:
+        return dt.date.fromisoformat(str(value))
+    except (TypeError, ValueError):
+        return None
+
+
+def rank_clusters(graph: dict[str, Any]) -> dict[str, Any]:
+    """Rank deterministic clusters with transparent, non-causal components."""
+    nodes = graph.get("nodes", {})
+    corpus_dates = [
+        parsed
+        for node in nodes.values()
+        if (parsed := _valid_date(node.get("discovered"))) is not None
+    ]
+    reference_date = max(corpus_dates) if corpus_dates else None
+    severity_points = {"P0": 20, "P1": 15, "P2": 10, "P3": 5}
+    ranked: list[dict[str, Any]] = []
+    warnings: list[str] = []
+    for cluster in graph.get("topology", {}).get("clusters", []):
+        members = sorted(cluster.get("members", []))
+        member_nodes = [nodes.get(member, {}) for member in members]
+        recurrence = min(len(members), 5) * 5
+        domains = sorted(
+            {
+                str(node.get("affects", "")).replace("\\", "/").strip("/").split("/", 1)[0]
+                for node in member_nodes
+                if str(node.get("affects", "")).strip("/")
+            }
+        )
+        diversity = min(len(domains), 5) * 5
+        severity = max(
+            [severity_points.get(str(node.get("priority", "")), 0) for node in member_nodes]
+            or [0]
+        )
+        member_dates = [
+            parsed
+            for node in member_nodes
+            if (parsed := _valid_date(node.get("discovered"))) is not None
+        ]
+        recency = 0
+        newest = max(member_dates) if member_dates else None
+        if reference_date and newest:
+            age = (reference_date - newest).days
+            recency = 15 if age <= 7 else 10 if age <= 30 else 5 if age <= 90 else 0
+        elif members:
+            warnings.append(
+                f"{cluster.get('fingerprint')}: missing valid discovered dates"
+            )
+        canonical_count = sum(
+            1 for node in member_nodes if _as_list(node.get("pattern_ids"))
+        )
+        canonical_points = (
+            (10 * canonical_count) // len(members) if members else 0
+        )
+        signal_kinds = sorted(
+            {
+                str(signal.get("kind"))
+                for signal in cluster.get("signals", [])
+                if signal.get("kind")
+            }
+        )
+        evidence_quality = canonical_points + (5 if len(signal_kinds) >= 2 else 0)
+        components = {
+            "recurrence": recurrence,
+            "domain_diversity": diversity,
+            "severity": severity,
+            "relative_recency": recency,
+            "evidence_quality": evidence_quality,
+        }
+        ranked.append(
+            {
+                "cluster_id": cluster.get("id"),
+                "cluster_fingerprint": cluster.get("fingerprint"),
+                "members": members,
+                "member_sources": {
+                    member: str(nodes.get(member, {}).get("source", ""))
+                    for member in members
+                },
+                "pattern_ids": sorted(cluster.get("pattern_ids", [])),
+                "patterns": sorted(cluster.get("patterns", [])),
+                "affected_domains": domains,
+                "signal_kinds": signal_kinds,
+                "score": sum(components.values()),
+                "components": components,
+                "inputs": {
+                    "member_count": len(members),
+                    "domain_count": len(domains),
+                    "highest_priority": next(
+                        (
+                            priority
+                            for priority in ("P0", "P1", "P2", "P3")
+                            if any(
+                                str(node.get("priority", "")) == priority
+                                for node in member_nodes
+                            )
+                        ),
+                        None,
+                    ),
+                    "newest_discovered": newest.isoformat() if newest else None,
+                    "canonical_pattern_members": canonical_count,
+                    "signal_kind_count": len(signal_kinds),
+                },
+            }
+        )
+    ranked.sort(key=lambda item: (-item["score"], item["cluster_fingerprint"]))
+    return {
+        "ranking_rule_version": RANKING_RULE_VERSION,
+        "reference_discovered": (
+            reference_date.isoformat() if reference_date else None
+        ),
+        "ranked_clusters": ranked,
+        "warnings": sorted(set(warnings)),
+    }
+
+
+def build_insights(
+    board_dir: Path,
+    project: str,
+    cluster_fingerprint: str | None = None,
+    limit: int | None = None,
+) -> dict[str, Any]:
+    """Return ranked clusters plus hypothesis and negative-memory references."""
+    board_dir = board_dir.resolve()
+    graph = build_graph(board_dir, project, _utc_now(), build_mode="full")
+    ranking = rank_clusters(graph)
+    registry = load_hypothesis_registry(board_dir)
+    clusters = ranking["ranked_clusters"]
+    if cluster_fingerprint:
+        if not SAFE_CLUSTER_FINGERPRINT.fullmatch(cluster_fingerprint):
+            raise GraphError("invalid cluster fingerprint")
+        clusters = [
+            cluster
+            for cluster in clusters
+            if cluster["cluster_fingerprint"] == cluster_fingerprint
+        ]
+        if not clusters:
+            raise GraphError(f"cluster not found: {cluster_fingerprint}")
+    if limit is not None:
+        if limit < 1 or limit > 100:
+            raise GraphError("limit must be between 1 and 100")
+        clusters = clusters[:limit]
+    references: dict[str, list[dict[str, Any]]] = {}
+    negative_memory: list[dict[str, Any]] = []
+    for hypothesis_id, record in sorted(registry["by_id"].items()):
+        summary = {
+            "id": hypothesis_id,
+            "status": record["status"],
+            "claim_key": record["claim_key"],
+            "claim_fingerprint": record["claim_fingerprint"],
+            "cluster_fingerprint": record["cluster_fingerprint"],
+            "stale": (
+                record["graph_source_fingerprint"]
+                != graph["source_fingerprint"]
+                or not any(
+                    cluster.get("fingerprint")
+                    == record["cluster_fingerprint"]
+                    for cluster in graph.get("topology", {}).get("clusters", [])
+                )
+            ),
+            "source": record["source"],
+        }
+        references.setdefault(record["cluster_fingerprint"], []).append(summary)
+        if record["status"] == "rejected":
+            negative_memory.append(summary)
+    for cluster in clusters:
+        cluster["hypothesis_refs"] = references.get(
+            cluster["cluster_fingerprint"], []
+        )
+    return {
+        "project": project,
+        "graph_source_fingerprint": graph["source_fingerprint"],
+        "ranking_rule_version": ranking["ranking_rule_version"],
+        "reference_discovered": ranking["reference_discovered"],
+        "ranked_clusters": clusters,
+        "negative_memory": negative_memory,
+        "warnings": ranking["warnings"],
+    }
+
+
+def _claim_fingerprint(claim_key: str, pattern_ids: list[str]) -> str:
+    payload = {
+        "claim_key": claim_key,
+        "pattern_ids": sorted(set(pattern_ids)),
+    }
+    digest = hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()[:16]
+    return f"h-{digest}"
+
+
+def _all_canonical_entry_ids(board_dir: Path) -> set[str]:
+    result: set[str] = set()
+    for subdir in ENTRY_SUBDIRS + ("learnings",):
+        root = board_dir / subdir
+        if not root.is_dir():
+            continue
+        for path in root.glob("*.md"):
+            if path.is_symlink():
+                raise GraphError(
+                    f"{path.relative_to(board_dir).as_posix()}: linked evidence "
+                    "record is not allowed"
+                )
+            frontmatter, _ = parse_frontmatter(
+                path.read_text(encoding="utf-8"),
+                path.relative_to(board_dir).as_posix(),
+            )
+            entry_id = str(frontmatter.get("id") or "")
+            if SAFE_EVIDENCE_ID.fullmatch(entry_id):
+                result.add(entry_id)
+    return result
+
+
+def _normalize_evidence_ids(
+    values: Any, valid_ids: set[str], field: str, *, required: bool = True
+) -> list[str]:
+    ids = sorted(set(_as_list(values)))
+    if required and not ids:
+        raise GraphError(f"{field} requires at least one evidence id")
+    invalid = [
+        item
+        for item in ids
+        if not SAFE_EVIDENCE_ID.fullmatch(item) or item not in valid_ids
+    ]
+    if invalid:
+        raise GraphError(f"{field} contains unknown evidence id(s): {', '.join(invalid)}")
+    return ids
+
+
+def _serialize_hypothesis(record: dict[str, Any]) -> str:
+    frontmatter = record["frontmatter"]
+    field_order = (
+        "id",
+        "type",
+        "status",
+        "title",
+        "claim_key",
+        "claim_fingerprint",
+        "cluster_fingerprint",
+        "graph_source_fingerprint",
+        "pattern_ids",
+        "confidence",
+        "derived_from",
+        "affected_domains",
+        "supersedes",
+        "split_claim_keys",
+        "merged_into",
+        "created",
+        "last_evaluated",
+        "revision",
+    )
+    fields = [
+        (key, frontmatter.get(key))
+        for key in field_order
+        if key in frontmatter
+    ]
+    sections = record["sections"]
+    body = "\n\n".join(
+        f"## {name}\n\n{sections.get(name, '')}".rstrip()
+        for name in HYPOTHESIS_SECTIONS
+    )
+    return serialize_frontmatter(fields) + "\n\n" + body + "\n"
+
+
+def _encode_plan(payload: dict[str, Any]) -> tuple[str, str]:
+    plan_id = _plan_id(payload)
+    envelope = {"payload": payload, "plan_id": plan_id}
+    raw = json.dumps(
+        envelope, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    token = base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+    return token, plan_id
+
+
+def _decode_plan(token: str) -> dict[str, Any]:
+    token = str(token or "")
+    if not token or len(token) > 65536 or not re.fullmatch(r"[A-Za-z0-9_-]+", token):
+        raise GraphError("invalid hypothesis plan token")
+    try:
+        raw = base64.urlsafe_b64decode(token + "=" * (-len(token) % 4))
+        envelope = json.loads(raw.decode("utf-8"))
+        payload = envelope["payload"]
+        plan_id = envelope["plan_id"]
+    except (ValueError, KeyError, TypeError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise GraphError("invalid hypothesis plan token") from exc
+    if not isinstance(payload, dict) or plan_id != _plan_id(payload):
+        raise GraphError("invalid hypothesis plan checksum")
+    return envelope
+
+
+def _cluster_by_fingerprint(
+    graph: dict[str, Any], cluster_fingerprint: str
+) -> dict[str, Any]:
+    if not SAFE_CLUSTER_FINGERPRINT.fullmatch(cluster_fingerprint):
+        raise GraphError("invalid cluster fingerprint")
+    for cluster in graph.get("topology", {}).get("clusters", []):
+        if cluster.get("fingerprint") == cluster_fingerprint:
+            return cluster
+    raise GraphError(f"cluster not found: {cluster_fingerprint}")
+
+
+def _history_line(
+    date: str,
+    status: str,
+    actor: str,
+    evidence_ids: list[str],
+    reason: str,
+) -> str:
+    evidence = ", ".join(evidence_ids) if evidence_ids else "none"
+    return (
+        f"- {date}: status `{status}` via explicit apply by `{actor}`; "
+        f"evidence [{evidence}]; {reason}"
+    )
+
+
+def _append_history(sections: dict[str, str], line: str) -> dict[str, str]:
+    updated = dict(sections)
+    prior = updated.get("Outcome history", "").rstrip()
+    updated["Outcome history"] = (prior + "\n" + line).strip()
+    return updated
+
+
+def plan_hypothesis_operation(
+    board_dir: Path,
+    project: str,
+    action: str,
+    params: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate a hypothesis mutation and return a self-contained plan token."""
+    board_dir = board_dir.resolve()
+    action = str(action or "").strip().lower()
+    if action not in {"propose", "evaluate", "reopen", "split", "merge"}:
+        raise GraphError("invalid hypothesis action")
+    graph = build_graph(board_dir, project, _utc_now(), build_mode="full")
+    registry = load_hypothesis_registry(board_dir)
+    valid_ids = _all_canonical_entry_ids(board_dir)
+    date = _utc_now()[:10]
+    operation: dict[str, Any]
+    request: dict[str, Any]
+
+    if action == "propose":
+        cluster_fingerprint = _bounded_text(
+            params.get("cluster_fingerprint"), "cluster_fingerprint", 18
+        )
+        cluster = _cluster_by_fingerprint(graph, cluster_fingerprint)
+        claim_key = _bounded_text(params.get("claim_key"), "claim_key", 80)
+        if not SAFE_CLAIM_KEY.fullmatch(claim_key):
+            raise GraphError("claim_key must be lowercase kebab-case")
+        title = _bounded_text(params.get("title"), "title", 160)
+        root_cause = _bounded_text(
+            params.get("root_cause"), "root_cause", 2000
+        )
+        confidence = _bounded_text(
+            params.get("confidence"), "confidence", 6
+        )
+        if confidence not in {"low", "medium", "high"}:
+            raise GraphError("confidence must be low, medium, or high")
+        confidence_basis = _bounded_text(
+            params.get("confidence_basis"), "confidence_basis", 800
+        )
+        falsifier = _bounded_text(params.get("falsifier"), "falsifier", 800)
+        alternatives_raw = params.get("alternatives")
+        if not isinstance(alternatives_raw, list) or not alternatives_raw:
+            raise GraphError("alternatives requires at least one explanation")
+        if len(alternatives_raw) > 5:
+            raise GraphError("alternatives permits at most five explanations")
+        alternatives = [
+            _bounded_text(value, "alternative", 400)
+            for value in alternatives_raw
+        ]
+        counter_raw = params.get("counter_evidence", [])
+        if not isinstance(counter_raw, list):
+            raise GraphError("counter_evidence must be a list")
+        counter_evidence = [
+            _bounded_text(value, "counter_evidence", 400)
+            for value in counter_raw
+        ]
+        evidence_raw = params.get("supporting_evidence")
+        if not isinstance(evidence_raw, list):
+            raise GraphError("supporting_evidence must be a list")
+        supporting: list[dict[str, str]] = []
+        for item in evidence_raw:
+            if not isinstance(item, dict):
+                raise GraphError("each supporting evidence item must be an object")
+            evidence_id = _bounded_text(item.get("id"), "evidence id", 16)
+            if evidence_id not in valid_ids:
+                raise GraphError(f"unknown supporting evidence id {evidence_id}")
+            supporting.append(
+                {
+                    "id": evidence_id,
+                    "reason": _bounded_text(
+                        item.get("reason"), "evidence reason", 400
+                    ),
+                }
+            )
+        required_members = sorted(cluster.get("members", []))
+        supplied_members = sorted(item["id"] for item in supporting)
+        if supplied_members != required_members or len(set(supplied_members)) != len(
+            supplied_members
+        ):
+            raise GraphError(
+                "supporting_evidence must cite every cluster member exactly once"
+            )
+        pattern_ids = sorted(cluster.get("pattern_ids", []))
+        claim_fingerprint = _claim_fingerprint(claim_key, pattern_ids)
+        existing = [
+            registry["by_id"][hypothesis_id]
+            for hypothesis_id in registry["by_claim"].get(claim_fingerprint, [])
+        ]
+        rejected = [record for record in existing if record["status"] == "rejected"]
+        if rejected:
+            record = rejected[0]
+            return {
+                "project": project,
+                "action": action,
+                "disposition": "blocked_by_negative_memory",
+                "hypothesis_id": record["id"],
+                "claim_fingerprint": claim_fingerprint,
+                "rejecting_outcome": record["status"],
+                "evaluated_evidence": record["derived_from"],
+                "message": (
+                    f"{record['id']} rejected this claim; "
+                    "use reopen with new evidence"
+                ),
+                "writes_canonical": False,
+                "plan_token": None,
+            }
+        if existing:
+            raise GraphError(
+                "duplicate_claim: "
+                + ", ".join(record["id"] for record in existing)
+            )
+        supersedes = sorted(set(_as_list(params.get("supersedes"))))
+        for parent_id in supersedes:
+            parent = registry["by_id"].get(parent_id)
+            if (
+                not parent
+                or parent["status"] != "split"
+                or claim_key
+                not in _as_list(parent["frontmatter"].get("split_claim_keys"))
+            ):
+                raise GraphError(
+                    f"supersedes requires split parent authorizing {claim_key}"
+                )
+        next_number = max(
+            [int(hypothesis_id[1:]) for hypothesis_id in registry["by_id"]]
+            or [0]
+        ) + 1
+        hypothesis_id = f"H{next_number:03d}"
+        frontmatter = {
+            "id": hypothesis_id,
+            "type": "hypothesis",
+            "status": "proposed",
+            "title": title,
+            "claim_key": claim_key,
+            "claim_fingerprint": claim_fingerprint,
+            "cluster_fingerprint": cluster_fingerprint,
+            "graph_source_fingerprint": graph["source_fingerprint"],
+            "pattern_ids": pattern_ids,
+            "confidence": confidence,
+            "derived_from": required_members,
+            "affected_domains": sorted(cluster.get("affected_domains", [])),
+            "supersedes": supersedes,
+            "created": date,
+            "last_evaluated": date,
+            "revision": 1,
+        }
+        sections = {
+            "Proposed root cause": root_cause,
+            "Supporting evidence": "\n".join(
+                f"- {item['id']}: {item['reason']}"
+                for item in sorted(supporting, key=lambda item: item["id"])
+            ),
+            "Alternative explanations": "\n".join(
+                f"- {value}" for value in alternatives
+            ),
+            "Counter-evidence": (
+                "\n".join(f"- {value}" for value in counter_evidence)
+                if counter_evidence
+                else "None found during this cited review."
+            ),
+            "Confidence basis": confidence_basis,
+            "Falsifier": falsifier,
+            "Outcome history": _history_line(
+                date,
+                "proposed",
+                _bounded_text(params.get("actor"), "actor", 120),
+                required_members,
+                "Created from the selected deterministic cluster; not confirmed.",
+            ),
+        }
+        target = f"hypotheses/{hypothesis_id}-{claim_key}.md"
+        record = {"frontmatter": frontmatter, "sections": sections}
+        request = {
+            "cluster_fingerprint": cluster_fingerprint,
+            "claim_key": claim_key,
+            "title": title,
+            "root_cause": root_cause,
+            "supporting_evidence": supporting,
+            "alternatives": alternatives,
+            "counter_evidence": counter_evidence,
+            "confidence": confidence,
+            "confidence_basis": confidence_basis,
+            "falsifier": falsifier,
+            "supersedes": supersedes,
+            "actor": _bounded_text(params.get("actor"), "actor", 120),
+        }
+        operation = {
+            "action": action,
+            "target": target,
+            "id": hypothesis_id,
+            "record": record,
+        }
+    else:
+        hypothesis_id = _bounded_text(
+            params.get("hypothesis_id"), "hypothesis_id", 16
+        )
+        record_current = registry["by_id"].get(hypothesis_id)
+        if not record_current:
+            raise GraphError(f"hypothesis not found: {hypothesis_id}")
+        frontmatter = dict(record_current["frontmatter"])
+        sections = dict(record_current["sections"])
+        actor = _bounded_text(params.get("actor"), "actor", 120)
+        reason_field = (
+            "new_evidence_reason" if action == "reopen" else "reason"
+        )
+        reason = _bounded_text(params.get(reason_field), reason_field, 800)
+        evidence_ids = _normalize_evidence_ids(
+            params.get("evidence_ids"), valid_ids, "evidence_ids"
+        )
+        request = {
+            "hypothesis_id": hypothesis_id,
+            "actor": actor,
+            reason_field: reason,
+            "evidence_ids": evidence_ids,
+        }
+        current_status = record_current["status"]
+        new_status: str
+        if action == "evaluate":
+            new_status = _bounded_text(params.get("status"), "status", 16)
+            allowed = {
+                "proposed": {"weakened", "confirmed", "rejected"},
+                "weakened": {"proposed", "confirmed", "rejected"},
+                "confirmed": {"weakened", "rejected"},
+            }
+            if new_status not in allowed.get(current_status, set()):
+                raise GraphError(
+                    f"unsupported hypothesis transition {current_status} -> {new_status}"
+                )
+            request["status"] = new_status
+            confidence = params.get("confidence")
+            if confidence is not None:
+                confidence = _bounded_text(confidence, "confidence", 6)
+                if confidence not in {"low", "medium", "high"}:
+                    raise GraphError("confidence must be low, medium, or high")
+                frontmatter["confidence"] = confidence
+                request["confidence"] = confidence
+        elif action == "reopen":
+            if current_status != "rejected":
+                raise GraphError("reopen requires a rejected hypothesis")
+            cluster_fingerprint = _bounded_text(
+                params.get("cluster_fingerprint"),
+                "cluster_fingerprint",
+                18,
+            )
+            cluster = _cluster_by_fingerprint(graph, cluster_fingerprint)
+            current_members = set(cluster.get("members", []))
+            old_members = set(record_current["derived_from"])
+            new_members = set(evidence_ids) - old_members
+            if not new_members:
+                raise GraphError("reopen requires at least one new evidence id")
+            if not old_members.issubset(current_members) or not new_members.issubset(
+                current_members
+            ):
+                raise GraphError(
+                    "reopen cluster must contain retained and new evidence"
+                )
+            frontmatter["cluster_fingerprint"] = cluster_fingerprint
+            frontmatter["graph_source_fingerprint"] = graph["source_fingerprint"]
+            frontmatter["pattern_ids"] = sorted(cluster.get("pattern_ids", []))
+            frontmatter["affected_domains"] = sorted(
+                cluster.get("affected_domains", [])
+            )
+            frontmatter["derived_from"] = sorted(current_members)
+            new_status = "proposed"
+            request["cluster_fingerprint"] = cluster_fingerprint
+        elif action == "split":
+            if current_status not in {"proposed", "weakened", "rejected"}:
+                raise GraphError(f"cannot split {current_status} hypothesis")
+            claim_keys = sorted(set(_as_list(params.get("claim_keys"))))
+            if len(claim_keys) < 2 or any(
+                not SAFE_CLAIM_KEY.fullmatch(item) for item in claim_keys
+            ):
+                raise GraphError(
+                    "split requires at least two unique kebab-case claim keys"
+                )
+            frontmatter["split_claim_keys"] = claim_keys
+            request["claim_keys"] = claim_keys
+            new_status = "split"
+        else:
+            if current_status not in {"proposed", "weakened", "rejected"}:
+                raise GraphError(f"cannot merge {current_status} hypothesis")
+            target_id = _bounded_text(params.get("into"), "into", 16)
+            target_record = registry["by_id"].get(target_id)
+            if (
+                target_id == hypothesis_id
+                or not target_record
+                or target_record["status"] not in HYPOTHESIS_ACTIVE_STATUSES
+            ):
+                raise GraphError("merge target must be a different active hypothesis")
+            frontmatter["merged_into"] = target_id
+            request["into"] = target_id
+            new_status = "merged"
+        if action in {"evaluate", "reopen"}:
+            cluster_fingerprint = params.get("cluster_fingerprint")
+            stale = (
+                record_current["graph_source_fingerprint"]
+                != graph["source_fingerprint"]
+            )
+            if stale and action == "evaluate" and not cluster_fingerprint:
+                raise GraphError(
+                    "stale hypothesis evaluation requires current cluster_fingerprint"
+                )
+            if cluster_fingerprint and action == "evaluate":
+                cluster_value = _bounded_text(
+                    cluster_fingerprint, "cluster_fingerprint", 18
+                )
+                cluster = _cluster_by_fingerprint(graph, cluster_value)
+                frontmatter["cluster_fingerprint"] = cluster_value
+                frontmatter["graph_source_fingerprint"] = graph[
+                    "source_fingerprint"
+                ]
+                frontmatter["pattern_ids"] = sorted(cluster.get("pattern_ids", []))
+                frontmatter["affected_domains"] = sorted(
+                    cluster.get("affected_domains", [])
+                )
+                frontmatter["derived_from"] = sorted(
+                    set(_as_list(frontmatter.get("derived_from")))
+                    | set(cluster.get("members", []))
+                )
+                request["cluster_fingerprint"] = cluster_value
+        frontmatter["status"] = new_status
+        frontmatter["last_evaluated"] = date
+        frontmatter["revision"] = int(str(frontmatter["revision"])) + 1
+        history_reason = reason
+        if record_current["graph_source_fingerprint"] != frontmatter.get(
+            "graph_source_fingerprint"
+        ):
+            history_reason += (
+                f" Rebound graph {record_current['graph_source_fingerprint'][:12]}"
+                f" to {frontmatter['graph_source_fingerprint'][:12]}."
+            )
+        sections = _append_history(
+            sections,
+            _history_line(date, new_status, actor, evidence_ids, history_reason),
+        )
+        operation = {
+            "action": action,
+            "target": record_current["source"],
+            "id": hypothesis_id,
+            "record": {"frontmatter": frontmatter, "sections": sections},
+        }
+
+    target_path = (board_dir / operation["target"]).resolve()
+    target_bytes_fingerprint = (
+        hashlib.sha256(target_path.read_bytes()).hexdigest()
+        if target_path.is_file() and not target_path.is_symlink()
+        else "absent"
+    )
+    payload = {
+        "version": 1,
+        "project": project,
+        "action": action,
+        "request": request,
+        "graph_source_fingerprint": graph["source_fingerprint"],
+        "hypothesis_inventory_fingerprint": registry["fingerprint"],
+        "target_bytes_fingerprint": target_bytes_fingerprint,
+        "operation": operation,
+    }
+    token, plan_id = _encode_plan(payload)
+    return {
+        "project": project,
+        "action": action,
+        "operation": operation,
+        "graph_source_fingerprint": graph["source_fingerprint"],
+        "hypothesis_inventory_fingerprint": registry["fingerprint"],
+        "plan_id": plan_id,
+        "plan_token": token,
+        "writes_canonical": False,
+    }
+
+
+def _hypothesis_lock_path(board_dir: Path, project: str) -> Path:
+    cache_path = cache_path_for_board(board_dir, project)
+    safe_project = re.sub(r"[^A-Za-z0-9._-]+", "-", project).strip("-")
+    return (
+        cache_path.parents[3]
+        / "locks"
+        / "hypotheses"
+        / f"{safe_project}.lock"
+    )
+
+
+def apply_hypothesis_plan(
+    board_dir: Path, project: str, plan_token: str
+) -> dict[str, Any]:
+    """Revalidate and apply one content-bound hypothesis plan."""
+    board_dir = board_dir.resolve()
+    envelope = _decode_plan(plan_token)
+    payload = envelope["payload"]
+    if payload.get("project") != project:
+        raise GraphError("hypothesis plan project mismatch")
+    try:
+        fresh = plan_hypothesis_operation(
+            board_dir,
+            project,
+            str(payload.get("action") or ""),
+            dict(payload.get("request") or {}),
+        )
+    except GraphError as exc:
+        raise GraphError(
+            "plan_stale: canonical inputs changed; request a fresh preview"
+        ) from exc
+    if fresh.get("plan_id") != envelope["plan_id"]:
+        raise GraphError(
+            "plan_stale: canonical inputs changed; request a fresh preview"
+        )
+    lock_path = _hypothesis_lock_path(board_dir, project)
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    acquired = False
+    for _ in range(20):
+        try:
+            lock_path.mkdir()
+            acquired = True
+            break
+        except FileExistsError:
+            time.sleep(0.05)
+    if not acquired:
+        raise GraphError("lock_contended: retry the hypothesis apply")
+    try:
+        try:
+            fresh = plan_hypothesis_operation(
+                board_dir,
+                project,
+                str(payload.get("action") or ""),
+                dict(payload.get("request") or {}),
+            )
+        except GraphError as exc:
+            raise GraphError(
+                "plan_stale: canonical inputs changed after lock acquisition"
+            ) from exc
+        if fresh.get("plan_id") != envelope["plan_id"]:
+            raise GraphError(
+                "plan_stale: canonical inputs changed after lock acquisition"
+            )
+        operation = fresh["operation"]
+        target = (board_dir / operation["target"]).resolve()
+        hypotheses_dir = (board_dir / "hypotheses").resolve()
+        try:
+            target.relative_to(hypotheses_dir)
+        except ValueError as exc:
+            raise GraphError("unsafe hypothesis target path") from exc
+        if target.is_symlink():
+            raise GraphError("linked hypothesis target is not mutable")
+        if operation["action"] == "propose" and target.exists():
+            raise GraphError("plan_stale: hypothesis target already exists")
+        content = _serialize_hypothesis(operation["record"])
+        _atomic_write(target, content)
+        return {
+            "project": project,
+            "action": operation["action"],
+            "applied": True,
+            "id": operation["id"],
+            "changed": operation["target"],
+            "plan_id": fresh["plan_id"],
+            "graph_source_fingerprint": fresh["graph_source_fingerprint"],
+            "hypothesis_inventory_fingerprint": load_hypothesis_registry(
+                board_dir
+            )["fingerprint"],
+        }
+    finally:
+        try:
+            lock_path.rmdir()
+        except OSError:
+            pass
 
 
 def cache_path_for_board(board_dir: Path, project: str) -> Path:

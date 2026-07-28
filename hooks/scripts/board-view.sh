@@ -23,6 +23,7 @@ if [ -z "${CLAUDE_PROJECT_DIR:-}" ]; then
 fi
 
 EB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export EB_VIEW_PLUGIN_ROOT="$(cd "${EB_SCRIPT_DIR}/../.." && pwd)"
 # shellcheck source=board-paths.sh
 . "${EB_SCRIPT_DIR}/board-paths.sh"
 
@@ -250,9 +251,13 @@ render_one() {
   # render_one <label> <board-dir>  -> HTML on stdout
   python3 - "$1" "$2" <<'PY'
 import os, re, sys, html, glob, json
+from pathlib import Path
 
 label, board_dir = sys.argv[1], sys.argv[2]
 LINK_BASE = os.environ.get("EB_VIEW_LINK_BASE", "")
+PLUGIN_ROOT = os.environ.get("EB_VIEW_PLUGIN_ROOT", "")
+if PLUGIN_ROOT:
+    sys.path.insert(0, os.path.join(PLUGIN_ROOT, "mcp-server"))
 FM = re.compile(r"^---\s*\n(.*?)\n---", re.S)
 SUBDIRS = ["bugs", "features", "questions", "observations", "learnings"]
 
@@ -324,6 +329,96 @@ LEARNINGS.sort(key=lambda e: (
 
 def esc(s):
     return html.escape(str(s or ""))
+
+def intelligence_panel_html():
+    try:
+        from engineering_board_core import build_insights, load_hypothesis_registry
+        insights = build_insights(Path(board_dir), label, limit=5)
+        registry = load_hypothesis_registry(Path(board_dir))
+    except Exception as exc:
+        return (
+            '<section class="intel"><div class="intel-head">'
+            '<div><span class="eyebrow">Pattern intelligence</span>'
+            '<h2>Analysis unavailable</h2></div></div>'
+            f'<p class="intel-error">{esc(exc)}</p></section>'
+        )
+    clusters = insights.get("ranked_clusters", [])
+    records = registry.get("by_id", {})
+    cluster_cards = []
+    for cluster in clusters:
+        components = cluster.get("components", {})
+        component_html = "".join(
+            f'<li><span>{esc(name.replace("_", " "))}</span>'
+            f'<strong>{esc(value)}</strong></li>'
+            for name, value in components.items()
+        )
+        member_html = "".join(
+            f'<a class="intel-member" href="{esc(LINK_BASE + cluster.get("member_sources", {}).get(member, ""))}">'
+            f'{esc(member)}</a>'
+            for member in cluster.get("members", [])
+        )
+        hypothesis_html = []
+        for ref in cluster.get("hypothesis_refs", []):
+            record = records.get(ref.get("id"), {})
+            frontmatter = record.get("frontmatter", {})
+            sections = record.get("sections", {})
+            source = record.get("source", "")
+            state = str(ref.get("status", "unknown"))
+            stale = bool(ref.get("stale"))
+            stale_badge = '<span class="hstate stale">stale binding</span>' if stale else ""
+            alternatives = [
+                line[2:].strip()
+                for line in sections.get("Alternative explanations", "").splitlines()
+                if line.startswith("- ")
+            ]
+            alternatives_html = "".join(
+                f"<li>{esc(value)}</li>" for value in alternatives
+            )
+            hypothesis_html.append(
+                f'<article class="hypothesis-card state-{esc(state)}">'
+                f'<div class="hypothesis-top"><a class="cid" href="{esc(LINK_BASE + source)}">'
+                f'{esc(ref.get("id"))}</a><span class="hstate">{esc(state)}</span>'
+                f'{stale_badge}</div>'
+                f'<h4>{esc(frontmatter.get("title"))}</h4>'
+                f'<p>{esc(sections.get("Proposed root cause"))}</p>'
+                f'<details><summary>Evidence and tests</summary>'
+                f'<h5>Supporting evidence</h5><pre>{esc(sections.get("Supporting evidence"))}</pre>'
+                f'<h5>Alternatives</h5><ul>{alternatives_html}</ul>'
+                f'<h5>Falsifier</h5><p>{esc(sections.get("Falsifier"))}</p>'
+                f'</details></article>'
+            )
+        hypotheses = (
+            "".join(hypothesis_html)
+            if hypothesis_html
+            else '<p class="intel-empty">No durable hypothesis yet.</p>'
+        )
+        cluster_cards.append(
+            '<article class="cluster-card">'
+            f'<div class="cluster-top"><div><span class="cluster-id">'
+            f'{esc(cluster.get("cluster_id"))}</span>'
+            f'<code>{esc(cluster.get("cluster_fingerprint"))}</code></div>'
+            f'<div class="cluster-score"><strong>{esc(cluster.get("score"))}</strong>'
+            '<span>investigation priority</span></div></div>'
+            f'<div class="intel-members">{member_html}</div>'
+            f'<p class="cluster-meta">patterns: {esc(", ".join(cluster.get("patterns", [])))}'
+            f' · domains: {esc(", ".join(cluster.get("affected_domains", [])))}</p>'
+            f'<ul class="score-components">{component_html}</ul>'
+            f'<div class="hypotheses">{hypotheses}</div>'
+            '</article>'
+        )
+    body = (
+        "".join(cluster_cards)
+        if cluster_cards
+        else '<p class="intel-empty">No multi-entry clusters are present.</p>'
+    )
+    return (
+        '<section class="intel"><div class="intel-head"><div>'
+        '<span class="eyebrow">Pattern intelligence</span>'
+        '<h2>Ranked systemic investigations</h2></div>'
+        f'<span class="rule">rule v{esc(insights.get("ranking_rule_version"))}'
+        ' · score is not confidence</span></div>'
+        f'<div class="cluster-grid">{body}</div></section>'
+    )
 
 def search_text(e):
     # C4: lowercase haystack for client-side substring search — id, title,
@@ -563,12 +658,14 @@ def coordination_panel_html():
     )
 
 panels_html = f'<div class="panels">{stats_panel_html()}{coordination_panel_html()}</div>'
+intelligence_html = intelligence_panel_html()
 
 open_ct = sum(1 for e in entries if e["_sub"] in ("bugs", "features") and e.get("status") != "resolved")
 sys.stdout.write(
     f'<section class="board">'
     f'<div class="board-head"><h1>{esc(label)}</h1>'
     f'<span class="summary">{open_ct} open · {len(entries)} total</span></div>'
+    f'{intelligence_html}'
     f'<div class="cols">{"".join(cols_html)}</div>'
     f'<div class="no-match" hidden>No entries match the current search and filters.</div>'
     f'{learn_html}'
@@ -716,6 +813,29 @@ footer{max-width:80rem;margin:0 auto;color:var(--eb-text-muted);font-size:.72rem
 .coord-list li{font-size:var(--eb-fs-xs);font-family:var(--eb-font-mono);overflow-wrap:anywhere}
 .coord-list code{font-family:var(--eb-font-mono);color:var(--eb-text-muted)}
 .empty-line{color:var(--eb-text-muted)}
+/* Milestone C — read-only pattern-intelligence projection. */
+.intel{border:1px solid var(--eb-border);border-radius:12px;background:var(--eb-surface);padding:1rem;margin:0 0 1rem}
+.intel-head,.cluster-top,.hypothesis-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem}
+.intel-head h2{font-size:var(--eb-fs-md);margin:.15rem 0 .8rem}
+.eyebrow,.rule{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);text-transform:uppercase;letter-spacing:.08em;color:var(--eb-accent-cur)}
+.rule{color:var(--eb-text-muted);text-transform:none;letter-spacing:0}
+.cluster-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));gap:.65rem}
+.cluster-card{background:var(--eb-card);border:1px solid var(--eb-border);border-radius:9px;padding:.75rem;min-width:0}
+.cluster-id{font-family:var(--eb-font-mono);font-weight:700;margin-right:.4rem}.cluster-card code{font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
+.cluster-score{text-align:right}.cluster-score strong{font:700 1.6rem var(--eb-font-mono);display:block;color:var(--eb-accent-cur)}
+.cluster-score span{font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
+.intel-members{display:flex;flex-wrap:wrap;gap:.3rem;margin:.6rem 0}.intel-member{font:700 var(--eb-fs-xs) var(--eb-font-mono);color:var(--eb-accent-cur)}
+.cluster-meta{font-size:var(--eb-fs-xs);color:var(--eb-text-muted);overflow-wrap:anywhere}
+.score-components{list-style:none;padding:0;margin:.5rem 0;display:grid;grid-template-columns:1fr 1fr;gap:.15rem .6rem}
+.score-components li{display:flex;justify-content:space-between;font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
+.score-components strong{font-family:var(--eb-font-mono);color:var(--eb-text)}
+.hypothesis-card{border-left:3px solid var(--eb-accent-cur);padding:.55rem .6rem;margin-top:.6rem;background:var(--eb-surface);border-radius:5px}
+.hypothesis-card.state-rejected,.hypothesis-card.state-split,.hypothesis-card.state-merged{border-left-color:var(--eb-text-muted)}
+.hypothesis-card h4{font-size:var(--eb-fs-sm);margin:.35rem 0}.hypothesis-card p,.hypothesis-card li{font-size:var(--eb-fs-xs)}
+.hypothesis-card h5{margin:.5rem 0 .15rem}.hypothesis-card pre{white-space:pre-wrap;font:var(--eb-fs-xs) var(--eb-font-sans);margin:.15rem 0}
+.hypothesis-card summary{cursor:pointer;font-size:var(--eb-fs-xs);color:var(--eb-accent-cur)}
+.hstate{font:700 var(--eb-fs-2xs) var(--eb-font-mono);text-transform:uppercase;border:1px solid var(--eb-border);border-radius:999px;padding:.05rem .35rem}
+.hstate.stale{color:var(--eb-danger)}.intel-empty,.intel-error{font-size:var(--eb-fs-xs);color:var(--eb-text-muted)}
 @media print{
   .controls{display:none}
   :root{--eb-bg:#FFFFFF;--eb-surface:#FFFFFF;--eb-card:#FFFFFF;--eb-text:#000000;--eb-text-muted:#333333;--eb-border:#BBBBBB}

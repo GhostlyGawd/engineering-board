@@ -14,7 +14,7 @@ _The board is the database._
 
 [![Website](https://img.shields.io/badge/website-ghostlygawd.github.io-E6A94E.svg)](https://ghostlygawd.github.io/engineering-board/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.9.1-E6A94E.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.10.0-E6A94E.svg)](CHANGELOG.md)
 [![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
 [![MCP](https://img.shields.io/badge/MCP-server-171719.svg)](mcp-server/README.md)
@@ -30,6 +30,11 @@ _Three surface-different symptoms become one evidence-linked systemic investigat
 _Real deterministic fixture output for stable pattern identity, adapter parity,
 preview/apply authority, and disposable-cache equivalence._
 
+<img src="docs/assets/milestone-c-root-cause-intelligence.svg" alt="Sanitized terminal validation: 15 Milestone C lifecycle checks pass for deterministic ranking, H001 proposal and evaluation, rejected-claim negative memory, split and merge lineage, stale-plan refusal, offline parity, and escaped read-only rendering." width="720">
+
+_Real deterministic fixture output for ranked systemic investigations and
+durable, correctable root-cause memory._
+
 <img src="docs/assets/board-screenshot.png" alt="Screenshot of this repo's real rendered board: a search input, type/priority/status filter chips, and kanban columns — to do, review, validate, done — populated with entry cards." width="720">
 
 _the real thing — this repo's own board, as `/board-view` renders it_
@@ -42,13 +47,17 @@ _the real thing — this repo's own board, as `/board-view` renders it_
 
 Markdown remains the canonical, PR-reviewable record. `BOARD.md`, `GRAPH.yml`, and the HTML views are rebuildable projections over that evidence—not a competing source of truth. Proposed root-cause hypotheses stay visibly separate from deterministic graph facts and cannot become confirmed knowledge without investigation or fix evidence. Passive capture, atomic multi-agent claims, and the optional `tdd → review → validate` loop support that memory by collecting and testing evidence; they are not the product's headline.
 
+Milestone C adds a transparent 0–100 investigation-priority score, durable
+H### hypothesis lifecycle, and rejected-claim memory. Every score component is
+visible. A score never means that a cause is true.
+
 ### Why it's different
 
 The market splits into two camps: **visible-but-shallow** git-markdown boards and **smart-but-opaque** memory-and-coordination engines whose useful state lives in a database or outside the repo. engineering-board joins the strengths of both and adds an explicit evidence → graph → hypothesis boundary:
 
 - **git-committed evidence and memory** — reviewed in the same PRs as your code
 - **cross-domain pattern graph** — recurring signals become explainable clusters with member evidence
-- **bounded agent interpretation** — root-cause candidates cite evidence and remain `proposed`
+- **bounded, correctable interpretation** — H### records cite evidence, preserve alternatives and falsifiers, and retain rejected claims as negative memory
 - **atomic multi-agent claim-locking** — parallel worker agents never collide
 - **native to Claude Code** — plus an MCP server for any MCP client
 
@@ -110,8 +119,17 @@ allowlist on its own — `/board-setup` simply composes the two.
 
 1. **Capture is automatic.** Just work in Claude Code as usual. When a turn ends, the Stop hook extracts any bug, feature, question, or observation and writes it to `engineering-board/<project>/_sessions/`. A non-empty capture prints a one-line summary and names `/board-promote` as the next action.
 2. **Promote explicitly.** Run `/board-promote`. It previews created, duplicate, rejected, and unresolved-pattern outcomes without changing canonical state. Apply the returned content-bound plan to create committed entries, provenance receipts, `BOARD.md`, and `GRAPH.yml`. Use `/pm-start` only when you want advanced per-turn batch promotion.
-3. **Inspect patterns before fixing symptoms.** Run `/board-graph` and `/board-view` to expose recurring signals, connected entries, and cross-domain structure. The production graph remains deterministic; interpreted root-cause hypotheses are kept separate from graph facts.
-4. **Verify a chosen fix when useful.** Start a fresh Claude Code session, run `/worker-start --discipline tdd`, then end a turn. A worker claims a `needs: tdd` entry and drives it through the optional `tdd → review → validate` proof loop. To drive one entry through all three disciplines in one session, use `/board-run <entry-id>`.
+3. **Rank systemic investigations.** Run `/board-insights <project>` to see
+   transparent cluster scores and linked evidence. Run `/board-view` for the
+   same pattern-intelligence layer above the Kanban.
+4. **Preserve a falsifiable explanation.** Use `/board-hypothesis <project>
+   propose` to preview an evidence-cited H### record. Apply the returned token
+   only after reviewing its alternatives, counter-evidence, confidence basis,
+   and falsifier.
+5. **Evaluate and verify when useful.** Confirm, weaken, reject, reopen, split,
+   or merge the hypothesis only with cited evidence. The optional
+   `tdd → review → validate` worker loop can test a chosen fix, but it supports
+   the memory system rather than defining it.
 
 > **One session, one mode.** `/pm-start` and `/worker-start` set a *session mode* (stored in `.engineering-board/session-mode.json`). A session holds one mode at a time, so switching from PM to Worker — or back to passive capture — is done by starting a new session, not by running the other command mid-session (it will decline and tell you to restart). On Claude Code web each session is a fresh clone, so a new session starts clean; on a local install the mode file persists on disk, so to return to plain passive capture, start a new session and, if it still shows a mode, delete `.engineering-board/session-mode.json`. The `SessionStart` banner prints the current mode so you always know where you are.
 
@@ -164,17 +182,27 @@ Works with any MCP client — setup blocks for **Codex CLI**, **Gemini CLI**, an
 | **PM** | `/pm-start` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` |
 | **Worker** | `/worker-start --discipline <tdd\|review\|validate>` | claim-acquire → `tdd-builder` / `code-reviewer` / `validator` → claim-release |
 
-**Commands (17)** — `/board-setup`, `/board-demo`, `/board-promote`, `/board-pattern`, `/board-run`, `/board-init`, `/board-rebuild`, `/board-graph`, `/board-view`, `/board-remember`, `/board-pause`, `/board-resume`, `/pm-start`, `/worker-start`, `/board-install-permissions`, `/board-claim-release`, `/board-migrate`.
+**Commands (19)** — `/board-setup`, `/board-demo`, `/board-promote`,
+`/board-pattern`, `/board-insights`, `/board-hypothesis`, `/board-run`,
+`/board-init`, `/board-rebuild`, `/board-graph`, `/board-view`,
+`/board-remember`, `/board-pause`, `/board-resume`, `/pm-start`,
+`/worker-start`, `/board-install-permissions`, `/board-claim-release`, and
+`/board-migrate`.
 
 **Agents (8)** — `board-manager` (router over the 4 skills); the PM pipeline `finding-extractor` → `consolidator` → `tidier` → `learnings-curator`; the Worker pipeline `tdd-builder` / `code-reviewer` / `validator` (the validator is strictly read-only).
 
-**Skills (5)** — `board-intake`, `board-triage`, `board-resolve`, `board-consolidate`, and `board-insights`. `board-insights` interprets deterministic cluster facts but can only write evidence-cited `proposed` hypotheses.
+**Skills (5)** — `board-intake`, `board-triage`, `board-resolve`,
+`board-consolidate`, and `board-insights`. `board-insights` interprets ranked
+deterministic clusters. Canonical H### changes still require explicit,
+content-bound preview/apply.
 
 **Hooks (4 events)** — `SessionStart` (board view), `PostToolUse(Write)` (entry validation), `UserPromptSubmit` (routing reminder), `Stop` (mode-routed orchestrator).
 
 ## The MCP tools
 
-15 tools, all backed by the same canonical Markdown and shared deterministic core. Locking is not reimplemented — `board_claim` / `board_release` shell out to the plugin's existing claim scripts.
+17 tools, all backed by the same canonical Markdown and shared deterministic
+core. Locking is not reimplemented — `board_claim` / `board_release` shell out
+to the plugin's existing claim scripts.
 
 | Tool | What it does |
 |---|---|
@@ -185,6 +213,8 @@ Works with any MCP client — setup blocks for **Codex CLI**, **Gemini CLI**, an
 | `board_get_entry` | Full markdown of one entry by id, plus parsed frontmatter. |
 | `board_update_entry` | Update frontmatter (incl. `parent`) and/or append a body section; validate the status transition; rebuild the index. Optional `comment: {author, text}` appends a server-timestamped line under `## Comments`. |
 | `board_graph` | Build the typed deterministic pattern graph, write `GRAPH.yml`, and reuse only a source-equivalent disposable cache. |
+| `board_insights` | Rank clusters with visible score components and return linked H### and rejected negative-memory references. |
+| `board_hypotheses` | List H### records or preview/apply proposal, evaluation, reopen, split, and merge operations. |
 | `board_patterns` | List canonical P### records or preview/apply create, alias, assign, and correction operations. |
 | `board_promote_findings` | Preview or apply scratch promotion with content-bound plans, per-finding outcomes, provenance, and idempotency. |
 | `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files. Idempotent. |
@@ -217,7 +247,8 @@ The canonical record is human-visible Markdown (cards, hypotheses, learnings, an
 
 ## Roadmap
 
-Directional and honest — the items below are designed, not shipped.
+Directional and honest — Milestone C pattern ranking and durable hypotheses
+ship in v1.10.0. The items below remain designed or incomplete.
 
 - **Conductor** ([`docs/rfcs/0001-symphony-conductor.md`](docs/rfcs/0001-symphony-conductor.md), Draft) — an always-on deterministic orchestrator that drives the board to PRs across sessions with no human in the loop. **Slice 1 shipped:** `/board-run <entry-id>` is its inner loop — one entry driven `tdd → review → validate` in a single session under claim lock. The cross-session supervisor remains the RFC; not built.
 - **Consolidation research** ([`docs/research/agentic-ecosystem/`](docs/research/agentic-ecosystem/)) — comparing the agentic systems in this ecosystem toward one product. Feeds a future PRD.

@@ -1,7 +1,8 @@
 # Engineering Board Product Evolution Spec
 
 _Status: Authoritative living product direction — Milestone A shipped in
-v1.8.0; Milestone B shipped in v1.9.1_
+v1.8.0; Milestone B shipped in v1.9.1; Milestone C implemented and
+worker-validated for v1.10.0_
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-28_
 _Product owner: GhostlyGawd_
@@ -69,7 +70,7 @@ selected milestone is approved.
 | Foreground promotion | Accepted for Milestone B | Preview captured findings and their proposed pattern assignments, then require an explicit apply action. PM mode may retain its already-authorized batch behavior but must use the same promotion core. |
 | Adapter parity | Accepted for Milestone B | Plugin and MCP surfaces must consume the same zero-dependency parser, pattern resolver, and deterministic graph engine and return semantically equivalent facts. |
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release; v1.9.1 is the corrected publication boundary. |
-| Milestone C direction | Gate 1 accepted | Turn deterministic clusters into ranked, evidence-linked, explicitly proposed root-cause hypotheses with durable evaluation and negative memory. Section 19 contains the proposed Gate 2 implementation contract. |
+| Milestone C direction | Accepted and implemented; release pending | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view are worker-validated for v1.10.0. Section 19 remains the approved contract. |
 
 ## 3. Product thesis
 
@@ -456,10 +457,11 @@ adapter-specific prompt execution.
 **Purpose:** Turn structural clusters into useful, bounded engineering
 interpretation.
 
-**Direction state:** Gate 1 accepted by the product owner on 2026-07-28.
-The proposed Gate 2 implementation contract is in section 19.
+**Direction state:** Gate 1 and Gate 2 accepted by the product owner on
+2026-07-28. The approved section 19 contract is implemented and
+worker-validated for v1.10.0. Merge, publication, and closeout evidence remain.
 
-Proposed scope:
+Implemented scope:
 
 - Cluster ranking using recurrence, domain diversity, severity, recency, and
   evidence quality.
@@ -682,18 +684,18 @@ with session tasks and planning tools instead.
 | Contract item | Normative level | Current implementation | Test/evidence | Documentation disposition | Status |
 |---|---|---|---|---|---|
 | Product-direction authority | Accepted | No runtime behavior | Owner decision recorded here | This file; `ROADMAP.md` precedence note | Direction aligned |
-| Pattern-intelligence substrate | Accepted direction | Production capture, promotion, stable pattern identity, and shared deterministic graph behavior now generalize the contained Milestone A evidence → cluster first win | Existing graph/curator tests; Milestone A evidence; Milestone B pattern matrix and release validation | README and landing page lead with pattern intelligence and distinguish deterministic graph facts from proposed hypotheses | Milestones A and B aligned; interpretation remains Milestone C |
-| Hypothesis authority | Accepted direction | Demo hypotheses persist as Markdown with `status: proposed`; schema and `board-insights` prohibit confirmation | Hypothesis contract tests and dated live validation | Proposed, confirmed, and rejected authority transitions are explicit | Milestone A aligned |
-| Canonical Markdown | Accepted | Entry and learning Markdown is current durable state | Existing intake, rebuild, resolve, and curation tests | Architecture direction documented here | Aligned |
+| Pattern-intelligence substrate | Accepted direction | Production capture, promotion, stable pattern identity, shared deterministic graph behavior, transparent cluster ranking, and durable H### lifecycle form one evidence-to-reasoning substrate | Existing graph/curator tests; Milestone A/B evidence; Milestone C lifecycle matrix | README, landing page, commands, normal view, and architecture distinguish ranking from confidence and proposals from confirmation | Milestones A–C worker-aligned |
+| Hypothesis authority | Accepted direction | Canonical H### records support proposed, weakened, confirmed, rejected, split, and merged states through evidence-gated preview/apply; negative memory blocks unchanged rejected claims | Hypothesis contract, Milestone C matrix, MCP suite, and full release tree | Schema, command, skill, security, architecture, and product docs aligned | Milestone C worker-validated |
+| Canonical Markdown | Accepted | Entry, pattern, hypothesis, and learning Markdown is durable state; graph, rankings, cache, and HTML remain derived | Intake, graph, hypothesis, rebuild, resolve, and curation tests | Architecture and storage boundary documented | Aligned |
 | Derived graph | Accepted direction | One shared zero-dependency engine serves production plugin, PM, contained demo, and MCP adapters; canonical P### identities and legacy fallbacks produce source-linked graph facts | Existing graph suites plus the Milestone B pattern-pipeline matrix | Graph schema, cache authority, and adapter parity are current in command, MCP, architecture, and schema docs | Milestone B aligned |
 | Milestone B reliable pipeline | Accepted and shipped | Stable P### records, foreground promotion, shared PM/MCP/plugin core, disposable cache, receipts, and graph provenance shipped in v1.9.1 | `tests/orchestration/milestone-b-pattern-pipeline.sh`, full release-tree suite, bundle-content parity, implementation evidence, and external release validation | Current-truth product, command, MCP, architecture, security, landing, and LLM docs updated | Shipped in v1.9.1 |
 | SQLite | Optional future accelerator | Not implemented or required | Future benchmark and rebuild-equivalence proof required | Migration explicitly rejected; adoption trigger recorded | Deferred optimization |
 | Current capture confirmation | Required current truth | Stop procedure and append helper surface a non-empty receipt | `tests/scratch/append.sh`; mode-routing tests | README was corrected in this branch | Documentation-only drift repaired |
 | Canonical setup instruction | Required current truth | `/board-setup` is the plugin setup path | Setup command test | Landing page was corrected in this branch | Documentation-only drift repaired |
 | TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped and unchanged | Existing mode and orchestration tests | Repositioned as optional falsifiable verification feedback, not the headline or required first experience | Behavior unchanged; messaging aligned |
-| MCP behavior | Required current truth | Fifteen tools share canonical Markdown; pattern, promotion, and graph tools delegate to the same core as plugin adapters | MCP lifecycle tests plus the Milestone B adapter-parity matrix | MCP reference, manifests, package modules, and counts updated | Milestone B aligned |
-| Security, privacy, versions, releases | Required current truth | Preview/apply authority, linked-input refusal, source-change detection, disposable cache, and existing untrusted-data controls cover new paths; coordinated manifests identify v1.9.1 | Security regression suites, pattern matrix, full release-tree suite, bundle-content parity, reproducible checksum, implementation evidence, and external publication checks | SECURITY, changelog, architecture, setup, manifests, and evidence aligned | v1.9.1 release aligned |
-| Milestone C implementation contract | Proposed direction | No Milestone C production behavior is implemented | Evidence matrix specified in section 19.10; implementation evidence intentionally pending | Central spec and dated contract workpad record scope, authority, docs impact, and handoff | Gate 2 approval required |
+| MCP behavior | Required current truth | Seventeen tools share canonical Markdown; pattern, promotion, graph, ranking, and hypothesis tools delegate to the same core as plugin adapters | 166-check MCP lifecycle suite plus Milestone B/C adapter-parity matrices | MCP reference, manifests, package modules, and counts updated | v1.10.0 worker-validated |
+| Security, privacy, versions, releases | Required current truth | Content-bound hypothesis tokens, inventory and graph revalidation, one-file atomic writes, linked-input refusal, HTML escaping, and offline operation extend the existing controls; coordinated manifests identify v1.10.0 | Security suites, Milestone C matrix, full 16-suite release tree, and reproducible bundle checksum; publication checks pending | SECURITY, changelog, architecture, commands, manifests, visual, and dated implementation evidence aligned | Worker gates passed; publication and closeout pending |
+| Milestone C implementation contract | Accepted direction | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging implemented | Milestone C 15-check matrix, 166-check MCP suite, and 16/16 release-tree suites pass | Central spec, contract workpad, current-truth docs, real sanitized visual, and dated implementation evidence updated | Implemented and worker-validated; merge/release pending |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -1341,10 +1343,11 @@ Implementation shipped through reviewed PRs #97 and #98. The v1.9.1 release
 passed the contract and publication gates. Publication does not weaken this
 contract or authorize unvalidated Milestone C behavior.
 
-## 19. Gate 2 proposed: Milestone C implementation contract
+## 19. Gate 2 accepted: Milestone C implementation contract
 
-_State: Gate 1 accepted by the product owner on 2026-07-28. Gate 2 is
-proposed and requires explicit implementation approval._
+_State: Gate 1 and Gate 2 accepted by the product owner on 2026-07-28.
+Implemented and worker-validated for v1.10.0 on 2026-07-28. Merge,
+publication, and closeout evidence remain pending._
 
 ### 19.1 Milestone purpose
 
@@ -1385,7 +1388,7 @@ The current v1.9.1 behavior remains preferable for users who only need
 deterministic structure or do not want agent interpretation. `/board-graph`
 stays independent, offline, deterministic, and sufficient for that use case.
 
-Proposed items:
+Selected and implemented items:
 
 | Item | Purpose | Capability or safety property | If omitted |
 |---|---|---|---|
@@ -1500,21 +1503,20 @@ Two foreground commands are added:
 /board-hypothesis <project> <operation> [arguments]
 ```
 
-`/board-insights` is read-only until it prepares a proposal preview. It:
+`/board-insights` is always read-only. It:
 
 1. rebuilds or verifies the current deterministic graph;
 2. returns ranked clusters with score components and existing hypothesis
-   references;
-3. reads the selected cluster and every canonical member as untrusted data;
-4. asks `board-insights` for one strict proposal payload;
-5. passes the payload to the deterministic hypothesis preview;
-6. reports the self-contained, content-bound plan token and exact apply
-   command.
+   and negative-memory references;
+3. optionally filters to one stable cluster fingerprint and limits the result.
 
-It does not apply the plan. The user or an explicitly authorized agent uses:
+The user or an explicitly authorized agent uses the `board-insights` skill to
+read a selected cluster's canonical members as untrusted data and produce one
+strict payload. `/board-hypothesis propose` passes that payload to the
+deterministic no-write preview. A separate apply action uses:
 
 ```text
-/board-hypothesis <project> apply <plan-token>
+/board-hypothesis <project> <operation> --apply <plan-token>
 ```
 
 `/board-hypothesis` also previews these operations before apply:
@@ -1760,6 +1762,7 @@ authorize the deferred Milestone D or E scope.
 
 Current product evidence:
 
+- [`2026-07-28 Milestone C implementation validation`](evidence/2026-07-28-milestone-c-implementation-validation.md)
 - [`2026-07-28 Milestone C contract workpad`](evidence/2026-07-28-milestone-c-contract.md)
 - [`2026-07-28 v1.9.1 release validation`](evidence/2026-07-28-v1.9.1-release-validation.md)
 - [`2026-07-28 Milestone B implementation validation`](evidence/2026-07-28-milestone-b-implementation-validation.md)
