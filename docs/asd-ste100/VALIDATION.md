@@ -8,6 +8,8 @@
 - Source commit: `e47f49422aab5df6229bd4f5dcc2e23d186dea2d`
 - Rewrite commit: `1c94fb3`
 - Release-preparation base commit: `f2218c4`
+- Release-preparation commit:
+  `a4bdec9d0140b003a2da225f257b61717a137690`
 - Prepared version: `1.10.1`
 - Files in the ordered rewrite corpus: 52
 - Lexical tokens in the output corpus: 58,541
@@ -18,6 +20,8 @@
   `47fee278068fd9f0b162260534564cbdfc71ac2239759c6c3371ebe71417aba3`
 - Review artifact SHA-256:
   `4295067c8941bcaf197e9bcefa284a7fc833855ff1a7fc349fe40682d52ad998`
+- Review archive SHA-256:
+  `2986fe42c072f70b67eb9eaa73426f85bfff51dd04dbf93d0229899753a343a1`
 
 The authorized Issue 9 PDF has this SHA-256 value:
 
