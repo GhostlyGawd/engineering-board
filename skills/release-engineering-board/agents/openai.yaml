@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Engineering Board"
+  short_description: "Prepare and verify a complete product release"
+  default_prompt: "Use $release-engineering-board to prepare and verify the next Engineering Board release."

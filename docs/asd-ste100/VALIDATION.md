@@ -66,7 +66,7 @@ and project terms do not have qualified approvals.
 - JSON parsing passed for all unchanged release manifests.
 - The HTML parser accepted `docs/index.html`.
 - `git diff --check` passed.
-- The full test suite passed 15 of 16 groups.
+- The full test suite passed 16 of 17 groups.
 - The MCP bundle checksum group failed.
 
 The documentation and agent instructions are part of the MCP bundle.
@@ -89,6 +89,20 @@ the new bundle and record its checksum. The test rebuilt this SHA-256 value:
 7. Obtain both approvals for the new digest.
 8. Build and pin a versioned MCP bundle.
 9. Run the full test suite again.
+
+## Superseding branch change
+
+The branch now adds the release policy, release skill, preparation script, and
+release-preparation test. The review artifact above does not include this new
+text. Therefore, its digest cannot approve the complete branch.
+
+The release-preparation suite passed seven checks. A real-tree preview for
+v1.10.1 identified all seven versioned files and produced a prospective MCP
+bundle checksum. The preview did not write a file.
+
+Regenerate the ordered corpus, token ledger, rule ledger, and review artifact
+after the release workflow change is stable. Both human reviewers must approve
+the superseding digest.
 
 ## Final status
 

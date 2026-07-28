@@ -18,8 +18,7 @@ Run the full test suite:
 bash tests/run-all.sh
 ```
 
-This command runs 16 test suites. The continuous integration (CI) workflow runs
-the same command for each push.
+The continuous integration (CI) workflow runs this command for each push.
 
 Add tests for new behavior. Change the tests when you change behavior.
 
@@ -59,19 +58,15 @@ Source `hooks/scripts/board-paths.sh` to find the board. Use
 
 Do not put `docs/boards/` or `engineering-board/` in a new path resolver.
 
-## Change both version manifests
+## Record the release note
 
-For a user-visible change, change the version in these files:
-
-- `.claude-plugin/plugin.json`
-- `.claude-plugin/marketplace.json`.
-
-The two versions must be equal. `tests/version-coherence.sh` checks this
-requirement.
-
-Add the change to the `[Unreleased]` section in
+For each user-visible change, add the change to the `[Unreleased]` section in
 [`CHANGELOG.md`](CHANGELOG.md).
 
+Do not change one versioned file independently. An explicit release preparation
+updates all versioned files and the MCP bundle checksum together.
+
+Read [`docs/RELEASING.md`](docs/RELEASING.md) when you prepare a release.
 ## Use a branch and a pull request
 
 1. Create a branch.
@@ -79,7 +74,7 @@ Add the change to the `[Unreleased]` section in
 3. Complete the [pull request template](.github/pull_request_template.md).
 4. Add the applicable board entry.
 5. Add the test evidence.
-6. Check the version requirement.
+6. Check the release-note requirement.
 7. Check that the README and the documentation agree with the behavior.
 8. Push the branch.
 9. Make sure that CI passes.

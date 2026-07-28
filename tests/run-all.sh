@@ -35,6 +35,7 @@ SUITES=(
   "permissions|bash tests/permissions/automated.sh"
   "lint-orchestrator-prompts|bash tests/lint-orchestrator-prompts.sh"
   "version-coherence|bash tests/version-coherence.sh"
+  "release-preparation|bash tests/release-preparation.sh"
   "docs-coherence|bash tests/docs-coherence.sh"
   "token-coherence|bash tests/token-coherence.sh"
   "crosscompat-lint|bash tests/crosscompat-lint.sh"

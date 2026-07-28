@@ -24,12 +24,11 @@ finding does this resolve? e.g. eb-self B0XX / F0XX, or a GitHub issue number.
 
 <!-- Paste the relevant suite output or note the new suite count. -->
 
-## Version bump (if user-facing)
+## Release note
 
-- [ ] `.claude-plugin/plugin.json` bumped
-- [ ] `.claude-plugin/marketplace.json` bumped in lockstep
-- [ ] `CHANGELOG.md` updated under `[Unreleased]`
-- [ ] Not user-facing: no bump needed
+- [ ] `CHANGELOG.md` updated under `[Unreleased]` for a user-visible change
+- [ ] Not user-facing: no release note needed
+- [ ] Release preparation only: `scripts/prepare-release.py` updated every versioned surface and the MCP checksum
 
 ## Surface coherence
 

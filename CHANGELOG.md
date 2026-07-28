@@ -9,6 +9,18 @@ increases.
 
 ## [Unreleased]
 
+### Added
+
+- Added a repository-owned release skill, release policy, and deterministic
+  preparation script. The script updates all versioned surfaces, builds the
+  prospective MCP bundle, and pins its reproducible checksum before release.
+
+### Changed
+
+- Added release preparation to the full CI suite. Each user-visible pull
+  request must update `[Unreleased]`. Publication remains an explicit,
+  versioned action after the prepared commit reaches `main`.
+
 ## [1.10.0] — 2026-07-28
 
 Milestone C turns deterministic clusters into prioritized, durable, and

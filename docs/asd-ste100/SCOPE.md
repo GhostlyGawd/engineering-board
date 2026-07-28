@@ -31,7 +31,9 @@ The first active-instruction batch includes:
 - all Markdown files in `skills/`;
 - `tests/smoke/manual-checks.md`;
 - `docs/PRODUCT_EVOLUTION_SPEC.md`;
-- `docs/llms.txt`.
+- `docs/llms.txt`;
+- `docs/RELEASING.md`;
+- `skills/release-engineering-board/SKILL.md`.
 
 The current user-facing landing-page batch includes:
 
@@ -88,9 +90,10 @@ The rewrite also does not change these current release and runtime files:
 - `mcp-server/server.json`;
 - `mcp-server/smithery.yaml`.
 
-The rewrite does not change executable source strings. These strings are part
-of product behavior. A later implementation change must update the version,
-tests, and documentation together.
+The rewrite does not change existing executable source strings. These strings
+are part of product behavior. The release-preparation change adds one new
+executable and its test. The release policy, skill, script, and test define one
+aligned workflow.
 
 The rewrite also preserves these historical design and planning records:
 
