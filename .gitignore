@@ -16,3 +16,5 @@ __pycache__/
 
 # Build output (MCP bundle) — a release asset, not source
 dist/
+.codeweb/
+.engineering-board/cache/

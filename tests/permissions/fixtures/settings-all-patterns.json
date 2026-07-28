@@ -16,6 +16,8 @@
       "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-view.sh:*)",
       "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-demo.sh:*)",
       "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-remember.sh:*)",
+      "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-intake.sh:*)",
+      "Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-graph-build.sh:*)",
       "SlashCommand(/pm-start)",
       "SlashCommand(/worker-start --discipline tdd)",
       "SlashCommand(/worker-start --discipline review)",

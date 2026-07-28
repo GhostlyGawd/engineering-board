@@ -1,11 +1,14 @@
 ---
 description: Build a deterministic structural graph (GRAPH.yml) of all open board entries. Same input always produces byte-identical output (modulo generated_at), with no LLM in the construction step. Downstream AI consumers read the structural facts and interpret them at point of use.
-argument-hint: [project-name] [--include-archive]
+argument-hint: [project-name] [--full]
 ---
 
 # /board-graph — build a deterministic structural graph of the live board
 
-Generates `engineering-board/<project>/GRAPH.yml`: a **purely deterministic** machine-readable graph of all open entries. Same input always produces byte-identical output (modulo `generated_at`). No LLM in the construction step.
+Generates `engineering-board/<project>/GRAPH.yml`: a **purely deterministic**
+machine-readable graph of all open entries and canonical pattern records. Same
+canonical Markdown produces the same structural facts. No LLM runs in the
+construction step.
 
 Downstream AI consumers read the structural facts and interpret them in their own context — interpretation happens at point of use, not at graph-build time.
 
@@ -13,20 +16,24 @@ Downstream AI consumers read the structural facts and interpret them in their ow
 
 - `/board-graph` — graph every project in BOARD-ROUTER.md (one GRAPH.yml per project)
 - `/board-graph <project-name>` — graph just that project
-- `/board-graph --include-archive` — include `status: resolved` entries from ARCHIVE.md
+- `/board-graph <project-name> --full` — bypass the disposable incremental cache
 
 ## Output schema
 
-YAML with these top-level keys, in this order:
+JSON-compatible YAML with these top-level keys:
 
-1. `generated_at` — ISO-8601 UTC, full seconds
-2. `project` — board name string
-3. `entries_analyzed` — `{open: int, archived: int, total: int}`
-4. `nodes` — keyed by ID. Fields per node: `type`, `priority` (when present), `tags`, `pattern` (when present), `status` (when not default). Omit absent fields.
-5. `edges` — list of relationships, each: `{from, to, kind, value, weight}`
-6. `topology` — derived structural facts: `clusters`, `isolated`, `cross_cluster_bridges`
-7. `findings` — structured facts about structure. **No prose. No claims. No implications.**
-8. `read_order`, `drill_in` — navigation hints for downstream consumers
+1. `schema_version`
+2. `generated_at`
+3. `source_fingerprint`
+4. `build_mode`
+5. `project`
+6. `entries_analyzed`
+7. `nodes`
+8. `edges`
+9. `topology`
+10. `unresolved_patterns`
+11. `findings`
+12. `read_order`, `drill_in`
 
 Use entry IDs (B003, O002, F001) everywhere — never titles.
 
@@ -38,7 +45,7 @@ Use entry IDs (B003, O002, F001) everywhere — never titles.
 | `superseded-by` | 3 | frontmatter `superseded_by:` | no |
 | `merged-into` | 3 | frontmatter `merged_into:` | no |
 | `contradicts` | 3 | frontmatter `contradicts:` | no |
-| `shared-pattern` | 2 | identical value in `pattern:` field | no |
+| `shared-pattern` | 2 | same resolved `pattern_ids:` identity, with legacy label fallback | no |
 | `shared-affects-prefix` | 2 | overlapping non-null `affects:` prefix | no |
 | `shared-tag` | 1 | same non-universal `tag:` (skip tags on >50% of entries) | no |
 
@@ -108,9 +115,18 @@ Thresholds:
 
 Resolve the board router in this order (first hit wins): `$CLAUDE_PROJECT_DIR/engineering-board/BOARD-ROUTER.md` (default since 1.1.0), then `$CLAUDE_PROJECT_DIR/docs/boards/BOARD-ROUTER.md` (compat). Target either the named project or all listed. Fall back to `$CLAUDE_PROJECT_DIR/docs/board/` legacy layout if no router.
 
-### Step 2 — Parse all entry frontmatter
+### Step 2 — Run the deterministic builder
 
-Read every `*.md` under `<board-dir>/bugs/`, `features/`, `questions/`, `observations/`. Skip entries with `status: resolved` unless `--include-archive` passed. Build the node table.
+For each target board, run:
+
+```bash
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-graph-build.sh" \
+  --board-dir "<board-dir>" \
+  --project "<project-name>" \
+  --output "<board-dir>/GRAPH.yml" [--full]
+```
+
+Do not reimplement graph parsing or edge construction in the command agent.
 
 ### Step 3 — Identify universal tags
 
@@ -130,7 +146,9 @@ For each finding type whose conditions are met, emit a structured record. No pro
 
 ### Step 7 — Write GRAPH.yml
 
-Path: `<board-dir>/GRAPH.yml`. Overwrite unconditionally. Output is byte-identical across runs for the same input (modulo `generated_at` and field ordering — emit keys in a stable order).
+The builder atomically replaces `<board-dir>/GRAPH.yml` only if canonical
+Markdown remains unchanged during the build. Its disposable cache is under
+`.engineering-board/cache/` and is never authoritative.
 
 ### Step 8 — Report
 

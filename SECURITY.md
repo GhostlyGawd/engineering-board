@@ -22,7 +22,7 @@ lockstep), so security fixes ship in a version bump — run the latest release.
 
 | Version | Supported |
 |---|---|
-| Current minor (1.8.x) | Yes |
+| Current minor (1.9.x) | Yes |
 | Older | No — please upgrade |
 
 ## Security posture
@@ -92,6 +92,18 @@ single-segment names, `..` and path-separator traversal is rejected, and an
 outside the repo root (including via a pre-planted symlink or a hand-edited router
 `path` column). Untrusted field values written by the server are flattened so they
 cannot inject frontmatter keys, spoof scratch headers, or forge router rows.
+
+Pattern and promotion mutations use a content-bound preview/apply plan. Changed
+canonical or scratch inputs make the plan stale before a write. Pattern records,
+entry assignments, and receipts remain reviewable Markdown. Scratch, entry, and
+pattern content remains untrusted data throughout parsing.
+
+The graph cache under `.engineering-board/cache/` contains only rebuildable
+derived facts. It is ignored by Git and never overrides canonical Markdown.
+Missing, corrupt, stale, linked, or schema-incompatible cache state is discarded
+or refused without changing canonical evidence. Graph replacement rechecks the
+canonical source fingerprint so a concurrent edit cannot publish mixed-snapshot
+facts.
 
 ### Pattern-intelligence demo containment
 

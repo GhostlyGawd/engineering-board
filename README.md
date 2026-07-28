@@ -14,7 +14,7 @@ _The board is the database._
 
 [![Website](https://img.shields.io/badge/website-ghostlygawd.github.io-E6A94E.svg)](https://ghostlygawd.github.io/engineering-board/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.8.0-E6A94E.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.9.0-E6A94E.svg)](CHANGELOG.md)
 [![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
 [![MCP](https://img.shields.io/badge/MCP-server-171719.svg)](mcp-server/README.md)
@@ -24,6 +24,11 @@ _The board is the database._
 <img src="docs/assets/pattern-intelligence-demo.png" alt="Three synthetic findings from worker routing, the board renderer, and MCP ready-work output connect into cluster C001 and a proposed root-cause hypothesis, with supporting evidence, an alternative explanation, and a falsifier." width="720">
 
 _Three surface-different symptoms become one evidence-linked systemic investigation candidate. Run `/board-demo` to reproduce the contained synthetic sample locally._
+
+<img src="docs/assets/milestone-b-pattern-pipeline.svg" alt="Sanitized terminal validation: 15 Milestone B checks pass; stable pattern P001 links B001 and F001 in cluster c-a4609c958c398d90, while one unresolved legacy label remains visible." width="720">
+
+_Real deterministic fixture output for stable pattern identity, adapter parity,
+preview/apply authority, and disposable-cache equivalence._
 
 <img src="docs/assets/board-screenshot.png" alt="Screenshot of this repo's real rendered board: a search input, type/priority/status filter chips, and kanban columns — to do, review, validate, done — populated with entry cards." width="720">
 
@@ -103,14 +108,14 @@ allowlist on its own — `/board-setup` simply composes the two.
 
 **Now you have a board. Here's how real project memory accumulates:**
 
-1. **Capture is automatic.** Just work in Claude Code as usual. When a turn ends, the Stop hook extracts any bug/feature/question/observation you or the agent surfaced and writes it to the board's scratch inbox at `engineering-board/<project>/_sessions/`. You don't run anything — when at least one finding is captured, a one-line summary confirms the count and names `/pm-start` as the next action.
-2. **Promote when you're ready.** Run `/pm-start`, then end a turn: the PM pipeline consolidates the scratch findings into real, committed board entries under `engineering-board/<project>/bugs/` (etc.) and updates `BOARD.md`. That's your first entry on the board.
+1. **Capture is automatic.** Just work in Claude Code as usual. When a turn ends, the Stop hook extracts any bug, feature, question, or observation and writes it to `engineering-board/<project>/_sessions/`. A non-empty capture prints a one-line summary and names `/board-promote` as the next action.
+2. **Promote explicitly.** Run `/board-promote`. It previews created, duplicate, rejected, and unresolved-pattern outcomes without changing canonical state. Apply the returned content-bound plan to create committed entries, provenance receipts, `BOARD.md`, and `GRAPH.yml`. Use `/pm-start` only when you want advanced per-turn batch promotion.
 3. **Inspect patterns before fixing symptoms.** Run `/board-graph` and `/board-view` to expose recurring signals, connected entries, and cross-domain structure. The production graph remains deterministic; interpreted root-cause hypotheses are kept separate from graph facts.
 4. **Verify a chosen fix when useful.** Start a fresh Claude Code session, run `/worker-start --discipline tdd`, then end a turn. A worker claims a `needs: tdd` entry and drives it through the optional `tdd → review → validate` proof loop. To drive one entry through all three disciplines in one session, use `/board-run <entry-id>`.
 
 > **One session, one mode.** `/pm-start` and `/worker-start` set a *session mode* (stored in `.engineering-board/session-mode.json`). A session holds one mode at a time, so switching from PM to Worker — or back to passive capture — is done by starting a new session, not by running the other command mid-session (it will decline and tell you to restart). On Claude Code web each session is a fresh clone, so a new session starts clean; on a local install the mode file persists on disk, so to return to plain passive capture, start a new session and, if it still shows a mode, delete `.engineering-board/session-mode.json`. The `SessionStart` banner prints the current mode so you always know where you are.
 
-**What to expect (measured, following only this page):** first captured finding in ~5 minutes from install; first promoted board entry in ~10–15 minutes once you run `/pm-start`. A successful non-empty capture prints a one-line confirmation; run `/board-view` to open a themed visual Kanban of the board (or `/board-rebuild` to refresh the markdown `BOARD.md` index). Full mode reference is the [feature tour](#feature-tour) below.
+**What to expect (measured, following only this page):** first captured finding in ~5 minutes from install; first promotion preview in ~10 minutes once you run `/board-promote`. A successful non-empty capture prints a one-line confirmation; run `/board-view` to open a themed visual Kanban of the board (or `/board-rebuild` to refresh the Markdown index). Full mode reference is the [feature tour](#feature-tour) below.
 
 ### MCP server
 
@@ -159,7 +164,7 @@ Works with any MCP client — setup blocks for **Codex CLI**, **Gemini CLI**, an
 | **PM** | `/pm-start` | `finding-extractor` → `consolidator` → `tidier` → `learnings-curator` |
 | **Worker** | `/worker-start --discipline <tdd\|review\|validate>` | claim-acquire → `tdd-builder` / `code-reviewer` / `validator` → claim-release |
 
-**Commands (15)** — `/board-setup`, `/board-demo`, `/board-run`, `/board-init`, `/board-rebuild`, `/board-graph`, `/board-view`, `/board-remember`, `/board-pause`, `/board-resume`, `/pm-start`, `/worker-start`, `/board-install-permissions`, `/board-claim-release`, `/board-migrate`.
+**Commands (17)** — `/board-setup`, `/board-demo`, `/board-promote`, `/board-pattern`, `/board-run`, `/board-init`, `/board-rebuild`, `/board-graph`, `/board-view`, `/board-remember`, `/board-pause`, `/board-resume`, `/pm-start`, `/worker-start`, `/board-install-permissions`, `/board-claim-release`, `/board-migrate`.
 
 **Agents (8)** — `board-manager` (router over the 4 skills); the PM pipeline `finding-extractor` → `consolidator` → `tidier` → `learnings-curator`; the Worker pipeline `tdd-builder` / `code-reviewer` / `validator` (the validator is strictly read-only).
 
@@ -169,7 +174,7 @@ Works with any MCP client — setup blocks for **Codex CLI**, **Gemini CLI**, an
 
 ## The MCP tools
 
-12 tools, all backed by the same on-disk format the plugin's hooks and skills expect. Locking is not reimplemented — `board_claim` / `board_release` shell out to the plugin's existing claim scripts.
+15 tools, all backed by the same canonical Markdown and shared deterministic core. Locking is not reimplemented — `board_claim` / `board_release` shell out to the plugin's existing claim scripts.
 
 | Tool | What it does |
 |---|---|
@@ -179,6 +184,9 @@ Works with any MCP client — setup blocks for **Codex CLI**, **Gemini CLI**, an
 | `board_list_entries` | List entries with parsed frontmatter; filters `project` / `type` / `status` / `needs` / `ready` (`ready: true` = the deterministic ready queue — open entries whose existing blockers are all resolved). |
 | `board_get_entry` | Full markdown of one entry by id, plus parsed frontmatter. |
 | `board_update_entry` | Update frontmatter (incl. `parent`) and/or append a body section; validate the status transition; rebuild the index. Optional `comment: {author, text}` appends a server-timestamped line under `## Comments`. |
+| `board_graph` | Build the typed deterministic pattern graph, write `GRAPH.yml`, and reuse only a source-equivalent disposable cache. |
+| `board_patterns` | List canonical P### records or preview/apply create, alias, assign, and correction operations. |
+| `board_promote_findings` | Preview or apply scratch promotion with content-bound plans, per-finding outcomes, provenance, and idempotency. |
 | `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files. Idempotent. |
 | `board_capture_finding` | Append a finding to the scratch inbox `_sessions/mcp-<UTC-date>.md`. |
 | `board_claim` | Acquire an entry lock (shells out to `board-claim-acquire.sh`). |

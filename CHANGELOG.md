@@ -9,6 +9,48 @@ increases.
 
 ## [Unreleased]
 
+## [1.9.0] — 2026-07-28
+
+The reliable pattern-pipeline release. Real findings from foreground plugin
+intake, PM consolidation, and MCP now converge on stable repository-owned
+pattern identity and one deterministic graph implementation.
+
+### Added
+
+- **Stable P### pattern records.** Boards can define active, merged, and retired
+  patterns with unique normalized labels and aliases. Entry `pattern_ids`
+  preserves identity across label changes; legacy free-form `pattern` values
+  remain visible evidence and resolve through an explicit `legacy:` fallback.
+- **Foreground preview/apply.** `/board-promote` and `/board-pattern` expose
+  content-bound plans for promotion, pattern creation, aliases, assignment, and
+  correction. Apply refuses stale inputs and records durable per-finding
+  receipts, `promoted_from` provenance, and assignment history.
+- **Three MCP tools.** `board_graph`, `board_patterns`, and
+  `board_promote_findings` expand the server from 12 to 15 tools.
+- **Disposable graph acceleration.** Source-equivalent state can be reused from
+  `.engineering-board/cache/graph/<project>/state.json`. The cache is ignored
+  by Git, deletable, schema-versioned, and never authoritative.
+
+### Changed
+
+- **One shared pattern pipeline.** The plugin adapters, PM consolidator, and MCP
+  server now delegate parsing, pattern resolution, promotion planning/writing,
+  graph construction, fingerprints, and typed domain failures to
+  `engineering_board_core.py`.
+- **Provenance-linked graph facts.** Shared-pattern edges identify canonical
+  pattern IDs and source entry fields. Nodes include resolved and observed
+  labels, clusters include stable fingerprints, and graph output reports
+  unresolved legacy identities.
+- **Canonical storage remains Markdown.** SQLite, embeddings, hosted services,
+  cross-repository aggregation, and Milestone C hypothesis reasoning remain
+  outside this release.
+
+### Security
+
+- Pattern and promotion mutations require unchanged content-bound plans.
+  Linked pattern or scratch records are refused, canonical source changes abort
+  graph replacement, and invalid cache state cannot override Markdown.
+
 ## [1.8.0] — 2026-07-27
 
 The pattern-intelligence release: accumulated Markdown findings become

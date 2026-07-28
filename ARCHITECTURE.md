@@ -2,7 +2,7 @@
 
 A complete structural map of the plugin: what every file does, how the pieces connect, and the lifecycle that ties them together. Companion to `README.md` (which is the install/usage surface).
 
-Current released state: **v1.8.0** — stable. Canonical board state and durable memory are repository-owned Markdown; `BOARD.md`, `GRAPH.yml`, and HTML are derived views. Passive capture, the PM and Worker pipelines, atomic claims, Learning entries, `/board-remember`, `/board-run`, and the 12-tool MCP server are shipped. Milestone A adds the contained `/board-demo`: three synthetic cross-domain findings become deterministic cluster facts and a separate evidence-cited hypothesis that can only persist as `status: proposed`. This first win does not yet replace the production `/board-graph` prompt contract or generalize hypothesis generation to arbitrary real boards. See `CHANGELOG.md` for release history and `docs/PRODUCT_EVOLUTION_SPEC.md` for the authoritative product direction.
+Current release line: **v1.9.0**. Canonical evidence, pattern identity, and durable memory are repository-owned Markdown. `BOARD.md`, `GRAPH.yml`, HTML, and `.engineering-board/cache/` are derived or disposable views. Milestone B adds stable P### pattern records, preview/apply foreground promotion, one shared parser/resolver/writer/graph core across plugin, PM, and MCP paths, and a 15-tool MCP server. The optional TDD/review/validate loop remains supporting verification behavior. See `CHANGELOG.md` for release history and `docs/PRODUCT_EVOLUTION_SPEC.md` for the authoritative product direction.
 
 ---
 
@@ -32,12 +32,12 @@ engineering-board/
 ├── LICENSE                         # MIT
 ├── .mcp.json                       # Bundles the MCP server at the plugin root
 ├── agents/                         # 8 agent definitions (Claude Code subagents)
-├── commands/                       # 15 slash commands
+├── commands/                       # 17 slash commands
 ├── hooks/
 │   ├── hooks.json                  # 4 hook events wired
 │   ├── stop-hook-procedure.md      # Canonical Stop procedure (passive/PM/worker)
-│   └── scripts/                    # 25 bash + 3 python scripts (mutation, claims, graph/demo, audit, reject filter, HTML)
-├── mcp-server/                     # zero-dep python3 MCP server (12 tools, stdio) + tests
+│   └── scripts/                    # 27 bash + 4 python scripts (mutation, claims, graph/demo, audit, reject filter, HTML)
+├── mcp-server/                     # shared zero-dep core + 15-tool MCP adapter (stdio) + tests
 ├── skills/                         # 5 Skills (intake, triage, resolve, consolidate, insights)
 ├── references/
 │   ├── auto-resolve-pass.md        # Shared protocol used by the 4 mutation skills
@@ -81,16 +81,18 @@ The `needs:` state machine: `tdd → review → validate → resolved`. The Stop
 
 ---
 
-## 4. Commands (`commands/`) — 15 total
+## 4. Commands (`commands/`) — 17 total
 
 | Command | Group | Purpose |
 |---|---|---|
 | `/board-demo [--run-id <id>]` | Pattern intelligence | Create a manifest-tracked synthetic run, build deterministic graph facts, invoke `board-insights` for one evidence-cited proposed hypothesis, render the evidence → cluster → hypothesis view, and report exact cleanup. No real board data or settings are changed. |
+| `/board-promote <project> [--session <file>] [--apply <plan-id>]` | Pattern intelligence | Preview foreground scratch promotion, then apply only an unchanged content-bound plan through the shared writer and receipts. |
+| `/board-pattern <project> <action> [--apply <plan-id>]` | Pattern intelligence | List P### pattern records or preview/apply create, alias, assign, and correction actions with durable history. |
 | `/board-run <entry-id>` | Pipeline | Drive ONE bug/feature end-to-end (`tdd → review → validate`) in this session under claim lock — the Conductor's inner loop (RFC 0001 slice 1). Bounded (5 rounds), passive-only, no mode file. |
 | `/board-setup [project]` | Lifecycle | One-command onboarding: infers the project name, delegates to `/board-init`, runs the permission self-check, prints the 3-line ready summary. Idempotent; leaves the session passive. |
 | `/board-init <project> [affects-prefix]` | Lifecycle | Scaffold `engineering-board/<project>/` (committed by default; `--private` for the one-line full-tree opt-out) + append to `BOARD-ROUTER.md`. Idempotent. |
 | `/board-rebuild [project]` | Lifecycle | Regenerate `BOARD.md` + `GRAPH.yml` deterministically from entry files. Runs auto-resolve terminal pass. Cheap to run after any entry mutation. |
-| `/board-graph [project] [--include-archive]` | Lifecycle | Build deterministic structural graph (`GRAPH.yml`): clusters, bridges, isolated nodes, density. Called internally by `/board-rebuild`. |
+| `/board-graph [project] [--full]` | Lifecycle | Build the source-fingerprinted pattern graph through the shared engine. Automatic mode reuses only equivalent disposable cache state; `--full` bypasses it. |
 | `/board-view [project] [--stdout]` | Lifecycle | Generate a self-contained themed HTML Kanban view to `engineering-board/<project>/board.html`. Zero-dep, offline, byte-deterministic, HTML-escaped. |
 | `/board-remember <insight>` | Memory | Persist one explicit durable insight as a validated `Learning` entry and rebuild the board, bypassing the automatic curator's recurrence threshold. |
 | `/board-pause` | Session control | Set `session-mode.json` `mode: paused`. Stop hook emits `<<EB-PASSIVE-PAUSED>>` and skips extraction. |
@@ -138,7 +140,7 @@ Board-location resolution lives in one place: **`board-paths.sh`** (sourced help
 - `board-claim-release.sh <board> <entry> <session>` — owner-verified release; NTFS retry loop
 - `board-claim-reclaim-stale.sh <board>` — scan + remove stale claims (heartbeat age > threshold); cloud-sync detection bumps threshold 180s→300s
 - `board-claim-heartbeat.sh <board> <entry> <session>` — owner-verified heartbeat refresh; v0.2.3 wired into worker subagents (`tdd-builder`, `code-reviewer`, `validator`) for long operations
-- `board-consolidate.sh` — re-applies reject rules + anchor verification + supersession; promotes scratch → live; writes `consolidation.log`
+- `board-consolidate.sh` — re-applies reject rules, transcript anchors, and supersession, then delegates verified promotion to the shared intake planner/writer and receipt model
 - `board-pm-fallback-heartbeat.sh <board>` — v0.2.3 PM pre-flight; scans `_claims/`, cross-references `.engineering-board/active-workers.json`, refreshes heartbeats for claims whose owning session is registered + alive + not paused
 
 **Registry mutators (3) — v0.2.3:**
@@ -156,10 +158,11 @@ Board-location resolution lives in one place: **`board-paths.sh`** (sourced help
 - `board-curate-learnings.sh <board> [min-recurrence]` — v0.3.0; deterministic Learning promotion. Dispatched by `learnings-curator` subagent
 - `board-migrate.sh --apply|--rollback|--status <board>` — v0.3.0; SHA256-idempotent migration of v0.2.x boards to v0.3.0 (creates `learnings/`, back-fills `needs: tdd` on open bugs/features without it, snapshots pre-state). Dispatched by `/board-migrate` command
 
-**Pattern-intelligence demo (3):**
+**Pattern intelligence and demo (5):**
 - `board-demo.sh create|hypothesis|status|clean` — portable shell entry point used by `/board-demo`; sends the validated agent interpretation to the lifecycle core through stdin and invokes the specialized renderer.
 - `board_demo.py` — contained run lifecycle: safe run-id allocation, synthetic fixture copy, SHA256 manifest, graph invocation, exact hypothesis schema enforcement, `H001` Markdown emission, status, and cleanup refusal on any link, extra file, missing file, or hash mismatch.
-- `board-graph-build.py` — zero-dependency deterministic graph engine for explicit board paths. It emits typed nodes, explainable edges, stable connected components, and findings. Milestone A uses it only for the contained demo; production command integration is Milestone B work.
+- `board-graph-build.py` / `board-graph-build.sh` — thin CLI adapters over `engineering_board_core.py` for production and contained-demo graph builds.
+- `board-intake.py` / `board-intake.sh` — foreground promotion and P### pattern preview/apply adapters.
 
 ---
 
@@ -169,7 +172,7 @@ Each is a Claude Code Skill (`SKILL.md` with name + description frontmatter). Sk
 
 | Skill | When it fires | Key steps | Writes |
 |---|---|---|---|
-| `board-intake` | User wants to create a finding | duplicate check → classify type+ID → write entry → tag patterns → wire blocked_by → `/board-rebuild` → auto-resolve (focused) | new entry file + BOARD.md update |
+| `board-intake` | User wants to create a finding | capture visible scratch evidence → shared no-write promotion preview → unchanged apply → receipts → rebuild → auto-resolve (focused) | scratch evidence, canonical entry, BOARD.md, GRAPH.yml |
 | `board-triage` | "what's next", "what should I work on" | identify project → read state → auto-resolve (full) → apply 5 triage rules → surface clusters → output sequence → mark `in_progress` | optional `status: in_progress` |
 | `board-resolve` | "close this", "mark resolved", "question answered" | (bug/feature) verify done-when → set resolved → ARCHIVE → `/board-rebuild` → auto-resolve cascade. (question) write Finding FIRST → set resolved → unblock dependents → auto-resolve cascade → triage. (observation) set resolved → ARCHIVE → `/board-rebuild` → auto-resolve cascade | entry + ARCHIVE.md + dependent unblocks |
 | `board-consolidate` | "consolidate the board", "promote scratch"; also implicit on PM Stop | enumerate `_sessions/*.md` → re-apply reject rules → anchor verify → supersession detect → promote survivors → GC scratch → auto-resolve | new live entries + BOARD.md + ARCHIVE.md + `consolidation.log` + scratch archives |

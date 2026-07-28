@@ -58,7 +58,7 @@ check_re() {
 # ── Trigger surface ─────────────────────────────────────────────────────────
 check "trigger: /board-graph documented"                      "/board-graph"
 check "trigger: per-project variant"                          "/board-graph <project-name>"
-check "trigger: --include-archive flag"                       "--include-archive"
+check "trigger: --full cache-bypass flag"                     "--full"
 
 # ── Determinism is the central contract ─────────────────────────────────────
 check "contract: purely deterministic"                        "purely deterministic"

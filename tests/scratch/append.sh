@@ -158,8 +158,8 @@ fi
 # ── B005: a human capture summary is printed on stdout (visible on the turn) ──
 if grep -qF 'EB-CAPTURE-SUMMARY: captured 1 finding(s):' "$UNIT/out1" \
    && grep -qF 'render helper mishandles format and env expansion' "$UNIT/out1" \
-   && grep -qF '/pm-start' "$UNIT/out1"; then
-  report 0 "B005: capture summary line names the finding + /pm-start"
+   && grep -qF '/board-promote' "$UNIT/out1"; then
+  report 0 "B005: capture summary line names the finding + /board-promote"
 else
   report 1 "B005: capture summary line present" "out1=$(tr '\n' '|' < "$UNIT/out1")"
 fi

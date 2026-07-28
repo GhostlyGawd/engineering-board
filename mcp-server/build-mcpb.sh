@@ -25,6 +25,7 @@ cp "$HERE/manifest.json" "$STAGE/manifest.json"
 
 # the server itself
 cp "$HERE/engineering_board_mcp.py" "$STAGE/mcp-server/engineering_board_mcp.py"
+cp "$HERE/engineering_board_core.py" "$STAGE/mcp-server/engineering_board_core.py"
 cp "$HERE/README.md" "$STAGE/mcp-server/README.md"
 
 # the hook scripts the server shells out to (whole scripts dir — small, keeps

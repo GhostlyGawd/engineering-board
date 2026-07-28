@@ -31,6 +31,7 @@
 #   20. board-graph-engine.sh       — executable positive/negative graph fixtures
 #   21. hypothesis-contract.sh      — proposed hypothesis persistence + rendering
 #   22. integration first-win       — full contained journey + tamper cleanup refusal
+#   23. milestone-b-pattern-pipeline.sh — canonical identity, cache, MCP, CLI, promotion
 #
 # Usage:
 #   bash tests/orchestration/automated.sh                # auto-detect plugin root
@@ -69,6 +70,7 @@ SUBTESTS=(
   "board-graph-engine.sh"
   "hypothesis-contract.sh"
   "../integration/pattern-intelligence-first-win.sh"
+  "milestone-b-pattern-pipeline.sh"
 )
 
 for st in "${SUBTESTS[@]}"; do

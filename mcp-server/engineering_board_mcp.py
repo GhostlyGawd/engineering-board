@@ -32,13 +32,29 @@ import re
 import json
 import subprocess
 from datetime import datetime, timezone
+from pathlib import Path
+
+MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
+if MODULE_DIR not in sys.path:
+    sys.path.insert(0, MODULE_DIR)
+
+from engineering_board_core import (
+    GraphError as CoreError,
+    apply_pattern_operation,
+    apply_promotion,
+    build_graph_cached,
+    load_pattern_registry,
+    plan_pattern_operation,
+    plan_promotion,
+    resolve_entry_patterns,
+)
 
 PROTOCOL_VERSION = "2025-06-18"
 SERVER_NAME = "engineering-board"
 
 # Directory of this script; used to locate the sibling hook scripts we shell out
 # to (claim acquire/release + validation).
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+SCRIPT_DIR = MODULE_DIR
 PLUGIN_ROOT = os.path.dirname(SCRIPT_DIR)  # repo root (mcp-server/..)
 
 
@@ -674,6 +690,34 @@ def tool_board_create_entry(params):
     fields = [("id", eid), ("type", entry_type), ("title", title),
               ("discovered", discovered)]
     body = ""
+    pattern = params.get("pattern")
+    pattern_ids = params.get("pattern_ids")
+    pattern_values = (
+        pattern if isinstance(pattern, list) else [pattern]
+        if pattern
+        else []
+    )
+    pattern_id_values = (
+        pattern_ids if isinstance(pattern_ids, list) else [pattern_ids]
+        if pattern_ids
+        else []
+    )
+    pattern_registry = load_pattern_registry(Path(bd))
+    resolved_patterns, unresolved_patterns = resolve_entry_patterns(
+        {
+            "id": eid,
+            "pattern": pattern_values,
+            "pattern_ids": pattern_id_values,
+        },
+        pattern_registry,
+    )
+    canonical_pattern_ids = sorted(
+        {
+            item["id"]
+            for item in resolved_patterns
+            if not item["id"].startswith("legacy:")
+        }
+    )
 
     if entry_type in ("bug", "feature"):
         status = params.get("status", "open")
@@ -687,14 +731,13 @@ def tool_board_create_entry(params):
         if needs is not None and needs not in VALID_NEEDS:
             raise ToolError("invalid needs %r (allowed: %s)" % (needs, ", ".join(VALID_NEEDS)))
         blocked_by = params.get("blocked_by")
-        pattern = params.get("pattern")
         fields += [("status", status), ("priority", priority), ("affects", affects)]
         if needs:
             fields.append(("needs", needs))
         if blocked_by:
             fields.append(("blocked_by", blocked_by if isinstance(blocked_by, list) else [blocked_by]))
-        if pattern:
-            fields.append(("pattern", pattern if isinstance(pattern, list) else [pattern]))
+        if pattern_values:
+            fields.append(("pattern", pattern_values))
         body = _body_from_done_when(params.get("done_when"), params.get("body"))
 
     elif entry_type == "question":
@@ -706,9 +749,8 @@ def tool_board_create_entry(params):
             fields.append(("source", params.get("source")))
         if params.get("affects"):
             fields.append(("affects", params.get("affects")))
-        if params.get("pattern"):
-            p = params.get("pattern")
-            fields.append(("pattern", p if isinstance(p, list) else [p]))
+        if pattern_values:
+            fields.append(("pattern", pattern_values))
         body = _body_from_done_when(params.get("done_when"), params.get("body"))
 
     elif entry_type == "observation":
@@ -716,9 +758,8 @@ def tool_board_create_entry(params):
             if params["status"] not in VALID_STATUS:
                 raise ToolError("invalid status %r" % params["status"])
             fields.append(("status", params["status"]))
-        if params.get("pattern"):
-            p = params.get("pattern")
-            fields.append(("pattern", p if isinstance(p, list) else [p]))
+        if pattern_values:
+            fields.append(("pattern", pattern_values))
         b = params.get("body") or "(observation details)"
         body = b.rstrip()
 
@@ -755,9 +796,17 @@ def tool_board_create_entry(params):
             src_lines = ["- %s" % s for s in derived_from]
         body = "## Takeaway\n\n%s\n\n## Sources\n\n%s" % (takeaway.rstrip(), "\n".join(src_lines))
 
+    if canonical_pattern_ids:
+        fields.append(("pattern_ids", canonical_pattern_ids))
+
     # C7: optional parent link (any entry type). A dangling parent id is a
     # WARNING in the response, never an error — same policy as blocked_by.
     warnings = []
+    for unresolved in unresolved_patterns:
+        warnings.append(
+            "pattern label %s is unresolved; preserved as observed evidence"
+            % unresolved["label"]
+        )
     parent = params.get("parent")
     if parent:
         parent = _oneline(str(parent))
@@ -935,6 +984,50 @@ def tool_board_update_entry(params):
     # C7: parent link. Validated transition-free; dangling id -> warning in
     # the response, not an error (same policy as blocked_by).
     warnings = []
+    if "pattern" in params or "pattern_ids" in params:
+        new_pattern = params.get("pattern", fm.get("pattern", []))
+        new_pattern_ids = params.get(
+            "pattern_ids", fm.get("pattern_ids", [])
+        )
+        pattern_values = (
+            new_pattern
+            if isinstance(new_pattern, list)
+            else [new_pattern]
+            if new_pattern
+            else []
+        )
+        pattern_id_values = (
+            new_pattern_ids
+            if isinstance(new_pattern_ids, list)
+            else [new_pattern_ids]
+            if new_pattern_ids
+            else []
+        )
+        resolved_patterns, unresolved_patterns = resolve_entry_patterns(
+            {
+                "id": entry_id,
+                "pattern": pattern_values,
+                "pattern_ids": pattern_id_values,
+            },
+            load_pattern_registry(Path(bd)),
+        )
+        canonical_pattern_ids = sorted(
+            {
+                item["id"]
+                for item in resolved_patterns
+                if not item["id"].startswith("legacy:")
+            }
+        )
+        fm["pattern"] = pattern_values
+        fm["pattern_ids"] = canonical_pattern_ids
+        changes.append(
+            "pattern_ids=%s" % fmt_list(canonical_pattern_ids)
+        )
+        for unresolved in unresolved_patterns:
+            warnings.append(
+                "pattern label %s is unresolved; preserved as observed evidence"
+                % unresolved["label"]
+            )
     new_parent = params.get("parent")
     if new_parent is not None:
         new_parent = _oneline(str(new_parent))
@@ -997,6 +1090,86 @@ def tool_board_update_entry(params):
     }
     if warnings:
         result["warnings"] = warnings
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Pattern intelligence and foreground promotion
+# ---------------------------------------------------------------------------
+def tool_board_graph(params):
+    project = require(params, "project")
+    root = resolve_root(params)
+    bd = ensure_board_exists(root, project)
+    graph, cache_path = build_graph_cached(
+        Path(bd),
+        project,
+        now_utc_iso(),
+        full=bool(params.get("full", False)),
+    )
+    output = Path(bd) / "GRAPH.yml"
+    atomic_write(
+        str(output),
+        json.dumps(graph, ensure_ascii=False, indent=2) + "\n",
+    )
+    try:
+        cache = os.path.relpath(str(cache_path), root)
+    except ValueError:
+        cache = cache_path.name
+    return {
+        "project": project,
+        "graph": graph,
+        "output": os.path.relpath(str(output), root),
+        "cache": cache,
+    }
+
+
+def tool_board_patterns(params):
+    project = require(params, "project")
+    root = resolve_root(params)
+    bd = ensure_board_exists(root, project)
+    action = params.get("action", "list")
+    if action == "list":
+        registry = load_pattern_registry(Path(bd))
+        return {
+            "patterns": [
+                {
+                    key: record.get(key)
+                    for key in (
+                        "id",
+                        "status",
+                        "label",
+                        "aliases",
+                        "merged_into",
+                        "source",
+                    )
+                    if record.get(key) is not None
+                }
+                for _, record in sorted(registry["by_id"].items())
+            ]
+        }
+    operation_params = {
+        key: value
+        for key, value in params.items()
+        if key not in {"root", "project", "action", "apply"}
+    }
+    plan_id = params.get("apply")
+    if plan_id:
+        return apply_pattern_operation(
+            Path(bd), project, action, operation_params, plan_id
+        )
+    return plan_pattern_operation(Path(bd), action, operation_params)
+
+
+def tool_board_promote_findings(params):
+    project = require(params, "project")
+    root = resolve_root(params)
+    bd = ensure_board_exists(root, project)
+    session = params.get("session")
+    plan_id = params.get("apply")
+    if not plan_id:
+        return plan_promotion(Path(bd), project, session)
+    result = apply_promotion(Path(bd), project, session, plan_id)
+    rebuild_board(bd, project)
     return result
 
 
@@ -1530,6 +1703,7 @@ TOOLS = [
                 "status": {"type": "string", "enum": VALID_STATUS, "description": "Initial status. Defaults to 'open' for bug/feature/question."},
                 "blocked_by": {"type": "array", "items": {"type": "string"}, "description": "Question ids (e.g. ['Q001']) blocking a bug/feature."},
                 "pattern": {"type": "array", "items": {"type": "string"}, "description": "Root-cause pattern tags (kebab-case)."},
+                "pattern_ids": {"type": "array", "items": {"type": "string", "pattern": "^P[0-9]{3}$"}, "description": "Canonical pattern record ids. Existing aliases and merged ids resolve to the active P### identity."},
                 "done_when": {"type": "array", "items": {"type": "string"}, "description": "Verification criteria — become the required '## Done when' checklist for bug/feature/question."},
                 "source": {"type": "string", "description": "Question only: what surfaced this question."},
                 "subtype": {"type": "string", "enum": ["pattern", "finding", "principle"], "description": "Learning only. Required."},
@@ -1591,6 +1765,8 @@ TOOLS = [
                 "needs": {"type": "string", "enum": VALID_NEEDS},
                 "priority": {"type": "string", "enum": VALID_PRIORITY},
                 "blocked_by": {"type": "array", "items": {"type": "string"}},
+                "pattern": {"type": "array", "items": {"type": "string"}, "description": "Observed root-cause labels. Unresolved values remain evidence and produce warnings."},
+                "pattern_ids": {"type": "array", "items": {"type": "string", "pattern": "^P[0-9]{3}$"}, "description": "Canonical pattern record ids."},
                 "parent": {"type": "string", "description": "Parent entry id for subtask grouping. A dangling id is accepted with a warning in the response."},
                 "comment": {
                     "type": "object",
@@ -1615,6 +1791,61 @@ TOOLS = [
             "required": ["project", "entry_id"],
         },
         "handler": tool_board_update_entry,
+    },
+    {
+        "name": "board_graph",
+        "description": "Build the deterministic pattern graph from canonical Markdown, write GRAPH.yml, and reuse only a source-equivalent disposable cache. full=true forces a full calculation.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project": {"type": "string"},
+                "full": {"type": "boolean"},
+                "root": _ROOT_PROP,
+            },
+            "required": ["project"],
+        },
+        "handler": tool_board_graph,
+    },
+    {
+        "name": "board_patterns",
+        "description": "List canonical P### pattern records or preview/apply create, alias, assign, and correct operations. Mutations require a content-bound plan id returned by the preview.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project": {"type": "string"},
+                "action": {"type": "string", "enum": ["list", "create", "alias", "assign", "correct"]},
+                "label": {"type": "string"},
+                "aliases": {"type": "array", "items": {"type": "string"}},
+                "alias": {"type": "string"},
+                "pattern_id": {"type": "string", "pattern": "^P[0-9]{3}$"},
+                "entry_id": {"type": "string"},
+                "replace": {"type": "string", "pattern": "^P[0-9]{3}$"},
+                "with": {"type": "string", "pattern": "^P[0-9]{3}$"},
+                "reason": {"type": "string"},
+                "definition": {"type": "string"},
+                "inclusion_evidence": {"type": "string"},
+                "exclusions": {"type": "string"},
+                "apply": {"type": "string", "description": "Plan id from an unchanged preview."},
+                "root": _ROOT_PROP,
+            },
+            "required": ["project"],
+        },
+        "handler": tool_board_patterns,
+    },
+    {
+        "name": "board_promote_findings",
+        "description": "Preview scratch finding promotion or apply an unchanged content-bound plan. Returns created, deduplicated, rejected, and already-applied outcomes with durable provenance.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project": {"type": "string"},
+                "session": {"type": "string", "description": "Optional scratch filename or session selector."},
+                "apply": {"type": "string", "description": "Plan id from an unchanged preview."},
+                "root": _ROOT_PROP,
+            },
+            "required": ["project"],
+        },
+        "handler": tool_board_promote_findings,
     },
     {
         "name": "board_rebuild",
@@ -1735,7 +1966,7 @@ def call_tool(name, arguments):
         result = tool["handler"](arguments)
         text = json.dumps(result, ensure_ascii=False, indent=2)
         return {"content": [{"type": "text", "text": text}], "isError": False}
-    except ToolError as e:
+    except (ToolError, CoreError) as e:
         return {"content": [{"type": "text", "text": "Error: %s" % e}], "isError": True}
     except Exception as e:  # pragma: no cover - defensive
         return {"content": [{"type": "text", "text": "Internal error: %s: %s" % (type(e).__name__, e)}],
@@ -1754,7 +1985,8 @@ def dispatch(method, params):
             "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
             "instructions": "Maintains the engineering-board markdown board: init projects, "
                             "create/list/update/get entries, rebuild the index, capture scratch "
-                            "findings, and claim/release entry locks.",
+                            "findings, canonical patterns, graph analysis, foreground "
+                            "promotion, and claim/release entry locks.",
         }
     if method == "ping":
         return {}
@@ -1816,7 +2048,9 @@ def serve_stdio(stdin=None, stdout=None):
             continue
         resp = handle_message(obj)
         if resp is not None:
-            stdout.write(json.dumps(resp, ensure_ascii=False) + "\n")
+            # JSON-RPC must also work when Windows gives stdout a legacy code
+            # page. Escaping non-ASCII keeps the wire representation portable.
+            stdout.write(json.dumps(resp, ensure_ascii=True) + "\n")
             stdout.flush()
 
 

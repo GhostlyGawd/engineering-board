@@ -77,6 +77,16 @@
       "rationale": "/board-remember: explicit learning capture -- writes learnings/L###-<slug>.md + its BOARD.md row"
     },
     {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-intake.sh:*",
+      "rationale": "/board-promote and /board-pattern: shared preview/apply planner, canonical writer, receipts, and graph rebuild"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-graph-build.sh:*",
+      "rationale": "/board-graph: deterministic canonical pattern graph with source-equivalent disposable cache"
+    },
+    {
       "tool": "SlashCommand",
       "pattern": "/pm-start",
       "rationale": "Start PM (consolidator) session for engineering board"
