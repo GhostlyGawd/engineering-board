@@ -4,7 +4,10 @@
 # real entries, byte-determinism (safe to commit), and HTML-escaping of
 # untrusted entry text (no markup injection into the view).
 
-set -uo pipefail
+# Do not use pipefail in this test. The grep -q checks close their input early.
+# With pipefail, a successful match can report the writer's SIGPIPE as a test
+# failure.
+set -u
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="${1:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 VIEW="$ROOT/hooks/scripts/board-view.sh"

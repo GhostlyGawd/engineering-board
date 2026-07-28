@@ -41,10 +41,9 @@ The current user-facing landing-page batch includes:
 - `docs/index.html`;
 
 The review found current text in release manifests and in `hooks/hooks.json`.
-The rewrite does not change these files. These files define the published
-v1.10.0 package and runtime behavior. A change would invalidate the package
-checksum or change runtime behavior. A documentation-only branch must preserve
-these files.
+The controlled-language rewrite did not change these files independently. The
+coordinated v1.10.1 release preparation updates the versioned manifests and
+the package checksum. It does not change runtime behavior.
 
 ## Protected content
 
@@ -82,19 +81,24 @@ The rewrite does not change these files:
 - generated board HTML;
 - machine data that has no user instructions.
 
-The rewrite also does not change these current release and runtime files:
+The v1.10.1 release preparation updates these files together:
 
 - `.claude-plugin/plugin.json`;
 - `.claude-plugin/marketplace.json`;
-- `hooks/hooks.json`;
 - `mcp-server/manifest.json`;
 - `mcp-server/server.json`;
+- `mcp-server/pyproject.toml`.
+
+The rewrite and release preparation do not change these runtime files:
+
+- `hooks/hooks.json`;
 - `mcp-server/smithery.yaml`.
 
-The rewrite does not change existing executable source strings. These strings
+The rewrite does not change executable product source strings. These strings
 are part of product behavior. The release-preparation change adds one new
-executable and its test. The release policy, skill, script, and test define one
-aligned workflow.
+executable and revises release and board-view test harnesses. The release
+policy, skill, script, and tests define one aligned workflow. The release test
+derives the next patch version from the current manifest.
 
 The rewrite also preserves these historical design and planning records:
 

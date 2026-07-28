@@ -9,6 +9,8 @@ increases.
 
 ## [Unreleased]
 
+## [1.10.1] — 2026-07-28
+
 ### Added
 
 - Added a maintainer-only release skill, release policy, and deterministic
@@ -21,6 +23,10 @@ increases.
 - Added release preparation to the full CI suite. Each user-visible pull
   request must update `[Unreleased]`. Publication remains an explicit,
   versioned action after the prepared commit reaches `main`.
+- Revised the release-preparation test to derive its target patch version from
+  the current manifest. The test remains valid after a version is prepared.
+- Prevented false board-view failures when `grep -q` closes a successful test
+  pipeline before its writer completes.
 
 ## [1.10.0] — 2026-07-28
 
