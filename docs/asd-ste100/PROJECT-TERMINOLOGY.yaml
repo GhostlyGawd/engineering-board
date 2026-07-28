@@ -94,8 +94,7 @@ terms:
     term_type: proper_noun
     approved_part_of_speech: proper_noun
     permitted_inflections: []
-    prohibited_synonyms:
-      - markdown
+    prohibited_synonyms: []
     domain: software-engineering
     source_authority: docs/PRODUCT_EVOLUTION_SPEC.md
     approval_status: PENDING

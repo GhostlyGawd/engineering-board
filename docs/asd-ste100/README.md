@@ -64,8 +64,7 @@ The rewrite must preserve:
 - `SCOPE.md` defines the files and the exclusions.
 - `PROJECT-TERMINOLOGY.yaml` is the project terminology register.
 - `WORKPAD.md` contains the one alignment table for this task.
-- `compliance-evidence.yaml` will contain the deterministic evidence.
-- `source.txt` will contain the ordered source corpus.
-- `output.txt` will contain the ordered rewritten corpus.
+- `CORPUS-MANIFEST.tsv` binds each source file to its output file.
+- `VALIDATION.md` records the deterministic report and the open gates.
 
 Do not use the clean-output mode while a release gate is open.

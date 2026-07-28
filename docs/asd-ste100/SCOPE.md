@@ -14,8 +14,7 @@ The rewrite includes current project text in these surfaces:
 - the current product specification;
 - the MCP user documentation and descriptions;
 - the landing page and the LLM index;
-- the current test instructions for a human operator;
-- current help text and user-visible messages in executable files.
+- the current test instructions for a human operator.
 
 The first active-instruction batch includes:
 
@@ -88,6 +87,10 @@ The rewrite also does not change these current release and runtime files:
 - `mcp-server/manifest.json`;
 - `mcp-server/server.json`;
 - `mcp-server/smithery.yaml`.
+
+The rewrite does not change executable source strings. These strings are part
+of product behavior. A later implementation change must update the version,
+tests, and documentation together.
 
 The rewrite also preserves these historical design and planning records:
 
