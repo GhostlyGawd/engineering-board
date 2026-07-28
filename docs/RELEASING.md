@@ -4,6 +4,10 @@
 
 This document defines the current release policy for Engineering Board.
 
+Repository agents must also read
+[`maintainers/skills/release-engineering-board/SKILL.md`](../maintainers/skills/release-engineering-board/SKILL.md).
+The maintainer skill is not part of the installed plugin.
+
 ## Release policy
 
 Keep `main` releasable. Do not publish an immutable release for every merge.

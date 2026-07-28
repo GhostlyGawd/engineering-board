@@ -237,8 +237,8 @@ The canonical Stop procedure is
 **Agents (8):** `board-manager`, `finding-extractor`, `consolidator`, `tidier`,
 `learnings-curator`, `tdd-builder`, `code-reviewer`, and `validator`.
 
-**Skills (6):** `board-intake`, `board-triage`, `board-resolve`,
-`board-consolidate`, `board-insights`, and `release-engineering-board`.
+**Skills (5):** `board-intake`, `board-triage`, `board-resolve`,
+`board-consolidate`, and `board-insights`.
 
 **Hooks (4 events):** `SessionStart`, `PostToolUse(Write)`,
 `UserPromptSubmit`, and `Stop`.

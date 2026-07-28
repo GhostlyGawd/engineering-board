@@ -1,11 +1,14 @@
 ---
 name: release-engineering-board
-description: Prepare, verify, publish, and close an Engineering Board release. Use when the user asks to bump the version, prepare a release, rebuild or pin the MCP bundle, update the changelog, create a release tag, publish to GitHub, PyPI, or the MCP Registry, or verify release alignment.
+description: Prepare, verify, publish, and close an Engineering Board maintainer release. Use for repository maintenance when the owner asks to bump the product version, prepare a release, rebuild or pin the MCP bundle, update the changelog, create a release tag, publish to GitHub, PyPI, or the MCP Registry, or verify release alignment.
 ---
 
 > DRAFT — FULL COMPLIANCE CHECK NOT COMPLETE
 
 # Release Engineering Board
+
+Use this skill only in the `GhostlyGawd/engineering-board` source repository.
+Do not use it in a repository that only installs the Engineering Board plugin.
 
 Use the repository script for release preparation. Do not update release files
 independently.

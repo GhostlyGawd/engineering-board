@@ -33,7 +33,8 @@ The first active-instruction batch includes:
 - `docs/PRODUCT_EVOLUTION_SPEC.md`;
 - `docs/llms.txt`;
 - `docs/RELEASING.md`;
-- `skills/release-engineering-board/SKILL.md`.
+- `AGENTS.md`;
+- `maintainers/skills/release-engineering-board/SKILL.md`.
 
 The current user-facing landing-page batch includes:
 

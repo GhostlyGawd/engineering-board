@@ -100,6 +100,11 @@ The release-preparation suite passed seven checks. A real-tree preview for
 v1.10.1 identified all seven versioned files and produced a prospective MCP
 bundle checksum. The preview did not write a file.
 
+The release skill moved from the plugin-distributed `skills/` directory to
+`maintainers/skills/`. The root `AGENTS.md` points repository agents to the
+maintainer skill. The installed plugin continues to expose five product
+skills.
+
 Regenerate the ordered corpus, token ledger, rule ledger, and review artifact
 after the release workflow change is stable. Both human reviewers must approve
 the superseding digest.

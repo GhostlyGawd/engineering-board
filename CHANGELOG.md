@@ -11,9 +11,10 @@ increases.
 
 ### Added
 
-- Added a repository-owned release skill, release policy, and deterministic
-  preparation script. The script updates all versioned surfaces, builds the
-  prospective MCP bundle, and pins its reproducible checksum before release.
+- Added a maintainer-only release skill, release policy, and deterministic
+  preparation script. The skill is outside the installed plugin. The script
+  updates all versioned surfaces, builds the prospective MCP bundle, and pins
+  its reproducible checksum before release.
 
 ### Changed
 
