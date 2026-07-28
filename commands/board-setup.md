@@ -1,5 +1,5 @@
 ---
-description: One-command onboarding — scaffold the board with smart defaults, check permissions, and print a concise "you're ready" summary plus the optional pattern-intelligence demo. Composes /board-init + the permission self-check; leaves the session in passive capture mode. Idempotent.
+description: Prepare the board, check permissions, and print a short readiness summary. This command can also run the optional pattern-intelligence demonstration. It uses /board-init and the permission self-check. It leaves the session in passive capture mode. Repeated use has the same result.
 argument-hint: [project-name]
 ---
 

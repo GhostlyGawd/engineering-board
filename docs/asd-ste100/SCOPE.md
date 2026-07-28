@@ -34,6 +34,16 @@ The first active-instruction batch includes:
 - `docs/PRODUCT_EVOLUTION_SPEC.md`;
 - `docs/llms.txt`.
 
+The current user-facing landing-page batch includes:
+
+- `docs/index.html`;
+
+The review found current text in release manifests and in `hooks/hooks.json`.
+The rewrite does not change these files. These files define the published
+v1.10.0 package and runtime behavior. A change would invalidate the package
+checksum or change runtime behavior. A documentation-only branch must preserve
+these files.
+
 ## Protected content
 
 The rewrite can change sentence construction. It must not change technical
@@ -69,6 +79,15 @@ The rewrite does not change these files:
 - adversarial and benign test fixtures;
 - generated board HTML;
 - machine data that has no user instructions.
+
+The rewrite also does not change these current release and runtime files:
+
+- `.claude-plugin/plugin.json`;
+- `.claude-plugin/marketplace.json`;
+- `hooks/hooks.json`;
+- `mcp-server/manifest.json`;
+- `mcp-server/server.json`;
+- `mcp-server/smithery.yaml`.
 
 The rewrite also preserves these historical design and planning records:
 

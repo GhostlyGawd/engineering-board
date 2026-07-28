@@ -1,6 +1,6 @@
 ---
 name: Board Resolve
-description: This skill should be used when the user says "close this", "mark resolved", "this is fixed", "question answered", "resolve Q###", "resolve B###", "mark done", "it's working now", or when an item's done-when criteria have been met and the work is verified complete.
+description: Use this skill when the user asks to close or resolve an entry. Also use it when the entry satisfies its completion criteria and verification is complete.
 version: 0.1.0
 ---
 

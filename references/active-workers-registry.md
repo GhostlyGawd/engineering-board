@@ -15,7 +15,7 @@ This file documents the registry. The implementation lives in three scripts:
 v0.2.2 ships PM and Worker orchestration, but the system has no central record of which sessions are alive at any moment. Two consequences leak from that gap:
 
 1. **A PM session that crashes mid-consolidation** leaves scratch un-promoted. The next PM session cannot tell whether the prior PM is still running and will not run catch-up consolidation.
-2. **A Worker session whose claim heartbeat falls behind** (slow Bash op, OS pause) has its claim reclaimed by another worker: but there's no signal that the original worker is still alive and about to refresh.
+2. **A Worker session whose claim heartbeat falls behind** can lose its claim to another Worker. The first Worker can still be active.
 
 The registry plus a PM-fallback heartbeat (`board-pm-fallback-heartbeat.sh`, separate doc) closes both gaps: the PM observes "this session is still alive per the registry" and refreshes its claim heartbeats on its behalf.
 
