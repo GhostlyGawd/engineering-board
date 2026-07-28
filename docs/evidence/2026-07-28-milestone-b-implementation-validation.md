@@ -120,7 +120,7 @@ source commit `1d910f8`, test
 
 | Drift class | Disposition |
 |---|---|
-| Behavior and specification | Repaired. The central product spec records Milestone B as implemented and validated for v1.9.0 while preserving the accepted scope and historical decisions. |
+| Behavior and specification | Repaired. The central product spec records Milestone B as implemented and validated for the corrected v1.9.1 release boundary while preserving the accepted scope and historical decisions. |
 | Commands and setup | Repaired. `/board-promote`, `/board-pattern`, shared `/board-graph`, foreground capture guidance, permissions, and retry behavior are current. |
 | Schema and architecture | Repaired. P### records, `pattern_ids`, legacy precedence, correction history, shared-core boundaries, and disposable cache authority are documented. |
 | MCP and packaging | Repaired and superseded by v1.9.1. Fifteen tools, two packaged Python modules, bundle/test content parity, coordinated manifests, and the reproducible digest are current. |
