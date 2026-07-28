@@ -3,13 +3,14 @@ description: Install the engineering-board plugin allowlist into your user-scope
 argument-hint: (no arguments)
 ---
 
-# /board-install-permissions — install plugin allowlist
+
+# /board-install-permissions: install plugin allowlist
 
 Add the engineering-board permission patterns to your `~/.claude/settings.json` so the plugin can run its claim scripts and slash commands without prompting each time. This command is interactive-only: it prints the exact `claude config add` lines for you to run yourself.
 
 ## What to do
 
-### Step 0 — Fast-path: check if already installed
+### Step 0: Fast-path: check if already installed
 
 Run:
 
@@ -33,7 +34,7 @@ ERROR: could not read required-permissions.json. Check that CLAUDE_PLUGIN_ROOT i
 
 Then stop.
 
-### Step 1 — Read and display the proposed allowlist
+### Step 1: Read and display the proposed allowlist
 
 Read `${CLAUDE_PLUGIN_ROOT}/references/required-permissions.json`. Parse the `patterns` array.
 
@@ -59,9 +60,9 @@ Example:
      Reason: Start PM (consolidator) session for engineering board
 ```
 
-(Use ASCII `--` not em-dash; the rationale field is copied verbatim from the JSON.)
+(Use ASCII `--` not em-dash. the rationale field is copied verbatim from the JSON.)
 
-### Step 2 — Confirmation prompt
+### Step 2: Confirmation prompt
 
 Print exactly:
 
@@ -71,7 +72,7 @@ Add these to your user-scope settings? Reply YES (uppercase) to confirm, or anyt
 
 Then stop and wait for the user's reply.
 
-### Step 3 — Handle user reply
+### Step 3: Handle user reply
 
 **If the user replied YES (exact uppercase match):**
 
@@ -88,7 +89,7 @@ claude config add permissions.allow "<tool>(<pattern>)"
 ```
 
 Where `<tool>` is the `tool` field and `<pattern>` is the `pattern` field from the
-JSON entry, combined into a Claude Code allow-rule of the form `Tool(specifier)` —
+JSON entry, combined into a Claude Code allow-rule of the form `Tool(specifier)` -
 e.g. `Bash(bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-scratch-append.sh:*)` and
 `SlashCommand(/pm-start)` (with surrounding double-quotes as shown). A **bare**
 specifier without the `Tool(...)` wrapper is parsed as a tool *name* and never
@@ -114,6 +115,6 @@ Then stop.
 ## Notes
 
 - Interactive-only is by design. Writing directly to `~/.claude/settings.json` has cross-platform variability (path resolution, file encoding, concurrent-write risk) that was evaluated and deferred for v0.2.2. The paste-able `claude config add` one-liners are the authoritative install path.
-- The self-check fast-path (Step 0) means running this command after installation is a safe no-op — it will confirm success and exit without re-prompting.
+- The self-check fast-path (Step 0) means running this command after installation is a safe no-op: it will confirm success and exit without re-prompting.
 - `board-permission-self-check.sh` exit codes: 0=all installed, 1=some missing, 2=manifest invalid, 3=settings.json invalid. Step 0 only short-circuits on exit 0.
-- If `CLAUDE_PLUGIN_ROOT` is not set, the self-check script will fail with a path error. Claude Code sets this automatically when running a plugin command; it should always be present in normal usage.
+- If `CLAUDE_PLUGIN_ROOT` is not set, the self-check script will fail with a path error. Claude Code sets this automatically when running a plugin command. it should always be present in normal usage.

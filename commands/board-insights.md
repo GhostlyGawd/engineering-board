@@ -3,7 +3,8 @@ description: Rank deterministic finding clusters for root-cause investigation an
 argument-hint: <project-name> [--cluster <fingerprint>] [--limit <1-100>]
 ---
 
-# /board-insights — rank systemic investigations
+
+# /board-insights: rank systemic investigations
 
 Resolve the named project through `engineering-board/BOARD-ROUTER.md`, then
 `docs/boards/BOARD-ROUTER.md`. Use the resolved project path as `<board-dir>`.
@@ -16,7 +17,7 @@ bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-insights.sh" \
   rank [--cluster "<cluster-fingerprint>"] [--limit "<count>"]
 ```
 
-Report each cluster's 0–100 investigation-priority score, score components,
+Report each cluster's 0-100 investigation-priority score, score components,
 members, member source paths, pattern IDs, domains, hypothesis references, and
 negative-memory references. State that the score prioritizes investigation. It
 does not measure causal confidence and cannot confirm a root cause.

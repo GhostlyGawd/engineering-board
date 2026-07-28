@@ -9,6 +9,27 @@ increases.
 
 ## [Unreleased]
 
+## [1.10.1] — 2026-07-28
+
+### Added
+
+- Added a maintainer-only release skill, release policy, and deterministic
+  preparation script. The skill is outside the installed plugin. The script
+  updates all versioned surfaces, builds the prospective MCP bundle, and pins
+  its reproducible checksum before release.
+
+### Changed
+
+- Added release preparation to the full CI suite. Each user-visible pull
+  request must update `[Unreleased]`. Publication remains an explicit,
+  versioned action after the prepared commit reaches `main`.
+- Revised the release-preparation test to derive its target patch version from
+  the current manifest. The test remains valid after a version is prepared.
+- Prevented false board-view failures when `grep -q` closes a successful test
+  pipeline before its writer completes.
+- Added an explicit release-refresh mode for approved changes that modify a
+  prepared bundle. Refresh preserves the release version and changelog section.
+
 ## [1.10.0] — 2026-07-28
 
 Milestone C turns deterministic clusters into prioritized, durable, and

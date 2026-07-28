@@ -4,15 +4,16 @@ description: This skill should be used when the user asks "what's next", "what s
 version: 0.1.0
 ---
 
+
 # Board Triage
 
-Derives the recommended work sequence from open board items and the six triage rules. Also governs Starting Work — setting an item `in_progress`.
+Derives the recommended work sequence from open board items and the six triage rules. Also governs Starting Work: setting an item `in_progress`.
 
-## Step 0 — Identify the project scope
+## Step 0: Identify the project scope
 
-If triage was requested for a specific project, read that project's board at `engineering-board/<project>/BOARD.md`. If no project was specified, read the resolved `BOARD-ROUTER.md` (resolution order: `engineering-board/BOARD-ROUTER.md` → `docs/boards/BOARD-ROUTER.md` → legacy `docs/board/`) to list all projects, then ask which to triage or triage all.
+If triage was requested for a specific project, read that project's board at `engineering-board/<project>/BOARD.md`. If no project was specified, read the resolved `BOARD-ROUTER.md` (resolution order: `engineering-board/BOARD-ROUTER.md` to `docs/boards/BOARD-ROUTER.md` to legacy `docs/board/`) to list all projects, then ask which to triage or triage all.
 
-## Step 1 — Read current state
+## Step 1: Read current state
 
 1. Read the target board's `BOARD.md` open list.
 2. For each open item: read its entry file to get `priority`, `status`, `blocked_by`, and `affects`.
@@ -21,39 +22,39 @@ If triage was requested for a specific project, read that project's board at `en
    grep -r "blocked_by:" engineering-board/<project>/ --include="*.md" -h | sort | uniq
    ```
 
-## Step 1b — Auto-resolve terminal pass (run before triage output)
+## Step 1b: Auto-resolve terminal pass (run before triage output)
 
-Before applying the triage rules, run the auto-resolve terminal pass — see `../../references/auto-resolve-pass.md`.
+Before applying the triage rules, run the auto-resolve terminal pass: see `../../references/auto-resolve-pass.md`.
 
 **Why at triage:** recommendations should never point at already-done items. If a Done-when criterion was satisfied by work that happened between the last `/board-rebuild` and this triage call, surface it now so the user can close it before the triage output is computed.
 
-**Scope:** `full` mode across the target board. Suppress `weak` candidates — the triage view should not be cluttered with low-confidence noise. Only surface `verbatim` and `semantic` candidates.
+**Scope:** `full` mode across the target board. Suppress `weak` candidates: the triage view should not be cluttered with low-confidence noise. Only surface `verbatim` and `semantic` candidates.
 
-**Silent path:** zero candidates → no output, proceed to Step 2 unchanged.
+**Silent path:** zero candidates to no output, proceed to Step 2 unchanged.
 
 **If the user closes any entries from the pass:** re-read the open list from disk before continuing to Step 2 (closed entries should not appear in the triage output).
 
-## Step 2 — Apply triage rules in order
+## Step 2: Apply triage rules in order
 
 Apply all six rules in sequence. Each pass narrows the candidate set.
 
-**Rule 1 — Deliverable failures first**
+**Rule 1: Deliverable failures first**
 Any bug that caused a missing or broken output already delivered ranks above all quality work regardless of complexity. These are P0/P1 bugs without `blocked_by`. Pull them to the top.
 
-**Rule 2 — Open questions before the work they block**
-Find every question with `status: open`. Any bug or feature with `blocked_by: [Q###]` pointing to it cannot start. Resolve the question first. Run open questions in parallel when they don't depend on each other.
+**Rule 2: Open questions before the work they block**
+Find every question with `status: open`. Any bug or feature with `blocked_by: [Q###]` pointing to it cannot start. Resolve the question first. Run open questions in parallel when they do not depend on each other.
 
-**Rule 3 — Prerequisite order within batches**
-Where one bug's fix feeds another (noted in entry body under "Fix direction" or "depends on"), fix upstream first. Example from current board: B004 → B003 (B004's keyword prioritization fix must land before B003's phrase integration work).
+**Rule 3: Prerequisite order within batches**
+Where one bug's fix feeds another (noted in entry body under "Fix direction" or "depends on"), fix upstream first. Example from current board: B004 to B003 (B004's keyword prioritization fix must land before B003's phrase integration work).
 
-**Rule 4 — Batch by `affects:` component**
-Bugs and features touching the same file go in one PR. Group them before proposing work order — this minimizes context-switching and merge conflicts.
+**Rule 4: Batch by `affects:` component**
+Bugs and features touching the same file go in one PR. Group them before proposing work order: this minimizes context-switching and merge conflicts.
 
-**Rule 5 — Defer structural redesigns**
+**Rule 5: Defer structural redesigns**
 Changes requiring new content logic or architectural rethink go after incremental fixes are stable. Flag these explicitly as deferred with a reason.
 
-**Rule 6 — Surface systemic pattern clusters**
-After applying Rules 1–5, run the pattern cluster analysis:
+**Rule 6: Surface systemic pattern clusters**
+After applying Rules 1-5, run the pattern cluster analysis:
 ```bash
 # Current density — open entries
 grep -r "^pattern:" engineering-board/<project>/bugs/ engineering-board/<project>/features/ \
@@ -65,19 +66,19 @@ grep -r "^pattern:" engineering-board/<project>/bugs/ engineering-board/<project
 grep "pattern:" engineering-board/<project>/ARCHIVE.md 2>/dev/null \
   | grep -oE '[a-z][a-z-]+' | grep -v '^pattern$' | sort | uniq -c | sort -rn
 ```
-When any pattern appears in **2+ open entries** OR **2+ archived resolutions**: flag it as a systemic investigation candidate. Recommend investigating the shared root cause across all affected entries before fixing them individually — isolated fixes on systemic bugs often recur.
+When any pattern appears in **2+ open entries** OR **2+ archived resolutions**: flag it as a systemic investigation candidate. Recommend investigating the shared root cause across all affected entries before fixing them individually: isolated fixes on systemic bugs often recur.
 
-> **Two distinct thresholds — not a contradiction.** `2+` here is the *cluster-surfacing* threshold: it flags a pattern for human investigation during triage. It is separate from the *Learning-promotion* threshold used by the `learnings-curator` PM subagent, which promotes a pattern to a durable `L###` entry only at **recurrence ≥ 3** (across resolved entries). A pattern can be surfaced as a cluster (2+) well before it earns a committed Learning (3+).
+> **Two distinct thresholds: not a contradiction.** `2+` here is the *cluster-surfacing* threshold: it flags a pattern for human investigation during triage. It is separate from the *Learning-promotion* threshold used by the `learnings-curator` PM subagent, which promotes a pattern to a durable `L###` entry only at **recurrence ≥ 3** (across resolved entries). A pattern can be surfaced as a cluster (2+) well before it earns a committed Learning (3+).
 
-## Step 3 — Output the sequence
+## Step 3: Output the sequence
 
 Present:
-1. **Recommended next item** — with ID, title, and rationale from the rule that selected it
-2. **Full prioritized sequence** — all open, unblocked items in order
-3. **Blocked items** — list what's waiting and what question unblocks each
-4. **Deferred items** — if any, with reason
+1. **Recommended next item**: with ID, title, and rationale from the rule that selected it
+2. **Full prioritized sequence**: all open, unblocked items in order
+3. **Blocked items**: list what is waiting and what question unblocks each
+4. **Deferred items**: if any, with reason
 
-## Step 4 — Starting Work (when asked to begin an item)
+## Step 4: Starting Work (when asked to begin an item)
 
 Before marking any item `in_progress`:
 
@@ -88,4 +89,4 @@ Before marking any item `in_progress`:
 2. If any found: surface them. One item `in_progress` per session maximum. Either complete the existing item, reset it to `open` with a note on where it stopped, or confirm explicitly before proceeding.
 3. If clear: set `status: in_progress` in the entry file.
 4. If a new issue or question surfaces during implementation: create a new entry immediately using board-intake. Add a `## Related discoveries` section to the current item referencing the new ID. Continue with the current item's original scope.
-5. If the session ends without resolving: leave `in_progress` — the next session's `SessionStart` hook will surface it.
+5. If the session ends without resolving: leave `in_progress`: the next session's `SessionStart` hook will surface it.

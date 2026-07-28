@@ -1,116 +1,112 @@
-# Contributing to engineering-board
+# Contribute to Engineering Board
 
-Thanks for being here. engineering-board is a native Claude Code plugin and a
-zero-dependency MCP server, both driving one git-committed markdown board. It is
-built to be easy to contribute to: no toolchain to install, no service to stand
-up, no hidden database. If you have `bash` and `python3`, you can run everything.
+Engineering Board includes a Claude Code plugin and a Model Context Protocol
+(MCP) server. Both interfaces use one Markdown board in the repository.
 
-This guide covers how to get a change merged. For the deep system map — how the
-hooks, skills, agents, and the board format fit together — read
-[`ARCHITECTURE.md`](ARCHITECTURE.md).
+The project has no runtime package dependency. You need `bash` and `python3` to
+run the tests.
 
-## The one thing that matters: keep the suite green
+Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for the system structure.
 
-The whole test suite is `bash` + `python3` only, with **no install step**:
+## Run the test suite
+
+Run the full test suite:
 
 ```sh
-bash tests/run-all.sh   # 16 suites
+bash tests/run-all.sh
 ```
 
-That command is the merge gate. A change lands when it is green and stays green.
-There is no other build to learn, no dependency to fetch — clone the repo and run
-it. If it passes for you locally, it passes in CI
-([`.github/workflows/test.yml`](.github/workflows/test.yml) runs the same command
-on every push).
+The continuous integration (CI) workflow runs this command for each push.
 
-The rule for what a change must carry:
+Add tests for new behavior. Change the tests when you change behavior.
 
-- **New behavior ships with tests** that pin it.
-- **Changed behavior ships with changed tests** that pin the new behavior.
+Do not use a successful test result as proof of untested behavior. If the test
+location is not clear, open a draft pull request.
 
-A green suite over an untested change is not green — it is silent. If you are not
-sure where a test belongs, open a draft PR and ask; we would rather help you place
-it than merge it without one.
+## Find the project files
 
-## Where things live
-
-| Directory | What's in it |
+| Directory | Content |
 |---|---|
-| `commands/` | Slash commands (`/board-init`, `/pm-start`, `/worker-start`, …) as markdown |
-| `agents/` | Subagents — the PM pipeline and worker pipeline, plus the `board-manager` router |
-| `skills/` | The four board skills (`board-intake`, `board-triage`, `board-resolve`, `board-consolidate`) |
-| `hooks/` | Hook wiring (`hooks.json`), the Stop procedure, and `hooks/scripts/*.sh` — the deterministic core |
-| `mcp-server/` | The zero-dependency `python3` MCP server and its tests |
-| `tests/` | The suite — one directory per domain; `run-all.sh` is the runner |
-| `references/` | Shared protocol docs the agents load (auto-resolve pass, required permissions) |
+| `commands/` | Slash-command instructions |
+| `agents/` | Project Manager and Worker agent instructions |
+| `skills/` | Engineering Board skills |
+| `hooks/` | Hook configuration, the Stop procedure, and shell scripts |
+| `mcp-server/` | The zero-dependency Python MCP server and its tests |
+| `tests/` | One test area for each behavior domain |
+| `references/` | Shared agent protocols and permission data |
 
-The board itself, when scaffolded, lives at `engineering-board/<project>/` — human
-visible, committed, diffed in the same PRs as code. This repo dogfoods its own
-board at `engineering-board/eb-self/`.
+A generated board is in `engineering-board/<project>/`. The repository stores
+its own board in `engineering-board/eb-self/`.
 
-## Cross-compat rules for hooks and scripts
+## Obey the script portability rules
 
-Any new or edited `hooks/scripts/*.sh` must pass `tests/crosscompat-lint.sh`. The
-board runs on machines we don't control, so the rules are strict and mechanical:
+Apply these rules to each new or changed `hooks/scripts/*.sh` file:
 
-- Shebang is **exactly** `#!/usr/bin/env bash`.
-- No `date -d` and no `date -j -f` (GNU-only / BSD-only date math is banned).
-- No `jq`.
-- No drive letters in paths.
-- Use `python3` for anything involving JSON or timestamps — it is the one
-  interpreter present everywhere and gives you portable date and JSON handling.
+1. Use `#!/usr/bin/env bash` as the exact shebang.
+2. Do not use `date -d`.
+3. Do not use `date -j -f`.
+4. Do not use `jq`.
+5. Do not put a drive letter in a path.
+6. Use `python3` for JSON operations and timestamps.
 
-Board location is resolved in exactly one place: source `hooks/scripts/board-paths.sh`
-and call `eb_board_dirs` / `eb_board_rows` / `eb_router_path`. Do not re-hardcode
-`docs/boards/` or `engineering-board/` anywhere else.
+Run `tests/crosscompat-lint.sh` to check these rules.
 
-## Version bumps move in lockstep
+Source `hooks/scripts/board-paths.sh` to find the board. Use
+`eb_board_dirs`, `eb_board_rows`, or `eb_router_path`.
 
-When a change is user-facing, bump the version in **both** manifests together:
+Do not put `docs/boards/` or `engineering-board/` in a new path resolver.
 
-- `.claude-plugin/plugin.json`
-- `.claude-plugin/marketplace.json`
+## Record the release note
 
-`tests/version-coherence.sh` fails if they diverge. A fix only reaches installed
-plugins when the version increases, so a shippable fix without a bump is a fix no
-user receives. Also update [`CHANGELOG.md`](CHANGELOG.md) under `[Unreleased]`.
+For each user-visible change, add the change to the `[Unreleased]` section in
+[`CHANGELOG.md`](CHANGELOG.md).
 
-## Workflow: branch, then PR
+Do not change one versioned file independently. An explicit release preparation
+updates all versioned files and the MCP bundle checksum together.
 
-- Develop on a branch. **Never push to `main` directly** — every change lands via
-  a pull request.
-- Fill in the [pull request template](.github/pull_request_template.md): the
-  summary, which board entry it resolves, your test evidence
-  (`bash tests/run-all.sh` green plus any new or changed tests), the version-bump
-  checklist, and the surface-coherence check (README and docs still match
-  behavior).
-- CI runs `run-all` on your push. Keep it green.
+Read [`docs/RELEASING.md`](docs/RELEASING.md) when you prepare a release.
+## Use a branch and a pull request
 
-## Adding a test
+1. Create a branch.
+2. Make the change on the branch.
+3. Complete the [pull request template](.github/pull_request_template.md).
+4. Add the applicable board entry.
+5. Add the test evidence.
+6. Check the release-note requirement.
+7. Check that the README and the documentation agree with the behavior.
+8. Push the branch.
+9. Make sure that CI passes.
 
-Tests are plain `bash`. To add one:
+Do not push a change directly to `main`.
 
-1. Put it in the matching domain directory under `tests/` (e.g. a claim-locking
-   test goes in `tests/claims/`, a reject-filter fixture goes in `tests/security/`).
-2. Register it so `tests/run-all.sh` picks it up — follow the pattern of the
-   neighbouring tests in that directory's runner.
-3. Run `bash tests/run-all.sh` and confirm your suite count went up and everything
-   is green.
+## Add a test
 
-Security fixtures are especially welcome. The injection corpus at
-`tests/security/reject-filter.sh` grows with every pinned bypass — a fixture that
-declares its expected `expect:` / `expect_reason:` and drives the canonical filter
-is exactly the shape we want (see [SECURITY.md](SECURITY.md) for the posture).
+1. Put the test in the applicable directory under `tests/`.
+2. Add the test to the applicable test runner.
+3. Run `bash tests/run-all.sh`.
+4. Make sure that all test suites pass.
 
-## First contributions
+Add a claim test to `tests/claims/`. Add a reject-filter test to
+`tests/security/`.
 
-Look for issues labelled **good first issue**. Small, well-scoped, and a good way
-to learn where things live. Questions before you start are welcome — open a
-[Discussion](https://github.com/GhostlyGawd/engineering-board/discussions) or a
-draft PR. We would rather talk early than review a large change built on a wrong
-assumption.
+Each security fixture defines `expect` and `expect_reason`. The fixture must
+call the canonical reject filter.
+
+Read [`SECURITY.md`](SECURITY.md) for the security model.
+
+## Make a first contribution
+
+Find an issue with the `good first issue` label. Select a small issue with a
+clear scope.
+
+Use a [GitHub Discussion](https://github.com/GhostlyGawd/engineering-board/discussions)
+or a draft pull request if you need information.
 
 ## License
 
-By contributing, you agree that your contributions are licensed under the
-project's [MIT License](LICENSE).
+Your contribution uses the project [MIT License](LICENSE).
+
+## Language status
+
+The owner approved the current controlled-English text. The project does not
+claim formal ASD-STE100 compliance, certification, or independent review.

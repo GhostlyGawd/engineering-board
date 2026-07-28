@@ -1,7 +1,7 @@
 # engineering-board
 
 > A repository-owned pattern-intelligence system for engineering agents.
-> Findings, hypotheses, and learnings live as visible Markdown evidence;
+> Findings, hypotheses, and learnings live as visible Markdown evidence.
 > deterministic graph views connect recurring signals across domains so agents
 > can investigate shared root causes instead of repeatedly patching symptoms.
 > No hidden database, external service, or daemon. Ships as a Claude Code
@@ -16,7 +16,7 @@ into durable, correctable engineering memory:
 - Findings (bugs, features, questions, observations) are captured passively
   from every Claude Code session by a Stop hook.
 - Exact patterns and affected domains form explainable graph edges and clusters.
-  Graph structure is deterministic; agent-authored causal interpretations remain
+  Graph structure is deterministic. agent-authored causal interpretations remain
   separate, evidence-cited hypotheses.
 - /board-insights ranks clusters with a versioned, transparent 0-100
   investigation-priority score. /board-hypothesis preserves cited H### state,
@@ -29,14 +29,14 @@ into durable, correctable engineering memory:
   machine under atomic claim locking when fix verification is useful. This is a
   supporting proof loop, not the required first experience.
 - Recurring lessons promote into committed Learning entries (L###) that survive
-  session boundaries; board_remember / /board-remember saves one on demand.
+  session boundaries. board_remember / /board-remember saves one on demand.
 - BOARD.md (the index) and board.html (ranked pattern intelligence plus a
   themed Kanban with search, filters, stats, and coordination panels) are
   regenerated deterministically.
 
-Who it's for: developers running Claude Code (or any MCP client) who want their
+Who it is for: developers running Claude Code (or any MCP client) who want their
 agents' task state and memory to be repo-committed, PR-reviewable, and shared
-with the team — instead of per-user state in ~/.claude/ or a local database.
+with the team: instead of per-user state in ~/.claude/ or a local database.
 
 How it differs from the 2026 field (beads, Backlog.md, Task Master, Claude
 Code's built-in Tasks, claude-mem): its center is evidence-linked cross-domain
@@ -46,34 +46,34 @@ substrate.
 
 ## Install
 
-Claude Code plugin (full autonomous pipeline; requires Claude Code, free):
+Claude Code plugin (full autonomous pipeline. requires Claude Code, free):
 
     /plugin marketplace add GhostlyGawd/engineering-board
     /plugin install engineering-board
     /board-setup
     /board-demo
 
-MCP server, primary path — one line from PyPI:
+MCP server, primary path: one line from PyPI:
 
     claude mcp add engineering-board -- uvx engineering-board-mcp
 
-MCP server, fallback — run from a clone:
+MCP server, fallback: run from a clone:
 
     git clone https://github.com/GhostlyGawd/engineering-board
     claude mcp add engineering-board -- python3 "$(pwd)/engineering-board/mcp-server/engineering_board_mcp.py"
 
-Works with any MCP client — Codex CLI, Gemini CLI, Cursor, Claude Desktop
+Works with any MCP client: Codex CLI, Gemini CLI, Cursor, Claude Desktop
 config blocks:
 https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
 
 ## MCP tools (17)
 
-- board_init: scaffold a project board; optional agents_md writes a usage block
+- board_init: scaffold a project board. optional agents_md writes a usage block
   into the repo's AGENTS.md for hook-less agents.
 - board_list_projects: list projects from BOARD-ROUTER.md.
 - board_create_entry: create a validated entry, allocate the next id, rebuild
-  the index; optional parent links a subtask.
-- board_list_entries: list entries; filters project/type/status/needs/ready
+  the index. optional parent links a subtask.
+- board_list_entries: list entries. filters project/type/status/needs/ready
   (ready = open with all existing blockers resolved).
 - board_get_entry: full markdown + parsed frontmatter of one entry.
 - board_update_entry: update frontmatter (status, needs, priority, blocked_by,

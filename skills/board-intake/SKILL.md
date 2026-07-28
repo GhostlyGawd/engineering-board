@@ -4,6 +4,7 @@ description: This skill should be used when the user says "log this to the board
 version: 0.2.0
 ---
 
+
 # Board Intake
 
 Capture a finding as visible scratch evidence. Then use the shared foreground
@@ -107,7 +108,7 @@ scratch finding to that entry.
 
 Use `/board-pattern` for create, alias, assign, and correction operations.
 Each mutation requires a preview and unchanged plan ID. Corrections append
-durable `## Pattern history`; do not silently replace `pattern_ids`.
+durable `## Pattern history`. do not silently replace `pattern_ids`.
 
 Legacy `pattern` strings remain observed evidence. Canonical identity lives in
 repository-owned `patterns/P###-*.md` records and entry `pattern_ids`.
@@ -116,10 +117,10 @@ repository-owned `patterns/P###-*.md` records and entry `pattern_ids`.
 
 Report:
 
-- the created or matched entry ID for each finding;
-- unresolved pattern labels;
-- rejected findings and reasons;
-- the scratch archive result;
+- the created or matched entry ID for each finding.
+- unresolved pattern labels.
+- rejected findings and reasons.
+- the scratch archive result.
 - the `BOARD.md` and `GRAPH.yml` rebuild result.
 
 Run the focused auto-resolve terminal pass in

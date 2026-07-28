@@ -1,0 +1,197 @@
+schema_version: 2
+approval_status_values:
+  - APPROVED
+  - PENDING
+  - REJECTED
+approved_part_of_speech_values:
+  - noun
+  - verb
+  - proper_noun
+  - abbreviation
+  - identifier
+term_type_values:
+  - technical_noun
+  - technical_verb
+  - proper_noun
+  - abbreviation
+  - identifier
+entry_schema:
+  required_fields:
+    - approved_term
+    - definition
+    - term_type
+    - approved_part_of_speech
+    - permitted_inflections
+    - prohibited_synonyms
+    - domain
+    - source_authority
+    - approval_status
+    - approval_date
+    - notes
+terms:
+  - approved_term: Engineering Board
+    definition: The repository-owned product that stores and analyzes engineering findings.
+    term_type: proper_noun
+    approved_part_of_speech: proper_noun
+    permitted_inflections: []
+    prohibited_synonyms:
+      - board system
+      - engineering memory system
+    domain: agentic-software-engineering
+    source_authority: docs/PRODUCT_EVOLUTION_SPEC.md
+    approval_status: PENDING
+    approval_date: null
+    notes: Product-owner approval is required.
+  - approved_term: Model Context Protocol
+    definition: The protocol that exposes Engineering Board tools to an MCP client.
+    term_type: proper_noun
+    approved_part_of_speech: proper_noun
+    permitted_inflections: []
+    prohibited_synonyms: []
+    domain: agentic-software-engineering
+    source_authority: mcp-server/README.md
+    approval_status: PENDING
+    approval_date: null
+    notes: Technical approval is required.
+  - approved_term: MCP
+    definition: The approved abbreviation for Model Context Protocol.
+    term_type: abbreviation
+    approved_part_of_speech: abbreviation
+    permitted_inflections: []
+    prohibited_synonyms: []
+    domain: agentic-software-engineering
+    source_authority: mcp-server/README.md
+    approval_status: PENDING
+    approval_date: null
+    notes: Define the full term before the first use when the context requires it.
+  - approved_term: command-line interface
+    definition: A text interface that accepts a command.
+    term_type: technical_noun
+    approved_part_of_speech: noun
+    permitted_inflections:
+      - command-line interfaces
+    prohibited_synonyms:
+      - command line interface
+      - commandline interface
+    domain: software-engineering
+    source_authority: repository implementation
+    approval_status: PENDING
+    approval_date: null
+    notes: Technical approval is required.
+  - approved_term: CLI
+    definition: The approved abbreviation for command-line interface.
+    term_type: abbreviation
+    approved_part_of_speech: abbreviation
+    permitted_inflections: []
+    prohibited_synonyms: []
+    domain: software-engineering
+    source_authority: repository implementation
+    approval_status: PENDING
+    approval_date: null
+    notes: Define the full term before the first use when the context requires it.
+  - approved_term: Markdown
+    definition: The text format for canonical Engineering Board records.
+    term_type: proper_noun
+    approved_part_of_speech: proper_noun
+    permitted_inflections: []
+    prohibited_synonyms: []
+    domain: software-engineering
+    source_authority: docs/PRODUCT_EVOLUTION_SPEC.md
+    approval_status: PENDING
+    approval_date: null
+    notes: Product-owner approval is required.
+  - approved_term: graph
+    definition: A derived data structure that connects canonical records.
+    term_type: technical_noun
+    approved_part_of_speech: noun
+    permitted_inflections:
+      - graphs
+    prohibited_synonyms:
+      - relationship map
+      - network
+    domain: agentic-software-engineering
+    source_authority: ARCHITECTURE.md
+    approval_status: PENDING
+    approval_date: null
+    notes: Technical approval is required.
+  - approved_term: pattern
+    definition: A canonical record for a recurring engineering condition.
+    term_type: technical_noun
+    approved_part_of_speech: noun
+    permitted_inflections:
+      - patterns
+    prohibited_synonyms:
+      - theme
+      - motif
+    domain: agentic-software-engineering
+    source_authority: docs/PRODUCT_EVOLUTION_SPEC.md
+    approval_status: PENDING
+    approval_date: null
+    notes: Product-owner approval is required.
+  - approved_term: hypothesis
+    definition: A proposed explanation that cites canonical evidence.
+    term_type: technical_noun
+    approved_part_of_speech: noun
+    permitted_inflections:
+      - hypotheses
+    prohibited_synonyms:
+      - theory
+      - guess
+    domain: agentic-software-engineering
+    source_authority: docs/PRODUCT_EVOLUTION_SPEC.md
+    approval_status: PENDING
+    approval_date: null
+    notes: Product-owner approval is required.
+  - approved_term: negative memory
+    definition: A durable record that prevents an unchanged rejected hypothesis from returning.
+    term_type: technical_noun
+    approved_part_of_speech: noun
+    permitted_inflections: []
+    prohibited_synonyms:
+      - rejection cache
+    domain: agentic-software-engineering
+    source_authority: docs/PRODUCT_EVOLUTION_SPEC.md
+    approval_status: PENDING
+    approval_date: null
+    notes: Product-owner approval is required.
+  - approved_term: finding
+    definition: An observed engineering issue, feature request, question, or learning candidate.
+    term_type: technical_noun
+    approved_part_of_speech: noun
+    permitted_inflections:
+      - findings
+    prohibited_synonyms:
+      - observation
+      - item
+    domain: agentic-software-engineering
+    source_authority: README.md
+    approval_status: PENDING
+    approval_date: null
+    notes: Product-owner approval is required.
+  - approved_term: entry
+    definition: A canonical Engineering Board record for work or knowledge.
+    term_type: technical_noun
+    approved_part_of_speech: noun
+    permitted_inflections:
+      - entries
+    prohibited_synonyms:
+      - ticket
+      - card
+    domain: agentic-software-engineering
+    source_authority: STATES.md
+    approval_status: PENDING
+    approval_date: null
+    notes: Technical approval is required.
+  - approved_term: claim
+    definition: The temporary ownership record for work on one entry.
+    term_type: technical_noun
+    approved_part_of_speech: noun
+    permitted_inflections:
+      - claims
+    prohibited_synonyms:
+      - lock
+    domain: agentic-software-engineering
+    source_authority: commands/board-claim-release.md
+    approval_status: PENDING
+    approval_date: null
+    notes: Technical approval is required.

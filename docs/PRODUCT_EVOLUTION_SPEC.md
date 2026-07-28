@@ -1,13 +1,13 @@
 # Engineering Board Product Evolution Spec
 
-_Status: Authoritative living product direction — Milestone A shipped in
-v1.8.0; Milestone B shipped in v1.9.1; Milestone C shipped in v1.10.0_
+_Status: Authoritative living product direction: Milestone A shipped in
+v1.8.0. Milestone B shipped in v1.9.1. Milestone C shipped in v1.10.0_
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-28_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
 _Current release boundary: `v1.10.0`_
-_Portfolio context: inventory-only; audit source `GhostlyGawd/repo-audit` at
+_Portfolio context: inventory-only. audit source `GhostlyGawd/repo-audit` at
 `907f0759f9d08f478cd5384ad88e50963f1af79a`_
 
 ## 1. Authority and use
@@ -32,11 +32,11 @@ together.
 
 Decision states:
 
-- **Accepted** — explicitly chosen product direction.
-- **Active recommendation** — recommended, but still revisable by the owner.
-- **Open** — a material product choice is unresolved.
-- **Deferred** — deliberately outside the next milestone.
-- **Rejected** — considered and deliberately excluded.
+- **Accepted**: explicitly chosen product direction.
+- **Active recommendation**: recommended, but still revisable by the owner.
+- **Open**: a material product choice is unresolved.
+- **Deferred**: deliberately outside the next milestone.
+- **Rejected**: considered and deliberately excluded.
 
 No product implementation begins until an implementation contract for the
 selected milestone is approved.
@@ -47,15 +47,15 @@ selected milestone is approved.
 |---|---|---|
 | Central product-direction source | Accepted | This document is authoritative for product direction. Roadmaps, RFCs, audits, and earlier prose cannot silently override it. |
 | Primary product outcome | Accepted | Turn accumulated engineering findings into visible, clustered graph memory that helps agents recognize recurring and cross-domain root causes, avoid repeated band-aid fixes, and make better decisions in later sessions. |
-| Product substrate | Accepted | Pattern intelligence is the substrate. Capture, execution, TDD, review, and validation support and improve that intelligence; they are not the primary product identity. |
+| Product substrate | Accepted | Pattern intelligence is the substrate. Capture, execution, TDD, review, and validation support and improve that intelligence. they are not the primary product identity. |
 | Durable state | Accepted | Preserve repository-owned, human-readable Markdown as the canonical evidence and knowledge record. |
 | Derived graph | Accepted | Generate machine-readable relationships, clusters, and retrieval views from canonical repository state. Derived artifacts must remain explainable from source evidence. |
 | SQLite | Active recommendation | Do not replace Markdown. Consider SQLite only as a disposable, locally rebuildable analysis index after measured scale or query needs justify it. |
 | Epistemic boundary | Accepted | Separate observed evidence, deterministic relationships, inferred root-cause candidates, confirmed conclusions, and durable learnings. Never present a cluster as proof of causation. |
 | Hypothesis authority | Accepted | Root-cause hypotheses may be stored durably with `status: proposed` and evidence. Only explicit investigation or fix outcomes may confirm them. Rejected hypotheses remain durable negative knowledge. |
-| Default capture policy | Active recommendation | Capture automatically; promote explicitly through a foreground action. Automatic capture does not silently become committed project truth. |
+| Default capture policy | Active recommendation | Capture automatically. promote explicitly through a foreground action. Automatic capture does not silently become committed project truth. |
 | Verification loop | Accepted | Keep `tdd → review → validate` as an optional, falsifiable fix-verification and feedback mechanism. Do not make it the required first experience or the headline value. |
-| Claims and resolution | Active recommendation | Preserve atomic claims. Validation may recommend closure; final resolution remains an explicit user or explicitly authorized action. |
+| Claims and resolution | Active recommendation | Preserve atomic claims. Validation may recommend closure. final resolution remains an explicit user or explicitly authorized action. |
 | Session modes | Active recommendation | Keep PM and Worker modes as advanced batch controls, not required concepts in the default pattern-memory workflow. |
 | Cross-repository intelligence | Deferred | Prove repository-local pattern intelligence before designing aggregation across repositories. |
 | Hosted service or required database | Deferred | No hosted control plane, daemon, account system, cloud sync, or required database in the next milestones. |
@@ -65,10 +65,10 @@ selected milestone is approved.
 | B057 prerequisite | Landed | PR #93's scratch-finding count fix landed before Milestone A and is included in v1.8.0. The superseded 1.7.1 preparation was folded into the combined feature release instead of publishing two adjacent versions. |
 | Milestone A delivery | Accepted and shipped | The contained synthetic `/board-demo`, deterministic demo graph engine, proposed-hypothesis contract, real evidence view, cleanup boundary, tests, and dated validation ship in v1.8.0. |
 | Milestone B direction | Accepted and shipped | Make real findings from every supported intake path converge into trustworthy, normalized, provenance-linked graph memory before adding richer root-cause reasoning. |
-| Stable pattern identity | Accepted for Milestone B | Add repository-owned `P###` pattern records with readable labels and aliases. Preserve legacy free-form labels as evidence and compatibility input; do not let semantic suggestions silently become canonical identity. |
+| Stable pattern identity | Accepted for Milestone B | Add repository-owned `P###` pattern records with readable labels and aliases. Preserve legacy free-form labels as evidence and compatibility input. do not let semantic suggestions silently become canonical identity. |
 | Foreground promotion | Accepted for Milestone B | Preview captured findings and their proposed pattern assignments, then require an explicit apply action. PM mode may retain its already-authorized batch behavior but must use the same promotion core. |
 | Adapter parity | Accepted for Milestone B | Plugin and MCP surfaces must consume the same zero-dependency parser, pattern resolver, and deterministic graph engine and return semantically equivalent facts. |
-| Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release; v1.9.1 is the corrected publication boundary. |
+| Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 
 ## 3. Product thesis
@@ -153,9 +153,9 @@ The current product already contains important pieces of this direction:
 |---|---|---|
 | Finding capture | Stop-hook extraction appends evidence-backed scratch findings and surfaces a capture receipt. | Pattern metadata is not assigned until intake/promotion, so captured evidence does not immediately participate in analysis. |
 | Canonical board | Promoted bugs, features, questions, observations, and learnings are readable Markdown with frontmatter. | The board is optimized around entry lifecycle more than knowledge connectivity. |
-| Pattern vocabulary | Intake asks agents to reuse kebab-case failure-mode tags and apply them broadly. | Free-form exact strings fragment easily; aliases, hierarchy, and semantic equivalence are not represented. |
+| Pattern vocabulary | Intake asks agents to reuse kebab-case failure-mode tags and apply them broadly. | Free-form exact strings fragment easily. aliases, hierarchy, and semantic equivalence are not represented. |
 | Structural graph | `/board-graph` defines nodes, explicit relationships, shared-pattern, shared-affects, shared-tag edges, topology, and typed findings in `GRAPH.yml`. | The graph builder is a command procedure rather than a shared deterministic executable engine. Exact tags and path prefixes miss semantically related cross-domain symptoms. |
-| Cluster surfacing | Intake and triage flag a pattern at 2+ occurrences; SessionStart warns at 3+ open occurrences. | Thresholds and presentation differ. Counts identify recurrence but do not explain cluster evidence or competing hypotheses. |
+| Cluster surfacing | Intake and triage flag a pattern at 2+ occurrences. SessionStart warns at 3+ open occurrences. | Thresholds and presentation differ. Counts identify recurrence but do not explain cluster evidence or competing hypotheses. |
 | Learning curation | At 3+ resolved entries sharing an exact pattern, the curator creates a source-linked Learning and raises confidence by recurrence. | Curation runs through PM mode, treats recurrence count as the main confidence signal, and does not learn from failed fixes or rejected causal hypotheses. |
 | Context retrieval | SessionStart shows up to three medium/high-confidence learnings filtered by `applies_to` and current directory. | Retrieval is path-centric and does not surface relevant live clusters, root-cause candidates, or the reason a cross-domain match matters. |
 | Resolution feedback | Resolution archives pattern tags and can cascade across pattern/affects neighbors. | A resolution does not yet record whether the suspected root cause was confirmed, whether the fix held, or which cluster interpretation changed. |
@@ -171,10 +171,10 @@ what is inferred.
 
 | Layer | Meaning | Authority | Durable form |
 |---|---|---|---|
-| Observation | A symptom, constraint, result, or user report with provenance. | Captured evidence; reviewed at promotion. | Canonical Markdown finding/entry. |
+| Observation | A symptom, constraint, result, or user report with provenance. | Captured evidence. reviewed at promotion. | Canonical Markdown finding/entry. |
 | Relationship fact | An explicit dependency, contradiction, shared exact pattern, shared affected prefix, or other reproducible relation. | Deterministic rule or explicit author. | Derived graph edge with source/rule reference. |
 | Candidate cluster | A reproducible grouping that crosses a configured threshold. | Deterministic clustering engine. | Rebuildable derived graph record. |
-| Root-cause hypothesis | An interpretation explaining why cluster members may share a cause. | Agent-generated proposal with cited members, confidence, alternatives, and falsifier. | Proposed insight; durable only when retained through an explicit policy. |
+| Root-cause hypothesis | An interpretation explaining why cluster members may share a cause. | Agent-generated proposal with cited members, confidence, alternatives, and falsifier. | Proposed insight. durable only when retained through an explicit policy. |
 | Confirmed finding | A hypothesis supported by investigation or fix outcome. | Explicit resolution/investigation evidence. | Canonical Markdown update with provenance. |
 | Learning | A reusable conclusion with scope, recurrence, confidence, and source cases. | Explicit remember action or approved deterministic curation policy. | Canonical Markdown learning. |
 
@@ -217,8 +217,8 @@ be able to reconstruct the same logical intelligence from canonical files.
 |---|---|---|---|
 | Human inspection and review | Excellent | Poor without tooling | Excellent |
 | Git diffs and merge recovery | Excellent | Binary and conflict-prone | Canonical diffs remain excellent |
-| Portability and zero-service use | Excellent | Requires schema/tooling | Excellent; index optional |
-| Transactions and referential integrity | Manual | Strong | Canonical writes remain explicit; index can validate |
+| Portability and zero-service use | Excellent | Requires schema/tooling | Excellent. index optional |
+| Transactions and referential integrity | Manual | Strong | Canonical writes remain explicit. index can validate |
 | Large scans, joins, ranking, and aggregation | Degrades with corpus size | Strong | SQLite can accelerate only when justified |
 | Full-text and compound queries | Awkward | Strong | Optional index serves advanced queries |
 | Corruption recovery | Source files are directly recoverable | Depends on backup/migrations | Delete and rebuild derived state |
@@ -250,13 +250,13 @@ Evaluate a derived SQLite index only when at least one is demonstrated:
 
 Any SQLite proposal must prove:
 
-- deletion and deterministic rebuild from canonical Markdown;
-- logically equivalent query and cluster results with and without the index;
-- source provenance for every returned result;
-- no committed binary database or database merge workflow;
-- schema versioning and forward recovery;
-- corrupt or stale index detection with safe self-rebuild;
-- cross-platform packaging and performance evidence;
+- deletion and deterministic rebuild from canonical Markdown.
+- logically equivalent query and cluster results with and without the index.
+- source provenance for every returned result.
+- no committed binary database or database merge workflow.
+- schema versioning and forward recovery.
+- corrupt or stale index detection with safe self-rebuild.
+- cross-platform packaging and performance evidence.
 - no dependency on SQLite for reading, editing, reviewing, or recovering the
   board.
 
@@ -270,10 +270,10 @@ adjacent products while preserving its distinct job.
 
 | Source | Strength to learn from | Apply to Engineering Board | Boundary |
 |---|---|---|---|
-| [Beads](https://github.com/gastownhall/beads) | Durable agent memory, graph queries, ready work, and multi-agent coordination. | Make graph memory and contextual retrieval first-class; provide concise next investigation/action. | Do not adopt database-first authority or distributed sync before a current consumer requires it. |
+| [Beads](https://github.com/gastownhall/beads) | Durable agent memory, graph queries, ready work, and multi-agent coordination. | Make graph memory and contextual retrieval first-class. provide concise next investigation/action. | Do not adopt database-first authority or distributed sync before a current consumer requires it. |
 | [Backlog.md](https://github.com/MrLesk/Backlog.md) | Rich, inspectable Markdown tasks and human-friendly browsing. | Keep evidence, hypotheses, acceptance criteria, and learning provenance easy to read and review. | Do not become a general-purpose project-management suite. |
 | [Task Master](https://github.com/eyaltoledano/claude-task-master) | PRD decomposition and recommended-next workflows. | Later accept structured plans as one finding source and make the next investigation obvious. | Planning breadth is not the intelligence substrate. |
-| Claude Code Tasks | Frictionless in-session checklist. | Compose with it: ephemeral steps remain session-local; durable discoveries enter Engineering Board. | Do not rebuild a personal checklist. |
+| Claude Code Tasks | Frictionless in-session checklist. | Compose with it: ephemeral steps remain session-local. durable discoveries enter Engineering Board. | Do not rebuild a personal checklist. |
 
 The differentiator is:
 
@@ -417,7 +417,7 @@ No conclusion should be a dead-end summary without drill-down.
 
 Milestones are ordered by the product's intelligence value.
 
-### Milestone A — Pattern-intelligence first win
+### Milestone A: Pattern-intelligence first win
 
 **Purpose:** Demonstrate the unique product value in one session.
 
@@ -429,12 +429,12 @@ Milestones are ordered by the product's intelligence value.
 - Graph and cluster output with member evidence and relationship reasons.
 - A root-cause candidate clearly labeled as an inference.
 - Explicit, fingerprinted sample cleanup or retention.
-- A real visual showing evidence → cluster → root-cause candidate.
+- A real visual showing evidence to cluster to root-cause candidate.
 
 If omitted, the first experience continues to showcase workflow mechanics
 instead of the product's intelligence advantage.
 
-### Milestone B — Reliable finding-to-graph pipeline
+### Milestone B: Reliable finding-to-graph pipeline
 
 **Purpose:** Ensure real findings become trustworthy, connected memory.
 
@@ -451,7 +451,7 @@ instead of the product's intelligence advantage.
 If omitted, intelligence remains dependent on exact free-form tags and
 adapter-specific prompt execution.
 
-### Milestone C — Cross-domain root-cause intelligence
+### Milestone C: Cross-domain root-cause intelligence
 
 **Purpose:** Turn structural clusters into useful, bounded engineering
 interpretation.
@@ -474,7 +474,7 @@ Implemented scope:
 If omitted, Engineering Board can count and group patterns but cannot reliably
 help an agent reason from symptoms toward a shared cause.
 
-### Milestone D — Contextual retrieval and outcome learning
+### Milestone D: Contextual retrieval and outcome learning
 
 **Purpose:** Deliver accumulated intelligence at the decision where it changes
 agent behavior.
@@ -482,7 +482,7 @@ agent behavior.
 Candidate scope:
 
 - Retrieval based on current files, task intent, patterns, graph neighbors, and
-  prior outcomes—not only current working directory.
+  prior outcomes-not only current working directory.
 - SessionStart and on-demand surfacing of relevant clusters and learnings.
 - Resolution feedback that updates hypothesis and learning confidence.
 - Source-linked explanation of why a memory applies.
@@ -492,9 +492,9 @@ Candidate scope:
 If omitted, the repository may contain strong memory that the acting agent
 still fails to use.
 
-### Milestone E — Execution ergonomics and planning bridge
+### Milestone E: Execution ergonomics and planning bridge
 
-**State: Deferred until A–D are proven.**
+**State: Deferred until A-D are proven.**
 
 Possible work:
 
@@ -528,7 +528,7 @@ feed the result back into memory. It does not lead the roadmap.
    alternatives, confidence basis, and at least one falsifier.
 8. Rejected hypotheses remain queryable and are not proposed again without
    materially new evidence.
-9. Confirmed fix outcomes strengthen the relevant learning; failed or partial
+9. Confirmed fix outcomes strengthen the relevant learning. failed or partial
    fixes weaken or split it.
 10. A user can correct a pattern, edge, cluster interpretation, or learning
     without editing an opaque cache.
@@ -558,7 +558,7 @@ feed the result back into memory. It does not lead the roadmap.
 
 ## 13. Accepted and open decisions
 
-### A1 — Hypothesis authority
+### A1: Hypothesis authority
 
 **State: Accepted 2026-07-27.**
 
@@ -574,7 +574,7 @@ preserving the distinction between useful inference and established knowledge.
 Option 3 is rejected: confidence never converts correlation into confirmed
 causation without outcome evidence.
 
-### A2 — Pattern normalization
+### A2: Pattern normalization
 
 **State: Accepted for Milestone B on 2026-07-27.**
 
@@ -586,10 +586,10 @@ Options:
    for proposed aliases or links.
 
 Decision: option 3. Exact canonical identity keeps durable results
-deterministic; semantic suggestions can discover cross-domain equivalence but
+deterministic. semantic suggestions can discover cross-domain equivalence but
 must remain reviewable before becoming durable.
 
-### A3 — Cluster model
+### A3: Cluster model
 
 **State: Accepted for Milestone B on 2026-07-27.**
 
@@ -597,14 +597,14 @@ Options:
 
 1. Exact pattern recurrence only.
 2. One global similarity score.
-3. Typed signals—explicit relationships, normalized pattern, affected domain,
-   temporal recurrence, evidence semantics, and outcome history—with each
+3. Typed signals-explicit relationships, normalized pattern, affected domain,
+   temporal recurrence, evidence semantics, and outcome history-with each
    contribution exposed.
 
 Decision: option 3. A single opaque score would make false positives hard
 to diagnose and weaken trust.
 
-### A4 — First-win fixture
+### A4: First-win fixture
 
 **State: Accepted, implemented, and shipped in v1.8.0.**
 
@@ -612,14 +612,14 @@ The sample contains different surface symptoms and affected domains that share
 the verifiable `duplicated-state-contract` pattern. Its containment and cleanup
 model are pinned by the accepted Milestone A contract and dated evidence.
 
-### O5 — SQLite trigger and latency target
+### O5: SQLite trigger and latency target
 
-The layered storage direction is set; the numeric corpus and interactive
+The layered storage direction is set. the numeric corpus and interactive
 latency threshold that would justify an optional SQLite index remains open.
 Benchmark the file/graph implementation first rather than inventing a threshold
 without evidence.
 
-### A5 — Promotion boundary
+### A5: Promotion boundary
 
 **State: Accepted for Milestone B on 2026-07-27.**
 
@@ -627,7 +627,7 @@ Decision: a foreground promote action writes validated findings, reports
 created/rejected/deduplicated outcomes, and offers a preview. Silent
 auto-promotion remains deferred.
 
-### O7 — Resolution and learning feedback
+### O7: Resolution and learning feedback
 
 Recommendation: after verification, offer an explicit resolve action that also
 records the hypothesis outcome. Do not silently convert successful validation
@@ -638,7 +638,7 @@ into confirmed causation.
 ### Keep emphasizing the build loop
 
 This proves engineering discipline but underuses the accumulated corpus. Many
-tools can run tests and reviews; the unique advantage is recognizing patterns
+tools can run tests and reviews. the unique advantage is recognizing patterns
 that a stateless agent misses. Rejected as the primary product story.
 
 ### Use Markdown only forever
@@ -664,7 +664,7 @@ interpretation.
 This adds breadth while diluting the root-cause memory job. Continue composing
 with session tasks and planning tools instead.
 
-## 15. Explicit non-goals for Milestones A–D
+## 15. Explicit non-goals for Milestones A-D
 
 - Replacing canonical Markdown with SQLite or another database.
 - Committing a binary database as collaboration state.
@@ -682,31 +682,31 @@ with session tasks and planning tools instead.
 
 | Contract item | Normative level | Current implementation | Test/evidence | Documentation disposition | Status |
 |---|---|---|---|---|---|
-| Product-direction authority | Accepted | No runtime behavior | Owner decision recorded here | This file; `ROADMAP.md` precedence note | Direction aligned |
-| Pattern-intelligence substrate | Accepted direction | Production capture, promotion, stable pattern identity, shared deterministic graph behavior, transparent cluster ranking, and durable H### lifecycle form one evidence-to-reasoning substrate | Existing graph/curator tests; Milestone A/B evidence; Milestone C lifecycle matrix and release validation | README, landing page, commands, normal view, and architecture distinguish ranking from confidence and proposals from confirmation | Milestones A–C shipped and aligned |
-| Hypothesis authority | Accepted direction | Canonical H### records support proposed, weakened, confirmed, rejected, split, and merged states through evidence-gated preview/apply; negative memory blocks unchanged rejected claims | Hypothesis contract, Milestone C matrix, MCP suite, full release tree, and v1.10.0 publication evidence | Schema, command, skill, security, architecture, and product docs aligned | Shipped in v1.10.0 |
-| Canonical Markdown | Accepted | Entry, pattern, hypothesis, and learning Markdown is durable state; graph, rankings, cache, and HTML remain derived | Intake, graph, hypothesis, rebuild, resolve, and curation tests | Architecture and storage boundary documented | Aligned |
-| Derived graph | Accepted direction | One shared zero-dependency engine serves production plugin, PM, contained demo, and MCP adapters; canonical P### identities and legacy fallbacks produce source-linked graph facts | Existing graph suites plus the Milestone B pattern-pipeline matrix | Graph schema, cache authority, and adapter parity are current in command, MCP, architecture, and schema docs | Milestone B aligned |
+| Product-direction authority | Accepted | No runtime behavior | Owner decision recorded here | This file. `ROADMAP.md` precedence note | Direction aligned |
+| Pattern-intelligence substrate | Accepted direction | Production capture, promotion, stable pattern identity, shared deterministic graph behavior, transparent cluster ranking, and durable H### lifecycle form one evidence-to-reasoning substrate | Existing graph/curator tests. Milestone A/B evidence. Milestone C lifecycle matrix and release validation | README, landing page, commands, normal view, and architecture distinguish ranking from confidence and proposals from confirmation | Milestones A-C shipped and aligned |
+| Hypothesis authority | Accepted direction | Canonical H### records support proposed, weakened, confirmed, rejected, split, and merged states through evidence-gated preview/apply. negative memory blocks unchanged rejected claims | Hypothesis contract, Milestone C matrix, MCP suite, full release tree, and v1.10.0 publication evidence | Schema, command, skill, security, architecture, and product docs aligned | Shipped in v1.10.0 |
+| Canonical Markdown | Accepted | Entry, pattern, hypothesis, and learning Markdown is durable state. graph, rankings, cache, and HTML remain derived | Intake, graph, hypothesis, rebuild, resolve, and curation tests | Architecture and storage boundary documented | Aligned |
+| Derived graph | Accepted direction | One shared zero-dependency engine serves production plugin, PM, contained demo, and MCP adapters. canonical P### identities and legacy fallbacks produce source-linked graph facts | Existing graph suites plus the Milestone B pattern-pipeline matrix | Graph schema, cache authority, and adapter parity are current in command, MCP, architecture, and schema docs | Milestone B aligned |
 | Milestone B reliable pipeline | Accepted and shipped | Stable P### records, foreground promotion, shared PM/MCP/plugin core, disposable cache, receipts, and graph provenance shipped in v1.9.1 | `tests/orchestration/milestone-b-pattern-pipeline.sh`, full release-tree suite, bundle-content parity, implementation evidence, and external release validation | Current-truth product, command, MCP, architecture, security, landing, and LLM docs updated | Shipped in v1.9.1 |
-| SQLite | Optional future accelerator | Not implemented or required | Future benchmark and rebuild-equivalence proof required | Migration explicitly rejected; adoption trigger recorded | Deferred optimization |
-| Current capture confirmation | Required current truth | Stop procedure and append helper surface a non-empty receipt | `tests/scratch/append.sh`; mode-routing tests | README was corrected in this branch | Documentation-only drift repaired |
+| SQLite | Optional future accelerator | Not implemented or required | Future benchmark and rebuild-equivalence proof required | Migration explicitly rejected. adoption trigger recorded | Deferred optimization |
+| Current capture confirmation | Required current truth | Stop procedure and append helper surface a non-empty receipt | `tests/scratch/append.sh`. mode-routing tests | README was corrected in this branch | Documentation-only drift repaired |
 | Canonical setup instruction | Required current truth | `/board-setup` is the plugin setup path | Setup command test | Landing page was corrected in this branch | Documentation-only drift repaired |
-| TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped and unchanged | Existing mode and orchestration tests | Repositioned as optional falsifiable verification feedback, not the headline or required first experience | Behavior unchanged; messaging aligned |
-| MCP behavior | Required current truth | Seventeen tools share canonical Markdown; pattern, promotion, graph, ranking, and hypothesis tools delegate to the same core as plugin adapters | 166-check MCP lifecycle suite plus Milestone B/C adapter-parity matrices; official registry version 1.10.0 active and latest | MCP reference, manifests, package modules, and counts updated | Shipped in v1.10.0 |
-| Security, privacy, versions, releases | Required current truth | Content-bound hypothesis tokens, inventory and graph revalidation, one-file atomic writes, linked-input refusal, HTML escaping, and offline operation extend the existing controls; coordinated manifests identify v1.10.0 | Security suites, Milestone C matrix, full 16-suite release tree, reproducible bundle checksum, merged-main CI, and external publication checks passed | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and release evidence aligned | Shipped and externally validated |
+| TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped and unchanged | Existing mode and orchestration tests | Repositioned as optional falsifiable verification feedback, not the headline or required first experience | Behavior unchanged. messaging aligned |
+| MCP behavior | Required current truth | Seventeen tools share canonical Markdown. pattern, promotion, graph, ranking, and hypothesis tools delegate to the same core as plugin adapters | 166-check MCP lifecycle suite plus Milestone B/C adapter-parity matrices. official registry version 1.10.0 active and latest | MCP reference, manifests, package modules, and counts updated | Shipped in v1.10.0 |
+| Security, privacy, versions, releases | Required current truth | Content-bound hypothesis tokens, inventory and graph revalidation, one-file atomic writes, linked-input refusal, HTML escaping, and offline operation extend the existing controls. coordinated manifests identify v1.10.0 | Security suites, Milestone C matrix, full 16-suite release tree, reproducible bundle checksum, merged-main CI, and external publication checks passed | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and release evidence aligned | Shipped and externally validated |
 | Milestone C implementation contract | Accepted and shipped | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging shipped | Milestone C 15-check matrix, 166-check MCP suite, 16/16 release-tree suites, merged-main CI, release workflow, and live-surface checks pass | Central spec, contract workpad, current-truth docs, real sanitized visual, implementation evidence, and v1.10.0 release validation updated | Shipped in v1.10.0 |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
 
 _State: Accepted by the product owner on 2026-07-27 and implemented on the
-direction branch; shipped in v1.8.0._
+direction branch. shipped in v1.8.0._
 
 ### 17.1 Milestone purpose
 
 > Give a new user one bounded, trustworthy experience in which three
 > surface-different engineering symptoms across separate domains become one
-> evidence-linked systemic investigation candidate—proving the product's
+> evidence-linked systemic investigation candidate-proving the product's
 > intelligence advantage before introducing its operating model.
 
 ### 17.2 Demonstration scenario
@@ -750,26 +750,26 @@ Try the pattern-intelligence sample: /board-demo
 `/board-demo` must:
 
 1. create a run-scoped workspace under
-   `.engineering-board/demo/pattern-intelligence/<run-id>/`;
-2. copy only the three labeled sample entries and required templates;
+   `.engineering-board/demo/pattern-intelligence/<run-id>/`.
+2. copy only the three labeled sample entries and required templates.
 3. record a manifest containing relative paths and content hashes before any
-   analysis;
-4. build deterministic graph facts from the sample;
+   analysis.
+4. build deterministic graph facts from the sample.
 5. show the candidate cluster, member evidence, relationship reasons, and
-   affected domains;
-6. create one evidence-linked `status: proposed` hypothesis;
-7. show at least one alternative explanation and one falsifier;
-8. render a local static visual and print its path;
+   affected domains.
+6. create one evidence-linked `status: proposed` hypothesis.
+7. show at least one alternative explanation and one falsifier.
+8. render a local static visual and print its path.
 9. report the exact cleanup command and that modified files will be preserved.
 
 The command must not:
 
-- initialize or edit the user's real board;
-- modify a board router, source file, settings file, or Git configuration;
-- start PM/Worker mode;
-- run code-generation or fix the synthetic issue;
+- initialize or edit the user's real board.
+- modify a board router, source file, settings file, or Git configuration.
+- start PM/Worker mode.
+- run code-generation or fix the synthetic issue.
 - require an additional network service, service credentials, SQLite, or a
-  hosted control plane beyond the already-active agent runtime;
+  hosted control plane beyond the already-active agent runtime.
 - confirm the proposed root cause.
 
 ### 17.4 Data contract
@@ -825,14 +825,14 @@ Authority rules:
 - Confirmation requires an explicit cited investigation or fix outcome.
 - Rejection preserves the hypothesis and appends the rejecting evidence.
 - A correction changes canonical sample/finding state, then rebuilds derived
-  graph state; generated files are never hand-edited as authority.
+  graph state. generated files are never hand-edited as authority.
 
 ### 17.5 State, preservation, and cleanup
 
 | Condition | Meaning | Required behavior |
 |---|---|---|
 | No prior demo run | Clean start | Create a unique run directory and manifest. |
-| Complete unchanged run exists | Repeat request | Reuse or create a new run without overwriting the prior run; report which occurred. |
+| Complete unchanged run exists | Repeat request | Reuse or create a new run without overwriting the prior run. report which occurred. |
 | Prior run is modified | User or external process changed demo content | Preserve it, create a new run, and report why cleanup is withheld. |
 | Graph generation fails | Derived analysis is incomplete | Keep canonical sample entries, emit a typed failure, and do not create a hypothesis or claim success. |
 | Hypothesis generation fails | Structural result exists but interpretation does not | Show the graph result, label interpretation unavailable, and preserve the run for inspection/retry. |
@@ -854,7 +854,7 @@ Proposed implementation map:
   fingerprint artifacts, invoke deterministic analysis, and perform bounded
   cleanup.
 - `hooks/scripts/board-graph-build.py`: shared deterministic parser and graph
-  builder for explicit board paths. Milestone A integrates it with the demo;
+  builder for explicit board paths. Milestone A integrates it with the demo.
   real-board modifying commands remain unchanged until Milestone B.
 - `skills/board-insights/SKILL.md`: interpret a completed cluster into the
   hypothesis schema without changing deterministic graph facts.
@@ -862,7 +862,7 @@ Proposed implementation map:
   fields, sections, states, and authority rules.
 - `references/demo/pattern-intelligence/`: the three synthetic canonical
   entries and expected scenario metadata.
-- `hooks/scripts/board-view.sh`: render the demo's evidence → cluster →
+- `hooks/scripts/board-view.sh`: render the demo's evidence to cluster  to
   hypothesis drill-down without adding mutation controls.
 - `tests/fixtures/pattern-intelligence/`: positive, negative, malformed, and
   cleanup-tamper fixtures.
@@ -881,18 +881,18 @@ must not silently change real-board command behavior.
 
 ### 17.7 Failure and security contract
 
-- Malformed sample or graph input → non-zero typed error naming the exact
-  relative file; no partial success claim.
-- Missing Python runtime → explicit prerequisite error; no package installation.
-- Analysis timeout or interpreter failure → preserve the run and print a safe
+- Malformed sample or graph input to non-zero typed error naming the exact
+  relative file. no partial success claim.
+- Missing Python runtime to explicit prerequisite error. no package installation.
+- Analysis timeout or interpreter failure to preserve the run and print a safe
   retry command.
-- Hypothesis output missing required citations or sections → reject the output
+- Hypothesis output missing required citations or sections to reject the output
   as invalid and leave deterministic graph results available.
-- Path escape, symlink, reparse point, manifest expansion, or unexpected file →
+- Path escape, symlink, reparse point, manifest expansion, or unexpected file  to
   refuse cleanup.
-- Existing user data under the selected run path → never overwrite; allocate a
+- Existing user data under the selected run path to never overwrite. allocate a
   new run ID.
-- Captured visual and evidence → synthetic data only; no usernames, absolute
+- Captured visual and evidence to synthetic data only. no usernames, absolute
   personal paths, tokens, repository secrets, or private findings.
 - Demo scripts make no network calls and perform no credential reads, settings
   writes, repository commits, or automatic browser launch. Interpretation uses
@@ -905,7 +905,7 @@ must not silently change real-board command behavior.
 | Positive cluster | Three sample entries produce exactly three nodes, three `shared-pattern` edges, one cluster, three affected domains, and stable membership. |
 | Determinism | Repeated analysis of unchanged canonical sample input produces logically identical graph output, excluding documented volatile timestamps. |
 | Cross-domain value | The rendered explanation identifies three distinct domains and traces the shared pattern to all member entries. |
-| Hypothesis authority | Output is `status: proposed`, cites `B001`–`B003`, includes an alternative and falsifier, and cannot auto-confirm from confidence. |
+| Hypothesis authority | Output is `status: proposed`, cites `B001`-`B003`, includes an alternative and falsifier, and cannot auto-confirm from confidence. |
 | Negative fixture | Surface-similar entries without a shared supported signal do not become one durable cluster or hypothesis. |
 | Singleton fixture | One finding remains isolated and produces no fabricated systemic hypothesis. |
 | Malformed input | A bad entry produces an explicit error and no success/hypothesis artifact. |
@@ -929,7 +929,7 @@ must not silently change real-board command behavior.
 6. Restore or create a clean run, execute cleanup, and verify only that run was
    removed.
 7. Capture a sanitized static visual from the observed output.
-8. Append dated evidence; do not rewrite historical reports.
+8. Append dated evidence. do not rewrite historical reports.
 
 ### 17.10 Documentation-impact contract
 
@@ -938,33 +938,33 @@ When implemented:
 | Surface | Required disposition |
 |---|---|
 | This product spec | Mark Milestone A contract accepted and later record shipped evidence without rewriting the decision history. |
-| README and quickstart | Lead the optional first win with pattern intelligence; keep current behavior claims accurate. |
-| Landing page | Show the evidence → cluster → proposed-hypothesis outcome only after live validation. |
-| Command docs | Add `/board-demo`; revise `/board-setup` optional next step; document cleanup and offline boundaries. |
+| README and quickstart | Lead the optional first win with pattern intelligence. keep current behavior claims accurate. |
+| Landing page | Show the evidence to cluster to proposed-hypothesis outcome only after live validation. |
+| Command docs | Add `/board-demo`. revise `/board-setup` optional next step. document cleanup and offline boundaries. |
 | Architecture | Document canonical Markdown, deterministic graph facts, interpreted hypotheses, and authority transitions. |
 | MCP docs | State unaffected unless an equivalent demo/analysis surface actually ships. |
 | Security/privacy | Document contained synthetic data, no-extra-service behavior, path validation, and cleanup refusal conditions. |
 | Visuals | Add a real sanitized demo capture with date, source version, alt text, and provenance. |
 | Tests/evidence | Add the matrix above and a dated live-validation report. |
-| Versions/releases | Review at delivery; change only if the owner separately approves a release. |
+| Versions/releases | Review at delivery. change only if the owner separately approves a release. |
 
 ### 17.11 Non-goals and delivery boundary
 
 Milestone A does not:
 
-- analyze arbitrary real boards through the new engine by default;
-- normalize free-form production tags;
-- add semantic embeddings or SQLite;
-- confirm hypotheses;
-- change resolution, learning confidence, PM/Worker mode, claims, or MCP tools;
-- fix the synthetic root cause;
-- add cross-repository aggregation or a hosted service;
+- analyze arbitrary real boards through the new engine by default.
+- normalize free-form production tags.
+- add semantic embeddings or SQLite.
+- confirm hypotheses.
+- change resolution, learning confidence, PM/Worker mode, claims, or MCP tools.
+- fix the synthetic root cause.
+- add cross-repository aggregation or a hosted service.
 - merge, release, tag, or deploy without separate owner authorization.
 
 Implementation delivery is this focused branch and draft PR with code, tests,
 current-truth documentation, a real visual, and dated evidence. The owner
 separately authorized merge, release, tag, publication, and deployment on
-2026-07-27; v1.8.0 is the resulting delivery boundary.
+2026-07-27. v1.8.0 is the resulting delivery boundary.
 
 ## 18. Gate 2 accepted: Milestone B implementation contract
 
@@ -1004,17 +1004,17 @@ created: YYYY-MM-DD
 
 Required pattern-record sections:
 
-- `## Definition` — the failure mode, independent of product area;
-- `## Inclusion evidence` — what is sufficient to assign the pattern;
-- `## Exclusions` — nearby symptoms that do not establish the pattern;
-- `## History` — label, alias, merge, retirement, and correction events.
+- `## Definition`: the failure mode, independent of product area.
+- `## Inclusion evidence`: what is sufficient to assign the pattern.
+- `## Exclusions`: nearby symptoms that do not establish the pattern.
+- `## History`: label, alias, merge, retirement, and correction events.
 
 Pattern IDs are allocated from the highest existing `P###` in that board and
 are never reused. Labels and aliases normalize by Unicode case folding,
 whitespace/hyphen folding, and surrounding-space removal. A normalized label
 or alias may resolve to only one active pattern. Renaming a label does not
 change its ID. A merged record remains durable with `status: merged` and
-`merged_into: P###`; it is never deleted or silently reused.
+`merged_into: P###`. it is never deleted or silently reused.
 
 Entry frontmatter gains an optional canonical assignment:
 
@@ -1032,12 +1032,12 @@ The two fields have different authority:
 - the current display label comes from the `P###` record, not from rewriting
   every historical entry.
 - assignment and correction reasons are appended to the entry's
-  `## Pattern history`; generated graph files are never edited as authority.
+  `## Pattern history`. generated graph files are never edited as authority.
 
 Resolution precedence is:
 
-1. an explicit valid `pattern_ids` assignment;
-2. an exact unique match from a `pattern` label to a registry label or alias;
+1. an explicit valid `pattern_ids` assignment.
+2. an exact unique match from a `pattern` label to a registry label or alias.
 3. an exact normalized legacy label represented as
    `legacy:<normalized-label>`.
 
@@ -1078,7 +1078,7 @@ content-bound `plan_id`. It performs no canonical write.
 target entry set, pattern registry, and next-ID state included in that plan.
 The command emits a typed per-finding receipt and rebuilds `BOARD.md` and
 `GRAPH.yml` after successful canonical writes. A direct user request to promote
-is apply authority; otherwise the interactive agent must show the preview and
+is apply authority. otherwise the interactive agent must show the preview and
 obtain approval.
 
 PM mode retains its already-authorized per-turn promotion behavior, but its
@@ -1115,15 +1115,15 @@ relationship reasons, source fingerprints, and typed failure codes.
 
 | Condition | Meaning | Authoritative owner | Required behavior | Preservation |
 |---|---|---|---|---|
-| Scratch captured | Evidence exists but is not canonical project truth | Scratch file plus capture provenance | Include in foreground preview; do not graph as a live entry | Keep until applied, explicitly rejected, or manually retained |
-| Promotion previewed | A deterministic write proposal exists | Content-bound plan | Return plan and warnings; write nothing canonical | Preserve scratch and current board |
+| Scratch captured | Evidence exists but is not canonical project truth | Scratch file plus capture provenance | Include in foreground preview. do not graph as a live entry | Keep until applied, explicitly rejected, or manually retained |
+| Promotion previewed | A deterministic write proposal exists | Content-bound plan | Return plan and warnings. write nothing canonical | Preserve scratch and current board |
 | Promotion applied | Explicit authority accepted the unchanged plan | Entry and pattern Markdown | Write each idempotent finding once, record receipt, rebuild derived views | Archive processed scratch only after its canonical write is verified |
 | Pattern unresolved | A readable label has no reviewed registry identity | Entry `pattern` field | Preserve legacy exact-label behavior and expose unresolved status | Never invent or silently persist a `P###` |
 | Pattern assigned | Entry cites a valid active `P###` | Entry `pattern_ids` plus pattern record | Use stable ID for graph identity and expose assignment provenance | Preserve observed label and history |
 | Pattern corrected | Reviewed assignment changed | Entry and its appended history | Replace the canonical reference only through an explicit plan | Preserve old ID, reason, timestamp, and actor/source |
 | Pattern merged | Two canonical identities are intentionally unified | Durable source and target pattern records | Resolve the old ID to `merged_into` and expose that resolution | Never delete or reuse the old record |
 | Graph current | Derived source fingerprint matches canonical inputs | Canonical Markdown snapshot | Serve graph facts | Cache may be deleted and rebuilt |
-| Graph stale or invalid | Inputs changed or parsing failed | Canonical Markdown remains authoritative | Return typed stale/invalid state; do not claim current intelligence | Preserve last good graph and all canonical evidence |
+| Graph stale or invalid | Inputs changed or parsing failed | Canonical Markdown remains authoritative | Return typed stale/invalid state. do not claim current intelligence | Preserve last good graph and all canonical evidence |
 
 Canonical precedence is entry and pattern Markdown, followed by the generated
 `GRAPH.yml`, followed by the disposable local cache. A cache, graph, or command
@@ -1137,14 +1137,14 @@ canonical evidence.
 
 The production graph schema adds:
 
-- `schema_version`;
-- `source_fingerprint` over sorted canonical relative paths and content hashes;
+- `schema_version`.
+- `source_fingerprint` over sorted canonical relative paths and content hashes.
 - per-node `pattern_ids`, resolved display labels, original labels, resolution
-  kind, and source field;
-- typed `unresolved_patterns`;
-- `pattern_id` and source-entry/field provenance on `shared-pattern` edges;
+  kind, and source field.
+- typed `unresolved_patterns`.
+- `pattern_id` and source-entry/field provenance on `shared-pattern` edges.
 - a deterministic cluster `fingerprint` derived from sorted member IDs,
-  relationship kinds, and canonical pattern identities;
+  relationship kinds, and canonical pattern identities.
 - `build_mode: full|incremental` as diagnostic metadata, not graph meaning.
 
 Existing display IDs such as `C001` remain ordered presentation identifiers.
@@ -1169,10 +1169,10 @@ change returns `source_changed` and preserves the prior graph/cache.
 
 For identical canonical inputs:
 
-- full and incremental builds must have identical logical graph content;
-- deleting the cache and rebuilding must recover the same logical graph;
+- full and incremental builds must have identical logical graph content.
+- deleting the cache and rebuilding must recover the same logical graph.
 - only documented volatile metadata such as `generated_at` and diagnostic
-  `build_mode` may differ;
+  `build_mode` may differ.
 - plugin and MCP adapters must return the same source fingerprint and graph
   facts.
 
@@ -1181,46 +1181,46 @@ introduced.
 
 ### 18.6 Component and file responsibilities
 
-- `mcp-server/engineering_board_core.py` — new zero-dependency shared core for
+- `mcp-server/engineering_board_core.py`: new zero-dependency shared core for
   entry parsing, pattern-registry parsing and normalization, source
   fingerprinting, graph construction, incremental-state validation, promotion
   planning, and typed domain errors. It contains no MCP or Claude-specific
   presentation.
-- `mcp-server/engineering_board_mcp.py` — retain JSON-RPC transport and tool
-  schemas; delegate graph, pattern, direct-entry pattern handling, and
+- `mcp-server/engineering_board_mcp.py`: retain JSON-RPC transport and tool
+  schemas. delegate graph, pattern, direct-entry pattern handling, and
   promotion behavior to the shared core.
-- `mcp-server/pyproject.toml` — package both the MCP adapter and shared core
+- `mcp-server/pyproject.toml`: package both the MCP adapter and shared core
   without adding a runtime dependency.
-- `hooks/scripts/board-graph-build.py` — become the thin CLI adapter over the
+- `hooks/scripts/board-graph-build.py`: become the thin CLI adapter over the
   shared graph core while retaining the explicit-board-path contract used by
   the demo.
-- `hooks/scripts/board-intake.py` — new local CLI adapter for deterministic
+- `hooks/scripts/board-intake.py`: new local CLI adapter for deterministic
   create, promote-plan/apply, and pattern-plan/apply operations.
-- `hooks/scripts/board-consolidate.sh` — retain Stop-hook/transcript framing and
+- `hooks/scripts/board-consolidate.sh`: retain Stop-hook/transcript framing and
   PM authority, but delegate validation, deduplication, pattern resolution,
   canonical writes, and receipts to the shared intake core.
-- `commands/board-promote.md` — foreground preview/apply interaction, authority,
+- `commands/board-promote.md`: foreground preview/apply interaction, authority,
   typed receipt, retry, and preservation behavior.
-- `commands/board-pattern.md` — pattern registry, alias, assignment, and
+- `commands/board-pattern.md`: pattern registry, alias, assignment, and
   correction interaction without opaque-cache editing.
-- `commands/board-graph.md` — shared-engine invocation, incremental/full
+- `commands/board-graph.md`: shared-engine invocation, incremental/full
   behavior, typed output, and unresolved-pattern reporting.
-- `skills/board-intake/SKILL.md` — use the deterministic intake adapter after
+- `skills/board-intake/SKILL.md`: use the deterministic intake adapter after
   duplicate review instead of independently serializing canonical files.
-- `skills/board-intake/references/frontmatter-schema.md` — define
+- `skills/board-intake/references/frontmatter-schema.md`: define
   `pattern_ids`, legacy `pattern` semantics, and `## Pattern history`.
-- `references/required-permissions.json` and plugin metadata — add only the
+- `references/required-permissions.json` and plugin metadata: add only the
   command/script permissions and discovery entries required by the new
   surfaces.
-- `tests/orchestration/milestone-b-pattern-pipeline.sh` — consolidated
+- `tests/orchestration/milestone-b-pattern-pipeline.sh`: consolidated
   deterministic matrix for registry normalization, stable identity, aliases,
   merge preservation, legacy fallback, preview/apply, promotion outcomes,
   correction history, MCP/plugin parity, source-change refusal, link refusal,
   and full/incremental/cache-deleted equivalence.
-- `tests/orchestration/board-graph-engine.sh` — retained executable positive,
+- `tests/orchestration/board-graph-engine.sh`: retained executable positive,
   negative, deterministic, and malformed-input graph fixtures.
-- `mcp-server/test_mcp_server.py` — retained full stdio, lifecycle,
-  compatibility, packaging, and typed-failure coverage; the shared matrix
+- `mcp-server/test_mcp_server.py`: retained full stdio, lifecycle,
+  compatibility, packaging, and typed-failure coverage. the shared matrix
   invokes the new MCP tools against the same canonical snapshot as the CLI.
 
 Implementation may adjust mechanical module boundaries after repository
@@ -1231,24 +1231,24 @@ or the user contract reopens alignment.
 ### 18.7 Failure, retry, and security contract
 
 - Invalid pattern ID, duplicate normalized label/alias, merge cycle, malformed
-  pattern record, or conflicting assignment → typed validation error naming
-  only safe relative paths; no canonical or derived partial write.
-- Changed or expired plan inputs → `plan_stale`; write nothing and return a
+  pattern record, or conflicting assignment to typed validation error naming
+  only safe relative paths. no canonical or derived partial write.
+- Changed or expired plan inputs to `plan_stale`. write nothing and return a
   fresh-preview instruction.
-- Duplicate scratch provenance already promoted → idempotent `already_applied`
-  receipt; never allocate another entry.
-- One finding fails during a multi-finding apply → report per-finding results,
+- Duplicate scratch provenance already promoted to idempotent `already_applied`
+  receipt. never allocate another entry.
+- One finding fails during a multi-finding apply to report per-finding results,
   preserve every unverified scratch finding, and make retry idempotent from the
   durable receipt. Never claim all-or-nothing atomicity across files.
-- Missing Python → explicit prerequisite error; never install packages.
-- Cache missing, corrupt, stale, or from another schema version → discard only
+- Missing Python to explicit prerequisite error. never install packages.
+- Cache missing, corrupt, stale, or from another schema version to discard only
   the cache and perform a full rebuild.
-- Canonical source changes during analysis → `source_changed`; preserve the
+- Canonical source changes during analysis to `source_changed`. preserve the
   last good derived output and retry from a fresh snapshot.
-- Graph input invalid → name the safe relative source and preserve the last
-  good graph; do not emit a partial replacement.
+- Graph input invalid to name the safe relative source and preserve the last
+  good graph. do not emit a partial replacement.
 - Path escape, symlink, junction, or reparse point in a mutation or cache path
-  → refuse the operation.
+  to refuse the operation.
 - Scratch and entry contents remain untrusted data. Existing injection,
   transcript-anchor, one-line serialization, and HTML-escaping defenses remain
   mandatory and must cover the new shared paths.
@@ -1274,7 +1274,7 @@ or the user contract reopens alignment.
 | Full/incremental equivalence | Full build, unchanged incremental build, one-file incremental build, and cache-deleted rebuild produce equal logical graphs. |
 | Determinism | Repeated builds have stable ordering, edge provenance, pattern identity, and cluster fingerprints apart from documented volatile metadata. |
 | Concurrent change | A canonical edit between scan and replace returns `source_changed` and leaves the prior graph/cache intact. |
-| Preview/apply | Preview writes nothing; unchanged apply succeeds once; changed inputs make the plan stale; retry cannot duplicate an entry. |
+| Preview/apply | Preview writes nothing. unchanged apply succeeds once. changed inputs make the plan stale. retry cannot duplicate an entry. |
 | Promotion outcomes | Created, deduplicated, rejected, deferred, and already-applied findings receive explicit typed receipts and only verified applied scratch is archived. |
 | Malformed input | Invalid entries, registry records, caches, and plans fail closed without partial canonical or graph replacements. |
 | Security regression | Hostile scratch/frontmatter strings remain data, path/link escapes are refused, and rendered output stays escaped. |
@@ -1297,7 +1297,7 @@ or the user contract reopens alignment.
 8. Deny outbound access to the scripts and verify the journey remains local.
 9. Capture a sanitized terminal or static graph view generated from the actual
    result, with source commit, date, alt text, and provenance.
-10. Remove only the disposable validation repository and append dated evidence;
+10. Remove only the disposable validation repository and append dated evidence.
     preserve prior Milestone A and release reports unchanged.
 
 ### 18.10 Documentation-impact contract
@@ -1313,9 +1313,9 @@ When implemented:
 | MCP docs and manifests | Document the three tools, extended entry/update fields, tool count, packaging, and semantic parity only after tests pass. |
 | Architecture | Replace adapter-specific graph/promotion descriptions with the shared-core, canonical/derived, cache, and authority model. |
 | Security/privacy | Document preview/apply authority, untrusted-data handling, path containment, receipts, cache contents, and local-only behavior. |
-| Visuals | Add a real sanitized graph/terminal capture if user-facing output changes; preserve the v1.8.0 synthetic demo provenance. |
-| Changelog and versions | Record behavior in Unreleased; coordinate versions and release claims only at the actual release boundary. |
-| Tests/evidence | Add the matrix above and a dated live-validation report; keep volatile totals and run results out of timeless prose. |
+| Visuals | Add a real sanitized graph/terminal capture if user-facing output changes. preserve the v1.8.0 synthetic demo provenance. |
+| Changelog and versions | Record behavior in Unreleased. coordinate versions and release claims only at the actual release boundary. |
+| Tests/evidence | Add the matrix above and a dated live-validation report. keep volatile totals and run results out of timeless prose. |
 | Historical reports | Preserve Milestone A and v1.8.0 evidence as historical state and append superseding Milestone B observations. |
 
 README, landing-page, setup, examples, architecture, security, MCP metadata,
@@ -1327,15 +1327,15 @@ not establish semantic alignment.
 
 Milestone B does not:
 
-- generate, rank, confirm, reject, split, or merge root-cause hypotheses;
-- add embeddings or an autonomous semantic-similarity authority;
-- replace Markdown or require SQLite;
-- aggregate across repositories;
-- add a hosted service, daemon, login, organization, billing, or cloud sync;
-- turn read-only graph requests into code execution or project mutation;
-- silently promote captures, create aliases, assign patterns, or resolve work;
-- redesign the pattern-focused HTML experience planned for Milestone C;
-- remove PM/Worker modes or change the TDD/review/validate state machine;
+- generate, rank, confirm, reject, split, or merge root-cause hypotheses.
+- add embeddings or an autonomous semantic-similarity authority.
+- replace Markdown or require SQLite.
+- aggregate across repositories.
+- add a hosted service, daemon, login, organization, billing, or cloud sync.
+- turn read-only graph requests into code execution or project mutation.
+- silently promote captures, create aliases, assign patterns, or resolve work.
+- redesign the pattern-focused HTML experience planned for Milestone C.
+- remove PM/Worker modes or change the TDD/review/validate state machine.
 - implement the persistent supervisor from RFC 0001.
 
 Implementation shipped through reviewed PRs #97 and #98. The v1.9.1 release
@@ -1378,7 +1378,7 @@ of repeatedly patching symptoms.
 |---|---|---|---|
 | Cluster priority | The graph returns stable clusters in structural order. | A deterministic score exposes recurrence, domain diversity, severity, relative recency, and evidence quality separately. | Agents can inspect the highest-value systemic candidate first without treating the score as causal confidence. |
 | Interpretation | The contained demo can create one synthetic proposed hypothesis. Real boards require ad hoc chat reasoning. | `/board-insights` prepares a strict, evidence-complete proposal for one real cluster. | Useful reasoning becomes reproducible and repository-visible. |
-| Authority | Production graph facts are deterministic; no production hypothesis writer exists. | Proposal and evaluation mutations use content-bound preview/apply plans. Confirmation requires an explicit outcome-evidence action. | An agent cannot silently convert correlation into truth. |
+| Authority | Production graph facts are deterministic. no production hypothesis writer exists. | Proposal and evaluation mutations use content-bound preview/apply plans. Confirmation requires an explicit outcome-evidence action. | An agent cannot silently convert correlation into truth. |
 | Failed explanations | Rejection can be written manually but has no production query or suppression contract. | Rejected claim identities remain queryable and suppress unchanged reproposals. | Later sessions do not recycle a disproven explanation without new evidence. |
 | Inspection | The normal HTML view emphasizes entry lifecycle. | A read-only pattern-intelligence section shows ranked clusters, evidence, hypotheses, status, and stale bindings. | The accumulated intelligence is visible without reading graph serialization. |
 
@@ -1401,7 +1401,7 @@ Alternatives considered:
 1. Keep all interpretation ephemeral. This has the least implementation cost,
    but it preserves repeated rediscovery and cannot provide negative memory.
 2. Generate deterministic hypothesis templates without agent interpretation.
-   This preserves reproducibility, but a template can restate graph structure;
+   This preserves reproducibility, but a template can restate graph structure.
    it cannot responsibly infer a shared causal mechanism.
 3. Let a model write or confirm hypotheses directly. This is faster but
    collapses the evidence, inference, and authority boundaries. It is rejected.
@@ -1422,7 +1422,7 @@ Each cluster receives a score from 0 through 100:
 | Recurrence | 25 | `min(member_count, 5) × 5` |
 | Domain diversity | 25 | `min(distinct_affected_domains, 5) × 5` |
 | Severity | 20 | Highest member priority: P0=20, P1=15, P2=10, P3=5, absent=0 |
-| Relative recency | 15 | Newest valid member `discovered` date compared with the newest valid date in the corpus: 0–7 days=15, 8–30=10, 31–90=5, older or unknown=0 |
+| Relative recency | 15 | Newest valid member `discovered` date compared with the newest valid date in the corpus: 0-7 days=15, 8-30=10, 31-90=5, older or unknown=0 |
 | Evidence quality | 15 | `floor(10 × members_with_canonical_pattern_ids / member_count)` plus 5 when the cluster contains at least two distinct deterministic signal kinds |
 
 The result includes every component, input count, warning, and rule version.
@@ -1481,7 +1481,7 @@ Required body sections:
 
 `claim_key` is a reviewed kebab-case identity for one causal mechanism.
 `claim_fingerprint` hashes the normalized claim key plus sorted `pattern_ids`.
-It provides deterministic negative-memory identity; it does not claim semantic
+It provides deterministic negative-memory identity. it does not claim semantic
 equivalence. Semantic suggestions can recommend a merge but cannot change
 canonical identity.
 
@@ -1503,9 +1503,9 @@ Two foreground commands are added:
 
 `/board-insights` is always read-only. It:
 
-1. rebuilds or verifies the current deterministic graph;
+1. rebuilds or verifies the current deterministic graph.
 2. returns ranked clusters with score components and existing hypothesis
-   and negative-memory references;
+   and negative-memory references.
 3. optionally filters to one stable cluster fingerprint and limits the result.
 
 The user or an explicitly authorized agent uses the `board-insights` skill to
@@ -1519,18 +1519,18 @@ deterministic no-write preview. A separate apply action uses:
 
 `/board-hypothesis` also previews these operations before apply:
 
-- `list` — read every valid H### record, including rejected, split, and merged
+- `list`: read every valid H### record, including rejected, split, and merged
   records.
-- `propose` — validate one proposal against the current cluster and negative
+- `propose`: validate one proposal against the current cluster and negative
   memory.
-- `evaluate H### confirmed|weakened|rejected` — append an evidence-linked
+- `evaluate H### confirmed|weakened|rejected`: append an evidence-linked
   outcome and change epistemic status.
-- `reopen H###` — return a rejected hypothesis to `proposed` only with at
+- `reopen H###`: return a rejected hypothesis to `proposed` only with at
   least one new canonical evidence ID and a reason.
-- `split H###` — mark one interpretation `split` and record two or more
+- `split H###`: mark one interpretation `split` and record two or more
   replacement claim keys. Child proposals are separate later actions with
   `supersedes: [H###]`.
-- `merge H### --into H###` — mark one source interpretation `merged` into an
+- `merge H### --into H###`: mark one source interpretation `merged` into an
   existing active target. Reverse references are derived by scanning records.
 
 The MCP server adds two tools over the same core:
@@ -1555,12 +1555,12 @@ the payload produced by its current interactive agent.
 
 | Condition | Meaning | Authority | Required behavior | Preservation |
 |---|---|---|---|---|
-| Ranked cluster | Deterministic investigation priority | Shared core | Return score components and source fingerprint | Rebuildable; never canonical |
+| Ranked cluster | Deterministic investigation priority | Shared core | Return score components and source fingerprint | Rebuildable. never canonical |
 | `proposed` | One bounded explanation fits the cited evidence | Explicit proposal apply | Preserve alternatives, counter-evidence, and falsifier | Canonical H### Markdown |
-| `weakened` | New evidence reduces explanatory strength | Explicit evaluation apply | Append reason and evidence; do not delete prior proposal | Full outcome history |
+| `weakened` | New evidence reduces explanatory strength | Explicit evaluation apply | Append reason and evidence. do not delete prior proposal | Full outcome history |
 | `confirmed` | Investigation or fix outcome supports the cause | Explicit evaluation apply with outcome evidence | Record who/what authorized the outcome and the evidence IDs | Full outcome history |
 | `rejected` | Evidence contradicts or fails to support the cause | Explicit evaluation apply | Keep the claim fingerprint as negative memory | File remains queryable |
-| `split` | One explanation must become multiple distinct claims | Explicit split apply | Record replacement claim keys; create children only through later proposal applies | Parent remains terminal history |
+| `split` | One explanation must become multiple distinct claims | Explicit split apply | Record replacement claim keys. create children only through later proposal applies | Parent remains terminal history |
 | `merged` | One explanation is the same canonical interpretation as another | Explicit merge apply | Record the active target H### | Source remains terminal history |
 | Stale binding | Graph source or selected cluster changed after preview | Shared core | Refuse apply and require a new preview | Existing canonical files unchanged |
 
@@ -1585,10 +1585,10 @@ the evidence already evaluated.
 
 The agent must use `reopen`, not create a duplicate. Reopen requires:
 
-- at least one canonical evidence ID not present in the hypothesis history;
-- a specific `new_evidence_reason`;
-- the current cluster fingerprint that contains the retained and new evidence;
-- an unchanged content-bound preview;
+- at least one canonical evidence ID not present in the hypothesis history.
+- a specific `new_evidence_reason`.
+- the current cluster fingerprint that contains the retained and new evidence.
+- an unchanged content-bound preview.
 - preservation of the rejection event in `## Outcome history`.
 
 Reopen is an explicit rebind. It records the previous cluster and graph source
@@ -1621,7 +1621,7 @@ operation deletes or rewrites outcome history.
   token because the operation and current state are validated again.
 - A per-board hypothesis lock serializes ID allocation and mutation. Apply
   revalidates after lock acquisition. Lock contention returns a typed retry
-  result; it does not wait indefinitely.
+  result. it does not wait indefinitely.
 - Each operation writes at most one canonical H### file. Split records child
   claim keys without creating child files. Merge changes only the source
   record. Atomic replacement prevents partial multi-file state.
@@ -1647,7 +1647,7 @@ operation deletes or rewrites outcome history.
 
 ### 19.9 Component responsibilities
 
-- `mcp-server/engineering_board_core.py`: deterministic cluster ranking;
+- `mcp-server/engineering_board_core.py`: deterministic cluster ranking.
   hypothesis parsing, validation, inventory fingerprints, plan/apply,
   transitions, negative memory, locking, and serialization.
 - `hooks/scripts/board-insights.py` and `board-insights.sh`: thin portable CLI
@@ -1656,14 +1656,14 @@ operation deletes or rewrites outcome history.
   and strict separation between preview and persistence.
 - `commands/board-hypothesis.md`: explicit apply and evaluation operations.
 - `skills/board-insights/SKILL.md`: production evidence-reading contract,
-  proposal schema, injection boundary, and decline behavior; preserve the
+  proposal schema, injection boundary, and decline behavior. preserve the
   existing contained demo protocol.
 - `skills/board-intake/references/hypothesis-schema.md`: normative production
   H### schema, transitions, negative memory, and authority.
 - `hooks/scripts/board-view.sh`: read-only ranked cluster and hypothesis
-  section for normal boards; keep existing Kanban and demo views.
+  section for normal boards. keep existing Kanban and demo views.
 - `mcp-server/engineering_board_mcp.py`: `board_insights` and
-  `board_hypotheses` adapters only; no duplicate business rules.
+  `board_hypotheses` adapters only. no duplicate business rules.
 - `mcp-server/test_mcp_server.py`: tool discovery, adapter parity, lifecycle,
   stale-plan, negative-memory, and stdout safety coverage.
 - `tests/orchestration/milestone-c-root-cause-intelligence.sh`: deterministic
@@ -1684,19 +1684,19 @@ operation deletes or rewrites outcome history.
 
 | Sequence | Failure injection | Expected semantic outcome | Durable evidence | Test |
 |---|---|---|---|---|
-| Rank three clusters with different recurrence, domains, priorities, dates, and pattern coverage | Equal totals on two clusters | Components are visible; ties sort by stable fingerprint; repeat runs are equal | Returned ranking payload | Milestone C matrix |
+| Rank three clusters with different recurrence, domains, priorities, dates, and pattern coverage | Equal totals on two clusters | Components are visible. ties sort by stable fingerprint. repeat runs are equal | Returned ranking payload | Milestone C matrix |
 | Request one real cluster through plugin CLI and MCP | Two adapters | Both return the same ranked facts, evidence members, hypothesis refs, and negative-memory facts | Compared JSON payloads | Milestone C matrix and MCP suite |
-| Preview a valid proposal that cites every member | No apply token | No H### file exists; preview returns the next ID and bound plan | Plan payload only | Milestone C matrix |
-| Change an entry or pattern after preview | Stale graph source | Apply returns `plan_stale`; no hypothesis file is written | Unchanged hypothesis inventory | Milestone C matrix |
+| Preview a valid proposal that cites every member | No apply token | No H### file exists. preview returns the next ID and bound plan | Plan payload only | Milestone C matrix |
+| Change an entry or pattern after preview | Stale graph source | Apply returns `plan_stale`. no hypothesis file is written | Unchanged hypothesis inventory | Milestone C matrix |
 | Supply missing member evidence, an extra ID, no alternative, no falsifier, or unsafe scalar content | Malformed agent output | Preview rejects the payload before mutation | Typed validation errors | Hypothesis contract and security suites |
-| Apply one valid proposal | Concurrent second plan for the same next ID | Exactly one H### is created; the loser receives a retry/stale result | Canonical H### and outcome receipt | Milestone C matrix |
+| Apply one valid proposal | Concurrent second plan for the same next ID | Exactly one H### is created. the loser receives a retry/stale result | Canonical H### and outcome receipt | Milestone C matrix |
 | Reject H001, then propose the same claim fingerprint | Unchanged explanation | New proposal is blocked and cites H001 negative memory | Preserved rejected H001 | Milestone C matrix |
-| Reopen rejected H001 without new evidence, then with one new canonical member | Missing then valid novelty | First request is rejected; second returns to proposed and retains rejection history | Revised H001 history | Milestone C matrix |
-| Confirm a proposal without outcome evidence, then with explicit evidence | Missing authority evidence | First preview fails; second records confirmation without changing entries or creating a Learning | Revised H### history | Milestone C matrix |
-| Split H001 into two claim keys | Child creation failure is not possible in the split action | H001 becomes terminal `split`; no child file appears until separate proposal applies | H001 split record | Milestone C matrix |
-| Merge H002 into active H003 | Missing or terminal target | Invalid target fails; valid merge changes only H002 and reverse lookup finds it from H003 | H002 merge record | Milestone C matrix |
+| Reopen rejected H001 without new evidence, then with one new canonical member | Missing then valid novelty | First request is rejected. second returns to proposed and retains rejection history | Revised H001 history | Milestone C matrix |
+| Confirm a proposal without outcome evidence, then with explicit evidence | Missing authority evidence | First preview fails. second records confirmation without changing entries or creating a Learning | Revised H### history | Milestone C matrix |
+| Split H001 into two claim keys | Child creation failure is not possible in the split action | H001 becomes terminal `split`. no child file appears until separate proposal applies | H001 split record | Milestone C matrix |
+| Merge H002 into active H003 | Missing or terminal target | Invalid target fails. valid merge changes only H002 and reverse lookup finds it from H003 | H002 merge record | Milestone C matrix |
 | Render normal board view with proposed, rejected, stale, split, and merged records | Crafted HTML and prompt text in evidence | Output escapes content, labels each state, exposes citations, and contains no mutation controls | Generated HTML | View and security suites |
-| Delete GRAPH.yml and disposable cache | Missing read model | Shared core rebuilds equal graph/ranking facts; hypotheses remain unchanged | Rebuilt graph and compared ranks | Milestone C matrix |
+| Delete GRAPH.yml and disposable cache | Missing read model | Shared core rebuilds equal graph/ranking facts. hypotheses remain unchanged | Rebuilt graph and compared ranks | Milestone C matrix |
 | Run with outbound proxies pointed at a closed local port | Network unavailable | Complete ranking, proposal, evaluation, and view sequence stays green | Dated offline result | Milestone C matrix |
 | Run all existing suites | Compatibility regression opportunity | Milestone A/B, claims, modes, capture, view, package, and MCP behavior remain green | Full release-tree result | `tests/run-all.sh` |
 
@@ -1704,11 +1704,11 @@ operation deletes or rewrites outcome history.
 
 Implementation validation uses a disposable repository fixture with:
 
-- at least three clusters;
-- one cross-domain high-priority cluster;
-- one valid proposed hypothesis;
-- one rejected explanation that exercises negative memory;
-- one new item that permits an evidence-backed reopen;
+- at least three clusters.
+- one cross-domain high-priority cluster.
+- one valid proposed hypothesis.
+- one rejected explanation that exercises negative memory.
+- one new item that permits an evidence-backed reopen.
 - malicious Markdown and HTML strings that must remain inert.
 
 The run must use the real plugin CLI, shared core, MCP stdio adapter, and normal
@@ -1721,14 +1721,14 @@ release evidence.
 
 The implementation change must update or substantively review:
 
-- the central product spec and this contract state;
-- README quickstart, command list, MCP table, and product claims;
-- command and skill contracts;
-- hypothesis schema and graph schema;
-- architecture and security/privacy boundaries;
-- normal HTML view documentation and a real visual;
-- MCP package, manifests, tool counts, and installation docs;
-- changelog, coordinated versions, deterministic tests, and dated evidence;
+- the central product spec and this contract state.
+- README quickstart, command list, MCP table, and product claims.
+- command and skill contracts.
+- hypothesis schema and graph schema.
+- architecture and security/privacy boundaries.
+- normal HTML view documentation and a real visual.
+- MCP package, manifests, tool counts, and installation docs.
+- changelog, coordinated versions, deterministic tests, and dated evidence.
 - historical v1.8.0 and v1.9.1 reports, which remain unchanged.
 
 The release boundary is v1.10.0 because Milestone C adds user-visible commands,
@@ -1741,15 +1741,15 @@ report records the immutable digests, workflow runs, and live observations.
 
 Milestone C does not:
 
-- use a model to build or modify deterministic graph topology;
-- treat ranking as confidence or confirmation;
-- automatically apply a proposal or evaluation;
-- automatically resolve entries or create/update Learnings;
-- execute a proposed fix;
-- add embeddings, SQLite, a hosted service, or cross-repository aggregation;
-- add SessionStart retrieval or task-context retrieval from Milestone D;
-- redesign PM/Worker orchestration or the TDD/review/validate state machine;
-- delete rejected, split, merged, or stale hypotheses;
+- use a model to build or modify deterministic graph topology.
+- treat ranking as confidence or confirmation.
+- automatically apply a proposal or evaluation.
+- automatically resolve entries or create/update Learnings.
+- execute a proposed fix.
+- add embeddings, SQLite, a hosted service, or cross-repository aggregation.
+- add SessionStart retrieval or task-context retrieval from Milestone D.
+- redesign PM/Worker orchestration or the TDD/review/validate state machine.
+- delete rejected, split, merged, or stale hypotheses.
 - claim semantic duplicate detection beyond reviewed `claim_key` identity.
 
 Gate 2 approval authorizes implementation of this contract. It does not
@@ -1781,7 +1781,7 @@ Current product evidence:
 - [`hooks/scripts/board-curate-learnings.sh`](../hooks/scripts/board-curate-learnings.sh)
 - [`hooks/scripts/board-session-start.sh`](../hooks/scripts/board-session-start.sh)
 
-External product references, reviewed 2026-07-26–27:
+External product references, reviewed 2026-07-26-27:
 
 - [Beads](https://github.com/gastownhall/beads)
 - [Backlog.md](https://github.com/MrLesk/Backlog.md)

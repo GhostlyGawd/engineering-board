@@ -3,7 +3,8 @@ description: List canonical patterns or preview/apply create, alias, assign, and
 argument-hint: <project-name> <list|create|alias|assign|correct> [options] [--apply <plan-id>]
 ---
 
-# /board-pattern — manage canonical pattern identity
+
+# /board-pattern: manage canonical pattern identity
 
 Resolve the named project through `engineering-board/BOARD-ROUTER.md`, then
 `docs/boards/BOARD-ROUTER.md`. Use the resolved board path as `<board-dir>`.
