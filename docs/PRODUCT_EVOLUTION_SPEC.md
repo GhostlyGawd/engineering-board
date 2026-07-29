@@ -2,14 +2,14 @@
 
 _Status: Authoritative living product direction: Milestone A shipped in
 v1.8.0. Milestone B shipped in v1.9.1. Milestone C shipped in v1.10.0.
-Milestone D shipped in v1.11.0. Milestone D.1 Gate 1 is accepted._
+Milestone D shipped in v1.11.0. Milestone D.1 Gate 2 is accepted._
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-29_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
 _Current release boundary: `v1.11.0`_
 _Portfolio context: inventory-only. audit source `GhostlyGawd/repo-audit` at
-`9c64832e0d97e62a4fa45f2a544ffbc4c29b7a11`_
+`ee6e44fe4498f9f624f43d2f355516f98f821148`_
 
 ## 1. Authority and use
 
@@ -72,7 +72,7 @@ selected milestone is approved.
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 | Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
-| Milestone D.1 direction | Gate 1 accepted | Prove whether the shipped context changes an agent diagnosis before a local fix. Use failed cases to calibrate retrieval and outcome ergonomics before Milestone E. Section 21 defines the accepted direction and the open Gate 2 decisions. |
+| Milestone D.1 direction | Gate 2 accepted | Prove whether the shipped context changes an agent diagnosis before a local fix. Use failed cases to calibrate retrieval and outcome ergonomics before Milestone E. Section 21 defines the accepted implementation contract. |
 
 ## 3. Product thesis
 
@@ -504,8 +504,8 @@ still fails to use.
 **Purpose:** Prove whether the shipped context changes an agent diagnosis
 before the agent proposes a local correction.
 
-**Direction state:** Gate 1 accepted by the product owner on 2026-07-29.
-Section 21 contains the direction and the draft Gate 2 contract.
+**Direction state:** Gate 1 and Gate 2 accepted by the product owner on
+2026-07-29. Section 21 contains the accepted implementation contract.
 
 Approved direction:
 
@@ -732,7 +732,7 @@ with session tasks and planning tools instead.
 | Security, privacy, versions, releases | Required current truth | Bounded automatic reads, content-bound H### and L### writes, lock revalidation, linked-input refusal, HTML escaping, no raw-prompt retention, and offline operation extend the existing controls | Security suites, Milestone D matrix, hook benchmarks, full 18-suite release tree, reproducible bundle gate, merged-main CI, and publication checks | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and release validation aligned | v1.11.0 published and externally validated |
 | Milestone C implementation contract | Accepted and shipped | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging shipped | Milestone C 15-check matrix, 166-check MCP suite, 17/17 current release-tree suites, merged-main CI, release workflow, and live-surface checks pass | Central spec, contract workpad, current-truth docs, real sanitized visual, implementation evidence, and v1.10.0 release validation remain current for Milestone C behavior | Shipped in v1.10.0; packaging current at v1.10.1 |
 | Milestone D implementation contract | Accepted and shipped | Shared contextual retrieval, automatic read adapters, explicit H### fix outcomes, separate L### feedback, value evidence, and the normal HTML view shipped from the accepted section 20 baseline. | Milestone D core, hook, MCP, view, security, performance, recovery, full release-tree, merged-main, and publication evidence | Central spec, workpad, schemas, commands, skills, README, MCP, architecture, security, landing page, LLM guide, sanitized visual, and release validation are aligned | Shipped in v1.11.0 |
-| Milestone D.1 product-proof direction | Gate 1 accepted | No production behavior change. The draft contract defines an evaluation corpus, isolated paired trials, decision records, retrieval-quality scoring, outcome-loop comparison, and bounded reporting. | Requirements checker has no deterministic failure. Four owner decisions and semantic review remain open before Gate 2. | Central spec section 21 and the dated D.1 contract workpad | Direction accepted; Gate 2 draft |
+| Milestone D.1 product-proof contract | Gate 2 accepted | No production behavior change. The contract defines the fixed corpus, isolated paired trials, bounded client coverage, retry rules, decision records, scoring thresholds, outcome-loop comparison, and reporting. | Requirements checker, documentation inspection, and future evaluation-harness tests | Central spec section 21 and the dated D.1 contract workpad | Contract accepted; implementation authorized |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -2377,11 +2377,11 @@ Milestone D does not:
 Gate 2 approval authorizes implementation of this section. It does not
 authorize any non-goal or deferred portfolio work.
 
-## 21. Gate 1 accepted: Milestone D.1 product-proof direction
+## 21. Gate 2 accepted: Milestone D.1 product-proof contract
 
-_State: Gate 1 accepted by the product owner on 2026-07-29. The requirements
-below are a Gate 2 draft. No evaluation implementation or production
-calibration is authorized by this section._
+_State: Gate 1 and Gate 2 accepted by the product owner on 2026-07-29.
+Evaluation-harness implementation is authorized. Production calibration is
+not authorized by this section._
 
 ### 21.1 Product question
 
@@ -2434,25 +2434,36 @@ trial-policy inputs. Only the context brief differs.
 Each trial starts with a clean workspace and agent session. A trial cannot use
 prompt text, generated files, or mutable agent memory from another trial.
 
-### 21.4 Draft requirements
+### 21.4 Accepted requirements
 
-| ID | Draft requirement |
+| ID | Requirement |
 |---|---|
 | D1-REQ-001 | The evaluation corpus shall define the canonical evidence, expected relevant memory, rejected memory, and expected systemic cause for each case. |
-| D1-REQ-002 | The paired-trial runner shall give each arm equal declared inputs except for the context brief. |
-| D1-REQ-003 | The paired-trial runner shall isolate each trial from prior trial state. |
-| D1-REQ-004 | The trial recorder shall preserve the first proposed correction, first stated cause, canonical citations, surfaced memory identifiers, and final diagnosis. |
-| D1-REQ-005 | The outcome scorer shall classify the systemic-before-local result for each trial. |
-| D1-REQ-006 | The retrieval-quality scorer shall report expected-memory rank, irrelevant-memory count, rejected-memory treatment, and lexical-decoy treatment. |
-| D1-REQ-007 | The outcome-loop evaluator shall compare retrieval before and after an applied structured outcome. |
-| D1-REQ-008 | The validation cycle shall use a frozen production baseline for each evidence run. |
+| D1-REQ-002 | The paired-trial runner shall give each arm equal declared task, repository, tool, client, model, and trial-policy inputs except for the context brief. |
+| D1-REQ-003 | The paired-trial runner shall isolate each trial from prior trial prompts, context briefs, generated files, and agent memory. |
+| D1-REQ-004 | The trial recorder shall preserve the first proposed correction, the first stated cause, canonical citations, surfaced memory identifiers, and final diagnosis for each trial. |
+| D1-REQ-005 | The outcome scorer shall classify whether each trial achieved a systemic-before-local outcome from the preserved trial record and case contract. |
+| D1-REQ-006 | The retrieval-quality scorer shall report expected-memory rank, irrelevant-memory count, rejected-memory treatment, and lexical-decoy treatment for each context arm. |
+| D1-REQ-007 | The outcome-loop evaluator shall compare retrieval before and after an applied structured outcome against unchanged canonical case expectations. |
+| D1-REQ-008 | The validation cycle shall use a frozen production baseline for the evidence run, with calibration changes recorded as later candidate changes. |
 | D1-REQ-009 | The validation report shall publish per-case evidence, aggregate results, limitations, failed cases, and approved next-step decisions. |
-| D1-REQ-010 | The validation report shall not make a general productivity claim from the bounded evidence. |
-| D1-REQ-011 | Milestone E implementation shall remain deferred until the product owner accepts the D.1 evidence and next-step decision. |
+| D1-REQ-010 | The validation report shall not make a general productivity claim from the bounded D.1 evidence. |
+| D1-REQ-011 | Milestone E implementation shall remain deferred until the product owner accepts the D.1 validation evidence and the resulting next-step decision. |
+| D1-REQ-012 | The primary evidence run shall execute three independent paired repetitions for each of eight fixed cases through the Claude Code plugin. |
+| D1-REQ-013 | The compatibility evidence run shall execute one paired repetition for each of the eight fixed cases through Codex CLI as an MCP client. |
+| D1-REQ-014 | The run manifest shall pin the exact source commit, client version, model identifier, instructions, tool set, trial policy, and context fingerprint for each evidence arm. |
+| D1-REQ-015 | The paired-trial runner shall not retry a trial after the trial produces a scored result. |
+| D1-REQ-016 | The primary evidence scorer shall pass the product-effect gate only when the context arm achieves at least 75 percent systemic-before-local outcomes and exceeds the baseline arm by at least 25 percentage points. |
+| D1-REQ-017 | The validation report shall cite canonical evidence for 100 percent of positive systemic-before-local classifications. |
+| D1-REQ-018 | The retrieval-quality scorer shall pass an applicable context-arm trial only when the expected relevant memory appears within the first three results. |
+| D1-REQ-019 | The false-positive scorer shall pass the evidence run only when lexical-decoy and independent-issue cases produce zero durable systemic conclusions. |
+| D1-REQ-020 | The trial recorder shall preserve each invalid attempt, infrastructure-failure reason, and replacement relationship. |
+| D1-REQ-021 | The paired-trial runner shall permit no more than one replacement for an infrastructure failure that occurs before a scored result. |
+| D1-REQ-022 | The evaluation corpus shall contain exactly two recurring-bug cases, two cross-domain shared-cause cases, two lexical-decoy cases, and two independent-issue cases. |
 
-The structured draft has no deterministic requirement-quality failure. Its
-content digest is recorded in the D.1 contract workpad. Open product decisions
-and human semantic review correctly block a Gate 2 baseline.
+The structured requirement artifact has no deterministic requirement-quality
+failure. Its current status and content digest are recorded in the D.1
+contract workpad. Automated checks do not replace semantic review.
 
 ### 21.5 Primary evaluation record
 
@@ -2497,30 +2508,56 @@ The report records each failed case and assigns the likely defect class:
 A calibration candidate becomes a later product change. It requires its own
 requirement, test, documentation review, and new validation baseline.
 
-### 21.7 Open Gate 2 decisions
+### 21.7 Accepted Gate 2 decisions
 
-The product owner must approve these values before implementation:
+The product owner accepted the following values on 2026-07-29.
 
-1. Evaluation corpus size and category allocation.
-2. Independent repetition count and retry policy.
-3. Primary client and model plus any compatibility arms.
-4. Systemic-before-local pass threshold.
-5. Expected-memory rank threshold.
-6. Maximum false-positive rate.
+#### Corpus
 
-Recommended starting point for review:
+The corpus contains exactly eight fixed cases with this allocation:
 
-- eight fixed cases;
-- three independent paired repetitions for each case;
-- the primary supported plugin client plus one MCP-client compatibility arm;
-- 100 percent canonical citation for a positive scored claim;
-- zero durable systemic conclusion for lexical decoys;
-- expected relevant memory in the first three results;
-- a context-arm systemic-before-local rate that exceeds the baseline arm by a
-  preapproved meaningful margin.
+- two recurring-bug cases;
+- two cross-domain shared-cause cases;
+- two lexical-decoy cases;
+- two independent-issue cases.
 
-The meaningful-margin value remains open. The product owner must select it
-before Gate 2 approval.
+Each case remains fixed for an evidence run. A later case change creates a new
+corpus version and a new evidence baseline.
+
+#### Trials and retry policy
+
+The primary evidence run uses three independent paired repetitions for each
+case through the Claude Code plugin. The compatibility evidence run uses one
+paired repetition for each case through Codex CLI as an MCP client.
+
+A scored trial cannot be retried. An infrastructure failure is invalid only if
+it occurs before the trial produces a scored result. The recorder must preserve
+the invalid attempt, its failure reason, and its replacement relationship.
+Only one replacement is permitted. A second infrastructure failure makes the
+applicable evidence run incomplete.
+
+#### Client and model control
+
+The primary client is the Claude Code plugin. The compatibility client is Codex
+CLI through the MCP server. Each dated run manifest pins the exact client
+version, model identifier, instructions, tools, source commit, trial policy,
+and context fingerprint. A baseline and context pair use equal pinned values
+except for the context brief.
+
+#### Success gates
+
+The primary evidence run passes only when all these conditions are true:
+
+- the context arm achieves at least 75 percent systemic-before-local outcomes;
+- the context arm exceeds the baseline arm by at least 25 percentage points;
+- 100 percent of positive classifications cite canonical evidence;
+- the expected relevant memory is in the first three results for each
+  applicable context-arm trial;
+- lexical-decoy and independent-issue cases produce zero durable systemic
+  conclusions.
+
+Compatibility results are reported separately. They test surface compatibility
+and do not change the primary product-effect gate.
 
 ### 21.8 Explicit non-goals
 
@@ -2537,17 +2574,15 @@ Milestone D.1 does not:
 
 ### 21.9 Gate 2 and delivery
 
-Gate 2 requires:
+Gate 2 is accepted. It authorizes implementation of the evaluation harness,
+frozen corpus, scoring tools, and evidence-reporting path in this repository.
+The implementation must keep the exact client and model identifiers in dated
+run evidence instead of timeless product prose.
 
-- resolution of all section 21.7 decisions;
-- human review of source fidelity, coverage, conflicts, feasibility, and
-  verification adequacy;
-- product-owner approval of the exact contract digest;
-- one implementation plan for the evaluation harness and evidence;
-- no production calibration bundled into the initial evidence run.
-
-Gate 1 approval authorizes this direction and contract preparation. It does
-not authorize implementation until Gate 2 is accepted.
+Gate 2 does not authorize production ranking changes, a release, Milestone E,
+or any section 21.8 non-goal. The first evidence run must evaluate the frozen
+v1.11.0 behavior. A failed gate produces calibration candidates and a new
+product decision. It does not permit the current evidence baseline to change.
 
 ## 22. Research and evidence
 
