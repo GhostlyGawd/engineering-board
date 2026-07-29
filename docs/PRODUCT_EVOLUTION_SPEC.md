@@ -2,9 +2,9 @@
 
 _Status: Authoritative living product direction: Milestone A shipped in
 v1.8.0. Milestone B shipped in v1.9.1. Milestone C shipped in v1.10.0.
-Milestone D shipped in v1.11.0._
+Milestone D shipped in v1.11.0. Milestone D.1 Gate 1 is accepted._
 _Started: 2026-07-27_
-_Last direction revision: 2026-07-28_
+_Last direction revision: 2026-07-29_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
 _Current release boundary: `v1.11.0`_
@@ -72,6 +72,7 @@ selected milestone is approved.
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 | Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
+| Milestone D.1 direction | Gate 1 accepted | Prove whether the shipped context changes an agent diagnosis before a local fix. Use failed cases to calibrate retrieval and outcome ergonomics before Milestone E. Section 21 defines the accepted direction and the open Gate 2 decisions. |
 
 ## 3. Product thesis
 
@@ -481,10 +482,11 @@ help an agent reason from symptoms toward a shared cause.
 **Purpose:** Deliver accumulated intelligence at the decision where it changes
 agent behavior.
 
-**Direction state:** Gate 1 and Gate 2 accepted by the product owner on
-2026-07-28. Section 20 is the accepted implementation contract.
+**Implementation state:** shipped in v1.11.0. Gate 1 and Gate 2 were accepted
+by the product owner on 2026-07-28. Section 20 remains the accepted
+implementation contract.
 
-Approved direction:
+Delivered scope:
 
 - Retrieval based on current files, task intent, patterns, graph neighbors, and
   prior outcomes-not only current working directory.
@@ -497,9 +499,35 @@ Approved direction:
 If omitted, the repository may contain strong memory that the acting agent
 still fails to use.
 
+### Milestone D.1: Product proof and retrieval calibration
+
+**Purpose:** Prove whether the shipped context changes an agent diagnosis
+before the agent proposes a local correction.
+
+**Direction state:** Gate 1 accepted by the product owner on 2026-07-29.
+Section 21 contains the direction and the draft Gate 2 contract.
+
+Approved direction:
+
+- Use a fixed and sanitized evaluation corpus.
+- Run paired clean-agent trials with and without the real context brief.
+- Record whether the agent identifies the systemic investigation before it
+  proposes a symptom-only correction.
+- Measure expected-memory rank, irrelevant results, rejected-memory treatment,
+  canonical citations, and the effect of an applied outcome on later
+  retrieval.
+- Keep production behavior frozen during each evidence run.
+- Use failed cases to propose later ranking, explanation, presentation, or
+  outcome-ergonomics changes.
+- Keep Milestone E deferred until the product owner accepts the validation
+  evidence and the resulting next-step decision.
+
+If omitted, Engineering Board can show that its components work without
+showing that the accumulated memory improves an agent decision.
+
 ### Milestone E: Execution ergonomics and planning bridge
 
-**State: Deferred until A-D are proven.**
+**State: Deferred until Milestone D.1 product validation is accepted.**
 
 Possible work:
 
@@ -672,7 +700,7 @@ interpretation.
 This adds breadth while diluting the root-cause memory job. Continue composing
 with session tasks and planning tools instead.
 
-## 15. Explicit non-goals for Milestones A-D
+## 15. Explicit non-goals for Milestones A-D.1
 
 - Replacing canonical Markdown with SQLite or another database.
 - Committing a binary database as collaboration state.
@@ -704,6 +732,7 @@ with session tasks and planning tools instead.
 | Security, privacy, versions, releases | Required current truth | Bounded automatic reads, content-bound H### and L### writes, lock revalidation, linked-input refusal, HTML escaping, no raw-prompt retention, and offline operation extend the existing controls | Security suites, Milestone D matrix, hook benchmarks, full 18-suite release tree, reproducible bundle gate, merged-main CI, and publication checks | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and release validation aligned | v1.11.0 published and externally validated |
 | Milestone C implementation contract | Accepted and shipped | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging shipped | Milestone C 15-check matrix, 166-check MCP suite, 17/17 current release-tree suites, merged-main CI, release workflow, and live-surface checks pass | Central spec, contract workpad, current-truth docs, real sanitized visual, implementation evidence, and v1.10.0 release validation remain current for Milestone C behavior | Shipped in v1.10.0; packaging current at v1.10.1 |
 | Milestone D implementation contract | Accepted and shipped | Shared contextual retrieval, automatic read adapters, explicit H### fix outcomes, separate L### feedback, value evidence, and the normal HTML view shipped from the accepted section 20 baseline. | Milestone D core, hook, MCP, view, security, performance, recovery, full release-tree, merged-main, and publication evidence | Central spec, workpad, schemas, commands, skills, README, MCP, architecture, security, landing page, LLM guide, sanitized visual, and release validation are aligned | Shipped in v1.11.0 |
+| Milestone D.1 product-proof direction | Gate 1 accepted | No production behavior change. The draft contract defines an evaluation corpus, isolated paired trials, decision records, retrieval-quality scoring, outcome-loop comparison, and bounded reporting. | Requirements checker has no deterministic failure. Four owner decisions and semantic review remain open before Gate 2. | Central spec section 21 and the dated D.1 contract workpad | Direction accepted; Gate 2 draft |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -2348,10 +2377,183 @@ Milestone D does not:
 Gate 2 approval authorizes implementation of this section. It does not
 authorize any non-goal or deferred portfolio work.
 
-## 21. Research and evidence
+## 21. Gate 1 accepted: Milestone D.1 product-proof direction
+
+_State: Gate 1 accepted by the product owner on 2026-07-29. The requirements
+below are a Gate 2 draft. No evaluation implementation or production
+calibration is authorized by this section._
+
+### 21.1 Product question
+
+Milestone D proves that Engineering Board can retrieve bounded systemic memory
+and record explicit outcomes. Milestone D.1 must answer a different question:
+
+> Does the retrieved memory cause an engineering agent to identify the prior
+> systemic investigation before it proposes another symptom-only correction?
+
+Release tests verify product requirements. They do not answer this product
+validation question.
+
+### 21.2 Stakeholder expectation
+
+The product owner expects Engineering Board to improve an agent diagnosis, not
+only to return technically correct context.
+
+The validation must show:
+
+- whether the context arm identifies the systemic investigation before a local
+  correction;
+- whether the baseline arm misses or delays that investigation;
+- whether the expected memory appears in the first three results;
+- whether irrelevant, stale, or rejected memory misleads the agent;
+- whether the agent cites canonical evidence;
+- whether an applied structured outcome changes later retrieval as expected.
+
+The validation must preserve failed cases. A failed case is calibration
+evidence, not a result to remove from the corpus.
+
+### 21.3 Evaluation boundary
+
+The evaluation uses repository-local, sanitized cases. Each case declares:
+
+- canonical evidence;
+- expected relevant memory;
+- rejected memory;
+- expected systemic cause;
+- task and file context;
+- scoring facts.
+
+Each paired trial has:
+
+1. A baseline arm with no Engineering Board context brief.
+2. A context arm with the real v1.11.0 context brief.
+
+The two arms use equal declared task, repository, tool, client, model, and
+trial-policy inputs. Only the context brief differs.
+
+Each trial starts with a clean workspace and agent session. A trial cannot use
+prompt text, generated files, or mutable agent memory from another trial.
+
+### 21.4 Draft requirements
+
+| ID | Draft requirement |
+|---|---|
+| D1-REQ-001 | The evaluation corpus shall define the canonical evidence, expected relevant memory, rejected memory, and expected systemic cause for each case. |
+| D1-REQ-002 | The paired-trial runner shall give each arm equal declared inputs except for the context brief. |
+| D1-REQ-003 | The paired-trial runner shall isolate each trial from prior trial state. |
+| D1-REQ-004 | The trial recorder shall preserve the first proposed correction, first stated cause, canonical citations, surfaced memory identifiers, and final diagnosis. |
+| D1-REQ-005 | The outcome scorer shall classify the systemic-before-local result for each trial. |
+| D1-REQ-006 | The retrieval-quality scorer shall report expected-memory rank, irrelevant-memory count, rejected-memory treatment, and lexical-decoy treatment. |
+| D1-REQ-007 | The outcome-loop evaluator shall compare retrieval before and after an applied structured outcome. |
+| D1-REQ-008 | The validation cycle shall use a frozen production baseline for each evidence run. |
+| D1-REQ-009 | The validation report shall publish per-case evidence, aggregate results, limitations, failed cases, and approved next-step decisions. |
+| D1-REQ-010 | The validation report shall not make a general productivity claim from the bounded evidence. |
+| D1-REQ-011 | Milestone E implementation shall remain deferred until the product owner accepts the D.1 evidence and next-step decision. |
+
+The structured draft has no deterministic requirement-quality failure. Its
+content digest is recorded in the D.1 contract workpad. Open product decisions
+and human semantic review correctly block a Gate 2 baseline.
+
+### 21.5 Primary evaluation record
+
+For each trial, preserve:
+
+- the first proposed correction;
+- the first stated cause;
+- each cited canonical source;
+- each surfaced memory identifier and rank;
+- the final diagnosis;
+- the systemic-before-local classification;
+- the classification evidence and reviewer.
+
+For each context arm, also preserve:
+
+- expected-memory rank;
+- irrelevant-memory count;
+- rejected-memory treatment;
+- lexical-decoy treatment;
+- context fingerprint and evaluated source commit.
+
+These records are product-validation evidence. They are not product telemetry.
+The repository must not retain unrelated raw prompts or private user data.
+
+### 21.6 Baseline integrity and calibration
+
+One immutable Git commit identifies the behavior under evaluation. The
+validation cannot change ranking weights, prompts, result presentation, or
+outcome behavior during the evidence run.
+
+The report records each failed case and assigns the likely defect class:
+
+- corpus or expectation defect;
+- retrieval eligibility defect;
+- ranking defect;
+- explanation defect;
+- presentation defect;
+- agent-use defect;
+- outcome-feedback defect;
+- inconclusive evidence.
+
+A calibration candidate becomes a later product change. It requires its own
+requirement, test, documentation review, and new validation baseline.
+
+### 21.7 Open Gate 2 decisions
+
+The product owner must approve these values before implementation:
+
+1. Evaluation corpus size and category allocation.
+2. Independent repetition count and retry policy.
+3. Primary client and model plus any compatibility arms.
+4. Systemic-before-local pass threshold.
+5. Expected-memory rank threshold.
+6. Maximum false-positive rate.
+
+Recommended starting point for review:
+
+- eight fixed cases;
+- three independent paired repetitions for each case;
+- the primary supported plugin client plus one MCP-client compatibility arm;
+- 100 percent canonical citation for a positive scored claim;
+- zero durable systemic conclusion for lexical decoys;
+- expected relevant memory in the first three results;
+- a context-arm systemic-before-local rate that exceeds the baseline arm by a
+  preapproved meaningful margin.
+
+The meaningful-margin value remains open. The product owner must select it
+before Gate 2 approval.
+
+### 21.8 Explicit non-goals
+
+Milestone D.1 does not:
+
+- start Milestone E;
+- add a general planning system;
+- change production ranking during an evidence run;
+- add hosted evaluation infrastructure or telemetry;
+- add SQLite, embeddings, or cross-repository aggregation;
+- automatically execute a fix;
+- make a general productivity claim;
+- hide, remove, or relabel a failed case after the baseline is frozen.
+
+### 21.9 Gate 2 and delivery
+
+Gate 2 requires:
+
+- resolution of all section 21.7 decisions;
+- human review of source fidelity, coverage, conflicts, feasibility, and
+  verification adequacy;
+- product-owner approval of the exact contract digest;
+- one implementation plan for the evaluation harness and evidence;
+- no production calibration bundled into the initial evidence run.
+
+Gate 1 approval authorizes this direction and contract preparation. It does
+not authorize implementation until Gate 2 is accepted.
+
+## 22. Research and evidence
 
 Current product evidence:
 
+- [`2026-07-29 Milestone D.1 product-proof contract workpad`](evidence/2026-07-29-milestone-d1-product-proof-contract.md)
 - [`2026-07-29 v1.11.0 release validation`](evidence/2026-07-29-v1.11.0-release-validation.md)
 - [`2026-07-28 Milestone D implementation validation`](evidence/2026-07-28-milestone-d-implementation-validation.md)
 - [`2026-07-28 Milestone D contract workpad`](evidence/2026-07-28-milestone-d-contract.md)
