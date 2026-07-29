@@ -1,7 +1,8 @@
 # Engineering Board Product Evolution Spec
 
 _Status: Authoritative living product direction: Milestone A shipped in
-v1.8.0. Milestone B shipped in v1.9.1. Milestone C shipped in v1.10.0_
+v1.8.0. Milestone B shipped in v1.9.1. Milestone C shipped in v1.10.0.
+Milestone D Gate 2 accepted and implementation authorized._
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-28_
 _Product owner: GhostlyGawd_
@@ -70,7 +71,7 @@ selected milestone is approved.
 | Adapter parity | Accepted for Milestone B | Plugin and MCP surfaces must consume the same zero-dependency parser, pattern resolver, and deterministic graph engine and return semantically equivalent facts. |
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
-| Milestone D direction | Gate 1 accepted; Gate 2 proposed | Deliver relevant repository-local pattern memory when an agent makes a decision, then use explicit fix outcomes to improve later retrieval and learning confidence. Section 20 is the proposed implementation contract. |
+| Milestone D direction | Gate 1 and Gate 2 accepted | Deliver relevant repository-local pattern memory when an agent makes a decision, then use explicit fix outcomes to improve later retrieval and learning confidence. Section 20 is the accepted implementation contract. |
 
 ## 3. Product thesis
 
@@ -480,8 +481,8 @@ help an agent reason from symptoms toward a shared cause.
 **Purpose:** Deliver accumulated intelligence at the decision where it changes
 agent behavior.
 
-**Direction state:** Gate 1 accepted by the product owner on 2026-07-28. The
-section 20 Gate 2 implementation contract is proposed for owner approval.
+**Direction state:** Gate 1 and Gate 2 accepted by the product owner on
+2026-07-28. Section 20 is the accepted implementation contract.
 
 Approved direction:
 
@@ -633,7 +634,7 @@ auto-promotion remains deferred.
 
 ### O7: Resolution and learning feedback
 
-**State: Gate 1 accepted. Gate 2 mechanism proposed in section 20.**
+**State: Gate 1 and Gate 2 accepted in section 20.**
 
 After verification, offer explicit outcome feedback that records the fix
 result against cited evidence. The outcome can recommend a hypothesis or
@@ -702,7 +703,7 @@ with session tasks and planning tools instead.
 | MCP behavior | Required current truth | Seventeen tools share canonical Markdown. pattern, promotion, graph, ranking, and hypothesis tools delegate to the same core as plugin adapters | 166-check MCP lifecycle suite plus Milestone B/C adapter-parity matrices. official registry version 1.10.1 is active and latest | MCP reference, manifests, package modules, and counts updated | Current package v1.10.1; Milestone C behavior shipped in v1.10.0 |
 | Security, privacy, versions, releases | Required current truth | Content-bound hypothesis tokens, inventory and graph revalidation, one-file atomic writes, linked-input refusal, HTML escaping, and offline operation extend the existing controls. coordinated manifests identify v1.10.1 | Security suites, Milestone C matrix, full 17-suite release tree, reproducible bundle checksum, merged-main CI, and external publication checks passed | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and v1.10.1 release evidence aligned | Shipped and externally validated |
 | Milestone C implementation contract | Accepted and shipped | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging shipped | Milestone C 15-check matrix, 166-check MCP suite, 17/17 current release-tree suites, merged-main CI, release workflow, and live-surface checks pass | Central spec, contract workpad, current-truth docs, real sanitized visual, implementation evidence, and v1.10.0 release validation remain current for Milestone C behavior | Shipped in v1.10.0; packaging current at v1.10.1 |
-| Milestone D implementation contract | Gate 2 proposed | No Milestone D behavior is implemented. Current SessionStart uses exact-tag recurrence and directory-filtered Learnings. | Proposed deterministic retrieval, outcome-feedback, adapter-parity, security, performance, and full-sequence matrix in section 20 | Central spec and Milestone D contract workpad only. Current product docs remain unchanged until implementation. | Ready for owner Gate 2 review |
+| Milestone D implementation contract | Gate 2 accepted | Implementation starts from the accepted section 20 baseline. Current released behavior remains v1.10.1 until the implementation, tests, documentation, and release evidence land together. | Deterministic retrieval, outcome-feedback, adapter-parity, security, performance, and full-sequence matrix in section 20 | Central spec and Milestone D contract workpad record the accepted baseline. Current product docs remain unchanged until implementation. | Implementation authorized |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -1763,11 +1764,10 @@ Milestone C does not:
 Gate 2 approval authorizes implementation of this contract. It does not
 authorize the deferred Milestone D or E scope.
 
-## 20. Gate 2 proposed: Milestone D implementation contract
+## 20. Gate 2 accepted: Milestone D implementation contract
 
-_State: Gate 1 accepted by the product owner on 2026-07-28. Gate 2 is
-proposed for owner review. No Milestone D implementation is authorized until
-the owner accepts this section._
+_State: Gate 1 and Gate 2 accepted by the product owner on 2026-07-28.
+Milestone D implementation is authorized within this section._
 
 ### 20.1 Milestone purpose
 
@@ -1820,8 +1820,8 @@ Source precedence is:
 3. The shipped Milestone B and C contracts in sections 18 and 19.
 4. Current implementation and current-truth documentation.
 
-The product owner is the approval authority. Until Gate 2 approval, each
-requirement has proposed status.
+The product owner is the approval authority. Gate 2 approval makes each
+requirement in this section an accepted implementation requirement.
 
 | ID | Product requirement | Rationale and parent trace | Allocation | Planned verification |
 |---|---|---|---|---|
