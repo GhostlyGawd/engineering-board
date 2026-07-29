@@ -131,7 +131,20 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
     root = root.resolve()
     corpus_path = corpus_path.resolve()
     corpus = _read_json(corpus_path)
-    _require(corpus.get("schema_version") == "2", "unsupported corpus schema version")
+    _require(corpus.get("schema_version") == "3", "unsupported corpus schema version")
+    corpus_id = corpus.get("corpus_id")
+    corpus_role = corpus.get("corpus_role")
+    corpus_version = corpus.get("corpus_version")
+    _require(isinstance(corpus_id, str) and SAFE_NAME.fullmatch(corpus_id) is not None, "invalid corpus id")
+    _require(corpus_role in {"calibration", "evidence"}, "invalid corpus role")
+    _require(isinstance(corpus_version, int) and corpus_version >= 1, "invalid corpus version")
+    _require(corpus.get("locked") is (corpus_role == "evidence"), "invalid corpus lock state")
+    if corpus_role == "evidence":
+        _require(
+            isinstance(corpus.get("sealed_at"), str)
+            and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", corpus["sealed_at"]) is not None,
+            "evidence corpus requires a seal date",
+        )
     cases = corpus.get("cases")
     _require(isinstance(cases, list) and len(cases) == 8, "corpus must contain exactly eight cases")
     allocation = Counter(case.get("category") for case in cases if isinstance(case, dict))
@@ -176,6 +189,7 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
         evidence = case.get("canonical_evidence")
         _require(isinstance(evidence, list) and evidence, f"{case_id} requires canonical evidence")
         evidence_ids: set[str] = set()
+        evidence_texts: list[str] = []
         for item in evidence:
             _require(isinstance(item, dict) and isinstance(item.get("id"), str), f"invalid evidence for {case_id}")
             _require(item["id"] not in evidence_ids, f"duplicate evidence id for {case_id}")
@@ -185,6 +199,7 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
             _require(_is_within(source, evidence_base), f"unsafe relative path: {relative}")
             _reject_linked_path(source)
             _require(source.is_file(), f"missing evidence file: {source}")
+            evidence_texts.append(source.read_text(encoding="utf-8"))
         memory = case.get("expected_relevant_memory")
         cause = case.get("expected_systemic_cause")
         rejected = case.get("rejected_memories")
@@ -203,6 +218,41 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
             _require(outcome["hypothesis_id"] == memory, f"{case_id} outcome must target the expected memory")
             _require(isinstance(outcome.get("expected_score_delta"), int), f"{case_id} outcome requires expected_score_delta")
             _require(isinstance(outcome.get("expected_rank_max"), int) and outcome["expected_rank_max"] >= 1, f"{case_id} outcome requires expected_rank_max")
+            if corpus_role == "evidence":
+                oracle_terms = scoring.get("oracle_terms")
+                _require(
+                    isinstance(oracle_terms, list)
+                    and len(oracle_terms) >= 2
+                    and all(
+                        isinstance(item, str) and len(item.strip()) >= 4
+                        for item in oracle_terms
+                    ),
+                    f"{case_id} requires at least two oracle terms",
+                )
+                for field in ("information_gap", "plausible_local_correction"):
+                    _require(
+                        isinstance(scoring.get(field), str)
+                        and bool(scoring[field].strip()),
+                        f"{case_id} scoring requires {field}",
+                    )
+                visible = "\n".join(
+                    [case["title"], case["task"], *files, *evidence_texts]
+                ).casefold()
+                _require(
+                    cause.casefold() not in visible,
+                    f"{case_id} visible input discloses the expected systemic cause",
+                )
+                _require(
+                    memory.casefold() not in visible,
+                    f"{case_id} visible input discloses the expected memory id",
+                )
+                leaked_terms = [
+                    item for item in oracle_terms if item.casefold() in visible
+                ]
+                _require(
+                    not leaked_terms,
+                    f"{case_id} visible input discloses oracle terms: {leaked_terms}",
+                )
         else:
             _require(memory is None and cause is None, f"negative case {case_id} cannot define a systemic cause")
             _require(scoring.get("durable_systemic_conclusion_allowed") is False, f"negative case {case_id} cannot allow a conclusion")
@@ -215,7 +265,14 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
             domains = {Path(item).parts[0] for item in files}
             _require(len(domains) >= 2, f"cross-domain case {case_id} requires two domains")
     _require(dict(counts) == expected, f"invalid category allocation: {dict(counts)}")
-    return {"case_count": len(cases), "category_counts": dict(sorted(counts.items())), "digest": _digest(corpus)}
+    return {
+        "corpus_id": corpus_id,
+        "corpus_role": corpus_role,
+        "corpus_version": corpus_version,
+        "case_count": len(cases),
+        "category_counts": dict(sorted(counts.items())),
+        "digest": _digest(corpus),
+    }
 
 
 def _load_frozen_core(root: Path, source_commit: str, directory: Path) -> tuple[Any, str]:
@@ -321,6 +378,13 @@ def build_context_evidence(root: Path, corpus_path: Path, source_commit: str) ->
                     observation is not None and observation["rank"] <= 3,
                     f"frozen product did not retrieve {expected_memory} for {case_id}",
                 )
+            if case["category"] == "lexical-decoy":
+                for rejected_memory in case["rejected_memories"]:
+                    observation = _memory_observation(brief, rejected_memory)
+                    _require(
+                        observation is not None and observation["rank"] <= 3,
+                        f"frozen product did not retrieve rejected memory {rejected_memory} for {case_id}",
+                    )
             briefs[case_id] = brief
 
             outcome_contract = case["scoring"]["outcome_evaluation"]
@@ -459,6 +523,10 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
     output.parent.mkdir(parents=True, exist_ok=True)
     corpus_summary = validate_corpus(root, corpus_path)
     corpus = _read_json(corpus_path)
+    _require(
+        corpus_summary["corpus_role"] == "evidence" and corpus.get("locked") is True,
+        "scored runs require a locked evidence corpus",
+    )
     contracts = _read_json(contracts_path)
     profiles = _validate_contracts(contracts)
     config = _read_json(config_path)
@@ -517,7 +585,7 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
                         trial_input = {"schema_version": "3", "trial_key": trial_key, "pair_key": pair_key, "profile": profile_name, "profile_role": contract["role"], "client": {"client_id": contract["client_id"], "transport": contract["transport"], **config["profiles"][profile_name]}, "case_id": case["id"], "category": case["category"], "repetition": repetition, "arm": arm, "controlled_inputs": controlled, "context_brief": context_brief, "evidence": evidence_artifacts, "repository": repository_artifact}
                         _atomic_json(destination / "input.json", trial_input)
                         trials.append({**trial_input, "workspace": str(workspace), "input_sha256": _file_digest(destination / "input.json")})
-        manifest = {"schema_version": "3", "run_id": config["run_id"], "source_commit": config["source_commit"], "trial_policy": config["trial_policy"], "corpus_digest": corpus_summary["digest"], "client_contracts_digest": _digest(contracts), "configuration_digest": _digest(config), "context_fixture_digest": context_evidence["fixture_digest"], "frozen_core_sha256": context_evidence["frozen_core_sha256"], "outcome_evaluations": context_evidence["outcomes"], "corpus": corpus, "trials": trials}
+        manifest = {"schema_version": "3", "run_id": config["run_id"], "source_commit": config["source_commit"], "trial_policy": config["trial_policy"], "corpus_id": corpus_summary["corpus_id"], "corpus_version": corpus_summary["corpus_version"], "corpus_digest": corpus_summary["digest"], "client_contracts_digest": _digest(contracts), "configuration_digest": _digest(config), "context_fixture_digest": context_evidence["fixture_digest"], "frozen_core_sha256": context_evidence["frozen_core_sha256"], "outcome_evaluations": context_evidence["outcomes"], "corpus": corpus, "trials": trials}
         manifest["manifest_fingerprint"] = _digest(manifest)
         _atomic_json(stage / "run-manifest.json", manifest)
         os.replace(stage, output)

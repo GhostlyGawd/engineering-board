@@ -1,5 +1,9 @@
 {
-  "schema_version": "2",
+  "schema_version": "3",
+  "corpus_id": "d1-calibration",
+  "corpus_role": "calibration",
+  "corpus_version": 1,
+  "locked": false,
   "evidence_root": "corpus/evidence",
   "context_fixture": {
     "board": "corpus/context-board",

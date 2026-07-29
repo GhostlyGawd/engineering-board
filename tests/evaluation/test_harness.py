@@ -32,7 +32,8 @@ POSITIVE_CATEGORIES = {"recurring-bug", "cross-domain-shared-cause"}
 
 
 class EvaluationHarnessTests(unittest.TestCase):
-    corpus_path = ROOT / "evaluation" / "corpus.json"
+    corpus_path = ROOT / "evaluation" / "evidence-corpus.json"
+    calibration_corpus_path = ROOT / "evaluation" / "calibration-corpus.json"
     contracts_path = ROOT / "evaluation" / "client-contracts.json"
     source_commit = "e26149bf505ea7f5ae2d95294a8a108e6b3c429f"
     context_evidence: dict | None = None
@@ -165,6 +166,9 @@ class EvaluationHarnessTests(unittest.TestCase):
 
     def test_corpus_contract_has_balanced_sanitized_cases(self) -> None:
         summary = validate_corpus(ROOT, self.corpus_path)
+        self.assertEqual(summary["corpus_id"], "d1-product-effect")
+        self.assertEqual(summary["corpus_role"], "evidence")
+        self.assertEqual(summary["corpus_version"], 3)
         self.assertEqual(summary["case_count"], 8)
         self.assertEqual(
             summary["category_counts"],
@@ -177,15 +181,37 @@ class EvaluationHarnessTests(unittest.TestCase):
         )
         self.assertEqual(len(summary["digest"]), 64)
 
+    def test_calibration_corpus_validates_but_cannot_prepare_scored_run(self) -> None:
+        summary = validate_corpus(ROOT, self.calibration_corpus_path)
+        self.assertEqual(summary["corpus_role"], "calibration")
+        with tempfile.TemporaryDirectory(prefix="eb-eval-calibration-") as temp:
+            base = Path(temp)
+            with self.assertRaisesRegex(
+                EvaluationError, "locked evidence corpus"
+            ):
+                prepare_run(
+                    ROOT,
+                    self.calibration_corpus_path,
+                    self.contracts_path,
+                    self.make_config(base),
+                    base / "run",
+                )
+
     def test_corpus_rejects_category_drift_and_path_escape(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-corpus-") as temp:
             copied = Path(temp) / "evaluation"
             shutil.copytree(ROOT / "evaluation", copied)
-            corpus_path = copied / "corpus.json"
+            corpus_path = copied / "evidence-corpus.json"
             value = json.loads(corpus_path.read_text(encoding="utf-8"))
             value["cases"][0]["category"] = "independent-issue"
             corpus_path.write_text(json.dumps(value), encoding="utf-8")
             with self.assertRaisesRegex(EvaluationError, "category allocation"):
+                validate_corpus(copied.parent, corpus_path)
+
+            value = json.loads(self.corpus_path.read_text(encoding="utf-8"))
+            value["locked"] = False
+            corpus_path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaisesRegex(EvaluationError, "invalid corpus lock"):
                 validate_corpus(copied.parent, corpus_path)
 
             value = json.loads(self.corpus_path.read_text(encoding="utf-8"))
@@ -194,10 +220,75 @@ class EvaluationHarnessTests(unittest.TestCase):
             with self.assertRaisesRegex(EvaluationError, "unsafe relative path"):
                 validate_corpus(copied.parent, corpus_path)
 
+    def test_evidence_corpus_rejects_visible_scoring_oracles(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-leakage-") as temp:
+            copied = Path(temp) / "evaluation"
+            shutil.copytree(ROOT / "evaluation", copied)
+            corpus_path = copied / "evidence-corpus.json"
+            value = json.loads(corpus_path.read_text(encoding="utf-8"))
+            case = value["cases"][0]
+            evidence_path = (
+                copied
+                / value["evidence_root"]
+                / case["canonical_evidence"][0]["path"]
+            )
+            evidence_path.write_text(
+                evidence_path.read_text(encoding="utf-8")
+                + "\nThe paths use one shared canonical region-code boundary.\n",
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(EvaluationError, "oracle terms"):
+                validate_corpus(copied.parent, corpus_path)
+
+            evidence_path.write_text(
+                (
+                    ROOT
+                    / "evaluation"
+                    / value["evidence_root"]
+                    / case["canonical_evidence"][0]["path"]
+                ).read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            case["task"] = case["expected_systemic_cause"]
+            corpus_path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaisesRegex(
+                EvaluationError, "expected systemic cause"
+            ):
+                validate_corpus(copied.parent, corpus_path)
+
+            case["task"] = "Inspect the reported behavior."
+            case["title"] = case["expected_relevant_memory"]
+            corpus_path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaisesRegex(EvaluationError, "expected memory id"):
+                validate_corpus(copied.parent, corpus_path)
+
+            case["title"] = "A sanitized title"
+            case["scoring"]["information_gap"] = ""
+            corpus_path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaisesRegex(EvaluationError, "information_gap"):
+                validate_corpus(copied.parent, corpus_path)
+
+    def test_evidence_context_surfaces_expected_negative_memory(self) -> None:
+        evidence = build_context_evidence(
+            ROOT, self.corpus_path, self.source_commit
+        )
+        expected = {"D1-C05": "H105", "D1-C06": "H106"}
+        for case_id, memory_id in expected.items():
+            result_ids = [
+                item["id"] for item in evidence["briefs"][case_id]["results"]
+            ]
+            self.assertIn(memory_id, result_ids)
+
     def test_prepare_builds_48_isolated_arms_with_equal_pair_controls(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-plan-") as temp:
             run_dir = self.prepare(Path(temp))
             manifest = load_run(run_dir)
+            self.assertEqual(manifest["corpus_id"], "d1-product-effect")
+            self.assertEqual(manifest["corpus_version"], 3)
+            self.assertEqual(
+                manifest["corpus_digest"],
+                validate_corpus(ROOT, self.corpus_path)["digest"],
+            )
             self.assertEqual(len(manifest["trials"]), 48)
             reference = [
                 t for t in manifest["trials"] if t["profile_role"] == "reference"

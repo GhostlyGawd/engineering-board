@@ -92,8 +92,10 @@ Codex reference run. Other clients can run as optional replications without
 changing the product gate. Protocol and package tests establish supported
 client surfaces without requiring provider accounts. The first Codex run
 scored 100 percent in both positive baseline and context arms, so the corpus
-does not yet measure product-effect improvement. The project does not claim
-that the context improves agent diagnoses. See
+was retained as a non-scored calibration set. A separate locked evidence
+corpus excludes declared scoring oracles and requires rejected memory in its
+lexical-decoy contexts. That corpus has not completed its reference run. The
+project does not claim that the context improves agent diagnoses. See
 [`evaluation/README.md`](evaluation/README.md) for the proof boundary and
 operator commands.
 

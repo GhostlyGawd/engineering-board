@@ -11,6 +11,9 @@ increases.
 
 ### Added
 
+- Added separate Milestone D.1 calibration and locked evidence corpora. The
+  locked corpus contains eight sanitized cases with scoring-only information
+  gaps, plausible local corrections, and declared oracle terms.
 - Added a repository-only Milestone D.1 evaluation harness, a frozen sanitized
   eight-case corpus, isolated paired-trial planning, exclusive-create attempt
   records,
@@ -20,6 +23,9 @@ increases.
 
 ### Changed
 
+- The harness now refuses calibration corpora for scored runs, records corpus
+  identity and version in each manifest, rejects visible scoring-oracle
+  leakage, and requires lexical-decoy contexts to retrieve rejected memory.
 - Replaced the provider-specific Milestone D.1 gate with one required Codex
   reference profile and zero or more optional replication profiles. Missing
   provider accounts no longer block product proof. Client-compatibility claims
