@@ -24,6 +24,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # The Milestone D.1 harness loads the product core from the pinned
+          # v1.11.0 commit. A one-commit checkout cannot verify that source.
+          fetch-depth: 0
 
       - name: Show toolchain versions
         run: |

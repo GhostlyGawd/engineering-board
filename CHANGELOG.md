@@ -18,6 +18,16 @@ increases.
   and Markdown reports. The harness does not execute live clients and is not
   part of the plugin or MCP bundle.
 
+### Changed
+
+- Replaced schematic Milestone D.1 context inputs with real v1.11.0
+  `board_context` output from a sanitized Markdown board fixture. The harness
+  now loads the product core from the pinned release commit, excludes scoring
+  expectations from agent inputs, verifies surfaced result ranks, and applies
+  a real structured outcome to an isolated fixture copy.
+- Made the test workflow fetch full Git history so it can verify and load the
+  pinned Milestone D.1 source commit.
+
 ## [1.11.0] — 2026-07-29
 
 ### Added

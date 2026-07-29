@@ -2,7 +2,9 @@
 
 _Status: Authoritative living product direction: Milestone A shipped in
 v1.8.0. Milestone B shipped in v1.9.1. Milestone C shipped in v1.10.0.
-Milestone D shipped in v1.11.0. Milestone D.1 Gate 2 is accepted. The repository-only evaluation harness is implemented. The live evidence run has not started._
+Milestone D shipped in v1.11.0. Milestone D.1 Gate 2 is accepted. The corrected
+repository-only evaluation harness builds real v1.11.0 context and outcome
+evidence. The live product-effect run is incomplete._
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-29_
 _Product owner: GhostlyGawd_
@@ -72,7 +74,7 @@ selected milestone is approved.
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 | Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
-| Milestone D.1 direction | Harness implemented | Prove whether the shipped context changes an agent diagnosis before a local fix. The repository-only harness and frozen corpus implement the Gate 2 contract. The live paired evidence run remains next. Use failed cases to calibrate retrieval and outcome ergonomics before Milestone E. |
+| Milestone D.1 direction | Corrected harness implemented | Prove whether the shipped context changes an agent diagnosis before a local fix. The repository-only harness loads the product core from the v1.11.0 release commit, builds real context from a sanitized Markdown fixture, excludes scoring expectations from agent input, and applies real structured outcomes to isolated fixture copies. The live paired evidence run remains incomplete. Use failed cases to calibrate retrieval and outcome ergonomics before Milestone E. |
 
 ## 3. Product thesis
 
@@ -2380,8 +2382,8 @@ authorize any non-goal or deferred portfolio work.
 ## 21. Gate 2 accepted: Milestone D.1 product-proof contract
 
 _State: Gate 1 and Gate 2 accepted by the product owner on 2026-07-29. The
-repository-only evaluation harness is implemented. The live paired evidence
-run and production calibration have not started._
+corrected repository-only evaluation harness is implemented. The live paired
+evidence run is incomplete. Production calibration has not started._
 
 ### 21.1 Product question
 
@@ -2588,15 +2590,43 @@ or any section 21.8 non-goal. The first evidence run must evaluate the frozen
 v1.11.0 behavior. A failed gate produces calibration candidates and a new
 product decision. It does not permit the current evidence baseline to change.
 
-The repository-only harness, frozen corpus, client contracts, recorder, scorer,
-report writer, and deterministic tests implement this contract. The harness
-does not execute a live client. Therefore, this implementation is not product-
-effect evidence.
+The repository-only harness, frozen corpus, real Markdown context fixture,
+client contracts, recorder, scorer, report writer, and deterministic tests
+implement this contract. The harness loads the product core from the pinned
+commit. It builds real product context, keeps scoring expectations out of
+agent input, and applies structured outcomes to isolated fixture copies. The
+harness does not execute a live client. Therefore, this implementation is not
+product-effect evidence.
+
+### 21.10 Preflight validity correction
+
+The first live-run preflight found that harness schema 1 did not satisfy the
+accepted contract. Its context arm contained the expected memory and rejected-
+memory list instead of a real v1.11.0 context brief. Its outcome gate accepted
+an agent-supplied match instead of applying and observing a product outcome.
+Either behavior could inflate the result.
+
+Harness schema 2 corrects both defects before any scored live trial:
+
+- The corpus includes a sanitized canonical Markdown board fixture.
+- The harness loads `engineering_board_core.py` from the exact pinned source
+  commit.
+- The context arm receives the complete `build_context` result and no scoring
+  oracle field.
+- The recorder binds surfaced memory identifiers and ranks to that result.
+- The outcome evaluator resolves an isolated fixture entry, applies the
+  structured outcome with frozen product code, rebuilds context, and records
+  the observed status, score, rank, and fingerprint change.
+- The manifest records the fixture and frozen-core digests.
+
+No schema 1 trial is valid D.1 product evidence. The dated preflight evidence
+records the live-client readiness result and the remaining external gate.
 
 ## 22. Research and evidence
 
 Current product evidence:
 
+- [`2026-07-29 Milestone D.1 live-evaluation preflight`](evidence/2026-07-29-milestone-d1-live-evaluation-preflight.md)
 - [`2026-07-29 Milestone D.1 harness implementation`](evidence/2026-07-29-milestone-d1-harness-implementation.md)
 - [`2026-07-29 Milestone D.1 product-proof contract workpad`](evidence/2026-07-29-milestone-d1-product-proof-contract.md)
 - [`2026-07-29 v1.11.0 release validation`](evidence/2026-07-29-v1.11.0-release-validation.md)

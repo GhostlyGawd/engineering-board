@@ -1,6 +1,10 @@
 {
-  "schema_version": "1",
+  "schema_version": "2",
   "evidence_root": "corpus/evidence",
+  "context_fixture": {
+    "board": "corpus/context-board",
+    "project": "d1-evaluation"
+  },
   "cases": [
     {
       "id": "D1-C01",
@@ -9,10 +13,21 @@
       "task": "Diagnose why equivalent configuration values produce different behavior.",
       "files": ["service/config.py", "service/loader.py"],
       "canonical_evidence": [{"id": "E-D1-C01", "path": "D1-C01.md"}],
-      "expected_relevant_memory": "M-CONFIG-NORMALIZATION",
+      "expected_relevant_memory": "H001",
       "rejected_memories": [],
       "expected_systemic_cause": "Configuration values enter the system through paths that do not share one normalization boundary.",
-      "scoring": {"expected_outcome_effect": "Promote the normalization finding after confirmation.", "durable_systemic_conclusion_allowed": true}
+      "scoring": {
+        "expected_outcome_effect": "Confirm H001 and increase its context score by 5 while keeping its rank at or below 3.",
+        "durable_systemic_conclusion_allowed": true,
+        "outcome_evaluation": {
+          "applicable": true,
+          "entry_id": "B001",
+          "hypothesis_id": "H001",
+          "expected_status": "confirmed",
+          "expected_score_delta": 5,
+          "expected_rank_max": 3
+        }
+      }
     },
     {
       "id": "D1-C02",
@@ -21,10 +36,21 @@
       "task": "Diagnose why restarted workers can reclaim stale ownership.",
       "files": ["worker/lease.py", "worker/recovery.py"],
       "canonical_evidence": [{"id": "E-D1-C02", "path": "D1-C02.md"}],
-      "expected_relevant_memory": "M-LEASE-FRESHNESS",
+      "expected_relevant_memory": "H002",
       "rejected_memories": [],
       "expected_systemic_cause": "Lease recovery uses inconsistent freshness rules across claim and restart paths.",
-      "scoring": {"expected_outcome_effect": "Increase the lease-freshness finding rank after confirmation.", "durable_systemic_conclusion_allowed": true}
+      "scoring": {
+        "expected_outcome_effect": "Confirm H002 and increase its context score by 5 while keeping its rank at or below 3.",
+        "durable_systemic_conclusion_allowed": true,
+        "outcome_evaluation": {
+          "applicable": true,
+          "entry_id": "B003",
+          "hypothesis_id": "H002",
+          "expected_status": "confirmed",
+          "expected_score_delta": 5,
+          "expected_rank_max": 3
+        }
+      }
     },
     {
       "id": "D1-C03",
@@ -33,10 +59,21 @@
       "task": "Diagnose related tenant-isolation failures in two product domains.",
       "files": ["api/tenant_scope.py", "ui/project_filter.ts"],
       "canonical_evidence": [{"id": "E-D1-C03", "path": "D1-C03.md"}],
-      "expected_relevant_memory": "M-TENANT-BOUNDARY",
+      "expected_relevant_memory": "H003",
       "rejected_memories": [],
       "expected_systemic_cause": "The API and interface derive tenant scope from different ownership boundaries.",
-      "scoring": {"expected_outcome_effect": "Link both findings to one tenant-boundary cause.", "durable_systemic_conclusion_allowed": true}
+      "scoring": {
+        "expected_outcome_effect": "Confirm H003 and increase its context score by 5 while keeping its rank at or below 3.",
+        "durable_systemic_conclusion_allowed": true,
+        "outcome_evaluation": {
+          "applicable": true,
+          "entry_id": "B005",
+          "hypothesis_id": "H003",
+          "expected_status": "confirmed",
+          "expected_score_delta": 5,
+          "expected_rank_max": 3
+        }
+      }
     },
     {
       "id": "D1-C04",
@@ -45,10 +82,21 @@
       "task": "Diagnose why two client paths report different completion states.",
       "files": ["plugin/lifecycle.py", "mcp/status.py"],
       "canonical_evidence": [{"id": "E-D1-C04", "path": "D1-C04.md"}],
-      "expected_relevant_memory": "M-LIFECYCLE-SEMANTICS",
+      "expected_relevant_memory": "H004",
       "rejected_memories": [],
       "expected_systemic_cause": "Plugin and MCP adapters translate one lifecycle state model with different terminal-state rules.",
-      "scoring": {"expected_outcome_effect": "Promote the shared lifecycle finding after both paths confirm it.", "durable_systemic_conclusion_allowed": true}
+      "scoring": {
+        "expected_outcome_effect": "Confirm H004 and increase its context score by 5 while keeping its rank at or below 3.",
+        "durable_systemic_conclusion_allowed": true,
+        "outcome_evaluation": {
+          "applicable": true,
+          "entry_id": "B007",
+          "hypothesis_id": "H004",
+          "expected_status": "confirmed",
+          "expected_score_delta": 5,
+          "expected_rank_max": 3
+        }
+      }
     },
     {
       "id": "D1-C05",
@@ -58,9 +106,13 @@
       "files": ["docs/ownership.md"],
       "canonical_evidence": [{"id": "E-D1-C05", "path": "D1-C05.md"}],
       "expected_relevant_memory": null,
-      "rejected_memories": ["M-TENANT-BOUNDARY"],
+      "rejected_memories": ["H005"],
       "expected_systemic_cause": null,
-      "scoring": {"expected_outcome_effect": "Do not promote the tenant-boundary finding.", "durable_systemic_conclusion_allowed": false}
+      "scoring": {
+        "expected_outcome_effect": "Do not apply a systemic outcome.",
+        "durable_systemic_conclusion_allowed": false,
+        "outcome_evaluation": {"applicable": false}
+      }
     },
     {
       "id": "D1-C06",
@@ -70,9 +122,13 @@
       "files": ["ui/heartbeat.css"],
       "canonical_evidence": [{"id": "E-D1-C06", "path": "D1-C06.md"}],
       "expected_relevant_memory": null,
-      "rejected_memories": ["M-LEASE-FRESHNESS"],
+      "rejected_memories": ["H006"],
       "expected_systemic_cause": null,
-      "scoring": {"expected_outcome_effect": "Do not promote the lease-freshness finding.", "durable_systemic_conclusion_allowed": false}
+      "scoring": {
+        "expected_outcome_effect": "Do not apply a systemic outcome.",
+        "durable_systemic_conclusion_allowed": false,
+        "outcome_evaluation": {"applicable": false}
+      }
     },
     {
       "id": "D1-C07",
@@ -84,7 +140,11 @@
       "expected_relevant_memory": null,
       "rejected_memories": [],
       "expected_systemic_cause": null,
-      "scoring": {"expected_outcome_effect": "Keep the issue independent unless new evidence appears.", "durable_systemic_conclusion_allowed": false}
+      "scoring": {
+        "expected_outcome_effect": "Do not apply a systemic outcome.",
+        "durable_systemic_conclusion_allowed": false,
+        "outcome_evaluation": {"applicable": false}
+      }
     },
     {
       "id": "D1-C08",
@@ -96,7 +156,11 @@
       "expected_relevant_memory": null,
       "rejected_memories": [],
       "expected_systemic_cause": null,
-      "scoring": {"expected_outcome_effect": "Keep the issue independent unless new evidence appears.", "durable_systemic_conclusion_allowed": false}
+      "scoring": {
+        "expected_outcome_effect": "Do not apply a systemic outcome.",
+        "durable_systemic_conclusion_allowed": false,
+        "outcome_evaluation": {"applicable": false}
+      }
     }
   ]
 }
