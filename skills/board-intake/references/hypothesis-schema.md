@@ -54,6 +54,16 @@ Required body sections:
 - `## Falsifier`
 - `## Outcome history`
 
+New structured fix outcomes use one stable JSON line in `## Outcome history`:
+
+```text
+- outcome-json: {"event_id":"out-...","entry_id":"B001","hypothesis_id":"H001","fix_result":"held","hypothesis_disposition":"confirmed","fix_summary":"...","evidence_ids":["B001"],"observed_until":"YYYY-MM-DD","actor":"agent","context_used":true,"context_reference":{"context_fingerprint":"ctx-...","source_fingerprint":"...","source_state":"current","verified":true}}
+```
+
+The record can also contain earlier readable lifecycle lines. Preserve all
+history lines. The structured event stores an optional verified context
+reference. It does not store the raw task or prompt.
+
 Authority:
 
 - A graph cluster may justify `status: proposed`.
@@ -71,3 +81,7 @@ Authority:
   retained evidence plus at least one new current-cluster evidence ID.
 - Mutations use content-bound preview/apply tokens. Apply revalidates graph and
   hypothesis inventory fingerprints and refuses stale plans.
+- An outcome records `fix_result` separately from
+  `hypothesis_disposition`. Compatible values are enforced. An unchanged
+  disposition appends history and increments `revision` without changing
+  `status`.

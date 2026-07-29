@@ -33,6 +33,7 @@
 #   22. integration first-win       — full contained journey + tamper cleanup refusal
 #   23. milestone-b-pattern-pipeline.sh — canonical identity, cache, MCP, CLI, promotion
 #   24. milestone-c-root-cause-intelligence.sh — ranking, hypotheses, negative memory, view
+#   25. milestone-d-context-outcome-intelligence.sh — retrieval, outcomes, Learnings, rebuild
 #
 # Usage:
 #   bash tests/orchestration/automated.sh                # auto-detect plugin root
@@ -73,6 +74,7 @@ SUBTESTS=(
   "../integration/pattern-intelligence-first-win.sh"
   "milestone-b-pattern-pipeline.sh"
   "milestone-c-root-cause-intelligence.sh"
+  "milestone-d-context-outcome-intelligence.sh"
 )
 
 for st in "${SUBTESTS[@]}"; do

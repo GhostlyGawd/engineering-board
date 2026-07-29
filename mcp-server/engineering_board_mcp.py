@@ -40,13 +40,18 @@ if MODULE_DIR not in sys.path:
 
 from engineering_board_core import (
     GraphError as CoreError,
+    apply_learning_plan,
+    apply_outcome_plan,
     apply_pattern_operation,
     apply_hypothesis_plan,
     apply_promotion,
+    build_context,
     build_insights,
     build_graph_cached,
+    build_value_report,
     list_hypotheses,
     load_pattern_registry,
+    plan_outcome,
     plan_hypothesis_operation,
     plan_pattern_operation,
     plan_promotion,
@@ -1183,6 +1188,52 @@ def tool_board_insights(params):
     )
 
 
+def tool_board_context(params):
+    project = require(params, "project")
+    root = resolve_root(params)
+    bd = ensure_board_exists(root, project)
+    if params.get("report") is True:
+        return build_value_report(Path(bd), project)
+    limit = params.get("limit", 3)
+    if isinstance(limit, bool) or not isinstance(limit, int):
+        raise ToolError("limit must be an integer")
+    return build_context(
+        Path(bd),
+        project,
+        task=str(params.get("task") or ""),
+        files=params.get("files"),
+        entry_ids=params.get("entry_ids"),
+        cwd=str(params.get("cwd") or ""),
+        limit=limit,
+    )
+
+
+def tool_board_outcomes(params):
+    project = require(params, "project")
+    root = resolve_root(params)
+    bd = ensure_board_exists(root, project)
+    action = str(params.get("action") or "preview")
+    if action == "report":
+        return build_value_report(Path(bd), project)
+    plan_token = params.get("apply")
+    if action == "apply":
+        if not plan_token:
+            raise ToolError("apply requires a plan token")
+        return apply_outcome_plan(Path(bd), project, str(plan_token))
+    if action == "apply_learning":
+        if not plan_token:
+            raise ToolError("apply_learning requires a Learning plan token")
+        return apply_learning_plan(Path(bd), project, str(plan_token))
+    if action != "preview":
+        raise ToolError("action must be preview, apply, apply_learning, or report")
+    operation_params = {
+        key: value
+        for key, value in params.items()
+        if key not in {"root", "project", "action", "apply"}
+    }
+    return plan_outcome(Path(bd), project, operation_params)
+
+
 def tool_board_hypotheses(params):
     project = require(params, "project")
     root = resolve_root(params)
@@ -1871,6 +1922,103 @@ TOOLS = [
             "required": ["project"],
         },
         "handler": tool_board_insights,
+    },
+    {
+        "name": "board_context",
+        "description": "Return a deterministic context brief from repository-local canonical memory. Every result exposes structural relevance signals, score components, source references, status, and staleness. The context token records only digests and result ids. report=true returns the derived outcome-value report.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project": {"type": "string"},
+                "task": {"type": "string", "maxLength": 4000},
+                "files": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {"type": "string", "maxLength": 512},
+                },
+                "entry_ids": {
+                    "type": "array",
+                    "maxItems": 50,
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[BFOQ][0-9]+$",
+                    },
+                },
+                "cwd": {
+                    "type": "string",
+                    "description": "Absolute path inside the repository or a repository-relative path.",
+                },
+                "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10,
+                    "default": 3,
+                },
+                "report": {
+                    "type": "boolean",
+                    "description": "Return the canonical outcome-value report instead of a context brief.",
+                },
+                "root": _ROOT_PROP,
+            },
+            "required": ["project"],
+        },
+        "handler": tool_board_context,
+    },
+    {
+        "name": "board_outcomes",
+        "description": "Preview or apply one explicit fix result against one H### hypothesis, apply one returned L### Learning plan, or read the derived value report. Every mutation requires an unchanged content-bound plan token.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project": {"type": "string"},
+                "action": {
+                    "type": "string",
+                    "enum": ["preview", "apply", "apply_learning", "report"],
+                    "default": "preview",
+                },
+                "entry_id": {
+                    "type": "string",
+                    "pattern": "^[BFOQ][0-9]+$",
+                },
+                "hypothesis_id": {
+                    "type": "string",
+                    "pattern": "^H[0-9]{3,}$",
+                },
+                "fix_result": {
+                    "type": "string",
+                    "enum": ["held", "failed", "partial", "inconclusive"],
+                },
+                "hypothesis_disposition": {
+                    "type": "string",
+                    "enum": [
+                        "unchanged",
+                        "confirmed",
+                        "weakened",
+                        "rejected",
+                        "split",
+                    ],
+                },
+                "fix_summary": {"type": "string", "maxLength": 1000},
+                "evidence_ids": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                },
+                "observed_until": {
+                    "type": "string",
+                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                },
+                "actor": {"type": "string", "maxLength": 120},
+                "context_token": {"type": "string"},
+                "context_used": {"type": "boolean"},
+                "apply": {
+                    "type": "string",
+                    "description": "Outcome or Learning plan token returned by preview.",
+                },
+                "root": _ROOT_PROP,
+            },
+            "required": ["project"],
+        },
+        "handler": tool_board_outcomes,
     },
     {
         "name": "board_hypotheses",

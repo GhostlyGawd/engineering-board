@@ -21,7 +21,7 @@ Repository context:
 ```text
 repository: GhostlyGawd/engineering-board
 default_branch: main
-baseline_commit: bba602156f5836c94478a588f6c048c30f7ea04e
+baseline_commit: becbb3eaf219c239fbd186c2f749f4067b06cb3e
 portfolio_status: inventory-only
 audit_source: GhostlyGawd/repo-audit@9c64832e0d97e62a4fa45f2a544ffbc4c29b7a11
 ```
@@ -57,20 +57,54 @@ repository.
 | Contract item | Normative level | Implementation | Test | Docs/example | Status |
 |---|---|---|---|---|---|
 | Milestone D purpose and authority | Gate 1 and Gate 2 accepted | Implementation starts only from the accepted section 20 baseline | Owner approval and baselined requirements digest | Product spec sections 2, 11, 13, and 20 | Accepted |
-| Deterministic contextual retrieval | Accepted requirement | Shared core, command, MCP, SessionStart, and prompt adapters are allocated in section 20.10 | Repeat equality, lexical decoy, cross-domain, adapter parity, stale source, cache rebuild, and offline rows in section 20.11 | `/board-context` contract and context request/response example | Implementation pending |
-| Explainable relevance | Accepted requirement | Five exposed score components, structural eligibility gate, source-linked why templates, and stable tie order are specified | Component, threshold, source-link, and no-fabrication rows in section 20.11 | Product spec sections 20.3-20.5 | Implementation pending |
-| Explicit outcome feedback | Accepted requirement | Existing H### plan/apply and lock boundary will add typed fix results and compatible explicit dispositions | No-write preview, incompatible result, stale plan, contention, repeated apply, and history rows | `/board-outcome`, H### schema, and resolve-skill changes | Implementation pending |
-| Outcome-aware Learning confidence | Accepted requirement | Shared core will preview one-file L### changes. PM may reuse the same plans sequentially under existing authority | Supported, weakened, contested, untested, partial-batch, retry, and explicit-remember preservation rows | Learning schema and confidence table | Implementation pending |
-| Repository-local value evidence | Accepted requirement | Derived report reads canonical H### and L### state. No prompt log or telemetry is allocated | Verified context reference, zero-outcome, and no-vanity-count rows | Product spec section 20.7 | Implementation pending |
-| Security, failure, and performance | Accepted requirement | Existing path, parser, token, lock, atomic-write, and offline boundaries are retained and extended | Malformed input, linked evidence, injection text, closed proxy, timeout fallback, and 1,200-entry benchmark | Product spec sections 20.8-20.9; implementation must update SECURITY and architecture | Implementation pending |
-| Current product documentation | Required current truth | No runtime behavior changes in this contract PR | Existing 17-suite release tree remains the current evidence | README, setup, commands, MCP, architecture, security, visuals, and manifests remain v1.10.1 current truth | Reviewed and unaffected because accepted future behavior is not shipped behavior |
+| Deterministic contextual retrieval | Accepted requirement | Shared core, command, MCP, SessionStart, and prompt adapters use one implementation | Repeat equality, lexical decoy, adapter parity, cache rebuild, hook, and offline checks | `/board-context`, README, MCP, architecture, and product spec | Implemented and verified |
+| Explainable relevance | Accepted requirement | Five score components, a structural eligibility gate, source-linked reason templates, and stable tie order are implemented | Component, threshold, source-link, and lexical-decoy checks | Product spec sections 20.3-20.5 and Milestone D visual | Implemented and verified |
+| Explicit outcome feedback | Accepted requirement | The H### preview/apply and lock boundary records typed fix results and compatible explicit dispositions | No-write preview, incompatible input, repeated apply, structured history, and lifecycle checks | `/board-outcome`, H### schema, resolve skill, architecture, and security | Implemented and verified |
+| Outcome-aware Learning confidence | Accepted requirement | The shared core previews and applies one-file L### changes. PM uses the same plans sequentially under existing authority | Supported, contested, recurrence-confidence, idempotency, and curator compatibility checks | Learning schema, outcome command, view, and confidence table | Implemented and verified |
+| Repository-local value evidence | Accepted requirement | The derived report reads canonical H### and L### state only | Verified context reference and no-prompt/no-session checks | README, MCP, architecture, security, and view | Implemented and verified |
+| Security, failure, and performance | Accepted requirement | Existing path, parser, token, lock, atomic-write, and offline boundaries are extended to context and outcomes | Malformed input, unrelated prompt, hostile prompt, no-write, deadline, and 1,200-entry checks | SECURITY and architecture | Implemented and verified |
+| Current product documentation | Required current truth | Runtime behavior, schemas, commands, adapters, counts, and view are aligned | Documentation-coherence and full release-tree gates | README, product spec, commands, skills, MCP, architecture, security, landing, LLM guide, visual, and changelog | Updated for v1.11.0 |
 | Historical Milestone A-C evidence | Required preservation | No historical behavior or report change | Existing dated reports remain immutable observations | Historical reports remain unchanged | Reviewed and unaffected because contract acceptance does not revise shipped evidence |
-| Version, release, and publication | Deferred until implementation | Current release remains v1.10.1. The implementation contract requires one coordinated minor release boundary | Future release preparation, bundle, CI, registry, Pages, and closeout gates | Current release docs remain unchanged | Reviewed and unaffected in the specification phase |
+| Version, release, and publication | Required after implementation | The coordinated v1.11.0 release preparation updates all versioned surfaces and rebuilds the MCP bundle pin | Release preparation, full suite, PR CI, merged-main CI, publication, registry, PyPI, Pages, and closeout gates | Changelog, manifests, package files, README badge, and dated release evidence | In progress |
 
-No required behavior conflict exists because proposed Milestone D behavior is
-clearly labeled as unimplemented. The specification PR also repairs stale
-v1.10.0 current-release references in the central alignment table. Historical
-Milestone C delivery remains v1.10.0.
+No required behavior conflict remains. The implementation follows the accepted
+section 20 authority and storage boundaries. Historical Milestone A-C reports
+remain unchanged.
+
+## Implementation plan and acceptance phases
+
+- [x] Worker: baseline the accepted Gate 2 contract.
+- [x] Worker: implement deterministic contextual retrieval in the shared core.
+- [x] Worker: connect the command, MCP, SessionStart, and UserPromptSubmit
+  adapters.
+- [x] Worker: implement explicit H### outcome preview and apply.
+- [x] Worker: implement outcome-aware L### preview and apply.
+- [x] Worker: implement the derived value report.
+- [x] Worker: pass the Milestone D lifecycle matrix.
+- [x] Worker: align schemas, commands, skills, architecture, security, product
+  guidance, visuals, and manifests.
+- [x] Worker: pass the complete 18-suite release tree.
+- [ ] Worker: pass pull-request continuous integration.
+- [ ] Post-merge: pass merged-main continuous integration.
+- [ ] Post-merge: build and publish the coordinated minor release.
+- [ ] Closeout: append external release evidence, merge it, pass closeout
+  continuous integration, and revalidate current GitHub state.
+
+## Lifecycle evidence matrix
+
+| Sequence | Failure injection | Expected semantic outcome | Durable evidence | Test |
+|---|---|---|---|---|
+| Retrieve equal context twice | None | Equal ordered facts and fingerprint | Compared JSON | Milestone D core matrix |
+| Retrieve a lexical decoy | No structural signal | Empty result | Empty JSON result | Milestone D core matrix |
+| Retrieve through each adapter | Equivalent normalized input | Equal IDs, scores, signals, and sources | Captured adapter output | Adapter-parity matrix |
+| Run automatic retrieval | Timeout, malformed evidence, or unrelated prompt | Typed limitation before timeout, or silence for unrelated input | Captured hook output | Hook and benchmark matrix |
+| Preview an outcome | No apply token | No canonical file changes | File digests and preview | Outcome matrix |
+| Apply an outcome | Stale source, replay, or lock contention | One atomic H### change, or a typed no-change receipt | H### digest and receipt | Outcome lifecycle matrix |
+| Derive Learning feedback | Mixed held, failed, partial, and absent outcomes | Exact outcome state and confidence from canonical evidence | L### preview and file | Learning matrix |
+| Apply multiple Learning plans | Second apply fails | First change persists. Retry changes only the pending L###. | Batch receipt and file digests | Partial-batch matrix |
+| Generate a value report | Retrieval calls without outcomes | No activity or telemetry count appears | Derived report | Value-report matrix |
+| Delete derived state and rebuild | Graph and cache absent | Equal logical retrieval. H### and L### remain unchanged. | Compared payloads and digests | Recovery matrix |
+| Run offline and with hostile text | Closed proxy and instruction-like evidence | No network use, code execution, path escape, or instruction execution | Process assertions and payload | Security matrix |
 
 ## Requirements review state
 
@@ -106,22 +140,21 @@ against the same content digest.
 - Specification phase: this PR contains the accepted central contract and this
   workpad.
 - Owner gate: complete. The product owner approved section 20 on 2026-07-28.
-- Implementation phase: starts after this contract PR merges.
-- Post-merge and release phases: remain future work. Their evidence
-  destinations are the Milestone D implementation and release-validation
-  reports.
+- Implementation phase: complete on `agent/milestone-d-intelligence`.
+- Post-merge and release phases: in progress. Their evidence destinations are
+  the Milestone D implementation and v1.11.0 release-validation reports.
 
 PR completion state:
 
 ```text
-state: self-contained accepted specification
+state: implementation and documentation aligned; external gates pending
 external_gate: none
-evidence_destination: docs/evidence/2026-07-28-milestone-d-contract.md
-terminal_action: merge after passing continuous integration
+evidence_destination: docs/evidence/2026-07-28-milestone-d-implementation-validation.md
+terminal_action: keep open through merge, publication, and closeout evidence
 ```
 
 ## Current handoff
 
-The contract PR must merge after passing continuous integration. The
-implementation owner must then implement the bounded Milestone D contract.
-Approval does not authorize any explicit non-goal in section 20.14.
+The implementation must pass the complete release tree and PR continuous
+integration. It must then merge, publish v1.11.0, and add dated closeout
+evidence. Approval does not authorize an explicit non-goal in section 20.14.

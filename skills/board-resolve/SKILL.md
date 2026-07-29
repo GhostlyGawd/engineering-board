@@ -51,6 +51,14 @@ After the rebuild, run the auto-resolve terminal pass: see `../../references/aut
 
 **Silent path:** zero candidates to no output. The resolution proceeds normally.
 
+### Step 6: Offer explicit outcome feedback
+
+If the entry is cited by an H### hypothesis, offer `/board-outcome`. A held
+fix requires this resolved entry as cited completion evidence. The user or an
+authorized caller must select the hypothesis disposition explicitly. Do not
+infer causal confirmation from validation success. Outcome preview and
+Learning feedback preview do not write files.
+
 ---
 
 ## Closing a Question (9-step sequence: order is mandatory)

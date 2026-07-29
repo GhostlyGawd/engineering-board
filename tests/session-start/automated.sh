@@ -115,7 +115,10 @@ for i in range(1, N + 1):
 PY
 # Portable elapsed-time measurement via python3 (no `date -d`, crosscompat-safe).
 START="$(python3 -c 'import time; print(time.time())')"
-CLAUDE_PROJECT_DIR="$PBIG" bash "$SESSION_START" >/dev/null 2>&1 || true
+(
+  cd "$PBIG"
+  CLAUDE_PROJECT_DIR="$PBIG" bash "$SESSION_START" >/dev/null 2>&1 || true
+)
 END="$(python3 -c 'import time; print(time.time())')"
 ELAPSED="$(python3 -c "print(f'{${END} - ${START}:.2f}')")"
 UNDER="$(python3 -c "print(1 if (${END} - ${START}) < 10.0 else 0)")"
@@ -182,6 +185,71 @@ if printf '%s\n' "$OUT5" | grep -qF "was unreadable"; then
   fail "T8c: absent session-mode.json wrongly warns"
 else
   pass "T8c: absent session-mode.json stays quiet (no false warning)"
+fi
+
+# Relevant active-entry context surfaces bounded systemic memory.
+P9="$TMP/context"
+python3 - "$ROOT" "$P9" <<'PY'
+from pathlib import Path
+import sys
+root, repo = Path(sys.argv[1]), Path(sys.argv[2])
+sys.path.insert(0, str(root / "mcp-server"))
+from engineering_board_core import (
+    apply_hypothesis_plan, apply_pattern_operation, build_insights,
+    plan_hypothesis_operation, plan_pattern_operation,
+)
+from engineering_board_mcp import (
+    tool_board_create_entry, tool_board_init, tool_board_update_entry,
+)
+(repo / ".git").mkdir(parents=True)
+tool_board_init({"root": str(repo), "project": "demo"})
+board = repo / "engineering-board" / "demo"
+p = plan_pattern_operation(board, "create", {"label": "Boundary Ownership"})
+apply_pattern_operation(
+    board, "demo", "create", {"label": "Boundary Ownership"}, p["plan_id"]
+)
+for index, affects in enumerate(("api/router.py", "ui/state.ts"), 1):
+    tool_board_create_entry({
+        "root": str(repo), "project": "demo", "type": "bug",
+        "title": f"Boundary failure {index}", "priority": "P1",
+        "affects": affects, "pattern": ["boundary-ownership"],
+        "discovered": "2026-07-28",
+        "done_when": ["The shared boundary is owned."],
+    })
+tool_board_update_entry({
+    "root": str(repo), "project": "demo", "entry_id": "B001",
+    "status": "in_progress",
+})
+c = build_insights(board, "demo")["ranked_clusters"][0]
+h = plan_hypothesis_operation(board, "demo", "propose", {
+    "cluster_fingerprint": c["cluster_fingerprint"],
+    "claim_key": "shared-boundary-has-no-owner",
+    "title": "The shared boundary has no owner",
+    "root_cause": "Two domains use an implicit boundary.",
+    "supporting_evidence": [
+        {"id": item, "reason": "The entry crosses the boundary."}
+        for item in c["members"]
+    ],
+    "alternatives": ["Independent failures."], "counter_evidence": [],
+    "confidence": "medium", "confidence_basis": "Two domains share a pattern.",
+    "falsifier": "Independent owners explain both failures.",
+    "actor": "session-start-test",
+})
+apply_hypothesis_plan(board, "demo", h["plan_token"])
+PY
+OUT9="$(
+  cd "$P9"
+  CLAUDE_PROJECT_DIR="$P9" bash "$SESSION_START" 2>/dev/null || true
+)"
+MEMORY_COUNT="$(
+  printf '%s\n' "$OUT9" | grep -cE '^    - .*score [0-9]+:' || true
+)"
+if printf '%s\n' "$OUT9" | grep -qF "SYSTEMIC MEMORY" &&
+   printf '%s\n' "$OUT9" | grep -qF "H001" &&
+   [ "$MEMORY_COUNT" -le 3 ]; then
+  pass "T9: active entry surfaces no more than three systemic memories"
+else
+  fail "T9: bounded systemic memory was not surfaced"
 fi
 
 echo ""

@@ -9,6 +9,45 @@ increases.
 
 ## [Unreleased]
 
+## [1.11.0] — 2026-07-29
+
+### Added
+
+- Added deterministic contextual retrieval through `/board-context`,
+  `board_context`, SessionStart, and relevant UserPromptSubmit requests. Each
+  result exposes structural eligibility, five score components, matched
+  signals, state, staleness, a reason, and canonical sources.
+- Added `/board-outcome` and `board_outcomes` to preview and apply explicit
+  `held`, `failed`, `partial`, or `inconclusive` fix outcomes against H###
+  hypotheses.
+- Added outcome-aware L### Learning plans with `supported`, `weakened`,
+  `contested`, and `untested` state plus deterministic confidence.
+- Added a repository-local value report from canonical outcome history and
+  Learning state. The report excludes prompt, session, and activity counts.
+- Added a normal-view value strip, H### outcome counts, Learning outcome
+  state, the Milestone D lifecycle matrix, prompt-hook tests, and a sanitized
+  validation visual.
+
+### Changed
+
+- Expanded the MCP server from 17 to 19 tools and plugin commands from 19 to
+  21.
+- Replaced exact-label SessionStart memory with the shared bounded context
+  core. Relevant prompt retrieval now uses the same core and remains silent
+  for unrelated prompts.
+- Moved automatic Learning curation onto the shared outcome-aware plan and
+  apply implementation while preserving legacy pattern-label compatibility.
+- Reframed setup, product, architecture, security, and LLM guidance around
+  systemic context before a fix and explicit evidence after a fix.
+
+### Security
+
+- Automatic retrieval is read-only, offline, deadline-bounded, and limited to
+  safe repository context. It does not retain raw prompts.
+- H### outcomes and L### feedback use content-bound plans, repository-local
+  locks, repeat validation, atomic one-file writes, and typed stale or
+  contention failures.
+
 ## [1.10.1] — 2026-07-28
 
 ### Added

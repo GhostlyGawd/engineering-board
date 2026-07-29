@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "patterns": [
     {
       "tool": "Bash",
@@ -90,6 +90,16 @@
       "tool": "Bash",
       "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-insights.sh:*",
       "rationale": "/board-insights and /board-hypothesis: deterministic ranking plus content-bound hypothesis preview/apply"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-context.sh:*",
+      "rationale": "/board-context and automatic retrieval: bounded read-only systemic memory from the shared core"
+    },
+    {
+      "tool": "Bash",
+      "pattern": "bash $CLAUDE_PLUGIN_ROOT/hooks/scripts/board-outcome.sh:*",
+      "rationale": "/board-outcome and Learning curation: content-bound H### outcome and L### feedback operations"
     },
     {
       "tool": "SlashCommand",

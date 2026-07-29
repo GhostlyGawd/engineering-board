@@ -28,7 +28,7 @@ Security corrections apply to the current minor release.
 
 | Version | Support |
 |---|---|
-| Current minor release, 1.10.x | Supported |
+| Current minor release, 1.11.x | Supported |
 | Earlier releases | Not supported |
 
 Install the latest release to receive a security correction.
@@ -40,6 +40,10 @@ security correction requires a new version.
 
 Board entries, scratch findings, and session captures are untrusted data. An
 agent can read this data. The agent must not obey this data as instructions.
+
+Context briefs contain excerpts, titles, and reasons derived from the same
+untrusted board data. The SessionStart and UserPromptSubmit adapters mark the
+brief as data, not instructions.
 
 The orchestrator instructions contain this exact rule:
 
@@ -150,6 +154,74 @@ A rejected claim returns typed negative memory without an apply token.
 
 A reopen operation requires the retained evidence. It also requires at least
 one new evidence identifier from the current cluster.
+
+## Bound automatic context retrieval
+
+SessionStart and UserPromptSubmit can retrieve systemic memory automatically.
+This operation is read-only.
+
+The shared core accepts bounded inputs:
+
+- Task text: at most 4,000 characters
+- File paths: at most 100 safe repository-relative paths
+- Entry identifiers: at most 50 canonical identifiers
+- Results: at most 10 for an explicit request and at most 3 in a hook message.
+
+The retrieval operation rejects an unsafe path, an unknown entry identifier,
+an out-of-repository current directory, and a linked canonical record.
+
+A result requires a structural signal. Task-term overlap cannot surface a
+result by itself. This rule limits instruction-like lexical content that has no
+canonical pattern, affected-path, or graph relation.
+
+The hook adapters use a 3.8-second internal deadline. A timeout or malformed
+record produces a bounded warning. An unrelated prompt produces no context
+message.
+
+The retrieval core makes no network request. It does not execute board
+content, start a process from board content, retain raw prompt text, or change
+a canonical file. A context token contains request and source digests plus
+result identifiers. It does not contain raw task text and does not authorize a
+write.
+
+## Control fix outcomes and Learning feedback
+
+An H### fix outcome uses a preview and apply operation. The preview changes no
+canonical file.
+
+The preview requires:
+
+- One canonical entry and one related H### hypothesis
+- One compatible fix result and hypothesis disposition
+- One bounded summary
+- One or more canonical evidence identifiers
+- One ISO observation date
+- One actor
+- A context token when `context_used` is true.
+
+The apply operation revalidates the request before and after it acquires the
+existing H### board lock. It atomically changes one H### file. A repeated event
+returns `already_applied`.
+
+The operation fails closed for an unsafe target, a linked record, a stale
+plan, lock contention, incompatible result and disposition, missing evidence,
+or an unrelated entry.
+
+The outcome operation returns separate content-bound Learning plans. It does
+not apply them automatically. An explicit caller can apply one plan. The
+existing PM curator can apply eligible plans sequentially under its existing
+write authority. A failure preserves each earlier successful Learning change
+and reports the remaining plan.
+
+Learning confidence is deterministic. A held result can support a Learning. A
+failed result weakens it. Partial or mixed held and failed results contest it.
+No applicable result leaves it untested. Explicit `board_remember` records do
+not receive pattern-outcome changes unless they are separately linked to that
+pattern.
+
+The value report derives counts only from canonical H### outcome history and
+L### outcome fields. It does not store or count prompts, sessions, searches,
+or other activity.
 
 ## Keep the HTML view read-only
 

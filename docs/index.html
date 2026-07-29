@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Engineering Board: Pattern intelligence for engineering agents</title>
-<meta name="description" content="Repository engineering memory that connects recurring findings to explainable clusters and bounded root-cause hypotheses.">
+<meta name="description" content="Repository engineering memory that retrieves systemic patterns before a fix and learns from explicit fix outcomes.">
   <link rel="canonical" href="https://ghostlygawd.github.io/engineering-board/">
   <meta name="keywords" content="claude code plugin, mcp server, engineering pattern intelligence, root cause analysis, git-committed memory, multi-agent coordination, ai agent memory, evidence graph, agent claim locking, cross-session agent memory, markdown knowledge graph">
   <meta name="theme-color" content="#FAF9F5" media="(prefers-color-scheme: light)">
@@ -243,7 +243,7 @@
     <section class="hero wrap" aria-labelledby="h1">
 <p class="eyebrow">Claude Code plugin and Model Context Protocol server</p>
 <h1 id="h1">Find a shared root cause across different findings.</h1>
-<p class="tagline"><strong>The board is the memory.</strong> Markdown evidence becomes an explainable pattern graph and a bounded investigation candidate.</p>
+<p class="tagline"><strong>The board is the memory.</strong> The agent receives relevant systemic evidence before a fix and returns the verified outcome after the fix.</p>
 <p class="whofor">Use Engineering Board when an engineering agent must learn across sessions and domains. The product does not require a database, service, or daemon.</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="#install">Install — free &amp; MIT</a>
@@ -260,18 +260,23 @@
         <figcaption class="demo-cap">Real deterministic fixture output · 15 lifecycle checks · 2026-07-28</figcaption>
       </figure>
 
+      <figure class="demo" aria-label="Milestone D lifecycle validation">
+        <img src="assets/milestone-d-context-outcome-intelligence.svg" alt="Sanitized automated fixture showing 11 passed checks for deterministic context retrieval, explicit fix outcomes, outcome-aware Learning confidence, value evidence, and rebuild equivalence." width="1200" height="680" style="display:block;max-width:100%;height:auto;border-radius:var(--eb-radius-card)">
+        <figcaption class="demo-cap">Real deterministic fixture output · context before a fix · evidence after a fix · 2026-07-28</figcaption>
+      </figure>
+
 <p class="trustband">The project uses its <a href="board.html">public board</a>. The project has <a href="https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml">CI tests</a>, no runtime package dependency, and an MIT license. The server is on the <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">MCP Registry</a>.</p>
     </section>
 
     <section id="why" aria-labelledby="why-h">
       <div class="wrap">
 <h2 id="why-h" class="reveal">Product differences</h2>
-<p class="sub reveal">A single chat can hide recurrence. Engineering Board stores the evidence and shows the common signal. A cluster does not prove causation.</p>
+<p class="sub reveal">A single chat can hide recurrence. Engineering Board retrieves the common signal before an agent chooses another local correction. A cluster does not prove causation.</p>
         <div class="vp">
-<div class="card2 reveal lead"><h3>Evidence-linked pattern intelligence</h3><p>Findings become typed nodes and explainable edges. A transparent score ranks cross-domain clusters. Each member and score component remains visible.</p><p class="proof">Markdown evidence to ranked cluster to cited H###</p></div>
-<div class="card2 reveal"><h3>Durable and correctable memory</h3><p>The product keeps evidence, hypotheses, rejected claims, lineage, and learnings separate. Negative memory prevents an unchanged rejected cause from returning.</p><p class="proof">B###, H###, and L###</p></div>
+<div class="card2 reveal lead"><h3>Systemic context before a fix</h3><p>Task, path, and entry signals retrieve relevant clusters, hypotheses, negative memory, and Learnings. Each result shows why it surfaced and cites canonical sources.</p><p class="proof">Context → pattern evidence → root-cause choice</p></div>
+<div class="card2 reveal"><h3>Memory that learns from outcomes</h3><p>An explicit fix result updates H### history. A separate preview can revise L### outcome state and confidence. A failed fix can weaken or contest earlier memory.</p><p class="proof">Fix outcome → H### history → L### confidence</p></div>
 <div class="card2 reveal"><h3>Claims for parallel agents</h3><p>An atomic claim prevents two Worker agents from changing the same entry at the same time.</p><p class="proof">board-claim-acquire.sh</p></div>
-<div class="card2 reveal"><h3>Falsifiable verification</h3><p>The optional TDD, review, and validation loop can test a selected explanation. This loop returns evidence to the memory system.</p><p class="proof">tdd-builder, code-reviewer, and validator</p></div>
+<div class="card2 reveal"><h3>Falsifiable verification</h3><p>Any suitable workflow can test a selected explanation. The optional TDD, review, and validation loop is one source of outcome evidence.</p><p class="proof">held · failed · partial · inconclusive</p></div>
 <div class="card2 reveal"><h3>Stable pattern memory</h3><p>A canonical P### identifier keeps a cluster stable after a label change. Preview and apply operations keep each correction explicit.</p><p class="proof">Markdown evidence, P### identity, and graph provenance</p></div>
         </div>
         <div class="faq reveal">
@@ -342,7 +347,7 @@ claude mcp add engineering-board -- \
     "args": ["engineering-board-mcp"]
   }
 }</code></pre>
-<p class="muted" style="font-size:.8rem">The Python server has no package dependency. It provides 17 tools through standard input and output. Read the <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md">client setup procedures</a>.</p>
+<p class="muted" style="font-size:.8rem">The Python server has no package dependency. It provides 19 tools through standard input and output. Read the <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md">client setup procedures</a>.</p>
           </div>
         </div>
 <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">An uninstall operation does not remove the Markdown board. The system treats scratch content as untrusted data. Read the <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/SECURITY.md">security policy</a>.</p>

@@ -90,13 +90,19 @@ mk learnings/L001.md <<'EOF'
 ---
 id: L001
 type: learning
+subtype: pattern
 title: durable lesson worth surfacing
 discovered: 2026-07-04
 status: open
 confidence: high
+confidence_basis: Four resolved sources and one held fix outcome.
 recurrence: 4
+derived_from: [B001, B002, B003, B004]
 applies_to: [src/]
+pattern_ids: [P001]
 pattern_tag: some-pattern
+outcome_status: supported
+outcome_refs: []
 ---
 ## Lesson
 - x
@@ -127,6 +133,18 @@ if echo "$OUT" | grep -qF '>high<' && echo "$OUT" | grep -qF '×4'; then
   pass "learning confidence + recurrence surfaced"
 else
   fail "learning confidence/recurrence not surfaced"
+fi
+if echo "$OUT" | grep -qF '>supported<' &&
+   echo "$OUT" | grep -qF 'Four resolved sources and one held fix outcome.'; then
+  pass "Learning outcome state and confidence basis surfaced"
+else
+  fail "Learning outcome state or confidence basis missing"
+fi
+if echo "$OUT" | grep -qF 'useful resurfacing' &&
+   echo "$OUT" | grep -qF 'confirmed systemic fixes'; then
+  pass "canonical outcome-value strip surfaced"
+else
+  fail "outcome-value strip missing"
 fi
 # The Q/O lane header no longer claims to include Learnings.
 echo "$OUT" | grep -qF 'Questions · Observations<' && pass "Q/O lane header no longer lists Learnings" || fail "Q/O lane header not updated"
