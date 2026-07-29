@@ -2,7 +2,7 @@
 
 Date: 2026-07-29
 
-State: Ready for product-owner baseline review.
+State: Product-owner baseline accepted.
 
 Requirement digest:
 `sha256:7f583c3d03aca672c77b35adf436d2f2bf45a57b85824cbaf32bf4e024cd21fd`
@@ -62,10 +62,9 @@ must pass. The requirements checker must report no deterministic defect in the
 changed normative requirements. Pull-request and merged-main continuous
 integration must pass.
 
-The requirements checker reports that all deterministic, lifecycle, and
-authority checks pass for the digest above. The five semantic reviews and the
-product-owner baseline approval remain open. This state is a draft. It is not
-an approved baseline.
+The requirements checker reports `BASELINED — AUTHORIZED APPROVAL RECORDED`.
+All deterministic, lifecycle, authority, semantic-review, and baseline-
+approval gates pass for the digest above.
 
 ## Next product task
 
@@ -76,5 +75,6 @@ Milestone E remains deferred until the product owner accepts the new evidence.
 
 ## Approval gate
 
-The product owner must approve the exact requirement digest before this
-contract becomes the new baseline. After approval, merge the reviewed branch.
+The product owner approved the exact requirement digest on 2026-07-29. This
+contract is the accepted baseline. Merge the reviewed branch after continuous
+integration passes.
