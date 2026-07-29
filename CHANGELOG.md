@@ -9,6 +9,8 @@ increases.
 
 ## [Unreleased]
 
+## [1.11.0] — 2026-07-29
+
 ### Added
 
 - Added deterministic contextual retrieval through `/board-context`,

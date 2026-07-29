@@ -83,7 +83,8 @@ remain unchanged.
 - [x] Worker: pass the Milestone D lifecycle matrix.
 - [x] Worker: align schemas, commands, skills, architecture, security, product
   guidance, visuals, and manifests.
-- [ ] Worker: pass the complete release tree and PR continuous integration.
+- [x] Worker: pass the complete 18-suite release tree.
+- [ ] Worker: pass pull-request continuous integration.
 - [ ] Post-merge: pass merged-main continuous integration.
 - [ ] Post-merge: build and publish the coordinated minor release.
 - [ ] Closeout: append external release evidence, merge it, pass closeout

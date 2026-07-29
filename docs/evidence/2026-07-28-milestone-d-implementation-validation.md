@@ -82,10 +82,23 @@ The 1,200-entry SessionStart fixture completed within the 10-second hook
 boundary. It used the real shared context adapter and completed in
 approximately 4.62 seconds on the validation host.
 
-Complete release-tree, pull-request, merged-main, publication, registry,
-package, and product-site results belong to the later delivery phases. The
-v1.11.0 release-validation report will record the external evidence without
-rewriting this report.
+The coordinated v1.11.0 preparation generated this MCP bundle digest:
+
+```text
+4045dfce20339f09187966d1856df95d29ea0a5294aa11ee05ce76afe8f7fb36
+```
+
+The complete local release tree passed:
+
+```text
+RUN-ALL SUMMARY: 18 pass, 0 fail (of 18 suites)
+version coherence: 1.11.0
+documentation coherence: 19 tools, 21 commands, 5 skills
+```
+
+Pull-request, merged-main, publication, registry, package, and product-site
+results belong to the later delivery phases. The v1.11.0 release-validation
+report will record the external evidence without rewriting this report.
 
 ## Documentation alignment
 
@@ -113,10 +126,10 @@ canonical storage boundary, and the optional Worker loop remain compatible.
 ## Current delivery state
 
 ```text
-state: worker validation in progress
+state: worker validation complete; external delivery gates pending
 branch: agent/milestone-d-intelligence
 baseline: becbb3eaf219c239fbd186c2f749f4067b06cb3e
 target_release: v1.11.0
-external_gate: complete release tree, PR CI, merged-main CI, publication, and closeout evidence
+external_gate: PR CI, merged-main CI, publication, and closeout evidence
 terminal_action: keep open
 ```
