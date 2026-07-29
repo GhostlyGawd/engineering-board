@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import copy
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -19,6 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from evaluation.harness import (  # noqa: E402
     EvaluationError,
+    build_context_evidence,
     load_run,
     prepare_run,
     record_attempt,
@@ -34,17 +34,24 @@ POSITIVE_CATEGORIES = {"recurring-bug", "cross-domain-shared-cause"}
 class EvaluationHarnessTests(unittest.TestCase):
     corpus_path = ROOT / "evaluation" / "corpus.json"
     contracts_path = ROOT / "evaluation" / "client-contracts.json"
+    source_commit = "e26149bf505ea7f5ae2d95294a8a108e6b3c429f"
+    context_evidence: dict | None = None
 
     def make_config(self, directory: Path, run_id: str = "test-run") -> Path:
-        corpus = json.loads(self.corpus_path.read_text(encoding="utf-8"))
+        if self.__class__.context_evidence is None:
+            self.__class__.context_evidence = build_context_evidence(
+                ROOT, self.corpus_path, self.source_commit
+            )
+        evidence = self.__class__.context_evidence
+        assert evidence is not None
         fingerprints = {
-            case["id"]: f"ctx-{hashlib.sha256(case['id'].encode()).hexdigest()[:24]}"
-            for case in corpus["cases"]
+            case_id: brief["context_fingerprint"]
+            for case_id, brief in evidence["briefs"].items()
         }
         value = {
-            "schema_version": "1",
+            "schema_version": "2",
             "run_id": run_id,
-            "source_commit": "a" * 40,
+            "source_commit": self.source_commit,
             "trial_policy": "d1-gate2-v1",
             "profiles": {
                 "primary": {
@@ -83,6 +90,22 @@ class EvaluationHarnessTests(unittest.TestCase):
         context = trial["arm"] == "context"
         systemic = bool(positive and context)
         expected_memory = case["expected_relevant_memory"]
+        surfaced_memories = (
+            [
+                {"id": item["id"], "rank": rank}
+                for rank, item in enumerate(trial["context_brief"]["results"], start=1)
+            ]
+            if context
+            else []
+        )
+        expected_memory_rank = next(
+            (
+                item["rank"]
+                for item in surfaced_memories
+                if item["id"] == expected_memory
+            ),
+            None,
+        )
         attempt: dict[str, object] = {
             "schema_version": "1",
             "attempt_id": "attempt-1",
@@ -95,11 +118,7 @@ class EvaluationHarnessTests(unittest.TestCase):
             "canonical_citations": (
                 [case["canonical_evidence"][0]["id"]] if systemic else []
             ),
-            "surfaced_memories": (
-                [{"id": expected_memory, "rank": 1}]
-                if context and expected_memory
-                else []
-            ),
+            "surfaced_memories": surfaced_memories,
             "final_diagnosis": (
                 case["expected_systemic_cause"] or "The issue is independent."
             ),
@@ -111,8 +130,10 @@ class EvaluationHarnessTests(unittest.TestCase):
         if context:
             attempt.update(
                 {
-                    "context_fingerprint": trial["context_brief"]["fingerprint"],
-                    "expected_memory_rank": 1 if expected_memory else None,
+                    "context_fingerprint": trial["context_brief"][
+                        "context_fingerprint"
+                    ],
+                    "expected_memory_rank": expected_memory_rank,
                     "irrelevant_memory_count": 0,
                     "rejected_memory_treatment": "not_surfaced",
                     "lexical_decoy_treatment": (
@@ -120,17 +141,6 @@ class EvaluationHarnessTests(unittest.TestCase):
                         if case["category"] == "lexical-decoy"
                         else "not_applicable"
                     ),
-                    "outcome_loop": {
-                        "expected_effect": case["scoring"][
-                            "expected_outcome_effect"
-                        ],
-                        "observed_effect": case["scoring"][
-                            "expected_outcome_effect"
-                        ],
-                        "before_rank": 2 if expected_memory else None,
-                        "after_rank": 1 if expected_memory else None,
-                        "matches_expected": True,
-                    },
                 }
             )
         attempt.update(overrides)
@@ -206,8 +216,26 @@ class EvaluationHarnessTests(unittest.TestCase):
                 self.assertEqual(
                     baseline["controlled_inputs"], context["controlled_inputs"]
                 )
+                self.assertEqual(baseline["repository"], context["repository"])
+                for item in pair:
+                    repository = (
+                        run_dir
+                        / item["workspace"]
+                        / item["repository"]["path"]
+                        / "engineering-board"
+                        / "d1-evaluation"
+                    )
+                    self.assertTrue(
+                        (repository / "hypotheses").is_dir()
+                    )
                 self.assertIsNone(baseline["context_brief"])
                 self.assertIsNotNone(context["context_brief"])
+                self.assertIn("context_fingerprint", context["context_brief"])
+                self.assertIn("results", context["context_brief"])
+                self.assertNotIn(
+                    "expected_relevant_memory", context["context_brief"]
+                )
+                self.assertNotIn("rejected_memories", context["context_brief"])
 
     def test_prepare_refuses_existing_or_linked_output(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-path-") as temp:
@@ -314,8 +342,29 @@ class EvaluationHarnessTests(unittest.TestCase):
             self.assertEqual(score["primary"]["positive_context_denominator"], 12)
             self.assertEqual(score["primary"]["context_rate_percent"], 100.0)
             self.assertEqual(score["primary"]["baseline_rate_percent"], 0.0)
+            self.assertTrue(score["compatibility"]["complete"])
             self.assertEqual(score["false_positive_count"], 0)
             self.assertEqual(score["missing_trial_arms"], [])
+
+    def test_compatibility_completion_is_reported_before_primary_completion(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-compat-") as temp:
+            run_dir = self.prepare(Path(temp))
+            manifest = load_run(run_dir)
+            cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+            for trial in manifest["trials"]:
+                if trial["profile"] != "compatibility":
+                    continue
+                record_attempt(
+                    run_dir,
+                    trial["trial_key"],
+                    self.scored_attempt(trial, cases[trial["case_id"]]),
+                )
+            score = score_run(run_dir)
+            self.assertTrue(score["compatibility"]["complete"])
+            self.assertTrue(score["gates"]["compatibility_complete"])
+            self.assertTrue(score["gates"]["outcome_loop_matches"])
+            self.assertFalse(score["gates"]["complete_evidence"])
+            self.assertFalse(score["overall_pass"])
 
     def test_threshold_and_false_positive_failures_remain_visible(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-fail-") as temp:

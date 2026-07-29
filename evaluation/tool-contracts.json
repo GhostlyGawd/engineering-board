@@ -1,0 +1,20 @@
+{
+  "schema_version": "1",
+  "trial_rule": "The agent must not call a tool during a scored trial.",
+  "profiles": {
+    "primary": {
+      "client": "Claude Code",
+      "integration": "Engineering Board plugin",
+      "integration_source_commit": "e26149bf505ea7f5ae2d95294a8a108e6b3c429f",
+      "workspace_access": "read-only",
+      "agent_tool_calls": "forbidden"
+    },
+    "compatibility": {
+      "client": "Codex CLI",
+      "integration": "Engineering Board MCP server over stdio",
+      "integration_source_commit": "e26149bf505ea7f5ae2d95294a8a108e6b3c429f",
+      "workspace_access": "read-only",
+      "agent_tool_calls": "forbidden"
+    }
+  }
+}
