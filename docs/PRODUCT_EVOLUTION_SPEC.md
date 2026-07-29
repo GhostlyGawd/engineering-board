@@ -6,9 +6,9 @@ _Started: 2026-07-27_
 _Last direction revision: 2026-07-28_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
-_Current release boundary: `v1.10.0`_
+_Current release boundary: `v1.10.1`_
 _Portfolio context: inventory-only. audit source `GhostlyGawd/repo-audit` at
-`907f0759f9d08f478cd5384ad88e50963f1af79a`_
+`9c64832e0d97e62a4fa45f2a544ffbc4c29b7a11`_
 
 ## 1. Authority and use
 
@@ -70,6 +70,7 @@ selected milestone is approved.
 | Adapter parity | Accepted for Milestone B | Plugin and MCP surfaces must consume the same zero-dependency parser, pattern resolver, and deterministic graph engine and return semantically equivalent facts. |
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
+| Milestone D direction | Gate 1 accepted; Gate 2 proposed | Deliver relevant repository-local pattern memory when an agent makes a decision, then use explicit fix outcomes to improve later retrieval and learning confidence. Section 20 is the proposed implementation contract. |
 
 ## 3. Product thesis
 
@@ -479,7 +480,10 @@ help an agent reason from symptoms toward a shared cause.
 **Purpose:** Deliver accumulated intelligence at the decision where it changes
 agent behavior.
 
-Candidate scope:
+**Direction state:** Gate 1 accepted by the product owner on 2026-07-28. The
+section 20 Gate 2 implementation contract is proposed for owner approval.
+
+Approved direction:
 
 - Retrieval based on current files, task intent, patterns, graph neighbors, and
   prior outcomes-not only current working directory.
@@ -629,9 +633,12 @@ auto-promotion remains deferred.
 
 ### O7: Resolution and learning feedback
 
-Recommendation: after verification, offer an explicit resolve action that also
-records the hypothesis outcome. Do not silently convert successful validation
-into confirmed causation.
+**State: Gate 1 accepted. Gate 2 mechanism proposed in section 20.**
+
+After verification, offer explicit outcome feedback that records the fix
+result against cited evidence. The outcome can recommend a hypothesis or
+Learning change. It cannot silently convert successful validation into
+confirmed causation.
 
 ## 14. Alternatives
 
@@ -692,9 +699,10 @@ with session tasks and planning tools instead.
 | Current capture confirmation | Required current truth | Stop procedure and append helper surface a non-empty receipt | `tests/scratch/append.sh`. mode-routing tests | README was corrected in this branch | Documentation-only drift repaired |
 | Canonical setup instruction | Required current truth | `/board-setup` is the plugin setup path | Setup command test | Landing page was corrected in this branch | Documentation-only drift repaired |
 | TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped and unchanged | Existing mode and orchestration tests | Repositioned as optional falsifiable verification feedback, not the headline or required first experience | Behavior unchanged. messaging aligned |
-| MCP behavior | Required current truth | Seventeen tools share canonical Markdown. pattern, promotion, graph, ranking, and hypothesis tools delegate to the same core as plugin adapters | 166-check MCP lifecycle suite plus Milestone B/C adapter-parity matrices. official registry version 1.10.0 active and latest | MCP reference, manifests, package modules, and counts updated | Shipped in v1.10.0 |
-| Security, privacy, versions, releases | Required current truth | Content-bound hypothesis tokens, inventory and graph revalidation, one-file atomic writes, linked-input refusal, HTML escaping, and offline operation extend the existing controls. coordinated manifests identify v1.10.0 | Security suites, Milestone C matrix, full 16-suite release tree, reproducible bundle checksum, merged-main CI, and external publication checks passed | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and release evidence aligned | Shipped and externally validated |
-| Milestone C implementation contract | Accepted and shipped | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging shipped | Milestone C 15-check matrix, 166-check MCP suite, 16/16 release-tree suites, merged-main CI, release workflow, and live-surface checks pass | Central spec, contract workpad, current-truth docs, real sanitized visual, implementation evidence, and v1.10.0 release validation updated | Shipped in v1.10.0 |
+| MCP behavior | Required current truth | Seventeen tools share canonical Markdown. pattern, promotion, graph, ranking, and hypothesis tools delegate to the same core as plugin adapters | 166-check MCP lifecycle suite plus Milestone B/C adapter-parity matrices. official registry version 1.10.1 is active and latest | MCP reference, manifests, package modules, and counts updated | Current package v1.10.1; Milestone C behavior shipped in v1.10.0 |
+| Security, privacy, versions, releases | Required current truth | Content-bound hypothesis tokens, inventory and graph revalidation, one-file atomic writes, linked-input refusal, HTML escaping, and offline operation extend the existing controls. coordinated manifests identify v1.10.1 | Security suites, Milestone C matrix, full 17-suite release tree, reproducible bundle checksum, merged-main CI, and external publication checks passed | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and v1.10.1 release evidence aligned | Shipped and externally validated |
+| Milestone C implementation contract | Accepted and shipped | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging shipped | Milestone C 15-check matrix, 166-check MCP suite, 17/17 current release-tree suites, merged-main CI, release workflow, and live-surface checks pass | Central spec, contract workpad, current-truth docs, real sanitized visual, implementation evidence, and v1.10.0 release validation remain current for Milestone C behavior | Shipped in v1.10.0; packaging current at v1.10.1 |
+| Milestone D implementation contract | Gate 2 proposed | No Milestone D behavior is implemented. Current SessionStart uses exact-tag recurrence and directory-filtered Learnings. | Proposed deterministic retrieval, outcome-feedback, adapter-parity, security, performance, and full-sequence matrix in section 20 | Central spec and Milestone D contract workpad only. Current product docs remain unchanged until implementation. | Ready for owner Gate 2 review |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -1755,10 +1763,596 @@ Milestone C does not:
 Gate 2 approval authorizes implementation of this contract. It does not
 authorize the deferred Milestone D or E scope.
 
-## 20. Research and evidence
+## 20. Gate 2 proposed: Milestone D implementation contract
+
+_State: Gate 1 accepted by the product owner on 2026-07-28. Gate 2 is
+proposed for owner review. No Milestone D implementation is authorized until
+the owner accepts this section._
+
+### 20.1 Milestone purpose
+
+> Make relevant systemic memory difficult for an agent to miss when it chooses
+> a fix, then use explicit fix outcomes to improve the memory that a later
+> agent receives.
+
+Current workflow:
+
+1. Engineering Board captures and promotes findings.
+2. The shared graph builds patterns and clusters.
+3. `/board-insights` ranks systemic investigations.
+4. H### records preserve proposed, confirmed, weakened, rejected, split, and
+   merged explanations.
+5. SessionStart separately counts exact pattern labels and filters Learnings
+   by the current directory.
+
+The current workflow can contain the correct systemic memory without giving it
+to the acting agent. The agent must know when and how to request the memory.
+Resolution also does not carry a structured fix result into Learning
+confidence. The product can therefore preserve intelligence without using or
+improving it at the next decision.
+
+Milestone D changes the actor that performs retrieval. The product, not the
+user, performs a bounded relevance check when a work session or investigation
+begins. The user or an explicitly authorized agent retains authority over every
+canonical hypothesis, outcome, resolution, and Learning change.
+
+Implementation is divided into two ordered slices:
+
+1. **D1: Contextual retrieval.** Deliver a source-linked context brief through
+   SessionStart, relevant UserPromptSubmit events, a foreground command, and
+   MCP.
+2. **D2: Outcome learning.** Record an explicit fix outcome in H### history,
+   then preview any resulting Learning change through the same shared core.
+
+D1 must ship with the D2 data contract in place. D2 must ship before Milestone
+D is called complete.
+
+### 20.2 Requirement profile and authority
+
+This section uses `shall` for a proposed binding product requirement. The
+lifecycle profile is general requirements engineering. This section does not
+claim NASA, BCP 14, or formal ASD-STE100 compliance.
+
+Source precedence is:
+
+1. The product owner's latest explicit decision.
+2. Sections 1-16 of this product-direction spec.
+3. The shipped Milestone B and C contracts in sections 18 and 19.
+4. Current implementation and current-truth documentation.
+
+The product owner is the approval authority. Until Gate 2 approval, each
+requirement has proposed status.
+
+| ID | Product requirement | Rationale and parent trace | Allocation | Planned verification |
+|---|---|---|---|---|
+| MD-REQ-001 | The shared core shall accept one bounded context request and return one deterministic context brief from repository-local canonical evidence. | Delivers section 11 Milestone D retrieval without hidden chat state. | Shared Python core | Repeat-run equality test |
+| MD-REQ-002 | The retrieval engine shall return a memory only when the memory has at least one structural relevance signal. | Prevents plausible but unrelated language from becoming false context. Traces to outcome acceptance 4 and 5. | Shared Python core | Lexical-decoy negative test |
+| MD-REQ-003 | Each returned memory shall state its score components, matched signals, status, staleness, and canonical source references. | Keeps derived intelligence explainable. Traces to non-negotiable properties 1-3. | Shared core and all adapters | Payload and source-link inspection |
+| MD-REQ-004 | The command, MCP, SessionStart, and UserPromptSubmit adapters shall return semantically equivalent memory facts for equivalent context signals. | Prevents adapter-specific intelligence. Traces to the accepted parity boundary. | Plugin and MCP adapters | Cross-adapter matrix |
+| MD-REQ-005 | A context request shall not modify canonical or derived board state, execute code, or use network access. | Keeps retrieval safe at the decision boundary. | Shared core and adapters | Filesystem, process, and closed-proxy tests |
+| MD-REQ-006 | SessionStart shall surface no more than three eligible memories from current directory, changed-file, and active-entry context. | Makes repository return useful without overwhelming startup. | SessionStart adapter | SessionStart fixture |
+| MD-REQ-007 | UserPromptSubmit shall return no output for an unrelated prompt and no more than three eligible memories for a bounded investigation or change prompt. | Delivers memory when task intent first becomes available without adding noise to every turn. | Prompt adapter | Positive and silent-path fixtures |
+| MD-REQ-008 | The foreground command and MCP tool shall accept explicit task, file, entry, and result-limit context. | Gives agents a direct and testable retrieval path. | `/board-context` and `board_context` | Command/MCP schema tests |
+| MD-REQ-009 | When evidence is insufficient, invalid, stale, or unavailable, the retrieval engine shall return an empty result or a typed limitation without a fabricated match. | Makes uncertainty visible. | Shared core | Missing, malformed, and stale-input tests |
+| MD-REQ-010 | Each hook retrieval shall complete within its configured timeout on the 1,200-entry benchmark or return a typed limitation before the timeout. | Prevents contextual memory from blocking the interactive agent. | Shared core and hook adapters | Timed benchmark |
+| MD-REQ-011 | Outcome preview shall validate one entry, one H### record, a typed fix result, cited evidence, an actor, and a bounded fix summary without writing a file. | Connects verified work to memory without granting silent mutation authority. | Shared core | No-write preview tests |
+| MD-REQ-012 | Outcome apply shall require an unchanged content-bound plan, revalidate under the per-board lock, and update at most one H### file atomically. | Preserves Milestone C mutation safety and resumability. | Shared core | Stale, contention, and repeated-apply tests |
+| MD-REQ-013 | A fix result shall not confirm, weaken, reject, or split a hypothesis without an explicit compatible disposition in the applied request. | Validation success is evidence, not automatic causal authority. | Shared core | Result/disposition compatibility matrix |
+| MD-REQ-014 | Applied outcome history shall preserve the fix result, entry, evidence IDs, summary, actor, date, and optional verified context reference. | Makes later confidence and value reports auditable. | H### serializer and schema | Round-trip and history-preservation tests |
+| MD-REQ-015 | A Learning-feedback preview shall derive its proposed L### change only from canonical resolved entries and structured H### fix outcomes. | Prevents recurrence or model confidence from silently becoming a Learning. | Shared core and curator adapter | Learning preview/apply matrix |
+| MD-REQ-016 | The Learning apply core shall update at most one L### file atomically for a foreground or authorized PM caller. | Preserves explicit foreground authority and resumable batch behavior. | Shared core and PM adapter | Partial-batch and retry tests |
+| MD-REQ-017 | The value report shall derive all counts only from canonical outcome history. | Measures useful resurfacing and systemic fixes instead of activity volume. | Shared core and read adapters | Derived-report fixture |
+| MD-REQ-018 | After deletion of `GRAPH.yml` and disposable caches, a rebuild shall restore logically equivalent retrieval results without loss of context, outcome, or Learning evidence. | Preserves Markdown authority and postpones SQLite until evidence justifies it. | Graph and retrieval core | Delete-and-rebuild equivalence test |
+
+Requirement verification proves the specified behavior. Product validation
+must separately show that a representative agent receives a relevant
+cross-domain memory before it chooses a local fix.
+
+### 20.3 Context request and response contract
+
+The shared core accepts this logical request:
+
+```json
+{
+  "project": "atlas",
+  "task": "Investigate why the CLI loses tenant state after a retry.",
+  "files": ["cli/session.py"],
+  "entry_ids": ["B014"],
+  "cwd": "cli",
+  "limit": 3
+}
+```
+
+Rules:
+
+- `project` is required.
+- At least one of `task`, `files`, `entry_ids`, or `cwd` is required.
+- `task` permits at most 4000 Unicode characters.
+- `files` permits at most 100 repository-relative paths. Each path permits at
+  most 512 characters.
+- `entry_ids` permits at most 50 canonical IDs.
+- `cwd` must resolve inside the repository.
+- `limit` is 1-10. The default is 3.
+- Adapters can add a repository root as transport context. The root is not
+  part of the logical relevance input.
+- The core normalizes path separators and compares path segments. It does not
+  read a file named in task text.
+
+The response contains:
+
+```json
+{
+  "project": "atlas",
+  "context_fingerprint": "ctx-<16 lowercase hex>",
+  "source_fingerprint": "<canonical source fingerprint>",
+  "ranking_rule_version": "1",
+  "results": [
+    {
+      "kind": "hypothesis",
+      "id": "H003",
+      "status": "confirmed",
+      "stale": false,
+      "score": 90,
+      "components": {
+        "pattern": 35,
+        "affected_path": 30,
+        "graph_proximity": 20,
+        "intent_overlap": 0,
+        "outcome_relevance": 5
+      },
+      "matched_signals": [
+        "P004 lifecycle-state-ownership",
+        "cli/session.py overlaps cli"
+      ],
+      "why": "The current file and B014 share P004 with H003.",
+      "source_refs": [
+        "hypotheses/H003-lifecycle-state-ownership.md",
+        "bugs/B014.md"
+      ]
+    }
+  ],
+  "warnings": [],
+  "context_token": "<self-contained non-authority token>"
+}
+```
+
+The context fingerprint binds a digest of the normalized request, canonical
+source fingerprint, ranking rule version, and ordered result IDs. The context
+token contains the request digest, source fingerprint, ranking rule version,
+ordered result IDs, and a checksum. It does not contain raw task or prompt
+text. It is historical reference data. It does not grant mutation authority.
+
+Every `why` statement is generated from typed signal templates. The core does
+not ask a model to invent the explanation.
+
+### 20.4 Deterministic retrieval and ranking
+
+Eligible memory kinds are:
+
+- ranked graph clusters.
+- active or terminal H### hypotheses.
+- active L### Learnings.
+- rejected H### negative memory.
+
+The core derives context entries from explicit `entry_ids` and from canonical
+entries whose `affects` path overlaps an explicit file or `cwd`. It then scores
+each memory:
+
+| Component | Maximum | Deterministic rule |
+|---|---:|---|
+| Canonical pattern | 35 | 35 for an exact P###, canonical label, or alias match in explicit context. 25 when the pattern comes from a context entry. |
+| Affected path | 30 | 30 when a context path and a cited entry `affects` path overlap at a complete path-segment boundary. |
+| Graph proximity | 20 | 20 when the memory contains a context entry. 12 at one graph edge. 6 at two graph edges. |
+| Intent overlap | 10 | Two points for each distinct normalized task token found in a canonical pattern label, alias, title, or Learning takeaway. Stop words and tokens shorter than three characters do not count. |
+| Outcome relevance | 5 | 5 for a confirmed hypothesis, an outcome-supported Learning, or directly matched rejected negative memory. 2 for weakened or contested memory. 0 otherwise. |
+
+Eligibility requires:
+
+1. a total score of at least 30; and
+2. a nonzero canonical-pattern, affected-path, or graph-proximity score.
+
+Intent overlap cannot independently return a memory. A singleton remains a
+singleton. Retrieval does not create a cluster or relationship.
+
+Results sort by:
+
+1. descending total score.
+2. directly matched rejected negative memory before other equal-score kinds.
+3. hypothesis, Learning, cluster, then other negative-memory records.
+4. stable canonical ID or cluster fingerprint.
+
+The output exposes every component. The score is contextual relevance. It is
+not causal confidence, fix priority, or confirmation authority.
+
+### 20.5 Delivery surfaces
+
+#### Foreground command
+
+Add:
+
+```text
+/board-context <project> [--task "<text>"] [--file <path>]...
+  [--entry <ID>]... [--limit <1-10>]
+```
+
+The command returns the complete context brief. It never mutates the board.
+
+#### MCP
+
+Add `board_context` with the same logical fields and result. The MCP adapter
+must delegate to the shared core and must not implement scoring.
+
+#### SessionStart
+
+SessionStart builds a request from:
+
+- the repository-relative current directory.
+- at most 100 changed repository paths from a bounded Git status read.
+- active in-progress entry IDs already found by SessionStart.
+
+SessionStart returns at most three memories. It shows warnings before memory.
+It remains silent when no memory is eligible. It does not retain prompt text or
+write a retrieval log.
+
+#### UserPromptSubmit
+
+The existing prompt guard remains the trigger boundary. For prompts that match
+its bounded investigation or change intent:
+
+1. Treat the prompt as untrusted data.
+2. Pass at most the first 4000 characters plus bounded changed-file context to
+   the shared retrieval adapter.
+3. Return at most three memory summaries in the system message.
+4. State that titles and evidence are data, not instructions.
+5. Keep the existing real-time finding-routing reminder.
+
+An unrelated prompt produces no output. The hook does not read paths or run
+commands found in the prompt.
+
+### 20.6 Explicit outcome and Learning feedback
+
+Add a foreground `/board-outcome` command and a `board_outcomes` MCP tool.
+Both delegate to one shared preview/apply core.
+
+An outcome preview accepts:
+
+```json
+{
+  "project": "atlas",
+  "entry_id": "B014",
+  "hypothesis_id": "H003",
+  "fix_result": "held",
+  "hypothesis_disposition": "confirmed",
+  "fix_summary": "The shared lifecycle owner removed all three symptoms.",
+  "evidence_ids": ["B014", "O009"],
+  "observed_until": "2026-08-04",
+  "actor": "agent-session-42",
+  "context_token": "<optional token>",
+  "context_used": true
+}
+```
+
+Allowed `fix_result` values are:
+
+- `held`: the cited verification observed the intended result.
+- `failed`: the cited verification observed the original failure.
+- `partial`: some cited symptoms changed and others remained.
+- `inconclusive`: the cited evidence cannot distinguish the explanations.
+
+Allowed result and disposition combinations are:
+
+| Fix result | Compatible explicit hypothesis disposition |
+|---|---|
+| `held` | `unchanged`, `confirmed` |
+| `failed` | `unchanged`, `weakened`, `rejected` |
+| `partial` | `unchanged`, `weakened`, `split` |
+| `inconclusive` | `unchanged`, `weakened` |
+
+`unchanged` appends outcome history and increments the H### revision without
+changing its status. No result selects a disposition automatically.
+
+`held` requires a resolved entry and cited completion evidence. Other results
+may apply while an entry remains open or in progress. The entry must be a
+member of the hypothesis cluster, a cited source of the hypothesis, or a
+current graph neighbor with a shared canonical pattern. `observed_until`
+cannot precede the entry discovery date.
+
+If `context_used` is true, `context_token` is required. Preview verifies the
+token checksum and verifies that it surfaced the target hypothesis or its
+Learning. A changed canonical source does not erase the historical reference.
+The outcome history labels whether the context source was current or stale
+when the outcome was recorded.
+
+Apply uses the Milestone C plan-token, inventory, lock, path, symlink,
+revalidation, and atomic-write rules. It updates one H### file. It returns
+zero or more Learning feedback previews. It does not apply them.
+
+Learning feedback applies to curator-managed `subtype: pattern` records.
+Explicit `source: remember` records remain user-authored unless the user links
+them in a separate explicit request.
+
+Add these Learning fields:
+
+```yaml
+outcome_status: untested
+outcome_refs: [H003]
+confidence_basis: "Three resolved cases; one held systemic fix."
+```
+
+Allowed `outcome_status` values are:
+
+- `untested`: no structured fix outcome applies.
+- `supported`: one or more `held` outcomes apply and no `failed` outcome
+  applies.
+- `weakened`: one or more `failed` outcomes apply and no `held` outcome
+  applies.
+- `contested`: held and failed or partial outcomes both apply.
+
+For curator-managed pattern Learnings, deterministic confidence is:
+
+| Outcome status | Recurrence | Confidence |
+|---|---:|---|
+| `supported` | 3 or more | `high` |
+| `supported` | 1-2 | `medium` |
+| `untested` | 3 or more | `medium` |
+| `untested` | 1-2 | `low` |
+| `weakened` or `contested` | any | `low` |
+
+The Learning preview shows the old and new fields, cited entries, cited
+hypotheses, and rationale. A foreground apply changes one L### file. PM mode
+may apply a batch only through the same one-file plans under its existing
+authorization. A partial batch reports applied, pending, stale, and failed
+plans. A retry recomputes only pending plans.
+
+### 20.7 Value report
+
+The context command and MCP tool can request a derived value report. It
+contains:
+
+- hypotheses with at least one structured fix outcome.
+- outcome-supported, weakened, and contested Learnings.
+- confirmed systemic fixes, defined as a `held` outcome that explicitly
+  confirms a hypothesis whose cluster spans at least two affected domains.
+- useful resurfacing events, defined as an applied outcome with a verified
+  context token and explicit `context_used: true`.
+
+The report does not count prompts, sessions, token volume, graph size, command
+calls, or raw retrieval impressions as product value. It reads canonical H###
+and L### files. It does not require or emit telemetry.
+
+### 20.8 State, authority, and preservation
+
+Authority order is:
+
+1. Explicit user or authorized-agent apply.
+2. Canonical entry, P###, H###, and L### Markdown.
+3. Canonical H### outcome history.
+4. Deterministic graph, context brief, and value report.
+5. Agent-authored interpretation.
+
+Precedence within retrieval is:
+
+1. explicit context entry and file signals.
+2. canonical P### identity.
+3. exact canonical label or alias.
+4. graph proximity.
+5. normalized task-token overlap.
+
+The following operations are read-only:
+
+- SessionStart retrieval.
+- UserPromptSubmit retrieval.
+- `/board-context`.
+- `board_context`.
+- value reporting.
+- outcome and Learning preview.
+
+The following operations require content-bound apply:
+
+- appending a structured outcome to one H###.
+- changing one curator-managed L###.
+
+A context token is not an apply token. A validation result is not resolution
+authority. A confirmed hypothesis is not execution authority. PM mode does not
+gain new authority over hypotheses.
+
+Canonical files and Git history remain the recovery source. Context briefs,
+value reports, `GRAPH.yml`, and caches are disposable. H### and L### history is
+never deleted by a rebuild.
+
+### 20.9 Failure, retry, performance, and security
+
+- Invalid context returns `invalid_context` before analysis.
+- No eligible memory returns `results: []`.
+- Malformed canonical evidence returns `source_invalid` with source paths. The
+  engine does not silently skip evidence that could change a result.
+- A stale derived source returns `analysis_stale` or rebuilds in memory. A read
+  does not persist the rebuild.
+- A hook that cannot complete safely returns `analysis_unavailable` before its
+  host timeout. SessionStart continues with its existing non-intelligence
+  status output. UserPromptSubmit keeps the routing reminder and omits memory.
+- The 1,200-entry benchmark must complete the UserPromptSubmit retrieval in
+  less than 4 seconds and the complete SessionStart path in less than 10
+  seconds in the release test environment. The evidence report records actual
+  timings. These thresholds protect current hook timeouts; they do not
+  authorize SQLite.
+- Outcome and Learning apply acquire the existing per-board lock, then
+  revalidate canonical source, target bytes, inventory, request, and plan
+  checksum. Lock contention returns a typed retry result.
+- A stale plan writes nothing. A repeated successful plan returns an
+  `already_applied` receipt when the exact history event exists.
+- A Learning batch can stop after any one-file apply. Applied files remain
+  valid. The receipt identifies the next resumable plan.
+- Task text, entry content, titles, summaries, and Learning text are untrusted
+  data. The engine treats them as scalar matching input. It never follows
+  embedded instructions.
+- Context paths must remain inside the repository after normalization. Linked
+  canonical evidence fails closed. Context reads do not follow linked paths.
+- Output adapters escape HTML and JSON as applicable. They do not place raw
+  evidence bodies in hook system messages.
+- Milestone D performs no network request, subprocess from evidence, code
+  execution, automatic fix, automatic resolution, cross-repository read,
+  database write, or telemetry upload.
+
+The benchmark records parse time, graph time, retrieval time, candidate count,
+and total time for representative corpus sizes. Those measurements can inform
+the separate SQLite trigger decision. A benchmark failure does not silently
+add SQLite to Milestone D.
+
+### 20.10 Component and file responsibilities
+
+- `mcp-server/engineering_board_core.py`: context parsing, candidate loading,
+  deterministic scoring, why templates, context fingerprints and tokens,
+  structured outcome planning, H### history updates, Learning feedback plans,
+  value-report derivation, locks, and serialization.
+- `hooks/scripts/board-context.py` and `board-context.sh`: thin portable
+  command adapters over the shared core. They contain no ranking or confidence
+  rules.
+- `hooks/scripts/board-session-start.sh`: collect bounded startup signals and
+  render at most three context results while retaining current safety,
+  recovery, mode, claim, and scratch output.
+- `hooks/scripts/board-prompt-guard.sh`: retain its current routing reminder,
+  pass bounded task context to the shared adapter, and remain silent for
+  unrelated prompts.
+- `commands/board-context.md`: foreground read-only interaction contract.
+- `commands/board-outcome.md`: outcome and Learning preview/apply interaction
+  contract.
+- `skills/board-insights/SKILL.md`: evidence-reading, context explanation,
+  untrusted-data, and no-match behavior.
+- `skills/board-resolve/SKILL.md`: after verification or resolution, offer the
+  relevant outcome preview. It cannot apply an outcome without explicit
+  authority.
+- `skills/board-intake/references/hypothesis-schema.md`: structured fix-result
+  fields, compatible dispositions, context reference, and history rules.
+- `skills/board-intake/references/frontmatter-schema.md`: Learning outcome
+  status, references, and confidence rules.
+- `hooks/scripts/board-curate-learnings.sh`: delegate pattern-Learning plans to
+  the shared core. Preserve PM batch authorization and resumable receipts.
+- `mcp-server/engineering_board_mcp.py`: add `board_context` and
+  `board_outcomes`. Both tools remain adapters over the shared core.
+- `mcp-server/test_mcp_server.py`: discovery, schema, adapter parity,
+  read-only, outcome, Learning, retry, and standard-output safety coverage.
+- `tests/orchestration/milestone-d-context-outcome-intelligence.sh`: complete
+  deterministic D1 and D2 lifecycle matrix.
+- `tests/session-start/automated.sh`: startup relevance, caps, silence,
+  failure, and 1,200-entry performance.
+- A new prompt-guard test suite: relevant-prompt retrieval, unrelated-prompt
+  silence, bounded input, injection text, and timeout fallback.
+- `tests/view/automated.sh`: supported, weakened, contested, and context-linked
+  outcome presentation.
+- `hooks/scripts/board-view.sh`: show Learning outcome state and derived value
+  evidence. It does not add mutation controls.
+- `README.md`, `ARCHITECTURE.md`, `SECURITY.md`, `mcp-server/README.md`,
+  `docs/index.html`, and `docs/llms.txt`: shipped user value, setup,
+  architecture, security, MCP, and retrieval boundaries.
+- `docs/assets/`: one sanitized real Milestone D context-brief visual with
+  source version, capture date, alt text, and provenance.
+- Coordinated manifests, changelog, bundle checksum, and release evidence:
+  update together at an explicit minor release boundary.
+
+### 20.11 Deterministic acceptance matrix
+
+| Sequence | Failure injection | Expected semantic outcome | Durable evidence | Requirement |
+|---|---|---|---|---|
+| Retrieve with one task, file, and entry twice | Same canonical source | Ordered results, component scores, why text, fingerprints, and warnings are equal | Compared payloads | MD-REQ-001, 003 |
+| Use similar task words for an unrelated pattern | Text overlap without a structural signal | No memory is eligible | Empty result | MD-REQ-002, 009 |
+| Match a prior pattern through a file in another domain | Different affected domain, same P### identity | Prior cluster, H###, and Learning surface with cross-domain reasons and source links | Context brief | MD-REQ-001-003 |
+| Request the same context through CLI and MCP | Two adapters | Both return semantically equal facts and fingerprints | Compared JSON | MD-REQ-004, 008 |
+| Trigger SessionStart with relevant changed files | More than three eligible memories | Exactly three highest-ranked memories surface after safety warnings | Captured hook output | MD-REQ-006 |
+| Submit a relevant and then unrelated prompt | Prompt contains instruction-like evidence text | Relevant prompt returns escaped data and routing guidance. Unrelated prompt is silent. No embedded instruction executes. | Captured hook output and process assertions | MD-REQ-005, 007 |
+| Corrupt a canonical pattern, hypothesis, or Learning | Candidate could change | Retrieval returns a typed limitation and source path. It does not return an incomplete confident result. | Error payload | MD-REQ-009 |
+| Run 1,200-entry hook fixtures | Cold parse and graph build | Prompt retrieval completes in less than 4 seconds. Complete SessionStart remains below 10 seconds. | Timed release evidence | MD-REQ-010 |
+| Preview one held outcome | No apply token | H### and L### files remain byte-identical. Preview shows compatible disposition and Learning effects. | Plan only | MD-REQ-011, 015 |
+| Pair `held` with `rejected`, or `failed` with `confirmed` | Incompatible disposition | Preview fails before mutation | Typed validation error | MD-REQ-013 |
+| Change the entry, H###, or evidence after preview | Stale plan | Apply returns `plan_stale`. No file changes. | Compared inventory | MD-REQ-012 |
+| Apply one valid outcome twice and concurrently | Same H### target | One history event exists. Other attempts return stale or already-applied receipts. | Revised H### | MD-REQ-012, 014 |
+| Apply held, failed, partial, and inconclusive outcomes | Each uses cited evidence | H### status changes only to the explicit compatible disposition. Each history event remains queryable. | H### history | MD-REQ-013, 014 |
+| Apply one outcome that yields two Learning recommendations | Fail the second Learning apply | First L### remains valid. Second remains pending and succeeds on retry without rewriting the first. | L### files and batch receipt | MD-REQ-015, 016 |
+| Create supported, weakened, contested, and untested pattern Learnings | Mixed recurrence and outcomes | Outcome status and confidence follow the exact table. Explicit remember Learnings remain unchanged. | L### files | MD-REQ-015, 016 |
+| Record an outcome with a verified context token and `context_used: true` | Canonical source changed after retrieval | H### history preserves the historical reference and labels staleness. Value report counts one useful resurfacing event. | H### history and derived report | MD-REQ-014, 017 |
+| Generate a value report from prompts with no applied outcomes | Many retrieval calls | Report contains no useful-resurfacing claim and no prompt or session counts. | Derived report | MD-REQ-017 |
+| Delete graph and cache artifacts, then repeat retrieval | Missing derived state | Rebuilt context results are logically equal. H### and L### files are unchanged. | Compared payloads and file digests | MD-REQ-018 |
+| Run with closed outbound proxies | Network unavailable | Context, outcome, Learning, and value-report sequences pass offline | Offline test result | MD-REQ-005 |
+| Run all current suites | Compatibility regression opportunity | Milestones A-C, capture, claims, modes, view, package, and MCP behavior remain green | Full release-tree result | All |
+
+### 20.12 Product validation and live evidence
+
+Use a disposable repository with:
+
+- earlier findings in authentication and worker-recovery domains.
+- one canonical cross-domain pattern.
+- one confirmed H### and one rejected competing explanation.
+- one outcome-supported Learning.
+- a new CLI symptom that shares the pattern but not the prior paths.
+- one lexical decoy with similar words and an unrelated canonical pattern.
+- malicious Markdown, HTML, path, and prompt strings.
+
+Run two bounded scenarios:
+
+1. A clean agent receives only the new CLI symptom and current file.
+2. A clean agent receives the same task plus the real Milestone D context
+   brief.
+
+The product validation report must show whether the second agent identifies the
+prior systemic investigation before proposing a local fix. It must cite the
+exact brief and canonical evidence. The report must not generalize one scenario
+into a universal productivity claim.
+
+The live run uses the real SessionStart adapter, UserPromptSubmit adapter,
+foreground command, MCP stdio tools, outcome preview/apply, Learning
+preview/apply, value report, and normal HTML renderer. It runs offline and
+records sanitized paths, source commit, timings, fingerprints, file digests,
+negative checks, and cleanup.
+
+### 20.13 Documentation alignment and delivery
+
+Before Milestone D can ship, the implementation change must update or
+substantively review:
+
+- this central spec and the contract state.
+- the Milestone D contract workpad and implementation evidence.
+- README first-win, setup, command list, and product claims.
+- command, skill, hypothesis, Learning, and MCP contracts.
+- SessionStart and UserPromptSubmit behavior.
+- architecture, security, privacy, failure, and performance boundaries.
+- normal HTML view documentation and one real sanitized visual.
+- tool and command counts, manifests, package files, and bundle contents.
+- changelog, coordinated version surfaces, release tests, and dated release
+  evidence.
+- historical Milestone A-C reports, which remain unchanged.
+
+The implementation must use a feature branch, commit, push, and pull request.
+Worker validation, PR CI, merged-main CI, release publication, package
+registries, product-site deployment, and dated closeout evidence remain
+separate evidence phases. The release is a Semantic Versioning minor release
+if no later release already contains part of the behavior.
+
+### 20.14 Explicit non-goals
+
+Milestone D does not:
+
+- replace canonical Markdown or require SQLite.
+- add embeddings, vector search, or model-generated graph edges.
+- read or aggregate another repository.
+- add a hosted service, account, synchronization layer, or telemetry.
+- retain raw prompts after the hook request.
+- use text similarity alone as a structural relation.
+- make SessionStart or UserPromptSubmit mutate canonical state.
+- automatically confirm, reject, split, resolve, or execute work.
+- automatically apply a foreground Learning recommendation.
+- redesign PM or Worker orchestration.
+- add Milestone E planning, ready-action, or execution ergonomics.
+- claim that a relevance score measures causal confidence.
+- claim that one product-validation scenario proves general performance.
+
+Gate 2 approval authorizes implementation of this section. It does not
+authorize any non-goal or deferred portfolio work.
+
+## 21. Research and evidence
 
 Current product evidence:
 
+- [`2026-07-28 Milestone D contract workpad`](evidence/2026-07-28-milestone-d-contract.md)
 - [`2026-07-28 v1.10.0 release validation`](evidence/2026-07-28-v1.10.0-release-validation.md)
 - [`2026-07-28 Milestone C implementation validation`](evidence/2026-07-28-milestone-c-implementation-validation.md)
 - [`2026-07-28 Milestone C contract workpad`](evidence/2026-07-28-milestone-c-contract.md)
