@@ -1,17 +1,22 @@
 # Milestone D.1 evaluation harness
 
 This repository-only harness prepares and scores the accepted Milestone D.1
-product-proof trials. It loads the product core from the pinned Git commit. It
-builds each context brief from a sanitized Markdown board fixture. It also
-applies the structured outcome to an isolated fixture copy and compares
-retrieval before and after the outcome. It does not change the Engineering
-Board plugin or MCP runtime. It does not execute a live agent client.
+product-proof trials. It keeps a development calibration corpus separate from
+the locked evidence corpus. It loads the product core from the pinned Git
+commit. It builds each context brief from a sanitized Markdown board fixture.
+It also applies the structured outcome to an isolated fixture copy and
+compares retrieval before and after the outcome. It does not change the
+Engineering Board plugin or MCP runtime. It does not execute a live agent
+client.
 
 ## What the harness controls
 
 The harness:
 
 - validates eight sanitized cases with two cases in each accepted category;
+- identifies each corpus by role, version, digest, and lock state;
+- rejects a calibration corpus as input to a scored run;
+- rejects declared scoring-oracle leakage from positive evidence cases;
 - creates 24 required reference pairs and 48 trial arms;
 - keeps the declared inputs equal inside each pair;
 - copies the same sanitized Markdown repository fixture into both arms;
@@ -21,6 +26,7 @@ The harness:
   policy, and context fingerprint;
 - records the fixture digest and frozen product-core digest;
 - evaluates the structured outcome with frozen product code;
+- requires each lexical-decoy context to retrieve its rejected memory;
 - permits one replacement only after a recorded pre-score infrastructure
   failure;
 - blocks every retry after a scored result;
@@ -37,8 +43,13 @@ independent-issue cases use the separate zero-durable-conclusion gate.
 ```sh
 python3 evaluation/harness.py validate \
   --root . \
-  --corpus evaluation/corpus.json
+  --corpus evaluation/evidence-corpus.json
 ```
+
+Use `evaluation/calibration-corpus.json` to develop and test benchmark
+structure. It preserves the saturated cases from the first Codex run. The
+prepare command refuses this corpus because calibration cases cannot produce
+product-effect evidence.
 
 ## Prepare a run
 
@@ -49,7 +60,7 @@ full-history checkout for continuous integration.
 ```sh
 python3 evaluation/harness.py contexts \
   --root . \
-  --corpus evaluation/corpus.json \
+  --corpus evaluation/evidence-corpus.json \
   --source-commit e26149bf505ea7f5ae2d95294a8a108e6b3c429f
 ```
 
@@ -101,7 +112,7 @@ replication.
 ```sh
 python3 evaluation/harness.py prepare \
   --root . \
-  --corpus evaluation/corpus.json \
+  --corpus evaluation/evidence-corpus.json \
   --contracts evaluation/client-contracts.json \
   --config /safe/path/run-config.json \
   --output /safe/path/run-directory
@@ -136,9 +147,11 @@ frozen product comparison in the run manifest, not from an agent claim.
 
 ## Current proof boundary
 
-The deterministic harness and its tests are implemented. A dated Codex run
-produced a 100 percent positive-case rate in both the baseline and context
-arms. The result shows that the current corpus cannot measure product-effect
-improvement. Engineering Board does not yet claim that Milestone D context
-improves agent diagnoses. The next evaluation task is to improve corpus
-discrimination and then run the Codex reference profile again.
+The deterministic harness and its tests are implemented. The first dated
+Codex run produced a 100 percent positive-case rate in both the baseline and
+context arms. Those cases now form the calibration corpus and cannot be used
+for a scored run. The locked evidence corpus withholds the prior cross-session
+or cross-domain relationship from agent-visible evidence. Its positive cases
+also record a plausible local correction in scoring-only data. The corpus has
+not completed a Codex reference run. Engineering Board does not yet claim that
+Milestone D context improves agent diagnoses.

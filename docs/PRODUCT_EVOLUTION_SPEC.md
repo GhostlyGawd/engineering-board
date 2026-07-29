@@ -5,15 +5,16 @@ v1.8.0. Milestone B shipped in v1.9.1. Milestone C shipped in v1.10.0.
 Milestone D shipped in v1.11.0. Milestone D.1 Gate 2 is accepted. The corrected
 repository-only evaluation harness builds real v1.11.0 context and outcome
 evidence. Codex is the required reference client. Live provider replications
-are optional. The first Codex run exposed a non-discriminating corpus and did
-not prove a product effect._
+are optional. The first Codex run exposed a non-discriminating corpus. A
+separate locked evidence-corpus baseline is in product-owner review. No run has
+proved a product effect._
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-29_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
 _Current release boundary: `v1.11.0`_
 _Portfolio context: inventory-only. audit source `GhostlyGawd/repo-audit` at
-`ee6e44fe4498f9f624f43d2f355516f98f821148`_
+`0ced6f4136b12c6251439ff72ca8f22b6dec9b61`_
 
 ## 1. Authority and use
 
@@ -76,7 +77,7 @@ selected milestone is approved.
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 | Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
-| Milestone D.1 direction | Client-neutral correction accepted | Prove whether the shipped context changes an agent diagnosis before a local fix. Codex is the required reference client because it is the available product-development client. Other clients are optional replication profiles. Protocol and package contract tests establish client-surface compatibility without provider accounts. The first Codex run scored 100 percent in both positive baseline and context arms, so corpus discrimination must improve before a product-effect claim. |
+| Milestone D.1 direction | Corpus-calibration baseline in review | Prove whether the shipped context changes an agent diagnosis before a local fix. Codex is the required reference client. Other clients are optional replication profiles. The saturated first-run cases are a non-scored calibration corpus. A separate locked evidence corpus with scoring-oracle checks is in baseline review. |
 
 ## 3. Product thesis
 
@@ -736,7 +737,7 @@ with session tasks and planning tools instead.
 | Security, privacy, versions, releases | Required current truth | Bounded automatic reads, content-bound H### and L### writes, lock revalidation, linked-input refusal, HTML escaping, no raw-prompt retention, and offline operation extend the existing controls | Security suites, Milestone D matrix, hook benchmarks, full release tree, reproducible bundle gate, merged-main CI, and publication checks | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and release validation aligned | v1.11.0 published and externally validated |
 | Milestone C implementation contract | Accepted and shipped | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging shipped | Milestone C 15-check matrix, 166-check MCP suite, 17/17 current release-tree suites, merged-main CI, release workflow, and live-surface checks pass | Central spec, contract workpad, current-truth docs, real sanitized visual, implementation evidence, and v1.10.0 release validation remain current for Milestone C behavior | Shipped in v1.10.0; packaging current at v1.10.1 |
 | Milestone D implementation contract | Accepted and shipped | Shared contextual retrieval, automatic read adapters, explicit H### fix outcomes, separate L### feedback, value evidence, and the normal HTML view shipped from the accepted section 20 baseline. | Milestone D core, hook, MCP, view, security, performance, recovery, full release-tree, merged-main, and publication evidence | Central spec, workpad, schemas, commands, skills, README, MCP, architecture, security, landing page, LLM guide, sanitized visual, and release validation are aligned | Shipped in v1.11.0 |
-| Milestone D.1 product-proof contract | Client-neutral correction accepted | The repository-only harness implements the fixed corpus, isolated paired trials, one required reference profile, optional replication profiles, retry rules, scoring thresholds, outcome-loop comparison, and reporting. Codex is the reference client. Replications do not affect the product gate. The harness does not change production behavior. | Requirements checker, 14 focused harness tests, full release tree, continuous integration, and dated Codex evidence | Central spec section 21, evaluation guide, client-neutral workpad, and preserved historical evidence | Provider-account gate removed; corpus discrimination remains open |
+| Milestone D.1 product-proof contract | Corpus-calibration baseline in review | The repository-only harness separates a non-scored calibration corpus from a locked evidence corpus. Scored runs require the locked corpus. The validator rejects declared oracle leakage, requires positive-case information gaps, and verifies that lexical decoys retrieve rejected memory. Codex remains the reference client. | Requirements checker, 17 focused harness tests, full release tree, continuous integration, and dated Codex evidence | Central spec section 21, evaluation guide, calibration workpad, and preserved historical evidence | Implementation ready for baseline review; Codex reference run pending |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -2464,10 +2465,18 @@ prompt text, generated files, or mutable agent memory from another trial.
 | D1-REQ-019 | The false-positive scorer shall pass the evidence run only when lexical-decoy and independent-issue cases produce zero durable systemic conclusions. |
 | D1-REQ-020 | The trial recorder shall preserve each invalid attempt, infrastructure-failure reason, and replacement relationship. |
 | D1-REQ-021 | The paired-trial runner shall permit no more than one replacement for an infrastructure failure that occurs before a scored result. |
-| D1-REQ-022 | The evaluation corpus shall contain exactly two recurring-bug cases, two cross-domain shared-cause cases, two lexical-decoy cases, and two independent-issue cases. |
+| D1-REQ-022 | The locked evidence corpus shall contain exactly two recurring-bug cases, two cross-domain shared-cause cases, two lexical-decoy cases, and two independent-issue cases. |
 | D1-REQ-023 | A client-compatibility claim shall identify one tested protocol or package surface. |
 | D1-REQ-024 | A client-compatibility claim shall cite deterministic contract evidence for the identified surface. |
 | D1-REQ-025 | The reference product-effect gate shall not depend on the availability or result of a `replication` profile. |
+| D1-REQ-026 | Each D.1 corpus shall declare one corpus identifier, one corpus role, one integer version, and one lock state. |
+| D1-REQ-027 | The paired-trial runner shall prepare a scored run only when the selected corpus has the `evidence` role and a locked state. |
+| D1-REQ-028 | The paired-trial runner shall reject a corpus that has the `calibration` role. |
+| D1-REQ-029 | For each positive evidence case, the corpus validator shall reject an agent-visible title, task, file path, or evidence file that contains the expected cause, expected memory identifier, or a declared oracle term. |
+| D1-REQ-030 | Each positive evidence case shall record its information gap and plausible local correction in scoring-only fields. |
+| D1-REQ-031 | Each lexical-decoy context shall retrieve its declared rejected memory within the first three results. |
+| D1-REQ-032 | The run manifest shall record the corpus identifier, corpus version, and corpus digest. |
+| D1-REQ-033 | A content change to a locked evidence corpus shall increment the corpus version and create a new evidence baseline. |
 
 The structured requirement artifact has no deterministic requirement-quality
 failure. Its current status and content digest are recorded in the D.1
@@ -2652,11 +2661,34 @@ Harness schema 3 applies that decision:
 - Deterministic MCP and plugin tests support compatibility claims.
 - Live provider behavior is optional dated replication evidence.
 
-The next D.1 task is corpus calibration. The calibrated corpus must include
-positive cases in which the baseline can plausibly miss or delay the shared
-cause while the context arm can use the retrieved memory. Milestone E remains
-deferred until the owner accepts the resulting product-effect evidence and
-next-step decision.
+The saturated first-run cases are retained as calibration evidence. They
+cannot enter a scored product-effect run. Milestone E remains deferred until
+the owner accepts the resulting product-effect evidence and next-step
+decision.
+
+### 21.12 Corpus calibration and evidence isolation
+
+The corpus-calibration correction separates benchmark development from scored
+evidence:
+
+- `calibration-corpus.json` preserves the first-run cases that gave Codex no
+  measurable headroom.
+- `evidence-corpus.json` defines a separate locked eight-case baseline.
+- Positive evidence cases withhold the prior cross-session or cross-domain
+  relationship from agent-visible evidence.
+- Scoring-only fields record the missing relationship, a plausible local
+  correction, and terms that would disclose the scoring oracle.
+- The validator rejects an evidence case when an agent-visible field contains
+  the expected cause, expected memory identifier, or a declared oracle term.
+- Lexical-decoy cases deliberately surface rejected memory. This tests whether
+  the agent uses negative memory instead of following a misleading label.
+- A run manifest records the corpus identifier, version, and digest.
+
+This design does not force a low baseline score. It creates an information
+boundary that gives the baseline a realistic local explanation and gives the
+context arm prior repository knowledge. The locked evidence corpus has not run
+through the Codex reference profile. Therefore, it does not yet support a
+product-effect claim.
 
 ## 22. Research and evidence
 
@@ -2664,6 +2696,7 @@ Current product evidence:
 
 - [`2026-07-29 Milestone D.1 live-evaluation preflight`](evidence/2026-07-29-milestone-d1-live-evaluation-preflight.md)
 - [`2026-07-29 Milestone D.1 client-neutral evaluation contract`](evidence/2026-07-29-milestone-d1-client-neutral-evaluation-contract.md)
+- [`2026-07-29 Milestone D.1 corpus-calibration contract`](evidence/2026-07-29-milestone-d1-corpus-calibration-contract.md)
 - [`2026-07-29 Milestone D.1 harness implementation`](evidence/2026-07-29-milestone-d1-harness-implementation.md)
 - [`2026-07-29 Milestone D.1 product-proof contract workpad`](evidence/2026-07-29-milestone-d1-product-proof-contract.md)
 - [`2026-07-29 v1.11.0 release validation`](evidence/2026-07-29-v1.11.0-release-validation.md)

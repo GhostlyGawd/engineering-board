@@ -14,8 +14,9 @@ source report — no new findings are smuggled in._
 > client-neutral repository harness uses Codex as the required reference
 > client. Live runs for other providers are optional replications. The first
 > Codex run gave both positive baseline and context arms a 100 percent rate.
-> The next task is to calibrate the corpus so it can measure product-effect
-> improvement, and then run the Codex reference profile again.
+> Those cases are now a non-scored calibration set. A separate locked evidence
+> corpus with scoring-oracle checks is in baseline review. After acceptance,
+> run the Codex reference profile against that frozen corpus.
 > Milestone E remains deferred. The priority lists below preserve the 2026-07-08
 > audit synthesis and are not the current product sequence.
 
