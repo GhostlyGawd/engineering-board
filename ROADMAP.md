@@ -11,7 +11,8 @@ source report — no new findings are smuggled in._
 > product spec, the product spec wins.
 
 > **Current sequence (2026-07-29):** Milestone D.1 Gate 2 is accepted. The
-> evaluation harness, frozen corpus, and paired product-proof run are next.
+> repository-only evaluation harness and frozen corpus are implemented. The
+> dated paired product-proof run is next; it has not started.
 > Milestone E remains deferred. The priority lists below preserve the 2026-07-08
 > audit synthesis and are not the current product sequence.
 

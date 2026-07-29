@@ -1,0 +1,102 @@
+{
+  "schema_version": "1",
+  "evidence_root": "corpus/evidence",
+  "cases": [
+    {
+      "id": "D1-C01",
+      "category": "recurring-bug",
+      "title": "Configuration values bypass normalization",
+      "task": "Diagnose why equivalent configuration values produce different behavior.",
+      "files": ["service/config.py", "service/loader.py"],
+      "canonical_evidence": [{"id": "E-D1-C01", "path": "D1-C01.md"}],
+      "expected_relevant_memory": "M-CONFIG-NORMALIZATION",
+      "rejected_memories": [],
+      "expected_systemic_cause": "Configuration values enter the system through paths that do not share one normalization boundary.",
+      "scoring": {"expected_outcome_effect": "Promote the normalization finding after confirmation.", "durable_systemic_conclusion_allowed": true}
+    },
+    {
+      "id": "D1-C02",
+      "category": "recurring-bug",
+      "title": "Stale worker ownership returns after restart",
+      "task": "Diagnose why restarted workers can reclaim stale ownership.",
+      "files": ["worker/lease.py", "worker/recovery.py"],
+      "canonical_evidence": [{"id": "E-D1-C02", "path": "D1-C02.md"}],
+      "expected_relevant_memory": "M-LEASE-FRESHNESS",
+      "rejected_memories": [],
+      "expected_systemic_cause": "Lease recovery uses inconsistent freshness rules across claim and restart paths.",
+      "scoring": {"expected_outcome_effect": "Increase the lease-freshness finding rank after confirmation.", "durable_systemic_conclusion_allowed": true}
+    },
+    {
+      "id": "D1-C03",
+      "category": "cross-domain-shared-cause",
+      "title": "Tenant boundary differs between API and interface",
+      "task": "Diagnose related tenant-isolation failures in two product domains.",
+      "files": ["api/tenant_scope.py", "ui/project_filter.ts"],
+      "canonical_evidence": [{"id": "E-D1-C03", "path": "D1-C03.md"}],
+      "expected_relevant_memory": "M-TENANT-BOUNDARY",
+      "rejected_memories": [],
+      "expected_systemic_cause": "The API and interface derive tenant scope from different ownership boundaries.",
+      "scoring": {"expected_outcome_effect": "Link both findings to one tenant-boundary cause.", "durable_systemic_conclusion_allowed": true}
+    },
+    {
+      "id": "D1-C04",
+      "category": "cross-domain-shared-cause",
+      "title": "Lifecycle state differs across plugin and MCP paths",
+      "task": "Diagnose why two client paths report different completion states.",
+      "files": ["plugin/lifecycle.py", "mcp/status.py"],
+      "canonical_evidence": [{"id": "E-D1-C04", "path": "D1-C04.md"}],
+      "expected_relevant_memory": "M-LIFECYCLE-SEMANTICS",
+      "rejected_memories": [],
+      "expected_systemic_cause": "Plugin and MCP adapters translate one lifecycle state model with different terminal-state rules.",
+      "scoring": {"expected_outcome_effect": "Promote the shared lifecycle finding after both paths confirm it.", "durable_systemic_conclusion_allowed": true}
+    },
+    {
+      "id": "D1-C05",
+      "category": "lexical-decoy",
+      "title": "Documentation owner label is inconsistent",
+      "task": "Correct an inconsistent owner label in documentation.",
+      "files": ["docs/ownership.md"],
+      "canonical_evidence": [{"id": "E-D1-C05", "path": "D1-C05.md"}],
+      "expected_relevant_memory": null,
+      "rejected_memories": ["M-TENANT-BOUNDARY"],
+      "expected_systemic_cause": null,
+      "scoring": {"expected_outcome_effect": "Do not promote the tenant-boundary finding.", "durable_systemic_conclusion_allowed": false}
+    },
+    {
+      "id": "D1-C06",
+      "category": "lexical-decoy",
+      "title": "Heartbeat animation timing is uneven",
+      "task": "Correct an uneven heartbeat animation in the interface.",
+      "files": ["ui/heartbeat.css"],
+      "canonical_evidence": [{"id": "E-D1-C06", "path": "D1-C06.md"}],
+      "expected_relevant_memory": null,
+      "rejected_memories": ["M-LEASE-FRESHNESS"],
+      "expected_systemic_cause": null,
+      "scoring": {"expected_outcome_effect": "Do not promote the lease-freshness finding.", "durable_systemic_conclusion_allowed": false}
+    },
+    {
+      "id": "D1-C07",
+      "category": "independent-issue",
+      "title": "Status icon lacks alternative text",
+      "task": "Correct the missing alternative text for one status icon.",
+      "files": ["ui/status_icon.tsx"],
+      "canonical_evidence": [{"id": "E-D1-C07", "path": "D1-C07.md"}],
+      "expected_relevant_memory": null,
+      "rejected_memories": [],
+      "expected_systemic_cause": null,
+      "scoring": {"expected_outcome_effect": "Keep the issue independent unless new evidence appears.", "durable_systemic_conclusion_allowed": false}
+    },
+    {
+      "id": "D1-C08",
+      "category": "independent-issue",
+      "title": "Changelog contains one spelling error",
+      "task": "Correct one spelling error in a changelog entry.",
+      "files": ["CHANGELOG.md"],
+      "canonical_evidence": [{"id": "E-D1-C08", "path": "D1-C08.md"}],
+      "expected_relevant_memory": null,
+      "rejected_memories": [],
+      "expected_systemic_cause": null,
+      "scoring": {"expected_outcome_effect": "Keep the issue independent unless new evidence appears.", "durable_systemic_conclusion_allowed": false}
+    }
+  ]
+}

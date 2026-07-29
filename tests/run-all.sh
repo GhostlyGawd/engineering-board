@@ -39,6 +39,7 @@ SUITES=(
   "docs-coherence|bash tests/docs-coherence.sh"
   "token-coherence|bash tests/token-coherence.sh"
   "crosscompat-lint|bash tests/crosscompat-lint.sh"
+  "evaluation-harness|bash tests/evaluation/automated.sh"
   "reject-filter|bash tests/security/reject-filter.sh"
   "session-start|bash tests/session-start/automated.sh"
   "prompt-guard|bash tests/prompt-guard/automated.sh"

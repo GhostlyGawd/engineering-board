@@ -86,6 +86,15 @@ Milestone D puts this memory in the agent's decision path:
 - A derived value report counts verified reuse and systemic fix evidence. It
   does not count prompts, sessions, or other activity.
 
+Milestone D.1 adds a repository-only evaluation harness and eight sanitized
+cases. The harness prepares 32 isolated baseline/context pairs, records bounded
+evidence, and scores the accepted product-effect and false-positive gates.
+The live paired evidence run has not started. The project does not yet claim
+that the context improves agent diagnoses. See
+[`evaluation/README.md`](evaluation/README.md) for the proof boundary and
+operator commands.
+
+
 ## Product differences
 
 Some Git boards show visible state but have little analysis. Some memory
@@ -327,7 +336,7 @@ Run the complete test suite:
 bash tests/run-all.sh
 ```
 
-The suite contains 18 test areas. Read
+The run-all command uses the maintained suite list. Read
 [`CONTRIBUTING.md`](CONTRIBUTING.md) before you change the repository.
 
 ## Support

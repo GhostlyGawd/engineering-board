@@ -9,6 +9,15 @@ increases.
 
 ## [Unreleased]
 
+### Added
+
+- Added a repository-only Milestone D.1 evaluation harness, a frozen sanitized
+  eight-case corpus, isolated paired-trial planning, exclusive-create attempt
+  records,
+  accepted product-effect and false-positive scoring gates, and bounded JSON
+  and Markdown reports. The harness does not execute live clients and is not
+  part of the plugin or MCP bundle.
+
 ## [1.11.0] — 2026-07-29
 
 ### Added
