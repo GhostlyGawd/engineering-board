@@ -2,12 +2,12 @@
 
 _Status: Authoritative living product direction: Milestone A shipped in
 v1.8.0. Milestone B shipped in v1.9.1. Milestone C shipped in v1.10.0.
-Milestone D is implemented for the v1.11.0 release boundary._
+Milestone D shipped in v1.11.0._
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-28_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
-_Current prepared release boundary: `v1.11.0`_
+_Current release boundary: `v1.11.0`_
 _Portfolio context: inventory-only. audit source `GhostlyGawd/repo-audit` at
 `9c64832e0d97e62a4fa45f2a544ffbc4c29b7a11`_
 
@@ -71,7 +71,7 @@ selected milestone is approved.
 | Adapter parity | Accepted for Milestone B | Plugin and MCP surfaces must consume the same zero-dependency parser, pattern resolver, and deterministic graph engine and return semantically equivalent facts. |
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
-| Milestone D direction | Accepted and implemented | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
+| Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
 
 ## 3. Product thesis
 
@@ -700,10 +700,10 @@ with session tasks and planning tools instead.
 | Current capture confirmation | Required current truth | Stop procedure and append helper surface a non-empty receipt | `tests/scratch/append.sh`. mode-routing tests | README was corrected in this branch | Documentation-only drift repaired |
 | Canonical setup instruction | Required current truth | `/board-setup` is the plugin setup path | Setup command test | Landing page was corrected in this branch | Documentation-only drift repaired |
 | TDD/review/validate | Required current truth, supporting future role | Worker loop remains shipped and unchanged | Existing mode and orchestration tests | Repositioned as optional falsifiable verification feedback, not the headline or required first experience | Behavior unchanged. messaging aligned |
-| MCP behavior | Required current truth | Nineteen tools share canonical Markdown. Pattern, promotion, graph, ranking, context, hypothesis, outcome, and Learning tools delegate to the same core as plugin adapters | MCP lifecycle suite plus Milestone B-D adapter-parity matrices | MCP reference, manifests, package modules, and counts updated | Milestone D package prepared for v1.11.0 |
-| Security, privacy, versions, releases | Required current truth | Bounded automatic reads, content-bound H### and L### writes, lock revalidation, linked-input refusal, HTML escaping, no raw-prompt retention, and offline operation extend the existing controls | Security suites, Milestone D matrix, hook benchmarks, full 18-suite release tree, and reproducible bundle gate | SECURITY, changelog, architecture, commands, manifests, visual, and implementation evidence aligned | v1.11.0 publication pending |
+| MCP behavior | Required current truth | Nineteen tools share canonical Markdown. Pattern, promotion, graph, ranking, context, hypothesis, outcome, and Learning tools delegate to the same core as plugin adapters | MCP lifecycle suite plus Milestone B-D adapter-parity matrices | MCP reference, manifests, package modules, and counts updated | Published in v1.11.0 |
+| Security, privacy, versions, releases | Required current truth | Bounded automatic reads, content-bound H### and L### writes, lock revalidation, linked-input refusal, HTML escaping, no raw-prompt retention, and offline operation extend the existing controls | Security suites, Milestone D matrix, hook benchmarks, full 18-suite release tree, reproducible bundle gate, merged-main CI, and publication checks | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and release validation aligned | v1.11.0 published and externally validated |
 | Milestone C implementation contract | Accepted and shipped | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging shipped | Milestone C 15-check matrix, 166-check MCP suite, 17/17 current release-tree suites, merged-main CI, release workflow, and live-surface checks pass | Central spec, contract workpad, current-truth docs, real sanitized visual, implementation evidence, and v1.10.0 release validation remain current for Milestone C behavior | Shipped in v1.10.0; packaging current at v1.10.1 |
-| Milestone D implementation contract | Gate 2 accepted | Shared contextual retrieval, automatic read adapters, explicit H### fix outcomes, separate L### feedback, value evidence, and the normal HTML view are implemented from the accepted section 20 baseline. | Milestone D core, hook, MCP, view, security, performance, recovery, and full release-tree tests | Central spec, workpad, schemas, commands, skills, README, MCP, architecture, security, landing page, LLM guide, and sanitized visual are aligned | Implemented for v1.11.0 |
+| Milestone D implementation contract | Accepted and shipped | Shared contextual retrieval, automatic read adapters, explicit H### fix outcomes, separate L### feedback, value evidence, and the normal HTML view shipped from the accepted section 20 baseline. | Milestone D core, hook, MCP, view, security, performance, recovery, full release-tree, merged-main, and publication evidence | Central spec, workpad, schemas, commands, skills, README, MCP, architecture, security, landing page, LLM guide, sanitized visual, and release validation are aligned | Shipped in v1.11.0 |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -1767,7 +1767,7 @@ authorize the deferred Milestone D or E scope.
 ## 20. Gate 2 accepted: Milestone D implementation contract
 
 _State: Gate 1 and Gate 2 accepted by the product owner on 2026-07-28.
-Milestone D implementation is complete for the v1.11.0 release boundary._
+Milestone D shipped in v1.11.0 on 2026-07-29._
 
 ### 20.1 Milestone purpose
 
@@ -2352,6 +2352,8 @@ authorize any non-goal or deferred portfolio work.
 
 Current product evidence:
 
+- [`2026-07-29 v1.11.0 release validation`](evidence/2026-07-29-v1.11.0-release-validation.md)
+- [`2026-07-28 Milestone D implementation validation`](evidence/2026-07-28-milestone-d-implementation-validation.md)
 - [`2026-07-28 Milestone D contract workpad`](evidence/2026-07-28-milestone-d-contract.md)
 - [`2026-07-28 v1.10.0 release validation`](evidence/2026-07-28-v1.10.0-release-validation.md)
 - [`2026-07-28 Milestone C implementation validation`](evidence/2026-07-28-milestone-c-implementation-validation.md)
