@@ -25,6 +25,8 @@ increases.
   now loads the product core from the pinned release commit, excludes scoring
   expectations from agent inputs, verifies surfaced result ranks, and applies
   a real structured outcome to an isolated fixture copy.
+- Made the test workflow fetch full Git history so it can verify and load the
+  pinned Milestone D.1 source commit.
 
 ## [1.11.0] — 2026-07-29
 

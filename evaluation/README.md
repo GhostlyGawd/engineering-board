@@ -42,7 +42,8 @@ python3 evaluation/harness.py validate \
 ## Prepare a run
 
 Build the frozen context evidence first. Use the v1.11.0 release commit for the
-first dated run.
+first dated run. The local Git object database must contain that commit. Use a
+full-history checkout for continuous integration.
 
 ```sh
 python3 evaluation/harness.py contexts \

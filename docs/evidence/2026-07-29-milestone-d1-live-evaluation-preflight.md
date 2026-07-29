@@ -118,6 +118,11 @@ frozen-source loading, arm isolation, retry policy, scoring calculations, and
 documentation counts. They do not prove product effect or perfect semantic
 correctness.
 
+PR test run `30430050481` failed because the default one-commit GitHub Actions
+checkout did not contain the pinned v1.11.0 source commit. The workflow now
+uses a full-history checkout. This correction preserves frozen-source
+verification instead of substituting current source.
+
 ## Alignment workpad
 
 | Contract item | Normative level | Implementation | Test | Docs/example | Status |
