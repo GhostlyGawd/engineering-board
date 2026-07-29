@@ -402,22 +402,31 @@ def build_context_evidence(root: Path, corpus_path: Path, source_commit: str) ->
 
 
 def _validate_contracts(value: dict[str, Any]) -> dict[str, Any]:
-    _require(value.get("schema_version") == "1", "unsupported client contract schema")
+    _require(value.get("schema_version") == "2", "unsupported client contract schema")
     profiles = value.get("profiles")
-    _require(isinstance(profiles, dict) and set(profiles) == {"primary", "compatibility"}, "client contracts require primary and compatibility profiles")
-    expected = {"primary": ("claude-code-plugin", "plugin", 3), "compatibility": ("codex-cli-mcp", "mcp-stdio", 1)}
+    _require(isinstance(profiles, dict) and bool(profiles), "client contracts require profiles")
+    reference_profiles: list[str] = []
     for name, contract in profiles.items():
-        client, transport, repetitions = expected[name]
-        _require((contract.get("client_id"), contract.get("transport"), contract.get("repetitions")) == (client, transport, repetitions), f"invalid {name} client contract")
+        _require(isinstance(name, str) and SAFE_NAME.fullmatch(name) is not None, f"invalid profile name: {name}")
+        _require(isinstance(contract, dict), f"invalid {name} client contract")
+        role = contract.get("role")
+        _require(role in {"reference", "replication"}, f"invalid {name} profile role")
+        if role == "reference":
+            reference_profiles.append(name)
+        _require(contract.get("affects_product_gate") is (role == "reference"), f"invalid {name} product-gate authority")
+        _require(isinstance(contract.get("client_id"), str) and bool(contract["client_id"].strip()), f"invalid {name} client id")
+        _require(isinstance(contract.get("transport"), str) and bool(contract["transport"].strip()), f"invalid {name} transport")
+        _require(isinstance(contract.get("repetitions"), int) and contract["repetitions"] >= 1, f"invalid {name} repetitions")
         _require(contract.get("required_pins") == ["client_version", "model_identifier", "instructions_sha256", "tools_sha256"], f"invalid {name} required pins")
+    _require(len(reference_profiles) == 1, "client contracts require exactly one reference profile")
     return profiles
 
 
 def _validate_config(value: dict[str, Any], cases: list[dict[str, Any]], profiles: dict[str, Any]) -> None:
-    _require(value.get("schema_version") == "2", "unsupported run configuration schema")
+    _require(value.get("schema_version") == "3", "unsupported run configuration schema")
     _require(isinstance(value.get("run_id"), str) and SAFE_NAME.fullmatch(value["run_id"]) is not None, "invalid run id")
     _require(isinstance(value.get("source_commit"), str) and HEX40.fullmatch(value["source_commit"]) is not None, "source commit must be a lowercase 40-character SHA")
-    _require(value.get("trial_policy") == "d1-gate2-v1", "invalid trial policy")
+    _require(value.get("trial_policy") == "d1-client-neutral-v2", "invalid trial policy")
     configured = value.get("profiles")
     _require(isinstance(configured, dict) and set(configured) == set(profiles), "run profiles do not match client contracts")
     for name, contract in profiles.items():
@@ -474,7 +483,7 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
             / _safe_relative(corpus["context_fixture"]["board"])
         )
         fixture_project = corpus["context_fixture"]["project"]
-        for profile_name in ("primary", "compatibility"):
+        for profile_name in sorted(profiles):
             contract = profiles[profile_name]
             for case in corpus["cases"]:
                 for repetition in range(1, contract["repetitions"] + 1):
@@ -505,10 +514,10 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
                         context_brief = None
                         if arm == "context":
                             context_brief = context_evidence["briefs"][case["id"]]
-                        trial_input = {"schema_version": "2", "trial_key": trial_key, "pair_key": pair_key, "profile": profile_name, "client": {"client_id": contract["client_id"], "transport": contract["transport"], **config["profiles"][profile_name]}, "case_id": case["id"], "category": case["category"], "repetition": repetition, "arm": arm, "controlled_inputs": controlled, "context_brief": context_brief, "evidence": evidence_artifacts, "repository": repository_artifact}
+                        trial_input = {"schema_version": "3", "trial_key": trial_key, "pair_key": pair_key, "profile": profile_name, "profile_role": contract["role"], "client": {"client_id": contract["client_id"], "transport": contract["transport"], **config["profiles"][profile_name]}, "case_id": case["id"], "category": case["category"], "repetition": repetition, "arm": arm, "controlled_inputs": controlled, "context_brief": context_brief, "evidence": evidence_artifacts, "repository": repository_artifact}
                         _atomic_json(destination / "input.json", trial_input)
                         trials.append({**trial_input, "workspace": str(workspace), "input_sha256": _file_digest(destination / "input.json")})
-        manifest = {"schema_version": "2", "run_id": config["run_id"], "source_commit": config["source_commit"], "trial_policy": config["trial_policy"], "corpus_digest": corpus_summary["digest"], "client_contracts_digest": _digest(contracts), "configuration_digest": _digest(config), "context_fixture_digest": context_evidence["fixture_digest"], "frozen_core_sha256": context_evidence["frozen_core_sha256"], "outcome_evaluations": context_evidence["outcomes"], "corpus": corpus, "trials": trials}
+        manifest = {"schema_version": "3", "run_id": config["run_id"], "source_commit": config["source_commit"], "trial_policy": config["trial_policy"], "corpus_digest": corpus_summary["digest"], "client_contracts_digest": _digest(contracts), "configuration_digest": _digest(config), "context_fixture_digest": context_evidence["fixture_digest"], "frozen_core_sha256": context_evidence["frozen_core_sha256"], "outcome_evaluations": context_evidence["outcomes"], "corpus": corpus, "trials": trials}
         manifest["manifest_fingerprint"] = _digest(manifest)
         _atomic_json(stage / "run-manifest.json", manifest)
         os.replace(stage, output)
@@ -524,7 +533,7 @@ def load_run(run_dir: Path, trial_key: str | None = None) -> dict[str, Any]:
     _reject_linked_path(run_dir)
     run_dir = run_dir.resolve()
     manifest = _read_json(run_dir / "run-manifest.json")
-    _require(manifest.get("schema_version") == "2", "unsupported run manifest schema")
+    _require(manifest.get("schema_version") == "3", "unsupported run manifest schema")
     fingerprint = manifest.get("manifest_fingerprint")
     unsigned = dict(manifest)
     unsigned.pop("manifest_fingerprint", None)
@@ -663,24 +672,34 @@ def score_run(run_dir: Path) -> dict[str, Any]:
     run_dir = run_dir.resolve()
     cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
     scored, invalid = _collect_results(run_dir, manifest)
-    missing = [trial["trial_key"] for trial in manifest["trials"] if trial["trial_key"] not in scored]
-    primary_positive = [trial for trial in manifest["trials"] if trial["profile"] == "primary" and trial["category"] in POSITIVE_CATEGORIES]
-    context_trials = [trial for trial in primary_positive if trial["arm"] == "context"]
-    baseline_trials = [trial for trial in primary_positive if trial["arm"] == "baseline"]
-    compatibility_trials = [
-        trial for trial in manifest["trials"] if trial["profile"] == "compatibility"
+    reference_trials = [
+        trial for trial in manifest["trials"] if trial["profile_role"] == "reference"
     ]
-    compatibility_positive = [
-        trial
-        for trial in compatibility_trials
-        if trial["category"] in POSITIVE_CATEGORIES
+    reference_positive = [
+        trial for trial in reference_trials if trial["category"] in POSITIVE_CATEGORIES
     ]
-    compatibility_context = [
-        trial for trial in compatibility_positive if trial["arm"] == "context"
+    context_trials = [trial for trial in reference_positive if trial["arm"] == "context"]
+    baseline_trials = [trial for trial in reference_positive if trial["arm"] == "baseline"]
+    replication_profiles = sorted(
+        {
+            trial["profile"]
+            for trial in manifest["trials"]
+            if trial["profile_role"] == "replication"
+        }
+    )
+    missing = [
+        trial["trial_key"]
+        for trial in reference_trials
+        if trial["trial_key"] not in scored
     ]
-    compatibility_baseline = [
-        trial for trial in compatibility_positive if trial["arm"] == "baseline"
-    ]
+    missing_replications = {
+        profile: [
+            trial["trial_key"]
+            for trial in manifest["trials"]
+            if trial["profile"] == profile and trial["trial_key"] not in scored
+        ]
+        for profile in replication_profiles
+    }
 
     def rate(trials: list[dict[str, Any]]) -> float:
         if not trials or any(trial["trial_key"] not in scored for trial in trials):
@@ -690,8 +709,32 @@ def score_run(run_dir: Path) -> dict[str, Any]:
 
     context_rate = rate(context_trials)
     baseline_rate = rate(baseline_trials)
-    compatibility_context_rate = rate(compatibility_context)
-    compatibility_baseline_rate = rate(compatibility_baseline)
+    replications: dict[str, dict[str, Any]] = {}
+    for profile in replication_profiles:
+        profile_trials = [
+            trial for trial in manifest["trials"] if trial["profile"] == profile
+        ]
+        profile_positive = [
+            trial for trial in profile_trials if trial["category"] in POSITIVE_CATEGORIES
+        ]
+        profile_context = [
+            trial for trial in profile_positive if trial["arm"] == "context"
+        ]
+        profile_baseline = [
+            trial for trial in profile_positive if trial["arm"] == "baseline"
+        ]
+        profile_context_rate = rate(profile_context)
+        profile_baseline_rate = rate(profile_baseline)
+        replications[profile] = {
+            "complete": not missing_replications[profile],
+            "positive_context_denominator": len(profile_context),
+            "positive_baseline_denominator": len(profile_baseline),
+            "context_rate_percent": profile_context_rate,
+            "baseline_rate_percent": profile_baseline_rate,
+            "improvement_percentage_points": round(
+                profile_context_rate - profile_baseline_rate, 2
+            ),
+        }
     citation_total = 0
     citation_valid = 0
     rank_failures: set[str] = set()
@@ -703,7 +746,7 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         case_id: {"category": case["category"], "scored_arms": 0, "systemic_before_local": 0, "durable_systemic_conclusions": 0, "failures": []}
         for case_id, case in cases.items()
     }
-    for trial in manifest["trials"]:
+    for trial in reference_trials:
         attempt = scored.get(trial["trial_key"])
         if attempt is None:
             per_case[trial["case_id"]]["failures"].append(f"missing:{trial['trial_key']}")
@@ -740,57 +783,46 @@ def score_run(run_dir: Path) -> dict[str, Any]:
             outcome_failures.add(case_id)
             failed_cases.add(case_id)
             per_case[case_id]["failures"].append("outcome-loop")
-    complete = not missing
-    compatibility_complete = all(
-        trial["trial_key"] in scored for trial in compatibility_trials
-    )
-    citations_pass = complete and citation_total > 0 and citation_total == citation_valid
+    reference_complete = not missing
+    citations_pass = reference_complete and citation_total > 0 and citation_total == citation_valid
     gates = {
-        "complete_evidence": complete,
-        "primary_absolute_rate": complete and context_rate >= 75.0,
-        "primary_improvement": complete and context_rate - baseline_rate >= 25.0,
+        "reference_complete": reference_complete,
+        "reference_absolute_rate": reference_complete and context_rate >= 75.0,
+        "reference_improvement": reference_complete and context_rate - baseline_rate >= 25.0,
         "canonical_citation_coverage": citations_pass,
-        "expected_memory_rank": complete and not rank_failures,
-        "zero_negative_conclusions": complete and not negative_failures,
+        "expected_memory_rank": reference_complete and not rank_failures,
+        "zero_negative_conclusions": reference_complete and not negative_failures,
         "outcome_loop_matches": not outcome_failures,
-        "compatibility_complete": compatibility_complete,
     }
-    if complete and (not gates["primary_absolute_rate"] or not gates["primary_improvement"]):
+    if reference_complete and (not gates["reference_absolute_rate"] or not gates["reference_improvement"]):
         failed_cases.update(case["id"] for case in cases.values() if case["category"] in POSITIVE_CATEGORIES)
     return {
-        "schema_version": "1",
+        "schema_version": "2",
         "run_id": manifest["run_id"],
         "source_commit": manifest["source_commit"],
         "manifest_fingerprint": manifest["manifest_fingerprint"],
         "overall_pass": all(gates.values()),
         "gates": gates,
-        "primary": {
+        "reference": {
             "positive_context_denominator": len(context_trials),
             "positive_baseline_denominator": len(baseline_trials),
             "context_rate_percent": context_rate,
             "baseline_rate_percent": baseline_rate,
             "improvement_percentage_points": round(context_rate - baseline_rate, 2),
         },
-        "compatibility": {
-            "complete": compatibility_complete,
-            "positive_context_denominator": len(compatibility_context),
-            "positive_baseline_denominator": len(compatibility_baseline),
-            "context_rate_percent": compatibility_context_rate,
-            "baseline_rate_percent": compatibility_baseline_rate,
-            "improvement_percentage_points": round(
-                compatibility_context_rate - compatibility_baseline_rate, 2
-            ),
-        },
+        "replications": replications,
         "canonical_citation_coverage": {"valid": citation_valid, "total": citation_total, "percent": round(100.0 * citation_valid / citation_total, 2) if citation_total else 0.0},
         "false_positive_count": false_positive_count,
         "missing_trial_arms": missing,
+        "missing_replication_arms": missing_replications,
         "invalid_attempts": invalid,
         "failed_cases": sorted(failed_cases),
         "per_case": per_case,
         "outcome_evaluations": manifest["outcome_evaluations"],
         "limitations": [
             "This bounded evaluation does not establish general productivity.",
-            "The compatibility profile checks transport coverage and does not change the primary product-effect rate.",
+            "Optional replication profiles do not change the reference product-effect gate.",
+            "Client compatibility requires separate protocol or package contract evidence.",
             "The harness records supplied client results. It does not execute a live client.",
         ],
     }
@@ -813,12 +845,9 @@ def write_report(run_dir: Path) -> dict[str, str]:
         f"- Run: `{score['run_id']}`",
         f"- Source commit: `{score['source_commit']}`",
         f"- Result: **{status}**",
-        f"- Primary context rate: {score['primary']['context_rate_percent']}%",
-        f"- Primary baseline rate: {score['primary']['baseline_rate_percent']}%",
-        f"- Improvement: {score['primary']['improvement_percentage_points']} percentage points",
-        f"- Compatibility complete: {'yes' if score['compatibility']['complete'] else 'no'}",
-        f"- Compatibility context rate: {score['compatibility']['context_rate_percent']}%",
-        f"- Compatibility baseline rate: {score['compatibility']['baseline_rate_percent']}%",
+        f"- Reference context rate: {score['reference']['context_rate_percent']}%",
+        f"- Reference baseline rate: {score['reference']['baseline_rate_percent']}%",
+        f"- Improvement: {score['reference']['improvement_percentage_points']} percentage points",
         f"- Negative-case durable conclusions: {score['false_positive_count']}",
         "",
         "## Gates",
@@ -826,6 +855,20 @@ def write_report(run_dir: Path) -> dict[str, str]:
     ]
     for name, passed in score["gates"].items():
         lines.append(f"- {'PASS' if passed else 'FAIL'}: `{name}`")
+    if score["replications"]:
+        lines.extend(["", "## Optional replications", ""])
+        for profile, replication in score["replications"].items():
+            lines.extend(
+                [
+                    f"### {profile}",
+                    "",
+                    f"- Complete: {'yes' if replication['complete'] else 'no'}",
+                    f"- Context rate: {replication['context_rate_percent']}%",
+                    f"- Baseline rate: {replication['baseline_rate_percent']}%",
+                    f"- Improvement: {replication['improvement_percentage_points']} percentage points",
+                    "",
+                ]
+            )
     lines.extend(["", "## Per-case evidence", ""])
     for case_id, item in score["per_case"].items():
         failures = ", ".join(item["failures"]) if item["failures"] else "none"

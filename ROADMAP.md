@@ -11,8 +11,11 @@ source report — no new findings are smuggled in._
 > product spec, the product spec wins.
 
 > **Current sequence (2026-07-29):** Milestone D.1 Gate 2 is accepted. The
-> repository-only evaluation harness and frozen corpus are implemented. The
-> dated paired product-proof run is next; it has not started.
+> client-neutral repository harness uses Codex as the required reference
+> client. Live runs for other providers are optional replications. The first
+> Codex run gave both positive baseline and context arms a 100 percent rate.
+> The next task is to calibrate the corpus so it can measure product-effect
+> improvement, and then run the Codex reference profile again.
 > Milestone E remains deferred. The priority lists below preserve the 2026-07-08
 > audit synthesis and are not the current product sequence.
 

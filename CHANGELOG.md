@@ -20,6 +20,10 @@ increases.
 
 ### Changed
 
+- Replaced the provider-specific Milestone D.1 gate with one required Codex
+  reference profile and zero or more optional replication profiles. Missing
+  provider accounts no longer block product proof. Client-compatibility claims
+  now depend on deterministic protocol or package evidence.
 - Replaced schematic Milestone D.1 context inputs with real v1.11.0
   `board_context` output from a sanitized Markdown board fixture. The harness
   now loads the product core from the pinned release commit, excludes scoring

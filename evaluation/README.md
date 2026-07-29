@@ -12,7 +12,7 @@ Board plugin or MCP runtime. It does not execute a live agent client.
 The harness:
 
 - validates eight sanitized cases with two cases in each accepted category;
-- creates 32 isolated pairs and 64 trial arms;
+- creates 24 required reference pairs and 48 trial arms;
 - keeps the declared inputs equal inside each pair;
 - copies the same sanitized Markdown repository fixture into both arms;
 - adds the real product context brief only to the context arm;
@@ -24,11 +24,12 @@ The harness:
 - permits one replacement only after a recorded pre-score infrastructure
   failure;
 - blocks every retry after a scored result;
-- scores primary positive cases separately from negative-case false positives;
+- scores reference positive cases separately from negative-case false positives;
+- reports optional replication profiles without adding them to the product gate;
 - writes bounded JSON and Markdown reports.
 
 The positive-case denominator contains the recurring-bug and cross-domain
-shared-cause cases. Each primary arm has 12 positive trials. Lexical-decoy and
+shared-cause cases. Each reference arm has 12 positive trials. Lexical-decoy and
 independent-issue cases use the separate zero-durable-conclusion gate.
 
 ## Validate the corpus
@@ -61,22 +62,16 @@ digest of `evaluation/tool-contracts.json`. Require each client response to conf
 
 ```json
 {
-  "schema_version": "2",
+  "schema_version": "3",
   "run_id": "d1-YYYY-MM-DD",
   "source_commit": "e26149bf505ea7f5ae2d95294a8a108e6b3c429f",
-  "trial_policy": "d1-gate2-v1",
+  "trial_policy": "d1-client-neutral-v2",
   "profiles": {
-    "primary": {
+    "reference": {
       "client_version": "exact-version",
       "model_identifier": "exact-model",
       "instructions_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
       "tools_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
-    },
-    "compatibility": {
-      "client_version": "exact-version",
-      "model_identifier": "exact-model",
-      "instructions_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-      "tools_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
     }
   },
   "context_fingerprints": {
@@ -95,6 +90,13 @@ digest of `evaluation/tool-contracts.json`. Require each client response to conf
 The `context_fingerprints` object must contain all eight case identifiers. The
 prepare command fails if a configured value differs from frozen product
 output.
+
+The repository contract uses Codex as the required reference client. A dated
+contract can add one or more `replication` profiles for other clients. Each
+replication must use the same paired-trial rules and pinned inputs. A
+replication result does not change the reference product gate. A provider
+account is not required unless an operator elects to run that provider as a
+replication.
 
 ```sh
 python3 evaluation/harness.py prepare \
@@ -117,7 +119,7 @@ its structured result.
 ```sh
 python3 evaluation/harness.py record \
   --run /safe/path/run-directory \
-  --trial primary-D1-C01-r1-context \
+  --trial reference-D1-C01-r1-context \
   --attempt /safe/path/attempt.json
 
 python3 evaluation/harness.py score \
@@ -134,6 +136,9 @@ frozen product comparison in the run manifest, not from an agent claim.
 
 ## Current proof boundary
 
-The deterministic harness and its tests are implemented. No live paired trial
-has run as part of this implementation change. Therefore, Engineering Board
-does not yet claim that Milestone D context improves agent diagnoses.
+The deterministic harness and its tests are implemented. A dated Codex run
+produced a 100 percent positive-case rate in both the baseline and context
+arms. The result shows that the current corpus cannot measure product-effect
+improvement. Engineering Board does not yet claim that Milestone D context
+improves agent diagnoses. The next evaluation task is to improve corpus
+discrimination and then run the Codex reference profile again.
