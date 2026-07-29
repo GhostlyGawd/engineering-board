@@ -10,6 +10,11 @@ source report — no new findings are smuggled in._
 > and historical-planning input; when it conflicts with a newer decision in the
 > product spec, the product spec wins.
 
+> **Current sequence (2026-07-29):** Milestone D.1 product proof and retrieval
+> calibration is next. Milestone E remains deferred. The priority lists below
+> preserve the 2026-07-08 audit synthesis and are not the current product
+> sequence.
+
 **Scope note:** this roadmap carries only the **open** work. Items already shipped
 are excluded (IMPROVEMENTS.md's 14 — built; the design batch's headline fixes —
 v1.5.1/v1.6.0; the Experience Optimization safe fixes — PR #87). The pool is the
