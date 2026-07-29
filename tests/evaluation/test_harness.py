@@ -37,7 +37,12 @@ class EvaluationHarnessTests(unittest.TestCase):
     source_commit = "e26149bf505ea7f5ae2d95294a8a108e6b3c429f"
     context_evidence: dict | None = None
 
-    def make_config(self, directory: Path, run_id: str = "test-run") -> Path:
+    def make_config(
+        self,
+        directory: Path,
+        run_id: str = "test-run",
+        contracts_path: Path | None = None,
+    ) -> Path:
         if self.__class__.context_evidence is None:
             self.__class__.context_evidence = build_context_evidence(
                 ROOT, self.corpus_path, self.source_commit
@@ -48,25 +53,24 @@ class EvaluationHarnessTests(unittest.TestCase):
             case_id: brief["context_fingerprint"]
             for case_id, brief in evidence["briefs"].items()
         }
+        contracts = json.loads(
+            (contracts_path or self.contracts_path).read_text(encoding="utf-8")
+        )
+        profiles = {
+            name: {
+                "client_version": f"{name}-test-1",
+                "model_identifier": f"model-{name}-test",
+                "instructions_sha256": "b" * 64,
+                "tools_sha256": "c" * 64,
+            }
+            for name in contracts["profiles"]
+        }
         value = {
-            "schema_version": "2",
+            "schema_version": "3",
             "run_id": run_id,
             "source_commit": self.source_commit,
-            "trial_policy": "d1-gate2-v1",
-            "profiles": {
-                "primary": {
-                    "client_version": "claude-code-test-1",
-                    "model_identifier": "model-primary-test",
-                    "instructions_sha256": "b" * 64,
-                    "tools_sha256": "c" * 64,
-                },
-                "compatibility": {
-                    "client_version": "codex-cli-test-1",
-                    "model_identifier": "model-compat-test",
-                    "instructions_sha256": "d" * 64,
-                    "tools_sha256": "e" * 64,
-                },
-            },
+            "trial_policy": "d1-client-neutral-v2",
+            "profiles": profiles,
             "context_fingerprints": fingerprints,
         }
         path = directory / "run-config.json"
@@ -190,25 +194,23 @@ class EvaluationHarnessTests(unittest.TestCase):
             with self.assertRaisesRegex(EvaluationError, "unsafe relative path"):
                 validate_corpus(copied.parent, corpus_path)
 
-    def test_prepare_builds_64_isolated_arms_with_equal_pair_controls(self) -> None:
+    def test_prepare_builds_48_isolated_arms_with_equal_pair_controls(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-plan-") as temp:
             run_dir = self.prepare(Path(temp))
             manifest = load_run(run_dir)
-            self.assertEqual(len(manifest["trials"]), 64)
-            primary = [t for t in manifest["trials"] if t["profile"] == "primary"]
-            compatibility = [
-                t for t in manifest["trials"] if t["profile"] == "compatibility"
+            self.assertEqual(len(manifest["trials"]), 48)
+            reference = [
+                t for t in manifest["trials"] if t["profile_role"] == "reference"
             ]
-            self.assertEqual(len(primary), 48)
-            self.assertEqual(len(compatibility), 16)
+            self.assertEqual(len(reference), 48)
             self.assertEqual(
-                len({trial["workspace"] for trial in manifest["trials"]}), 64
+                len({trial["workspace"] for trial in manifest["trials"]}), 48
             )
             pairs: dict[str, list[dict]] = {}
             for trial in manifest["trials"]:
                 pairs.setdefault(trial["pair_key"], []).append(trial)
                 self.assertTrue((run_dir / trial["workspace"] / "input.json").is_file())
-            self.assertEqual(len(pairs), 32)
+            self.assertEqual(len(pairs), 24)
             for pair in pairs.values():
                 self.assertEqual({item["arm"] for item in pair}, {"baseline", "context"})
                 baseline = next(item for item in pair if item["arm"] == "baseline")
@@ -333,26 +335,52 @@ class EvaluationHarnessTests(unittest.TestCase):
             with self.assertRaisesRegex(EvaluationError, "context fingerprint"):
                 record_attempt(run_dir, trial["trial_key"], result)
 
-    def test_complete_run_passes_all_product_and_compatibility_gates(self) -> None:
+    def test_complete_reference_run_passes_all_product_gates(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-pass-") as temp:
             run_dir = self.prepare(Path(temp))
             self.record_complete_run(run_dir)
             score = score_run(run_dir)
             self.assertTrue(score["overall_pass"])
-            self.assertEqual(score["primary"]["positive_context_denominator"], 12)
-            self.assertEqual(score["primary"]["context_rate_percent"], 100.0)
-            self.assertEqual(score["primary"]["baseline_rate_percent"], 0.0)
-            self.assertTrue(score["compatibility"]["complete"])
+            self.assertEqual(score["reference"]["positive_context_denominator"], 12)
+            self.assertEqual(score["reference"]["context_rate_percent"], 100.0)
+            self.assertEqual(score["reference"]["baseline_rate_percent"], 0.0)
+            self.assertEqual(score["replications"], {})
             self.assertEqual(score["false_positive_count"], 0)
             self.assertEqual(score["missing_trial_arms"], [])
 
-    def test_compatibility_completion_is_reported_before_primary_completion(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="eb-eval-compat-") as temp:
-            run_dir = self.prepare(Path(temp))
+    def test_optional_replication_does_not_change_reference_gate(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-replication-") as temp:
+            base = Path(temp)
+            contracts_path = base / "client-contracts.json"
+            contracts = json.loads(self.contracts_path.read_text(encoding="utf-8"))
+            contracts["profiles"]["other-client"] = {
+                "role": "replication",
+                "affects_product_gate": False,
+                "client_id": "other-client",
+                "transport": "mcp-stdio",
+                "repetitions": 1,
+                "required_pins": [
+                    "client_version",
+                    "model_identifier",
+                    "instructions_sha256",
+                    "tools_sha256",
+                ],
+            }
+            contracts_path.write_text(
+                json.dumps(contracts, indent=2) + "\n", encoding="utf-8"
+            )
+            run_dir = base / "run"
+            prepare_run(
+                ROOT,
+                self.corpus_path,
+                contracts_path,
+                self.make_config(base, contracts_path=contracts_path),
+                run_dir,
+            )
             manifest = load_run(run_dir)
             cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
             for trial in manifest["trials"]:
-                if trial["profile"] != "compatibility":
+                if trial["profile_role"] != "reference":
                     continue
                 record_attempt(
                     run_dir,
@@ -360,11 +388,13 @@ class EvaluationHarnessTests(unittest.TestCase):
                     self.scored_attempt(trial, cases[trial["case_id"]]),
                 )
             score = score_run(run_dir)
-            self.assertTrue(score["compatibility"]["complete"])
-            self.assertTrue(score["gates"]["compatibility_complete"])
+            self.assertFalse(score["replications"]["other-client"]["complete"])
+            self.assertEqual(
+                len(score["missing_replication_arms"]["other-client"]), 16
+            )
             self.assertTrue(score["gates"]["outcome_loop_matches"])
-            self.assertFalse(score["gates"]["complete_evidence"])
-            self.assertFalse(score["overall_pass"])
+            self.assertTrue(score["gates"]["reference_complete"])
+            self.assertTrue(score["overall_pass"])
 
     def test_threshold_and_false_positive_failures_remain_visible(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-fail-") as temp:
@@ -373,7 +403,7 @@ class EvaluationHarnessTests(unittest.TestCase):
             positive_context = [
                 trial
                 for trial in manifest["trials"]
-                if trial["profile"] == "primary"
+                if trial["profile_role"] == "reference"
                 and trial["arm"] == "context"
                 and trial["category"] in POSITIVE_CATEGORIES
             ]
@@ -397,7 +427,7 @@ class EvaluationHarnessTests(unittest.TestCase):
             self.record_complete_run(run_dir, overrides)
             score = score_run(run_dir)
             self.assertFalse(score["overall_pass"])
-            self.assertFalse(score["gates"]["primary_absolute_rate"])
+            self.assertFalse(score["gates"]["reference_absolute_rate"])
             self.assertFalse(score["gates"]["zero_negative_conclusions"])
             self.assertIn(negative_context["case_id"], score["failed_cases"])
 
@@ -406,8 +436,8 @@ class EvaluationHarnessTests(unittest.TestCase):
             run_dir = self.prepare(Path(temp))
             score = score_run(run_dir)
             self.assertFalse(score["overall_pass"])
-            self.assertEqual(len(score["missing_trial_arms"]), 64)
-            self.assertFalse(score["gates"]["complete_evidence"])
+            self.assertEqual(len(score["missing_trial_arms"]), 48)
+            self.assertFalse(score["gates"]["reference_complete"])
 
     def test_report_is_bounded_and_contains_failed_cases(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-report-") as temp:

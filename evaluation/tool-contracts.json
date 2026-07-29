@@ -1,20 +1,25 @@
 {
-  "schema_version": "1",
+  "schema_version": "2",
   "trial_rule": "The agent must not call a tool during a scored trial.",
-  "profiles": {
-    "primary": {
-      "client": "Claude Code",
-      "integration": "Engineering Board plugin",
-      "integration_source_commit": "e26149bf505ea7f5ae2d95294a8a108e6b3c429f",
-      "workspace_access": "read-only",
-      "agent_tool_calls": "forbidden"
-    },
-    "compatibility": {
-      "client": "Codex CLI",
-      "integration": "Engineering Board MCP server over stdio",
-      "integration_source_commit": "e26149bf505ea7f5ae2d95294a8a108e6b3c429f",
-      "workspace_access": "read-only",
-      "agent_tool_calls": "forbidden"
-    }
+  "reference": {
+    "client": "Codex CLI",
+    "integration": "Engineering Board MCP server over stdio",
+    "integration_source_commit": "e26149bf505ea7f5ae2d95294a8a108e6b3c429f",
+    "workspace_access": "read-only",
+    "agent_tool_calls": "forbidden",
+    "required_for_product_gate": true
+  },
+  "replication": {
+    "client": "Any compatible client",
+    "integration": "A tested Engineering Board client surface",
+    "workspace_access": "read-only",
+    "agent_tool_calls": "forbidden",
+    "required_for_product_gate": false,
+    "provider_credentials": "operator-supplied when a live replication is selected"
+  },
+  "compatibility_evidence": {
+    "mcp_stdio": "Deterministic MCP protocol and package tests",
+    "claude_code_plugin": "Deterministic plugin package and manifest tests",
+    "live_provider_account_required": false
   }
 }

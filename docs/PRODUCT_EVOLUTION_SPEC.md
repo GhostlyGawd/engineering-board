@@ -4,8 +4,9 @@ _Status: Authoritative living product direction: Milestone A shipped in
 v1.8.0. Milestone B shipped in v1.9.1. Milestone C shipped in v1.10.0.
 Milestone D shipped in v1.11.0. Milestone D.1 Gate 2 is accepted. The corrected
 repository-only evaluation harness builds real v1.11.0 context and outcome
-evidence. The Codex compatibility profile is complete. The Claude Code primary
-product-effect profile is incomplete._
+evidence. Codex is the required reference client. Live provider replications
+are optional. The first Codex run exposed a non-discriminating corpus and did
+not prove a product effect._
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-29_
 _Product owner: GhostlyGawd_
@@ -75,7 +76,7 @@ selected milestone is approved.
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 | Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
-| Milestone D.1 direction | Corrected harness implemented | Prove whether the shipped context changes an agent diagnosis before a local fix. The repository-only harness loads the product core from the v1.11.0 release commit, builds real context from a sanitized Markdown fixture, excludes scoring expectations from agent input, and applies real structured outcomes to isolated fixture copies. The live paired evidence run remains incomplete. Use failed cases to calibrate retrieval and outcome ergonomics before Milestone E. |
+| Milestone D.1 direction | Client-neutral correction accepted | Prove whether the shipped context changes an agent diagnosis before a local fix. Codex is the required reference client because it is the available product-development client. Other clients are optional replication profiles. Protocol and package contract tests establish client-surface compatibility without provider accounts. The first Codex run scored 100 percent in both positive baseline and context arms, so corpus discrimination must improve before a product-effect claim. |
 
 ## 3. Product thesis
 
@@ -735,7 +736,7 @@ with session tasks and planning tools instead.
 | Security, privacy, versions, releases | Required current truth | Bounded automatic reads, content-bound H### and L### writes, lock revalidation, linked-input refusal, HTML escaping, no raw-prompt retention, and offline operation extend the existing controls | Security suites, Milestone D matrix, hook benchmarks, full release tree, reproducible bundle gate, merged-main CI, and publication checks | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and release validation aligned | v1.11.0 published and externally validated |
 | Milestone C implementation contract | Accepted and shipped | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging shipped | Milestone C 15-check matrix, 166-check MCP suite, 17/17 current release-tree suites, merged-main CI, release workflow, and live-surface checks pass | Central spec, contract workpad, current-truth docs, real sanitized visual, implementation evidence, and v1.10.0 release validation remain current for Milestone C behavior | Shipped in v1.10.0; packaging current at v1.10.1 |
 | Milestone D implementation contract | Accepted and shipped | Shared contextual retrieval, automatic read adapters, explicit H### fix outcomes, separate L### feedback, value evidence, and the normal HTML view shipped from the accepted section 20 baseline. | Milestone D core, hook, MCP, view, security, performance, recovery, full release-tree, merged-main, and publication evidence | Central spec, workpad, schemas, commands, skills, README, MCP, architecture, security, landing page, LLM guide, sanitized visual, and release validation are aligned | Shipped in v1.11.0 |
-| Milestone D.1 product-proof contract | Primary evaluation open | The corrected repository-only harness implements the fixed corpus, isolated paired trials, bounded client contracts, retry rules, decision records, scoring thresholds, outcome-loop comparison, and reporting. The Codex compatibility profile is complete. The Claude Code primary profile is not complete. The harness does not change production behavior. | Requirements checker, 14 focused harness tests, full release tree, continuous integration, and the dated Codex compatibility report | Central spec section 21, evaluation guide, contract workpad, and dated live-evaluation evidence | Harness corrected; Codex compatibility profile complete; Claude Code primary profile blocked by authentication |
+| Milestone D.1 product-proof contract | Client-neutral correction accepted | The repository-only harness implements the fixed corpus, isolated paired trials, one required reference profile, optional replication profiles, retry rules, scoring thresholds, outcome-loop comparison, and reporting. Codex is the reference client. Replications do not affect the product gate. The harness does not change production behavior. | Requirements checker, 14 focused harness tests, full release tree, continuous integration, and dated Codex evidence | Central spec section 21, evaluation guide, client-neutral workpad, and preserved historical evidence | Provider-account gate removed; corpus discrimination remains open |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -2382,9 +2383,10 @@ authorize any non-goal or deferred portfolio work.
 
 ## 21. Gate 2 accepted: Milestone D.1 product-proof contract
 
-_State: Gate 1 and Gate 2 accepted by the product owner on 2026-07-29. The
-corrected repository-only evaluation harness is implemented. The live paired
-evidence run is incomplete. Production calibration has not started._
+_State: Gate 1 and Gate 2 were accepted by the product owner on 2026-07-29.
+The owner replaced the provider-specific run contract on 2026-07-29. The
+client-neutral correction baseline was accepted on 2026-07-29. Corpus
+calibration remains open._
 
 ### 21.1 Product question
 
@@ -2452,23 +2454,26 @@ prompt text, generated files, or mutable agent memory from another trial.
 | D1-REQ-009 | The validation report shall publish per-case evidence, aggregate results, limitations, failed cases, and approved next-step decisions. |
 | D1-REQ-010 | The validation report shall not make a general productivity claim from the bounded D.1 evidence. |
 | D1-REQ-011 | Milestone E implementation shall remain deferred until the product owner accepts the D.1 validation evidence and the resulting next-step decision. |
-| D1-REQ-012 | The primary evidence run shall execute three independent paired repetitions for each of eight fixed cases through the Claude Code plugin. |
-| D1-REQ-013 | The compatibility evidence run shall execute one paired repetition for each of the eight fixed cases through Codex CLI as an MCP client. |
+| D1-REQ-012 | The reference evidence run shall execute three independent paired repetitions for each of the eight fixed cases through the single profile that has the `reference` role in the dated contract. |
+| D1-REQ-013 | The evaluation contract shall permit zero or more profiles that have the `replication` role. |
 | D1-REQ-014 | The run manifest shall pin the exact source commit, client version, model identifier, instructions, tool set, trial policy, and context fingerprint for each evidence arm. |
 | D1-REQ-015 | The paired-trial runner shall not retry a trial after the trial produces a scored result. |
-| D1-REQ-016 | The primary evidence scorer shall pass the product-effect gate only when the positive-case context arms achieve at least 75 percent systemic-before-local outcomes and exceed the positive-case baseline arms by at least 25 percentage points. |
+| D1-REQ-016 | The reference evidence scorer shall pass the product-effect gate only when the positive-case context arms achieve at least 75 percent systemic-before-local outcomes and exceed the positive-case baseline arms by at least 25 percentage points. |
 | D1-REQ-017 | The validation report shall cite canonical evidence for 100 percent of positive systemic-before-local classifications. |
 | D1-REQ-018 | The retrieval-quality scorer shall pass an applicable context-arm trial only when the expected relevant memory appears within the first three results. |
 | D1-REQ-019 | The false-positive scorer shall pass the evidence run only when lexical-decoy and independent-issue cases produce zero durable systemic conclusions. |
 | D1-REQ-020 | The trial recorder shall preserve each invalid attempt, infrastructure-failure reason, and replacement relationship. |
 | D1-REQ-021 | The paired-trial runner shall permit no more than one replacement for an infrastructure failure that occurs before a scored result. |
 | D1-REQ-022 | The evaluation corpus shall contain exactly two recurring-bug cases, two cross-domain shared-cause cases, two lexical-decoy cases, and two independent-issue cases. |
+| D1-REQ-023 | A client-compatibility claim shall identify one tested protocol or package surface. |
+| D1-REQ-024 | A client-compatibility claim shall cite deterministic contract evidence for the identified surface. |
+| D1-REQ-025 | The reference product-effect gate shall not depend on the availability or result of a `replication` profile. |
 
 The structured requirement artifact has no deterministic requirement-quality
 failure. Its current status and content digest are recorded in the D.1
 contract workpad. Automated checks do not replace semantic review.
 
-### 21.5 Primary evaluation record
+### 21.5 Reference evaluation record
 
 For each trial, preserve:
 
@@ -2529,9 +2534,10 @@ corpus version and a new evidence baseline.
 
 #### Trials and retry policy
 
-The primary evidence run uses three independent paired repetitions for each
-case through the Claude Code plugin. The compatibility evidence run uses one
-paired repetition for each case through Codex CLI as an MCP client.
+The reference evidence run uses three independent paired repetitions for each
+case. Codex is the current reference client. A dated evaluation contract can
+add one or more replication profiles for other clients. Replications are
+optional and do not change the reference gate.
 
 A scored trial cannot be retried. An infrastructure failure is invalid only if
 it occurs before the trial produces a scored result. The recorder must preserve
@@ -2541,15 +2547,15 @@ applicable evidence run incomplete.
 
 #### Client and model control
 
-The primary client is the Claude Code plugin. The compatibility client is Codex
-CLI through the MCP server. Each dated run manifest pins the exact client
-version, model identifier, instructions, tools, source commit, trial policy,
-and context fingerprint. A baseline and context pair use equal pinned values
-except for the context brief.
+The current reference client is Codex CLI through the MCP server. Each dated
+run manifest pins the exact client version, model identifier, instructions,
+tools, source commit, trial policy, and context fingerprint. A baseline and
+context pair use equal pinned values except for the context brief. A
+replication profile uses the same controls.
 
 #### Success gates
 
-The primary evidence run passes only when all these conditions are true:
+The reference evidence run passes only when all these conditions are true:
 
 - the 12 positive-case context trials achieve at least 75 percent systemic-before-local outcomes;
 - the positive-case context rate exceeds the positive-case baseline rate by at least 25 percentage points;
@@ -2563,8 +2569,12 @@ The positive-case rate denominators contain only recurring-bug and cross-domain
 shared-cause cases. Lexical-decoy and independent-issue cases use the separate
 zero-durable-conclusion gate.
 
-Compatibility results are reported separately. They test surface compatibility
-and do not change the primary product-effect gate.
+Replication results are reported separately and do not change the reference
+product-effect gate. Client compatibility is a separate claim. MCP
+compatibility requires deterministic MCP protocol and package evidence. Plugin
+compatibility requires deterministic plugin package and manifest evidence. A
+live provider run can add behavioral replication evidence, but it is not
+required for compatibility.
 
 ### 21.8 Explicit non-goals
 
@@ -2574,6 +2584,7 @@ Milestone D.1 does not:
 - add a general planning system;
 - change production ranking during an evidence run;
 - add hosted evaluation infrastructure or telemetry;
+- acquire or maintain accounts for each model provider;
 - add SQLite, embeddings, or cross-repository aggregation;
 - automatically execute a fix;
 - make a general productivity claim;
@@ -2593,11 +2604,11 @@ product decision. It does not permit the current evidence baseline to change.
 
 The repository-only harness, frozen corpus, real Markdown context fixture,
 client contracts, recorder, scorer, report writer, and deterministic tests
-implement this contract. The harness loads the product core from the pinned
-commit. It builds real product context, keeps scoring expectations out of
-agent input, and applies structured outcomes to isolated fixture copies. The
-harness does not execute a live client. Therefore, this implementation is not
-product-effect evidence.
+implement the corrected contract on the review branch. The harness loads the
+product core from the pinned commit. It builds real product context, keeps
+scoring expectations out of agent input, and applies structured outcomes to
+isolated fixture copies. The harness does not execute a live client. Therefore,
+the harness implementation is not product-effect evidence.
 
 ### 21.10 Preflight validity correction
 
@@ -2623,11 +2634,36 @@ Harness schema 2 corrects both defects before any scored live trial:
 No schema 1 trial is valid D.1 product evidence. The dated preflight evidence
 records the live-client readiness result and the remaining external gate.
 
+### 21.11 Client-neutral evaluation correction
+
+The first complete Codex profile scored 100 percent in the positive baseline
+arms and 100 percent in the positive context arms. The zero-point difference
+does not prove a product effect. It shows that the current corpus gives the
+reference client no measurable headroom.
+
+The owner rejected provider accounts as a required evaluation dependency.
+Harness schema 3 applies that decision:
+
+- One `reference` profile is required.
+- Codex is the repository reference profile.
+- A contract can add zero or more `replication` profiles.
+- An incomplete replication cannot fail the reference product gate.
+- Compatibility evidence names a protocol or package surface.
+- Deterministic MCP and plugin tests support compatibility claims.
+- Live provider behavior is optional dated replication evidence.
+
+The next D.1 task is corpus calibration. The calibrated corpus must include
+positive cases in which the baseline can plausibly miss or delay the shared
+cause while the context arm can use the retrieved memory. Milestone E remains
+deferred until the owner accepts the resulting product-effect evidence and
+next-step decision.
+
 ## 22. Research and evidence
 
 Current product evidence:
 
 - [`2026-07-29 Milestone D.1 live-evaluation preflight`](evidence/2026-07-29-milestone-d1-live-evaluation-preflight.md)
+- [`2026-07-29 Milestone D.1 client-neutral evaluation contract`](evidence/2026-07-29-milestone-d1-client-neutral-evaluation-contract.md)
 - [`2026-07-29 Milestone D.1 harness implementation`](evidence/2026-07-29-milestone-d1-harness-implementation.md)
 - [`2026-07-29 Milestone D.1 product-proof contract workpad`](evidence/2026-07-29-milestone-d1-product-proof-contract.md)
 - [`2026-07-29 v1.11.0 release validation`](evidence/2026-07-29-v1.11.0-release-validation.md)

@@ -1,21 +1,12 @@
 {
-  "schema_version": "1",
+  "schema_version": "2",
   "profiles": {
-    "primary": {
-      "client_id": "claude-code-plugin",
-      "transport": "plugin",
-      "repetitions": 3,
-      "required_pins": [
-        "client_version",
-        "model_identifier",
-        "instructions_sha256",
-        "tools_sha256"
-      ]
-    },
-    "compatibility": {
+    "reference": {
+      "role": "reference",
+      "affects_product_gate": true,
       "client_id": "codex-cli-mcp",
       "transport": "mcp-stdio",
-      "repetitions": 1,
+      "repetitions": 3,
       "required_pins": [
         "client_version",
         "model_identifier",
