@@ -6,8 +6,9 @@ Milestone D shipped in v1.11.0. Milestone D.1 Gate 2 is accepted. The corrected
 repository-only evaluation harness builds real v1.11.0 context and outcome
 evidence. Codex is the required reference client. Live provider replications
 are optional. The first Codex run exposed a non-discriminating corpus. The
-product owner accepted a separate locked evidence-corpus baseline. No run has
-proved a product effect._
+product owner accepted a separate locked evidence-corpus baseline. Its
+reference run improved the positive rate by 16.67 percentage points. This
+result failed the required 25-point product-effect gate._
 _Started: 2026-07-27_
 _Last direction revision: 2026-07-29_
 _Product owner: GhostlyGawd_
@@ -77,7 +78,7 @@ selected milestone is approved.
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 | Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
-| Milestone D.1 direction | Corpus-calibration baseline accepted | Prove whether the shipped context changes an agent diagnosis before a local fix. Codex is the required reference client. Other clients are optional replication profiles. The saturated first-run cases are a non-scored calibration corpus. The product owner accepted a separate locked evidence corpus with scoring-oracle checks. |
+| Milestone D.1 direction | Calibrated reference evidence complete; product gate failed | Prove whether the shipped context changes an agent diagnosis before a local fix. Codex is the required reference client. Other clients are optional replication profiles. The saturated first-run cases are a non-scored calibration corpus. The locked version 3 corpus produced a 100 percent context rate and an 83.33 percent baseline rate. The 16.67-point difference did not meet the required 25-point improvement. |
 
 ## 3. Product thesis
 
@@ -737,7 +738,7 @@ with session tasks and planning tools instead.
 | Security, privacy, versions, releases | Required current truth | Bounded automatic reads, content-bound H### and L### writes, lock revalidation, linked-input refusal, HTML escaping, no raw-prompt retention, and offline operation extend the existing controls | Security suites, Milestone D matrix, hook benchmarks, full release tree, reproducible bundle gate, merged-main CI, and publication checks | SECURITY, changelog, architecture, commands, manifests, visual, implementation evidence, and release validation aligned | v1.11.0 published and externally validated |
 | Milestone C implementation contract | Accepted and shipped | Shared core, two commands, two MCP tools, H### schema and lifecycle, graph schema 3, normal HTML intelligence view, permissions, and packaging shipped | Milestone C 15-check matrix, 166-check MCP suite, 17/17 current release-tree suites, merged-main CI, release workflow, and live-surface checks pass | Central spec, contract workpad, current-truth docs, real sanitized visual, implementation evidence, and v1.10.0 release validation remain current for Milestone C behavior | Shipped in v1.10.0; packaging current at v1.10.1 |
 | Milestone D implementation contract | Accepted and shipped | Shared contextual retrieval, automatic read adapters, explicit H### fix outcomes, separate L### feedback, value evidence, and the normal HTML view shipped from the accepted section 20 baseline. | Milestone D core, hook, MCP, view, security, performance, recovery, full release-tree, merged-main, and publication evidence | Central spec, workpad, schemas, commands, skills, README, MCP, architecture, security, landing page, LLM guide, sanitized visual, and release validation are aligned | Shipped in v1.11.0 |
-| Milestone D.1 product-proof contract | Corpus-calibration baseline accepted | The repository-only harness separates a non-scored calibration corpus from a locked evidence corpus. Scored runs require the locked corpus. The validator rejects declared oracle leakage, requires positive-case information gaps, and verifies that lexical decoys retrieve rejected memory. Codex remains the reference client. | Baselined requirements checker, 17 focused harness tests, full release tree, continuous integration, and dated Codex evidence | Central spec section 21, evaluation guide, calibration workpad, and preserved historical evidence | Baseline accepted; Codex reference run pending |
+| Milestone D.1 product-proof contract | Calibrated reference run complete; product gate failed | The repository-only harness separates a non-scored calibration corpus from a locked evidence corpus. Scored runs require the locked corpus. The validator rejects declared oracle leakage, requires positive-case information gaps, and verifies that lexical decoys retrieve rejected memory. Codex remains the reference client. | Baselined requirements checker, 17 focused harness tests, full release tree, continuous integration, and dated Codex evidence | Central spec section 21, evaluation guide, calibration workpad, calibrated reference evidence, and preserved historical evidence | Version 3 preserved; a new baseline is required before another scored run |
 | Historical audits and evidence | Historical | Preserved | Superseding dated evidence added | Historical claims are not rewritten | Reviewed and preserved |
 
 ## 17. Gate 2 accepted: Milestone A implementation contract
@@ -2686,9 +2687,28 @@ evidence:
 
 This design does not force a low baseline score. It creates an information
 boundary that gives the baseline a realistic local explanation and gives the
-context arm prior repository knowledge. The locked evidence corpus has not run
-through the Codex reference profile. Therefore, it does not yet support a
-product-effect claim.
+context arm prior repository knowledge.
+
+The version 3 reference run produced these results:
+
+- Positive context rate: 100 percent.
+- Positive baseline rate: 83.33 percent.
+- Improvement: 16.67 percentage points.
+- Negative durable systemic conclusions: zero.
+- Product-effect result: fail. The required improvement is 25 percentage
+  points.
+
+The first three positive cases still disclosed enough current cross-path
+evidence for Codex to infer a systemic boundary without repository memory.
+Only D1-C04 produced local-first baseline diagnoses. Preserve version 3 and its
+failed result. Do not change its content after observation.
+
+The next D.1 corpus proposal is an active recommendation, not an accepted
+baseline. The proposal should use a new version. The current trial should show
+a plausible local symptom, and only Engineering Board context should supply
+the prior incident relationship that supports a recurring or cross-domain
+cause. Keep the accepted scoring thresholds unchanged. Obtain product-owner
+approval before another scored run.
 
 ## 22. Research and evidence
 
@@ -2697,6 +2717,7 @@ Current product evidence:
 - [`2026-07-29 Milestone D.1 live-evaluation preflight`](evidence/2026-07-29-milestone-d1-live-evaluation-preflight.md)
 - [`2026-07-29 Milestone D.1 client-neutral evaluation contract`](evidence/2026-07-29-milestone-d1-client-neutral-evaluation-contract.md)
 - [`2026-07-29 Milestone D.1 corpus-calibration contract`](evidence/2026-07-29-milestone-d1-corpus-calibration-contract.md)
+- [`2026-07-29 Milestone D.1 calibrated reference run`](evidence/2026-07-29-milestone-d1-calibrated-reference-run.md)
 - [`2026-07-29 Milestone D.1 harness implementation`](evidence/2026-07-29-milestone-d1-harness-implementation.md)
 - [`2026-07-29 Milestone D.1 product-proof contract workpad`](evidence/2026-07-29-milestone-d1-product-proof-contract.md)
 - [`2026-07-29 v1.11.0 release validation`](evidence/2026-07-29-v1.11.0-release-validation.md)

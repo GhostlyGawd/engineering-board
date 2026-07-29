@@ -15,8 +15,11 @@ source report — no new findings are smuggled in._
 > client. Live runs for other providers are optional replications. The first
 > Codex run gave both positive baseline and context arms a 100 percent rate.
 > Those cases are now a non-scored calibration set. The product owner accepted
-> a separate locked evidence corpus with scoring-oracle checks. Run the Codex
-> reference profile against that frozen corpus.
+> a separate locked evidence corpus with scoring-oracle checks. Its reference
+> run gave context a 100 percent rate and baseline an 83.33 percent rate. The
+> 16.67-point difference failed the required 25-point improvement gate. Keep
+> version 3 locked. Use the failed cases to design a new versioned baseline in
+> which only Engineering Board memory supplies the prior incident relationship.
 > Milestone E remains deferred. The priority lists below preserve the 2026-07-08
 > audit synthesis and are not the current product sequence.
 
