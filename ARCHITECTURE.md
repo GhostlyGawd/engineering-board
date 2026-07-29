@@ -2,20 +2,26 @@
 
 A complete structural map of the plugin: what every file does, how the pieces connect, and the lifecycle that ties them together. Companion to `README.md` (which is the install/usage surface).
 
-Current release line: **v1.10.0**. Canonical evidence, P### pattern
+Current release line: **v1.11.0**. Canonical evidence, P### pattern
 identity, H### hypotheses, and durable memory are repository-owned Markdown.
-`BOARD.md`, `GRAPH.yml`, HTML, and `.engineering-board/cache/` are derived or
-disposable views. Milestone C adds transparent cluster ranking, content-bound
-hypothesis preview/apply, rejected-claim memory, and a 17-tool MCP server over
-the same shared core. The optional TDD/review/validate loop remains supporting
-verification behavior. See `CHANGELOG.md` for release history and
+`BOARD.md`, `GRAPH.yml`, context briefs, value reports, HTML, and
+`.engineering-board/cache/` are derived or disposable views. Milestone D adds
+bounded contextual retrieval, explicit H### fix outcomes, outcome-aware L###
+confidence, and a 19-tool MCP server over the same shared core. The optional
+TDD/review/validate loop remains supporting verification behavior. See
+`CHANGELOG.md` for release history and
 `docs/PRODUCT_EVOLUTION_SPEC.md` for the authoritative product direction.
 
 ---
 
 ## 1. The 30-second mental model
 
-The plugin turns `engineering-board/<project>/` markdown into a **multi-agent autonomous build system** with three modes a session can run in:
+The plugin turns `engineering-board/<project>/` Markdown into a repository
+pattern-memory system. SessionStart and relevant prompts retrieve systemic
+memory before an agent selects a fix. Explicit fix outcomes improve later
+hypothesis and Learning memory.
+
+Three optional session modes control capture and work:
 
 | Mode | Set by | Stop hook dispatches | Purpose |
 |---|---|---|---|
@@ -39,18 +45,18 @@ engineering-board/
 ├── LICENSE                         # MIT
 ├── .mcp.json                       # Bundles the MCP server at the plugin root
 ├── agents/                         # 8 agent definitions (Claude Code subagents)
-├── commands/                       # 17 slash commands
+├── commands/                       # 21 slash commands
 ├── hooks/
 │   ├── hooks.json                  # 4 hook events wired
 │   ├── stop-hook-procedure.md      # Canonical Stop procedure (passive/PM/worker)
-│   └── scripts/                    # 27 bash + 4 python scripts (mutation, claims, graph/demo, audit, reject filter, HTML)
-├── mcp-server/                     # shared zero-dep core + 17-tool MCP adapter (stdio) + tests
+│   └── scripts/                    # 30 bash + 7 python scripts
+├── mcp-server/                     # shared zero-dep core + 19-tool MCP adapter (stdio) + tests
 ├── skills/                         # 5 Skills (intake, triage, resolve, consolidate, insights)
 ├── references/
 │   ├── auto-resolve-pass.md        # Shared protocol used by the 4 mutation skills
 │   ├── demo/                       # Contained synthetic pattern-intelligence fixture
 │   └── required-permissions.json   # Permission allowlist for board-install-permissions
-├── tests/                          # 16 run-all suites
+├── tests/                          # 18 run-all suites
 └── .omc/
     ├── plans/                      # Roadmap (v0.2.1 → v0.3.0 consensus plan)
     └── specs/                      # Deep-interview spec that fed the plan
@@ -88,10 +94,12 @@ The `needs:` state machine: `tdd → review → validate → resolved`. The Stop
 
 ---
 
-## 4. Commands (`commands/`): 19 total
+## 4. Commands (`commands/`): 21 total
 
 | Command | Group | Purpose |
 |---|---|---|
+| `/board-context <project> [options]` | Pattern intelligence | Retrieve a bounded brief of relevant clusters, H### hypotheses, negative memory, and L### Learnings. Each result exposes structural signals, score components, a reason, and canonical sources. Read-only. |
+| `/board-outcome <project> <action>` | Pattern intelligence | Preview/apply one explicit H### fix outcome, apply one returned L### plan, run the authorized Learning curator, or show the derived value report. |
 | `/board-demo [--run-id <id>]` | Pattern intelligence | Create a manifest-tracked synthetic run, build deterministic graph facts, invoke `board-insights` for one evidence-cited proposed hypothesis, render the evidence to cluster to hypothesis view, and report exact cleanup. No real board data or settings are changed. |
 | `/board-insights <project> [--cluster …] [--limit …]` | Pattern intelligence | Rank deterministic clusters with exposed score components and linked hypothesis and negative-memory references. Read-only. |
 | `/board-hypothesis <project> <action>` | Pattern intelligence | List H### records or preview/apply propose, evaluate, reopen, split, and merge operations with cited evidence and content-bound tokens. |
@@ -119,9 +127,9 @@ The `needs:` state machine: `tdd → review → validate → resolved`. The Stop
 ### `hooks.json`: 4 events wired
 | Event | Matcher | Script | Timeout | Purpose |
 |---|---|---|---|---|
-| `SessionStart` | `*` | `board-session-start.sh` | 10s | Surface open items, in-progress, blocked, systemic patterns, un-promoted scratch counts |
+| `SessionStart` | `*` | `board-session-start.sh` | 10s | Surface open state and at most three relevant systemic-memory results through the shared context core |
 | `PostToolUse` | `Write` | `board-validate-entry.sh` | 10s | Validate entry frontmatter + cross-check BOARD.md indexing on every Write to `engineering-board/.../*.md` (and the `docs/boards/.../*.md` compat path) |
-| `UserPromptSubmit` | `*` | `board-prompt-guard.sh` | 5s | If prompt matches debug/error/bug/crash keywords, inject system reminder that real-time routing is active |
+| `UserPromptSubmit` | `*` | `board-prompt-guard.sh` | 5s | For a relevant engineering-change prompt, inject at most three read-only context results and preserve the routing reminder |
 | `Stop` | `*` | `board-stop-gate.sh` (command) | 5s | Capture stdin to `.engineering-board/last-stop-stdin.json`. check `session-mode.json`. suppress prompt hook if paused or no board exists |
 
 The Stop hook's actual orchestration body (the `type: "prompt"` content) lives separately in `hooks/stop-hook-procedure.md`: a 184-line procedure the model reads and executes. Splitting prompt-shaped logic into a `.md` keeps `hooks.json` reviewable.
@@ -133,14 +141,18 @@ The Stop hook's actual orchestration body (the `type: "prompt"` content) lives s
 | `3-PM` | `mode: pm` | `finding-extractor` to `consolidator` to `tidier` to `learnings-curator` (4 Tasks) | `<<EB-PM-CONTINUE>>` / `<<EB-PM-FAIL>>` |
 | `3-WORKER` | `mode: worker, discipline: <d>` | claim-acquire script to one of `tdd-builder` / `code-reviewer` / `validator` to write back `needs:` to claim-release script | `<<EB-WORKER-CONTINUE>>` / `<<EB-WORKER-NOTHING-TO-DO>>` / `<<EB-WORKER-FAIL>>` |
 
-### `scripts/`: 28 bash scripts + 5 python modules
+### `scripts/`: 30 bash scripts + 7 python modules
 
 Board-location resolution lives in one place: **`board-paths.sh`** (sourced helper, not invoked directly) exposes `eb_router_path` / `eb_board_dirs` / `eb_board_rows`, implementing the `engineering-board/` to `docs/boards/` to legacy `docs/board/` resolution order. all consumers source it rather than re-hardcoding paths. **`board_reject_check.py`** is the single source of truth for the injection reject filter (imported by `board-consolidate.sh`, driven by `tests/security/reject-filter.sh`). **`board-relocate.sh`** backs `/board-migrate --relocate` (moves `docs/boards/<p>` to `engineering-board/<p>`).
 
 **Hook-triggered (4):**
-- `board-session-start.sh`: SessionStart. v0.3.0 also surfaces top medium/high-confidence learnings filtered by cwd against each learning's `applies_to` field.
+- `board-session-start.sh`: SessionStart. It sends bounded current-directory,
+  changed-file, and active-entry signals to `board-context.py`. Retrieval is
+  read-only and has a 3.8-second internal deadline.
 - `board-validate-entry.sh`: PostToolUse(Write). v0.3.0 validates `learnings/*.md` against the Learning schema.
-- `board-prompt-guard.sh`: UserPromptSubmit
+- `board-prompt-guard.sh`: UserPromptSubmit. It is silent for unrelated
+  prompts. It truncates relevant prompt text to 4,000 characters, treats each
+  result as untrusted data, and uses the same context deadline.
 - `board-stop-gate.sh`: Stop
 
 **Procedure-invoked from `stop-hook-procedure.md` (7):**
@@ -160,7 +172,7 @@ Board-location resolution lives in one place: **`board-paths.sh`** (sourced help
 **Mode-transition decision (1): v0.3.1:**
 - `board-mode-guard.sh <pm|worker|paused|resumed> [--discipline <d>]`: deterministic enforcement of the §11.5 refusal matrix. Reads `session-mode.json`, decides `0=ALLOW / 2=NOOP / 3=REFUSE`, prints canonical user-facing message (NOOP/REFUSE) or key=value decision payload (ALLOW) for the calling command to read back. Invoked by `/pm-start`, `/worker-start`, `/board-pause`, `/board-resume` before each writes state.
 
-**Operator/CI invoked (5):**
+**Operator/CI invoked:**
 - `board-audit-scratch.sh`: completeness audit: every scratch_id must have a `consolidation.log` disposition
 - `board-index-check.sh`: invariant: `BOARD.md` row count == `{bugs,features,questions,observations,learnings}/*.md` file count
 - `board-permission-self-check.sh`: compare `references/required-permissions.json` against `~/.claude/settings.json`
@@ -174,6 +186,10 @@ Board-location resolution lives in one place: **`board-paths.sh`** (sourced help
 - `board-intake.py` / `board-intake.sh`: foreground promotion and P### pattern preview/apply adapters.
 - `board-insights.py` / `board-insights.sh`: deterministic cluster ranking
   plus content-bound H### lifecycle adapters over the shared core.
+- `board-context.py` / `board-context.sh`: bounded contextual-retrieval and
+  value-report adapters over the shared core.
+- `board-outcome.py` / `board-outcome.sh`: explicit H### fix-outcome,
+  outcome-aware L### feedback, curator, and value-report adapters.
 
 ---
 
@@ -187,7 +203,7 @@ Each is a Claude Code Skill (`SKILL.md` with name + description frontmatter). Sk
 | `board-triage` | "what is next", "what should I work on" | identify project to read state to auto-resolve (full) to apply 5 triage rules to surface clusters to output sequence to mark `in_progress` | optional `status: in_progress` |
 | `board-resolve` | "close this", "mark resolved", "question answered" | (bug/feature) verify done-when to set resolved to ARCHIVE to `/board-rebuild` to auto-resolve cascade. (question) write Finding FIRST to set resolved to unblock dependents to auto-resolve cascade to triage. (observation) set resolved to ARCHIVE to `/board-rebuild` to auto-resolve cascade | entry + ARCHIVE.md + dependent unblocks |
 | `board-consolidate` | "consolidate the board", "promote scratch". also implicit on PM Stop | enumerate `_sessions/*.md` to re-apply reject rules to anchor verify to supersession detect to promote survivors to GC scratch to auto-resolve | new live entries + BOARD.md + ARCHIVE.md + `consolidation.log` + scratch archives |
-| `board-insights` | `/board-insights`, `/board-hypothesis`, or `/board-demo` supplies completed deterministic cluster facts | treat evidence as untrusted data to cite every cluster member to state one candidate cause to include alternatives, counter-evidence, confidence basis, and falsifier to return strict JSON | no direct writes. the shared core validates preview/apply and only explicit cited evaluation changes state |
+| `board-insights` | Context retrieval, `/board-insights`, `/board-hypothesis`, or `/board-demo` supplies deterministic cluster facts | Start with bounded context. Treat evidence as untrusted data. Cite cluster members. State one candidate cause, alternatives, counter-evidence, confidence basis, and a falsifier. | Context and interpretation are read-only. Shared-core preview/apply controls H### and outcome writes. |
 
 The four mutation skills end by invoking `references/auto-resolve-pass.md` with
 different scope modes (`focused` / `full` / `cascade`). `board-insights` is
@@ -238,10 +254,43 @@ repository-local lock and atomically writes one canonical Markdown record.
 Rejected claim fingerprints remain negative memory. Reopen requires retained
 evidence and at least one new current-cluster evidence ID.
 
+### Context and outcome memory loop
+
+```text
+task + changed paths + selected entries
+  → shared deterministic context ranking
+  → at most three automatic results, or an explicit bounded brief
+  → agent investigates cited systemic memory
+  → verification produces an explicit fix result
+  → content-bound H### outcome apply
+  → separate content-bound L### Learning feedback
+  → later retrieval uses the revised outcome state
+```
+
+Context eligibility requires a structural signal from a canonical pattern,
+affected-path overlap, or graph proximity. Task-term overlap cannot make a
+result eligible by itself. Each result exposes its five score components.
+
+Context reads do not write canonical state. A context token records the memory
+source and result identifiers. It does not grant mutation authority.
+
+An outcome preview validates the entry, H### relation, cited evidence, result
+and disposition compatibility, observation date, and optional context token.
+Apply revalidates the same request before and after it acquires the H### lock.
+It atomically appends one structured event to H### outcome history.
+
+Learning feedback is a separate one-file preview/apply operation. `held`
+supports memory. `failed` weakens memory. Mixed or partial results contest
+memory. No applicable result leaves memory untested. Recurrence can increase
+confidence only within that outcome state.
+
+The value report reads canonical H### outcome history and L### outcome fields.
+It does not count prompts, sessions, searches, or other activity.
+
 ### Default session (passive)
 ```
-SessionStart   → board-session-start.sh prints board snapshot + scratch counts
-UserPrompt     → board-prompt-guard.sh maybe injects routing reminder
+SessionStart   → board-session-start.sh prints board snapshot + bounded context
+UserPrompt     → board-prompt-guard.sh maybe injects bounded context + reminder
 [ conversation ]
 PostToolUse W. → board-validate-entry.sh on every Write to engineering-board/ (or docs/boards/ compat)
 Stop           → board-stop-gate.sh saves stdin, checks mode (paused? no-board?)

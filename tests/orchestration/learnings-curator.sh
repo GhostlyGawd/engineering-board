@@ -8,7 +8,7 @@
 #   3. Plant 1 OPEN entry with the shared tag → not counted in recurrence.
 #   4. Idempotency: re-run produces byte-identical learnings/.
 #   5. Update path: add a 4th source, recurrence and derived_from advance.
-#   6. Confidence ladder: recurrence ≥ 5 → confidence=high.
+#   6. Untested recurrence remains medium without a held fix outcome.
 #   7. Below-threshold tag is reported in `skipped`.
 
 set -euo pipefail
@@ -139,11 +139,11 @@ UPDATED3="$(echo "$OUT3" | python3 -c "import json, sys; print(len(json.load(sys
 NEW_REC="$(grep "^recurrence:" "$LEARNING_FILE" | awk '{print $2}')"
 [ "$NEW_REC" = "4" ] && report 0 "Recurrence advances to 4" || report 1 "Recurrence advances to 4" "got $NEW_REC"
 
-# 6. Confidence ladder: add 5th source → high.
+# 6. Recurrence alone does not create high confidence.
 plant_resolved_bug "B007" "shared" "2026-05-07"
 bash "$CURATOR" "$BOARD_DIR" >/dev/null
 NEW_CONF="$(grep "^confidence:" "$LEARNING_FILE" | awk '{print $2}')"
-[ "$NEW_CONF" = "high" ] && report 0 "Confidence advances to high at recurrence=5" || report 1 "Confidence advances to high at recurrence=5" "got $NEW_CONF"
+[ "$NEW_CONF" = "medium" ] && report 0 "Untested confidence stays medium at recurrence=5" || report 1 "Untested confidence stays medium at recurrence=5" "got $NEW_CONF"
 
 echo ""
 echo "learnings-curator: $PASS pass, $FAIL fail"

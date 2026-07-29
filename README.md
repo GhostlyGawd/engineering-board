@@ -33,6 +33,10 @@ _This visual shows real deterministic fixture output for the pattern pipeline._
 
 _This visual shows real deterministic fixture output for root-cause memory._
 
+<img src="docs/assets/milestone-d-context-outcome-intelligence.svg" alt="The Milestone D validation shows context retrieval, explicit fix outcomes, and outcome-aware Learning confidence." width="720">
+
+_This visual shows the tested context-to-outcome memory loop._
+
 <img src="docs/assets/board-screenshot.png" alt="The repository board has search, filters, and four Kanban columns." width="720">
 
 _This repository uses its own Engineering Board._
@@ -69,6 +73,18 @@ Milestone C adds:
 - Negative memory for a rejected claim.
 
 Each score component is visible. A score does not prove that a cause is true.
+
+Milestone D puts this memory in the agent's decision path:
+
+- `board_context` retrieves relevant clusters, hypotheses, negative memory, and
+  Learnings before the agent selects a fix.
+- Each result shows the structural signals, score components, reason, state,
+  and canonical sources.
+- `board_outcomes` records an explicit fix result against an H### hypothesis.
+- Structured outcomes update Learning state and confidence through a separate
+  preview and apply operation.
+- A derived value report counts verified reuse and systemic fix evidence. It
+  does not count prompts, sessions, or other activity.
 
 ## Product differences
 
@@ -146,18 +162,28 @@ For explicit setup values, use:
 ## Use the pattern-memory workflow
 
 1. Work in Claude Code.
-2. Let the Stop hook capture a finding in `engineering-board/<project>/_sessions/`.
-3. Run `/board-promote` to preview canonical changes.
-4. Apply the unchanged promotion plan after you review it.
-5. Run `/board-insights <project>` to rank systemic investigations.
-6. Run `/board-view` to open the pattern-intelligence view.
-7. Run `/board-hypothesis <project> propose` to preview an H### record.
-8. Review the evidence, alternative, counter-evidence, confidence basis, and falsifier.
-9. Apply the unchanged hypothesis plan.
-10. Evaluate the hypothesis only with cited evidence.
+2. Let SessionStart and UserPromptSubmit retrieve relevant systemic memory.
+3. Run `/board-context <project>` when you want the same bounded brief
+   explicitly.
+4. Investigate the cited cluster, hypothesis, negative memory, or Learning
+   before you select a local fix.
+5. Let the Stop hook capture a finding in
+   `engineering-board/<project>/_sessions/`.
+6. Run `/board-promote` to preview canonical changes.
+7. Apply the unchanged promotion plan after you review it.
+8. Run `/board-insights <project>` when you need the complete ranked
+   investigation view.
+9. Run `/board-hypothesis <project> propose` to preview an H### record.
+10. Review the evidence, alternative, counter-evidence, confidence basis, and
+    falsifier.
+11. Apply the unchanged hypothesis plan.
+12. After verification, run `/board-outcome <project> preview ...`.
+13. Apply the unchanged outcome plan. Review and apply each returned Learning
+    plan separately.
 
-An evaluation can confirm, weaken, reject, reopen, split, or merge a
-hypothesis.
+An outcome records `held`, `failed`, `partial`, or `inconclusive`. It can
+confirm, weaken, reject, or leave a hypothesis unchanged only through a
+compatible explicit disposition.
 
 Use `/pm-start` only for advanced batch promotion. Use the optional Worker loop
 only when you want to test a selected fix.
@@ -225,12 +251,12 @@ The plugin has four session modes:
 The canonical Stop procedure is
 [`hooks/stop-hook-procedure.md`](hooks/stop-hook-procedure.md).
 
-**Commands (19):** `/board-setup`, `/board-demo`, `/board-promote`,
-`/board-pattern`, `/board-insights`, `/board-hypothesis`, `/board-run`,
-`/board-init`, `/board-rebuild`, `/board-graph`, `/board-view`,
-`/board-remember`, `/board-pause`, `/board-resume`, `/pm-start`,
-`/worker-start`, `/board-install-permissions`, `/board-claim-release`, and
-`/board-migrate`.
+**Commands (21):** `/board-setup`, `/board-demo`, `/board-context`,
+`/board-outcome`, `/board-promote`, `/board-pattern`, `/board-insights`,
+`/board-hypothesis`, `/board-run`, `/board-init`, `/board-rebuild`,
+`/board-graph`, `/board-view`, `/board-remember`, `/board-pause`,
+`/board-resume`, `/pm-start`, `/worker-start`,
+`/board-install-permissions`, `/board-claim-release`, and `/board-migrate`.
 
 **Agents (8):** `board-manager`, `finding-extractor`, `consolidator`, `tidier`,
 `learnings-curator`, `tdd-builder`, `code-reviewer`, and `validator`.
@@ -241,7 +267,7 @@ The canonical Stop procedure is
 **Hooks (4 events):** `SessionStart`, `PostToolUse(Write)`,
 `UserPromptSubmit`, and `Stop`.
 
-The MCP server has 17 tools. All tools use the same canonical Markdown and the
+The MCP server has 19 tools. All tools use the same canonical Markdown and the
 same deterministic core.
 
 | Tool | Function |
@@ -253,8 +279,10 @@ same deterministic core.
 | `board_get_entry` | Get one entry |
 | `board_update_entry` | Change one entry |
 | `board_graph` | Build the deterministic graph |
+| `board_context` | Retrieve bounded and explainable systemic memory |
 | `board_insights` | Rank clusters and return linked evidence |
 | `board_hypotheses` | List, preview, or apply H### operations |
+| `board_outcomes` | Preview or apply fix outcomes and Learning feedback |
 | `board_patterns` | List, preview, or apply P### operations |
 | `board_promote_findings` | Preview or apply scratch promotion |
 | `board_rebuild` | Build `BOARD.md` again |
@@ -266,8 +294,9 @@ same deterministic core.
 
 ## Architecture boundary
 
-Canonical cards, hypotheses, learnings, and `BOARD-ROUTER.md` use Markdown.
-Derived views include `BOARD.md`, `GRAPH.yml`, JSON, and HTML.
+Canonical cards, hypotheses, Learnings, and `BOARD-ROUTER.md` use Markdown.
+Derived views include `BOARD.md`, `GRAPH.yml`, context briefs, value reports,
+JSON, and HTML.
 
 The product does not require SQLite. A future SQLite index must be disposable
 and rebuildable. Measured query requirements must justify it.
@@ -279,7 +308,7 @@ Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full system map.
 
 ## Roadmap boundary
 
-Milestone C shipped in v1.10.0.
+Milestone D ships in v1.11.0.
 
 The cross-session Conductor remains a draft RFC. `/board-run <entry-id>` ships
 only the single-session inner loop.
@@ -298,7 +327,7 @@ Run the complete test suite:
 bash tests/run-all.sh
 ```
 
-The suite contains 16 test areas. Read
+The suite contains 18 test areas. Read
 [`CONTRIBUTING.md`](CONTRIBUTING.md) before you change the repository.
 
 ## Support

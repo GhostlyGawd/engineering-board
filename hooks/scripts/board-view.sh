@@ -332,8 +332,11 @@ def esc(s):
 
 def intelligence_panel_html():
     try:
-        from engineering_board_core import build_insights, load_hypothesis_registry
+        from engineering_board_core import (
+            build_insights, build_value_report, load_hypothesis_registry,
+        )
         insights = build_insights(Path(board_dir), label, limit=5)
+        value_report = build_value_report(Path(board_dir), label)
         registry = load_hypothesis_registry(Path(board_dir))
     except Exception as exc:
         return (
@@ -366,6 +369,15 @@ def intelligence_panel_html():
             state = str(ref.get("status", "unknown"))
             stale = bool(ref.get("stale"))
             stale_badge = '<span class="hstate stale">stale binding</span>' if stale else ""
+            outcome_count = sections.get("Outcome history", "").count(
+                "- outcome-json: "
+            )
+            outcome_badge = (
+                f'<span class="hstate">{outcome_count} fix outcome'
+                f'{"s" if outcome_count != 1 else ""}</span>'
+                if outcome_count
+                else ""
+            )
             alternatives = [
                 line[2:].strip()
                 for line in sections.get("Alternative explanations", "").splitlines()
@@ -378,7 +390,7 @@ def intelligence_panel_html():
                 f'<article class="hypothesis-card state-{esc(state)}">'
                 f'<div class="hypothesis-top"><a class="cid" href="{esc(LINK_BASE + source)}">'
                 f'{esc(ref.get("id"))}</a><span class="hstate">{esc(state)}</span>'
-                f'{stale_badge}</div>'
+                f'{stale_badge}{outcome_badge}</div>'
                 f'<h4>{esc(frontmatter.get("title"))}</h4>'
                 f'<p>{esc(sections.get("Proposed root cause"))}</p>'
                 f'<details><summary>Evidence and tests</summary>'
@@ -417,6 +429,11 @@ def intelligence_panel_html():
         '<h2>Ranked systemic investigations</h2></div>'
         f'<span class="rule">rule v{esc(insights.get("ranking_rule_version"))}'
         ' · score is not confidence</span></div>'
+        '<div class="value-strip">'
+        f'<span><strong>{esc(value_report.get("useful_resurfacing_events"))}</strong> useful resurfacing</span>'
+        f'<span><strong>{esc(value_report.get("confirmed_systemic_fixes"))}</strong> confirmed systemic fixes</span>'
+        f'<span><strong>{esc(value_report.get("hypotheses_with_structured_outcomes"))}</strong> hypotheses with outcomes</span>'
+        '</div>'
         f'<div class="cluster-grid">{body}</div></section>'
     )
 
@@ -493,6 +510,10 @@ def learning_card_html(e):
     )
     rec = str(e.get("recurrence", "")).strip()
     rec_badge = f'<span class="rec">×{esc(rec)}</span>' if rec.isdigit() and int(rec) else ""
+    outcome = str(e.get("outcome_status", "untested")).strip().lower()
+    outcome_badge = f'<span class="rec">{esc(outcome)}</span>'
+    basis = str(e.get("confidence_basis", "")).strip()
+    basis_html = f'<div class="lbasis">{esc(basis)}</div>' if basis else ""
     applies = ", ".join(parse_list(e.get("applies_to", "")))
     applies_html = f'<div class="lapplies">applies to: {esc(applies)}</div>' if applies else ""
     # Learnings tag their pattern via `pattern_tag` (single) and/or `pattern` (list).
@@ -506,9 +527,9 @@ def learning_card_html(e):
     lcid_html = f'<a class="cid" href="{lhref}">{lcid}</a>' if lhref else f'<span class="cid">{lcid}</span>'
     return (
         f'<div class="lcard"{data_attrs(e)}>'
-        f'<div class="lhead">{lcid_html}{conf_badge}{rec_badge}</div>'
+        f'<div class="lhead">{lcid_html}{conf_badge}{rec_badge}{outcome_badge}</div>'
         f'<div class="ltitle">{esc(e.get("title"))}</div>'
-        f'{applies_html}{tags_html}'
+        f'{basis_html}{applies_html}{tags_html}'
         f'</div>'
     )
 
@@ -780,6 +801,7 @@ details.more>summary:hover{color:var(--eb-accent-cur)}
 .conf{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);text-transform:uppercase;letter-spacing:.05em;padding:.05rem .3rem;border-radius:3px;border:1px solid var(--eb-border);color:var(--eb-text-muted)}
 .conf.high{color:var(--eb-accent-cur);border-color:var(--eb-accent-cur)}
 .rec{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
+.lbasis{margin-top:.3rem;font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
 .lapplies{margin-top:.3rem;font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
 footer{max-width:80rem;margin:0 auto;color:var(--eb-text-muted);font-size:.72rem;font-family:var(--eb-font-mono);text-align:center}
 /* C4 — search + filter controls. Shipped `hidden`; the embedded JS un-hides
@@ -819,6 +841,9 @@ footer{max-width:80rem;margin:0 auto;color:var(--eb-text-muted);font-size:.72rem
 .intel-head h2{font-size:var(--eb-fs-md);margin:.15rem 0 .8rem}
 .eyebrow,.rule{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);text-transform:uppercase;letter-spacing:.08em;color:var(--eb-accent-cur)}
 .rule{color:var(--eb-text-muted);text-transform:none;letter-spacing:0}
+.value-strip{display:flex;flex-wrap:wrap;gap:.45rem;margin:0 0 .7rem}
+.value-strip span{font-size:var(--eb-fs-xs);color:var(--eb-text-muted);border:1px solid var(--eb-border);border-radius:999px;padding:.15rem .5rem}
+.value-strip strong{color:var(--eb-text);font-family:var(--eb-font-mono)}
 .cluster-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));gap:.65rem}
 .cluster-card{background:var(--eb-card);border:1px solid var(--eb-border);border-radius:9px;padding:.75rem;min-width:0}
 .cluster-id{font-family:var(--eb-font-mono);font-weight:700;margin-right:.4rem}.cluster-card code{font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}

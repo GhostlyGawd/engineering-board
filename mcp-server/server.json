@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
   "name": "io.github.GhostlyGawd/engineering-board",
-  "description": "Repository-owned engineering pattern intelligence - 17 MCP tools over stdio.",
+  "description": "Repository-owned engineering pattern intelligence - 19 MCP tools over stdio.",
   "repository": {
     "url": "https://github.com/GhostlyGawd/engineering-board",
     "source": "github"

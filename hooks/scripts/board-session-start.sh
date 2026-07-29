@@ -109,6 +109,67 @@ for i in "${!BOARD_PATHS[@]}"; do
     echo ""
   fi
 
+  # Milestone D — retrieve bounded systemic memory before the agent chooses
+  # work. The shared core owns ranking. This adapter supplies only repository
+  # context and formats typed facts.
+  context_args=(
+    --board-dir "${BOARD_DIR}"
+    --project "${LABEL}"
+    --cwd "${PWD}"
+    --limit 3
+  )
+  context_root="${CLAUDE_PROJECT_DIR:-$PWD}"
+  while IFS= read -r -d '' changed_path; do
+    context_args+=(--file "${changed_path}")
+  done < <(
+    {
+      git -C "${context_root}" diff --name-only -z 2>/dev/null || true
+      git -C "${context_root}" diff --cached --name-only -z 2>/dev/null || true
+      git -C "${context_root}" ls-files --others --exclude-standard -z 2>/dev/null || true
+    } | python3 -c '
+import sys
+paths = sorted({p for p in sys.stdin.buffer.read().split(b"\0") if p})
+sys.stdout.buffer.write(b"\0".join(paths[:100]) + (b"\0" if paths else b""))
+'
+  )
+  while IFS= read -r active_id; do
+    [ -n "${active_id}" ] && context_args+=(--entry "${active_id}")
+  done < <(
+    if [ -n "${in_progress_files}" ]; then
+      while IFS= read -r active_file; do
+        grep "^id:" "${active_file}" 2>/dev/null | awk '{print $2}' || true
+      done <<< "${in_progress_files}"
+    fi
+  )
+  context_json=""
+  if context_json="$(
+    "${EB_SCRIPT_DIR}/board-context.sh" \
+      "${context_args[@]}" --deadline-seconds 3.8 2>/dev/null
+  )"; then
+    context_output="$(
+      printf '%s' "${context_json}" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+for warning in d.get("warnings", []):
+    print(f"  CONTEXT WARNING — {warning}")
+results = d.get("results", [])
+if results:
+    print("  SYSTEMIC MEMORY — review before choosing a local fix:")
+for item in results:
+    print(f"    - {item.get('\''id'\'')} [{item.get('\''status'\'')}] score {item.get('\''score'\'')}: {item.get('\''why'\'')}")
+    sources = ", ".join(item.get("source_refs", [])[:4])
+    if sources:
+        print(f"      sources: {sources}")
+' 2>/dev/null || true
+    )"
+    if [ -n "${context_output}" ]; then
+      printf '%s\n\n' "${context_output}"
+    fi
+  else
+    echo "  CONTEXT WARNING — systemic memory retrieval was unavailable or exceeded 4 seconds."
+    echo ""
+  fi
+
   # Live dependency map — single python3 pass over entry frontmatter.
   # The prior shell loop ran a full-tree `grep -rl` for EACH unique blocked_by
   # line, i.e. O(unique_blockers x files); on a mature board (~1000+ entries
@@ -159,17 +220,6 @@ PY
     echo ""
   fi
 
-  # Systemic pattern clusters — warn if any pattern appears 3+ times in open entries
-  pattern_clusters=$(grep -r "^pattern:" "${BOARD_DIR}/bugs/" "${BOARD_DIR}/features/" \
-    --include="*.md" -h 2>/dev/null \
-    | sed 's/^pattern: *//' | tr -d '[]' | tr ',' '\n' | tr -d ' ' | grep -v '^$' \
-    | sort | uniq -c | sort -rn | awk '$1 >= 3 {print "    " $1 "x " $2}' || true)
-  if [ -n "${pattern_clusters}" ]; then
-    echo "  SYSTEMIC PATTERNS (3+ open entries) — investigate root cause before fixing individually:"
-    echo "${pattern_clusters}"
-    echo ""
-  fi
-
   # Un-promoted scratch entries from prior interrupted sessions (v0.2.1)
   SCRATCH_DIR="${BOARD_DIR}/_sessions"
   if [ -d "${SCRATCH_DIR}" ]; then
@@ -190,82 +240,6 @@ PY
     fi
   fi
 
-  # v0.3.0 — Surface top learnings (by confidence then recurrence) filtered by
-  # cwd affects-prefix. Shows up to 3 entries; no output if learnings/ is
-  # empty or no high/medium-confidence matches exist.
-  LEARNINGS_DIR="${BOARD_DIR}/learnings"
-  if [ -d "${LEARNINGS_DIR}" ]; then
-    learnings_output="$(python3 - "${LEARNINGS_DIR}" "${PWD}" <<'PY' 2>/dev/null || true
-import os, re, sys
-
-learnings_dir, cwd = sys.argv[1], sys.argv[2]
-cwd_lower = cwd.lower()
-FM = re.compile(r"^---\s*\n(.*?)\n---", re.S)
-
-def parse_fm(t):
-    m = FM.match(t)
-    if not m: return {}
-    out = {}
-    for line in m.group(1).splitlines():
-        if ":" in line:
-            k, v = line.split(":", 1)
-            out[k.strip()] = v.strip()
-    return out
-
-def parse_list(v):
-    if not v: return []
-    v = v.strip()
-    if v.startswith("[") and v.endswith("]"):
-        inner = v[1:-1].strip()
-        if not inner: return []
-        return [t.strip().strip("'\"") for t in inner.split(",") if t.strip()]
-    return [v]
-
-CONF_RANK = {"high": 3, "medium": 2, "low": 1}
-
-entries = []
-try:
-    for fn in sorted(os.listdir(learnings_dir)):
-        if not fn.endswith(".md") or fn.startswith("."): continue
-        p = os.path.join(learnings_dir, fn)
-        try:
-            with open(p, "r", encoding="utf-8", errors="replace") as f:
-                text = f.read()
-        except Exception:
-            continue
-        fm = parse_fm(text)
-        if fm.get("status") == "resolved": continue
-        conf = fm.get("confidence", "low")
-        if CONF_RANK.get(conf, 0) < 2: continue  # only medium+
-        applies = parse_list(fm.get("applies_to", ""))
-        # If applies_to is set, require at least one entry to be a substring of cwd.
-        if applies:
-            match = any(a and a.lower() in cwd_lower for a in applies)
-            if not match: continue
-        try:
-            rec = int(fm.get("recurrence", "0"))
-        except Exception:
-            rec = 0
-        entries.append({
-            "id": fm.get("id", ""),
-            "title": fm.get("title", ""),
-            "confidence": conf,
-            "recurrence": rec,
-        })
-except Exception:
-    pass
-
-entries.sort(key=lambda e: (-CONF_RANK.get(e["confidence"], 0), -e["recurrence"], e["id"]))
-for e in entries[:3]:
-    print(f"    {e['id']} [{e['confidence']} / x{e['recurrence']}] {e['title']}")
-PY
-)"
-    if [ -n "${learnings_output}" ]; then
-      echo "  LEARNINGS — relevant patterns from past resolutions:"
-      printf '%s\n' "${learnings_output}"
-      echo ""
-    fi
-  fi
 done
 
 # Reads as status to the user while still carrying the routing instruction the

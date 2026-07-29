@@ -77,7 +77,17 @@ EOF
   printf 'id: F001\ntitle: keep me too\n' > "$root/docs/boards/beta/features/F001-y.md"
 }
 
-git_init() { ( cd "$1" && git init -q && git add -A && git -c commit.gpgsign=false -c user.email=t@t -c user.name=t commit -qm init ); }
+git_init() {
+  (
+    cd "$1"
+    git init -q
+    git add -A
+    git -c commit.gpgsign=false \
+      -c user.email=141867403+GhostlyGawd@users.noreply.github.com \
+      -c user.name=GhostlyGawd \
+      commit -qm init
+  )
+}
 
 # ── 1. Full relocate (git mv) ───────────────────────────────────────────────
 T1="$(mktmp)"; plant_boards "$T1"; git_init "$T1"

@@ -71,12 +71,29 @@ Learnings are durable takeaways promoted from recurring patterns across resolved
 | `subtype` | Yes | `pattern`, `finding`, `principle` | `pattern` = recurring failure mode. `finding` = single-source insight. `principle` = synthesised heuristic |
 | `title` | Yes | One-line takeaway | Present-tense, declarative, no question marks |
 | `discovered` | Yes | `YYYY-MM-DD` | First date the underlying pattern was observed |
-| `confidence` | Yes | `low`, `medium`, `high` | Curator-assigned. high requires recurrence ≥ 3 |
+| `confidence` | Yes | `low`, `medium`, `high` | Derived from recurrence and structured fix outcomes for `subtype: pattern`. |
+| `confidence_basis` | Required for `subtype: pattern` | Short source statement | States the recurrence and outcome basis. |
 | `recurrence` | Yes | Integer ≥ 1 | Number of resolved entries this learning is derived from |
 | `derived_from` | Yes | `[B###, F###, ...]` | List of resolved entry IDs that surfaced this pattern |
 | `applies_to` | No | List of paths or component names | Where this learning is relevant. informs SessionStart filtering by cwd |
+| `pattern_ids` | Required for `subtype: pattern` | `[P###, ...]` | Canonical pattern identity. |
 | `pattern_tag` | No | kebab-case string | The original `pattern:` tag from `derived_from` entries, retained for cross-reference |
+| `outcome_status` | Required for `subtype: pattern` | `untested`, `supported`, `weakened`, `contested` | Derived only from structured H### fix outcomes. |
+| `outcome_refs` | Required for `subtype: pattern` | `[H###, ...]` | Hypotheses that contain the structured outcomes. |
 | `status` | No | `open`, `resolved` | Default omitted (active). `resolved` retires the learning from active surfacing |
+
+Pattern Learning confidence:
+
+| Outcome status | Recurrence | Confidence |
+|---|---:|---|
+| `supported` | 3 or more | `high` |
+| `supported` | 1-2 | `medium` |
+| `untested` | 3 or more | `medium` |
+| `untested` | 1-2 | `low` |
+| `weakened` or `contested` | any | `low` |
+
+An explicit `board_remember` Learning is not a curator-managed pattern
+Learning unless it is separately linked to a canonical pattern.
 
 ### Required Body Sections: Learning
 
