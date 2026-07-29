@@ -146,3 +146,28 @@ verification instead of substituting current source.
 - Terminal action: merge the validity repair, verify merged-main continuous
   integration, then run the 48 primary arms after Claude Code authentication.
 - Milestone action: keep Milestone D.1 open. Do not start Milestone E.
+
+## Merge closeout
+
+This section supersedes the pre-merge completion state above for the validity
+repair only.
+
+1. [PR #112](https://github.com/GhostlyGawd/engineering-board/pull/112)
+   merged the corrected harness and bounded compatibility evidence as
+   `8889f59e22f9eee5e9271def40aec3408e1217ca`.
+2. PR test run
+   [30430277993](https://github.com/GhostlyGawd/engineering-board/actions/runs/30430277993)
+   passed with the full-history checkout correction.
+3. Merged-main test run
+   [30430376308](https://github.com/GhostlyGawd/engineering-board/actions/runs/30430376308)
+   passed against the exact merge commit.
+
+Closeout state:
+
+- Completion state: `closeout`.
+- Completed gates: worker validation, PR validation, merge, and merged-main
+  validation.
+- External gates for this validity-repair closeout: none.
+- Terminal action: merge this evidence closeout after its PR test passes.
+- Remaining product gate: authenticate Claude Code and run the 48 primary
+  arms. Keep Milestone D.1 open. Do not start Milestone E.
