@@ -98,3 +98,30 @@ Evidence destination:
 Terminal action: merge the closeout evidence after all named gates pass. Keep
 the milestone open until that merge and its merged-main continuous integration
 complete.
+
+## Merge closeout
+
+This section supersedes the pre-merge completion state above.
+
+1. [PR 116](https://github.com/GhostlyGawd/engineering-board/pull/116)
+   merged the accepted version 3 corpus as
+   `c96831ec849638585c8859f686340e6c0a45c33b`.
+2. Merged-main test run
+   [30495451562](https://github.com/GhostlyGawd/engineering-board/actions/runs/30495451562)
+   passed against the corpus merge commit.
+3. [PR 117](https://github.com/GhostlyGawd/engineering-board/pull/117)
+   merged the calibrated reference evidence as
+   `c68b41aaa2fd378937684be08e97c44149416c73`.
+4. Merged-main test run
+   [30496784080](https://github.com/GhostlyGawd/engineering-board/actions/runs/30496784080)
+   passed against the evidence merge commit.
+
+Closeout state:
+
+- Completion state: `closeout`.
+- Completed gates: exact baseline approval, corpus merge, corpus merged-main
+  validation, 48-arm reference run, bounded review, evidence merge, and
+  evidence merged-main validation.
+- External gates for this corpus-calibration closeout: none.
+- Product result: fail. Preserve corpus version 3 and its observed result.
+- Milestone action: keep Milestone D.1 open. Keep Milestone E deferred.
