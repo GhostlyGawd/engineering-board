@@ -52,8 +52,13 @@ requirements consistent.
 - Python compatibility boundary: the harness uses the standard library and
   supports the declared Python 3.8 or later runtime.
 - Complete repository suite: PASS, 19 of 19 suites.
-- Pull-request and merged-main continuous integration: pending before
-  publication.
+- Implementation pull request: [#110](https://github.com/GhostlyGawd/engineering-board/pull/110).
+- Tested branch commit: `7858f97f7437dfd356f5811b68bbb2765562071c`.
+- Pull-request continuous integration: PASS. Both `run-all` checks passed.
+- Merged implementation commit:
+  `85c7ef1f7e0c7b45348cbff6e028b6f64862aafc`.
+- Merged-main continuous integration: PASS,
+  [tests run 30426727416](https://github.com/GhostlyGawd/engineering-board/actions/runs/30426727416).
 
 The focused tests verify the repository-owned harness contract. They do not
 validate a live Claude Code plugin run or a live Codex CLI MCP run. Those

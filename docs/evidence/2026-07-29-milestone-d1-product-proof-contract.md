@@ -93,6 +93,9 @@ Evidence collected on 2026-07-29:
 - `git diff --check` passed;
 - the focused harness suite passed all 13 tests;
 - the complete repository suite passed all 19 suites;
+- both pull-request `run-all` checks passed for branch commit `7858f97`;
+- pull request #110 merged as `85c7ef1`;
+- merged-main tests run 30426727416 passed;
 - the focused documentation-coherence check passed;
 - the workpad contains exactly one alignment table; and
 - the central specification contains all 22 checked requirement identifiers.
@@ -157,9 +160,9 @@ Reviewed and unaffected:
 ## Completion state
 
 ```text
-state: self-contained Milestone D.1 harness implementation
+state: Milestone D.1 harness merged and verified
 external_gate: none
 evidence_destination: docs/evidence/2026-07-29-milestone-d1-harness-implementation.md
-terminal_action: merge after continuous integration
+terminal_action: implementation complete; preserve the frozen baseline
 next_owner: authorize and run the dated paired product validation
 ```
