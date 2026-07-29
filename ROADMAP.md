@@ -10,10 +10,10 @@ source report — no new findings are smuggled in._
 > and historical-planning input; when it conflicts with a newer decision in the
 > product spec, the product spec wins.
 
-> **Current sequence (2026-07-29):** Milestone D.1 product proof and retrieval
-> calibration is next. Milestone E remains deferred. The priority lists below
-> preserve the 2026-07-08 audit synthesis and are not the current product
-> sequence.
+> **Current sequence (2026-07-29):** Milestone D.1 Gate 2 is accepted. The
+> evaluation harness, frozen corpus, and paired product-proof run are next.
+> Milestone E remains deferred. The priority lists below preserve the 2026-07-08
+> audit synthesis and are not the current product sequence.
 
 **Scope note:** this roadmap carries only the **open** work. Items already shipped
 are excluded (IMPROVEMENTS.md's 14 — built; the design batch's headline fixes —
