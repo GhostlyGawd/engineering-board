@@ -2,7 +2,7 @@
 
 Date: 2026-07-29
 
-State: Ready for product-owner baseline review.
+State: Product-owner baseline accepted.
 
 Completion state: `post-merge-pending`
 
@@ -18,8 +18,9 @@ Evidence corpus:
 Structured requirement digest:
 `sha256:482579893a8c16adf2e16e2cf06397895d71d49d514ca48961bef9e6b90e5c24`
 
-The deterministic requirement checks pass. The semantic reviews and
-product-owner baseline approval remain open.
+The structured requirement checker reports
+`BASELINED — AUTHORIZED APPROVAL RECORDED`. The product-owner approval matches
+the exact digest above.
 
 ## Product decision
 
@@ -57,11 +58,11 @@ embedding system, or Milestone E behavior is added.
 
 | Contract item | Normative level | Implementation | Test | Docs/example | Status |
 |---|---|---|---|---|---|
-| Calibration and evidence separation | Required | Schema 3 corpus roles and separate JSON files | Calibration corpus validates but scored preparation rejects it | Central spec, evaluation guide, README, roadmap, architecture | Implemented; approval pending |
-| Locked scored input | Required | `prepare_run` accepts only locked `evidence` role | Calibration rejection and normal preparation tests | Evaluation guide | Implemented; approval pending |
-| Positive-case information boundary | Required | Scoring-only information gap, plausible local correction, and oracle terms | Visible expected cause, memory ID, and oracle terms fail validation | Central spec and evidence corpus | Implemented; semantic review pending |
-| Negative-memory behavior | Required | Lexical decoys use misleading pattern labels and declared rejected memories | Frozen context must retrieve each rejected memory within the first three results | Central spec and corpus cases | Implemented |
-| Corpus identity and reproducibility | Required | Manifest records corpus ID, version, and digest | Preparation test inspects manifest metadata | Architecture and evaluation guide | Implemented |
+| Calibration and evidence separation | Required | Schema 3 corpus roles and separate JSON files | Calibration corpus validates but scored preparation rejects it | Central spec, evaluation guide, README, roadmap, architecture | Accepted |
+| Locked scored input | Required | `prepare_run` accepts only locked `evidence` role | Calibration rejection and normal preparation tests | Evaluation guide | Accepted |
+| Positive-case information boundary | Required | Scoring-only information gap, plausible local correction, and oracle terms | Visible expected cause, memory ID, and oracle terms fail validation | Central spec and evidence corpus | Accepted |
+| Negative-memory behavior | Required | Lexical decoys use misleading pattern labels and declared rejected memories | Frozen context must retrieve each rejected memory within the first three results | Central spec and corpus cases | Accepted |
+| Corpus identity and reproducibility | Required | Manifest records corpus ID, version, and digest | Preparation test inspects manifest metadata | Architecture and evaluation guide | Accepted |
 | Reference product-effect run | Required post-merge evidence | Codex reference profile, 24 pairs, 48 arms | Scorer gates and dated live evidence | Future closeout evidence | Pending accepted merge and live run |
 | Historical saturated run | Historical | Preserved without rewrite | Dated report remains unchanged | Calibration corpus and prior evidence | Preserved |
 | Runtime, plugin, MCP package, setup, security, privacy, visuals, versions, and releases | Reviewed and unaffected | Evaluation-only files do not enter shipped bundles or runtime paths | Existing release and runtime suites | Current product documentation retains existing runtime claims | Unaffected |
@@ -85,7 +86,7 @@ The post-merge Codex reference run must:
 
 External gates:
 
-- product-owner approval of the exact requirement digest;
+- product-owner approval of the exact requirement digest: satisfied;
 - pull-request continuous integration;
 - merged-main continuous integration;
 - completion of the Codex reference run;
