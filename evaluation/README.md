@@ -152,6 +152,9 @@ Codex run produced a 100 percent positive-case rate in both the baseline and
 context arms. Those cases now form the calibration corpus and cannot be used
 for a scored run. The locked evidence corpus withholds the prior cross-session
 or cross-domain relationship from agent-visible evidence. Its positive cases
-also record a plausible local correction in scoring-only data. The corpus has
-not completed a Codex reference run. Engineering Board does not yet claim that
-Milestone D context improves agent diagnoses.
+also record a plausible local correction in scoring-only data. The locked
+corpus reference run produced a 100 percent context rate and an 83.33 percent
+baseline rate. The 16.67-point improvement failed the required 25-point gate.
+Engineering Board does not claim that Milestone D context improves agent
+diagnoses. The active recommendation is to keep the current symptom visible
+while only Engineering Board memory supplies the prior incident relationship.

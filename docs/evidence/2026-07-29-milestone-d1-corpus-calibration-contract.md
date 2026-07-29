@@ -2,9 +2,9 @@
 
 Date: 2026-07-29
 
-State: Product-owner baseline accepted.
+State: Product-owner baseline accepted. Reference run complete.
 
-Completion state: `post-merge-pending`
+Completion state: `closeout-pending`
 
 Evidence corpus:
 
@@ -63,7 +63,7 @@ embedding system, or Milestone E behavior is added.
 | Positive-case information boundary | Required | Scoring-only information gap, plausible local correction, and oracle terms | Visible expected cause, memory ID, and oracle terms fail validation | Central spec and evidence corpus | Accepted |
 | Negative-memory behavior | Required | Lexical decoys use misleading pattern labels and declared rejected memories | Frozen context must retrieve each rejected memory within the first three results | Central spec and corpus cases | Accepted |
 | Corpus identity and reproducibility | Required | Manifest records corpus ID, version, and digest | Preparation test inspects manifest metadata | Architecture and evaluation guide | Accepted |
-| Reference product-effect run | Required post-merge evidence | Codex reference profile, 24 pairs, 48 arms | Scorer gates and dated live evidence | Future closeout evidence | Pending accepted merge and live run |
+| Reference product-effect run | Required post-merge evidence | Codex reference profile, 24 pairs, 48 arms | Scorer gates and dated live evidence | Calibrated reference-run evidence | Complete; improvement gate failed |
 | Historical saturated run | Historical | Preserved without rewrite | Dated report remains unchanged | Calibration corpus and prior evidence | Preserved |
 | Runtime, plugin, MCP package, setup, security, privacy, visuals, versions, and releases | Reviewed and unaffected | Evaluation-only files do not enter shipped bundles or runtime paths | Existing release and runtime suites | Current product documentation retains existing runtime claims | Unaffected |
 
@@ -87,9 +87,9 @@ The post-merge Codex reference run must:
 External gates:
 
 - product-owner approval of the exact requirement digest: satisfied;
-- pull-request continuous integration;
-- merged-main continuous integration;
-- completion of the Codex reference run;
+- pull-request continuous integration: satisfied for PR 116;
+- merged-main continuous integration: satisfied by run 30495451562;
+- completion of the Codex reference run: satisfied;
 - review and merge of dated closeout evidence.
 
 Evidence destination:
