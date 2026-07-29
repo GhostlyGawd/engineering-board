@@ -126,10 +126,10 @@ canonical storage boundary, and the optional Worker loop remain compatible.
 ## Current delivery state
 
 ```text
-state: worker validation complete; external delivery gates pending
+state: implementation and v1.11.0 publication complete; closeout pending
 branch: agent/milestone-d-intelligence
 baseline: becbb3eaf219c239fbd186c2f749f4067b06cb3e
 target_release: v1.11.0
-external_gate: PR CI, merged-main CI, publication, and closeout evidence
+external_gate: closeout evidence merge and continuous integration
 terminal_action: keep open
 ```

@@ -65,7 +65,7 @@ repository.
 | Security, failure, and performance | Accepted requirement | Existing path, parser, token, lock, atomic-write, and offline boundaries are extended to context and outcomes | Malformed input, unrelated prompt, hostile prompt, no-write, deadline, and 1,200-entry checks | SECURITY and architecture | Implemented and verified |
 | Current product documentation | Required current truth | Runtime behavior, schemas, commands, adapters, counts, and view are aligned | Documentation-coherence and full release-tree gates | README, product spec, commands, skills, MCP, architecture, security, landing, LLM guide, visual, and changelog | Updated for v1.11.0 |
 | Historical Milestone A-C evidence | Required preservation | No historical behavior or report change | Existing dated reports remain immutable observations | Historical reports remain unchanged | Reviewed and unaffected because contract acceptance does not revise shipped evidence |
-| Version, release, and publication | Required after implementation | The coordinated v1.11.0 release preparation updates all versioned surfaces and rebuilds the MCP bundle pin | Release preparation, full suite, PR CI, merged-main CI, publication, registry, PyPI, Pages, and closeout gates | Changelog, manifests, package files, README badge, and dated release evidence | In progress |
+| Version, release, and publication | Required after implementation | The coordinated v1.11.0 release updates all versioned surfaces and pins the rebuilt MCP bundle | Release preparation, full suite, PR CI, merged-main CI, publication, registry, PyPI, and Pages passed. Closeout CI remains. | Changelog, manifests, package files, README badge, and dated release evidence | Published; closeout pending |
 
 No required behavior conflict remains. The implementation follows the accepted
 section 20 authority and storage boundaries. Historical Milestone A-C reports
@@ -85,10 +85,11 @@ remain unchanged.
   guidance, visuals, and manifests.
 - [x] Worker: pass the complete 18-suite release tree.
 - [ ] Worker: pass pull-request continuous integration.
-- [ ] Post-merge: pass merged-main continuous integration.
-- [ ] Post-merge: build and publish the coordinated minor release.
-- [ ] Closeout: append external release evidence, merge it, pass closeout
-  continuous integration, and revalidate current GitHub state.
+- [x] Post-merge: pass merged-main continuous integration.
+- [x] Post-merge: build and publish the coordinated minor release.
+- [x] Closeout: append external release evidence.
+- [ ] Closeout: merge the evidence, pass closeout continuous integration, and
+  revalidate current GitHub state.
 
 ## Lifecycle evidence matrix
 
@@ -141,20 +142,20 @@ against the same content digest.
   workpad.
 - Owner gate: complete. The product owner approved section 20 on 2026-07-28.
 - Implementation phase: complete on `agent/milestone-d-intelligence`.
-- Post-merge and release phases: in progress. Their evidence destinations are
-  the Milestone D implementation and v1.11.0 release-validation reports.
+- Post-merge and release phases: complete. Closeout evidence is on its separate
+  delivery branch.
 
 PR completion state:
 
 ```text
-state: implementation and documentation aligned; external gates pending
+state: implementation and v1.11.0 publication complete; closeout gates pending
 external_gate: none
-evidence_destination: docs/evidence/2026-07-28-milestone-d-implementation-validation.md
-terminal_action: keep open through merge, publication, and closeout evidence
+evidence_destination: docs/evidence/2026-07-29-v1.11.0-release-validation.md
+terminal_action: merge closeout evidence and revalidate current state
 ```
 
 ## Current handoff
 
-The implementation must pass the complete release tree and PR continuous
-integration. It must then merge, publish v1.11.0, and add dated closeout
-evidence. Approval does not authorize an explicit non-goal in section 20.14.
+Milestone D and v1.11.0 are published. The closeout evidence must merge and
+pass continuous integration. Approval does not authorize an explicit non-goal
+in section 20.14.
