@@ -144,3 +144,28 @@ Remaining gates:
 
 Terminal action: merge this dated evidence and verify merged-main continuous
 integration.
+
+## Merge closeout
+
+This section supersedes the pre-merge completion state above.
+
+1. [PR 117](https://github.com/GhostlyGawd/engineering-board/pull/117)
+   merged the calibrated reference evidence as
+   `c68b41aaa2fd378937684be08e97c44149416c73`.
+2. Both PR test runs passed.
+3. Merged-main test run
+   [30496784080](https://github.com/GhostlyGawd/engineering-board/actions/runs/30496784080)
+   passed against the exact merge commit.
+
+Closeout state:
+
+- Completion state: `closeout`.
+- Completed gates: baseline approval, corpus merge, corpus merged-main
+  validation, reference run, bounded review, evidence merge, and evidence
+  merged-main validation.
+- External gates for this reference-run closeout: none.
+- Product result: the 16.67-point improvement failed the accepted 25-point
+  gate.
+- Milestone action: keep Milestone D.1 open. Keep Milestone E deferred.
+- Next direction: review a new versioned corpus proposal before accepting
+  another baseline.
