@@ -7,8 +7,8 @@
   correction.
 - Gate 1: accepted by the product owner on 2026-07-29.
 - Gate 2: accepted by the product owner on 2026-07-29.
-- Authorized next work: implement the repository-local evaluation harness,
-  frozen corpus, scoring tools, and dated evidence path.
+- Implemented work: repository-local evaluation harness, frozen corpus,
+  scoring tools, and dated evidence path.
 - Evaluated product: frozen Engineering Board v1.11.0 behavior. The dated run
   manifest must identify the exact source commit, clients, and models.
 - Canonical storage: repository-owned Markdown remains authoritative.
@@ -46,23 +46,23 @@ product adds another action layer.
 
 | Contract item | Normative level | Implementation | Test | Docs/example | Status |
 |---|---|---|---|---|---|
-| D.1 product question | Gate 1 accepted | No production behavior change | Paired product validation is required | Product spec sections 11 and 21 | Direction accepted |
-| Fixed evaluation corpus | Gate 2 accepted | Exactly eight sanitized cases: two recurring-bug, two cross-domain shared-cause, two lexical-decoy, and two independent-issue cases | Future schema, category, and case-integrity checks | Product spec sections 21.3, 21.4, and 21.7 | Implementation authorized |
-| Primary paired trials | Gate 2 accepted | Three independent paired repetitions for each case through the Claude Code plugin | Future controlled-input, isolation, count, and retry checks | Product spec sections 21.3-21.7 | Implementation authorized |
-| MCP compatibility trials | Gate 2 accepted | One paired repetition for each case through Codex CLI as an MCP client | Future protocol and evidence-parity checks | Product spec sections 21.4 and 21.7 | Implementation authorized |
-| Run controls | Gate 2 accepted | Each dated manifest pins source, client, model, instructions, tools, policy, and context; one bounded infrastructure replacement is permitted | Future manifest and invalid-attempt checks | Product spec sections 21.6-21.7 | Implementation authorized |
-| Product-effect threshold | Gate 2 accepted | Context arm must reach 75 percent and exceed baseline by 25 percentage points | Future aggregate scorer and preserved trial records | Product spec sections 21.4 and 21.7 | Implementation authorized |
-| Retrieval and false-positive gates | Gate 2 accepted | Positive claims require 100 percent canonical citation; expected memory must rank in the first three; decoy and independent cases allow zero durable systemic conclusions | Future retrieval, citation, decoy, and independent-case checks | Product spec sections 21.4, 21.5, and 21.7 | Implementation authorized |
-| Outcome-loop evidence | Gate 2 accepted | Before-and-after retrieval comparison remains required | Future outcome-loop fixture | Product spec sections 21.4-21.5 | Implementation authorized |
-| Baseline integrity | Gate 2 accepted | One frozen source commit for each evidence run | Future manifest and report inspection | Product spec section 21.6 | Implementation authorized |
-| Bounded reporting | Gate 2 accepted | Per-case evidence, limitations, failed cases, and no general productivity claim | Future report review | Product spec sections 21.5-21.9 | Implementation authorized |
+| D.1 product question | Gate 1 accepted | Harness implemented without a production behavior change | Live paired product validation remains required | Product spec sections 11 and 21 | Harness implemented; proof pending |
+| Fixed evaluation corpus | Gate 2 accepted | `evaluation/corpus.json` defines eight sanitized cases with two cases in each accepted category | Schema, allocation, semantic, evidence-path, and digest tests | Product spec sections 21.3, 21.4, and 21.7; evaluation guide | Implemented |
+| Primary paired trials | Gate 2 accepted | Planner creates three isolated baseline/context pairs for each case under the Claude Code plugin contract | Controlled-input, isolation, count, and retry tests | Product spec sections 21.3-21.7; evaluation guide | Planning and recording implemented; live trials pending |
+| MCP compatibility trials | Gate 2 accepted | Planner creates one isolated pair for each case under the Codex CLI MCP contract | Profile, count, and evidence-parity tests | Product spec sections 21.4 and 21.7; evaluation guide | Planning and recording implemented; live trials pending |
+| Run controls | Gate 2 accepted | Manifest pins source, client, model, instructions, tools, policy, and context; recorder permits one bounded infrastructure replacement | Manifest fingerprint, linked-path, input digest, retry, and replacement tests | Product spec sections 21.6-21.7; implementation evidence | Implemented |
+| Product-effect threshold | Gate 2 accepted | Twelve positive-case context trials must reach 75 percent and exceed the 12 positive-case baseline trials by 25 percentage points | Aggregate boundary scorer test and preserved records | Product spec sections 21.4 and 21.7; implementation evidence | Implemented; live proof pending |
+| Retrieval and false-positive gates | Gate 2 accepted | Positive claims require 100 percent canonical citation; expected memory must rank in the first three; decoy and independent cases allow zero durable systemic conclusions | Retrieval, citation, decoy, and independent-case scorer tests | Product spec sections 21.4, 21.5, and 21.7; implementation evidence | Implemented; live proof pending |
+| Outcome-loop evidence | Gate 2 accepted | Each context record preserves expected and observed outcome effects and rank changes | Outcome-loop schema and scorer tests | Product spec sections 21.4-21.5; implementation evidence | Implemented; live proof pending |
+| Baseline integrity | Gate 2 accepted | One frozen source commit and content fingerprints identify each run | Manifest and input-integrity tests | Product spec section 21.6; evaluation guide | Implemented |
+| Bounded reporting | Gate 2 accepted | JSON and Markdown reports contain per-case evidence, limitations, failed cases, and no general productivity claim | Bounded-report test | Product spec sections 21.5-21.9; implementation evidence | Implemented |
 | Milestone E sequencing | Accepted constraint | No Milestone E implementation before owner acceptance of D.1 evidence | Repository and GitHub history inspection | Product spec sections 11 and 21.8-21.9 | Deferred |
-| Current roadmap sequence | Required precedence clarity | No runtime behavior | Documentation inspection | ROADMAP current-sequence note points to the accepted D.1 contract | Documentation-only drift repaired |
-| Current runtime documentation | Required current truth | v1.11.0 behavior is unchanged | Existing 18-suite release tree remains the current runtime evidence | README, setup, commands, MCP, architecture, security, landing page, LLM guide, visuals, versions, and manifests | Reviewed and unaffected because this change authorizes evaluation work only |
+| Current roadmap sequence | Required precedence clarity | Harness implemented; live product validation is next | Documentation inspection | ROADMAP current-sequence note and central spec | Aligned |
+| Current runtime documentation | Required current truth | v1.11.0 plugin and MCP behavior is unchanged; repository tooling adds the harness | Harness suite and full release tree | README, architecture, security, changelog, evaluation guide, and evidence changed; setup, commands, MCP, landing page, LLM guide, visuals, versions, and manifests reviewed | Runtime surfaces unaffected; repository tooling aligned |
 | Historical Milestone A-D evidence | Required preservation | No historical behavior or evidence change | Existing dated evidence remains immutable | Historical reports | Reviewed and unaffected because they describe completed release boundaries |
 
-No required behavior conflict exists. This change accepts a product-validation
-contract. It does not advertise new runtime behavior.
+No required behavior conflict remains. This change implements product-validation
+tooling. It does not advertise a product effect or new runtime behavior.
 
 ## Requirement state
 
@@ -74,7 +74,7 @@ deterministic checker reports no `FAIL` result.
 
 ```text
 status: DRAFT — SOURCE OR DECISIONS INCOMPLETE
-content_digest: sha256:28728a96582a6a118647fb4680726b40f05eadf2f08b444bdd87e8988600e71f
+content_digest: sha256:1428c553a5490546d21f8a649d12f4ac5d823bf3d6bc6719a3d5ab4e641f2cfb
 deterministic_failures: 0
 ```
 
@@ -91,7 +91,8 @@ Evidence collected on 2026-07-29:
 - the structured requirements checker passed every deterministic check and
   reported the draft status and digest above;
 - `git diff --check` passed;
-- the full release-tree test command passed all 18 suites;
+- the focused harness suite passed all 13 tests;
+- the complete repository suite passed all 19 suites;
 - the focused documentation-coherence check passed;
 - the workpad contains exactly one alignment table; and
 - the central specification contains all 22 checked requirement identifiers.
@@ -109,8 +110,9 @@ paired evidence run must supply that proof.
 3. Use the Claude Code plugin as the primary client. Use Codex CLI as the MCP
    compatibility client. Pin exact client and model identifiers in dated run
    evidence.
-4. Require at least 75 percent systemic-before-local outcomes in the context
-   arm and at least a 25-percentage-point improvement over baseline.
+4. Apply the 75 percent rate and 25-percentage-point improvement to the 12
+   positive-case trials in each primary arm. Apply the separate zero-conclusion
+   gate to lexical-decoy and independent-issue cases.
 5. Require the expected relevant memory in the first three results and
    canonical citations for every positive classification.
 6. Permit zero durable systemic conclusions from lexical-decoy or
@@ -125,7 +127,7 @@ paired evidence run must supply that proof.
 - [x] Record Gate 2 acceptance.
 - [x] Run the deterministic requirements checker.
 - [x] Align the central spec, roadmap, and this workpad.
-- [ ] Implement the evaluation harness and frozen corpus.
+- [x] Implement the evaluation harness and frozen corpus.
 - [ ] Run paired product validation.
 - [ ] Publish dated results and calibration candidates.
 - [ ] Decide whether to calibrate Milestone D or begin a Milestone E contract.
@@ -136,22 +138,28 @@ Changed:
 
 - `docs/PRODUCT_EVOLUTION_SPEC.md`
 - `docs/evidence/2026-07-29-milestone-d1-product-proof-contract.md`
+- `docs/evidence/2026-07-29-milestone-d1-harness-implementation.md`
+- `evaluation/README.md`
+- `README.md`
+- `ARCHITECTURE.md`
+- `SECURITY.md`
+- `CHANGELOG.md`
 - `ROADMAP.md`
 
 Reviewed and unaffected:
 
-- README, setup, command, skill, MCP, architecture, security, privacy, visual,
-  version, manifest, and package surfaces because no runtime behavior, command,
-  interface, permission, security boundary, package, or release changed.
+- Setup, command, skill, MCP, landing-page, LLM-guide, visual, version,
+  manifest, permission, and package surfaces because the harness does not
+  change a runtime interface, permission, package, bundle, or release.
 - Historical Milestone A-D evidence because each report describes a dated
   completed state.
 
 ## Completion state
 
 ```text
-state: self-contained Gate 2 contract
+state: self-contained Milestone D.1 harness implementation
 external_gate: none
-evidence_destination: docs/evidence/2026-07-29-milestone-d1-product-proof-contract.md
+evidence_destination: docs/evidence/2026-07-29-milestone-d1-harness-implementation.md
 terminal_action: merge after continuous integration
-next_owner: implement the Milestone D.1 evaluation harness
+next_owner: authorize and run the dated paired product validation
 ```

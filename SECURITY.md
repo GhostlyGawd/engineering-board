@@ -58,6 +58,26 @@ the entry content for the applicable HTML context.
 The controls that follow add defense in depth. They do not replace the
 untrusted-data rule.
 
+## Protect evaluation evidence
+
+The `evaluation/` harness uses sanitized repository fixtures. It does not
+execute a live client and does not make a network request.
+
+Keep prepared run directories outside the source tree. Do not put raw prompts,
+credentials, private repository content, or unrelated user data in a run
+configuration or attempt record.
+
+The harness applies these controls:
+
+- It rejects absolute, parent-relative, and linked corpus evidence paths.
+- It rejects an existing or linked run output.
+- It fingerprints the run manifest and each trial input.
+- It creates attempt records with owner-only permissions.
+- It preserves infrastructure failures and blocks retries after a scored result.
+
+These controls protect evaluation integrity. They do not make an unsafe live
+
+client or unsafe case data acceptable.
 ## Filter and sanitize a promoted finding
 
 The promotion process sends each scratch finding to the deterministic reject
