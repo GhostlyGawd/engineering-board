@@ -1,8 +1,10 @@
 # Milestone D.1 evaluation harness
 
 This repository-only harness prepares and scores the accepted Milestone D.1
-product-proof trials. It keeps a development calibration corpus separate from
-the locked evidence corpus. It loads the product core from the pinned Git
+product-proof trials. It keeps a development calibration corpus and an
+unlocked proposal corpus separate from the locked evidence corpus. A proposal
+can pass structural validation, but it cannot enter a scored run. The harness
+loads the product core from the pinned Git
 commit. It builds each context brief from a sanitized Markdown board fixture.
 It also applies the structured outcome to an isolated fixture copy and
 compares retrieval before and after the outcome. It does not change the
@@ -15,7 +17,7 @@ The harness:
 
 - validates eight sanitized cases with two cases in each accepted category;
 - identifies each corpus by role, version, digest, and lock state;
-- rejects a calibration corpus as input to a scored run;
+- rejects a calibration or proposal corpus as input to a scored run;
 - rejects declared scoring-oracle leakage from positive evidence cases;
 - creates 24 required reference pairs and 48 trial arms;
 - keeps the declared inputs equal inside each pair;
@@ -34,6 +36,16 @@ The harness:
 - reports optional replication profiles without adding them to the product gate;
 - writes bounded JSON and Markdown reports.
 
+For corpus version 4 and later, validation also requires one visible current
+domain, one current incident, at least one prior incident that appears only in
+the expected memory, and a cross-incident scoring contract. A diagnosis that
+states only a rule inside the current component is local for this bounded
+product-effect test.
+
+For corpus version 4 and later, the reported corpus digest binds the JSON
+contract, all canonical case-evidence files, and the complete context fixture.
+A change to any of these inputs changes the digest.
+
 The positive-case denominator contains the recurring-bug and cross-domain
 shared-cause cases. Each reference arm has 12 positive trials. Lexical-decoy and
 independent-issue cases use the separate zero-durable-conclusion gate.
@@ -50,6 +62,14 @@ Use `evaluation/calibration-corpus.json` to develop and test benchmark
 structure. It preserves the saturated cases from the first Codex run. The
 prepare command refuses this corpus because calibration cases cannot produce
 product-effect evidence.
+
+Validate the unlocked version 4 proposal separately:
+
+```sh
+python3 evaluation/harness.py validate \
+  --root . \
+  --corpus evaluation/corpus-v4-proposal.json
+```
 
 ## Prepare a run
 
@@ -155,6 +175,18 @@ or cross-domain relationship from agent-visible evidence. Its positive cases
 also record a plausible local correction in scoring-only data. The locked
 corpus reference run produced a 100 percent context rate and an 83.33 percent
 baseline rate. The 16.67-point improvement failed the required 25-point gate.
+
+The unlocked version 4 proposal keeps one current incident visible and places
+the prior incident relationship in Engineering Board memory. A non-scored
+positive-case preflight used four baseline and four context arms. The preflight
+found no cross-incident diagnosis in either arm. The frozen v1.11.0 product
+ranked each expected memory within the first three results, but each returned
+result contained only its identifier, kind, status, score, match reasons, and
+source paths. It did not contain the hypothesis title, proposed cause, or a
+bounded summary. The ranked context therefore did not supply the information
+that the version 4 rubric requires.
+
 Engineering Board does not claim that Milestone D context improves agent
-diagnoses. The active recommendation is to keep the current symptom visible
-while only Engineering Board memory supplies the prior incident relationship.
+diagnoses. Version 4 remains a proposal. Do not seal it or prepare a scored run
+until the product owner approves a context-information correction and the
+exact new baseline.
