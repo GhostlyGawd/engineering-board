@@ -136,9 +136,15 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
     corpus_role = corpus.get("corpus_role")
     corpus_version = corpus.get("corpus_version")
     _require(isinstance(corpus_id, str) and SAFE_NAME.fullmatch(corpus_id) is not None, "invalid corpus id")
-    _require(corpus_role in {"calibration", "evidence"}, "invalid corpus role")
+    _require(corpus_role in {"calibration", "proposal", "evidence"}, "invalid corpus role")
     _require(isinstance(corpus_version, int) and corpus_version >= 1, "invalid corpus version")
     _require(corpus.get("locked") is (corpus_role == "evidence"), "invalid corpus lock state")
+    if corpus_role == "proposal":
+        _require(
+            isinstance(corpus.get("proposed_at"), str)
+            and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", corpus["proposed_at"]) is not None,
+            "proposal corpus requires a proposal date",
+        )
     if corpus_role == "evidence":
         _require(
             isinstance(corpus.get("sealed_at"), str)
@@ -166,13 +172,19 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
         and SAFE_NAME.fullmatch(fixture_project) is not None,
         "invalid context fixture project",
     )
-    memory_ids = {
-        path.name.split("-", 1)[0]
-        for directory in ("hypotheses", "learnings")
-        for path in (fixture_board / directory).glob("*.md")
-    }
+    memory_sources: dict[str, str] = {}
+    for directory in ("hypotheses", "learnings"):
+        for path in (fixture_board / directory).glob("*.md"):
+            memory_id = path.name.split("-", 1)[0]
+            _require(
+                memory_id not in memory_sources,
+                f"duplicate context memory id: {memory_id}",
+            )
+            memory_sources[memory_id] = path.read_text(encoding="utf-8")
+    memory_ids = set(memory_sources)
     counts: Counter[str] = Counter()
     ids: set[str] = set()
+    evidence_records: list[dict[str, str]] = []
     for case in cases:
         _require(isinstance(case, dict), "each corpus case must be an object")
         case_id = case.get("id")
@@ -200,6 +212,14 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
             _reject_linked_path(source)
             _require(source.is_file(), f"missing evidence file: {source}")
             evidence_texts.append(source.read_text(encoding="utf-8"))
+            evidence_records.append(
+                {
+                    "case_id": case_id,
+                    "evidence_id": item["id"],
+                    "path": relative.as_posix(),
+                    "sha256": _file_digest(source),
+                }
+            )
         memory = case.get("expected_relevant_memory")
         cause = case.get("expected_systemic_cause")
         rejected = case.get("rejected_memories")
@@ -218,7 +238,7 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
             _require(outcome["hypothesis_id"] == memory, f"{case_id} outcome must target the expected memory")
             _require(isinstance(outcome.get("expected_score_delta"), int), f"{case_id} outcome requires expected_score_delta")
             _require(isinstance(outcome.get("expected_rank_max"), int) and outcome["expected_rank_max"] >= 1, f"{case_id} outcome requires expected_rank_max")
-            if corpus_role == "evidence":
+            if corpus_role in {"proposal", "evidence"}:
                 oracle_terms = scoring.get("oracle_terms")
                 _require(
                     isinstance(oracle_terms, list)
@@ -253,6 +273,110 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
                     not leaked_terms,
                     f"{case_id} visible input discloses oracle terms: {leaked_terms}",
                 )
+                if corpus_version >= 4:
+                    boundary = scoring.get("information_boundary")
+                    _require(
+                        isinstance(boundary, dict),
+                        f"{case_id} requires an information_boundary",
+                    )
+                    current_entry_id = boundary.get("current_entry_id")
+                    prior_entry_ids = boundary.get("prior_entry_ids")
+                    current_domains = boundary.get("current_domains")
+                    prior_domains = boundary.get("prior_domains")
+                    prior_oracle_terms = boundary.get(
+                        "prior_incident_oracle_terms"
+                    )
+                    _require(
+                        isinstance(current_entry_id, str)
+                        and bool(current_entry_id),
+                        f"{case_id} requires one current incident entry",
+                    )
+                    _require(
+                        isinstance(prior_entry_ids, list)
+                        and bool(prior_entry_ids)
+                        and all(
+                            isinstance(item, str) and bool(item)
+                            for item in prior_entry_ids
+                        ),
+                        f"{case_id} requires prior incident entries",
+                    )
+                    _require(
+                        current_entry_id not in prior_entry_ids,
+                        f"{case_id} current incident cannot be a prior incident",
+                    )
+                    _require(
+                        isinstance(current_domains, list)
+                        and len(current_domains) == 1
+                        and all(
+                            isinstance(item, str) and bool(item)
+                            for item in current_domains
+                        ),
+                        f"{case_id} requires exactly one current domain",
+                    )
+                    _require(
+                        isinstance(prior_domains, list)
+                        and bool(prior_domains)
+                        and all(
+                            isinstance(item, str) and bool(item)
+                            for item in prior_domains
+                        ),
+                        f"{case_id} requires prior incident domains",
+                    )
+                    visible_domains = {Path(item).parts[0] for item in files}
+                    _require(
+                        visible_domains == set(current_domains),
+                        f"{case_id} visible files must stay in the declared current domain",
+                    )
+                    _require(
+                        set(current_domains).isdisjoint(prior_domains),
+                        f"{case_id} prior incident domains must remain outside the current input",
+                    )
+                    _require(
+                        len(evidence) == 1,
+                        f"{case_id} requires one current incident evidence file",
+                    )
+                    memory_text = memory_sources[memory]
+                    for entry_id in [current_entry_id, *prior_entry_ids]:
+                        _require(
+                            re.search(rf"\b{re.escape(entry_id)}\b", memory_text)
+                            is not None,
+                            f"{case_id} memory does not cite incident {entry_id}",
+                        )
+                    _require(
+                        isinstance(prior_oracle_terms, list)
+                        and len(prior_oracle_terms) >= 2
+                        and all(
+                            isinstance(item, str) and len(item.strip()) >= 4
+                            for item in prior_oracle_terms
+                        ),
+                        f"{case_id} requires prior incident oracle terms",
+                    )
+                    prior_leaks = [
+                        item
+                        for item in prior_oracle_terms
+                        if item.casefold() in visible
+                    ]
+                    _require(
+                        not prior_leaks,
+                        f"{case_id} visible input discloses prior incident terms: {prior_leaks}",
+                    )
+                    classification = scoring.get("systemic_classification")
+                    _require(
+                        isinstance(classification, dict),
+                        f"{case_id} requires a systemic classification contract",
+                    )
+                    _require(
+                        classification.get("scope") == "cross-incident",
+                        f"{case_id} systemic scope must be cross-incident",
+                    )
+                    _require(
+                        classification.get("minimum_incidents") == 2,
+                        f"{case_id} systemic classification requires two incidents",
+                    )
+                    _require(
+                        classification.get("current_only_rule_is_local") is True,
+                        f"{case_id} must classify a current-only rule as local",
+                    )
         else:
             _require(memory is None and cause is None, f"negative case {case_id} cannot define a systemic cause")
             _require(scoring.get("durable_systemic_conclusion_allowed") is False, f"negative case {case_id} cannot allow a conclusion")
@@ -262,16 +386,37 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
         for memory_id in rejected:
             _require(memory_id in memory_ids, f"missing rejected memory for {case_id}: {memory_id}")
         if category == "cross-domain-shared-cause":
-            domains = {Path(item).parts[0] for item in files}
-            _require(len(domains) >= 2, f"cross-domain case {case_id} requires two domains")
+            if corpus_version >= 4 and corpus_role in {"proposal", "evidence"}:
+                boundary = scoring["information_boundary"]
+                domains = set(boundary["current_domains"]) | set(
+                    boundary["prior_domains"]
+                )
+                _require(
+                    len(domains) >= 2,
+                    f"cross-domain case {case_id} requires two domains across current and prior incidents",
+                )
+            else:
+                domains = {Path(item).parts[0] for item in files}
+                _require(len(domains) >= 2, f"cross-domain case {case_id} requires two domains")
     _require(dict(counts) == expected, f"invalid category allocation: {dict(counts)}")
+    corpus_digest = _digest(corpus)
+    if corpus_version >= 4:
+        corpus_digest = _digest(
+            {
+                "corpus": corpus,
+                "evidence_files": sorted(
+                    evidence_records, key=lambda item: (item["case_id"], item["path"])
+                ),
+                "context_fixture_sha256": _directory_digest(fixture_board),
+            }
+        )
     return {
         "corpus_id": corpus_id,
         "corpus_role": corpus_role,
         "corpus_version": corpus_version,
         "case_count": len(cases),
         "category_counts": dict(sorted(counts.items())),
-        "digest": _digest(corpus),
+        "digest": corpus_digest,
     }
 
 

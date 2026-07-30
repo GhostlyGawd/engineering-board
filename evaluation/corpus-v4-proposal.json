@@ -1,0 +1,255 @@
+{
+  "schema_version": "3",
+  "corpus_id": "d1-product-effect",
+  "corpus_role": "proposal",
+  "corpus_version": 4,
+  "locked": false,
+  "proposed_at": "2026-07-30",
+  "evidence_root": "corpus-v4-proposal/evidence",
+  "context_fixture": {
+    "board": "corpus-v4-proposal/context-board",
+    "project": "d1-v4-evaluation"
+  },
+  "cases": [
+    {
+      "id": "D1-V4-C01",
+      "category": "recurring-bug",
+      "title": "Scheduled import rejects visually valid regions",
+      "task": "Diagnose why partner batch 73 leaves 18 orders in review after scheduled import even though the displayed region values match accepted orders.",
+      "files": ["imports/scheduled_orders.py"],
+      "canonical_evidence": [{"id": "E-D1-V4-C01", "path": "D1-V4-C01.md"}],
+      "expected_relevant_memory": "H101",
+      "rejected_memories": [],
+      "expected_systemic_cause": "Order entry paths do not share one canonical region-code boundary.",
+      "scoring": {
+        "expected_outcome_effect": "Confirm H101 and increase its context score by 5 while keeping its rank at or below 3.",
+        "durable_systemic_conclusion_allowed": true,
+        "information_gap": "The visible incident contains one scheduled-import symptom. It does not include the prior administrator-path incident or the relationship between the two paths.",
+        "plausible_local_correction": "Trim or remap the region value only in the scheduled importer.",
+        "oracle_terms": [
+          "canonical region-code boundary",
+          "shared region-code canonicalizer"
+        ],
+        "information_boundary": {
+          "current_entry_id": "B101",
+          "prior_entry_ids": ["B102"],
+          "current_domains": ["imports"],
+          "prior_domains": ["admin"],
+          "prior_incident_oracle_terms": [
+            "administrator order editor",
+            "rewrites region values"
+          ]
+        },
+        "systemic_classification": {
+          "scope": "cross-incident",
+          "minimum_incidents": 2,
+          "current_only_rule_is_local": true
+        },
+        "outcome_evaluation": {
+          "applicable": true,
+          "entry_id": "B101",
+          "hypothesis_id": "H101",
+          "expected_status": "confirmed",
+          "expected_score_delta": 5,
+          "expected_rank_max": 3
+        }
+      }
+    },
+    {
+      "id": "D1-V4-C02",
+      "category": "recurring-bug",
+      "title": "Renewal worker loses an active lease",
+      "task": "Diagnose why one active worker loses ownership during renewal even though its stored expiration value is later than the renewal log value.",
+      "files": ["worker/renewal.py"],
+      "canonical_evidence": [{"id": "E-D1-V4-C02", "path": "D1-V4-C02.md"}],
+      "expected_relevant_memory": "H102",
+      "rejected_memories": [],
+      "expected_systemic_cause": "Lease paths do not share one time authority.",
+      "scoring": {
+        "expected_outcome_effect": "Confirm H102 and increase its context score by 5 while keeping its rank at or below 3.",
+        "durable_systemic_conclusion_allowed": true,
+        "information_gap": "The visible incident contains one renewal-worker symptom. It does not include the prior lease-recovery incident or its different time basis.",
+        "plausible_local_correction": "Add a renewal allowance before the worker releases ownership.",
+        "oracle_terms": [
+          "one time authority",
+          "shared lease clock"
+        ],
+        "information_boundary": {
+          "current_entry_id": "B103",
+          "prior_entry_ids": ["B104"],
+          "current_domains": ["worker"],
+          "prior_domains": ["recovery"],
+          "prior_incident_oracle_terms": [
+            "recovery scan",
+            "elapsed runtime"
+          ]
+        },
+        "systemic_classification": {
+          "scope": "cross-incident",
+          "minimum_incidents": 2,
+          "current_only_rule_is_local": true
+        },
+        "outcome_evaluation": {
+          "applicable": true,
+          "entry_id": "B103",
+          "hypothesis_id": "H102",
+          "expected_status": "confirmed",
+          "expected_score_delta": 5,
+          "expected_rank_max": 3
+        }
+      }
+    },
+    {
+      "id": "D1-V4-C03",
+      "category": "cross-domain-shared-cause",
+      "title": "Restored account remains forbidden by export API",
+      "task": "Diagnose why the export API continues to return a forbidden response after support restores the affected account.",
+      "files": ["api/export_auth.py"],
+      "canonical_evidence": [{"id": "E-D1-V4-C03", "path": "D1-V4-C03.md"}],
+      "expected_relevant_memory": "H103",
+      "rejected_memories": [],
+      "expected_systemic_cause": "The API and dashboard read different representations of entitlement state.",
+      "scoring": {
+        "expected_outcome_effect": "Confirm H103 and increase its context score by 5 while keeping its rank at or below 3.",
+        "durable_systemic_conclusion_allowed": true,
+        "information_gap": "The visible incident contains only the export API symptom. It does not include the prior dashboard incident or the relationship between their entitlement sources.",
+        "plausible_local_correction": "Invalidate the export API cache after account restoration.",
+        "oracle_terms": [
+          "different representations of entitlement state",
+          "shared entitlement state boundary"
+        ],
+        "information_boundary": {
+          "current_entry_id": "B105",
+          "prior_entry_ids": ["B106"],
+          "current_domains": ["api"],
+          "prior_domains": ["dashboard"],
+          "prior_incident_oracle_terms": [
+            "dashboard access badge",
+            "subscription projection"
+          ]
+        },
+        "systemic_classification": {
+          "scope": "cross-incident",
+          "minimum_incidents": 2,
+          "current_only_rule_is_local": true
+        },
+        "outcome_evaluation": {
+          "applicable": true,
+          "entry_id": "B105",
+          "hypothesis_id": "H103",
+          "expected_status": "confirmed",
+          "expected_score_delta": 5,
+          "expected_rank_max": 3
+        }
+      }
+    },
+    {
+      "id": "D1-V4-C04",
+      "category": "cross-domain-shared-cause",
+      "title": "Editor status remains stale after a branch switch",
+      "task": "Diagnose why the editor extension continues to report two pending changes after a rapid branch switch when a full extension reload clears the status.",
+      "files": ["extension/status_cache.ts"],
+      "canonical_evidence": [{"id": "E-D1-V4-C04", "path": "D1-V4-C04.md"}],
+      "expected_relevant_memory": "H104",
+      "rejected_memories": [],
+      "expected_systemic_cause": "CLI and extension clients do not share one cache generation contract.",
+      "scoring": {
+        "expected_outcome_effect": "Confirm H104 and increase its context score by 5 while keeping its rank at or below 3.",
+        "durable_systemic_conclusion_allowed": true,
+        "information_gap": "The visible incident contains only the editor-extension symptom. It does not include the prior command-line incident or its invalidation signal.",
+        "plausible_local_correction": "Force the editor extension to refresh after each branch switch.",
+        "oracle_terms": [
+          "cache generation contract",
+          "shared generation token"
+        ],
+        "information_boundary": {
+          "current_entry_id": "B108",
+          "prior_entry_ids": ["B107"],
+          "current_domains": ["extension"],
+          "prior_domains": ["cli"],
+          "prior_incident_oracle_terms": [
+            "command-line index",
+            "directory modification time"
+          ]
+        },
+        "systemic_classification": {
+          "scope": "cross-incident",
+          "minimum_incidents": 2,
+          "current_only_rule_is_local": true
+        },
+        "outcome_evaluation": {
+          "applicable": true,
+          "entry_id": "B108",
+          "hypothesis_id": "H104",
+          "expected_status": "confirmed",
+          "expected_score_delta": 5,
+          "expected_rank_max": 3
+        }
+      }
+    },
+    {
+      "id": "D1-V4-C05",
+      "category": "lexical-decoy",
+      "title": "Clock icon animation pauses after resume",
+      "task": "A dashboard report tagged this issue as time-authority. Correct a visual pause in the clock icon after the browser resumes.",
+      "files": ["ui/clock_icon.css"],
+      "canonical_evidence": [{"id": "E-D1-V4-C05", "path": "D1-V4-C05.md"}],
+      "expected_relevant_memory": null,
+      "rejected_memories": ["H105"],
+      "expected_systemic_cause": null,
+      "scoring": {
+        "expected_outcome_effect": "Do not apply a systemic outcome.",
+        "durable_systemic_conclusion_allowed": false,
+        "outcome_evaluation": {"applicable": false}
+      }
+    },
+    {
+      "id": "D1-V4-C06",
+      "category": "lexical-decoy",
+      "title": "Plan label capitalization differs",
+      "task": "A documentation report tagged this issue as entitlement-state. Correct one inconsistent plan label in the subscription guide.",
+      "files": ["docs/subscription_labels.md"],
+      "canonical_evidence": [{"id": "E-D1-V4-C06", "path": "D1-V4-C06.md"}],
+      "expected_relevant_memory": null,
+      "rejected_memories": ["H106"],
+      "expected_systemic_cause": null,
+      "scoring": {
+        "expected_outcome_effect": "Do not apply a systemic outcome.",
+        "durable_systemic_conclusion_allowed": false,
+        "outcome_evaluation": {"applicable": false}
+      }
+    },
+    {
+      "id": "D1-V4-C07",
+      "category": "independent-issue",
+      "title": "Dismiss button lacks an accessible name",
+      "task": "Correct the missing accessible name on one dismiss button.",
+      "files": ["ui/notice_banner.tsx"],
+      "canonical_evidence": [{"id": "E-D1-V4-C07", "path": "D1-V4-C07.md"}],
+      "expected_relevant_memory": null,
+      "rejected_memories": [],
+      "expected_systemic_cause": null,
+      "scoring": {
+        "expected_outcome_effect": "Do not apply a systemic outcome.",
+        "durable_systemic_conclusion_allowed": false,
+        "outcome_evaluation": {"applicable": false}
+      }
+    },
+    {
+      "id": "D1-V4-C08",
+      "category": "independent-issue",
+      "title": "Configuration example contains one obsolete flag",
+      "task": "Replace one obsolete flag in a configuration example.",
+      "files": ["docs/configuration_example.md"],
+      "canonical_evidence": [{"id": "E-D1-V4-C08", "path": "D1-V4-C08.md"}],
+      "expected_relevant_memory": null,
+      "rejected_memories": [],
+      "expected_systemic_cause": null,
+      "scoring": {
+        "expected_outcome_effect": "Do not apply a systemic outcome.",
+        "durable_systemic_conclusion_allowed": false,
+        "outcome_evaluation": {"applicable": false}
+      }
+    }
+  ]
+}

@@ -97,10 +97,17 @@ corpus excludes declared scoring oracles and requires rejected memory in its
 lexical-decoy contexts. Its reference run scored 100 percent for context and
 83.33 percent for baseline. The 16.67-point difference did not meet the
 required 25-point improvement. The project does not claim that the context
-improves agent diagnoses. See
+improves agent diagnoses.
+
+The unlocked version 4 proposal now limits each positive case to one visible
+current incident. It also requires a positive classification to connect that
+incident to prior repository evidence. A non-scored proposal preflight found
+that v1.11.0 ranks the expected memory but does not include the memory title,
+cause, or summary in the returned result. The proposal remains unlocked. It
+cannot enter a scored run until the product owner approves a corrected
+baseline and the context-information gap is resolved. See
 [`evaluation/README.md`](evaluation/README.md) for the proof boundary and
 operator commands.
-
 
 ## Product differences
 

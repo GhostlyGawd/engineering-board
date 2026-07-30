@@ -7,6 +7,7 @@ import copy
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -34,6 +35,7 @@ POSITIVE_CATEGORIES = {"recurring-bug", "cross-domain-shared-cause"}
 class EvaluationHarnessTests(unittest.TestCase):
     corpus_path = ROOT / "evaluation" / "evidence-corpus.json"
     calibration_corpus_path = ROOT / "evaluation" / "calibration-corpus.json"
+    proposal_corpus_path = ROOT / "evaluation" / "corpus-v4-proposal.json"
     contracts_path = ROOT / "evaluation" / "client-contracts.json"
     source_commit = "e26149bf505ea7f5ae2d95294a8a108e6b3c429f"
     context_evidence: dict | None = None
@@ -181,6 +183,11 @@ class EvaluationHarnessTests(unittest.TestCase):
         )
         self.assertEqual(len(summary["digest"]), 64)
 
+        self.assertEqual(
+            summary["digest"],
+            "e8756040e5c6b9c1f9f40e7b47cc17cf196d59e605234fd0c67796a24da6b956",
+        )
+
     def test_calibration_corpus_validates_but_cannot_prepare_scored_run(self) -> None:
         summary = validate_corpus(ROOT, self.calibration_corpus_path)
         self.assertEqual(summary["corpus_role"], "calibration")
@@ -196,6 +203,149 @@ class EvaluationHarnessTests(unittest.TestCase):
                     self.make_config(base),
                     base / "run",
                 )
+
+    def test_v4_proposal_validates_but_cannot_prepare_scored_run(self) -> None:
+        summary = validate_corpus(ROOT, self.proposal_corpus_path)
+        self.assertEqual(summary["corpus_role"], "proposal")
+        self.assertEqual(summary["corpus_version"], 4)
+        self.assertEqual(summary["case_count"], 8)
+        with tempfile.TemporaryDirectory(prefix="eb-eval-proposal-") as temp:
+            base = Path(temp)
+            with self.assertRaisesRegex(
+                EvaluationError, "locked evidence corpus"
+            ):
+                prepare_run(
+                    ROOT,
+                    self.proposal_corpus_path,
+                    self.contracts_path,
+                    base / "unused-config.json",
+                    base / "run",
+                )
+
+    def test_v4_digest_binds_evidence_and_context_fixture(self) -> None:
+        original = validate_corpus(ROOT, self.proposal_corpus_path)["digest"]
+        with tempfile.TemporaryDirectory(prefix="eb-eval-v4-digest-") as temp:
+            copied = Path(temp) / "evaluation"
+            shutil.copytree(ROOT / "evaluation", copied)
+            corpus_path = copied / "corpus-v4-proposal.json"
+            corpus = json.loads(corpus_path.read_text(encoding="utf-8"))
+            evidence_path = (
+                copied
+                / corpus["evidence_root"]
+                / corpus["cases"][0]["canonical_evidence"][0]["path"]
+            )
+            evidence_path.write_text(
+                evidence_path.read_text(encoding="utf-8") + "\nObserved again.\n",
+                encoding="utf-8",
+            )
+            evidence_digest = validate_corpus(
+                copied.parent, corpus_path
+            )["digest"]
+            self.assertNotEqual(original, evidence_digest)
+
+            context_path = (
+                copied
+                / corpus["context_fixture"]["board"]
+                / "bugs/B101-scheduled-orders-preserve-partner-region-values.md"
+            )
+            context_path.write_text(
+                context_path.read_text(encoding="utf-8") + "\n",
+                encoding="utf-8",
+            )
+            context_digest = validate_corpus(copied.parent, corpus_path)["digest"]
+            self.assertNotEqual(evidence_digest, context_digest)
+
+    def test_v4_proposal_enforces_the_memory_only_incident_boundary(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-v4-boundary-") as temp:
+            copied = Path(temp) / "evaluation"
+            shutil.copytree(ROOT / "evaluation", copied)
+            corpus_path = copied / "corpus-v4-proposal.json"
+            original = json.loads(corpus_path.read_text(encoding="utf-8"))
+
+            value = copy.deepcopy(original)
+            value["cases"][0]["files"].append("admin/order_editor.ts")
+            corpus_path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaisesRegex(
+                EvaluationError, "declared current domain"
+            ):
+                validate_corpus(copied.parent, corpus_path)
+
+            value = copy.deepcopy(original)
+            case = value["cases"][0]
+            evidence_path = (
+                copied
+                / value["evidence_root"]
+                / case["canonical_evidence"][0]["path"]
+            )
+            evidence_path.write_text(
+                evidence_path.read_text(encoding="utf-8")
+                + "\nThe administrator order editor also failed.\n",
+                encoding="utf-8",
+            )
+            corpus_path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaisesRegex(
+                EvaluationError, "prior incident terms"
+            ):
+                validate_corpus(copied.parent, corpus_path)
+
+            shutil.copyfile(
+                ROOT
+                / "evaluation"
+                / original["evidence_root"]
+                / original["cases"][0]["canonical_evidence"][0]["path"],
+                evidence_path,
+            )
+            value = copy.deepcopy(original)
+            value["cases"][0]["scoring"]["information_boundary"][
+                "prior_entry_ids"
+            ] = ["B999"]
+            corpus_path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaisesRegex(
+                EvaluationError, "memory does not cite incident B999"
+            ):
+                validate_corpus(copied.parent, corpus_path)
+
+            value = copy.deepcopy(original)
+            value["cases"][0]["scoring"]["systemic_classification"][
+                "scope"
+            ] = "current-component"
+            corpus_path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaisesRegex(
+                EvaluationError, "scope must be cross-incident"
+            ):
+                validate_corpus(copied.parent, corpus_path)
+
+    def test_v4_proposal_builds_expected_context_and_outcomes(self) -> None:
+        evidence = build_context_evidence(
+            ROOT, self.proposal_corpus_path, self.source_commit
+        )
+        corpus = json.loads(
+            self.proposal_corpus_path.read_text(encoding="utf-8")
+        )
+        for case in corpus["cases"]:
+            case_id = case["id"]
+            self.assertTrue(evidence["outcomes"][case_id]["matches_expected"])
+            expected_memory = case["expected_relevant_memory"]
+            if expected_memory is None:
+                continue
+            result_ids = [
+                item["id"]
+                for item in evidence["briefs"][case_id]["results"]
+            ]
+            self.assertIn(expected_memory, result_ids)
+
+    def test_trial_response_schema_accepts_versioned_evidence_ids(self) -> None:
+        schema = json.loads(
+            (ROOT / "evaluation" / "trial-response.schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        pattern = schema["properties"]["canonical_citations"]["items"][
+            "pattern"
+        ]
+        self.assertIsNotNone(re.fullmatch(pattern, "E-D1-C01"))
+        self.assertIsNotNone(re.fullmatch(pattern, "E-D1-V4-C01"))
+        self.assertIsNone(re.fullmatch(pattern, "E-D1-V4-01"))
 
     def test_corpus_rejects_category_drift_and_path_escape(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-corpus-") as temp:

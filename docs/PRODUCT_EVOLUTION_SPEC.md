@@ -8,9 +8,12 @@ evidence. Codex is the required reference client. Live provider replications
 are optional. The first Codex run exposed a non-discriminating corpus. The
 product owner accepted a separate locked evidence-corpus baseline. Its
 reference run improved the positive rate by 16.67 percentage points. This
-result failed the required 25-point product-effect gate._
+result failed the required 25-point product-effect gate. An unlocked version 4
+proposal now enforces a one-current-incident boundary. Its non-scored preflight
+found that v1.11.0 ranks the expected memory but does not return the memory
+content that an agent needs to identify the prior incident relationship._
 _Started: 2026-07-27_
-_Last direction revision: 2026-07-29_
+_Last direction revision: 2026-07-30_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
 _Current release boundary: `v1.11.0`_
@@ -78,7 +81,7 @@ selected milestone is approved.
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 | Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
-| Milestone D.1 direction | Calibrated reference evidence complete; product gate failed | Prove whether the shipped context changes an agent diagnosis before a local fix. Codex is the required reference client. Other clients are optional replication profiles. The saturated first-run cases are a non-scored calibration corpus. The locked version 3 corpus produced a 100 percent context rate and an 83.33 percent baseline rate. The 16.67-point difference did not meet the required 25-point improvement. |
+| Milestone D.1 direction | Version 4 proposal preflight complete; product gate still failed | Prove whether context changes an agent diagnosis before a local fix. Keep version 3 locked with its failed result. Version 4 is an unlocked proposal with one visible current incident and a cross-incident rubric. Its preflight found that v1.11.0 ranks relevant memory but omits its title, proposed cause, and summary from the returned result. Resolve and approve that product-information boundary before another scored run. |
 
 ## 3. Product thesis
 
@@ -2388,7 +2391,8 @@ authorize any non-goal or deferred portfolio work.
 _State: Gate 1 and Gate 2 were accepted by the product owner on 2026-07-29.
 The owner replaced the provider-specific run contract on 2026-07-29. The
 client-neutral correction baseline was accepted on 2026-07-29. Corpus
-calibration remains open._
+calibration remains open. Version 4 is an unlocked proposal. It is not an
+accepted evidence baseline._
 
 ### 21.1 Product question
 
@@ -2478,6 +2482,14 @@ prompt text, generated files, or mutable agent memory from another trial.
 | D1-REQ-031 | Each lexical-decoy context shall retrieve its declared rejected memory within the first three results. |
 | D1-REQ-032 | The run manifest shall record the corpus identifier, corpus version, and corpus digest. |
 | D1-REQ-033 | A content change to a locked evidence corpus shall increment the corpus version and create a new evidence baseline. |
+| D1-REQ-034 | A proposal corpus shall have the `proposal` role, an integer version, a proposal date, and an unlocked state. |
+| D1-REQ-035 | The paired-trial runner shall reject a corpus that has the `proposal` role. |
+| D1-REQ-036 | Each positive corpus case in version 4 or later shall expose exactly one current incident in exactly one top-level domain. |
+| D1-REQ-037 | Each positive corpus case in version 4 or later shall identify one current repository entry and at least one prior repository entry in scoring-only data. |
+| D1-REQ-038 | For each positive corpus case in version 4 or later, the expected memory shall cite the declared current and prior repository entries. |
+| D1-REQ-039 | For each positive corpus case in version 4 or later, a systemic-before-local classification shall identify a relationship across at least two incidents. A rule confined to the current component shall be classified as local. |
+| D1-REQ-040 | The trial-response schema shall accept canonical evidence identifiers that include a corpus-version segment. |
+| D1-REQ-041 | For corpus version 4 or later, the corpus digest shall bind the JSON contract, each canonical case-evidence file, and the complete context fixture. |
 
 The structured requirement artifact has no deterministic requirement-quality
 failure. Its current status and content digest are recorded in the D.1
@@ -2710,10 +2722,74 @@ the prior incident relationship that supports a recurring or cross-domain
 cause. Keep the accepted scoring thresholds unchanged. Obtain product-owner
 approval before another scored run.
 
+### 21.13 Version 4 proposal preflight
+
+Version 4 is an unlocked proposal. It is not a scored evidence corpus. The
+proposal adds these controls:
+
+- Each positive case shows one current incident in one top-level domain.
+- Scoring-only data identifies the current incident and the prior incidents.
+- The expected memory must cite both the current incident and the prior
+  incidents.
+- Declared prior-incident terms cannot appear in agent-visible input.
+- A positive systemic classification must connect at least two incidents.
+- A general rule that stays inside the current component is local for this
+  product-effect test.
+- The prepare command rejects the proposal role.
+
+A non-scored preflight tested the four positive cases. The frozen v1.11.0
+product ranked each expected hypothesis within the first three results.
+However, the context payload did not include the hypothesis title, proposed
+root cause, evidence summary, or Learning takeaway. The payload included the
+memory identifier, kind, state, score, match details, and source paths.
+
+The ranking engine already uses the title, proposed root cause, and Learning
+takeaway to calculate intent overlap. It removes those fields before it returns
+the result. The agent therefore receives evidence that a memory is relevant
+without receiving the bounded memory content that explains the prior incident
+relationship.
+
+Do not seal version 4 while this product-information gap remains. Additional
+corpus wording cannot supply information that the product result omits.
+
+The active recommendation is to add bounded, agent-usable memory content to
+each context result:
+
+- a stable title;
+- a bounded summary;
+- the epistemic state;
+- the match reason and score components;
+- canonical source references.
+
+For a hypothesis, the summary should contain the proposed root cause. For a
+Learning, the summary should contain the Takeaway. For a cluster, the summary
+should identify its normalized patterns and member scope. The result must keep
+evidence separate from inference and must not present a proposed hypothesis as
+confirmed.
+
+This recommendation is not an accepted implementation contract. Before a
+runtime change, define and approve:
+
+1. the exact result fields and size limits;
+2. redaction and sanitization rules;
+3. plugin and MCP adapter parity;
+4. deterministic tests for hypotheses, negative memory, Learnings, and
+   clusters;
+5. the new product source commit for evaluation;
+6. a new unlocked preflight and exact version 4 baseline digest.
+
+An alternative is to let the agent open each returned source reference. This
+would test a multi-step retrieval workflow instead of a self-contained context
+result. That alternative requires equal-tool controls and a new operator
+contract. It is not currently approved.
+
+Milestone D.1 remains open. Milestone E remains deferred.
+
 ## 22. Research and evidence
 
 Current product evidence:
 
+- [`2026-07-30 Milestone D.1 version 4 proposal preflight`](evidence/2026-07-30-milestone-d1-corpus-v4-proposal.md)
 - [`2026-07-29 Milestone D.1 live-evaluation preflight`](evidence/2026-07-29-milestone-d1-live-evaluation-preflight.md)
 - [`2026-07-29 Milestone D.1 client-neutral evaluation contract`](evidence/2026-07-29-milestone-d1-client-neutral-evaluation-contract.md)
 - [`2026-07-29 Milestone D.1 corpus-calibration contract`](evidence/2026-07-29-milestone-d1-corpus-calibration-contract.md)
