@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Milestone B real pattern-pipeline validation</title>
+  <desc id="desc">A sanitized terminal-style capture shows fifteen checks passed. Canonical pattern P001 links bug B001 and feature F001 in stable cluster c-a4609c958c398d90, while one unresolved legacy label remains visible.</desc>
+  <rect width="1200" height="620" rx="24" fill="#10131a"/>
+  <rect x="1" y="1" width="1198" height="618" rx="23" fill="none" stroke="#343b4a" stroke-width="2"/>
+  <rect x="1" y="1" width="1198" height="58" rx="23" fill="#1a1f2a"/>
+  <rect x="1" y="36" width="1198" height="23" fill="#1a1f2a"/>
+  <circle cx="32" cy="30" r="7" fill="#ff6b6b"/>
+  <circle cx="56" cy="30" r="7" fill="#f6c453"/>
+  <circle cx="80" cy="30" r="7" fill="#48c78e"/>
+  <text x="600" y="36" text-anchor="middle" fill="#aab2c2" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="16">milestone-b-pattern-pipeline</text>
+
+  <text x="54" y="105" fill="#8993a7" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">$ bash tests/orchestration/milestone-b-pattern-pipeline.sh</text>
+  <text x="54" y="148" fill="#7ee2a8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="20">milestone-b-pattern-pipeline: 15 checks passed</text>
+
+  <text x="54" y="210" fill="#e6a94e" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">canonical pattern</text>
+  <text x="300" y="210" fill="#f2f4f8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">P001</text>
+
+  <text x="54" y="254" fill="#e6a94e" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">resolved aliases</text>
+  <text x="300" y="254" fill="#f2f4f8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">split-brain-state · dual-state-contract</text>
+
+  <text x="54" y="298" fill="#e6a94e" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">cluster members</text>
+  <text x="300" y="298" fill="#f2f4f8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">B001 · F001</text>
+
+  <text x="54" y="342" fill="#e6a94e" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">cluster fingerprint</text>
+  <text x="300" y="342" fill="#f2f4f8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">c-a4609c958c398d90</text>
+
+  <text x="54" y="386" fill="#e6a94e" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">legacy evidence</text>
+  <text x="300" y="386" fill="#f2f4f8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">1 unresolved label retained; 0 implicit P### writes</text>
+
+  <text x="54" y="448" fill="#7aa2f7" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="17">full == incremental == cache-deleted rebuild</text>
+  <text x="54" y="484" fill="#7aa2f7" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="17">CLI == MCP canonical identity and graph facts</text>
+  <text x="54" y="520" fill="#7aa2f7" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="17">source change and linked scratch input fail closed</text>
+
+  <line x1="54" y1="552" x2="1146" y2="552" stroke="#343b4a"/>
+  <text x="54" y="586" fill="#8993a7" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="14">sanitized automated fixture · 2026-07-28 · tests/orchestration/milestone-b-pattern-pipeline.sh</text>
+</svg>

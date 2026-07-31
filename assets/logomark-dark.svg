@@ -1,0 +1,8 @@
+<svg width="64" height="64" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="engineering-board">
+  <!-- Dark-theme variant: neutral cards in paper, accent in amber-dark tint. -->
+  <rect x="3.5"  y="7"  width="9" height="5.2" rx="1.6" fill="#ECEBE6"/>
+  <rect x="3.5"  y="14.6" width="9" height="5.2" rx="1.6" fill="#ECEBE6" opacity="0.34"/>
+  <rect x="19.5" y="19.8" width="9" height="5.2" rx="1.6" fill="#ECEBE6" opacity="0.34"/>
+  <line x1="16" y1="5" x2="16" y2="27" stroke="#ECEBE6" stroke-width="1" opacity="0.18"/>
+  <rect x="11" y="11.4" width="10" height="5.6" rx="1.8" fill="#E6A94E"/>
+</svg>
