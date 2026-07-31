@@ -9,6 +9,8 @@ increases.
 
 ## [Unreleased]
 
+## [1.12.0] — 2026-07-31
+
 ### Added
 
 - Added separate Milestone D.1 calibration and locked evidence corpora. The
@@ -20,7 +22,6 @@ increases.
   accepted product-effect and false-positive scoring gates, and bounded JSON
   and Markdown reports. The harness does not execute live clients and is not
   part of the plugin or MCP bundle.
-
 - Added context contract version 2. Each cluster, hypothesis, rejected
   negative memory, and Learning result now includes a stable title and typed
   bounded summary from canonical repository memory.
@@ -41,7 +42,6 @@ increases.
   a real structured outcome to an isolated fixture copy.
 - Made the test workflow fetch full Git history so it can verify and load the
   pinned Milestone D.1 source commit.
-
 - SessionStart and UserPromptSubmit now show the selected memory title,
   summary kind, summary, epistemic state, match reason, and canonical sources
   before an agent chooses a fix.

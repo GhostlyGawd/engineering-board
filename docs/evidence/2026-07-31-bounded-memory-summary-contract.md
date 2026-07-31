@@ -2,7 +2,7 @@
 
 Date: 2026-07-31
 
-State: implementation verified locally; release preparation pending
+State: version 1.12.0 prepared; pull-request gates pending
 
 Completion state: `self-contained`
 
@@ -114,8 +114,8 @@ exact fields above preserve those meanings. No source condition was removed.
   tests.
 - [x] Worker: align the central spec, README, roadmap, architecture, command, MCP
   description, changelog, security text, and evaluation guidance.
-- [ ] Worker: run focused and complete repository tests.
-- [ ] Worker: prepare coordinated version 1.12.0 and reproduce its MCP bundle
+- [x] Worker: run focused and complete repository tests.
+- [x] Worker: prepare coordinated version 1.12.0 and reproduce its MCP bundle
   checksum.
 - [ ] Worker: pass pull-request continuous integration.
 - [ ] Post-merge: pass merged-main continuous integration.
@@ -149,8 +149,8 @@ Acceptance criteria:
 | Epistemic separation | Required | Existing `kind` and `status` plus `summary_kind` | Proposed, rejected, and outcome-state assertions | Product spec and architecture | Implemented and verified |
 | Adapter parity | Required | Shared core plus command, MCP, SessionStart, and prompt renderers | Core/CLI/MCP equality and hook fixtures | README, command, and MCP description | Implemented and focused tests pass |
 | Contract identity | Required | Context-contract version in response, fingerprint, and token | Token decode and fingerprint assertions | Product spec | Implemented and verified |
-| Security and privacy | Required current truth | Offline read, one-line sanitization, size limits, untrusted-data labels | No-write, hostile-text, and size tests | SECURITY and command guidance | Focused tests pass; full suite pending |
-| Version and publication | Required when shipped | Coordinated 1.12.0 release preparation and publication | Version coherence, bundle checksum, release workflow, and live checks | Changelog, manifests, README badge, and release evidence | Planned |
+| Security and privacy | Required current truth | Offline read, one-line sanitization, size limits, untrusted-data labels | No-write, hostile-text, and size tests | SECURITY and command guidance | Full suite passed |
+| Version and publication | Required when shipped | Coordinated 1.12.0 release preparation and publication | Version coherence, bundle checksum, release workflow, and live checks | Changelog, manifests, README badge, and release evidence | Prepared and locally verified; publication pending |
 | Version 4 evaluation baseline | Explicitly deferred | Proposal remains unlocked | Existing preparation rejection and 22 evaluation tests | Product spec and dated v4 evidence | Reviewed and unaffected |
 | SQLite, embeddings, hosted services, telemetry, and cross-repository reads | Explicitly deferred | No storage or service change | Existing offline and Markdown-authority suites | Architecture and security | Reviewed and unaffected |
 | Historical evidence | Required preservation | No historical report changes | Git diff inspection | Existing dated evidence | Reviewed and unaffected |
@@ -176,7 +176,7 @@ security boundary, version identity, and unchanged evaluation state.
   the fallback.
 - Requirements checker:
   `DRAFT — SOURCE OR DECISIONS INCOMPLETE`,
-  `sha256:ae0aebe6d5de51aef16499374923016980ae22196254ff56fb062be44c94adfc`,
+  `sha256:bf6f5c7c08cd2a6b9ad9b46b90d1f07633d7bd946de40369dff50fafd5e96f28`,
   zero deterministic failures, one open digest-approval decision.
 - Milestone D context and outcome matrix: 15 checks passed.
 - Prompt guard: 5 checks passed.
@@ -184,9 +184,9 @@ security boundary, version identity, and unchanged evaluation state.
 - Evaluation harness: 22 tests passed.
 - Documentation coherence: passed.
 - Python compilation and changed-shell syntax: passed.
-- MCP protocol and lifecycle checks: 167 checks passed before the expected
-  stale-bundle-checksum failure. Coordinated release preparation will rebuild
-  and pin the changed bundle before the full suite.
+- Complete repository release tree: 19 suites passed and zero failed.
+- Prepared MCP bundle SHA-256:
+  `f7de3784a0fed3604e2b774ef300533e36327da238eb409e8ddca453cf67c66c`.
 
 ## Uncertainties and assumptions
 
@@ -203,17 +203,16 @@ None.
 
 ## Handoff
 
-Current semantic state: implementation and focused verification complete;
-coordinated release preparation pending.
+Current semantic state: implementation, version 1.12.0 preparation, and local
+release verification complete; pull-request gates pending.
 
-Next owner: Engineering Board release agent.
+Next owner: Engineering Board delivery agent.
 
-Remaining gates: release preparation, complete repository tests, feature
-commit, pull-request continuous integration, merged-main continuous
-integration, publication, and release closeout.
+Remaining gates: release commit, push, pull-request continuous integration,
+merged-main continuous integration, publication, and release closeout.
 
 Evidence destination:
 `docs/evidence/2026-07-31-v1.12.0-release-validation.md`.
 
-Resume route: prepare version 1.12.0 from a clean feature commit, then continue
-through the release and closeout gates.
+Resume route: commit the prepared release, open and merge its pull request,
+publish from the exact main commit, and append closeout evidence.
