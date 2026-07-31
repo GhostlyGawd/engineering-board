@@ -81,7 +81,7 @@ selected milestone is approved.
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 | Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
-| Milestone D.1 direction | Version 4 proposal preflight complete; product gate still failed | Prove whether context changes an agent diagnosis before a local fix. Keep version 3 locked with its failed result. Version 4 is an unlocked proposal with one visible current incident and a cross-incident rubric. Its preflight found that v1.11.0 ranks relevant memory but omits its title, proposed cause, and summary from the returned result. Resolve and approve that product-information boundary before another scored run. |
+| Milestone D.1 direction | Context information correction approved; version 4 remains unlocked | Prove whether context changes an agent diagnosis before a local fix. Keep version 3 locked with its failed result. Context contract version 2 returns bounded canonical memory content. Run a new version 4 preflight before the owner reviews an exact scored baseline. |
 
 ## 3. Product thesis
 
@@ -1886,6 +1886,11 @@ Requirement verification proves the specified behavior. Product validation
 must separately show that a representative agent receives a relevant
 cross-domain memory before it chooses a local fix.
 
+The product owner's 2026-07-31 decision adds the bounded memory-content
+requirements in section 21.14. That additive contract extends the current
+response. It does not rewrite the historical 2026-07-28 Gate 2 approval or
+change the ranking rule.
+
 ### 20.3 Context request and response contract
 
 The shared core accepts this logical request:
@@ -1924,15 +1929,19 @@ The response contains:
   "context_fingerprint": "ctx-<16 lowercase hex>",
   "source_fingerprint": "<canonical source fingerprint>",
   "ranking_rule_version": "1",
+  "context_contract_version": "2",
   "results": [
     {
       "kind": "hypothesis",
       "id": "H003",
       "status": "confirmed",
+      "title": "Lifecycle state has no shared owner",
+      "summary_kind": "proposed_root_cause",
+      "summary": "The CLI and session adapter implement different lifecycle ownership rules.",
       "stale": false,
       "score": 90,
       "components": {
-        "pattern": 35,
+        "canonical_pattern": 35,
         "affected_path": 30,
         "graph_proximity": 20,
         "intent_overlap": 0,
@@ -1955,13 +1964,28 @@ The response contains:
 ```
 
 The context fingerprint binds a digest of the normalized request, canonical
-source fingerprint, ranking rule version, and ordered result IDs. The context
-token contains the request digest, source fingerprint, ranking rule version,
-ordered result IDs, and a checksum. It does not contain raw task or prompt
-text. It is historical reference data. It does not grant mutation authority.
+source fingerprint, context-contract version, ranking-rule version, and
+ordered result IDs. The context token contains the same identity fields plus
+a checksum. It does not contain raw task or prompt text. It is historical
+reference data. It does not grant mutation authority.
 
 Every `why` statement is generated from typed signal templates. The core does
 not ask a model to invent the explanation.
+
+Each title is one line and permits at most 160 Unicode characters. Each
+summary is one line and permits at most 2,000 Unicode characters. The core
+flattens line and control separators before it returns either field.
+
+A cluster uses `cluster_scope`. Its title contains normalized pattern labels.
+Its summary identifies pattern IDs, normalized labels, member IDs, and
+affected top-level domains. A hypothesis and rejected negative memory use
+`proposed_root_cause`. Their summary contains the canonical proposed-root-
+cause section. A Learning uses `learning_takeaway`. Its summary contains the
+canonical Takeaway.
+
+The result `kind` and `status` preserve epistemic authority. A readable
+proposed root cause is not confirmed unless the separate status is
+`confirmed`.
 
 ### 20.4 Deterministic retrieval and ranking
 
@@ -2750,9 +2774,9 @@ without receiving the bounded memory content that explains the prior incident
 relationship.
 
 Do not seal version 4 while this product-information gap remains. Additional
-corpus wording cannot supply information that the product result omits.
+corpus wording cannot supply information that the version 1 result omits.
 
-The active recommendation is to add bounded, agent-usable memory content to
+The approved correction adds bounded, agent-usable memory content to
 each context result:
 
 - a stable title;
@@ -2767,28 +2791,76 @@ should identify its normalized patterns and member scope. The result must keep
 evidence separate from inference and must not present a proposed hypothesis as
 confirmed.
 
-This recommendation is not an accepted implementation contract. Before a
-runtime change, define and approve:
-
-1. the exact result fields and size limits;
-2. redaction and sanitization rules;
-3. plugin and MCP adapter parity;
-4. deterministic tests for hypotheses, negative memory, Learnings, and
-   clusters;
-5. the new product source commit for evaluation;
-6. a new unlocked preflight and exact version 4 baseline digest.
+The product owner selected the self-contained result on 2026-07-31. Section
+21.14 defines the exact additive contract, limits, sanitization rules, adapter
+parity, and tests.
 
 An alternative is to let the agent open each returned source reference. This
 would test a multi-step retrieval workflow instead of a self-contained context
 result. That alternative requires equal-tool controls and a new operator
-contract. It is not currently approved.
+contract. The owner did not select it for this correction.
+
+The implementation correction does not prove product effect. Run a new
+unlocked preflight against the new product source. Then present the exact
+version 4 corpus and requirement digests for owner baseline review.
 
 Milestone D.1 remains open. Milestone E remains deferred.
+
+### 21.14 Approved bounded memory-content contract
+
+_State: approved by the product owner on 2026-07-31. Implementation and
+release verification are recorded in the linked workpad._
+
+The shared context response uses contract version `2`. Ranking rule version
+`1` remains unchanged.
+
+| ID | Product requirement | Verification |
+|---|---|---|
+| BMS-REQ-001 | Each context brief shall identify context contract version `2`. | Core, command, and MCP payload assertions |
+| BMS-REQ-002 | Each returned memory shall include a one-line title of at most 160 Unicode characters. | Kind and boundary tests |
+| BMS-REQ-003 | Each returned memory shall identify its summary as `cluster_scope`, `proposed_root_cause`, or `learning_takeaway`. | Kind matrix |
+| BMS-REQ-004 | Each returned memory shall include a one-line summary of at most 2,000 Unicode characters. | Multiline and over-limit tests |
+| BMS-REQ-005 | The shared core shall derive each summary only from the canonical content that its summary kind identifies. | Exact source-content assertions |
+| BMS-REQ-006 | The shared core shall preserve each memory kind and canonical epistemic status. | Proposed, rejected, and Learning state assertions |
+| BMS-REQ-007 | The command, MCP, SessionStart, and UserPromptSubmit adapters shall expose semantically equivalent title, summary, status, match, and source facts. | Adapter and hook matrices |
+| BMS-REQ-008 | The context fingerprint and token shall bind context contract version `2` while ranking rule version `1` remains unchanged. | Token decode and repeat equality |
+| BMS-REQ-009 | Context retrieval shall not modify canonical or derived board state, execute code, or use network access after it adds memory content. | No-write, hostile-input, and closed-proxy tests |
+| BMS-REQ-010 | The shared core shall not infer a stronger epistemic state from summary content. | Proposed-hypothesis assertion |
+
+The exact result fields are:
+
+```json
+{
+  "title": "<one line; 0-160 Unicode characters>",
+  "summary_kind": "cluster_scope | proposed_root_cause | learning_takeaway",
+  "summary": "<one line; 0-2000 Unicode characters>"
+}
+```
+
+The fields are additive. Existing clients can ignore them. The same shared
+core supplies the plugin command, MCP tool, SessionStart, and
+UserPromptSubmit. No adapter implements its own content selection.
+
+All returned Markdown content remains untrusted data. The core collapses line
+and control separators. It truncates content after the applicable character
+limit. It does not execute content, make a network request, open a source
+reference, change canonical Markdown, or record raw task text.
+
+A cluster summary is structural evidence. A hypothesis summary is an
+inference with the separate H### status. A Learning summary is a durable
+takeaway with its separate outcome status. Match reasons and source
+references remain separate from the memory claim.
+
+The formal structured requirement artifact remains draft until it receives
+digest-matched human reviews and baseline approval. This state does not change
+the owner's source decision that selects and authorizes the product
+correction.
 
 ## 22. Research and evidence
 
 Current product evidence:
 
+- [`2026-07-31 bounded memory summary contract`](evidence/2026-07-31-bounded-memory-summary-contract.md)
 - [`2026-07-30 Milestone D.1 version 4 proposal preflight`](evidence/2026-07-30-milestone-d1-corpus-v4-proposal.md)
 - [`2026-07-29 Milestone D.1 live-evaluation preflight`](evidence/2026-07-29-milestone-d1-live-evaluation-preflight.md)
 - [`2026-07-29 Milestone D.1 client-neutral evaluation contract`](evidence/2026-07-29-milestone-d1-client-neutral-evaluation-contract.md)

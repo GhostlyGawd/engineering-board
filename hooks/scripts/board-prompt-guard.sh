@@ -91,8 +91,11 @@ if results:
     )
 for item in results[:3]:
     lines.append(
-        f"{item.get('id')} [{item.get('status')}] score {item.get('score')}: "
-        f"{item.get('why')} Sources: {', '.join(item.get('source_refs', [])[:4])}"
+        f"{item.get('id')} [{item.get('kind')}/{item.get('status')}] "
+        f"score {item.get('score')}: {item.get('title')}. "
+        f"Summary ({item.get('summary_kind')}): {item.get('summary')} "
+        f"Match: {item.get('why')} "
+        f"Sources: {', '.join(item.get('source_refs', [])[:4])}"
     )
 print(json.dumps({"systemMessage": "\n".join(lines)}, ensure_ascii=True))
 PY

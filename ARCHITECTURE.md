@@ -112,7 +112,7 @@ The `needs:` state machine: `tdd → review → validate → resolved`. The Stop
 
 | Command | Group | Purpose |
 |---|---|---|
-| `/board-context <project> [options]` | Pattern intelligence | Retrieve a bounded brief of relevant clusters, H### hypotheses, negative memory, and L### Learnings. Each result exposes structural signals, score components, a reason, and canonical sources. Read-only. |
+| `/board-context <project> [options]` | Pattern intelligence | Retrieve a bounded brief of relevant clusters, H### hypotheses, negative memory, and L### Learnings. Each result exposes a stable title, typed summary, epistemic state, structural signals, score components, a reason, and canonical sources. Read-only. |
 | `/board-outcome <project> <action>` | Pattern intelligence | Preview/apply one explicit H### fix outcome, apply one returned L### plan, run the authorized Learning curator, or show the derived value report. |
 | `/board-demo [--run-id <id>]` | Pattern intelligence | Create a manifest-tracked synthetic run, build deterministic graph facts, invoke `board-insights` for one evidence-cited proposed hypothesis, render the evidence to cluster to hypothesis view, and report exact cleanup. No real board data or settings are changed. |
 | `/board-insights <project> [--cluster …] [--limit …]` | Pattern intelligence | Rank deterministic clusters with exposed score components and linked hypothesis and negative-memory references. Read-only. |
@@ -283,10 +283,18 @@ task + changed paths + selected entries
 
 Context eligibility requires a structural signal from a canonical pattern,
 affected-path overlap, or graph proximity. Task-term overlap cannot make a
-result eligible by itself. Each result exposes its five score components.
+result eligible by itself. Each result exposes its five score components, a
+stable title, a typed bounded summary, its epistemic state, and canonical
+sources.
+
+Context contract version `2` identifies the additive memory-content payload.
+Ranking rule version `1` remains unchanged. A cluster summary describes
+structural scope. A hypothesis summary remains a proposed root cause unless
+its separate status records stronger evidence.
 
 Context reads do not write canonical state. A context token records the memory
-source and result identifiers. It does not grant mutation authority.
+source, contract and ranking versions, and result identifiers. It does not
+grant mutation authority.
 
 An outcome preview validates the entry, H### relation, cited evidence, result
 and disposition compatibility, observation date, and optional context token.

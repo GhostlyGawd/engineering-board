@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "engineering-board",
   "display_name": "engineering-board",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "Repository-owned engineering pattern intelligence. 19 MCP tools over canonical Markdown.",
   "long_description": "A zero-dependency MCP server exposing Engineering Board's canonical Markdown as tools: retrieve relevant systemic context, manage P### pattern identities and H### hypotheses, record explicit fix outcomes, update L### Learning confidence, and coordinate work. Pure python3, no third-party dependencies.",
   "author": {

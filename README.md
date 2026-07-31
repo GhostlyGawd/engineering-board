@@ -14,7 +14,7 @@ _The board is the database._
 
 [![Website](https://img.shields.io/badge/website-ghostlygawd.github.io-E6A94E.svg)](https://ghostlygawd.github.io/engineering-board/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.11.0-E6A94E.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.12.0-E6A94E.svg)](CHANGELOG.md)
 [![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
 [![MCP](https://img.shields.io/badge/MCP-server-171719.svg)](mcp-server/README.md)
@@ -78,8 +78,9 @@ Milestone D puts this memory in the agent's decision path:
 
 - `board_context` retrieves relevant clusters, hypotheses, negative memory, and
   Learnings before the agent selects a fix.
-- Each result shows the structural signals, score components, reason, state,
-  and canonical sources.
+- Each result shows a stable title, a typed summary of at most 2,000
+  characters, the epistemic state, structural signals, score components,
+  match reason, and canonical sources.
 - `board_outcomes` records an explicit fix result against an H### hypothesis.
 - Structured outcomes update Learning state and confidence through a separate
   preview and apply operation.
@@ -103,11 +104,12 @@ The unlocked version 4 proposal now limits each positive case to one visible
 current incident. It also requires a positive classification to connect that
 incident to prior repository evidence. A non-scored proposal preflight found
 that v1.11.0 ranks the expected memory but does not include the memory title,
-cause, or summary in the returned result. The proposal remains unlocked. It
-cannot enter a scored run until the product owner approves a corrected
-baseline and the context-information gap is resolved. See
-[`evaluation/README.md`](evaluation/README.md) for the proof boundary and
-operator commands.
+cause, or summary in the returned result. Context contract version 2 now
+returns that bounded canonical content with its separate epistemic state,
+match reason, and sources. The proposal remains unlocked. Run a new
+non-scored preflight before the product owner reviews an exact version 4
+baseline. See [`evaluation/README.md`](evaluation/README.md) for the proof
+boundary and operator commands.
 
 ## Product differences
 
@@ -188,8 +190,9 @@ For explicit setup values, use:
 2. Let SessionStart and UserPromptSubmit retrieve relevant systemic memory.
 3. Run `/board-context <project>` when you want the same bounded brief
    explicitly.
-4. Investigate the cited cluster, hypothesis, negative memory, or Learning
-   before you select a local fix.
+4. Read the memory title, typed summary, epistemic state, match reason, and
+   sources. Inspect the cited canonical record before you rely on a proposed
+   cause.
 5. Let the Stop hook capture a finding in
    `engineering-board/<project>/_sessions/`.
 6. Run `/board-promote` to preview canonical changes.
