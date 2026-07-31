@@ -15,6 +15,7 @@ root = Path(sys.argv[1]).resolve()
 sys.path.insert(0, str(root / "mcp-server"))
 
 from engineering_board_core import (
+    _decode_context_token,
     GraphError,
     apply_hypothesis_plan,
     apply_learning_plan,
@@ -125,6 +126,28 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-d-") as tmp:
     assert before_digest == after_digest
     assert first["context_fingerprint"].startswith("ctx-")
     assert first["ranking_rule_version"] == "1"
+    assert first["context_contract_version"] == "2"
+    token_payload = _decode_context_token(first["context_token"])
+    assert token_payload["context_contract_version"] == "2"
+    hypothesis_memory = next(
+        item for item in first["results"] if item["id"] == "H001"
+    )
+    assert hypothesis_memory["kind"] == "hypothesis"
+    assert hypothesis_memory["status"] == "proposed"
+    assert hypothesis_memory["title"] == "The shared boundary has no owner"
+    assert hypothesis_memory["summary_kind"] == "proposed_root_cause"
+    assert hypothesis_memory["summary"] == (
+        "The API and UI rely on an implicit ownership boundary."
+    )
+    cluster_memory = next(
+        item for item in first["results"] if item["kind"] == "cluster"
+    )
+    assert cluster_memory["title"] == "boundary-ownership"
+    assert cluster_memory["summary_kind"] == "cluster_scope"
+    assert "Pattern IDs: P001" in cluster_memory["summary"]
+    assert "Normalized patterns: boundary-ownership" in cluster_memory["summary"]
+    assert "Members: B001, B002" in cluster_memory["summary"]
+    assert "Affected domains: api, ui" in cluster_memory["summary"]
     assert any(item["id"] == "H001" for item in first["results"])
     assert all(
         item["components"]["canonical_pattern"]
@@ -133,6 +156,7 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-d-") as tmp:
         > 0
         for item in first["results"]
     )
+    checks += 1
     checks += 1
 
     lexical_decoy = build_context(
@@ -260,6 +284,22 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-d-") as tmp:
     assert "outcome_status: supported" in learning_text
     assert "confidence: medium" in learning_text
     assert "outcome_refs: [H001]" in learning_text
+    learning_context = build_context(
+        board,
+        project,
+        task="boundary-ownership",
+        entry_ids=["B002"],
+        limit=10,
+    )
+    learning_memory = next(
+        item for item in learning_context["results"] if item["kind"] == "learning"
+    )
+    assert learning_memory["title"] == "Recurring pattern: boundary-ownership"
+    assert learning_memory["summary_kind"] == "learning_takeaway"
+    assert "Review the cited resolutions before another local fix." in (
+        learning_memory["summary"]
+    )
+    checks += 1
     checks += 1
 
     report = build_value_report(board, project)
@@ -340,6 +380,61 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-d-") as tmp:
     assert hashlib.sha256(
         next((board / "learnings").glob("L*.md")).read_bytes()
     ).hexdigest() == l_digest
+    checks += 1
+
+    learning_path = next((board / "learnings").glob("L*.md"))
+    learning_source = learning_path.read_text(encoding="utf-8")
+    learning_source = learning_source.replace(
+        "title: Recurring pattern: boundary-ownership",
+        "title: " + ("T" * 200),
+        1,
+    )
+    takeaway_start = learning_source.index("## Takeaway\n\n") + len(
+        "## Takeaway\n\n"
+    )
+    takeaway_end = learning_source.index("\n\n## Sources", takeaway_start)
+    learning_source = (
+        learning_source[:takeaway_start]
+        + "first line\n"
+        + ("x" * 2100)
+        + learning_source[takeaway_end:]
+    )
+    learning_path.write_text(learning_source, encoding="utf-8")
+    bounded_context = build_context(
+        board,
+        project,
+        task="boundary-ownership",
+        entry_ids=["B002"],
+        limit=10,
+    )
+    bounded_learning = next(
+        item for item in bounded_context["results"] if item["kind"] == "learning"
+    )
+    assert bounded_learning["title"] == "T" * 160
+    assert len(bounded_learning["summary"]) == 2000
+    assert "\n" not in bounded_learning["summary"]
+    assert bounded_learning["summary"].startswith("first line ")
+    checks += 1
+
+    hypothesis_path = next((board / "hypotheses").glob("H*.md"))
+    hypothesis_source = hypothesis_path.read_text(encoding="utf-8")
+    assert "status: weakened\n" in hypothesis_source
+    hypothesis_path.write_text(
+        hypothesis_source.replace(
+            "status: weakened\n", "status: rejected\n", 1
+        ),
+        encoding="utf-8",
+    )
+    rejected_context = build_context(
+        board, project, task="boundary-ownership", entry_ids=["B002"], limit=10
+    )
+    negative_memory = next(
+        item for item in rejected_context["results"] if item["id"] == "H001"
+    )
+    assert negative_memory["kind"] == "negative_memory"
+    assert negative_memory["status"] == "rejected"
+    assert negative_memory["summary_kind"] == "proposed_root_cause"
+    assert "implicit ownership boundary" in negative_memory["summary"]
     checks += 1
 
 print(f"Milestone D context and outcome intelligence matrix: {checks} checks passed")

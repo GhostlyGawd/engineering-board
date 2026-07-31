@@ -156,7 +156,12 @@ results = d.get("results", [])
 if results:
     print("  SYSTEMIC MEMORY — review before choosing a local fix:")
 for item in results:
-    print(f"    - {item.get('\''id'\'')} [{item.get('\''status'\'')}] score {item.get('\''score'\'')}: {item.get('\''why'\'')}")
+    print(
+        f"    - {item.get('\''id'\'')} [{item.get('\''kind'\'')}/{item.get('\''status'\'')}] "
+        f"score {item.get('\''score'\'')}: {item.get('\''title'\'')}"
+    )
+    print(f"      summary ({item.get('\''summary_kind'\'')}): {item.get('\''summary'\'')}")
+    print(f"      match: {item.get('\''why'\'')}")
     sources = ", ".join(item.get("source_refs", [])[:4])
     if sources:
         print(f"      sources: {sources}")

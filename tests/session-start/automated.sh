@@ -246,6 +246,8 @@ MEMORY_COUNT="$(
 )"
 if printf '%s\n' "$OUT9" | grep -qF "SYSTEMIC MEMORY" &&
    printf '%s\n' "$OUT9" | grep -qF "H001" &&
+   printf '%s\n' "$OUT9" | grep -qF "The shared boundary has no owner" &&
+   printf '%s\n' "$OUT9" | grep -qF "Two domains use an implicit boundary." &&
    [ "$MEMORY_COUNT" -le 3 ]; then
   pass "T9: active entry surfaces no more than three systemic memories"
 else

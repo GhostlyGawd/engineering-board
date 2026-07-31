@@ -37,7 +37,7 @@ the current working directory, and can be overridden per-call with a `root` argu
 | `board_get_entry` | Full markdown of one entry by id (+ parsed frontmatter). |
 | `board_update_entry` | Update frontmatter (`status`, `needs`, `priority`, `blocked_by`, `parent`) and/or append a body section. validate the status transition. rebuild the index. Optional `comment: {author, text}` appends a server-timestamped line to the entry's `## Comments` section. |
 | `board_graph` | Build the deterministic typed graph from canonical entry and P### pattern Markdown, write `GRAPH.yml`, and reuse only a source-equivalent disposable cache. `full: true` bypasses the cache. |
-| `board_context` | Retrieve a bounded context brief from task, path, entry, and current-directory signals. Each result exposes score components, matched signals, state, staleness, reason, and canonical sources. `report: true` returns the derived value report. |
+| `board_context` | Retrieve a bounded context brief from task, path, entry, and current-directory signals. Each result exposes a stable title, typed summary, epistemic state, score components, matched signals, staleness, reason, and canonical sources. `report: true` returns the derived value report. |
 | `board_insights` | Rank graph clusters with transparent score components and return linked H### and rejected negative-memory references. The score is investigation priority, not causal confidence. |
 | `board_hypotheses` | List H### records or preview/apply propose, evaluate, reopen, split, and merge operations. Mutations require an unchanged self-contained plan token and cited evidence. |
 | `board_outcomes` | Preview or apply a structured H### fix outcome. It also applies one returned L### Learning plan, curates eligible Learning feedback under PM authority, or returns the derived value report. |
@@ -55,7 +55,12 @@ ranking, context, hypothesis, outcome, and Learning behavior delegates to the
 same zero-dependency core used by the plugin.
 
 `board_context` is read-only. Its token proves which repository memory the
-system surfaced. It does not authorize a write.
+system surfaced. Context contract version `2` adds a one-line title of at most
+160 characters and a typed one-line summary of at most 2,000 characters.
+Cluster summaries state structural scope. H### summaries state a proposed root
+cause. L### summaries state a Takeaway. The separate status field preserves
+epistemic authority. The token binds the context-contract and ranking-rule
+versions. It does not authorize a write.
 
 `board_outcomes` uses a preview and apply boundary. The preview returns a
 content-bound plan and changes no canonical file. Apply revalidates under the

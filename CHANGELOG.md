@@ -21,6 +21,10 @@ increases.
   and Markdown reports. The harness does not execute live clients and is not
   part of the plugin or MCP bundle.
 
+- Added context contract version 2. Each cluster, hypothesis, rejected
+  negative memory, and Learning result now includes a stable title and typed
+  bounded summary from canonical repository memory.
+
 ### Changed
 
 - The harness now refuses calibration corpora for scored runs, records corpus
@@ -37,6 +41,19 @@ increases.
   a real structured outcome to an isolated fixture copy.
 - Made the test workflow fetch full Git history so it can verify and load the
   pinned Milestone D.1 source commit.
+
+- SessionStart and UserPromptSubmit now show the selected memory title,
+  summary kind, summary, epistemic state, match reason, and canonical sources
+  before an agent chooses a fix.
+- Context fingerprints and tokens now bind context contract version 2 while
+  ranking rule version 1 remains unchanged.
+
+### Security
+
+- Context titles are limited to 160 Unicode characters. Context summaries are
+  limited to 2,000 Unicode characters. The core flattens line and control
+  separators and the adapters label the returned content as untrusted
+  repository data.
 
 ## [1.11.0] — 2026-07-29
 

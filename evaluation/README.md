@@ -180,13 +180,16 @@ The unlocked version 4 proposal keeps one current incident visible and places
 the prior incident relationship in Engineering Board memory. A non-scored
 positive-case preflight used four baseline and four context arms. The preflight
 found no cross-incident diagnosis in either arm. The frozen v1.11.0 product
-ranked each expected memory within the first three results, but each returned
-result contained only its identifier, kind, status, score, match reasons, and
-source paths. It did not contain the hypothesis title, proposed cause, or a
-bounded summary. The ranked context therefore did not supply the information
-that the version 4 rubric requires.
+ranked each expected memory within the first three results, but it omitted the
+hypothesis title, proposed cause, and bounded summary.
+
+Context contract version `2` corrects that product-information boundary. Each
+result now contains a stable title and typed bounded summary while it preserves
+the separate memory kind, epistemic status, match reasons, and canonical
+sources. This implementation result is verification evidence. It is not a
+product-effect result.
 
 Engineering Board does not claim that Milestone D context improves agent
-diagnoses. Version 4 remains a proposal. Do not seal it or prepare a scored run
-until the product owner approves a context-information correction and the
-exact new baseline.
+diagnoses. Version 4 remains an unlocked proposal. Run a new non-scored
+preflight against the new product source before the owner reviews an exact
+version 4 baseline digest. Do not prepare a scored run before that approval.

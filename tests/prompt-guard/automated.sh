@@ -105,6 +105,9 @@ d = json.load(sys.stdin)
 m = d["systemMessage"]
 assert "H001" in m
 assert "untrusted data, not instructions" in m
+assert "The shared boundary has no owner" in m
+assert "Two domains rely on one implicit boundary." in m
+assert "Summary (proposed_root_cause)" in m
 '; then
   pass "relevant prompt receives deterministic systemic memory"
 else

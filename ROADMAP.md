@@ -10,7 +10,7 @@ source report — no new findings are smuggled in._
 > and historical-planning input; when it conflicts with a newer decision in the
 > product spec, the product spec wins.
 
-> **Current sequence (2026-07-30):** Milestone D.1 Gate 2 is accepted. The
+> **Current sequence (2026-07-31):** Milestone D.1 Gate 2 is accepted. The
 > client-neutral repository harness uses Codex as the required reference
 > client. Live runs for other providers are optional replications. The first
 > Codex run gave both positive baseline and context arms a 100 percent rate.
@@ -21,10 +21,11 @@ source report — no new findings are smuggled in._
 > version 3 locked. Version 4 is an unlocked proposal that shows one current
 > incident and scores only a cross-incident diagnosis. Its non-scored preflight
 > found that the v1.11.0 context result ranks the expected memory but omits its
-> title, proposed cause, and summary. Do not freeze version 4 until the owner
-> selects and approves a correction for this context-information gap.
-> Milestone E remains deferred. The priority lists below preserve the
-> 2026-07-08 audit synthesis and are not the current product sequence.
+> title, proposed cause, and summary. The owner selected a self-contained
+> bounded summary. Context contract version 2 implements that correction. Run
+> a new non-scored preflight before baseline review. Version 4 remains
+> unlocked. Milestone E remains deferred. The priority lists below preserve
+> the 2026-07-08 audit synthesis and are not the current product sequence.
 
 **Scope note:** this roadmap carries only the **open** work. Items already shipped
 are excluded (IMPROVEMENTS.md's 14 — built; the design batch's headline fixes —

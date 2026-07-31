@@ -61,7 +61,10 @@ HYPOTHESIS_SECTIONS = (
 GRAPH_SCHEMA_VERSION = "3"
 RANKING_RULE_VERSION = "1"
 CONTEXT_RANKING_RULE_VERSION = "1"
+CONTEXT_CONTRACT_VERSION = "2"
 CONTEXT_RESULT_LIMIT = 3
+CONTEXT_TITLE_LIMIT = 160
+CONTEXT_SUMMARY_LIMIT = 2000
 CONTEXT_STOPWORDS = {
     "and",
     "are",
@@ -2251,6 +2254,11 @@ def _context_task_tokens(value: str) -> set[str]:
     }
 
 
+def _bounded_context_text(value: Any, maximum: int) -> str:
+    """Return one bounded line of untrusted canonical memory content."""
+    return _oneline(value)[:maximum]
+
+
 def _graph_distance(
     graph: dict[str, Any], starts: set[str], targets: set[str]
 ) -> int | None:
@@ -2407,7 +2415,29 @@ def build_context(
     }
     for cluster_fp, cluster in sorted(ranked_by_fp.items()):
         pattern_ids = set(cluster.get("pattern_ids", []))
+        pattern_labels = sorted(
+            {str(value) for value in cluster.get("patterns", []) if str(value)}
+        )
         members = set(cluster.get("members", []))
+        affected_domains = sorted(
+            {
+                str(value)
+                for value in cluster.get("affected_domains", [])
+                if str(value)
+            }
+        )
+        summary_parts = []
+        if pattern_ids:
+            summary_parts.append("Pattern IDs: " + ", ".join(sorted(pattern_ids)))
+        if pattern_labels:
+            summary_parts.append(
+                "Normalized patterns: " + ", ".join(pattern_labels)
+            )
+        summary_parts.append("Members: " + ", ".join(sorted(members)))
+        if affected_domains:
+            summary_parts.append(
+                "Affected domains: " + ", ".join(affected_domains)
+            )
         candidates.append(
             {
                 "kind": "cluster",
@@ -2416,8 +2446,16 @@ def build_context(
                 "stale": False,
                 "pattern_ids": pattern_ids,
                 "members": members,
-                "title": " ".join(cluster.get("patterns", [])),
-                "texts": list(cluster.get("patterns", [])),
+                "title": _bounded_context_text(
+                    " / ".join(pattern_labels) or f"Cluster {cluster_fp}",
+                    CONTEXT_TITLE_LIMIT,
+                ),
+                "summary_kind": "cluster_scope",
+                "summary": _bounded_context_text(
+                    ". ".join(summary_parts) + ".",
+                    CONTEXT_SUMMARY_LIMIT,
+                ),
+                "texts": pattern_labels,
                 "source_refs": sorted(
                     set(cluster.get("member_sources", {}).values())
                 ),
@@ -2438,7 +2476,15 @@ def build_context(
                 ),
                 "pattern_ids": set(_as_list(frontmatter.get("pattern_ids"))),
                 "members": set(record["derived_from"]),
-                "title": str(frontmatter.get("title") or hypothesis_id),
+                "title": _bounded_context_text(
+                    frontmatter.get("title") or hypothesis_id,
+                    CONTEXT_TITLE_LIMIT,
+                ),
+                "summary_kind": "proposed_root_cause",
+                "summary": _bounded_context_text(
+                    record["sections"].get("Proposed root cause", ""),
+                    CONTEXT_SUMMARY_LIMIT,
+                ),
                 "texts": [
                     str(frontmatter.get("title") or ""),
                     record["claim_key"],
@@ -2464,7 +2510,15 @@ def build_context(
                 "stale": False,
                 "pattern_ids": learning_patterns,
                 "members": set(record["derived_from"]),
-                "title": record["title"],
+                "title": _bounded_context_text(
+                    record["title"],
+                    CONTEXT_TITLE_LIMIT,
+                ),
+                "summary_kind": "learning_takeaway",
+                "summary": _bounded_context_text(
+                    record["takeaway"],
+                    CONTEXT_SUMMARY_LIMIT,
+                ),
                 "texts": [record["title"], record["takeaway"], record["pattern_tag"]],
                 "source_refs": [record["source"]] + [
                     str(entries_by_id.get(item, {}).get("_source") or "")
@@ -2570,6 +2624,9 @@ def build_context(
                 "kind": candidate["kind"],
                 "id": candidate["id"],
                 "status": candidate["status"],
+                "title": candidate["title"],
+                "summary_kind": candidate["summary_kind"],
+                "summary": candidate["summary"],
                 "stale": candidate["stale"],
                 "score": score,
                 "components": components,
@@ -2612,6 +2669,7 @@ def build_context(
     context_material = {
         "request_digest": request_digest,
         "source_fingerprint": source_fp,
+        "context_contract_version": CONTEXT_CONTRACT_VERSION,
         "ranking_rule_version": CONTEXT_RANKING_RULE_VERSION,
         "result_ids": [item["id"] for item in results],
     }
@@ -2625,6 +2683,7 @@ def build_context(
         "context_fingerprint": context_fingerprint,
         "source_fingerprint": source_fp,
         "ranking_rule_version": CONTEXT_RANKING_RULE_VERSION,
+        "context_contract_version": CONTEXT_CONTRACT_VERSION,
         "results": results,
         "warnings": sorted(set(ranking["warnings"])),
         "context_token": _encode_context_token(context_material),

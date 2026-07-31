@@ -186,6 +186,8 @@ The shared core accepts bounded inputs:
 - File paths: at most 100 safe repository-relative paths
 - Entry identifiers: at most 50 canonical identifiers
 - Results: at most 10 for an explicit request and at most 3 in a hook message.
+- Result titles: one line and at most 160 Unicode characters.
+- Result summaries: one line and at most 2,000 Unicode characters.
 
 The retrieval operation rejects an unsafe path, an unknown entry identifier,
 an out-of-repository current directory, and a linked canonical record.
@@ -196,13 +198,19 @@ canonical pattern, affected-path, or graph relation.
 
 The hook adapters use a 3.8-second internal deadline. A timeout or malformed
 record produces a bounded warning. An unrelated prompt produces no context
-message.
+message. The adapters label titles and summaries as untrusted repository data.
+
+The core flattens line and control separators before it returns a title or
+summary. It derives cluster scope from typed graph fields, H### content from
+the proposed-root-cause section, and L### content from the Takeaway section.
+It preserves the separate kind and status fields. Readable content does not
+confirm a proposed hypothesis.
 
 The retrieval core makes no network request. It does not execute board
 content, start a process from board content, retain raw prompt text, or change
 a canonical file. A context token contains request and source digests plus
-result identifiers. It does not contain raw task text and does not authorize a
-write.
+the context-contract version, ranking-rule version, and result identifiers. It
+does not contain raw task text and does not authorize a write.
 
 ## Control fix outcomes and Learning feedback
 
