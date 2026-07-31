@@ -2,7 +2,7 @@
 
 Date: 2026-07-31
 
-State: version 1.12.0 prepared; pull-request gates pending
+State: version 1.12.0 published and verified; closeout evidence pending merge
 
 Completion state: `self-contained`
 
@@ -117,10 +117,10 @@ exact fields above preserve those meanings. No source condition was removed.
 - [x] Worker: run focused and complete repository tests.
 - [x] Worker: prepare coordinated version 1.12.0 and reproduce its MCP bundle
   checksum.
-- [ ] Worker: pass pull-request continuous integration.
-- [ ] Post-merge: pass merged-main continuous integration.
-- [ ] Post-merge: publish and verify version 1.12.0.
-- [ ] Closeout: append release evidence in a separate pull request.
+- [x] Worker: pass pull-request continuous integration.
+- [x] Post-merge: pass merged-main continuous integration.
+- [x] Post-merge: publish and verify version 1.12.0.
+- [x] Closeout: append release evidence in a separate pull request.
 - [ ] Closeout: merge evidence, pass merged-main continuous integration, and
   revalidate current GitHub state.
 
@@ -150,7 +150,7 @@ Acceptance criteria:
 | Adapter parity | Required | Shared core plus command, MCP, SessionStart, and prompt renderers | Core/CLI/MCP equality and hook fixtures | README, command, and MCP description | Implemented and focused tests pass |
 | Contract identity | Required | Context-contract version in response, fingerprint, and token | Token decode and fingerprint assertions | Product spec | Implemented and verified |
 | Security and privacy | Required current truth | Offline read, one-line sanitization, size limits, untrusted-data labels | No-write, hostile-text, and size tests | SECURITY and command guidance | Full suite passed |
-| Version and publication | Required when shipped | Coordinated 1.12.0 release preparation and publication | Version coherence, bundle checksum, release workflow, and live checks | Changelog, manifests, README badge, and release evidence | Prepared and locally verified; publication pending |
+| Version and publication | Required when shipped | Coordinated 1.12.0 release preparation and publication | Version coherence, bundle checksum, release workflow, and live checks | Changelog, manifests, README badge, and release evidence | Published and live surfaces verified |
 | Version 4 evaluation baseline | Explicitly deferred | Proposal remains unlocked | Existing preparation rejection and 22 evaluation tests | Product spec and dated v4 evidence | Reviewed and unaffected |
 | SQLite, embeddings, hosted services, telemetry, and cross-repository reads | Explicitly deferred | No storage or service change | Existing offline and Markdown-authority suites | Architecture and security | Reviewed and unaffected |
 | Historical evidence | Required preservation | No historical report changes | Git diff inspection | Existing dated evidence | Reviewed and unaffected |
@@ -187,6 +187,18 @@ security boundary, version identity, and unchanged evaluation state.
 - Complete repository release tree: 19 suites passed and zero failed.
 - Prepared MCP bundle SHA-256:
   `f7de3784a0fed3604e2b774ef300533e36327da238eb409e8ddca453cf67c66c`.
+- Pull request 120 test run 30606389189: passed.
+- Merged-main test run 30606464595: passed.
+- Pages run 30606464594: passed.
+- Release run 30606518305: passed.
+- Release tag `v1.12.0` dereferences to
+  `ec05d21bdcb5a5b6c806ee8edd56768362c63c2f`.
+- The downloaded 147,751-byte MCP bundle matches the pinned SHA-256.
+- PyPI serves unyanked version 1.12.0 wheel and source distributions.
+- The official MCP Registry reports version 1.12.0 as active and latest. Its
+  bundle URL and SHA-256 match the GitHub Release.
+- The product site returned HTTP 200 and contains the bounded-summary product
+  copy and 19-tool statement.
 
 ## Uncertainties and assumptions
 
@@ -203,16 +215,16 @@ None.
 
 ## Handoff
 
-Current semantic state: implementation, version 1.12.0 preparation, and local
-release verification complete; pull-request gates pending.
+Current semantic state: implementation and version 1.12.0 publication
+complete; release evidence is ready for its closeout pull request.
 
 Next owner: Engineering Board delivery agent.
 
-Remaining gates: release commit, push, pull-request continuous integration,
-merged-main continuous integration, publication, and release closeout.
+Remaining gates: closeout pull-request continuous integration, closeout merge,
+merged-main continuous integration, and final live-state revalidation.
 
 Evidence destination:
 `docs/evidence/2026-07-31-v1.12.0-release-validation.md`.
 
-Resume route: commit the prepared release, open and merge its pull request,
-publish from the exact main commit, and append closeout evidence.
+Resume route: merge the release-evidence pull request and verify its exact
+main commit.
