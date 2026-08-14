@@ -1,6 +1,6 @@
 {
   "name": "engineering-board",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "description": "Git-committed pattern intelligence for engineering agents. Engineering Board clusters findings, preserves root-cause evidence, and retrieves relevant repository memory through 19 MCP tools.",
   "author": {
     "name": "GhostlyGawd",
