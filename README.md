@@ -81,6 +81,8 @@ Milestone D puts this memory in the agent's decision path:
 - Each result shows a stable title, a typed summary of at most 2,000
   characters, the epistemic state, structural signals, score components,
   match reason, and canonical sources.
+- A task-only miss tells the caller to add a file, entry identifier, or current
+  directory. Task words do not bypass structural eligibility.
 - `board_outcomes` records an explicit fix result against an H### hypothesis.
 - Structured outcomes update Learning state and confidence through a separate
   preview and apply operation.
@@ -310,7 +312,7 @@ same deterministic core.
 | `board_hypotheses` | List, preview, or apply H### operations |
 | `board_outcomes` | Preview or apply fix outcomes and Learning feedback |
 | `board_patterns` | List, preview, or apply P### operations |
-| `board_promote_findings` | Preview or apply scratch promotion |
+| `board_promote_findings` | Preview or apply scratch promotion without reusing resolved IDs |
 | `board_rebuild` | Build `BOARD.md` again |
 | `board_capture_finding` | Add a finding to the scratch inbox |
 | `board_claim` | Acquire an entry claim |

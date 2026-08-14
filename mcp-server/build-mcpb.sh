@@ -65,7 +65,13 @@ echo "built: $BUNDLE"
 echo "version: $VERSION"
 echo "sha256: $SHA"
 echo
-echo "The build is reproducible: this sha is already pinned in mcp-server/server.json"
-echo "(packages[0].fileSha256) and verified by the MCP test suite. Next (human):"
-echo "upload this exact file as the v$VERSION release asset, then run"
-echo "  mcp-publisher publish   (see .goal/LAUNCH.md §4)."
+PIN="$(python3 -c "import json; print(json.load(open('$HERE/server.json'))['packages'][0].get('fileSha256', ''))")"
+if [[ "$SHA" == "$PIN" ]]; then
+  echo "The checksum matches the published v$VERSION pin in mcp-server/server.json."
+  echo "Use the release workflow for publication."
+else
+  echo "The checksum does not match the published v$VERSION pin in mcp-server/server.json."
+  echo "This is valid only for documented Unreleased source changes. Do not change"
+  echo "the current-version pin. A later explicit release must rebuild and pin the"
+  echo "bundle through scripts/prepare-release.py."
+fi

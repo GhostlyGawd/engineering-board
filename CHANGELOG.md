@@ -9,6 +9,18 @@ increases.
 
 ## [Unreleased]
 
+### Fixed
+
+- Foreground promotion now includes resolved canonical entries when it checks
+  duplicate provenance and allocates the next entry identifier. Graph ranking
+  remains limited to open entries.
+- A task-only `board_context` miss now tells the caller to add a file, entry
+  identifier, or current directory. Task text alone remains insufficient for
+  structural eligibility.
+- The MCP bundle builder now reports whether current source matches the
+  published checksum. CI accepts a different checksum only for a documented
+  Unreleased change; a later release must rebuild and pin the bundle.
+
 ## [1.12.0] — 2026-07-31
 
 ### Added

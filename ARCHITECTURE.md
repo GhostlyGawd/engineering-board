@@ -117,7 +117,7 @@ The `needs:` state machine: `tdd → review → validate → resolved`. The Stop
 | `/board-demo [--run-id <id>]` | Pattern intelligence | Create a manifest-tracked synthetic run, build deterministic graph facts, invoke `board-insights` for one evidence-cited proposed hypothesis, render the evidence to cluster to hypothesis view, and report exact cleanup. No real board data or settings are changed. |
 | `/board-insights <project> [--cluster …] [--limit …]` | Pattern intelligence | Rank deterministic clusters with exposed score components and linked hypothesis and negative-memory references. Read-only. |
 | `/board-hypothesis <project> <action>` | Pattern intelligence | List H### records or preview/apply propose, evaluate, reopen, split, and merge operations with cited evidence and content-bound tokens. |
-| `/board-promote <project> [--session <file>] [--apply <plan-id>]` | Pattern intelligence | Preview foreground scratch promotion, then apply only an unchanged content-bound plan through the shared writer and receipts. |
+| `/board-promote <project> [--session <file>] [--apply <plan-id>]` | Pattern intelligence | Preview foreground scratch promotion, then apply only an unchanged content-bound plan through the shared writer and receipts. Deduplication, provenance, and ID allocation include resolved canonical entries. |
 | `/board-pattern <project> <action> [--apply <plan-id>]` | Pattern intelligence | List P### pattern records or preview/apply create, alias, assign, and correction actions with durable history. |
 | `/board-run <entry-id>` | Pipeline | Drive ONE bug/feature end-to-end (`tdd → review → validate`) in this session under claim lock: the Conductor's inner loop (RFC 0001 slice 1). Bounded (5 rounds), passive-only, no mode file. |
 | `/board-setup [project]` | Lifecycle | One-command onboarding: infers the project name, delegates to `/board-init`, runs the permission self-check, prints the 3-line ready summary. Idempotent. leaves the session passive. |
@@ -286,6 +286,10 @@ affected-path overlap, or graph proximity. Task-term overlap cannot make a
 result eligible by itself. Each result exposes its five score components, a
 stable title, a typed bounded summary, its epistemic state, and canonical
 sources.
+
+If a task-only request does not identify eligible memory, the core returns a
+warning that tells the caller to add a file, entry identifier, or current
+directory. This diagnostic does not change eligibility or ranking.
 
 Context contract version `2` identifies the additive memory-content payload.
 Ranking rule version `1` remains unchanged. A cluster summary describes

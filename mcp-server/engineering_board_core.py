@@ -831,7 +831,9 @@ def plan_promotion(
     board_dir = board_dir.resolve()
     findings = load_scratch_findings(board_dir, session)
     registry = load_pattern_registry(board_dir)
-    entries = load_entries(board_dir)
+    # Promotion identity and provenance span the complete canonical lifecycle.
+    # Graph ranking remains open-entry-only through load_entries().
+    entries = _load_all_entries(board_dir)
     existing_by_key = {
         (
             str(entry.get("type", "")),
@@ -2652,6 +2654,18 @@ def build_context(
     results = results[:limit]
     for item in results:
         item.pop("_tie", None)
+    warnings = set(ranking["warnings"])
+    if (
+        task.strip()
+        and not normalized_files
+        and not normalized_entry_ids
+        and not cwd_relative
+        and not results
+    ):
+        warnings.add(
+            "No memory was eligible from task text alone. Add files, entry_ids, "
+            "or cwd to provide a structural signal."
+        )
     request_digest = hashlib.sha256(
         json.dumps(
             {
@@ -2685,7 +2699,7 @@ def build_context(
         "ranking_rule_version": CONTEXT_RANKING_RULE_VERSION,
         "context_contract_version": CONTEXT_CONTRACT_VERSION,
         "results": results,
-        "warnings": sorted(set(ranking["warnings"])),
+        "warnings": sorted(warnings),
         "context_token": _encode_context_token(context_material),
     }
 

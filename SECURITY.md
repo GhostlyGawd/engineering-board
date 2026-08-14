@@ -146,6 +146,10 @@ row.
 A pattern or promotion change has a preview operation and an apply operation.
 The preview returns a content-bound plan.
 
+Promotion reads open and resolved canonical entries when it checks provenance,
+deduplicates findings, and allocates identifiers. This prevents reuse of a
+resolved identifier. Derived graph ranking continues to exclude resolved entries.
+
 The apply operation checks the canonical and scratch inputs again. A changed
 input makes the plan stale before a write.
 
@@ -195,6 +199,10 @@ an out-of-repository current directory, and a linked canonical record.
 A result requires a structural signal. Task-term overlap cannot surface a
 result by itself. This rule limits instruction-like lexical content that has no
 canonical pattern, affected-path, or graph relation.
+
+A task-only request that has no eligible result returns a bounded diagnostic.
+The diagnostic tells the caller to add a file, entry identifier, or current
+directory. It does not treat task text as structural evidence.
 
 The hook adapters use a 3.8-second internal deadline. A timeout or malformed
 record produces a bounded warning. An unrelated prompt produces no context

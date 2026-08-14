@@ -4,18 +4,11 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ## Open
 
-### Bugs
-- B016 P3 | [B016-version-sprawl-across-surfaces-no-authoritative-](bugs/B016-version-sprawl-across-surfaces-no-authoritative-.md) (partial — required-permissions.json done)
-- B020 P3 | [B020-board-migrate-is-two-unrelated-operations-under-](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
-- B021 P3 | [B021-code-reviewer-name-collides-with-code-review-and](bugs/B021-code-reviewer-name-collides-with-code-review-and.md)
-- B022 P3 | [B022-nothingtotest--nothingtoreview-still-advance-the](bugs/B022-nothingtotest--nothingtoreview-still-advance-the.md)
-
-### Features
-- F003 P3 | [F003-surface-matched-learnings-at-the-moment-of-need-](features/F003-surface-matched-learnings-at-the-moment-of-need-.md) (partial — 1.4.0 viewer Learnings panel done + SessionStart already surfaces matched learnings; session-end PM-summary surfacing deferred, PR-body injection kill-gated to the Conductor)
-
-### Questions
-
-### Learnings
+- B016 P3 | [Version sprawl across surfaces; no authoritative version signal](bugs/B016-version-sprawl-across-surfaces-no-authoritative-.md)
+- B020 P3 | [board-migrate is two unrelated operations under one verb](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
+- B021 P3 | [code-reviewer name collides with /code-review and its tools contradict its read-only contract](bugs/B021-code-reviewer-name-collides-with-code-review-and.md)
+- B022 P3 | [nothing_to_test / nothing_to_review still advance the entry forward](bugs/B022-nothingtotest--nothingtoreview-still-advance-the.md)
+- F003 P3 | [Surface matched Learnings at the moment of need (session summary + viewer panel)](features/F003-surface-matched-learnings-at-the-moment-of-need-.md)
 - L001 | [Ship every deterministic guard with a test that drives its real fixtures and call-sites](learnings/L001-guards-need-tests-that-drive-real-callsites.md)
 - L002 | [Board health invariants must respect the open-vs-resolved entry lifecycle](learnings/L002-invariants-must-respect-the-entry-lifecycle.md)
 - L003 | [The newest surface carries the most risk — red-team it hardest](learnings/L003-newest-surfaces-carry-the-most-risk.md)

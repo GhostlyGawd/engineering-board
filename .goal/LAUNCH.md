@@ -67,16 +67,17 @@ Equivalent from a clone with push rights: `git tag -a v1.3.0 b35cf7f -m … && g
 The server ships from the repo tree (it shells out to sibling `hooks/scripts/`),
 so the registry package is an **MCP bundle** (`.mcpb`), built and version-locked
 to `plugin.json`. The build is **reproducible** (python3 `zipfile`, fixed
-timestamps), so `packages[0].fileSha256` in `server.json` is **already pinned**
-to the exact sha the build produces — and the MCP test suite fails if they drift.
-No manual sha copy-paste step.
+timestamps). In a release-prepared tree, `packages[0].fileSha256` in
+`server.json` is pinned to the exact checksum that the build produces. A tree
+with documented Unreleased changes can differ from the immutable published
+pin. No manual checksum copy step is necessary.
 
 **Preferred path: §3's release workflow does all of this** — bundle build, sha
 verification, asset upload, and (run 2) the OIDC registry publish. The manual
 equivalent, for a clone:
 
 ```sh
-# 1. Build the bundle. It is byte-reproducible: the sha it prints already equals
+# 1. Build the bundle. In a release-prepared tree, the checksum equals
 #    packages[0].fileSha256 in mcp-server/server.json (CI-verified).
 bash mcp-server/build-mcpb.sh          # → dist/engineering-board-mcp.mcpb
 

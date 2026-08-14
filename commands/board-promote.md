@@ -28,6 +28,10 @@ Show the returned `created`, `deduplicated`, `rejected`, and
 pattern label, and rejection reason. This preview does not write canonical
 state.
 
+The preview checks open and resolved canonical entries. It does not reuse a
+resolved identifier. It also deduplicates a finding against resolved canonical
+provenance and content.
+
 ## Apply
 
 Apply only when `$ARGUMENTS` includes `--apply <plan-id>`:

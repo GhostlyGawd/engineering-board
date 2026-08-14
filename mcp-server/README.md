@@ -42,7 +42,7 @@ the current working directory, and can be overridden per-call with a `root` argu
 | `board_hypotheses` | List H### records or preview/apply propose, evaluate, reopen, split, and merge operations. Mutations require an unchanged self-contained plan token and cited evidence. |
 | `board_outcomes` | Preview or apply a structured H### fix outcome. It also applies one returned L### Learning plan, curates eligible Learning feedback under PM authority, or returns the derived value report. |
 | `board_patterns` | List canonical pattern records or preview/apply create, alias, assign, and correction operations. Every mutation requires the unchanged content-bound plan id. |
-| `board_promote_findings` | Preview or apply captured scratch findings with typed created/deduplicated/rejected/already-applied outcomes, durable provenance, and idempotent receipts. |
+| `board_promote_findings` | Preview or apply captured scratch findings with typed created/deduplicated/rejected/already-applied outcomes, durable provenance, idempotent receipts, and identifier allocation across open and resolved entries. |
 | `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files (P0 to P3 ordering, `⊘ Q###` when blocked, `↳` child rows under parents, resolved omitted). Idempotent. |
 | `board_capture_finding` | Append a finding to the scratch inbox `_sessions/mcp-<UTC-date>.md`. |
 | `board_claim` | Acquire an entry lock (shells out to `board-claim-acquire.sh`. 0=acquired, 1=contended, 2=stale). |
@@ -61,6 +61,10 @@ Cluster summaries state structural scope. H### summaries state a proposed root
 cause. L### summaries state a Takeaway. The separate status field preserves
 epistemic authority. The token binds the context-contract and ranking-rule
 versions. It does not authorize a write.
+
+Task text refines structurally eligible memory. It does not create eligibility
+by itself unless it names a canonical P### pattern. A task-only miss returns a
+warning that asks for a file, entry identifier, or current directory.
 
 `board_outcomes` uses a preview and apply boundary. The preview returns a
 content-bound plan and changes no canonical file. Apply revalidates under the

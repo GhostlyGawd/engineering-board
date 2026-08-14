@@ -1284,6 +1284,9 @@ or the user contract reopens alignment.
   fresh-preview instruction.
 - Duplicate scratch provenance already promoted to idempotent `already_applied`
   receipt. never allocate another entry.
+- Promotion deduplication, provenance lookup, and identifier allocation read
+  the complete canonical entry lifecycle, including resolved entries. Graph
+  construction continues to exclude resolved entries from active ranking.
 - One finding fails during a multi-finding apply to report per-finding results,
   preserve every unverified scratch finding, and make retry idempotent from the
   durable receipt. Never claim all-or-nothing atomicity across files.
@@ -2225,7 +2228,9 @@ never deleted by a rebuild.
 ### 20.9 Failure, retry, performance, and security
 
 - Invalid context returns `invalid_context` before analysis.
-- No eligible memory returns `results: []`.
+- No eligible memory returns `results: []`. A task-only miss also returns a
+  bounded warning that tells the caller to add a file, entry identifier, or
+  current directory.
 - Malformed canonical evidence returns `source_invalid` with source paths. The
   engine does not silently skip evidence that could change a result.
 - A stale derived source returns `analysis_stale` or rebuilds in memory. A read
@@ -2317,7 +2322,7 @@ add SQLite to Milestone D.
 | Sequence | Failure injection | Expected semantic outcome | Durable evidence | Requirement |
 |---|---|---|---|---|
 | Retrieve with one task, file, and entry twice | Same canonical source | Ordered results, component scores, why text, fingerprints, and warnings are equal | Compared payloads | MD-REQ-001, 003 |
-| Use similar task words for an unrelated pattern | Text overlap without a structural signal | No memory is eligible | Empty result | MD-REQ-002, 009 |
+| Use similar task words for an unrelated pattern | Text overlap without a structural signal | No memory is eligible | Empty result and corrective structural-signal warning | MD-REQ-002, 009 |
 | Match a prior pattern through a file in another domain | Different affected domain, same P### identity | Prior cluster, H###, and Learning surface with cross-domain reasons and source links | Context brief | MD-REQ-001-003 |
 | Request the same context through CLI and MCP | Two adapters | Both return semantically equal facts and fingerprints | Compared JSON | MD-REQ-004, 008 |
 | Trigger SessionStart with relevant changed files | More than three eligible memories | Exactly three highest-ranked memories surface after safety warnings | Captured hook output | MD-REQ-006 |
@@ -2381,6 +2386,11 @@ substantively review:
 - tool and command counts, manifests, package files, and bundle contents.
 - changelog, coordinated version surfaces, release tests, and dated release
   evidence.
+
+An Unreleased source change can differ from the immutable checksum of the
+published MCP bundle only when `[Unreleased]` contains a release note. A later
+explicit release must rebuild and pin the bundle through the coordinated
+release script.
 - historical Milestone A-C reports, which remain unchanged.
 
 The implementation must use a feature branch, commit, push, and pull request.
