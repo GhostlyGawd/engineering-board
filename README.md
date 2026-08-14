@@ -353,7 +353,7 @@ same deterministic core.
 | `board_hypotheses` | List, preview, or apply H### operations |
 | `board_outcomes` | Preview or apply fix outcomes and Learning feedback |
 | `board_patterns` | List, preview, or apply P### operations |
-| `board_promote_findings` | Preview or apply scratch promotion without reusing resolved IDs |
+| `board_promote_findings` | Preview or apply scratch promotion without reusing resolved IDs; an unchanged plan id restores an omitted preview session selector |
 | `board_rebuild` | Build `BOARD.md` again |
 | `board_capture_finding` | Add a finding to the scratch inbox |
 | `board_claim` | Acquire an entry claim |

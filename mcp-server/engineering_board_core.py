@@ -1068,6 +1068,41 @@ def _write_promoted_entry(
     return path.relative_to(board_dir).as_posix()
 
 
+def _promotion_plan_for_apply(
+    board_dir: Path,
+    project: str,
+    session: str | None,
+    plan_id: str,
+) -> dict[str, Any]:
+    """Find the live plan that matches an apply request."""
+    selectors: list[str | None] = [session]
+    if session is None:
+        sessions_dir = board_dir / "_sessions"
+        if sessions_dir.is_dir():
+            selectors.extend(
+                selector
+                for path in sorted(
+                    sessions_dir.glob("*.md"), key=lambda item: item.name
+                )
+                for selector in (path.name, path.stem)
+            )
+
+    for selector in selectors:
+        try:
+            candidate = plan_promotion(board_dir, project, selector)
+        except GraphError:
+            # A scoped preview excludes every other scratch file. Preserve
+            # that isolation while recovering its selector from the plan id.
+            if session is not None:
+                raise
+            continue
+        if candidate["plan_id"] == plan_id:
+            return candidate
+    raise GraphError(
+        "plan_stale: scratch or canonical inputs changed; preview again"
+    )
+
+
 def apply_promotion(
     board_dir: Path,
     project: str,
@@ -1075,13 +1110,13 @@ def apply_promotion(
     plan_id: str,
     archive_sources: bool = True,
 ) -> dict[str, Any]:
-    """Apply an unchanged promotion plan with idempotent per-finding receipts."""
+    """Apply an unchanged plan, restoring an omitted preview selector."""
     board_dir = board_dir.resolve()
-    plan = plan_promotion(board_dir, project, session)
-    if plan["plan_id"] != plan_id:
-        raise GraphError(
-            "plan_stale: scratch or canonical inputs changed; preview again"
-        )
+    # A plan id binds the exact selector string used during preview. Codex can
+    # therefore apply that plan without repeating the optional session input.
+    plan = _promotion_plan_for_apply(
+        board_dir, project, session, plan_id
+    )
     now = _utc_now()
     results: list[dict[str, Any]] = []
     final_by_file: dict[str, list[str]] = {}

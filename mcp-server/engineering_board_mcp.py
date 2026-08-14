@@ -2279,8 +2279,21 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "project": {"type": "string"},
-                "session": {"type": "string", "description": "Optional scratch filename or session selector."},
-                "apply": {"type": "string", "description": "Plan id from an unchanged preview."},
+                "session": {
+                    "type": "string",
+                    "description": (
+                        "Optional scratch filename or session selector for "
+                        "preview. Apply may repeat the same selector but does "
+                        "not require it."
+                    ),
+                },
+                "apply": {
+                    "type": "string",
+                    "description": (
+                        "Plan id from an unchanged preview. It restores that "
+                        "preview's session scope when session is omitted."
+                    ),
+                },
                 "root": _ROOT_PROP,
             },
             "required": ["project"],

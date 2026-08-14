@@ -33,6 +33,8 @@ assert server == {
     "args": ["scripts/engineering-board-mcp-launcher.mjs"],
     "cwd": ".",
 }
+consolidate_skill = (root / "skills/board-consolidate/SKILL.md").read_text()
+assert "server restores the preview session scope" in consolidate_skill
 PY
 
 node "$ROOT/scripts/engineering-board-mcp-launcher.mjs" >"$OUT" <<'JSON'
@@ -63,6 +65,10 @@ assert {tool["name"] for tool in tools} >= {
     "board_release",
     "board_promote_findings",
 }
+promote = next(tool for tool in tools if tool["name"] == "board_promote_findings")
+properties = promote["inputSchema"]["properties"]
+assert "restores that preview's session scope" in properties["apply"]["description"]
+assert "does not require it" in properties["session"]["description"]
 missing_root = responses[3]["result"]
 assert missing_root["isError"] is True
 assert "missing required argument: root" in missing_root["content"][0]["text"]
