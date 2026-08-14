@@ -4,14 +4,16 @@
 - Repository: `GhostlyGawd/engineering-board`
 - Base commit: `89976e2252ac72ba9072a39ece23dfbdb9505e72`
 - Board entry: `B016`
-- Completion state: `post-merge-pending`
-- Implementation pull request: pending
+- Completion state: `closeout`
+- Implementation pull request: [#136](https://github.com/GhostlyGawd/engineering-board/pull/136)
+- Implementation merge commit: `7fe83c92e3645d9578e3001f653a1eeb373b30d1`
+- Implementation merged-main run: [31821137740](https://github.com/GhostlyGawd/engineering-board/actions/runs/31821137740)
+- Closeout pull request: [#137](https://github.com/GhostlyGawd/engineering-board/pull/137)
 - Evidence destination: this file
-- External gates: implementation pull request merge, passing implementation
-  merged-main continuous integration, closeout pull request merge, and passing
-  closeout merged-main continuous integration
-- Terminal action: `keep-open` until implementation merged-main evidence passes;
-  then resolve B016 in a closeout change and verify the closeout merged-main run
+- External gates: closeout pull request merge and passing closeout merged-main
+  continuous integration
+- Terminal action: resolve B016 in the closeout change, release its claim, and
+  verify the closeout merged-main run
 
 ## Decision
 
@@ -86,8 +88,18 @@ runtime protocol or data schema.
 - Green release phase: all 11 release-preparation checks pass, including
   preview, apply, refresh, version alignment, and reproducible bundle checksum.
 - Maintained repository suite: 21 of 21 suites pass.
-- Implementation pull request and merged-main run: pending.
-- Closeout pull request and merged-main run: pending.
+- Implementation pull request #136 merged as `7fe83c9`; merged-main run
+  31821137740 passed with no annotations.
+- Closeout pull request #137 and its merged-main run: pending.
+
+## Closeout review
+
+- B016 is resolved and omitted from the rebuilt live board index.
+- Claim session `codex-20260814-b016-version-source` released successfully.
+- The remaining ready entries B020 and F003 share neither B016's affected
+  path nor its `version-drift` pattern, so no cascade update applies.
+- The project has no canonical hypotheses, so no hypothesis outcome applies.
+- The board index invariant passes after resolution.
 
 The deterministic guard prevents silent version drift in the reviewed files.
 It does not prove that historical prose never contains an old version or that

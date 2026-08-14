@@ -3,7 +3,7 @@ id: B016
 type: bug
 title: Version sprawl across surfaces; no authoritative version signal
 discovered: 2026-07-04
-status: in_progress
+status: resolved
 priority: P3
 affects: references/required-permissions.json
 needs: validate
@@ -38,3 +38,8 @@ The required-permissions.json stamp is aligned (done in C1b). The remaining spra
 
 - **codex** 2026-08-14T16:27:41Z: Claimed for dogfood after B022. Scope: inventory live version consumers, define the authoritative signal on current 1.12.0 main, and add a real-fixture guard before reconciling or removing redundant stamps.
 - **codex** 2026-08-14T16:38:51Z: Authoritative version semantics are implemented and evidence-bounded. Red: version guard found 10 gaps and the PM-agent contract found 1. Green: version guard passes at 1.12.0, modes 6/6, permissions 29/29, release preparation 11/11, maintained suite 21/21. Implementation pull request and merged-main evidence remain pending.
+- **codex** 2026-08-14T16:51:27Z: Resolved after implementation PR #136 merged as 7fe83c9 and merged-main run 31821137740 passed. Closeout PR merge and its merged-main run remain delivery gates.
+
+## Resolution
+
+Established `.claude-plugin/plugin.json` as the authoritative product-version signal and expanded the maintained guard across all shipped release mirrors. Removed the unused 1.5.0 stamp from `references/required-permissions.json` without changing any of its 26 permission patterns. Reframed retained 0.x values as worker, finding, curation, maintenance, or frontmatter schemas and preserved all independent protocol and data-contract versions. Focused validation passed for modes (6/6 groups), permissions (29/29), release preparation (11/11), and documentation; all 21 maintained suites passed. Implementation PR [#136](https://github.com/GhostlyGawd/engineering-board/pull/136) merged as `7fe83c9`; merged-main run [31821137740](https://github.com/GhostlyGawd/engineering-board/actions/runs/31821137740) passed. Durable evidence: `docs/evidence/2026-08-14-b016-authoritative-product-version.md`.
