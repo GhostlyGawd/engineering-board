@@ -4,13 +4,16 @@
 - Repository: `GhostlyGawd/engineering-board`
 - Base commit: `ce16d982a6395f2c416298ee5c37c0558af65955`
 - Board entry: `B021`
-- Completion state: `post-merge-pending`
+- Completion state: `closeout`
+- Implementation pull request: `#128`
+- Implementation merge commit:
+  `c06d6bdbe8293965b6f1a030b8484aaa96c75f94`
+- Implementation merged-main run: `31808165945` (`tests`, passed)
 - Evidence destination: this file
-- External gates: implementation pull request merge and passing merged-main
-  continuous integration; closeout pull request merge and passing merged-main
-  continuous integration
-- Terminal action: update this record with merged-main evidence, resolve B021,
-  merge the closeout change, and verify the closeout merged-main run
+- External gates: closeout pull request merge and passing merged-main continuous
+  integration
+- Terminal action: resolve B021 in this closeout change, merge the closeout pull
+  request, and verify its merged-main run
 
 ## Decision
 
@@ -27,10 +30,10 @@ Unreleased change.
 
 | Contract item | Normative level | Implementation | Test | Docs/example | Status |
 |---|---|---|---|---|---|
-| The review worker cannot modify repository files. | Required by B021 and the agent output contract. | `agents/code-reviewer.md` grants `Read`, `Bash`, `Grep`, and `Glob` only. | `tests/modes/agent-frontmatter-disciplines.sh` requires the read tools and rejects `Write` or `Edit`. | `ARCHITECTURE.md` identifies the worker as read-only and records no writes. | Deterministic focused evidence passes; merge evidence pending. |
-| The registered name does not imply that this worker is a user-facing review skill. | Required alternative in B021. | The prompt has an Identity and scope section that distinguishes the internal worker from `/code-review` and `/review`. | The focused mode test requires both distinctions. | `ARCHITECTURE.md` records the distinction. The dated resolution note in RFC 0002 supersedes its rename recommendation. | Deterministic focused evidence passes; merge evidence pending. |
-| Existing Worker-mode routing remains compatible. | Implementation choice. | The file name and `name: code-reviewer` stay unchanged. | Existing mode-routing and orchestration suites cover the registered identity. | `hooks/stop-hook-procedure.md`, `commands/board-run.md`, and README references remain accurate. | Focused and maintained-suite evidence passes; merge evidence pending. |
-| Current product and release documentation matches the capability change. | Required alignment invariant. | No release or manifest changes. | Version-coherence and release tests pass in the maintained suite. | `CHANGELOG.md` records the Unreleased fix. Historical snapshots and controlled-English evidence remain unchanged. | Deterministic evidence passes; merge evidence pending. |
+| The review worker cannot modify repository files. | Required by B021 and the agent output contract. | `agents/code-reviewer.md` grants `Read`, `Bash`, `Grep`, and `Glob` only. | `tests/modes/agent-frontmatter-disciplines.sh` requires the read tools and rejects `Write` or `Edit`. | `ARCHITECTURE.md` identifies the worker as read-only and records no writes. | Implementation and merged-main evidence pass. |
+| The registered name does not imply that this worker is a user-facing review skill. | Required alternative in B021. | The prompt has an Identity and scope section that distinguishes the internal worker from `/code-review` and `/review`. | The focused mode test requires both distinctions. | `ARCHITECTURE.md` records the distinction. The dated resolution note in RFC 0002 supersedes its rename recommendation. | Implementation and merged-main evidence pass. |
+| Existing Worker-mode routing remains compatible. | Implementation choice. | The file name and `name: code-reviewer` stay unchanged. | Existing mode-routing and orchestration suites cover the registered identity. | `hooks/stop-hook-procedure.md`, `commands/board-run.md`, and README references remain accurate. | Implementation and merged-main evidence pass. |
+| Current product and release documentation matches the capability change. | Required alignment invariant. | No release or manifest changes. | Version-coherence and release tests pass in the maintained suite. | `CHANGELOG.md` records the Unreleased fix. Historical snapshots and controlled-English evidence remain unchanged. | Implementation and merged-main evidence pass; closeout evidence pending. |
 
 ## Drift classification
 
@@ -66,8 +69,9 @@ Unreleased change.
 - Focused routing evidence: all six mode groups pass; prompt lint passes for
   10 of 10 framing files; the board-run contract passes 18 checks.
 - Maintained repository suite: 20 of 20 suites pass with exit code 0.
-- Implementation pull request: pending.
-- Implementation merged-main run: pending.
+- Implementation pull request: #128 merged as `c06d6bd`.
+- Pull-request checks: runs 31808030059 and 31808053423 passed.
+- Implementation merged-main run: 31808165945 passed.
 - Closeout pull request and merged-main run: pending.
 
 Passing checks establish only their named invariants. They do not establish

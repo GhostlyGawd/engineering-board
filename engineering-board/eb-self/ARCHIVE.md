@@ -78,3 +78,4 @@ Resolved entries. Newest at the top.
 - B065 | Promotion provenance collides when a daily MCP scratch file is recreated | resolved: 2026-08-14
 - B066 | board_context rejects the safe repository-relative cwd '.' | resolved: 2026-08-14
 - F004 | Package Engineering Board as an installable Codex plugin | resolved: 2026-08-14
+- B021 | code-reviewer name collides with /code-review and its tools contradict its read-only contract | pattern: naming, contract-mismatch | resolved: 2026-08-14
