@@ -92,3 +92,13 @@ routing compatibility. The worker prompt now distinguishes this internal agent
 from the harness `/code-review` and `/review` skills. The tool grant excludes
 `Write` and `Edit`. This note supersedes the rename recommendation above while
 preserving the original product-review record.
+
+### B022 resolution note (2026-08-14)
+
+The implementation keeps the no-op pass-through behavior. `nothing_to_test`
+and `nothing_to_review` mean that the current discipline completed its
+applicability check and found no applicable work. Advancing prevents repeated
+dispatch of the same inapplicable discipline and starvation of later entries.
+The worker must record its evidence in `notes`; `cannot_proceed` with a null
+transition remains the hold path. This note supplies the rationale that the
+review above found missing while preserving the original review record.

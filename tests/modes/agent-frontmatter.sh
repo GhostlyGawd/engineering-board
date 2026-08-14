@@ -80,6 +80,9 @@ fi
 
 # suggested_next_needs field (drives the state machine M2.2.c will wire up).
 grep -qF 'suggested_next_needs' "$TDD" && report 0 "tdd-builder.md emits suggested_next_needs" || report 1 "tdd-builder.md emits suggested_next_needs"
+grep -qF 'completed applicability decision, not incomplete work' "$TDD" && report 0 "tdd-builder.md defines nothing_to_test as a completed applicability decision" || report 1 "tdd-builder.md defines nothing_to_test as a completed applicability decision"
+grep -qF 'repeated TDD dispatch' "$TDD" && report 0 "tdd-builder.md explains no-op pass-through rationale" || report 1 "tdd-builder.md explains no-op pass-through rationale"
+grep -qF 'notes` must state why TDD is not applicable' "$TDD" && report 0 "tdd-builder.md requires no-op evidence in notes" || report 1 "tdd-builder.md requires no-op evidence in notes"
 
 # ── Summary ──────────────────────────────────────────────────────────────────
 echo ""

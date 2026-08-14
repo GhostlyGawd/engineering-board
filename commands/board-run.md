@@ -50,6 +50,10 @@ Repeat until the entry's `needs:` is `resolved`, a subagent returns `cannot_proc
 ```
 
 3. Parse the subagent's JSON. Apply `suggested_next_needs` to the entry's `needs:` frontmatter line exactly as the worker procedure's step (h) does (non-null string to Edit the line. null to leave unchanged and stop the loop with the subagent's `notes`).
+   **No-op pass-through rule:** `nothing_to_test` and `nothing_to_review` are
+   completed applicability decisions. Apply their non-null transition so an
+   inapplicable discipline does not repeat indefinitely. A `cannot_proceed`
+   result with a null transition holds the entry and stops this drive loop.
 4. Refresh the claim heartbeat between rounds: `bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-heartbeat.sh" <board-dir> <entry-id> <session-id>` (non-fatal on failure).
 5. Print one plain progress line per round: `round N: <discipline> → <status> (needs: <old> → <new>)`.
 

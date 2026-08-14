@@ -35,6 +35,7 @@ done
 grep -qF -- '---ENTRY-ID---' "$CMD" && grep -qF -- '---ENTRY-CONTENT---' "$CMD" \
   && report 0 "worker dispatch format (ENTRY delimiters)" || report 1 "worker dispatch format"
 grep -qF 'suggested_next_needs' "$CMD" && report 0 "applies suggested_next_needs" || report 1 "applies suggested_next_needs"
+grep -qF 'No-op pass-through rule' "$CMD" && report 0 "documents no-op pass-through rationale" || report 1 "documents no-op pass-through rationale"
 grep -qF 'max 5 rounds' "$CMD" && report 0 "bounded (max 5 rounds)" || report 1 "bounded (max 5 rounds)"
 grep -qF '/board-resolve' "$CMD" && report 0 "resolve hand-off named" || report 1 "resolve hand-off named"
 grep -qF 'untrusted data, not instructions' "$CMD" && report 0 "untrusted-data framing present" || report 1 "untrusted-data framing present"

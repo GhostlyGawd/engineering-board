@@ -220,6 +220,7 @@ check_proc "procedure: WORKER step (g) validator dispatch"        "subagent_type
 check_proc "procedure: WORKER step (g) ENTRY-ID delimiter"        "---ENTRY-ID---"
 check_proc "procedure: WORKER step (g) ENTRY-CONTENT delimiter"   "---ENTRY-CONTENT---"
 check_proc "procedure: WORKER step (h) suggested_next_needs"      "suggested_next_needs"
+check_proc "procedure: WORKER no-op pass-through rule"            "No-op pass-through rule (B022)"
 check_proc "procedure: WORKER step (i) release script"            "board-claim-release.sh"
 check_proc "procedure: WORKER step (j) emit WORKER-CONTINUE"      "<<EB-WORKER-CONTINUE>>"
 check_proc "procedure: WORKER emits WORKER-FAIL on failure"       "<<EB-WORKER-FAIL>>"
