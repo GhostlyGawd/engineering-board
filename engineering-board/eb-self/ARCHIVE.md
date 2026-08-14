@@ -75,3 +75,6 @@ Resolved entries. Newest at the top.
 
 - B003 P1 | [adversarial/benign fixtures wired into CI + ARCHITECTURE claim reconciled](bugs/B003-adversarialbenign-fixtures-are-dead-code-archite.md) — resolved C1 (PR C1a)
 - B002 P1 | [injection reject-filter hardened + made single-source](bugs/B002-injection-reject-blocklist-is-trivially-bypassab.md) — resolved C1 (PR C1a)
+- B065 | Promotion provenance collides when a daily MCP scratch file is recreated | resolved: 2026-08-14
+- B066 | board_context rejects the safe repository-relative cwd '.' | resolved: 2026-08-14
+- F004 | Package Engineering Board as an installable Codex plugin | resolved: 2026-08-14

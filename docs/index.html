@@ -32,7 +32,7 @@
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "engineering-board",
-    "description": "A git-committed kanban board your AI agents run and remember. A Claude Code plugin and MCP server: multi-agent coordination, atomic claim-locking, and durable cross-session memory — all as committed markdown in your repo.",
+    "description": "Repository pattern memory for engineering agents. Install it as a Codex plugin, Claude Code plugin, or MCP server.",
     "url": "https://ghostlygawd.github.io/engineering-board/",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Cross-platform (Claude Code / MCP client)",
@@ -241,7 +241,7 @@
 
   <main>
     <section class="hero wrap" aria-labelledby="h1">
-<p class="eyebrow">Claude Code plugin and Model Context Protocol server</p>
+<p class="eyebrow">Codex plugin, Claude Code plugin, and Model Context Protocol server</p>
 <h1 id="h1">Find a shared root cause across different findings.</h1>
 <p class="tagline"><strong>The board is the memory.</strong> The agent receives relevant systemic evidence before a fix and returns the verified outcome after the fix.</p>
 <p class="whofor">Use Engineering Board when an engineering agent must learn across sessions and domains. The product does not require a database, service, or daemon.</p>
@@ -316,9 +316,17 @@
     <section id="install" aria-labelledby="install-h">
       <div class="wrap">
 <h2 id="install-h" class="reveal">Install Engineering Board</h2>
-<p class="sub reveal">The Claude Code plugin and the MCP server use one board format. The project uses the MIT license.</p>
+<p class="sub reveal">Codex, Claude Code, and standalone MCP clients use one canonical Markdown board format. The project uses the MIT license.</p>
         <div class="install">
           <div class="card2 reveal recommended">
+<p class="eyebrow">Codex plugin</p>
+            <pre><code>codex plugin marketplace add GhostlyGawd/engineering-board
+codex plugin add engineering-board@engineering-board
+
+# then start a new Codex session</code></pre>
+<p class="muted" style="font-size:.8rem">The plugin supplies five skills and starts only the 19-tool Engineering Board MCP server. It does not require another model-provider account.</p>
+          </div>
+          <div class="card2 reveal">
 <p class="eyebrow">Claude Code plugin</p>
             <pre><code>/plugin marketplace add GhostlyGawd/engineering-board
 /plugin install engineering-board

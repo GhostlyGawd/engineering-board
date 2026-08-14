@@ -1,12 +1,9 @@
 {
   "mcpServers": {
     "engineering-board": {
-      "command": "python3",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp-server/engineering_board_mcp.py"]
-    },
-    "goal-prompts": {
-      "command": "npx",
-      "args": ["-y", "github:GhostlyGawd/goal-prompts"]
+      "command": "node",
+      "args": ["scripts/engineering-board-mcp-launcher.mjs"],
+      "cwd": "."
     }
   }
 }

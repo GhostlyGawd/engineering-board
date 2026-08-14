@@ -20,10 +20,11 @@ fail() {
   FAIL=$((FAIL + 1))
 }
 
-mkdir -p "$TMP/.claude-plugin" "$TMP/mcp-server" "$TMP/hooks" "$TMP/scripts"
+mkdir -p "$TMP/.claude-plugin" "$TMP/.codex-plugin" "$TMP/mcp-server" "$TMP/hooks" "$TMP/scripts"
 cp -R "$ROOT/hooks/scripts" "$TMP/hooks/scripts"
 cp "$ROOT/.claude-plugin/plugin.json" "$TMP/.claude-plugin/plugin.json"
 cp "$ROOT/.claude-plugin/marketplace.json" "$TMP/.claude-plugin/marketplace.json"
+cp "$ROOT/.codex-plugin/plugin.json" "$TMP/.codex-plugin/plugin.json"
 for source in "$ROOT"/mcp-server/*; do
   if [ -f "$source" ]; then
     cp "$source" "$TMP/mcp-server/"
@@ -81,6 +82,7 @@ import json, pathlib, re, sys
 root = pathlib.Path(sys.argv[1])
 target = sys.argv[2]
 plugin = json.loads((root / ".claude-plugin/plugin.json").read_text())
+codex_plugin = json.loads((root / ".codex-plugin/plugin.json").read_text())
 market = json.loads((root / ".claude-plugin/marketplace.json").read_text())
 manifest = json.loads((root / "mcp-server/manifest.json").read_text())
 server = json.loads((root / "mcp-server/server.json").read_text())
@@ -88,6 +90,8 @@ pyproject = (root / "mcp-server/pyproject.toml").read_text()
 readme = (root / "README.md").read_text()
 changelog = (root / "CHANGELOG.md").read_text()
 assert plugin["version"] == target
+assert codex_plugin["name"] == plugin["name"]
+assert codex_plugin["version"] == target
 assert market["plugins"][0]["version"] == target
 assert manifest["version"] == target
 assert server["version"] == target
@@ -112,7 +116,7 @@ else
   fail "pinned MCP bundle checksum reproduces"
 fi
 
-printf "\n# approved review change\n" >> "$TMP/hooks/scripts/board-view.sh"
+printf "\nApproved review change.\n" >> "$TMP/mcp-server/README.md"
 if python3 "$ROOT/scripts/prepare-release.py" "$TARGET_VERSION" \
     --root "$TMP" --date 2026-07-28 --refresh --apply --json \
     > "$TMP/refreshed.json"; then

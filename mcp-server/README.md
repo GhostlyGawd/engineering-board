@@ -2,7 +2,7 @@
 
 A zero-dependency [Model Context Protocol](https://modelcontextprotocol.io) server
 that exposes the `engineering-board` plugin's markdown board as MCP tools. It lets
-any MCP client (Claude Code, Claude Desktop, ...) scaffold boards, create/list/update
+any MCP client (Codex, Claude Code, Claude Desktop, and others) scaffold boards, create/list/update
 entries, preview and promote scratch findings, manage stable pattern identities,
 rank provenance-linked clusters, preserve durable root-cause hypotheses and
 rejected-claim memory, retrieve relevant systemic context, record explicit fix
@@ -11,14 +11,13 @@ on-disk format the plugin's hooks and skills expect.
 
 ## Design constraints
 
-- **Pure `python3`, zero third-party dependencies.** No `mcp` pip SDK, no `pydantic`.
+- **Python 3, zero third-party dependencies.** No `mcp` pip SDK, no `pydantic`.
   The MCP stdio/JSON-RPC protocol is implemented directly, so the server runs under
-  the same `bash` + `python3` + coreutils toolchain as the rest of the plugin (CI has
-  no install step).
+  no package installation step.
 - **Transport:** stdio, JSON-RPC 2.0, newline-delimited messages, protocolVersion
   `2025-06-18`. Only JSON-RPC messages go to stdout. diagnostics go to stderr.
-- Locking is **not reimplemented**: `board_claim` / `board_release` shell out to the
-  plugin's existing `hooks/scripts/board-claim-acquire.sh` / `board-claim-release.sh`.
+- `board_claim` and `board_release` use atomic claim directories in Python.
+  They do not require Bash or plugin hook scripts.
 - Timestamps are real UTC ISO-8601 (second precision) via `datetime.now(timezone.utc)`.
 
 The board location for a `project` is resolved via `engineering-board/BOARD-ROUTER.md`
@@ -35,7 +34,7 @@ the current working directory, and can be overridden per-call with a `root` argu
 | `board_create_entry` | Create a valid entry (bug/feature/question/observation/learning) with correct frontmatter + required body sections, allocate the next zero-padded id, rebuild the index. Output passes `board-validate-entry.sh`. Optional `parent` links a subtask to an existing entry. |
 | `board_list_entries` | List entries with parsed frontmatter. filters: `project`, `type`, `status`, `needs`, `ready`. `ready: true` is the deterministic ready queue: open entries whose existing `blocked_by` targets are all resolved (dangling ids warn, never block). |
 | `board_get_entry` | Full markdown of one entry by id (+ parsed frontmatter). |
-| `board_update_entry` | Update frontmatter (`status`, `needs`, `priority`, `blocked_by`, `parent`) and/or append a body section. validate the status transition. rebuild the index. Optional `comment: {author, text}` appends a server-timestamped line to the entry's `## Comments` section. |
+| `board_update_entry` | Update frontmatter (`status`, `needs`, `priority`, `blocked_by`, `parent`) and/or append a body section. Validate the status transition and rebuild the index. A transition to `resolved` appends one `ARCHIVE.md` row. Optional `comment: {author, text}` appends a server-timestamped line to the entry's `## Comments` section. |
 | `board_graph` | Build the deterministic typed graph from canonical entry and P### pattern Markdown, write `GRAPH.yml`, and reuse only a source-equivalent disposable cache. `full: true` bypasses the cache. |
 | `board_context` | Retrieve a bounded context brief from task, path, entry, and current-directory signals. Each result exposes a stable title, typed summary, epistemic state, score components, matched signals, staleness, reason, and canonical sources. `report: true` returns the derived value report. |
 | `board_insights` | Rank graph clusters with transparent score components and return linked H### and rejected negative-memory references. The score is investigation priority, not causal confidence. |
@@ -45,8 +44,8 @@ the current working directory, and can be overridden per-call with a `root` argu
 | `board_promote_findings` | Preview or apply captured scratch findings with typed created/deduplicated/rejected/already-applied outcomes, durable provenance, idempotent receipts, and identifier allocation across open and resolved entries. |
 | `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files (P0 to P3 ordering, `⊘ Q###` when blocked, `↳` child rows under parents, resolved omitted). Idempotent. |
 | `board_capture_finding` | Append a finding to the scratch inbox `_sessions/mcp-<UTC-date>.md`. |
-| `board_claim` | Acquire an entry lock (shells out to `board-claim-acquire.sh`. 0=acquired, 1=contended, 2=stale). |
-| `board_release` | Release an entry lock (shells out to `board-claim-release.sh`. 0=released, 3=owner mismatch/missing, 4=retries exhausted). |
+| `board_claim` | Acquire an atomic entry claim. Results: 0=acquired, 1=contended, 2=stale. |
+| `board_release` | Release an owned entry claim. Results: 0=released, 3=owner mismatch or missing, 4=retries exhausted. |
 | `board_remember` | Save a durable insight straight to `learnings/L###-<slug>.md` (`source: remember`) and rebuild the index: explicit intent bypasses the curator's recurrence-≥3 threshold. |
 | `board_status` | Overview: per-type open counts, `in_progress` ids, `blocked` ids, the ready queue (capped at 20) with dangling-blocker warnings, un-promoted scratch count. |
 
@@ -79,10 +78,20 @@ The server is published to PyPI as
 (available with the v1.7.0 release), so the primary install is one `uvx` line: no clone,
 no absolute path. The clone path still works everywhere and is the fallback.
 
-> **Note (PyPI installs):** `board_claim` / `board_release` shell out to the
-> plugin's `hooks/scripts/board-claim-*.sh`, which the PyPI package does not
-> ship. on a PyPI install those two tools return a clean error unless the
-> plugin (or a repo clone) is present. All other tools are self-contained.
+All 19 tools are self-contained in the Python package.
+
+### Codex plugin
+
+```sh
+codex plugin marketplace add GhostlyGawd/engineering-board
+codex plugin add engineering-board@engineering-board
+```
+
+Start a new Codex session after installation. The plugin supplies the board
+skills and starts this server automatically. Each bundled-plugin tool call must
+include the absolute repository `root`. This requirement prevents a raw call
+from writing to the plugin cache when the active workspace is not available to
+the MCP process.
 
 ### Claude Code (CLI)
 
@@ -161,22 +170,26 @@ Add to `claude_desktop_config.json` (macOS:
 (Clone fallback: `"command": "python3"`, `"args":
 ["/abs/path/to/engineering-board/mcp-server/engineering_board_mcp.py"]`.)
 
-### Bundled with the plugin (automatic)
+### Bundled with the Claude Code plugin (automatic)
 
-Installing the `engineering-board` plugin auto-registers this server via the
-repo-root [`.mcp.json`](../.mcp.json), which resolves the script through
-`${CLAUDE_PLUGIN_ROOT}`:
+Installing the `engineering-board` plugin auto-registers this server through
+the repository-root [`.mcp.json`](../.mcp.json):
 
 ```json
 {
   "mcpServers": {
     "engineering-board": {
-      "command": "python3",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp-server/engineering_board_mcp.py"]
+      "command": "node",
+      "args": ["scripts/engineering-board-mcp-launcher.mjs"],
+      "cwd": "."
     }
   }
 }
 ```
+
+The plugins use `scripts/engineering-board-mcp-launcher.mjs`. The launcher selects `python3`,
+`python`, or the Windows `py -3` launcher without using a shell. Set `PYTHON`
+to an executable path when Python is not on `PATH`.
 
 No separate install step is needed when the plugin is installed.
 

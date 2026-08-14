@@ -3,8 +3,7 @@
 
 Exposes the engineering-board plugin's markdown board as MCP tools. Implements
 the Model Context Protocol stdio transport directly (no `mcp` pip SDK, no
-pydantic) so it runs under the same pure python3 + bash + coreutils toolchain
-as the rest of the plugin.
+pydantic) so it runs with Python only.
 
 Layout it maintains (matching commands/board-init.md and the hook scripts):
 
@@ -15,7 +14,7 @@ Layout it maintains (matching commands/board-init.md and the hook scripts):
         ARCHIVE.md
         bugs/ features/ questions/ observations/ learnings/   (+ .gitkeep)
         _sessions/               # scratch inbox (runtime)
-        _claims/                 # claim locks (runtime, managed by claim scripts)
+        _claims/                 # claim locks (runtime)
 
 Protocol: JSON-RPC 2.0, newline-delimited messages on stdin/stdout,
 protocolVersion 2025-06-18. Only JSON-RPC messages ever go to stdout; all
@@ -30,7 +29,9 @@ import sys
 import os
 import re
 import json
-import subprocess
+import random
+import shutil
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -61,8 +62,7 @@ from engineering_board_core import (
 PROTOCOL_VERSION = "2025-06-18"
 SERVER_NAME = "engineering-board"
 
-# Directory of this script; used to locate the sibling hook scripts we shell out
-# to (claim acquire/release + validation).
+# Directory of this script and the repository or plugin root.
 SCRIPT_DIR = MODULE_DIR
 PLUGIN_ROOT = os.path.dirname(SCRIPT_DIR)  # repo root (mcp-server/..)
 
@@ -133,6 +133,11 @@ def resolve_root(params):
     env = os.environ.get("CLAUDE_PROJECT_DIR")
     if env:
         return os.path.abspath(env)
+    if os.environ.get("ENGINEERING_BOARD_REQUIRE_ROOT") == "1":
+        raise ToolError(
+            "missing required argument: root (the bundled plugin cannot infer "
+            "the active repository)"
+        )
     return os.path.abspath(os.getcwd())
 
 
@@ -234,9 +239,9 @@ _SAFE_ENTRY_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 def validate_entry_id(entry_id):
     """Return `entry_id` if it is a safe single path segment, else raise ToolError.
 
-    Like a project name, an entry id becomes a path segment — it is interpolated
-    into `<board>/_claims/<entry_id>` by the claim scripts (mkdir + rm -rf), so a
-    `../` id would create/delete directories outside the board (eb-self B034).
+    Like a project name, an entry id becomes a path segment under
+    `<board>/_claims/<entry_id>`. A `../` id could create or delete a directory
+    outside the board (eb-self B034).
     """
     if not isinstance(entry_id, str) or not entry_id.strip():
         raise ToolError("entry_id must be a non-empty string")
@@ -250,11 +255,9 @@ def validate_entry_id(entry_id):
 def validate_session_id(session_id):
     """Return `session_id` if it has no whitespace/control chars, else ToolError.
 
-    session_id is written into `_claims/<id>/owner.txt` as `session_id: <id>`
-    and read back with `grep | awk '{print $2}'` by the claim scripts. Whitespace
-    or a newline both break that round-trip (self-DoS) and let a newline inject
-    extra owner.txt lines — so reject it (opaque session tokens never contain
-    whitespace). Closes eb-self B040-follow-up + the known-open B029.
+    session_id is written into `_claims/<id>/owner.txt` as `session_id: <id>`.
+    Whitespace or a newline can break the ownership round-trip and let a newline
+    inject extra owner lines. Opaque session tokens do not require whitespace.
     """
     if not isinstance(session_id, str) or not session_id.strip():
         raise ToolError("session_id must be a non-empty string")
@@ -965,12 +968,14 @@ def tool_board_update_entry(params):
     changes = []
 
     new_status = params.get("status")
+    became_resolved = False
     if new_status is not None:
         if new_status not in VALID_STATUS:
             raise ToolError("invalid status %r" % new_status)
         cur = fm.get("status")
         if cur and cur != new_status and new_status not in LEGAL_TRANSITIONS.get(cur, set()):
             raise ToolError("illegal status transition %s -> %s" % (cur, new_status))
+        became_resolved = cur != "resolved" and new_status == "resolved"
         fm["status"] = new_status
         changes.append("status=%s" % new_status)
 
@@ -1091,6 +1096,33 @@ def tool_board_update_entry(params):
     new_text = serialize_frontmatter(field_pairs) + "\n\n" + body.strip("\n") + "\n"
     with open(e["_path"], "w", encoding="utf-8") as f:
         f.write(new_text)
+
+    if became_resolved:
+        archive_path = os.path.join(bd, "ARCHIVE.md")
+        try:
+            archive = Path(archive_path).read_text(encoding="utf-8")
+        except OSError as exc:
+            raise ToolError("cannot read ARCHIVE.md: %s" % exc) from exc
+        archive_id_pattern = re.compile(
+            r"(?m)^-\s+%s\s+\|" % re.escape(entry_id)
+        )
+        if not archive_id_pattern.search(archive):
+            patterns = fm.get("pattern", [])
+            if not isinstance(patterns, list):
+                patterns = [patterns] if patterns else []
+            pattern_text = (
+                " | pattern: %s" % ", ".join(str(item) for item in patterns)
+                if patterns
+                else ""
+            )
+            archive_line = "- %s | %s%s | resolved: %s\n" % (
+                entry_id,
+                _oneline(fm.get("title", entry_id)),
+                pattern_text,
+                now_utc_iso()[:10],
+            )
+            atomic_write(archive_path, archive.rstrip() + "\n" + archive_line)
+            changes.append("appended ARCHIVE.md")
 
     rebuild_board(bd, project)
 
@@ -1644,13 +1676,55 @@ def count_scratch_findings(board_dir):
 
 
 # ---------------------------------------------------------------------------
-# board_claim / board_release — shell out to the existing scripts
+# board_claim / board_release — host-neutral atomic directory claims
 # ---------------------------------------------------------------------------
-CLAIM_ACQUIRE = os.path.join(PLUGIN_ROOT, "hooks", "scripts", "board-claim-acquire.sh")
-CLAIM_RELEASE = os.path.join(PLUGIN_ROOT, "hooks", "scripts", "board-claim-release.sh")
-
 ACQUIRE_MEANING = {0: "acquired", 1: "contended", 2: "stale"}
 RELEASE_MEANING = {0: "released", 3: "owner_mismatch_or_missing", 4: "retries_exhausted"}
+
+
+def _utc_timestamp():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _claim_age_seconds(raw_timestamp):
+    try:
+        heartbeat = datetime.strptime(
+            raw_timestamp.strip(), "%Y-%m-%dT%H:%M:%SZ"
+        ).replace(tzinfo=timezone.utc)
+    except (TypeError, ValueError):
+        return None
+    return int((datetime.now(timezone.utc) - heartbeat).total_seconds())
+
+
+def _is_nonempty_file(path):
+    try:
+        return path.is_file() and path.stat().st_size > 0
+    except OSError:
+        return False
+
+
+def _claim_result(entry_id, exit_code, stdout="", stderr=""):
+    return {
+        "action": "claim",
+        "entry_id": entry_id,
+        "exit_code": exit_code,
+        "result": ACQUIRE_MEANING.get(exit_code, "error"),
+        "acquired": exit_code == 0,
+        "stdout": stdout,
+        "stderr": stderr,
+    }
+
+
+def _release_result(entry_id, exit_code, stdout="", stderr=""):
+    return {
+        "action": "release",
+        "entry_id": entry_id,
+        "exit_code": exit_code,
+        "result": RELEASE_MEANING.get(exit_code, "error"),
+        "released": exit_code == 0,
+        "stdout": stdout,
+        "stderr": stderr,
+    }
 
 
 def tool_board_claim(params):
@@ -1658,22 +1732,50 @@ def tool_board_claim(params):
     entry_id = validate_entry_id(require(params, "entry_id"))
     session_id = validate_session_id(require(params, "session_id"))
     root = resolve_root(params)
-    bd = ensure_board_exists(root, project)
-    if not os.path.isfile(CLAIM_ACQUIRE):
-        raise ToolError("claim script not found: %s" % CLAIM_ACQUIRE)
-    proc = subprocess.run(
-        ["bash", CLAIM_ACQUIRE, bd, entry_id, session_id],
-        capture_output=True, text=True)
-    rc = proc.returncode
-    return {
-        "action": "claim",
-        "entry_id": entry_id,
-        "exit_code": rc,
-        "result": ACQUIRE_MEANING.get(rc, "error"),
-        "acquired": rc == 0,
-        "stdout": proc.stdout.strip(),
-        "stderr": proc.stderr.strip(),
-    }
+    board_dir = Path(ensure_board_exists(root, project))
+    claims_dir = board_dir / "_claims"
+    claim_dir = claims_dir / entry_id
+    owner_file = claim_dir / "owner.txt"
+    heartbeat_file = claim_dir / "heartbeat.txt"
+    stale_seconds = 300 if "onedrive" in board_dir.as_posix().casefold() else 180
+
+    claims_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        claim_dir.mkdir()
+    except FileExistsError:
+        # The winning process can still be writing the two claim files. Wait
+        # for at most 250 ms before classifying an incomplete claim as stale.
+        for _ in range(10):
+            if _is_nonempty_file(owner_file) and _is_nonempty_file(heartbeat_file):
+                break
+            time.sleep(0.025)
+        try:
+            heartbeat = heartbeat_file.read_text(encoding="utf-8").strip()
+            age = _claim_age_seconds(heartbeat)
+        except OSError:
+            age = None
+        if not owner_file.is_file() or age is None or age >= stale_seconds:
+            return _claim_result(entry_id, 2)
+        return _claim_result(entry_id, 1)
+    except OSError as exc:
+        return _claim_result(entry_id, 1, stderr=str(exc))
+
+    timestamp = _utc_timestamp()
+    try:
+        owner_file.write_text(
+            "session_id: %s\ntimestamp: %s\ncwd: %s\n"
+            % (session_id, timestamp, os.getcwd()),
+            encoding="utf-8",
+        )
+        heartbeat_file.write_text(timestamp + "\n", encoding="utf-8")
+        owner = owner_file.read_text(encoding="utf-8")
+        heartbeat = heartbeat_file.read_text(encoding="utf-8").strip()
+        if "session_id: %s\n" % session_id not in owner or not heartbeat:
+            raise OSError("claim verification failed")
+    except OSError as exc:
+        shutil.rmtree(claim_dir, ignore_errors=True)
+        return _claim_result(entry_id, 1, stderr=str(exc))
+    return _claim_result(entry_id, 0)
 
 
 def tool_board_release(params):
@@ -1681,22 +1783,42 @@ def tool_board_release(params):
     entry_id = validate_entry_id(require(params, "entry_id"))
     session_id = validate_session_id(require(params, "session_id"))
     root = resolve_root(params)
-    bd = ensure_board_exists(root, project)
-    if not os.path.isfile(CLAIM_RELEASE):
-        raise ToolError("release script not found: %s" % CLAIM_RELEASE)
-    proc = subprocess.run(
-        ["bash", CLAIM_RELEASE, bd, entry_id, session_id],
-        capture_output=True, text=True)
-    rc = proc.returncode
-    return {
-        "action": "release",
-        "entry_id": entry_id,
-        "exit_code": rc,
-        "result": RELEASE_MEANING.get(rc, "error"),
-        "released": rc == 0,
-        "stdout": proc.stdout.strip(),
-        "stderr": proc.stderr.strip(),
-    }
+    board_dir = Path(ensure_board_exists(root, project))
+    claim_dir = board_dir / "_claims" / entry_id
+    owner_file = claim_dir / "owner.txt"
+    if not claim_dir.is_dir() or not owner_file.is_file():
+        return _release_result(
+            entry_id, 3, stderr="claim or owner record not found"
+        )
+    try:
+        owner_lines = owner_file.read_text(encoding="utf-8").splitlines()
+    except OSError as exc:
+        return _release_result(entry_id, 3, stderr=str(exc))
+    owner = next(
+        (
+            line.split(":", 1)[1].strip()
+            for line in owner_lines
+            if line.startswith("session_id:")
+        ),
+        "",
+    )
+    if owner != session_id:
+        return _release_result(entry_id, 3, stderr="session_id mismatch")
+
+    last_error = ""
+    for attempt in range(3):
+        try:
+            shutil.rmtree(claim_dir)
+            return _release_result(
+                entry_id, 0, stdout="released: %s" % entry_id
+            )
+        except FileNotFoundError:
+            return _release_result(entry_id, 0, stdout="released: %s" % entry_id)
+        except OSError as exc:
+            last_error = str(exc)
+            if attempt < 2:
+                time.sleep(0.250 + random.uniform(0, 0.050))
+    return _release_result(entry_id, 4, stderr=last_error)
 
 
 # ---------------------------------------------------------------------------
@@ -1849,7 +1971,7 @@ TOOLS = [
     },
     {
         "name": "board_update_entry",
-        "description": "Update frontmatter fields (status, needs, priority, blocked_by, parent), append a timestamped comment, and/or append a body section to an entry, then rebuild BOARD.md. Validates status transitions minimally.",
+        "description": "Update frontmatter fields (status, needs, priority, blocked_by, parent), append a timestamped comment, and/or append a body section to an entry, then rebuild BOARD.md. A transition to resolved appends one durable ARCHIVE.md row. Validates status transitions minimally.",
         "inputSchema": {
             "type": "object",
             "properties": {

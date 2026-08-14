@@ -16,27 +16,29 @@ independently.
 
 1. Read `docs/RELEASING.md`.
 2. Confirm that the release branch is clean.
-3. Select the next Semantic Versioning value from the `[Unreleased]` changes.
-4. Preview the coordinated change:
+3. Confirm that the Codex manifest, Claude manifest, marketplace, Python
+   package, MCP manifests, and README badge have the current version.
+4. Select the next Semantic Versioning value from the `[Unreleased]` changes.
+5. Preview the coordinated change:
 
    ```bash
    python3 scripts/prepare-release.py <version>
    ```
 
-5. Review every listed file and the prospective MCP bundle checksum.
-6. Apply the same plan:
+6. Review every listed file and the prospective MCP bundle checksum.
+7. Apply the same plan:
 
    ```bash
    python3 scripts/prepare-release.py <version> --apply
    ```
 
-7. Run the complete test suite:
+8. Run the complete test suite:
 
    ```bash
    bash tests/run-all.sh
    ```
 
-8. Commit and push the release-preparation change.
+9. Commit and push the release-preparation change.
 
 If approved review changes modify the prepared bundle, use `--refresh` with
 the current prepared version. Preview the refresh before you apply it. Refresh

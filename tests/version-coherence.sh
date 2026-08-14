@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# tests/version-coherence.sh — Verify .claude-plugin/plugin.json,
-# marketplace.json, and mcp-server/pyproject.toml agree on the version string.
+# tests/version-coherence.sh — Verify all product version surfaces agree.
 #
 # NEXT-PHASE.md Tier 4.3 (Plugin version coherence check); pyproject added for
 # the C3 PyPI channel (a PyPI release with a stale version is irreversible).
@@ -21,11 +20,12 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="${1:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 
 PLUGIN_JSON="$ROOT/.claude-plugin/plugin.json"
+CODEX_PLUGIN_JSON="$ROOT/.codex-plugin/plugin.json"
 MARKETPLACE_JSON="$ROOT/.claude-plugin/marketplace.json"
 PYPROJECT_TOML="$ROOT/mcp-server/pyproject.toml"
 README_MD="$ROOT/README.md"
 
-for f in "$PLUGIN_JSON" "$MARKETPLACE_JSON" "$PYPROJECT_TOML" "$README_MD"; do
+for f in "$PLUGIN_JSON" "$CODEX_PLUGIN_JSON" "$MARKETPLACE_JSON" "$PYPROJECT_TOML" "$README_MD"; do
   if [ ! -f "$f" ]; then
     echo "version-coherence: MISSING $f" >&2
     exit 1
@@ -40,11 +40,13 @@ fi
 # Capture without aborting on a nonzero python exit, so the FAIL diagnostic the
 # python block prints is actually echoed instead of set -e killing us silently.
 set +e
-RESULT="$(python3 - "$PLUGIN_JSON" "$MARKETPLACE_JSON" "$PYPROJECT_TOML" "$README_MD" <<'PY'
+RESULT="$(python3 - "$PLUGIN_JSON" "$CODEX_PLUGIN_JSON" "$MARKETPLACE_JSON" "$PYPROJECT_TOML" "$README_MD" <<'PY'
 import json, re, sys
-plugin_path, marketplace_path, pyproject_path, readme_path = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+plugin_path, codex_plugin_path, marketplace_path, pyproject_path, readme_path = sys.argv[1:]
 with open(plugin_path, "r", encoding="utf-8") as f:
     plugin = json.load(f)
+with open(codex_plugin_path, "r", encoding="utf-8") as f:
+    codex_plugin = json.load(f)
 with open(marketplace_path, "r", encoding="utf-8") as f:
     market = json.load(f)
 with open(pyproject_path, "r", encoding="utf-8") as f:
@@ -61,6 +63,12 @@ if not plugin_name:
     sys.exit(1)
 if not plugin_version:
     print(f"FAIL plugin.json has no version field")
+    sys.exit(1)
+if codex_plugin.get("name") != plugin_name:
+    print(f"FAIL plugin name mismatch: Claude={plugin_name!r} vs Codex={codex_plugin.get('name')!r}")
+    sys.exit(1)
+if codex_plugin.get("version") != plugin_version:
+    print(f"FAIL version mismatch: Claude plugin={plugin_version!r} vs Codex plugin={codex_plugin.get('version')!r}")
     sys.exit(1)
 
 match = [p for p in market_entries if p.get("name") == plugin_name]
@@ -105,7 +113,7 @@ if readme_version != plugin_version:
     print(f"FAIL version mismatch: plugin.json={plugin_version!r} vs README badge={readme_version!r}")
     sys.exit(1)
 
-print(f"OK plugin={plugin_name} version={plugin_version} (marketplace.json + pyproject.toml + README badge in lockstep)")
+print(f"OK plugin={plugin_name} version={plugin_version} (Claude + Codex + marketplace + PyPI + README in lockstep)")
 sys.exit(0)
 PY
 )"

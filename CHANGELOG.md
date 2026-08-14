@@ -9,7 +9,27 @@ increases.
 
 ## [Unreleased]
 
+### Added
+
+- Added an installable Codex plugin manifest, five provider-neutral board
+  skills, an isolated MCP configuration, and a cross-platform MCP launcher.
+
+### Changed
+
+- The MCP server now implements atomic claim acquisition and release in Python.
+  All 19 tools work in the Codex plugin, PyPI package, MCP bundle, and clone
+  without the Claude Code hook scripts.
+- A new MCP resolution appends one durable `ARCHIVE.md` row, so the bundled
+  resolve skill can complete the canonical lifecycle through MCP tools.
+- Release preparation and version-coherence checks now keep the Codex and
+  Claude plugin manifests in the same version lockstep.
+
 ### Fixed
+
+- `board_context` now accepts `cwd: "."` as the safe repository-relative root.
+- Scratch promotion now uses content-derived fallback provenance. Recreating a
+  daily MCP scratch file cannot make an unrelated finding appear already
+  applied because it reused a path and item index.
 
 - Foreground promotion now includes resolved canonical entries when it checks
   duplicate provenance and allocates the next entry identifier. Graph ranking

@@ -28,13 +28,14 @@ Security corrections apply to the current minor release.
 
 | Version | Support |
 |---|---|
-| Current minor release, 1.11.x | Supported |
+| Current minor release, 1.12.x | Supported |
 | Earlier releases | Not supported |
 
 Install the latest release to receive a security correction.
 
-The plugin manifest and the marketplace manifest use the same version. A
-security correction requires a new version.
+The Codex manifest, Claude Code manifest, marketplace manifest, Python package,
+and MCP manifests use the same version. A security correction requires a new
+version.
 
 ## Treat board content as untrusted data
 
@@ -130,6 +131,19 @@ existing general mechanism is a corpus-growth item.
 
 The MCP server writes the canonical board format. Each write tool checks its
 target path.
+
+The bundled launcher starts only the repository-owned Engineering Board
+server. It does not start an unrelated MCP server. The launcher does not use a shell. It selects a Python 3
+executable from `PYTHON` or the platform command path.
+
+The Codex plugin process cannot infer the active workspace. The launcher makes
+the absolute `root` tool argument mandatory. This rule prevents an omitted root
+from selecting the installed plugin cache as a write target.
+
+Claim acquisition uses one atomic claim-directory creation. Claim release
+checks the recorded session owner and retries a failed directory removal. The
+Python implementation gives the MCP package the same ownership and stale-claim
+result contract without invoking a Bash script.
 
 A project identifier and an entry identifier must be one safe path segment.
 The server rejects `..` and a path separator.

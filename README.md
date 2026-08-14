@@ -16,6 +16,7 @@ _The board is the database._
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.12.0-E6A94E.svg)](CHANGELOG.md)
 [![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
+[![Codex plugin](https://img.shields.io/badge/Codex-plugin-171719.svg)](https://developers.openai.com/codex/plugins)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
 [![MCP](https://img.shields.io/badge/MCP-server-171719.svg)](mcp-server/README.md)
 [![GitHub stars](https://img.shields.io/github/stars/GhostlyGawd/engineering-board)](https://github.com/GhostlyGawd/engineering-board/stargazers)
@@ -126,7 +127,7 @@ Engineering Board combines these properties:
 - Negative memory for rejected claims
 - Atomic claims for parallel agents
 - Passive capture
-- A Claude Code plugin
+- Codex and Claude Code plugins
 - An MCP server.
 
 Native Claude Code Tasks and Engineering Board have different purposes.
@@ -137,6 +138,30 @@ part of a project pull request.
 Engineering Board stores shared project memory in the repository. Use Native
 Tasks for temporary personal work. Use Engineering Board for durable project
 knowledge.
+
+## Install the Codex plugin
+
+Add the repository marketplace:
+
+```sh
+codex plugin marketplace add GhostlyGawd/engineering-board
+```
+
+Install the plugin:
+
+```sh
+codex plugin add engineering-board@engineering-board
+```
+
+Start a new Codex session. The plugin supplies five board skills and starts the
+19-tool Engineering Board MCP server. It does not require a model-provider
+account. Codex reviews plugin hooks separately; Engineering Board does not
+require its Claude Code hooks in Codex.
+
+Ask Codex to initialize Engineering Board in the active repository. The agent
+passes the absolute repository root to `board_init` and uses the MCP tools for
+capture, promotion, context, graph, hypothesis, outcome, claim, and lifecycle
+operations.
 
 ## Install the Claude Code plugin
 
@@ -188,6 +213,21 @@ For explicit setup values, use:
 
 ## Use the pattern-memory workflow
 
+With Codex or another MCP client:
+
+1. Initialize one project with `board_init`.
+2. Retrieve relevant memory with `board_context` before selecting a fix.
+3. Capture findings with `board_capture_finding`.
+4. Preview and apply promotion with `board_promote_findings`.
+5. Use `board_insights` and `board_hypotheses` for evidence-linked shared-cause
+   analysis.
+6. Record the observed result with `board_outcomes`.
+
+Pass the absolute repository root in each bundled-plugin tool call. The plugin
+does not guess which open workspace a raw MCP call targets.
+
+With Claude Code hooks and commands:
+
 1. Work in Claude Code.
 2. Let SessionStart and UserPromptSubmit retrieve relevant systemic memory.
 3. Run `/board-context <project>` when you want the same bounded brief
@@ -232,7 +272,7 @@ To return to passive capture:
 2. Read the `SessionStart` message.
 3. If a mode remains, delete `.engineering-board/session-mode.json`.
 
-## Register the MCP server
+## Register the MCP server without a plugin
 
 Register the PyPI package with the Claude Code command-line interface (CLI):
 
@@ -263,7 +303,8 @@ For Claude Desktop, add this object to `claude_desktop_config.json`:
 [`mcp-server/README.md`](mcp-server/README.md) also contains setup procedures
 for Codex CLI, Gemini CLI, and Cursor.
 
-The plugin registers the same server through [`.mcp.json`](.mcp.json).
+Both plugins register the server through [`.mcp.json`](.mcp.json). This file
+starts only Engineering Board through a cross-platform launcher.
 
 ## Product surfaces
 
@@ -305,7 +346,7 @@ same deterministic core.
 | `board_create_entry` | Create a valid entry |
 | `board_list_entries` | List and filter entries |
 | `board_get_entry` | Get one entry |
-| `board_update_entry` | Change one entry |
+| `board_update_entry` | Change one entry and archive a new resolution |
 | `board_graph` | Build the deterministic graph |
 | `board_context` | Retrieve bounded and explainable systemic memory |
 | `board_insights` | Rank clusters and return linked evidence |
@@ -329,8 +370,9 @@ JSON, and HTML.
 The product does not require SQLite. A future SQLite index must be disposable
 and rebuildable. Measured query requirements must justify it.
 
-The runtime uses Claude Code, `bash`, and `python3`. It has no runtime package
-dependency.
+The shared MCP runtime uses Python 3 and has no third-party package dependency.
+The Codex plugin uses Node.js only to select a Python interpreter on Windows or
+Linux. Claude Code commands and hooks use Bash and Python 3.
 
 Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full system map.
 

@@ -1,13 +1,32 @@
 ---
-name: Board Triage
+name: board-triage
 description: This skill should be used when the user asks "what's next", "what should I work on", "triage the board", "what's the priority", "what order should I fix these", "start work on", "begin implementation", "pick up the next item", or wants a recommended sequence derived from the current open items.
-version: 0.1.0
 ---
 
 
 # Board Triage
 
 Derives the recommended work sequence from open board items and the six triage rules. Also governs Starting Work: setting an item `in_progress`.
+
+## Codex and MCP protocol
+
+Use this protocol when the `engineering-board` MCP server is available:
+
+1. Resolve the absolute repository root and project name. Pass `root` in every
+   tool call.
+2. Call `board_status` and `board_list_entries` with `ready: true`.
+3. Call `board_context` for the current task and candidate entries. Use
+   `board_insights` when a repeated pattern or graph cluster can change the
+   recommended scope.
+4. Recommend the next entry from priority, blocker, dependency, affected-area,
+   and systemic-pattern evidence. Explain the reason.
+5. When work starts, call `board_claim` before `board_update_entry`. Set the
+   entry to `in_progress` only after the claim succeeds.
+6. Capture new findings with `board_capture_finding`. Do not expand the claimed
+   entry silently.
+
+Use the detailed rules below to interpret the returned board state. Use shell
+commands only as a fallback when the MCP server is not available.
 
 ## Step 0: Identify the project scope
 
