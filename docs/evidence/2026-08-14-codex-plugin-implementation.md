@@ -2,6 +2,8 @@
 
 Date: 2026-08-14
 
+State: completed
+
 ## Outcome
 
 Package Engineering Board as an installable Codex plugin. The plugin must expose
@@ -48,7 +50,7 @@ require a model-provider account or install an unrelated MCP server.
 - [x] Align release automation and documentation.
 - [x] Validate the repository and packaged plugin.
 - [x] Install the plugin, dogfood it, and record dated evidence.
-- [ ] Commit, push, open a pull request, pass CI, and merge.
+- [x] Commit, push, open a pull request, pass CI, and merge.
 
 ## Drift record
 
@@ -88,5 +90,22 @@ append new dated evidence and will not rewrite the release record.
 - Self-dogfood entries B065, B066, and F004 were recorded and resolved through
   MCP. Their claim releases succeeded.
 
-The local installation needs a new Codex session before this active session can
-discover the newly installed skills and MCP tool namespace.
+## External and installed-state evidence
+
+- Pull request #126 merged commit
+  `3f03a81b0d01f8c0727169e3194e4313c3bf446c` into `main`.
+- Both pull-request `run-all` checks passed.
+- Merged-main test run `31801706412` passed for the exact merge commit.
+- Merged-main Pages run `31801706447` passed.
+- The configured Codex marketplace now uses the Git source
+  `https://github.com/GhostlyGawd/engineering-board.git` at `main`.
+- The installed cache matches merged `main` for the Codex manifest, MCP
+  configuration, launcher, MCP server, and sampled skill.
+- The prior manual global MCP entry was removed. The plugin-owned
+  `engineering-board` server remains enabled and points to the installed cache.
+- A post-merge installed-plugin probe returned protocol `2025-06-18`, version
+  `1.12.0`, 19 tools, and one readable disposable dogfood board.
+
+A new Codex session is required before an active session can discover newly
+installed skills and MCP tools. No version, tag, release, registry publication,
+or manual deployment was created for this Unreleased change.
