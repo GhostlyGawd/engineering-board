@@ -16,6 +16,9 @@ increases.
 
 ### Changed
 
+- `nothing_to_test` and `nothing_to_review` are now explicitly completed
+  applicability decisions. They advance to avoid repeated dispatch, require
+  evidence in worker notes, and retain `cannot_proceed` as the hold path.
 - The MCP server now implements atomic claim acquisition and release in Python.
   All 19 tools work in the Codex plugin, PyPI package, MCP bundle, and clone
   without the Claude Code hook scripts.

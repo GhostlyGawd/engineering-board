@@ -96,6 +96,9 @@ grep -qF 'suggested_next_needs' "$REVIEWER" && report 0 "code-reviewer.md emits 
 # Must produce validate (approve) or tdd (regress).
 grep -qF '"validate"' "$REVIEWER" && report 0 "code-reviewer.md suggested_next_needs: validate path present" || report 1 "code-reviewer.md suggested_next_needs: validate path present"
 grep -qF '"tdd"' "$REVIEWER" && report 0 "code-reviewer.md suggested_next_needs: tdd regress path present" || report 1 "code-reviewer.md suggested_next_needs: tdd regress path present"
+grep -qF 'completed applicability decision, not incomplete work' "$REVIEWER" && report 0 "code-reviewer.md defines nothing_to_review as a completed applicability decision" || report 1 "code-reviewer.md defines nothing_to_review as a completed applicability decision"
+grep -qF 'repeated review dispatch' "$REVIEWER" && report 0 "code-reviewer.md explains no-op pass-through rationale" || report 1 "code-reviewer.md explains no-op pass-through rationale"
+grep -qF 'notes` must state why review is not applicable' "$REVIEWER" && report 0 "code-reviewer.md requires no-op evidence in notes" || report 1 "code-reviewer.md requires no-op evidence in notes"
 
 # Orchestrator owns claim lifecycle.
 grep -qF 'orchestrator owns claim lifecycle' "$REVIEWER" && report 0 "code-reviewer.md disclaims claim acquire/release" || report 1 "code-reviewer.md disclaims claim acquire/release"

@@ -6,7 +6,7 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 - B016 P3 | [Version sprawl across surfaces; no authoritative version signal](bugs/B016-version-sprawl-across-surfaces-no-authoritative-.md)
 - B020 P3 | [board-migrate is two unrelated operations under one verb](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
-- B022 P3 | [nothing_to_test / nothing_to_review still advance the entry forward](bugs/B022-nothingtotest--nothingtoreview-still-advance-the.md)
+- B022 P3 | [nothing_to_test / nothing_to_review still advance the entry forward](bugs/B022-nothingtotest--nothingtoreview-still-advance-the.md) (in_progress)
 - F003 P3 | [Surface matched Learnings at the moment of need (session summary + viewer panel)](features/F003-surface-matched-learnings-at-the-moment-of-need-.md)
 - L001 | [Ship every deterministic guard with a test that drives its real fixtures and call-sites](learnings/L001-guards-need-tests-that-drive-real-callsites.md)
 - L002 | [Board health invariants must respect the open-vs-resolved entry lifecycle](learnings/L002-invariants-must-respect-the-entry-lifecycle.md)

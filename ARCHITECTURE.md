@@ -104,6 +104,12 @@ Each is a Claude Code subagent (frontmatter + body). All run `model: inherit` (n
 ### Worker pipeline (dispatched on `/worker-start --discipline <d>` Stop events)
 The `needs:` state machine: `tdd → review → validate → resolved`. The Stop hook claims an entry atomically, dispatches the matching worker, applies `suggested_next_needs` to the entry, releases the claim.
 
+`nothing_to_test` and `nothing_to_review` are completed applicability
+decisions. They advance to the next discipline so an inapplicable gate does
+not repeatedly redispatch the same entry. Each worker must explain its
+evidence in `notes`. `cannot_proceed` with a null transition is the explicit
+hold path.
+
 | File | Discipline | Tools | Writes |
 |---|---|---|---|
 | `tdd-builder.md` | `tdd`: write failing test, minimal fix, re-run | `Read,Write,Edit,Bash,Grep,Glob` | test + impl files |

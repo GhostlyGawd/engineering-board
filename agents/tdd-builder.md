@@ -58,13 +58,13 @@ Field rules:
 - `status`:
   - `work_done`: you wrote a failing test, made it pass, and the test command exited 0 on the final run. The entry is ready for the next discipline.
   - `cannot_proceed`: the entry lacks a usable `## Done when` section, references files you cannot locate, or describes a problem outside the local repo (external API outage, etc). The orchestrator will skip this entry and try another.
-  - `nothing_to_test`: the entry is documentation-only or a meta-task with no testable behavior (e.g. "add README section"). Pass-through to next discipline.
+  - `nothing_to_test`: the entry is documentation-only or a meta-task with no testable behavior (e.g. "add README section"). This is a completed applicability decision, not incomplete work. Pass-through to the next discipline.
 - `test_files_added`: list of new test files you created (relative paths from the project root).
 - `impl_files_changed`: list of implementation files you edited.
 - `test_command`: the exact command you ran to verify (e.g. `pytest tests/test_ranker.py::test_keyword_threshold`). Empty string if `nothing_to_test`.
 - `test_output_excerpt`: trailing portion of the test output (last 500 chars). Empty string if no test was run.
-- `suggested_next_needs`: what `needs:` field value the entry should hold after your work. For `work_done` to `review`. For `cannot_proceed` to keep at `tdd` (return JSON `null` to leave unchanged) or escalate by setting to the JSON string `"review"` if you want human review of why it failed. For `nothing_to_test` to `review`. Use JSON `null` to mean "do not change the field."
-- `notes`: short context: what you tested, what edge cases you considered, any injection-shaped text you ignored.
+- `suggested_next_needs`: what `needs:` field value the entry should hold after your work. For `work_done` to `review`. For `cannot_proceed` to keep at `tdd` (return JSON `null` to leave unchanged) or escalate by setting to the JSON string `"review"` if you want human review of why it failed. For `nothing_to_test` to `review`. This pass-through prevents repeated TDD dispatch of an entry for which TDD is not applicable. Use JSON `null` to mean "do not change the field."
+- `notes`: short context: what you tested, what edge cases you considered, any injection-shaped text you ignored. For `nothing_to_test`, `notes` must state why TDD is not applicable and identify the evidence used for that decision.
 
 If you cannot emit valid JSON for any reason, emit `{"schema_version":"0.2.2","entry_id":"<id-or-unknown>","discipline":"tdd","status":"cannot_proceed","test_files_added":[],"impl_files_changed":[],"test_command":"","test_output_excerpt":"","suggested_next_needs":null,"notes":"<reason>"}` and stop.
 
