@@ -2,22 +2,24 @@
 # tests/orchestration/board-migrate.sh — v0.3.0 board-migrate.sh apply / rollback.
 #
 # Covers:
-#   1. --apply creates learnings/ subdir with .gitkeep.
-#   2. --apply back-fills needs:tdd on open bug/feature without needs.
-#   3. --apply preserves existing needs: value on entries that have one.
-#   4. --apply skips resolved entries (no needs added).
-#   5. --apply is SHA256-idempotent (re-run produces identical tree).
-#   6. --rollback restores SHA256-equal pre-migrate state.
-#   7. --rollback after --apply --apply still SHA-equal pre-migrate.
+#   1-4. The command names two workflows and has no cross-workflow skip branch.
+#   5. --apply creates learnings/ subdir with .gitkeep.
+#   6. --apply back-fills needs:tdd on open bug/feature without needs.
+#   7. --apply preserves existing needs: value on entries that have one.
+#   8. --apply skips resolved entries (no needs added).
+#   9. --apply is SHA256-idempotent (re-run produces identical tree).
+#   10. --rollback restores SHA256-equal pre-migrate state.
+#   11. --rollback after --apply --apply still SHA-equal pre-migrate.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="${1:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 MIGRATE="$PLUGIN_ROOT/hooks/scripts/board-migrate.sh"
+COMMAND="$PLUGIN_ROOT/commands/board-migrate.md"
 
-if [ ! -f "$MIGRATE" ]; then
-  echo "MISSING: $MIGRATE" >&2
+if [ ! -f "$MIGRATE" ] || [ ! -f "$COMMAND" ]; then
+  echo "MISSING: $MIGRATE or $COMMAND" >&2
   exit 1
 fi
 
@@ -102,6 +104,21 @@ report() {
     printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"; FAIL=$((FAIL + 1))
   fi
 }
+
+grep -Fq "## Choose a migration mode" "$COMMAND" \
+  && report 0 "command names the mode-selection boundary" \
+  || report 1 "command names the mode-selection boundary"
+grep -Fq "### Data migration mode" "$COMMAND" \
+  && report 0 "command names the data migration workflow" \
+  || report 1 "command names the data migration workflow"
+grep -Fq "### Folder relocation mode" "$COMMAND" \
+  && report 0 "command names the folder relocation workflow" \
+  || report 1 "command names the folder relocation workflow"
+if grep -Fq "skip Steps" "$COMMAND"; then
+  report 1 "command has no cross-workflow skip instruction"
+else
+  report 0 "command has no cross-workflow skip instruction"
+fi
 
 PRE_SHA=$(sha_live_tree)
 

@@ -26,7 +26,7 @@ and the surface-coherence audits (Track D).
 | `/worker-start` | **simplify** | The per-discipline session lock forces two restarts to advance one entry (B006). Either allow discipline rotation / `--discipline auto`, or frame worker mode explicitly as a primitive the Conductor (RFC 0001) drives. Tracked: **B006**. |
 | `/board-install-permissions` | **simplify** | Coverage is now correct (B004), but delivery is a 6-step copy-paste loop that can't complete inside the session and is undiscoverable from onboarding. Tracked: **B030**. |
 | `/board-claim-release` | **keep** | Exemplary UX: exit-code-specific messages that each state the next action. The gold standard the rest of the product should match. |
-| `/board-migrate` | **simplify** | Bundles two unrelated operations (v0.3.0 data migration + 1.1.0 folder relocate) under one verb. Split or clearly document as two modes. Tracked: **B020**. |
+| `/board-migrate` | **simplify** | Resolved in **B020**: the compatibility command now presents v0.3.0 data migration and 1.1.0 folder relocation as two independent named workflows. |
 
 ## Agents (8)
 

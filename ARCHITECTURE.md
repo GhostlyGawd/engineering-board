@@ -142,7 +142,7 @@ hold path.
 | `/worker-start --discipline <tdd\|review\|validate>` | Orchestration | Set `session-mode.json` `mode: worker, discipline: <d>`. Stop hook starts dispatching worker subagent every turn. |
 | `/board-install-permissions` | Admin | Read `references/required-permissions.json`. print copy-pasteable `claude config add` commands. Does NOT write settings.json directly (cross-platform safety). |
 | `/board-claim-release <entry-id> [--force]` | Admin | Manual fallback to release a stuck `_claims/<entry-id>/` directory when a worker session went offline mid-turn. |
-| `/board-migrate --apply\|--rollback\|--status\|--relocate [project]` | Admin | v0.2.x to v0.3.0 data migration (creates `learnings/`, back-fills `needs: tdd`, SHA256-idempotent snapshot/rollback) + 1.1.0 `--relocate` (moves `docs/boards/` to `engineering-board/`). Thin dispatcher over `board-migrate.sh` / `board-relocate.sh`. |
+| `/board-migrate --apply\|--rollback\|--status\|--relocate [project]` | Admin | Compatibility dispatcher with two independent named workflows. Data migration uses `board-migrate.sh` per resolved board. Folder relocation uses `board-relocate.sh` once per repository. Mode selection occurs before target resolution; there is no cross-workflow skip branch. |
 
 ---
 
