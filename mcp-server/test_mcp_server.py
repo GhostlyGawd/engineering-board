@@ -564,22 +564,64 @@ def suite_lifecycle(mod, tmp_repo):
         "title": "Resolution archive contract", "affects": "src/archive.py",
         "evidence": "The MCP update must preserve the durable archive.",
     })
+    archive_path = Path(root, "engineering-board", "atlas", "ARCHIVE.md")
+    archive_preamble = archive_path.read_text()
+    first_archive_row = "- O999 | First resolved entry | resolved: 2026-01-02"
+    check(
+        mod.archive_with_newest_row(archive_preamble, first_archive_row)
+        == archive_preamble + first_archive_row + "\n",
+        "first archive row follows the unchanged preamble",
+    )
+    older_archive_rows = (
+        "- B900 | Older resolved entry | resolved: 2026-01-01\n"
+        "- B901 | Oldest resolved entry | resolved: 2025-12-31\n"
+    )
+    archive_path.write_text(archive_preamble + older_archive_rows)
     resolved = mod.tool_board_update_entry({
         "project": "atlas", "root": root,
         "entry_id": observation["id"], "status": "resolved",
     })
-    archive_path = Path(root, "engineering-board", "atlas", "ARCHIVE.md")
     archive_text = archive_path.read_text()
-    check("appended ARCHIVE.md" in resolved["changes"],
+    first_marker = "- O001 | Resolution archive contract | resolved:"
+    check("inserted ARCHIVE.md" in resolved["changes"],
           "resolving through MCP records the archive change")
-    check(archive_text.count("- O001 | Resolution archive contract | resolved:") == 1,
+    check(archive_text.count(first_marker) == 1,
           "resolved entry appears once in ARCHIVE.md", archive_text)
+    check(archive_text.startswith(archive_preamble + first_marker),
+          "resolved entry is first after the archive preamble", archive_text)
+    check(archive_text.endswith(older_archive_rows),
+          "existing archive rows preserve their order", archive_text)
+
+    second_observation = mod.tool_board_create_entry({
+        "project": "atlas", "root": root, "type": "observation",
+        "title": "Newer resolution archive contract", "affects": "src/archive.py",
+        "evidence": "The newest resolution must become the first archive row.",
+    })
+    mod.tool_board_update_entry({
+        "project": "atlas", "root": root,
+        "entry_id": second_observation["id"], "status": "resolved",
+    })
+    archive_after_second = archive_path.read_text()
+    second_marker = "- O002 | Newer resolution archive contract | resolved:"
+    check(archive_after_second.startswith(archive_preamble + second_marker),
+          "later resolution becomes the first archive row", archive_after_second)
+    check(
+        archive_after_second.index(second_marker)
+        < archive_after_second.index(first_marker)
+        < archive_after_second.index("- B900 |")
+        < archive_after_second.index("- B901 |"),
+        "archive rows remain newest-first without reordering older rows",
+        archive_after_second,
+    )
+    check(archive_after_second.endswith(older_archive_rows),
+          "later resolution preserves the archive preamble and older-row suffix",
+          archive_after_second)
     mod.tool_board_update_entry({
         "project": "atlas", "root": root,
         "entry_id": observation["id"], "status": "resolved",
     })
     archive_after_repeat = archive_path.read_text()
-    check(archive_after_repeat.count("- O001 | Resolution archive contract | resolved:") == 1,
+    check(archive_after_repeat.count(first_marker) == 1,
           "repeated resolved update does not duplicate ARCHIVE.md")
 
     # learning entry validates too (exercises the strictest schema branch)

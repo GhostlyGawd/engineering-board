@@ -74,7 +74,7 @@ Close any of these? (reply with IDs, or "skip")
 
 Wait for user response. **Never auto-close without confirmation in v1.** False positives are unrecoverable in user trust terms.
 
-If the user confirms closure of one or more IDs: execute the standard resolve protocol on each (frontmatter `status: resolved`, ARCHIVE.md append, BOARD.md regeneration). Cascade: closing each one re-invokes this pass with `cascade` mode on its neighbors: but **bounded depth 2** to prevent runaway cascades.
+If the user confirms closure of one or more IDs: execute the standard resolve protocol on each (frontmatter `status: resolved`, newest-first ARCHIVE.md insertion, BOARD.md regeneration). Cascade: closing each one re-invokes this pass with `cascade` mode on its neighbors: but **bounded depth 2** to prevent runaway cascades.
 
 If the user replies "skip" or leaves them: leave entries at their current status. The next board operation will surface them again.
 

@@ -55,16 +55,26 @@ Common routing:
 
 ### Executing board-resolve (question)
 
-All 8 steps are mandatory and order-sensitive:
+All 9 steps are mandatory and order-sensitive:
 
-1. Write `## Finding` in the question entry: full answer with evidence: before touching `status`.
+1. Write `## Finding` in the question entry with the full evidence-backed
+   answer before changing `status`.
 2. Set `status: resolved`.
-3. Remove from the project's BOARD.md open list.
-4. Append to the project's ARCHIVE.md.
-5. `grep -r "blocked_by:.*Q###" engineering-board/<project>/ --include="*.md" -l`: find all dependents.
-6. For each dependent: remove Q_id from `blocked_by:`, set `status: open` if list now empty, remove `⊘ Q###` from BOARD.md line.
-7. Read each newly-unblocked entry's fix direction against the Finding. Update entry if root cause, affects field, or fix direction is now stale. Add `## Q### finding (resolved YYYY-MM-DD)` section.
-8. Apply triage rules to current open items. State recommended next step.
+3. Insert the resolved question immediately after the project's ARCHIVE.md
+   preamble and before every older canonical row. Preserve the preamble and
+   older-row order.
+4. Find all dependents with `grep -r "blocked_by:.*Q###"
+   engineering-board/<project>/ --include="*.md" -l`.
+5. For each dependent, remove the question id from `blocked_by:` and set
+   `status: open` if the list is now empty.
+6. Read each newly unblocked entry's fix direction against the Finding. Update
+   stale root-cause, `affects:`, or fix-direction text. Add a
+   `## Q### finding (resolved YYYY-MM-DD)` section when needed.
+7. Run `/board-rebuild <project>`. Do not edit BOARD.md directly.
+8. Run the bounded auto-resolve cascade pass with the resolved question as the
+   seed.
+9. Apply triage rules to the current open items and state the recommended next
+   step.
 
 ### Executing board-triage
 
