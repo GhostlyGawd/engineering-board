@@ -80,3 +80,4 @@ Resolved entries. Newest at the top.
 - F004 | Package Engineering Board as an installable Codex plugin | resolved: 2026-08-14
 - B021 | code-reviewer name collides with /code-review and its tools contradict its read-only contract | pattern: naming, contract-mismatch | resolved: 2026-08-14
 - B068 | board-consolidate apply instructions omit the session selector required by session-scoped plans | resolved: 2026-08-14
+- B067 | GitHub Actions forces actions/checkout v4 from deprecated Node.js 20 onto Node.js 24 | resolved: 2026-08-14
