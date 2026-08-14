@@ -1,6 +1,6 @@
 # Codex MCP relative-cwd dogfood workpad — 2026-08-14
 
-State: implementation validation
+State: post-merge validation
 
 Completion state: `post-merge-pending`
 
@@ -53,15 +53,15 @@ that open defect. Entry `B066` owns the relative-cwd correction.
 - [x] Add a failing shared-core and MCP-adapter regression.
 - [x] Restrict repository-root normalization to `cwd`.
 - [x] Run the complete repository test suite.
-- [ ] Verify pull-request and merged-main continuous integration.
+- [x] Verify pull-request and merged-main continuous integration.
 - [ ] Revalidate the configured MCP server after it reloads merged code.
 
 ## Alignment workpad
 
 | Contract item | Normative level | Implementation | Test | Docs/example | Status |
 |---|---|---|---|---|---|
-| Repository-relative `cwd` root | Required | Context path normalizer permits root only when requested by `cwd` | Core, MCP adapter, and real STDIO server use `cwd: "."` | Product specification and MCP schema already permit the input | Required conflict corrected locally |
-| File-path safety | Required security boundary | File normalization does not enable the root exception | Invalid-input matrix retains `files: ["."]` rejection | Security guidance already requires safe repository-relative files | Preserved locally |
+| Repository-relative `cwd` root | Required | Context path normalizer permits root only when requested by `cwd` | Core, MCP adapter, and real STDIO server use `cwd: "."` | Product specification and MCP schema already permit the input | Required conflict corrected on main |
+| File-path safety | Required security boundary | File normalization does not enable the root exception | Invalid-input matrix retains `files: ["."]` rejection | Security guidance already requires safe repository-relative files | Preserved on main |
 | Parent and absolute-path rejection | Required security boundary | Existing traversal and containment checks are unchanged | Existing invalid-path and out-of-root checks | Security and product specification | Reviewed and unaffected |
 | User command behavior | Required current surface | `/board-context` continues to pass absolute `$PWD` | Existing adapter matrix | Command example remains accurate | Reviewed and unaffected |
 | Storage and canonical authority | Required architecture boundary | No storage or authority change | Existing read-only context checks | README and architecture remain accurate | Reviewed and unaffected |
@@ -78,17 +78,26 @@ that open defect. Entry `B066` owns the relative-cwd correction.
 - Board lifecycle: `B066` is resolved after validation. `B065` remains open in
   the ready queue. The board reports no in-progress or blocked entries and no
   unpromoted scratch.
-- Configured MCP process: still has the pre-change module loaded and continues
-  to reject `cwd: "."`; reload validation is pending.
+- Pull-request runs `31800613686` and `31800658508` passed `run-all` for head
+  commit `18daa2fb7b4e15e8f8781803aedb6d075b12b3d2`.
+- Pull request `#124` merged as
+  `54815bc8a5150c2cb66e662b729f6ef09cf8454e`.
+- Merged-main run `31800799470` passed `run-all` for that exact merge commit.
+- The configured MCP process now accepts `cwd: "."` in a semantic probe. Its
+  configured source is a concurrently reused worktree, and the long-lived
+  process loaded before the merge. This probe does not prove a reload from the
+  merged source.
 
 ## External gates
 
-- Pull request: pending.
-- Merged-main continuous integration: pending.
-- Configured MCP reload probe: pending.
+- Pull request `#124`: merged.
+- Merged-main continuous integration: passed.
+- Configured MCP semantic probe: passed.
+- Source-verified configured MCP reload: pending.
 - Release: not authorized and not required.
 
 Evidence destination:
 `docs/evidence/2026-08-14-codex-mcp-relative-cwd.md`.
 
-Terminal action: keep open until merged-main CI and the reloaded MCP probe pass.
+Terminal action: keep open until a configured MCP process reloads from the
+merged source and repeats the relative-root probe.
