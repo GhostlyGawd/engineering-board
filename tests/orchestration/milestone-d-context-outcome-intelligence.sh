@@ -123,6 +123,16 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-d-") as tmp:
         b"".join(path.read_bytes() for path in sorted(board.rglob("*.md")))
     ).hexdigest()
     assert first == second
+    relative_root = build_context(
+        board,
+        project,
+        task="Fix the boundary-ownership failures at the shared root.",
+        files=["api/router.py"],
+        entry_ids=["B001"],
+        cwd=".",
+        limit=10,
+    )
+    assert relative_root == first
     assert before_digest == after_digest
     assert first["context_fingerprint"].startswith("ctx-")
     assert first["ranking_rule_version"] == "1"
@@ -192,6 +202,18 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-d-") as tmp:
         }
     )
     assert mcp_context == first
+    mcp_relative_context = tool_board_context(
+        {
+            "root": str(repo),
+            "project": project,
+            "task": "Fix the boundary-ownership failures at the shared root.",
+            "files": ["api/router.py"],
+            "entry_ids": ["B001"],
+            "cwd": ".",
+            "limit": 10,
+        }
+    )
+    assert mcp_relative_context == first
     cli = subprocess.run(
         [
             sys.executable,
@@ -220,7 +242,10 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-d-") as tmp:
 
     for invalid in (
         {"task": "", "files": [], "entry_ids": [], "cwd": ""},
+        {"task": "x", "files": ["."], "entry_ids": [], "cwd": ""},
+        {"task": "x", "files": ["/tmp/escape"], "entry_ids": [], "cwd": ""},
         {"task": "x", "files": ["../escape"], "entry_ids": [], "cwd": ""},
+        {"task": "x", "files": [], "entry_ids": [], "cwd": str(repo.parent)},
         {"task": "x" * 4001, "files": [], "entry_ids": [], "cwd": ""},
     ):
         try:

@@ -2220,14 +2220,23 @@ def _memory_source_fingerprint(
     ).hexdigest()
 
 
-def _normalize_context_path(value: Any, field: str) -> str:
+def _normalize_context_path(
+    value: Any,
+    field: str,
+    *,
+    allow_root: bool = False,
+) -> str:
     text = str(value or "").replace("\\", "/").strip()
     if not text or len(text) > 512:
         raise GraphError(f"{field} must contain 1 through 512 characters")
     if text.startswith("/") or re.match(r"^[A-Za-z]:", text):
         raise GraphError(f"{field} must be repository-relative")
     parts = [part for part in text.split("/") if part not in {"", "."}]
-    if not parts or any(part == ".." for part in parts):
+    if not parts:
+        if allow_root:
+            return "."
+        raise GraphError(f"{field} contains an unsafe path")
+    if any(part == ".." for part in parts):
         raise GraphError(f"{field} contains an unsafe path")
     return "/".join(parts)
 
@@ -2363,7 +2372,9 @@ def build_context(
             if cwd_path.is_absolute():
                 cwd_relative = cwd_path.resolve().relative_to(repository_root.resolve()).as_posix()
             else:
-                cwd_relative = _normalize_context_path(str(cwd), "cwd")
+                cwd_relative = _normalize_context_path(
+                    str(cwd), "cwd", allow_root=True
+                )
         except (OSError, ValueError) as exc:
             raise GraphError("cwd must be inside the repository") from exc
     if not task.strip() and not normalized_files and not normalized_entry_ids and not cwd_relative:
