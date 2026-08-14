@@ -8,6 +8,7 @@
 - Implementation pull request: [#136](https://github.com/GhostlyGawd/engineering-board/pull/136)
 - Implementation merge commit: `7fe83c92e3645d9578e3001f653a1eeb373b30d1`
 - Implementation merged-main run: [31821137740](https://github.com/GhostlyGawd/engineering-board/actions/runs/31821137740)
+- Closeout pull request: [#137](https://github.com/GhostlyGawd/engineering-board/pull/137)
 - Evidence destination: this file
 - External gates: closeout pull request merge and passing closeout merged-main
   continuous integration
@@ -89,7 +90,7 @@ runtime protocol or data schema.
 - Maintained repository suite: 21 of 21 suites pass.
 - Implementation pull request #136 merged as `7fe83c9`; merged-main run
   31821137740 passed with no annotations.
-- Closeout pull request and merged-main run: pending.
+- Closeout pull request #137 and its merged-main run: pending.
 
 ## Closeout review
 
