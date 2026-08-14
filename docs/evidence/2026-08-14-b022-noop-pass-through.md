@@ -4,14 +4,15 @@
 - Repository: `GhostlyGawd/engineering-board`
 - Base commit: `635c85c4c16e103d3fcdaf03476b94d897421901`
 - Board entry: `B022`
-- Completion state: `post-merge-pending`
-- Implementation pull request: pending
+- Completion state: `closeout`
+- Implementation pull request: [#134](https://github.com/GhostlyGawd/engineering-board/pull/134)
+- Implementation merge commit: `494c76e74caab428e4622b15dfb1d8f8f7bc7c8c`
+- Implementation merged-main run: [31814617392](https://github.com/GhostlyGawd/engineering-board/actions/runs/31814617392)
 - Evidence destination: this file
-- External gates: implementation pull request merge, passing implementation
-  merged-main continuous integration, closeout pull request merge, and passing
-  closeout merged-main continuous integration
-- Terminal action: `keep-open` until implementation merged-main evidence passes;
-  then resolve B022 in a closeout change and verify the closeout merged-main run
+- External gates: closeout pull request merge and passing closeout merged-main
+  continuous integration
+- Terminal action: resolve B022 in the closeout change, release its claim, and
+  verify the closeout merged-main run
 
 ## Decision
 
@@ -67,8 +68,19 @@ sentinel inventory, claim lifecycle, product version, or release state.
   checks, the review/validator prompt reports 50, and Stop routing reports 99.
 - Green command phase: the `/board-run` contract reports 19 passing checks.
 - Maintained repository suite: 21 of 21 suites pass.
-- Implementation pull request and merged-main run: pending.
+- Implementation pull request #134 merged as `494c76e`; merged-main run
+  31814617392 passed with no annotations.
 - Closeout pull request and merged-main run: pending.
+
+## Closeout review
+
+- B022 is resolved and omitted from the rebuilt live board index.
+- Claim session `codex-20260814-b022-noop-transitions` released successfully.
+- The remaining ready entries B016, B020, and F003 share neither B022's
+  affected path nor its `counterintuitive-behavior` pattern, so no cascade
+  update applies.
+- The project has no canonical hypotheses, so no hypothesis outcome applies.
+- The board index invariant passes after resolution.
 
 These path and phrase checks prevent silent omission of the reviewed contract.
 They do not prove model behavior or perfect semantic correctness. They do not
