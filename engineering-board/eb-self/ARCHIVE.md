@@ -2,6 +2,7 @@
 
 Resolved entries. Newest at the top.
 
+- F003 | Surface matched Learnings at the moment of need (session summary + viewer panel) | pattern: learnings-surfacing | resolved: 2026-08-14
 - B020 | board-migrate is two unrelated operations under one verb | pattern: surface-overload | resolved: 2026-08-14
 - B069 | Resolved entries append below older archive rows despite newest-first contract | resolved: 2026-08-14
 - B057 P3 | [board_status counts every finding inside plugin scratch blocks](bugs/B057-count-scratch-findings-undercounts-multi-find.md) — resolved 2026-07-26
