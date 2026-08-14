@@ -26,6 +26,10 @@ increases.
 
 ### Fixed
 
+- The internal `code-reviewer` worker now excludes `Write` and `Edit` from its
+  tool grant. Its prompt distinguishes the Worker-mode agent from the harness
+  `/code-review` and `/review` skills while preserving the registered routing
+  name.
 - `board_context` now accepts `cwd: "."` as the safe repository-relative root.
 - Scratch promotion now uses content-derived fallback provenance. Recreating a
   daily MCP scratch file cannot make an unrelated finding appear already

@@ -107,7 +107,7 @@ The `needs:` state machine: `tdd → review → validate → resolved`. The Stop
 | File | Discipline | Tools | Writes |
 |---|---|---|---|
 | `tdd-builder.md` | `tdd`: write failing test, minimal fix, re-run | `Read,Write,Edit,Bash,Grep,Glob` | test + impl files |
-| `code-reviewer.md` | `review`: inspect tests + impl from tdd-builder | `Read,Write,Edit,Bash,Grep,Glob` | review notes. suggests `validate` or regress to `tdd` |
+| `code-reviewer.md` | `review`: read-only inspection of tests + implementation from tdd-builder; internal worker, not the harness `/code-review` or `/review` skill | `Read,Bash,Grep,Glob` (no Write or Edit: enforced) | nothing; suggests `validate` or regress to `tdd` |
 | `validator.md` | `validate`: re-run full suite + verify Done-when | `Read,Bash,Grep,Glob` (no Write: enforced) | nothing (read-only by design) |
 
 ---
