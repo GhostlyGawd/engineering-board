@@ -107,12 +107,14 @@ The unlocked version 4 proposal now limits each positive case to one visible
 current incident. It also requires a positive classification to connect that
 incident to prior repository evidence. A non-scored proposal preflight found
 that v1.11.0 ranks the expected memory but does not include the memory title,
-cause, or summary in the returned result. Context contract version 2 now
-returns that bounded canonical content with its separate epistemic state,
-match reason, and sources. The proposal remains unlocked. Run a new
-non-scored preflight before the product owner reviews an exact version 4
-baseline. See [`evaluation/README.md`](evaluation/README.md) for the proof
-boundary and operator commands.
+cause, or summary in the returned result. Context contract version 2 added
+that bounded canonical content with its separate epistemic state, match
+reason, and sources. Current contract version 3 preserves those limits and
+adds confidence for moment-of-need Learning delivery. The proposal remains
+unlocked. Run a new non-scored preflight before the product owner reviews an
+exact version 4 baseline. See
+[`evaluation/README.md`](evaluation/README.md) for the proof boundary and
+operator commands.
 
 ## Product differences
 
@@ -235,18 +237,20 @@ With Claude Code hooks and commands:
 4. Read the memory title, typed summary, epistemic state, match reason, and
    sources. Inspect the cited canonical record before you rely on a proposed
    cause.
-5. Let the Stop hook capture a finding in
+5. In PM mode, read the matched medium/high-confidence Learnings appended to
+   the pass summary after new findings promote.
+6. Let the Stop hook capture a finding in
    `engineering-board/<project>/_sessions/`.
-6. Run `/board-promote` to preview canonical changes.
-7. Apply the unchanged promotion plan after you review it.
-8. Run `/board-insights <project>` when you need the complete ranked
+7. Run `/board-promote` to preview canonical changes.
+8. Apply the unchanged promotion plan after you review it.
+9. Run `/board-insights <project>` when you need the complete ranked
    investigation view.
-9. Run `/board-hypothesis <project> propose` to preview an H### record.
-10. Review the evidence, alternative, counter-evidence, confidence basis, and
+10. Run `/board-hypothesis <project> propose` to preview an H### record.
+11. Review the evidence, alternative, counter-evidence, confidence basis, and
     falsifier.
-11. Apply the unchanged hypothesis plan.
-12. After verification, run `/board-outcome <project> preview ...`.
-13. Apply the unchanged outcome plan. Review and apply each returned Learning
+12. Apply the unchanged hypothesis plan.
+13. After verification, run `/board-outcome <project> preview ...`.
+14. Apply the unchanged outcome plan. Review and apply each returned Learning
     plan separately.
 
 An outcome records `held`, `failed`, `partial`, or `inconclusive`. It can

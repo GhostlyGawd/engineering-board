@@ -180,6 +180,9 @@ check_proc "procedure: PM step (c) tidier dispatch"               "subagent_type
 check_proc "procedure: PM step (d) learnings-curator dispatch"    "subagent_type=\`learnings-curator\`"
 check_proc "procedure: PM tidier described as idempotent"         "idempotent"
 check_proc "procedure: PM learnings-curator returns script JSON"  "returns its JSON verbatim"
+check_proc "procedure: PM requests matched Learning summary"      "--learning-summary"
+check_proc "procedure: PM filters through promoted entry ids"    "promoted entry ids"
+check_proc "procedure: PM appends matched Learnings"             "Matched Learnings:"
 check_proc "procedure: PM emits PM-CONTINUE"                      "<<EB-PM-CONTINUE>>"
 check_proc "procedure: PM emits PM-FAIL on failure"               "<<EB-PM-FAIL>>"
 

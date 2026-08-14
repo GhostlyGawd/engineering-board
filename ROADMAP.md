@@ -22,7 +22,8 @@ source report — no new findings are smuggled in._
 > incident and scores only a cross-incident diagnosis. Its non-scored preflight
 > found that the v1.11.0 context result ranks the expected memory but omits its
 > title, proposed cause, and summary. The owner selected a self-contained
-> bounded summary. Context contract version 2 implements that correction. Run
+> bounded summary. Context contract version 2 implemented that correction;
+> current version 3 preserves it and adds matched-Learning confidence. Run
 > a new non-scored preflight before baseline review. Version 4 remains
 > unlocked. Milestone E remains deferred. The priority lists below preserve
 > the 2026-07-08 audit synthesis and are not the current product sequence.

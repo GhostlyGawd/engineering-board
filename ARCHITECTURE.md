@@ -122,7 +122,7 @@ hold path.
 
 | Command | Group | Purpose |
 |---|---|---|
-| `/board-context <project> [options]` | Pattern intelligence | Retrieve a bounded brief of relevant clusters, H### hypotheses, negative memory, and L### Learnings. Each result exposes a stable title, typed summary, epistemic state, structural signals, score components, a reason, and canonical sources. Read-only. |
+| `/board-context <project> [options]` | Pattern intelligence | Retrieve a bounded brief of relevant clusters, H### hypotheses, negative memory, and L### Learnings. Each result exposes a stable title, typed summary, epistemic state, confidence when applicable, structural signals, score components, a reason, and canonical sources. `--learning-summary` emits only directly matched medium/high-confidence Learnings. Read-only. |
 | `/board-outcome <project> <action>` | Pattern intelligence | Preview/apply one explicit H### fix outcome, apply one returned L### plan, run the authorized Learning curator, or show the derived value report. |
 | `/board-demo [--run-id <id>]` | Pattern intelligence | Create a manifest-tracked synthetic run, build deterministic graph facts, invoke `board-insights` for one evidence-cited proposed hypothesis, render the evidence to cluster to hypothesis view, and report exact cleanup. No real board data or settings are changed. |
 | `/board-insights <project> [--cluster …] [--limit …]` | Pattern intelligence | Rank deterministic clusters with exposed score components and linked hypothesis and negative-memory references. Read-only. |
@@ -162,7 +162,7 @@ The Stop hook's actual orchestration body (the `type: "prompt"` content) lives s
 | Section | Triggers when | Dispatches | Emits sentinel |
 |---|---|---|---|
 | `3-EXTRACTOR` (passive) | default mode | `finding-extractor` (1 Task) | `<<EB-PASSIVE-DONE>>` / `<<EB-PASSIVE-PAUSED>>` / `<<EB-PASSIVE-NO-BOARD>>` / `<<EB-PASSIVE-FAIL>>` |
-| `3-PM` | `mode: pm` | `finding-extractor` to `consolidator` to `tidier` to `learnings-curator` (4 Tasks) | `<<EB-PM-CONTINUE>>` / `<<EB-PM-FAIL>>` |
+| `3-PM` | `mode: pm` | `finding-extractor` to `consolidator` to `tidier` to `learnings-curator` (4 Tasks), then matched-Learning retrieval from promoted entry ids | `<<EB-PM-CONTINUE>>` / `<<EB-PM-FAIL>>` |
 | `3-WORKER` | `mode: worker, discipline: <d>` | claim-acquire script to one of `tdd-builder` / `code-reviewer` / `validator` to write back `needs:` to claim-release script | `<<EB-WORKER-CONTINUE>>` / `<<EB-WORKER-NOTHING-TO-DO>>` / `<<EB-WORKER-FAIL>>` |
 
 ### `scripts/`: 30 bash scripts + 7 python modules
@@ -210,8 +210,9 @@ Board-location resolution lives in one place: **`board-paths.sh`** (sourced help
 - `board-intake.py` / `board-intake.sh`: foreground promotion and P### pattern preview/apply adapters.
 - `board-insights.py` / `board-insights.sh`: deterministic cluster ranking
   plus content-bound H### lifecycle adapters over the shared core.
-- `board-context.py` / `board-context.sh`: bounded contextual-retrieval and
-  value-report adapters over the shared core.
+- `board-context.py` / `board-context.sh`: bounded contextual-retrieval,
+  medium/high-confidence Learning-summary, and value-report adapters over the
+  shared core.
 - `board-outcome.py` / `board-outcome.sh`: explicit H### fix-outcome,
   outcome-aware L### feedback, curator, and value-report adapters.
 

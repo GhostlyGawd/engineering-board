@@ -13,9 +13,14 @@ increases.
 
 - Added an installable Codex plugin manifest, five provider-neutral board
   skills, an isolated MCP configuration, and a cross-platform MCP launcher.
+- PM summaries now append medium/high-confidence Learnings whose declared
+  scope or pattern matches entries promoted during that PM pass.
 
 ### Changed
 
+- Context contract version 3 exposes memory confidence. Ranking rule version
+  2 derives path context from selected entries and gives direct Learning
+  `applies_to` and raw/canonical pattern matches structural eligibility.
 - `.claude-plugin/plugin.json` is now the explicit authoritative product-version
   signal. The version guard covers every shipped release mirror, removes the
   unused permissions-manifest stamp, and distinguishes product versions from

@@ -3,9 +3,9 @@ id: F003
 type: feature
 title: Surface matched Learnings at the moment of need (session summary + viewer panel)
 discovered: 2026-07-04
-status: open
+status: in_progress
 priority: P3
-affects: hooks/scripts/board-session-start.sh
+affects: hooks/stop-hook-procedure.md
 needs: tdd
 pattern: [learnings-surfacing]
 ---
@@ -19,3 +19,8 @@ Rank-3 (Track C). Learnings (the moat) reach the user through exactly one surfac
 
 ## Kill criteria
 Kill if matching produces false positives that train users to ignore it (guard with the proven medium+ confidence + affects-prefix filter). Defer PR-body injection until there is an owned PR-authoring surface (Conductor).
+
+## Comments
+
+- **codex-20260814-f003-learning-surface** 2026-08-14T18:05:12Z: TDD implementation started. Viewer Learnings panel is already covered; scope is the PM summary plus shared-context matching for Learning applies_to and medium/high confidence.
+- **codex-20260814-f003-learning-surface** 2026-08-14T18:24:50Z: Implementation verified: context 16 checks, PM loop 20 checks, Stop routing 102 checks, viewer 52 checks, and maintained suite 21/21. Real-board B069 surfaced L003/L005 while F003 stayed quiet. Documentation and dated evidence are aligned; preparing delivery.

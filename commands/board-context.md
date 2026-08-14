@@ -1,6 +1,6 @@
 ---
 description: Retrieve the repository memory that is structurally relevant to the current task, files, or entries.
-argument-hint: <project-name> [--task <text>] [--file <path>] [--entry <id>] [--limit <1-10>] [--report]
+argument-hint: <project-name> [--task <text>] [--file <path>] [--entry <id>] [--limit <1-10>] [--learning-summary] [--report]
 ---
 
 
@@ -37,9 +37,16 @@ A `proposed_root_cause` summary remains an inference unless its separate
 status records stronger evidence. A `cluster_scope` summary states structural
 correlation, not causation.
 
-Context contract version `2` limits a title to 160 characters and a summary
-to 2,000 characters. The core flattens line and control separators. This
-command does not write board state.
+Context contract version `3` adds a `confidence` field while preserving the
+160-character title and 2,000-character summary limits. Ranking rule version
+`2` derives path context from selected entries and matches Learning
+`applies_to` with a strict repository-path prefix check. The core flattens line
+and control separators. This command does not write board state.
+
+Use `--learning-summary` with entry or file context to emit one optional line
+instead of the JSON brief. This mode selects only directly matched Learnings,
+excludes low-confidence records, and returns at most 10 entries. It is the PM
+session-end delivery surface. Do not combine it with `--report`.
 
 Use `--report` to read the derived outcome-value report. The report contains
 only counts derived from canonical H### outcome history and L### outcome

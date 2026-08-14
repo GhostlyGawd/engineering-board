@@ -135,10 +135,10 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-d-") as tmp:
     assert relative_root == first
     assert before_digest == after_digest
     assert first["context_fingerprint"].startswith("ctx-")
-    assert first["ranking_rule_version"] == "1"
-    assert first["context_contract_version"] == "2"
+    assert first["ranking_rule_version"] == "2"
+    assert first["context_contract_version"] == "3"
     token_payload = _decode_context_token(first["context_token"])
-    assert token_payload["context_contract_version"] == "2"
+    assert token_payload["context_contract_version"] == "3"
     hypothesis_memory = next(
         item for item in first["results"] if item["id"] == "H001"
     )
@@ -333,6 +333,7 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-d-") as tmp:
     )
     assert learning_memory["title"] == "Recurring pattern: boundary-ownership"
     assert learning_memory["summary_kind"] == "learning_takeaway"
+    assert learning_memory["confidence"] == "medium"
     assert "Review the cited resolutions before another local fix." in (
         learning_memory["summary"]
     )
@@ -472,6 +473,88 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-d-") as tmp:
     assert negative_memory["status"] == "rejected"
     assert negative_memory["summary_kind"] == "proposed_root_cause"
     assert "implicit ownership boundary" in negative_memory["summary"]
+    checks += 1
+
+    for title, affects, pattern in (
+        ("Worker retry path", "workers/retry.py", []),
+        ("Pattern-only retry path", "other/retry.py", ["summary-retry"]),
+    ):
+        tool_board_create_entry(
+            {
+                "root": str(repo),
+                "project": project,
+                "type": "feature",
+                "title": title,
+                "priority": "P3",
+                "affects": affects,
+                "pattern": pattern,
+                "discovered": "2026-07-28",
+                "done_when": ["The summary fixture is deterministic."],
+            }
+        )
+    for title, confidence, applies_to, pattern_tag in (
+        ("Scoped worker retry", "medium", ["workers/"], "worker-retry"),
+        ("Low-confidence decoy", "low", ["workers/"], "worker-retry-decoy"),
+        ("Retry pattern memory", "high", ["unrelated/"], "summary-retry"),
+        (
+            "Nested-segment scope decoy",
+            "high",
+            ["vendor/workers/"],
+            "nested-worker-decoy",
+        ),
+    ):
+        tool_board_create_entry(
+            {
+                "root": str(repo),
+                "project": project,
+                "type": "learning",
+                "title": title,
+                "subtype": "principle",
+                "confidence": confidence,
+                "recurrence": 1,
+                "derived_from": ["B001"],
+                "applies_to": applies_to,
+                "pattern_tag": pattern_tag,
+                "discovered": "2026-07-28",
+                "takeaway": "Surface this fixture only for a structural match.",
+            }
+        )
+
+    scoped_context = build_context(
+        board, project, entry_ids=["F001"], limit=10
+    )
+    scoped_learning = next(
+        item for item in scoped_context["results"] if item["id"] == "L002"
+    )
+    assert scoped_learning["confidence"] == "medium"
+    assert any(
+        signal.startswith("learning-applies-to:")
+        for signal in scoped_learning["matched_signals"]
+    )
+    summary_cli = subprocess.run(
+        [
+            sys.executable,
+            str(root / "hooks" / "scripts" / "board-context.py"),
+            "--board-dir",
+            str(board),
+            "--project",
+            project,
+            "--entry",
+            "F001",
+            "--entry",
+            "F002",
+            "--learning-summary",
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    assert summary_cli.stdout.strip() == (
+        "Matched Learnings: L002 [medium] - Scoped worker retry; "
+        "L004 [high] - Retry pattern memory"
+    )
+    assert "L003" not in summary_cli.stdout
+    assert "L005" not in summary_cli.stdout
     checks += 1
 
 print(f"Milestone D context and outcome intelligence matrix: {checks} checks passed")

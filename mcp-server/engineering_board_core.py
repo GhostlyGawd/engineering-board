@@ -60,8 +60,8 @@ HYPOTHESIS_SECTIONS = (
 )
 GRAPH_SCHEMA_VERSION = "3"
 RANKING_RULE_VERSION = "1"
-CONTEXT_RANKING_RULE_VERSION = "1"
-CONTEXT_CONTRACT_VERSION = "2"
+CONTEXT_RANKING_RULE_VERSION = "2"
+CONTEXT_CONTRACT_VERSION = "3"
 CONTEXT_RESULT_LIMIT = 3
 CONTEXT_TITLE_LIMIT = 160
 CONTEXT_SUMMARY_LIMIT = 2000
@@ -2234,6 +2234,15 @@ def _load_learnings(board_dir: Path) -> dict[str, Any]:
         outcome_status = str(frontmatter.get("outcome_status") or "untested")
         if outcome_status not in LEARNING_OUTCOME_STATUSES:
             raise GraphError(f"{relative}: invalid outcome_status {outcome_status!r}")
+        confidence = str(frontmatter.get("confidence") or "")
+        if confidence not in {"low", "medium", "high"}:
+            raise GraphError(f"{relative}: invalid confidence {confidence!r}")
+        applies_to = sorted(
+            {
+                _normalize_context_path(value, "applies_to")
+                for value in _as_list(frontmatter.get("applies_to"))
+            }
+        )
         pattern_tag = normalize_pattern_label(str(frontmatter.get("pattern_tag") or ""))
         pattern_ids = sorted(
             item
@@ -2250,6 +2259,8 @@ def _load_learnings(board_dir: Path) -> dict[str, Any]:
             "derived_from": sorted(_as_list(frontmatter.get("derived_from"))),
             "pattern_tag": pattern_tag,
             "pattern_ids": pattern_ids,
+            "applies_to": applies_to,
+            "confidence": confidence,
             "outcome_status": outcome_status,
             "outcome_refs": sorted(_as_list(frontmatter.get("outcome_refs"))),
             "text": text,
@@ -2317,6 +2328,19 @@ def _path_has_segment_overlap(left: str, right: str) -> bool:
         longer[index : index + len(shorter)] == shorter
         for index in range(len(longer) - len(shorter) + 1)
     )
+
+
+def _path_is_in_scope(path: str, scope: str) -> bool:
+    """Return true when a repository path is inside the declared scope."""
+    path_parts = [
+        part.casefold() for part in path.replace("\\", "/").split("/") if part
+    ]
+    scope_parts = [
+        part.casefold() for part in scope.replace("\\", "/").split("/") if part
+    ]
+    if not path_parts or not scope_parts or len(scope_parts) > len(path_parts):
+        return False
+    return path_parts[: len(scope_parts)] == scope_parts
 
 
 def _context_task_tokens(value: str) -> set[str]:
@@ -2403,12 +2427,29 @@ def build_context(
     entry_ids: list[str] | None = None,
     cwd: str = "",
     limit: int = CONTEXT_RESULT_LIMIT,
+    result_kinds: set[str] | None = None,
 ) -> dict[str, Any]:
     """Return deterministic repository memory for one bounded context."""
     board_dir = board_dir.resolve()
     project = _bounded_text(project, "project", 160)
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 10:
         raise GraphError("limit must be between 1 and 10")
+    allowed_result_kinds = {
+        "cluster",
+        "hypothesis",
+        "learning",
+        "negative_memory",
+    }
+    if result_kinds is None:
+        normalized_result_kinds = allowed_result_kinds
+    elif (
+        not isinstance(result_kinds, set)
+        or not result_kinds
+        or not result_kinds <= allowed_result_kinds
+    ):
+        raise GraphError("result_kinds contains an unsupported memory kind")
+    else:
+        normalized_result_kinds = set(result_kinds)
     task = "" if task is None else str(task)
     if len(task) > 4000:
         raise GraphError("task exceeds 4000 characters")
@@ -2481,7 +2522,21 @@ def build_context(
     context_paths = list(normalized_files)
     if cwd_relative:
         context_paths.append(cwd_relative)
+    context_paths.extend(
+        _normalize_context_path(
+            entries_by_id[entry_id].get("affects"), "entry affects"
+        )
+        for entry_id in normalized_entry_ids
+        if str(entries_by_id[entry_id].get("affects") or "").strip()
+    )
+    context_paths = sorted(set(context_paths))
     task_tokens = _context_task_tokens(task)
+    entry_pattern_tags = {
+        normalize_pattern_label(pattern)
+        for entry_id in normalized_entry_ids
+        for pattern in _as_list(entries_by_id[entry_id].get("pattern"))
+        if normalize_pattern_label(pattern)
+    }
 
     candidates: list[dict[str, Any]] = []
     ranked_by_fp = {
@@ -2520,7 +2575,10 @@ def build_context(
                 "status": "active",
                 "stale": False,
                 "pattern_ids": pattern_ids,
+                "pattern_tags": set(pattern_labels),
                 "members": members,
+                "applies_to": set(),
+                "confidence": None,
                 "title": _bounded_context_text(
                     " / ".join(pattern_labels) or f"Cluster {cluster_fp}",
                     CONTEXT_TITLE_LIMIT,
@@ -2550,7 +2608,10 @@ def build_context(
                     or record["cluster_fingerprint"] not in cluster_fps
                 ),
                 "pattern_ids": set(_as_list(frontmatter.get("pattern_ids"))),
+                "pattern_tags": set(),
                 "members": set(record["derived_from"]),
+                "applies_to": set(),
+                "confidence": str(frontmatter.get("confidence") or ""),
                 "title": _bounded_context_text(
                     frontmatter.get("title") or hypothesis_id,
                     CONTEXT_TITLE_LIMIT,
@@ -2584,7 +2645,12 @@ def build_context(
                 "status": record["outcome_status"],
                 "stale": False,
                 "pattern_ids": learning_patterns,
+                "pattern_tags": (
+                    {record["pattern_tag"]} if record["pattern_tag"] else set()
+                ),
                 "members": set(record["derived_from"]),
+                "applies_to": set(record["applies_to"]),
+                "confidence": record["confidence"],
                 "title": _bounded_context_text(
                     record["title"],
                     CONTEXT_TITLE_LIMIT,
@@ -2604,6 +2670,8 @@ def build_context(
 
     results: list[dict[str, Any]] = []
     for candidate in candidates:
+        if candidate["kind"] not in normalized_result_kinds:
+            continue
         components = {
             "canonical_pattern": 0,
             "affected_path": 0,
@@ -2613,15 +2681,24 @@ def build_context(
         }
         matched_signals: list[str] = []
         pattern_ids = set(candidate["pattern_ids"])
+        pattern_tags = set(candidate["pattern_tags"])
         if pattern_ids & explicit_pattern_ids:
             components["canonical_pattern"] = 35
             matched_signals.append(
                 "explicit-pattern:" + ",".join(sorted(pattern_ids & explicit_pattern_ids))
             )
         elif pattern_ids & entry_pattern_ids:
-            components["canonical_pattern"] = 25
+            components["canonical_pattern"] = (
+                30 if candidate["kind"] == "learning" else 25
+            )
             matched_signals.append(
                 "entry-pattern:" + ",".join(sorted(pattern_ids & entry_pattern_ids))
+            )
+        elif candidate["kind"] == "learning" and pattern_tags & entry_pattern_tags:
+            components["canonical_pattern"] = 30
+            matched_signals.append(
+                "entry-pattern-tag:"
+                + ",".join(sorted(pattern_tags & entry_pattern_tags))
             )
         member_entries = [
             entries_by_id[item]
@@ -2635,7 +2712,7 @@ def build_context(
                 if str(entry.get("affects") or "").strip("/")
             }
         )
-        path_matches = sorted(
+        evidence_path_matches = sorted(
             {
                 f"{context_path}~{affected_path}"
                 for context_path in context_paths
@@ -2643,9 +2720,24 @@ def build_context(
                 if _path_has_segment_overlap(context_path, affected_path)
             }
         )
-        if path_matches:
+        learning_scope_matches = sorted(
+            {
+                f"{context_path}~{scope_path}"
+                for context_path in context_paths
+                for scope_path in candidate["applies_to"]
+                if _path_is_in_scope(context_path, scope_path)
+            }
+        )
+        if evidence_path_matches or learning_scope_matches:
             components["affected_path"] = 30
-            matched_signals.append("affected-path:" + ",".join(path_matches[:5]))
+        if learning_scope_matches:
+            matched_signals.append(
+                "learning-applies-to:" + ",".join(learning_scope_matches[:5])
+            )
+        if evidence_path_matches:
+            matched_signals.append(
+                "affected-path:" + ",".join(evidence_path_matches[:5])
+            )
         distance = _graph_distance(
             graph, set(normalized_entry_ids), set(candidate["members"])
         ) if normalized_entry_ids else None
@@ -2677,7 +2769,9 @@ def build_context(
         why_parts = []
         if components["canonical_pattern"]:
             why_parts.append("It shares a canonical pattern with this context.")
-        if components["affected_path"]:
+        if learning_scope_matches:
+            why_parts.append("Its declared Learning scope overlaps a context path.")
+        if evidence_path_matches:
             why_parts.append("Its cited evidence overlaps a context path.")
         if components["graph_proximity"]:
             why_parts.append("Its evidence is near a selected entry in the graph.")
@@ -2702,6 +2796,7 @@ def build_context(
                 "title": candidate["title"],
                 "summary_kind": candidate["summary_kind"],
                 "summary": candidate["summary"],
+                "confidence": candidate["confidence"],
                 "stale": candidate["stale"],
                 "score": score,
                 "components": components,
@@ -2748,6 +2843,7 @@ def build_context(
                 "entry_ids": normalized_entry_ids,
                 "cwd": cwd_relative,
                 "limit": limit,
+                "result_kinds": sorted(normalized_result_kinds),
             },
             sort_keys=True,
             separators=(",", ":"),

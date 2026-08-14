@@ -82,7 +82,7 @@ selected milestone is approved.
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 | Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
-| Milestone D.1 direction | Context information correction approved; version 4 remains unlocked | Prove whether context changes an agent diagnosis before a local fix. Keep version 3 locked with its failed result. Context contract version 2 returns bounded canonical memory content. Run a new version 4 preflight before the owner reviews an exact scored baseline. |
+| Milestone D.1 direction | Context information correction approved; version 4 remains unlocked | Prove whether context changes an agent diagnosis before a local fix. Keep version 3 locked with its failed result. Context contract version 2 introduced bounded canonical memory content; current version 3 preserves it and adds matched-Learning confidence. Run a new version 4 preflight before the owner reviews an exact scored baseline. |
 
 ## 3. Product thesis
 
@@ -1894,10 +1894,10 @@ Requirement verification proves the specified behavior. Product validation
 must separately show that a representative agent receives a relevant
 cross-domain memory before it chooses a local fix.
 
-The product owner's 2026-07-31 decision adds the bounded memory-content
-requirements in section 21.14. That additive contract extends the current
-response. It does not rewrite the historical 2026-07-28 Gate 2 approval or
-change the ranking rule.
+The product owner's 2026-07-31 decision added the bounded memory-content
+requirements in section 21.14. Section 21.15 supersedes only the live context
+version and Learning-delivery behavior for F003. It does not rewrite the
+historical 2026-07-28 Gate 2 approval or the 2026-07-31 version-2 evidence.
 
 ### 20.3 Context request and response contract
 
@@ -1922,12 +1922,17 @@ Rules:
 - `files` permits at most 100 repository-relative paths. Each path permits at
   most 512 characters.
 - `entry_ids` permits at most 50 canonical IDs.
+- Each selected entry contributes its canonical `affects` path to the path
+  context. This makes an entry-only request sufficient for Learning scope
+  matching.
 - `cwd` must resolve inside the repository.
 - `limit` is 1-10. The default is 3.
 - Adapters can add a repository root as transport context. The root is not
   part of the logical relevance input.
 - The core normalizes path separators and compares path segments. It does not
   read a file named in task text.
+- For a Learning, the core compares `applies_to` by repository-path prefix and
+  compares both canonical pattern IDs and normalized `pattern_tag` values.
 
 The response contains:
 
@@ -1936,8 +1941,8 @@ The response contains:
   "project": "atlas",
   "context_fingerprint": "ctx-<16 lowercase hex>",
   "source_fingerprint": "<canonical source fingerprint>",
-  "ranking_rule_version": "1",
-  "context_contract_version": "2",
+  "ranking_rule_version": "2",
+  "context_contract_version": "3",
   "results": [
     {
       "kind": "hypothesis",
@@ -1946,6 +1951,7 @@ The response contains:
       "title": "Lifecycle state has no shared owner",
       "summary_kind": "proposed_root_cause",
       "summary": "The CLI and session adapter implement different lifecycle ownership rules.",
+      "confidence": "medium",
       "stale": false,
       "score": 90,
       "components": {
@@ -2042,10 +2048,12 @@ Add:
 
 ```text
 /board-context <project> [--task "<text>"] [--file <path>]...
-  [--entry <ID>]... [--limit <1-10>]
+  [--entry <ID>]... [--limit <1-10>] [--learning-summary]
 ```
 
-The command returns the complete context brief. It never mutates the board.
+The command returns the complete context brief. `--learning-summary` instead
+returns one optional line with at most 10 directly matched medium/high-
+confidence Learnings. It never mutates the board.
 
 #### MCP
 
@@ -2870,6 +2878,34 @@ The formal structured requirement artifact remains draft until it receives
 digest-matched human reviews and baseline approval. This state does not change
 the owner's source decision that selects and authorizes the product
 correction.
+
+### 21.15 Moment-of-need Learning delivery extension
+
+_State: implemented from canonical board feature F003 on 2026-08-14. This
+section supersedes the live version values in section 21.14. Section 21.14
+remains the historical version-2 contract._
+
+The current shared context response uses contract version `3` and ranking rule
+version `2`. Version 3 adds one `confidence` field to every result. The value
+is `low`, `medium`, or `high` for a Learning or hypothesis and `null` when the
+memory kind has no confidence field. Existing bounded title and summary limits
+remain unchanged.
+
+| ID | Product requirement | Verification |
+|---|---|---|
+| MLS-REQ-001 | Each selected entry shall contribute its validated `affects` value as repository-relative path context. | Entry-only direct-scope fixture |
+| MLS-REQ-002 | A Learning shall receive structural eligibility when a selected entry matches its canonical pattern, normalized raw pattern tag, or `applies_to` path prefix. | Canonical pattern, raw tag, and strict-prefix fixtures |
+| MLS-REQ-003 | A direct selected-entry pattern match for a Learning shall meet the minimum structural threshold without task-text assistance. | Task-empty pattern fixture |
+| MLS-REQ-004 | Learning-summary mode shall return at most 10 directly matched medium/high-confidence Learnings and shall exclude every low-confidence match. | Real CLI fixture with matching low-confidence decoy |
+| MLS-REQ-005 | After PM curation, the Stop procedure shall query Learning-summary mode with the consolidator's promoted entry ids and append non-empty output to the PM pass summary. | PM-loop substrate and Stop-procedure routing checks |
+| MLS-REQ-006 | The board viewer shall continue to render canonical Learnings in its dedicated panel. | Existing viewer Learning-panel fixture |
+
+The Learning-summary line is derived output. Learning Markdown remains the
+authority. The adapter accepts board titles only as untrusted data, flattens
+them through the shared bounded context contract, and replaces semicolons in
+titles before it joins multiple records. A retrieval failure does not stop PM
+consolidation; the procedure logs the failure and emits the normal PM summary
+without a Learning line.
 
 ## 22. Research and evidence
 
