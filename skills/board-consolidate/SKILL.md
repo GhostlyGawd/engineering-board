@@ -28,7 +28,7 @@ Do not run the shell consolidator when the MCP tools are available.
 
 ## Claude Code hook fallback
 
-The engineering-board v0.2.1 Stop hook captures per-turn findings to per-session scratch files at `engineering-board/<project>/_sessions/<session-id>.md` (or, on the compat path, `docs/boards/<project>/_sessions/<session-id>.md`. or legacy `docs/board/_sessions/<session-id>.md`). Consolidation is the second half of that pipeline: at real session end, scratch entries are promoted to live board entries under `bugs/`, `features/`, `questions/`, `observations/`: but only after deterministic anchor verification, defense-in-depth reject-rule re-application, and consolidator-detected supersession.
+The Engineering Board Stop hook captures per-turn findings to per-session scratch files at `engineering-board/<project>/_sessions/<session-id>.md` (or, on the compat path, `docs/boards/<project>/_sessions/<session-id>.md`. or legacy `docs/board/_sessions/<session-id>.md`). Consolidation is the second half of that pipeline: at real session end, scratch entries are promoted to live board entries under `bugs/`, `features/`, `questions/`, `observations/`: but only after deterministic anchor verification, defense-in-depth reject-rule re-application, and consolidator-detected supersession.
 
 ## Purpose
 
@@ -74,7 +74,7 @@ Log dropped entries as `disposition: rejected_<reason>`.
 
 - `confidence: confirmed`: `evidence_quote` must appear verbatim as a substring of the transcript's assistant-turn content. If the transcript is inaccessible or the quote does not match, log `deferred_anchor_unmatched` or `deferred_no_transcript` and skip promotion.
 - `confidence: tentative`: strict-AND: anchor matched AND (appears in assistant turns OR appears in user-message turns). Otherwise defer.
-- `confidence: speculative`: defer by default in v0.2.1. Log `deferred_speculative`.
+- `confidence: speculative`: defer by default under the current policy. Log `deferred_speculative`.
 
 ### Step 5: Supersession detection (consolidator-detected)
 
@@ -85,7 +85,7 @@ Group survivors by `(type, affects)`. Within a group where `affects` is non-null
 For each surviving finding:
 - Determine type subdir (`bugs/`, `features/`, `questions/`, `observations/`).
 - Assign the next zero-padded ID (`B###`, `F###`, `Q###`, `O###`) by scanning the subdir for the highest existing number.
-- Write the live entry file with v0.2.0-compatible frontmatter (`id`, `type`, `title`, `discovered`, `affects`, `status: open`, `priority: P2` for bug/feature, `tags` if present), plus a `# <title>` header and a `## Done when` section for bug/feature/question, plus an `## Evidence` section quoting `evidence_quote`.
+- Write the live entry file with current frontmatter (`id`, `type`, `title`, `discovered`, `affects`, `status: open`, `priority: P2` for bug/feature, `tags` if present), plus a `# <title>` header and a `## Done when` section for bug/feature/question, plus an `## Evidence` section quoting `evidence_quote`.
 - Append the new ID + title to `BOARD.md` under the project root.
 - Log `disposition: promoted_<live_id>`.
 
@@ -113,7 +113,7 @@ Every scratch entry is recorded in `consolidation.log` (JSON lines) with exactly
 |---|---|
 | `promoted_<live_id>` | Survived all checks. live entry written. |
 | `archived_superseded_by_<scratch_id>` | A later same-`type`+`affects` finding with a longer title replaced it. |
-| `deferred_speculative` | `confidence: speculative`: never auto-promoted in v0.2.1. |
+| `deferred_speculative` | `confidence: speculative`: never auto-promoted under the current policy. |
 | `deferred_anchor_unmatched` | `evidence_quote` did not match transcript content. |
 | `deferred_no_transcript` | Transcript inaccessible. cannot verify anchor. |
 | `deferred_unknown_confidence` | `confidence` not one of the three allowed values. |

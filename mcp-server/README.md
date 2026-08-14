@@ -213,8 +213,9 @@ self-contained). Beyond cloning the repo, the packaged channels:
 - **Smithery**: [`smithery.yaml`](smithery.yaml) describes the stdio launch for
   `smithery mcp publish`.
 
-`server.json`, `manifest.json`, and `smithery.yaml` are version-locked to
-`plugin.json` and validated by the MCP test suite so they cannot silently drift.
+`server.json` and `manifest.json` mirror the authoritative product version in
+`.claude-plugin/plugin.json`. The MCP test suite prevents silent drift.
+`smithery.yaml` is version-agnostic launch configuration.
 
 ## Multi-client: two clients, one board
 

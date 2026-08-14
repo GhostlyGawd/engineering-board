@@ -1,6 +1,6 @@
 ---
 name: consolidator
-description: PM subagent for engineering-board v0.2.2+. Thin dispatcher over the canonical consolidation engine (hooks/scripts/board-consolidate.sh) — the script owns parsing, reject filtering, anchor verification, supersession, and promotion writes; this agent adds the LLM value the script cannot: drafting Done-when criteria for newly promoted entries and reporting the run as structured JSON. Runs once per PM turn after the extractor subagent completes.
+description: PM subagent and thin dispatcher over the canonical consolidation engine (hooks/scripts/board-consolidate.sh). The script owns parsing, reject filtering, anchor verification, supersession, and promotion writes; this agent adds the LLM value the script cannot by drafting Done-when criteria for newly promoted entries and reporting consolidation schema 0.2.2. Runs once per PM turn after the extractor subagent completes.
 model: inherit
 tools: Read, Write, Edit, Bash, Grep, Glob
 color: blue

@@ -29,6 +29,25 @@ the checksum of the published version. The source change must have a note in
 explicit release uses `scripts/prepare-release.py` to rebuild the bundle and
 pin the new version.
 
+## Authoritative product version
+
+The `version` field in `.claude-plugin/plugin.json` is the authoritative
+product version. The MCP runtime reads that field. The release-preparation
+script uses it as the current version and updates these mirrors together:
+
+- `.codex-plugin/plugin.json`;
+- `.claude-plugin/marketplace.json`;
+- `mcp-server/manifest.json`;
+- `mcp-server/server.json` and its package record;
+- `mcp-server/pyproject.toml`;
+- the README version badge.
+
+Do not use the product version for an independent protocol, schema, or data
+format. Examples include the MCP protocol date, worker `schema_version`
+values, and graph or context contract versions. Label these values by their
+contract. `references/required-permissions.json` is an allowlist data file and
+does not contain a product-version mirror.
+
 ## Select the version
 
 Use Semantic Versioning:

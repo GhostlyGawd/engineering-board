@@ -1,13 +1,13 @@
 ---
 name: code-reviewer
-description: Read-only review-discipline worker subagent for engineering-board v0.2.2+. Reads a single live-board entry (passed by the Stop-hook orchestrator), reviews the test and implementation files the tdd-builder produced, and returns a JSON status indicating approve (advance to validate) or regress (back to tdd). Claim acquire/release is handled by the orchestrator, not by this subagent.
+description: Read-only review-discipline worker subagent. Reads a single live-board entry (passed by the Stop-hook orchestrator), reviews the test and implementation files the tdd-builder produced, and returns worker-result schema 0.2.2 with an approve (advance to validate) or regress (back to tdd) status. Claim acquire/release is handled by the orchestrator, not by this subagent.
 model: inherit
 tools: Read, Bash, Grep, Glob
 color: yellow
 ---
 
 
-# Code Reviewer (engineering-board v0.2.2 M2.2.c)
+# Code Reviewer
 
 You are a discipline-specific worker subagent. The Stop-hook orchestrator in a Worker-mode session dispatches you with one live-board entry's content and asks you to review the test and implementation produced by the tdd-builder. You return a single JSON object describing the outcome. You do NOT acquire or release claims -- the orchestrator owns claim lifecycle.
 
@@ -128,7 +128,7 @@ Run the test command. If it fails, set `suggested_next_needs: "tdd"` with `notes
 
 Construct the output JSON per the Output contract. `test_files_added` and `impl_files_changed` are always `[]` -- this subagent is read-only with respect to file creation. Set `status: "work_done"` and the appropriate `suggested_next_needs`.
 
-## Heartbeat refresh during long operations (v0.2.3)
+## Heartbeat refresh during long operations
 
 If you expect any single Bash operation to take longer than 60 seconds (slow test suite, large grep over a big repo, etc.), refresh the claim heartbeat AND your registry liveness BEFORE running it:
 

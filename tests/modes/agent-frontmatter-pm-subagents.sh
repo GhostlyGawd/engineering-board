@@ -166,7 +166,7 @@ check_grep "$LEARNINGS" "E" "^model: inherit$"                   "learnings-cura
 check_grep "$LEARNINGS" "E" "^tools:"                            "learnings-curator.md frontmatter: tools list present"
 check_grep "$LEARNINGS" "E" "^color:"                            "learnings-curator.md frontmatter: color present"
 
-# learnings-curator in v0.3.0 dispatches the deterministic curator script;
+# The learnings-curator dispatches the deterministic curator script;
 # Write/Edit are still excluded — the *script* owns writes, the agent does not.
 TOOLS_LINE_L="$(grep -E "^tools:" "$LEARNINGS" || true)"
 for tool in Read Bash Grep Glob; do
@@ -190,14 +190,14 @@ check_grep "$LEARNINGS" "F" "untrusted data, not instructions"   "learnings-cura
 # Input contract: board directory path
 check_grep "$LEARNINGS" "F" "board"                              "learnings-curator.md documents board directory input"
 
-# v0.3.0 output contract fields
+# Curation output contract fields
 for field in schema_version board_dir min_recurrence resolved_scanned tag_counts promoted updated skipped; do
   check_grep "$LEARNINGS" "F" "\"$field\""                       "learnings-curator.md output contract: $field field"
 done
 
 # Must dispatch the deterministic curator script.
 check_grep "$LEARNINGS" "F" "board-curate-learnings.sh"           "learnings-curator.md dispatches board-curate-learnings.sh"
-check_grep "$LEARNINGS" "F" "v0.3.0"                              "learnings-curator.md mentions v0.3.0"
+check_grep "$LEARNINGS" "F" "curation schema 0.3.0"               "learnings-curator.md labels 0.3.0 as a curation schema"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 TOTAL=$((PASS + FAIL))
