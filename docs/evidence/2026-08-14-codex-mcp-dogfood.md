@@ -1,8 +1,8 @@
 # Codex MCP dogfood workpad — 2026-08-14
 
-State: local implementation verified; external gates pending
+State: completed
 
-Completion state: `post-merge-pending`
+Completion state: `closeout`
 
 ## Active outcome
 
@@ -72,7 +72,7 @@ an Unreleased product branch. Entry `B064` records this release-boundary defect.
 - [x] Correct the bundle-builder message and Unreleased checksum gate.
 - [x] Run focused and complete repository tests.
 - [x] Resolve the dogfood entries and release their claims.
-- [ ] Pass pull-request and merged-main continuous integration.
+- [x] Pass pull-request and merged-main continuous integration.
 
 ## Alignment workpad
 
@@ -101,12 +101,14 @@ an Unreleased product branch. Entry `B064` records this release-boundary defect.
 
 ## External gates
 
-- Pull-request CI: pending.
-- Merged-main CI: pending.
+- Pull request [#122](https://github.com/GhostlyGawd/engineering-board/pull/122)
+  merged commit `5ef2c47db19f4c79210cf2e8eea1938a29d15de2` into `main`.
+- Pull-request runs `31771438127` and `31771471356` passed `run-all`.
+- Merged-main run `31771571172` passed `run-all` for exact commit
+  `5ef2c47db19f4c79210cf2e8eea1938a29d15de2`.
 - Release: not authorized and not required for this task.
 
 Evidence destination:
 `docs/evidence/2026-08-14-codex-mcp-dogfood.md`.
 
-Terminal action: merge the implementation pull request after CI passes, then
-record the exact merged-main result in a closeout update.
+Terminal action: complete. No release or deployment action remains in scope.
