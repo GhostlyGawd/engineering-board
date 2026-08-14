@@ -60,7 +60,7 @@ Observations have no required `priority`, `affects`, or `blocked_by`: they are r
 | `title` | Yes | Format: `YYYY-MM-DD ASIN — brief summary` |
 | `discovered` | Yes | Date of run |
 
-## Learning Fields (v0.3.0)
+## Learning Fields (schema 0.3.0)
 
 Learnings are durable takeaways promoted from recurring patterns across resolved bugs/features. They are written by the `learnings-curator` PM subagent, not by users directly: but the schema is enforced on every Write to `learnings/*.md`.
 

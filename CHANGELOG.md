@@ -16,6 +16,10 @@ increases.
 
 ### Changed
 
+- `.claude-plugin/plugin.json` is now the explicit authoritative product-version
+  signal. The version guard covers every shipped release mirror, removes the
+  unused permissions-manifest stamp, and distinguishes product versions from
+  worker schemas and compatibility history.
 - `nothing_to_test` and `nothing_to_review` are now explicitly completed
   applicability decisions. They advance to avoid repeated dispatch, require
   evidence in worker notes, and retain `cannot_proceed` as the hold path.

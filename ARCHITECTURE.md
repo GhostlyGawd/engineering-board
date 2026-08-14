@@ -249,7 +249,7 @@ claim implementation and has no Bash or third-party Python dependency.
 | File | Used by | Purpose |
 |---|---|---|
 | `references/auto-resolve-pass.md` | All 4 skills | Shared protocol: extract Done-when to gather evidence (transcript/git/filesystem) to rank confidence to prompt user to cascade depth 2 |
-| `references/required-permissions.json` | `/board-install-permissions`, `board-permission-self-check.sh` | Manifest of bash/tool permissions the plugin needs (claim scripts, slash commands, worker/PM scripts) |
+| `references/required-permissions.json` | `/board-install-permissions`, `board-permission-self-check.sh` | Unversioned manifest of bash/tool permissions the plugin needs (claim scripts, slash commands, worker/PM scripts). Product version authority remains `.claude-plugin/plugin.json`. |
 | `skills/board-intake/references/frontmatter-schema.md` | `board-intake` Step 3 | All field types, valid values, status transitions, required sections per entry type |
 | `skills/board-intake/references/hypothesis-schema.md` | `board-insights`, `/board-hypothesis`, `/board-demo`, MCP | Normative H### fields, state and lineage transitions, negative memory, and epistemic authority |
 | `references/demo/pattern-intelligence/` | `/board-demo` | Synthetic B001/B002/B003 fixtures and expected cross-domain pattern. never interpreted as current production defects |
