@@ -180,7 +180,10 @@ def archive_with_newest_row(archive, archive_line):
     archive has no entry row yet, add the new row after its existing content.
     """
     row = archive_line if archive_line.endswith("\n") else archive_line + "\n"
-    first_row = re.search(r"(?m)^-\s+[BFQOL]\d+\s+\|", archive)
+    first_row = re.search(
+        r"(?m)^-[ \t]+[BFQOL]\d+(?:[ \t]+P[0-3])?[ \t]+\|",
+        archive,
+    )
     if first_row:
         offset = first_row.start()
         return archive[:offset] + row + archive[offset:]

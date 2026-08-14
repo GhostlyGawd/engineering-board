@@ -573,8 +573,8 @@ def suite_lifecycle(mod, tmp_repo):
         "first archive row follows the unchanged preamble",
     )
     older_archive_rows = (
-        "- B900 | Older resolved entry | resolved: 2026-01-01\n"
-        "- B901 | Oldest resolved entry | resolved: 2025-12-31\n"
+        "- B900 P2 | [Older resolved entry](bugs/B900.md) — resolved 2026-01-01\n\n"
+        "- B901 P3 | [Oldest resolved entry](bugs/B901.md) — resolved 2025-12-31\n"
     )
     archive_path.write_text(archive_preamble + older_archive_rows)
     resolved = mod.tool_board_update_entry({
@@ -588,7 +588,8 @@ def suite_lifecycle(mod, tmp_repo):
     check(archive_text.count(first_marker) == 1,
           "resolved entry appears once in ARCHIVE.md", archive_text)
     check(archive_text.startswith(archive_preamble + first_marker),
-          "resolved entry is first after the archive preamble", archive_text)
+          "resolved entry precedes legacy priority-bearing archive rows",
+          archive_text)
     check(archive_text.endswith(older_archive_rows),
           "existing archive rows preserve their order", archive_text)
 
@@ -608,8 +609,8 @@ def suite_lifecycle(mod, tmp_repo):
     check(
         archive_after_second.index(second_marker)
         < archive_after_second.index(first_marker)
-        < archive_after_second.index("- B900 |")
-        < archive_after_second.index("- B901 |"),
+        < archive_after_second.index("- B900 P2 |")
+        < archive_after_second.index("- B901 P3 |"),
         "archive rows remain newest-first without reordering older rows",
         archive_after_second,
     )

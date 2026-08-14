@@ -4,19 +4,28 @@
 - Repository: `GhostlyGawd/engineering-board`
 - Base commit: `1c77039aa0e5d993b243062718b17bfbc877f031`
 - Board entry: `B069`
-- Completion state: implementation validation
+- Completion state: implementation follow-up
+- Implementation pull request: `#139`
+- Implementation merge commit:
+  `d3f4023a3648eb6c890b2ded11ab070243fe075e`
+- Implementation merged-main runs: `31823479030` (`tests`, passed) and
+  `31823478978` (`pages`, passed)
 - Evidence destination: this file
-- External gates: implementation pull request merge, passing merged-main
-  continuous integration, and a separate resolved-entry closeout
-- Terminal action: resolve B069 after the implementation reaches `main`
+- Follow-up base commit: `d3f4023a3648eb6c890b2ded11ab070243fe075e`
+- External gates: follow-up pull request merge, passing merged-main continuous
+  integration, and a separate resolved-entry closeout
+- Terminal action: resolve B069 only after the real-fixture follow-up reaches
+  `main`
 
 ## Decision
 
 Insert a newly resolved entry immediately after the existing archive preamble
-and before the first canonical archive row. Preserve every existing byte of the
-preamble and every older row in its current relative order. Do not reorder the
-historical archive because those rows are durable evidence. Keep repeated
-resolved updates idempotent through the existing status-transition guard.
+and before the first recognized archive entry row. Support both the historical
+priority-bearing rows and the current compact rows. Preserve every existing
+byte of the preamble and every older row in its current relative order. Do not
+reorder the historical archive because those rows are durable evidence. Keep
+repeated resolved updates idempotent through the existing status-transition
+guard.
 
 This change does not prepare a release or change a product version. Installed
 copies remain unchanged until a later owner-authorized release includes the
@@ -26,10 +35,10 @@ Unreleased fix.
 
 | Contract item | Normative level | Implementation | Test | Docs/example | Status |
 |---|---|---|---|---|---|
-| A newly resolved entry is the first canonical archive row. | Required by `ARCHIVE_SKELETON` and B069. | `archive_with_newest_row` inserts before the first canonical row. | The MCP lifecycle resolves O001 above two older rows, then resolves O002 above O001. | Resolver skill, board manager, MCP README and schema, public LLM summary, architecture, auto-resolve protocol, and changelog state newest-first insertion. | Worker validation passes; pull-request and merged-main evidence are pending. |
-| Existing archive evidence is not rewritten. | Required evidence-preservation boundary. | The helper retains the preamble byte-for-byte and does not sort or rewrite older rows. | The fixture asserts the unchanged preamble and the unchanged B900/B901 suffix after both resolutions. | Resolver instructions require preservation of the preamble and older-row relative order. | Worker validation passes; pull-request and merged-main evidence are pending. |
-| A repeated resolved update does not add another archive row. | Required lifecycle idempotency. | Archive insertion runs only on a transition from a non-resolved state to `resolved`. | The fixture repeats the O001 resolved update and asserts one O001 row. | The Unreleased note identifies repeat-update idempotency. | Worker validation passes; pull-request and merged-main evidence are pending. |
-| All supported resolver paths use the same archive rule. | Required by L005 and the documentation-alignment invariant. | MCP is the only executable archive writer found in the sibling-writer sweep. | MCP real-fixture coverage drives observation resolution, which uses the shared transition path for each entry type. | Bug, feature, question, observation, cascade, API, and architecture prose use the same rule. | Worker validation passes; pull-request and merged-main evidence are pending. |
+| A newly resolved entry is the first archive entry row. | Required by `ARCHIVE_SKELETON` and B069. | `archive_with_newest_row` inserts before the first recognized current or historical row. | The MCP lifecycle resolves O001 above two priority-bearing historical rows, then resolves O002 above canonical O001. | Resolver skill, board manager, MCP README and schema, public LLM summary, architecture, auto-resolve protocol, and changelog state newest-first insertion. | Follow-up worker validation passes; pull-request and merged-main evidence are pending. |
+| Existing archive evidence is not rewritten. | Required evidence-preservation boundary. | The helper retains the preamble byte-for-byte and does not sort or rewrite older rows. | The fixture asserts the unchanged preamble and the unchanged B900/B901 suffix after both resolutions. | Resolver instructions require preservation of the preamble and older-row relative order. | Follow-up worker validation passes; pull-request and merged-main evidence are pending. |
+| A repeated resolved update does not add another archive row. | Required lifecycle idempotency. | Archive insertion runs only on a transition from a non-resolved state to `resolved`. | The fixture repeats the O001 resolved update and asserts one O001 row. | The Unreleased note identifies repeat-update idempotency. | Initial implementation and merged-main evidence pass. |
+| All supported resolver paths use the same archive rule. | Required by L005 and the documentation-alignment invariant. | MCP is the only executable archive writer found in the sibling-writer sweep. | MCP real-fixture coverage drives observation resolution, which uses the shared transition path for each entry type. | Bug, feature, question, observation, cascade, API, and architecture prose use the same rule. | Follow-up worker validation passes; pull-request and merged-main evidence are pending. |
 
 ## Drift classification
 
@@ -38,6 +47,9 @@ Unreleased fix.
 - Documentation drift, resolved in the worker: the resolver skill, board
   manager, auto-resolve protocol, MCP README, public LLM summary, live schema,
   and architecture used append language.
+- Verification gap, found during closeout: the initial test used only current
+  `- B### |` rows. The durable eb-self archive begins with historical
+  `- B### P# |` rows, which the initial matcher did not recognize.
 - Reviewed and unaffected: archive row fields, pattern rendering, resolution
   date generation, status-transition validation, and BOARD.md regeneration do
   not change.
@@ -57,15 +69,28 @@ Unreleased fix.
 - Red phase: the focused MCP suite passed its first 100 checks, then failed the
   new archive-change assertion because the resolver still reported and used an
   append operation.
-- Green phase: the focused MCP suite reports 180 passing checks. It covers an
-  archive with no prior rows, two ordered resolutions above two older rows,
-  preservation of the preamble and older-row suffix, and repeat-update
-  idempotency.
+- Initial green phase: the focused MCP suite reported 180 passing checks, but
+  its older-row fixture used only the current canonical format.
+- Follow-up red phase: 103 checks passed before the live-format assertion
+  failed. O001 appeared after two priority-bearing historical rows instead of
+  immediately after the preamble.
+- Follow-up green phase: the focused MCP suite reports 180 passing checks. The
+  first resolution precedes priority-bearing historical rows, and the second
+  resolution precedes the current compact row created by the first.
+- Live archive dry-run: the merged-source helper inserted a candidate row
+  before the actual first `- B057 P3 |` row. A byte-for-byte comparison
+  confirmed that every existing archive byte remained unchanged.
 - Sibling-writer sweep: MCP `board_update_entry` is the only executable archive
   writer. The board manager, manual resolver, and auto-resolve paths delegate
   the same lifecycle but had stale append wording, which this change aligns.
-- Maintained repository suite: 21 of 21 suites pass with exit code 0.
-- Implementation pull request, merge commit, and merged-main run: pending.
+- Initial and follow-up maintained repository suites each report 21 of 21
+  passing suites with exit code 0.
+- Implementation pull-request checks: runs 31823346381 and 31823374743
+  passed.
+- Implementation pull request: #139 merged as `d3f4023`.
+- Implementation merged-main tests run 31823479030 and Pages run 31823478978
+  passed.
+- Follow-up worker, pull request, merge commit, and merged-main runs: pending.
 - Closeout pull request and merged-main run: pending.
 
 Passing checks establish only their named invariants. They do not establish
