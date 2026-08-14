@@ -28,7 +28,7 @@ Use the detailed rules below to preserve the entry-type-specific sequence.
 Use slash commands and shell operations only as a fallback when the MCP server
 is not available.
 
-**Identify the entry's board first:** the board directory is derived from the entry file's path: `engineering-board/<project>/` (or `docs/boards/<project>/` on the compat path). All BOARD.md index updates and ARCHIVE.md appends go to that project's board, not a different one.
+**Identify the entry's board first:** the board directory is derived from the entry file's path: `engineering-board/<project>/` (or `docs/boards/<project>/` on the compat path). All BOARD.md index updates and newest-first ARCHIVE.md insertions go to that project's board, not a different one.
 
 ## Closing a Bug or Feature
 
@@ -43,7 +43,7 @@ In the entry file:
 status: resolved
 ```
 
-### Step 3: Append to ARCHIVE.md
+### Step 3: Insert the newest row in ARCHIVE.md
 
 Read the entry's `pattern:` field. If present, include it in the archive line:
 ```
@@ -53,6 +53,10 @@ If no `pattern:` field, omit it:
 ```
 - B### | title | resolved: YYYY-MM-DD
 ```
+
+Insert the formatted row immediately after the archive preamble and before
+every older canonical row. Preserve the preamble and the relative order of all
+older rows.
 
 ### Step 4: Run /board-rebuild
 
@@ -101,12 +105,15 @@ Do not change `status` yet. The finding must be written first.
 status: resolved
 ```
 
-### Step 3: Append to ARCHIVE.md
+### Step 3: Insert the newest row in ARCHIVE.md
 
-Questions do not carry `pattern:` tags. Append:
+Questions do not carry `pattern:` tags. Format the row as:
 ```
 - Q### | title | resolved: YYYY-MM-DD
 ```
+
+Insert the row immediately after the archive preamble and before every older
+canonical row. Preserve the preamble and the relative order of all older rows.
 
 ### Step 4: Find all blocked dependents
 
@@ -166,7 +173,9 @@ After the cascade pass settles, apply the board-triage rules to the now-current 
 Observations are run logs, not work items. There are no done-when criteria. To close:
 
 1. Set `status: resolved` in the observation's frontmatter (observations did not track status historically, but adding it makes `/board-rebuild` correctly omit the entry from BOARD.md).
-2. Append to ARCHIVE.md: `- O### | title | resolved: YYYY-MM-DD`
+2. Insert `- O### | title | resolved: YYYY-MM-DD` immediately after the
+   ARCHIVE.md preamble and before every older canonical row. Preserve the
+   preamble and the relative order of all older rows.
 3. Run `/board-rebuild <project>`: this removes the observation from BOARD.md and regenerates GRAPH.yml.
 4. Run the auto-resolve cascade pass: see `../../references/auto-resolve-pass.md`. Scope: `cascade`, seed: the closed observation. Closing an observation often satisfies the bug or feature it was documenting evidence for (e.g. O003 documented the fix that satisfies B003).
 

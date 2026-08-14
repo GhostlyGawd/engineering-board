@@ -94,7 +94,7 @@ https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
 - board_get_entry: full markdown + parsed frontmatter of one entry.
 - board_update_entry: update frontmatter (status, needs, priority, blocked_by,
   parent), append a section, or append a timestamped comment. A new resolved
-  state appends one durable ARCHIVE.md row.
+  state inserts one durable ARCHIVE.md row before all older rows.
 - board_graph: build the deterministic provenance-linked pattern graph through
   the shared full/incremental engine.
 - board_context: retrieve bounded systemic memory with exposed relevance

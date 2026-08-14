@@ -26,13 +26,16 @@ increases.
 - The MCP server now implements atomic claim acquisition and release in Python.
   All 19 tools work in the Codex plugin, PyPI package, MCP bundle, and clone
   without the Claude Code hook scripts.
-- A new MCP resolution appends one durable `ARCHIVE.md` row, so the bundled
+- A new MCP resolution writes one durable `ARCHIVE.md` row, so the bundled
   resolve skill can complete the canonical lifecycle through MCP tools.
 - Release preparation and version-coherence checks now keep the Codex and
   Claude plugin manifests in the same version lockstep.
 
 ### Fixed
 
+- MCP resolution now inserts each new `ARCHIVE.md` row before older rows while
+  preserving the archive preamble, older-row order, and repeat-update
+  idempotency.
 - GitHub Actions workflows now use `actions/checkout@v7` and its Node.js 24
   runtime instead of the deprecated Node.js 20 runtime in checkout v4.
 - The internal `code-reviewer` worker now excludes `Write` and `Edit` from its

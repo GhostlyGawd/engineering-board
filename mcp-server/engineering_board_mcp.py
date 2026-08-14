@@ -172,6 +172,22 @@ def atomic_write(path, content):
     os.replace(tmp, path)
 
 
+def archive_with_newest_row(archive, archive_line):
+    """Insert one archive row before every existing canonical entry row.
+
+    Text before the first row is the archive preamble. Preserve that text and
+    every existing row byte-for-byte and in the same relative order. If the
+    archive has no entry row yet, add the new row after its existing content.
+    """
+    row = archive_line if archive_line.endswith("\n") else archive_line + "\n"
+    first_row = re.search(r"(?m)^-\s+[BFQOL]\d+\s+\|", archive)
+    if first_row:
+        offset = first_row.start()
+        return archive[:offset] + row + archive[offset:]
+    separator = "" if not archive or archive.endswith(("\n", "\r")) else "\n"
+    return archive + separator + row
+
+
 # ---------------------------------------------------------------------------
 # Router / board-dir resolution
 # ---------------------------------------------------------------------------
@@ -1121,8 +1137,8 @@ def tool_board_update_entry(params):
                 pattern_text,
                 now_utc_iso()[:10],
             )
-            atomic_write(archive_path, archive.rstrip() + "\n" + archive_line)
-            changes.append("appended ARCHIVE.md")
+            atomic_write(archive_path, archive_with_newest_row(archive, archive_line))
+            changes.append("inserted ARCHIVE.md")
 
     rebuild_board(bd, project)
 
@@ -1971,7 +1987,7 @@ TOOLS = [
     },
     {
         "name": "board_update_entry",
-        "description": "Update frontmatter fields (status, needs, priority, blocked_by, parent), append a timestamped comment, and/or append a body section to an entry, then rebuild BOARD.md. A transition to resolved appends one durable ARCHIVE.md row. Validates status transitions minimally.",
+        "description": "Update frontmatter fields (status, needs, priority, blocked_by, parent), append a timestamped comment, and/or append a body section to an entry, then rebuild BOARD.md. A transition to resolved inserts one durable ARCHIVE.md row newest-first. Validates status transitions minimally.",
         "inputSchema": {
             "type": "object",
             "properties": {
