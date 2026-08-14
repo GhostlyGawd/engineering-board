@@ -1037,11 +1037,6 @@ def suite_distribution():
         staged.append(("mcp-server/engineering_board_core.py", f.read()))
     with open(os.path.join(HERE, "README.md"), "rb") as f:
         staged.append(("mcp-server/README.md", f.read()))
-    scripts_dir = os.path.join(PLUGIN_ROOT, "hooks", "scripts")
-    for fn in sorted(os.listdir(scripts_dir)):
-        if fn.endswith(".sh") or fn.endswith(".py"):
-            with open(os.path.join(scripts_dir, fn), "rb") as f:
-                staged.append(("hooks/scripts/" + fn, f.read()))
     with open(os.path.join(PLUGIN_ROOT, "LICENSE"), "rb") as f:
         staged.append(("LICENSE", f.read()))
     staged.sort(key=lambda p: p[0])

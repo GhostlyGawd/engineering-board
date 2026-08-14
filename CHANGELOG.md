@@ -9,6 +9,8 @@ increases.
 
 ## [Unreleased]
 
+## [1.13.0] — 2026-08-14
+
 ### Added
 
 - Added an installable Codex plugin manifest, five provider-neutral board
@@ -38,6 +40,9 @@ increases.
 
 ### Fixed
 
+- Release bundle checksum validation now reconstructs the MCP-only archive
+  instead of including Claude Code hook scripts that the release builder does
+  not package.
 - `/board-migrate` now presents data migration and folder relocation as two
   independent named workflows. It selects the workflow before target
   resolution and no longer sends relocation through a skip-step branch.
