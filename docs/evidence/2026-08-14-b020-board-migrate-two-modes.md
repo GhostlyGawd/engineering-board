@@ -9,6 +9,7 @@
 - Implementation merge commit:
   `630ac9e148a10cc94c2261df76cbba1ecc526ffb`
 - Implementation merged-main run: `31826065558` (`tests`, passed)
+- Closeout pull request: `#143`
 - Evidence destination: this file
 - External gates: closeout pull request merge and passing closeout merged-main
   continuous integration
@@ -90,7 +91,7 @@ change deployment state.
 - Closeout worker checks: entry validation, board index, documentation
   coherence, archive position and uniqueness, BOARD.md omission, and diff
   checks pass.
-- Closeout pull request and merged-main run: pending.
+- Closeout pull request: #143; merge commit and merged-main run are pending.
 
 Passing checks establish only their named invariants. They do not establish
 perfect semantic correctness or formal controlled-English compliance.
