@@ -1,7 +1,7 @@
 ---
 id: B069
 type: bug
-status: in_progress
+status: resolved
 needs: validate
 priority: P2
 title: Resolved entries append below older archive rows despite newest-first contract
@@ -33,3 +33,9 @@ promoted_from: [mcp:_sessions/mcp-2026-08-14.md:e0f7094b14f76f45]
 - **codex** 2026-08-14T17:13:05Z: Implementation validation complete. Red: the new real-fixture assertion failed after 100 prior MCP checks because resolution still appended. Green: MCP 180 checks pass; documentation coherence, 6 mode suites, and 25 orchestration suites pass; the maintained suite passes 21 of 21. Acceptance criteria and dated alignment evidence are complete; ready for review and delivery.
 - **codex** 2026-08-14T17:22:49Z: Merged-main closeout preflight found a real-fixture gap before resolution. The live archive begins with legacy rows such as '- B057 P3 | ...', but the merged matcher recognizes only '- B057 | ...'; it would insert B069 near the bottom. B069 remains in_progress. Follow-up scope: support both legacy priority-bearing and current canonical rows, drive the live format in tests, and rerun delivery.
 - **codex** 2026-08-14T17:26:08Z: Real-fixture follow-up validation complete. Red: 103 MCP checks passed before O001 appeared below two '- B### P# |' rows. Green: all 180 MCP checks pass with priority-bearing historical rows followed by a current compact row; the full maintained suite passes 21 of 21. Acceptance checks are complete again; follow-up delivery is ready.
+- **codex** 2026-08-14T17:31:19Z: Resolving after PR #139 and real-fixture follow-up PR #140 reached main. Exact merged-main tests runs 31823479030 and 31824199079 passed; implementation Pages run 31823478978 also passed. Source-MCP archive placement and repeat idempotency are verified immediately after this transition.
+- **codex** 2026-08-14T17:31:55Z: Live closeout verification passed: B069 is the first archive row, every pre-existing archive byte follows unchanged, and a repeated resolved update leaves one B069 row with byte-identical archive content.
+
+## Resolution
+
+PR #139 replaced bottom appends with newest-first insertion. Closeout dogfooding then found that the initial matcher missed historical priority-bearing rows. PR #140 added that live format to the matcher and real-fixture test. Exact merged-main tests runs 31823479030 and 31824199079 passed; implementation Pages run 31823478978 also passed. The final source-MCP transition inserted B069 before the prior first B057 P3 row. A byte-for-byte comparison confirmed that the archive preamble and every older byte remained unchanged. Repeating the resolved update left the archive byte-identical with one B069 row. Product version 1.12.0, releases, packages, and deployment state remain unchanged.
