@@ -4,7 +4,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ## Open
 
-- B020 P3 | [board-migrate is two unrelated operations under one verb](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md) (in_progress)
 - F003 P3 | [Surface matched Learnings at the moment of need (session summary + viewer panel)](features/F003-surface-matched-learnings-at-the-moment-of-need-.md)
 - L001 | [Ship every deterministic guard with a test that drives its real fixtures and call-sites](learnings/L001-guards-need-tests-that-drive-real-callsites.md)
 - L002 | [Board health invariants must respect the open-vs-resolved entry lifecycle](learnings/L002-invariants-must-respect-the-entry-lifecycle.md)
