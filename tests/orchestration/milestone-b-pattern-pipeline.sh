@@ -226,6 +226,22 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-b-") as tmp:
 
     sessions = board / "_sessions"
     sessions.mkdir(exist_ok=True)
+    resolved_allocator_fixture = board / "bugs" / "B023-resolved-allocator-fixture.md"
+    resolved_allocator_fixture.write_text(
+        core.serialize_frontmatter(
+            [
+                ("id", "B023"),
+                ("type", "bug"),
+                ("status", "resolved"),
+                ("title", "Resolved allocator fixture"),
+                ("priority", "P2"),
+                ("affects", "src/promote.py"),
+                ("discovered", "2026-01-01"),
+            ]
+        )
+        + "\n\n# Resolved allocator fixture\n",
+        encoding="utf-8",
+    )
     scratch = sessions / "foreground-test.md"
     findings = {
         "findings": [
@@ -236,6 +252,13 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-b-") as tmp:
                 "affects": "src/patterns.py",
                 "pattern": ["dual-state-contract"],
                 "evidence_quote": "Clusters connect distant symptoms.",
+            },
+            {
+                "scratch_id": "S-after-resolved",
+                "type": "bug",
+                "title": "Do not reuse resolved identifiers",
+                "affects": "src/promote.py",
+                "evidence_quote": "Resolved identifiers remain canonical.",
             },
             {
                 "scratch_id": "S-batch-duplicate",
@@ -264,8 +287,12 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-b-") as tmp:
         }
     )
     assert promotion["summary"] == {
-        "create": 1, "deduplicated": 2, "rejected": 1
+        "create": 2, "deduplicated": 2, "rejected": 1
     }
+    planned_by_scratch = {
+        item["scratch_id"]: item for item in promotion["findings"]
+    }
+    assert planned_by_scratch["S-after-resolved"]["entry_id"] == "B024"
     applied_promotion = tool_board_promote_findings(
         {
             "root": str(repo), "project": project,
@@ -273,8 +300,10 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-b-") as tmp:
         }
     )
     assert applied_promotion["summary"] == {
-        "created": 1, "deduplicated": 2, "rejected": 1
+        "created": 2, "deduplicated": 2, "rejected": 1
     }
+    assert len(list((board / "bugs").glob("B023*.md"))) == 1
+    assert len(list((board / "bugs").glob("B024*.md"))) == 1
     assert scratch.is_file(), "rejected finding must preserve its source file"
     checks += 1
 
@@ -370,6 +399,8 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-b-") as tmp:
         for cluster in final_graph["topology"]["clusters"]
         if "P001" in cluster["pattern_ids"]
     )
+    assert "B023" not in final_graph["nodes"]
+    assert "B024" in final_graph["nodes"]
     evidence_summary = {
         "canonical_pattern": "P001",
         "cluster_fingerprint": p1_cluster["fingerprint"],

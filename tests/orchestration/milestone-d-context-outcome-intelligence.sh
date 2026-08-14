@@ -166,6 +166,18 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-d-") as tmp:
         limit=10,
     )
     assert lexical_decoy["results"] == []
+    assert lexical_decoy["warnings"] == [
+        "No memory was eligible from task text alone. Add files, entry_ids, "
+        "or cwd to provide a structural signal."
+    ]
+    explicit_pattern = build_context(
+        board,
+        project,
+        task="Investigate P001 before selecting a fix.",
+        limit=10,
+    )
+    assert explicit_pattern["results"]
+    assert explicit_pattern["warnings"] == []
     checks += 1
 
     mcp_context = tool_board_context(

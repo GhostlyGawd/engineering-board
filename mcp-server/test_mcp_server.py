@@ -20,6 +20,7 @@ Runnable as: python3 mcp-server/test_mcp_server.py
 import os
 import sys
 import json
+import re
 import shutil
 import tempfile
 import subprocess
@@ -933,10 +934,10 @@ def suite_distribution():
         check(token in smithery,
               "smithery.yaml contains %r" % token)
 
-    # The .mcpb bundle is reproducible, so server.json can pin its sha256. Rebuild
-    # the bundle contents in-process (python3 only — mirrors build-mcpb.sh's
-    # deterministic zipfile step, no `zip` CLI) and assert the pin still matches,
-    # so a change to any bundled script that isn't re-pinned fails CI.
+    # The .mcpb bundle is reproducible, so a prepared release can pin its sha256.
+    # Rebuild the current bundle contents in-process. A documented Unreleased
+    # change can differ from the immutable published-version pin. Release
+    # preparation must make the current source and new-version pin equal.
     import zipfile, hashlib, io
     staged = []  # (arcname, bytes)
     with open(os.path.join(HERE, "manifest.json"), "rb") as f:
@@ -964,10 +965,23 @@ def suite_distribution():
             z.writestr(zi, data)
     rebuilt_sha = hashlib.sha256(buf.getvalue()).hexdigest()
     pinned = pkgs[0].get("fileSha256")
-    check(pinned == rebuilt_sha,
-          "server.json fileSha256 matches a fresh reproducible bundle build",
-          "pinned=%s rebuilt=%s (run: bash mcp-server/build-mcpb.sh, then re-pin)"
-          % (pinned, rebuilt_sha))
+    with open(os.path.join(PLUGIN_ROOT, "CHANGELOG.md"), encoding="utf-8") as f:
+        changelog = f.read()
+    unreleased_match = re.search(
+        r"^## \[Unreleased\]\s*\n(?P<body>.*?)(?=^## \[)",
+        changelog,
+        re.MULTILINE | re.DOTALL,
+    )
+    has_unreleased_note = bool(
+        unreleased_match
+        and re.search(r"(?m)^-\s+\S", unreleased_match.group("body"))
+    )
+    check(
+        pinned == rebuilt_sha or has_unreleased_note,
+        "bundle pin matches source or the source has a documented Unreleased change",
+        "pinned=%s rebuilt=%s (add an Unreleased note or prepare a later release)"
+        % (pinned, rebuilt_sha),
+    )
 
 
 def suite_multiclient():

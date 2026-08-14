@@ -23,6 +23,12 @@ PyPI versions, MCP Registry versions, release tags, and release assets are
 immutable. An explicit release boundary prevents an accidental publication
 from an incomplete `main` commit.
 
+An unreleased source change can produce a bundle checksum that differs from
+the checksum of the published version. The source change must have a note in
+`[Unreleased]`. Do not overwrite the published-version checksum. The next
+explicit release uses `scripts/prepare-release.py` to rebuild the bundle and
+pin the new version.
+
 ## Select the version
 
 Use Semantic Versioning:
