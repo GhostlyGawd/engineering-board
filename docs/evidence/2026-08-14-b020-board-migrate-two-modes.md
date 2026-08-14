@@ -4,11 +4,17 @@
 - Repository: `GhostlyGawd/engineering-board`
 - Base commit: `231dd4587fb3fd7713ab0ae9e480645c6bf32091`
 - Board entry: `B020`
-- Completion state: implementation validation
+- Completion state: closeout
+- Implementation pull request: `#142`
+- Implementation merge commit:
+  `630ac9e148a10cc94c2261df76cbba1ecc526ffb`
+- Implementation merged-main run: `31826065558` (`tests`, passed)
+- Closeout pull request: `#143`
 - Evidence destination: this file
-- External gates: implementation pull request merge, passing merged-main
-  continuous integration, and a separate resolved-entry closeout
-- Terminal action: resolve B020 after the implementation reaches `main`
+- External gates: closeout pull request merge and passing closeout merged-main
+  continuous integration
+- Terminal action: resolve B020 in this closeout change, merge the closeout
+  pull request, and verify its merged-main run
 
 ## Decision
 
@@ -26,9 +32,9 @@ change deployment state.
 
 | Contract item | Normative level | Implementation | Test | Docs/example | Status |
 |---|---|---|---|---|---|
-| The command presents two independent named workflows. | Required by B020. | The command selects data migration or folder relocation before workflow steps. | The existing board-migrate orchestration test reads the real command file and requires both headings. | The command introduction and architecture summary use the same two workflow names. | Worker validation passes; pull-request and merged-main evidence are pending. |
-| Data migration remains a per-board operation. | Required compatibility behavior. | Apply, rollback, and status resolve board rows and invoke `board-migrate.sh` per target. | Existing apply, rollback, state, and SHA tests remain unchanged. | The data workflow records current path resolution, output, and rollback safety. | Worker validation passes; pull-request and merged-main evidence are pending. |
-| Folder relocation remains one repository-level operation. | Required relocation safety boundary. | Relocate invokes `board-relocate.sh` once, then rebuilds and reports. | The command contract rejects the old cross-workflow skip instruction; the existing relocation suite retains executable coverage. | The folder relocation workflow preserves snapshot, router rewrite, idempotency, and legacy-layout limits. | Worker validation passes; pull-request and merged-main evidence are pending. |
+| The command presents two independent named workflows. | Required by B020. | The command selects data migration or folder relocation before workflow steps. | The existing board-migrate orchestration test reads the real command file and requires both headings. | The command introduction and architecture summary use the same two workflow names. | Implementation, merged-main, and live closeout evidence pass; external closeout evidence is pending. |
+| Data migration remains a per-board operation. | Required compatibility behavior. | Apply, rollback, and status resolve board rows and invoke `board-migrate.sh` per target. | Existing apply, rollback, state, and SHA tests remain unchanged. | The data workflow records current path resolution, output, and rollback safety. | Implementation, merged-main, and live closeout evidence pass; external closeout evidence is pending. |
+| Folder relocation remains one repository-level operation. | Required relocation safety boundary. | Relocate invokes `board-relocate.sh` once, then rebuilds and reports. | The command contract rejects the old cross-workflow skip instruction; the existing relocation suite retains executable coverage. | The folder relocation workflow preserves snapshot, router rewrite, idempotency, and legacy-layout limits. | Implementation, merged-main, and live closeout evidence pass; external closeout evidence is pending. |
 | Historical controlled-English evidence remains historical. | Required evidence boundary. | No formal review artifact or corpus manifest changes. | Repository validation determines whether live docs remain coherent; it does not re-certify language. | `docs/asd-ste100/CORPUS-MANIFEST.tsv` remains the pre-approval snapshot identified by its validation record. | Reviewed and unaffected. |
 
 ## Drift classification
@@ -65,8 +71,27 @@ change deployment state.
 - The orchestration matrix reports 25 of 25 passing sub-suites, including the
   separate relocation script suite.
 - Maintained repository suite: 21 of 21 suites pass with exit code 0.
-- Implementation pull request, merge commit, and merged-main run: pending.
-- Closeout pull request and merged-main run: pending.
+- Implementation pull-request checks: runs 31825953515 and 31825968319
+  passed.
+- Implementation pull request: #142 merged as `630ac9e`.
+- Implementation merged-main tests run 31826065558 passed. Pages did not
+  trigger for this path set.
+- Closeout source-MCP transition reported `inserted ARCHIVE.md` and resolved
+  B020 through the merged `630ac9e` implementation.
+- Live closeout comparison: B020 is the first archive row. The complete
+  committed pre-resolution archive follows it byte-for-byte unchanged.
+- Live repeat comparison: a second resolved update left the archive
+  byte-identical with one B020 row.
+- Closeout cascade: F003 shares neither B020's path nor its
+  `surface-overload` pattern, so there were no candidates. The hypothesis
+  inventory is empty.
+- The B020 claim was released. Board status reports no open bugs, one open and
+  ready feature (F003), no in-progress or blocked items, no dangling blockers,
+  and no unpromoted scratch.
+- Closeout worker checks: entry validation, board index, documentation
+  coherence, archive position and uniqueness, BOARD.md omission, and diff
+  checks pass.
+- Closeout pull request: #143; merge commit and merged-main run are pending.
 
 Passing checks establish only their named invariants. They do not establish
 perfect semantic correctness or formal controlled-English compliance.
