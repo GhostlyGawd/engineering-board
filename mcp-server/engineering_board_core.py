@@ -770,9 +770,18 @@ def load_scratch_findings(
                 item["_source_file"] = relative
                 item["_source_index"] = index
                 item["_source_format"] = "extractor-json"
+                fallback_fingerprint = hashlib.sha256(
+                    json.dumps(
+                        finding,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                        default=str,
+                    ).encode("utf-8")
+                ).hexdigest()[:16]
                 item["scratch_id"] = str(
                     item.get("scratch_id")
-                    or f"scratch:{relative}:{index}"
+                    or f"scratch:{relative}:{fallback_fingerprint}"
                 )
                 findings.append(item)
                 index += 1
@@ -800,7 +809,6 @@ def load_scratch_findings(
                 elif line.startswith(">"):
                     evidence.append(line[1:].lstrip())
             item = {
-                "scratch_id": f"mcp:{relative}:{index}",
                 "type": fields.get("kind") or match.group("kind").strip(),
                 "confidence": "explicit",
                 "title": match.group("title").strip(),
@@ -812,6 +820,25 @@ def load_scratch_findings(
                 "_source_index": index,
                 "_source_format": "mcp-markdown",
             }
+            fingerprint_payload = {
+                key: item.get(key)
+                for key in (
+                    "type",
+                    "title",
+                    "affects",
+                    "evidence_quote",
+                    "discovered",
+                )
+            }
+            fingerprint = hashlib.sha256(
+                json.dumps(
+                    fingerprint_payload,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest()[:16]
+            item["scratch_id"] = f"mcp:{relative}:{fingerprint}"
             findings.append(item)
             index += 1
     return sorted(

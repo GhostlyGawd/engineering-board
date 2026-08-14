@@ -122,6 +122,15 @@ def plan_text_changes(
     plugin["version"] = target
     changes[plugin_path] = dump_json(plugin)
 
+    codex_plugin_path = root / ".codex-plugin" / "plugin.json"
+    codex_plugin = load_json(codex_plugin_path)
+    if codex_plugin.get("name") != plugin.get("name"):
+        raise ReleaseError("Codex and Claude plugin names must match")
+    if str(codex_plugin.get("version", "")) != current:
+        raise ReleaseError("Codex and Claude plugin versions must match")
+    codex_plugin["version"] = target
+    changes[codex_plugin_path] = dump_json(codex_plugin)
+
     marketplace_path = root / ".claude-plugin" / "marketplace.json"
     marketplace = load_json(marketplace_path)
     entries = marketplace.get("plugins")

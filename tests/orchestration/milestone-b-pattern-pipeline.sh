@@ -347,6 +347,36 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-b-") as tmp:
     assert retry["summary"] == {"already_applied": 1, "create": 1}
     checks += 1
 
+    daily = sessions / "mcp-2026-08-14.md"
+    daily.write_text(
+        "# MCP scratch inbox — 2026-08-14\n\n"
+        "## 2026-08-14T01:00:00Z — bug: First daily lifecycle finding\n\n"
+        "- kind: bug\n"
+        "- affects: src/daily.py\n\n"
+        "> The first file lifecycle has independent provenance.\n",
+        encoding="utf-8",
+    )
+    first_daily = core.plan_promotion(board, project, daily.name)
+    assert first_daily["summary"] == {"create": 1}
+    core.apply_promotion(
+        board, project, daily.name, first_daily["plan_id"]
+    )
+    daily.write_text(
+        "# MCP scratch inbox — 2026-08-14\n\n"
+        "## 2026-08-14T02:00:00Z — bug: Second daily lifecycle finding\n\n"
+        "- kind: bug\n"
+        "- affects: src/daily.py\n\n"
+        "> The recreated file must not reuse prior provenance.\n",
+        encoding="utf-8",
+    )
+    second_daily = core.plan_promotion(board, project, daily.name)
+    assert second_daily["summary"] == {"create": 1}
+    assert (
+        second_daily["findings"][0]["scratch_id"]
+        != first_daily["findings"][0]["scratch_id"]
+    )
+    checks += 1
+
     linked = sessions / "linked.md"
     link_supported = True
     try:

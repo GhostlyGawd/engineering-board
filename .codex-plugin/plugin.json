@@ -1,0 +1,40 @@
+{
+  "name": "engineering-board",
+  "version": "1.12.0",
+  "description": "Git-committed pattern intelligence for engineering agents. Engineering Board clusters findings, preserves root-cause evidence, and retrieves relevant repository memory through 19 MCP tools.",
+  "author": {
+    "name": "GhostlyGawd",
+    "url": "https://github.com/GhostlyGawd"
+  },
+  "homepage": "https://ghostlygawd.github.io/engineering-board/",
+  "repository": "https://github.com/GhostlyGawd/engineering-board",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "mcp",
+    "pattern-intelligence",
+    "graph-memory",
+    "root-cause-analysis",
+    "engineering-agents"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Engineering Board",
+    "shortDescription": "Give engineering agents durable pattern memory",
+    "longDescription": "Engineering Board records findings in reviewable Markdown, clusters related evidence, preserves root-cause hypotheses and outcomes, and retrieves the most relevant memory before an agent changes code.",
+    "developerName": "GhostlyGawd",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://ghostlygawd.github.io/engineering-board/",
+    "defaultPrompt": [
+      "Initialize Engineering Board in this repository and explain the memory workflow.",
+      "Show the patterns and root-cause hypotheses that are relevant to my current task.",
+      "Capture this finding and connect it to related failures before we fix it."
+    ]
+  }
+}

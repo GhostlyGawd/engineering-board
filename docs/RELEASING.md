@@ -67,6 +67,7 @@ python3 scripts/prepare-release.py <version> --apply
 The script updates:
 
 - `.claude-plugin/plugin.json`;
+- `.codex-plugin/plugin.json`;
 - `.claude-plugin/marketplace.json`;
 - `mcp-server/manifest.json`;
 - `mcp-server/server.json`;
@@ -74,6 +75,10 @@ The script updates:
 - the README version badge;
 - `CHANGELOG.md`;
 - the MCP bundle checksum and release URL.
+
+The script refuses the release when the Codex and Claude plugin names or
+current versions differ. A later release therefore updates both plugin hosts
+from one coordinated version change.
 
 Then, run:
 

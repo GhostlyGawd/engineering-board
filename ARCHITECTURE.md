@@ -2,7 +2,7 @@
 
 A complete structural map of the plugin: what every file does, how the pieces connect, and the lifecycle that ties them together. Companion to `README.md` (which is the install/usage surface).
 
-Current release line: **v1.11.0**. Canonical evidence, P### pattern
+Current release line: **v1.12.0**. Canonical evidence, P### pattern
 identity, H### hypotheses, and durable memory are repository-owned Markdown.
 `BOARD.md`, `GRAPH.yml`, context briefs, value reports, HTML, and
 `.engineering-board/cache/` are derived or disposable views. Milestone D adds
@@ -37,13 +37,15 @@ Mode is persisted in `.engineering-board/session-mode.json` and read on every St
 
 ```
 engineering-board/
+├── .codex-plugin/
+│   └── plugin.json                 # Codex manifest and product interface
 ├── .claude-plugin/
 │   ├── plugin.json                 # Plugin manifest (version, description)
 │   └── marketplace.json            # Marketplace entry
 ├── README.md                       # Install + usage (user-facing)
 ├── ARCHITECTURE.md                 # This file (contributor-facing)
 ├── LICENSE                         # MIT
-├── .mcp.json                       # Bundles the MCP server at the plugin root
+├── .mcp.json                       # Isolated Engineering Board MCP configuration
 ├── agents/                         # 8 agent definitions (Claude Code subagents)
 ├── commands/                       # 21 slash commands
 ├── evaluation/                     # Repository-only Milestone D.1 proof harness and sanitized corpus
@@ -52,6 +54,8 @@ engineering-board/
 │   ├── stop-hook-procedure.md      # Canonical Stop procedure (passive/PM/worker)
 │   └── scripts/                    # 30 bash + 7 python scripts
 ├── mcp-server/                     # shared zero-dep core + 19-tool MCP adapter (stdio) + tests
+├── scripts/
+│   └── engineering-board-mcp-launcher.mjs # Selects Python for the Codex plugin
 ├── skills/                         # 5 Skills (intake, triage, resolve, consolidate, insights)
 ├── references/
 │   ├── auto-resolve-pass.md        # Shared protocol used by the 4 mutation skills
@@ -209,7 +213,10 @@ Board-location resolution lives in one place: **`board-paths.sh`** (sourced help
 
 ## 6. Skills (`skills/`): 5 protocols
 
-Each is a Claude Code Skill (`SKILL.md` with name + description frontmatter). Skills are invoked automatically when the description matches the user's intent, OR explicitly by `board-manager`.
+Each workflow is a plugin Skill (`SKILL.md` with name and description
+frontmatter). Codex uses the MCP-first instructions. Claude Code can use the
+same skills with its command and hook fallbacks. Skills are invoked when the
+description matches the user's intent or when a host selects one explicitly.
 
 | Skill | When it fires | Key steps | Writes |
 |---|---|---|---|
@@ -222,6 +229,12 @@ Each is a Claude Code Skill (`SKILL.md` with name + description frontmatter). Sk
 The four mutation skills end by invoking `references/auto-resolve-pass.md` with
 different scope modes (`focused` / `full` / `cascade`). `board-insights` is
 read-only interpretation and does not invoke auto-resolution.
+
+The Codex MCP process cannot infer the active workspace from the installed
+plugin cache. Its launcher sets `ENGINEERING_BOARD_REQUIRE_ROOT=1`. The skills
+therefore pass an absolute repository `root` in each tool call. The launcher
+uses Node.js only to select a Python 3 executable. The MCP server contains the
+claim implementation and has no Bash or third-party Python dependency.
 
 ---
 

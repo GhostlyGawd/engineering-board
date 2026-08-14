@@ -1,13 +1,32 @@
 ---
-name: Board Resolve
+name: board-resolve
 description: Use this skill when the user asks to close or resolve an entry. Also use it when the entry satisfies its completion criteria and verification is complete.
-version: 0.1.0
 ---
 
 
 # Board Resolve
 
 The resolution protocol for all entry types. The question-closing sequence below is a 9-step, order-sensitive protocol: do not skip or reorder. its mandatory steps (1, 6, 7, and 8) are specified precisely in that section.
+
+## Codex and MCP protocol
+
+Use this protocol when the `engineering-board` MCP server is available:
+
+1. Resolve the absolute repository root and project name. Pass `root` in every
+   tool call.
+2. Call `board_get_entry`. Verify the completion criteria and required
+   evidence. For a question, append the Finding before a status change.
+3. Call `board_update_entry` to append evidence and set `status: resolved`.
+4. Call `board_rebuild`. Do not edit `BOARD.md` directly.
+5. If an H### record cites the entry, offer or execute `board_outcomes` through
+   its preview and apply boundary. Do not infer causal confirmation from a
+   passing test.
+6. Call `board_release` with the same session ID that acquired the entry.
+7. Call `board_status` and state the next ready work item.
+
+Use the detailed rules below to preserve the entry-type-specific sequence.
+Use slash commands and shell operations only as a fallback when the MCP server
+is not available.
 
 **Identify the entry's board first:** the board directory is derived from the entry file's path: `engineering-board/<project>/` (or `docs/boards/<project>/` on the compat path). All BOARD.md index updates and ARCHIVE.md appends go to that project's board, not a different one.
 

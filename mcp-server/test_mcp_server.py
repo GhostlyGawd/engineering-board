@@ -25,6 +25,7 @@ import shutil
 import tempfile
 import subprocess
 import importlib.util
+from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SERVER_PATH = os.path.join(HERE, "engineering_board_mcp.py")
@@ -545,7 +546,7 @@ def suite_lifecycle(mod, tmp_repo):
           "got %d" % b57_count)
     shutil.rmtree(b57_root, ignore_errors=True)
 
-    # board_claim / board_release round-trip via real scripts
+    # board_claim / board_release round-trip through the self-contained server
     cl = mod.tool_board_claim({"project": "atlas", "root": root, "entry_id": "B001",
                                "session_id": "sess-test-1"})
     check(cl["acquired"] is True and cl["exit_code"] == 0, "board_claim acquired", json.dumps(cl))
@@ -557,6 +558,29 @@ def suite_lifecycle(mod, tmp_repo):
     rel = mod.tool_board_release({"project": "atlas", "root": root, "entry_id": "B001",
                                   "session_id": "sess-test-1"})
     check(rel["released"] is True and rel["exit_code"] == 0, "board_release released", json.dumps(rel))
+
+    observation = mod.tool_board_create_entry({
+        "project": "atlas", "root": root, "type": "observation",
+        "title": "Resolution archive contract", "affects": "src/archive.py",
+        "evidence": "The MCP update must preserve the durable archive.",
+    })
+    resolved = mod.tool_board_update_entry({
+        "project": "atlas", "root": root,
+        "entry_id": observation["id"], "status": "resolved",
+    })
+    archive_path = Path(root, "engineering-board", "atlas", "ARCHIVE.md")
+    archive_text = archive_path.read_text()
+    check("appended ARCHIVE.md" in resolved["changes"],
+          "resolving through MCP records the archive change")
+    check(archive_text.count("- O001 | Resolution archive contract | resolved:") == 1,
+          "resolved entry appears once in ARCHIVE.md", archive_text)
+    mod.tool_board_update_entry({
+        "project": "atlas", "root": root,
+        "entry_id": observation["id"], "status": "resolved",
+    })
+    archive_after_repeat = archive_path.read_text()
+    check(archive_after_repeat.count("- O001 | Resolution archive contract | resolved:") == 1,
+          "repeated resolved update does not duplicate ARCHIVE.md")
 
     # learning entry validates too (exercises the strictest schema branch)
     learn = mod.tool_board_create_entry({

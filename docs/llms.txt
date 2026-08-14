@@ -5,17 +5,18 @@
 > deterministic graph views connect recurring signals across domains so agents
 > can retrieve shared root-cause memory before they repeatedly patch symptoms.
 > Explicit fix outcomes improve later Learning state and confidence.
-> No hidden database, external service, or daemon. Ships as a Claude Code
-> plugin and zero-dependency MCP server (19 tools over stdio, protocol
-> 2025-06-18).
+> No hidden database, external service, or daemon. Ships as Codex and Claude
+> Code plugins and as a zero-dependency MCP server (19 tools over stdio,
+> protocol 2025-06-18).
 
 ## What it is
 
 engineering-board turns a committed markdown tree (engineering-board/<project>/)
 into durable, correctable engineering memory:
 
-- Findings (bugs, features, questions, observations) are captured passively
-  from every Claude Code session by a Stop hook.
+- Findings (bugs, features, questions, observations) can be captured through
+  MCP in any supported client. The Claude Code plugin can also capture them
+  passively with a Stop hook.
 - Exact patterns and affected domains form explainable graph edges and clusters.
   Graph structure is deterministic. agent-authored causal interpretations remain
   separate, evidence-cited hypotheses.
@@ -41,7 +42,7 @@ into durable, correctable engineering memory:
   themed Kanban with search, filters, stats, and coordination panels) are
   regenerated deterministically.
 
-Who it is for: developers running Claude Code (or any MCP client) who want their
+Who it is for: developers running Codex, Claude Code, or another MCP client who want their
 agents' task state and memory to be repo-committed, PR-reviewable, and shared
 with the team: instead of per-user state in ~/.claude/ or a local database.
 
@@ -52,6 +53,14 @@ claims, passive capture, verification, and a published board support that
 substrate.
 
 ## Install
+
+Codex plugin (five skills and the 19-tool MCP server):
+
+    codex plugin marketplace add GhostlyGawd/engineering-board
+    codex plugin add engineering-board@engineering-board
+
+Start a new Codex session after installation. Pass the absolute repository
+root in each bundled-plugin MCP call.
 
 Claude Code plugin (full autonomous pipeline. requires Claude Code, free):
 
@@ -84,7 +93,8 @@ https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
   (ready = open with all existing blockers resolved).
 - board_get_entry: full markdown + parsed frontmatter of one entry.
 - board_update_entry: update frontmatter (status, needs, priority, blocked_by,
-  parent), append a section, or append a timestamped comment.
+  parent), append a section, or append a timestamped comment. A new resolved
+  state appends one durable ARCHIVE.md row.
 - board_graph: build the deterministic provenance-linked pattern graph through
   the shared full/incremental engine.
 - board_context: retrieve bounded systemic memory with exposed relevance
