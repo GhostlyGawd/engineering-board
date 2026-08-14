@@ -33,6 +33,9 @@ increases.
 
 ### Fixed
 
+- `/board-migrate` now presents data migration and folder relocation as two
+  independent named workflows. It selects the workflow before target
+  resolution and no longer sends relocation through a skip-step branch.
 - MCP resolution now inserts each new `ARCHIVE.md` row before older rows while
   preserving the archive preamble, older-row order, and repeat-update
   idempotency.
