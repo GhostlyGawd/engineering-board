@@ -84,3 +84,11 @@ scaling was fixed in C1 (B001) and its scratch-inbox banner corrected in C2 (B02
 
 None of the simplify/merge items is a blocker or major; all are tracked as P2/P3
 board entries for later cycles or the Conductor build (RFC 0001).
+
+### B021 resolution note (2026-08-14)
+
+The implementation keeps the registered `code-reviewer` name for Worker-mode
+routing compatibility. The worker prompt now distinguishes this internal agent
+from the harness `/code-review` and `/review` skills. The tool grant excludes
+`Write` and `Edit`. This note supersedes the rename recommendation above while
+preserving the original product-review record.
