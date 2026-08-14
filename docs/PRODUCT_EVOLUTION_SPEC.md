@@ -1150,7 +1150,7 @@ Milestone B adds three tools:
 
 | Tool | Contract |
 |---|---|
-| `board_promote_findings` | Preview or apply captured scratch findings using the same content-bound plan and per-finding receipt as `/board-promote`. |
+| `board_promote_findings` | Preview or apply captured scratch findings using the same content-bound plan and per-finding receipt as `/board-promote`. The unchanged plan id restores an omitted session selector from a scoped preview. |
 | `board_patterns` | List patterns or preview/apply create, alias, assign, and correct operations using the same registry rules as `/board-pattern`. |
 | `board_graph` | Build or return the typed deterministic graph using the shared full/incremental engine. |
 

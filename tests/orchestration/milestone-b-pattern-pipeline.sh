@@ -307,6 +307,118 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-b-") as tmp:
     assert scratch.is_file(), "rejected finding must preserve its source file"
     checks += 1
 
+    scoped = sessions / "scoped-apply.md"
+    scoped.write_text(
+        json.dumps(
+            {
+                "findings": [
+                    {
+                        "scratch_id": "S-scoped-apply",
+                        "type": "observation",
+                        "title": "Session-scoped apply restores preview scope",
+                    }
+                ]
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    scoped_plan = tool_board_promote_findings(
+        {
+            "root": str(repo), "project": project,
+            "session": scoped.name,
+        }
+    )
+    scoped_applied = tool_board_promote_findings(
+        {
+            "root": str(repo), "project": project,
+            "apply": scoped_plan["plan_id"],
+        }
+    )
+    assert scoped_applied["summary"] == {"created": 1}
+    assert scoped_applied["results"][0]["scratch_id"] == "S-scoped-apply"
+    assert not scoped.exists()
+    checks += 1
+
+    stale_scoped = sessions / "stale-scoped-apply.md"
+    stale_scoped.write_text(
+        json.dumps(
+            {
+                "findings": [
+                    {
+                        "scratch_id": "S-stale-scoped",
+                        "type": "observation",
+                        "title": "Original scoped finding",
+                    }
+                ]
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    stale_scoped_plan = tool_board_promote_findings(
+        {
+            "root": str(repo), "project": project,
+            "session": stale_scoped.name,
+        }
+    )
+    stale_scoped.write_text(
+        stale_scoped.read_text(encoding="utf-8").replace(
+            "Original scoped finding", "Changed scoped finding"
+        ),
+        encoding="utf-8",
+    )
+    stale_scoped_result = call_tool(
+        "board_promote_findings",
+        {
+            "root": str(repo), "project": project,
+            "apply": stale_scoped_plan["plan_id"],
+        },
+    )
+    assert stale_scoped_result["isError"] is True
+    assert "plan_stale" in stale_scoped_result["content"][0]["text"]
+    checks += 1
+
+    canonical_stale = sessions / "canonical-stale-scoped-apply.md"
+    canonical_stale.write_text(
+        json.dumps(
+            {
+                "findings": [
+                    {
+                        "scratch_id": "S-canonical-stale-scoped",
+                        "type": "observation",
+                        "title": "Canonical changes invalidate scoped apply",
+                    }
+                ]
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    canonical_stale_plan = tool_board_promote_findings(
+        {
+            "root": str(repo), "project": project,
+            "session": canonical_stale.name,
+        }
+    )
+    canonical = next((board / "bugs").glob("B001-*.md"))
+    canonical_text = canonical.read_text(encoding="utf-8")
+    canonical.write_text(
+        canonical_text + "\n<!-- changed after preview -->\n",
+        encoding="utf-8",
+    )
+    canonical_stale_result = call_tool(
+        "board_promote_findings",
+        {
+            "root": str(repo), "project": project,
+            "apply": canonical_stale_plan["plan_id"],
+        },
+    )
+    canonical.write_text(canonical_text, encoding="utf-8")
+    assert canonical_stale_result["isError"] is True
+    assert "plan_stale" in canonical_stale_result["content"][0]["text"]
+    checks += 1
+
     partial = sessions / "partial-write.md"
     partial.write_text(
         json.dumps(
@@ -393,6 +505,37 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-b-") as tmp:
         )
         assert linked_result["isError"] is True
         assert "linked scratch file" in linked_result["content"][0]["text"]
+        checks += 1
+
+        isolated = sessions / "isolated-from-linked-scratch.md"
+        isolated.write_text(
+            json.dumps(
+                {
+                    "findings": [
+                        {
+                            "scratch_id": "S-isolated-from-linked",
+                            "type": "observation",
+                            "title": "Scoped apply ignores unrelated scratch",
+                        }
+                    ]
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        isolated_plan = tool_board_promote_findings(
+            {
+                "root": str(repo), "project": project,
+                "session": isolated.name,
+            }
+        )
+        isolated_result = tool_board_promote_findings(
+            {
+                "root": str(repo), "project": project,
+                "apply": isolated_plan["plan_id"],
+            }
+        )
+        assert isolated_result["summary"] == {"created": 1}
         checks += 1
 
     stale = tool_board_patterns(

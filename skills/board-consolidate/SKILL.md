@@ -18,7 +18,9 @@ Use this protocol when the `engineering-board` MCP server is available:
 3. Call `board_promote_findings` without `apply`. Supply `session` only when
    the user selected one scratch file.
 4. Review every disposition and the content-bound `plan_id`.
-5. Call `board_promote_findings` with the unchanged `plan_id` in `apply`.
+5. Call `board_promote_findings` with the unchanged `plan_id` in `apply`. The
+   server restores the preview session scope when `session` is omitted. You
+   can repeat the same `session` selector, but do not supply a different one.
 6. Call `board_status` again. Report deferred or rejected findings and the
    preserved audit state.
 

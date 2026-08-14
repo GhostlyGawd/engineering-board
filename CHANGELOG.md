@@ -34,6 +34,9 @@ increases.
 - Scratch promotion now uses content-derived fallback provenance. Recreating a
   daily MCP scratch file cannot make an unrelated finding appear already
   applied because it reused a path and item index.
+- Session-scoped scratch promotion plans now apply with their unchanged plan id
+  alone. The server restores the preview selector while preserving explicit
+  same-session apply and stale-plan rejection.
 
 - Foreground promotion now includes resolved canonical entries when it checks
   duplicate provenance and allocates the next entry identifier. Graph ranking

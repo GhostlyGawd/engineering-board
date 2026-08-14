@@ -41,7 +41,7 @@ the current working directory, and can be overridden per-call with a `root` argu
 | `board_hypotheses` | List H### records or preview/apply propose, evaluate, reopen, split, and merge operations. Mutations require an unchanged self-contained plan token and cited evidence. |
 | `board_outcomes` | Preview or apply a structured H### fix outcome. It also applies one returned L### Learning plan, curates eligible Learning feedback under PM authority, or returns the derived value report. |
 | `board_patterns` | List canonical pattern records or preview/apply create, alias, assign, and correction operations. Every mutation requires the unchanged content-bound plan id. |
-| `board_promote_findings` | Preview or apply captured scratch findings with typed created/deduplicated/rejected/already-applied outcomes, durable provenance, idempotent receipts, and identifier allocation across open and resolved entries. |
+| `board_promote_findings` | Preview or apply captured scratch findings with typed created/deduplicated/rejected/already-applied outcomes, durable provenance, idempotent receipts, and identifier allocation across open and resolved entries. An unchanged plan id restores a session-scoped preview when apply omits the optional session selector. |
 | `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files (P0 to P3 ordering, `⊘ Q###` when blocked, `↳` child rows under parents, resolved omitted). Idempotent. |
 | `board_capture_finding` | Append a finding to the scratch inbox `_sessions/mcp-<UTC-date>.md`. |
 | `board_claim` | Acquire an atomic entry claim. Results: 0=acquired, 1=contended, 2=stale. |
