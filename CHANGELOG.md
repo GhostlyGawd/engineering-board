@@ -26,6 +26,8 @@ increases.
 
 ### Fixed
 
+- GitHub Actions workflows now use `actions/checkout@v7` and its Node.js 24
+  runtime instead of the deprecated Node.js 20 runtime in checkout v4.
 - The internal `code-reviewer` worker now excludes `Write` and `Edit` from its
   tool grant. Its prompt distinguishes the Worker-mode agent from the harness
   `/code-review` and `/review` skills while preserving the registered routing

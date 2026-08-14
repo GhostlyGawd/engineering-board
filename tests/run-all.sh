@@ -33,6 +33,7 @@ SUITES=(
   "paths|bash tests/paths/resolution-order.sh"
   "modes|bash tests/modes/automated.sh"
   "permissions|bash tests/permissions/automated.sh"
+  "workflow-actions|bash tests/workflow-actions.sh"
   "lint-orchestrator-prompts|bash tests/lint-orchestrator-prompts.sh"
   "version-coherence|bash tests/version-coherence.sh"
   "codex-plugin|bash tests/codex-plugin.sh"
