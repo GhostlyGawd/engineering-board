@@ -98,7 +98,8 @@ https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
 - board_graph: build the deterministic provenance-linked pattern graph through
   the shared full/incremental engine.
 - board_context: retrieve bounded systemic memory with exposed relevance
-  components, reasons, state, and canonical sources.
+  components, reasons, state, confidence, and canonical sources. Selected
+  entries contribute their affects paths to Learning scope matching.
 - board_insights: rank clusters with exposed score components and return linked
   hypotheses and rejected negative-memory references.
 - board_hypotheses: list H### records or preview/apply evidence-cited proposal,

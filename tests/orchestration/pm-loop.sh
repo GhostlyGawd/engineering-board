@@ -35,8 +35,9 @@ PLUGIN_ROOT="${1:-$DEFAULT_ROOT}"
 CONSOLIDATE="$PLUGIN_ROOT/hooks/scripts/board-consolidate.sh"
 AUDIT="$PLUGIN_ROOT/hooks/scripts/board-audit-scratch.sh"
 INDEX_CHECK="$PLUGIN_ROOT/hooks/scripts/board-index-check.sh"
+CONTEXT="$PLUGIN_ROOT/hooks/scripts/board-context.sh"
 
-for s in "$CONSOLIDATE" "$AUDIT" "$INDEX_CHECK"; do
+for s in "$CONSOLIDATE" "$AUDIT" "$INDEX_CHECK" "$CONTEXT"; do
   if [ ! -f "$s" ]; then
     echo "MISSING SCRIPT: $s" >&2
     exit 1
@@ -134,6 +135,77 @@ INDEX_CHECK_EXIT=0
 bash "$INDEX_CHECK" > "$TMP/index.stdout" 2> "$TMP/index.stderr" || INDEX_CHECK_EXIT=$?
 AUDIT_EXIT=0
 bash "$AUDIT" > "$TMP/audit.stdout" 2> "$TMP/audit.stderr" || AUDIT_EXIT=$?
+
+# Step (d.1) — the live PM procedure uses the consolidator's promoted ids to
+# retrieve medium/high-confidence Learnings before it emits the summary. Plant
+# one eligible Learning and one low-confidence decoy against a promoted path.
+mkdir -p "$BOARD_DIR/learnings"
+cat > "$BOARD_DIR/learnings/L001-cache-boundary.md" <<'EOF'
+---
+id: L001
+type: learning
+subtype: principle
+title: Cache changes need boundary verification
+discovered: 2026-05-11
+confidence: medium
+recurrence: 2
+derived_from: [B002]
+applies_to: [demo/cache/]
+pattern_tag: cache-boundary
+---
+
+## Takeaway
+
+Verify the cache boundary through its real call-sites.
+EOF
+cat > "$BOARD_DIR/learnings/L002-low-confidence-decoy.md" <<'EOF'
+---
+id: L002
+type: learning
+subtype: finding
+title: Low-confidence cache decoy
+discovered: 2026-05-11
+confidence: low
+recurrence: 1
+derived_from: [B002]
+applies_to: [demo/cache/]
+pattern_tag: cache-decoy
+---
+
+## Takeaway
+
+This matching decoy must not enter the PM summary.
+EOF
+
+mapfile -t PROMOTED_IDS < <(python3 - "$BOARD_DIR/consolidation.log" <<'PY'
+import json
+import sys
+
+ids = set()
+with open(sys.argv[1], encoding="utf-8") as stream:
+    for line in stream:
+        try:
+            disposition = str(json.loads(line).get("disposition") or "")
+        except (json.JSONDecodeError, TypeError):
+            continue
+        if disposition.startswith("promoted_"):
+            ids.add(disposition.removeprefix("promoted_"))
+print("\n".join(sorted(ids)))
+PY
+)
+CONTEXT_ARGS=(
+  --board-dir "$BOARD_DIR"
+  --project demo
+  --learning-summary
+)
+for entry_id in "${PROMOTED_IDS[@]}"; do
+  CONTEXT_ARGS+=(--entry "$entry_id")
+done
+LEARNING_SUMMARY="$(bash "$CONTEXT" "${CONTEXT_ARGS[@]}")"
+PM_SUMMARY="PM pass: ${#PROMOTED_IDS[@]} finding(s) promoted, board tidied."
+if [ -n "$LEARNING_SUMMARY" ]; then
+  PM_SUMMARY="$PM_SUMMARY $LEARNING_SUMMARY"
+fi
 
 # Step (e) — simulate the orchestrator sentinel emission so the assertion
 # below can verify the contract (the live Stop hook would emit this on its
@@ -292,6 +364,19 @@ if [ -f "$PROCEDURE_MD" ] && grep -qF '<<EB-PM-CONTINUE>>' "$PROCEDURE_MD"; then
   report 0 "stop-hook-procedure.md mandates <<EB-PM-CONTINUE>>"
 else
   report 1 "stop-hook-procedure.md mandates <<EB-PM-CONTINUE>>" "missing"
+fi
+
+# 19-20. The PM summary includes the structurally matched medium-confidence
+# Learning and excludes the low-confidence decoy.
+if [[ "$PM_SUMMARY" == *"Matched Learnings: L001 [medium] - Cache changes need boundary verification"* ]]; then
+  report 0 "PM summary surfaces matched medium-confidence Learning"
+else
+  report 1 "PM summary surfaces matched medium-confidence Learning" "got '$PM_SUMMARY'"
+fi
+if [[ "$PM_SUMMARY" != *"L002"* ]]; then
+  report 0 "PM summary excludes matching low-confidence Learning"
+else
+  report 1 "PM summary excludes matching low-confidence Learning" "got '$PM_SUMMARY'"
 fi
 
 echo ""

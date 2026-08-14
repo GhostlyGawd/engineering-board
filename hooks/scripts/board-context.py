@@ -28,10 +28,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--file", action="append", dest="files")
     parser.add_argument("--entry", action="append", dest="entry_ids")
     parser.add_argument("--cwd", default="")
-    parser.add_argument("--limit", type=int, default=3)
+    parser.add_argument("--limit", type=int)
     parser.add_argument("--report", action="store_true")
+    parser.add_argument("--learning-summary", action="store_true")
     parser.add_argument("--deadline-seconds", type=float)
     args = parser.parse_args(argv)
+    if args.report and args.learning_summary:
+        parser.error("--report and --learning-summary are mutually exclusive")
+    limit = (
+        args.limit
+        if args.limit is not None
+        else (10 if args.learning_summary else 3)
+    )
     board_dir = Path(args.board_dir).resolve()
     if not board_dir.is_dir():
         print(
@@ -63,7 +71,8 @@ def main(argv: list[str] | None = None) -> int:
                 files=args.files,
                 entry_ids=args.entry_ids,
                 cwd=args.cwd,
-                limit=args.limit,
+                limit=limit,
+                result_kinds={"learning"} if args.learning_summary else None,
             )
         )
     except (GraphError, OSError, TimeoutError, ValueError) as exc:
@@ -78,7 +87,32 @@ def main(argv: list[str] | None = None) -> int:
     finally:
         if alarm_enabled:
             signal.setitimer(signal.ITIMER_REAL, 0)
-    print(json.dumps(result, ensure_ascii=True, sort_keys=True))
+    if args.learning_summary:
+        matches = [
+            item
+            for item in result["results"]
+            if item.get("kind") == "learning"
+            and item.get("confidence") in {"medium", "high"}
+            and any(
+                str(signal).startswith(
+                    (
+                        "entry-pattern:",
+                        "entry-pattern-tag:",
+                        "learning-applies-to:",
+                    )
+                )
+                for signal in item.get("matched_signals", [])
+            )
+        ]
+        if matches:
+            rendered = "; ".join(
+                f"{item['id']} [{item['confidence']}] - "
+                f"{str(item['title']).replace(';', ',')}"
+                for item in matches
+            )
+            print(f"Matched Learnings: {rendered}")
+    else:
+        print(json.dumps(result, ensure_ascii=True, sort_keys=True))
     return 0
 
 

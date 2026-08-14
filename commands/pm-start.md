@@ -86,3 +86,6 @@ Then stop.
 - The Stop hook reads `session-mode.json` at the start of its procedure. the next Stop-hook turn after this command will emit `<<EB-PM-CONTINUE>>` instead of `<<EB-PASSIVE-DONE>>`.
 - `/board-pause` and `/board-resume` continue to work: pause sets `mode=paused` with `previous_mode=pm`, resume restores `mode=pm`.
 - PM mode dispatches the full continuation chain: the passive extractor, then the consolidator + tidier + learnings-curator subagents that promote scratch into the live board and keep the index tidy.
+- After curation, the Stop hook matches the promoted entry ids against Learning
+  `applies_to` scopes and patterns. It appends eligible medium/high-confidence
+  matches to the one-line PM pass summary.
