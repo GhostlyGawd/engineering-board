@@ -4,6 +4,7 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ## Open
 
+- B065 P2 | [Promotion provenance collides when a daily MCP scratch file is recreated](bugs/B065-promotion-provenance-collides-when-a-daily-mcp-scratch-file-.md)
 - B016 P3 | [Version sprawl across surfaces; no authoritative version signal](bugs/B016-version-sprawl-across-surfaces-no-authoritative-.md)
 - B020 P3 | [board-migrate is two unrelated operations under one verb](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
 - B021 P3 | [code-reviewer name collides with /code-review and its tools contradict its read-only contract](bugs/B021-code-reviewer-name-collides-with-code-review-and.md)

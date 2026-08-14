@@ -146,14 +146,36 @@ def suite_stdio(tmp_repo):
         payload = json.loads(res["content"][0]["text"])
         check(payload["id"] == "B001", "stdio-created bug got id B001", payload.get("id"))
 
+        # tools/call board_context accepts the repository-relative root
+        send({"jsonrpc": "2.0", "id": 6, "method": "tools/call",
+              "params": {"name": "board_context", "arguments": {
+                  "project": "navigator", "task": "Inspect root context", "cwd": "."}}})
+        r = recv()
+        res = r.get("result", {})
+        check(res.get("isError") is False, "stdio board_context relative root ok",
+              json.dumps(res))
+        relative_payload = json.loads(res["content"][0]["text"])
+
+        send({"jsonrpc": "2.0", "id": 7, "method": "tools/call",
+              "params": {"name": "board_context", "arguments": {
+                  "project": "navigator", "task": "Inspect root context",
+                  "cwd": tmp_repo}}})
+        r = recv()
+        res = r.get("result", {})
+        check(res.get("isError") is False, "stdio board_context absolute root ok",
+              json.dumps(res))
+        absolute_payload = json.loads(res["content"][0]["text"])
+        check(relative_payload == absolute_payload,
+              "stdio board_context root forms are equivalent")
+
         # unknown method -> -32601
-        send({"jsonrpc": "2.0", "id": 6, "method": "does/not/exist"})
+        send({"jsonrpc": "2.0", "id": 8, "method": "does/not/exist"})
         r = recv()
         check(r.get("error", {}).get("code") == -32601, "unknown method -> -32601",
               json.dumps(r.get("error")))
 
         # tools/call unknown tool -> isError result (invalid params surfaced)
-        send({"jsonrpc": "2.0", "id": 7, "method": "tools/call",
+        send({"jsonrpc": "2.0", "id": 9, "method": "tools/call",
               "params": {"name": "nope", "arguments": {}}})
         r = recv()
         check(r.get("error", {}).get("code") == -32602, "unknown tool -> -32602",
