@@ -2,6 +2,7 @@
 
 Resolved entries. Newest at the top.
 
+- B069 | Resolved entries append below older archive rows despite newest-first contract | resolved: 2026-08-14
 - B057 P3 | [board_status counts every finding inside plugin scratch blocks](bugs/B057-count-scratch-findings-undercounts-multi-find.md) — resolved 2026-07-26
 
 - B061 P2 | [reject filter rejects Unicode tag chars on sight (ASCII-smuggling strip-and-promote closed)](bugs/B061-reject-filter-strips-tag-chars-but-promotes-.md) — resolved C12 (PR C12a)
