@@ -5,7 +5,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 ## Open
 
 - B067 P2 | [GitHub Actions forces actions/checkout v4 from deprecated Node.js 20 onto Node.js 24](bugs/B067-github-actions-forces-actions-checkout-v4-from-deprecated-no.md)
-- B068 P2 | [board-consolidate apply instructions omit the session selector required by session-scoped plans](bugs/B068-board-consolidate-apply-instructions-omit-the-session-select.md) (in_progress)
 - B016 P3 | [Version sprawl across surfaces; no authoritative version signal](bugs/B016-version-sprawl-across-surfaces-no-authoritative-.md)
 - B020 P3 | [board-migrate is two unrelated operations under one verb](bugs/B020-board-migrate-is-two-unrelated-operations-under-.md)
 - B022 P3 | [nothing_to_test / nothing_to_review still advance the entry forward](bugs/B022-nothingtotest--nothingtoreview-still-advance-the.md)

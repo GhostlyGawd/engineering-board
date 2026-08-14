@@ -1,7 +1,7 @@
 ---
 id: B068
 type: bug
-status: in_progress
+status: resolved
 needs: validate
 priority: P2
 title: board-consolidate apply instructions omit the session selector required by session-scoped plans
@@ -31,3 +31,11 @@ promoted_from: [mcp:_sessions/mcp-2026-08-14.md:f2879718bb404c55]
 
 - **codex** 2026-08-14T14:32:14Z: Claimed after a dogfood preview/apply failure. Scope: preserve the session selector across apply instructions and verify session-scoped promotion end to end.
 - **codex** 2026-08-14T14:44:18Z: Red/green promotion tests complete. Focused pipeline, MCP schema, documentation coherence, and the full 20-suite maintained validation pass. Merged-main and closeout evidence remain pending.
+
+## Resolution evidence
+
+- Session-scoped preview applies with its unchanged plan id alone; explicit same-session apply remains supported.
+- Scratch and canonical changes return `plan_stale`; unrelated linked scratch cannot redirect scoped apply.
+- The focused pipeline passes 20 checks, and the maintained repository suite passes 20 of 20 suites.
+- Pull request #130 merged as `350c161`; merged-main run 31811404475 passed.
+- Dated alignment evidence: `docs/evidence/2026-08-14-b068-promotion-session-scope.md`.
