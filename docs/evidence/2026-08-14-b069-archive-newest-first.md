@@ -15,6 +15,7 @@
 - Follow-up pull request: `#140`
 - Follow-up merge commit: `f42516c552ed292531f400b8bf70b7d07f59a8f6`
 - Follow-up merged-main run: `31824199079` (`tests`, passed)
+- Closeout pull request: `#141`
 - External gates: closeout pull request merge and passing closeout merged-main
   continuous integration
 - Terminal action: resolve B069 in this closeout change, merge the closeout
@@ -111,7 +112,7 @@ Unreleased fix.
 - Closeout worker checks: entry validation, board index, documentation
   coherence, archive position and uniqueness, BOARD.md omission, and diff
   checks pass.
-- Closeout pull request and merged-main run: pending.
+- Closeout pull request: #141; merge commit and merged-main run are pending.
 
 Passing checks establish only their named invariants. They do not establish
 perfect semantic correctness or formal controlled-English compliance.
