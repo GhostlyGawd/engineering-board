@@ -24,8 +24,9 @@ into durable, correctable engineering memory:
   investigation-priority score. /board-hypothesis preserves cited H### state,
   alternatives, falsifiers, lineage, and rejected-claim negative memory.
 - /board-context retrieves a bounded and explainable brief from task, path,
-  entry, and current-directory signals. SessionStart and relevant prompts use
-  the same read-only core.
+  entry, and current-directory signals. Claude Code SessionStart and relevant
+  prompts use the same read-only core automatically. Codex calls board_context
+  explicitly through MCP.
 - /board-outcome records an explicit held, failed, partial, or inconclusive fix
   result against H### memory. Separate content-bound plans update L### outcome
   state and confidence.

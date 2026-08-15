@@ -1,22 +1,22 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-08-15T02:45:35Z",
-  "source_fingerprint": "cf5a1f67ed439fcbdf522f830ee902d1aa3c4dccb63079b357ca1b9249d2509c",
+  "generated_at": "2026-08-15T04:07:41Z",
+  "source_fingerprint": "71d03f7d887fc2c02d19ebc233db63cec7bd06eb850f1f1cbcce40392e48050d",
   "build_mode": "full",
   "project": "eb-self",
   "entries_analyzed": {
-    "open": 3,
+    "open": 6,
     "archived": 0,
-    "total": 3
+    "total": 6
   },
   "nodes": {
     "B071": {
       "type": "bug",
-      "title": "Codex hook adapters fail to derive the repository root without CLAUDE_PROJECT_DIR",
+      "title": "Codex auto-loads Claude hook adapters that require CLAUDE_PROJECT_DIR",
       "source": "bugs/B071-codex-hook-adapters-fail-to-derive-the-repository-root-witho.md",
       "priority": "P2",
-      "status": "open",
-      "affects": "hooks/scripts/board-paths.sh",
+      "status": "in_progress",
+      "affects": ".codex-plugin/plugin.json",
       "discovered": "2026-08-15"
     },
     "B072": {
@@ -24,8 +24,8 @@
       "title": "Codex skips the prompt Stop hook and reports failure after every turn",
       "source": "bugs/B072-codex-skips-the-prompt-stop-hook-and-reports-failure-after-e.md",
       "priority": "P2",
-      "status": "open",
-      "affects": "hooks/hooks.json",
+      "status": "in_progress",
+      "affects": ".codex-plugin/plugin.json",
       "discovered": "2026-08-15"
     },
     "B073": {
@@ -33,8 +33,35 @@
       "title": "SessionStart counts BOARD convention examples as open entries",
       "source": "bugs/B073-sessionstart-counts-board-convention-examples-as-open-entrie.md",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "affects": "hooks/scripts/board-session-start.sh",
+      "discovered": "2026-08-15"
+    },
+    "B074": {
+      "type": "bug",
+      "title": "Self-hosted claim locks dirty the repository because runtime board paths are not ignored",
+      "source": "bugs/B074-self-hosted-claim-locks-dirty-the-repository-because-runtime.md",
+      "priority": "P2",
+      "status": "in_progress",
+      "affects": ".gitignore",
+      "discovered": "2026-08-15"
+    },
+    "B075": {
+      "type": "bug",
+      "title": "Authoritative current-behavior table describes superseded graph context and outcome limitations",
+      "source": "bugs/B075-authoritative-current-behavior-table-describes-superseded-gr.md",
+      "priority": "P2",
+      "status": "in_progress",
+      "affects": "docs/PRODUCT_EVOLUTION_SPEC.md",
+      "discovered": "2026-08-15"
+    },
+    "B076": {
+      "type": "bug",
+      "title": "Dated root audit snapshots can be mistaken for current product truth",
+      "source": "bugs/B076-dated-root-audit-snapshots-can-be-mistaken-for-current-produ.md",
+      "priority": "P2",
+      "status": "in_progress",
+      "affects": "COMPREHENSION.md",
       "discovered": "2026-08-15"
     }
   },
@@ -43,7 +70,7 @@
       "from": "B071",
       "to": "B072",
       "kind": "shared-affects-prefix",
-      "value": "hooks/",
+      "value": ".codex-plugin/plugin.json/",
       "weight": 2,
       "evidence": [
         {
@@ -55,44 +82,6 @@
           "entry": "B072",
           "field": "affects",
           "source": "bugs/B072-codex-skips-the-prompt-stop-hook-and-reports-failure-after-e.md"
-        }
-      ]
-    },
-    {
-      "from": "B071",
-      "to": "B073",
-      "kind": "shared-affects-prefix",
-      "value": "hooks/scripts/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B071",
-          "field": "affects",
-          "source": "bugs/B071-codex-hook-adapters-fail-to-derive-the-repository-root-witho.md"
-        },
-        {
-          "entry": "B073",
-          "field": "affects",
-          "source": "bugs/B073-sessionstart-counts-board-convention-examples-as-open-entrie.md"
-        }
-      ]
-    },
-    {
-      "from": "B072",
-      "to": "B073",
-      "kind": "shared-affects-prefix",
-      "value": "hooks/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B072",
-          "field": "affects",
-          "source": "bugs/B072-codex-skips-the-prompt-stop-hook-and-reports-failure-after-e.md"
-        },
-        {
-          "entry": "B073",
-          "field": "affects",
-          "source": "bugs/B073-sessionstart-counts-board-convention-examples-as-open-entrie.md"
         }
       ]
     }
@@ -101,40 +90,35 @@
     "clusters": [
       {
         "id": "C001",
-        "fingerprint": "c-6e8674cea31b2d37",
+        "fingerprint": "c-d787e89b95532188",
         "members": [
           "B071",
-          "B072",
-          "B073"
+          "B072"
         ],
         "pattern_ids": [],
         "patterns": [],
         "affected_domains": [
-          "hooks"
+          ".codex-plugin"
         ],
         "signals": [
           {
             "kind": "shared-affects-prefix",
-            "value": "hooks/",
+            "value": ".codex-plugin/plugin.json/",
             "members": [
               "B071",
-              "B072",
-              "B073"
-            ]
-          },
-          {
-            "kind": "shared-affects-prefix",
-            "value": "hooks/scripts/",
-            "members": [
-              "B071",
-              "B073"
+              "B072"
             ]
           }
         ],
         "density": 1.0
       }
     ],
-    "isolated": [],
+    "isolated": [
+      "B073",
+      "B074",
+      "B075",
+      "B076"
+    ],
     "cross_cluster_bridges": []
   },
   "unresolved_patterns": [],
@@ -144,24 +128,42 @@
       "cluster_id": "C001",
       "members": [
         "B071",
-        "B072",
-        "B073"
+        "B072"
       ],
       "density": 1.0,
       "shared_dimensions": {
         "patterns": []
       },
-      "internal_edges": 3
+      "internal_edges": 1
+    },
+    {
+      "type": "isolated-node",
+      "node": "B073"
+    },
+    {
+      "type": "isolated-node",
+      "node": "B074"
+    },
+    {
+      "type": "isolated-node",
+      "node": "B075"
+    },
+    {
+      "type": "isolated-node",
+      "node": "B076"
     }
   ],
   "read_order": [
-    "C001"
+    "C001",
+    "B073",
+    "B074",
+    "B075",
+    "B076"
   ],
   "drill_in": {
     "C001": [
       "B071",
-      "B072",
-      "B073"
+      "B072"
     ]
   }
 }

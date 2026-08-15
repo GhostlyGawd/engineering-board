@@ -14,7 +14,7 @@ _The board is the database._
 
 [![Website](https://img.shields.io/badge/website-ghostlygawd.github.io-E6A94E.svg)](https://ghostlygawd.github.io/engineering-board/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.13.1-E6A94E.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.13.2-E6A94E.svg)](CHANGELOG.md)
 [![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
 [![Codex plugin](https://img.shields.io/badge/Codex-plugin-171719.svg)](https://developers.openai.com/codex/plugins)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
@@ -161,8 +161,9 @@ installing a newer released version.
 
 Start a new Codex session. The plugin supplies five board skills and starts the
 19-tool Engineering Board MCP server. It does not require a model-provider
-account. Codex reviews plugin hooks separately; Engineering Board does not
-require its Claude Code hooks in Codex.
+account. The Codex manifest explicitly selects `hooks/codex-hooks.json`, which
+contains no automatic hooks. Codex therefore uses the skills and MCP server
+without loading the Claude Code hook workflow from `hooks/hooks.json`.
 
 Ask Codex to initialize Engineering Board in the active repository. The agent
 passes the absolute repository root to `board_init` and uses the MCP tools for
@@ -341,8 +342,9 @@ The canonical Stop procedure is
 **Skills (5):** `board-intake`, `board-triage`, `board-resolve`,
 `board-consolidate`, and `board-insights`.
 
-**Hooks (4 events):** `SessionStart`, `PostToolUse(Write)`,
-`UserPromptSubmit`, and `Stop`.
+**Claude Code hooks (4 events):** `SessionStart`, `PostToolUse(Write)`,
+`UserPromptSubmit`, and `Stop`. The Codex plugin selects its separate empty
+hook manifest and uses the MCP-first workflow.
 
 The MCP server has 19 tools. All tools use the same canonical Markdown and the
 same deterministic core.

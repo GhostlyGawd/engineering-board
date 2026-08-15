@@ -2,7 +2,7 @@
 
 A complete structural map of the plugin: what every file does, how the pieces connect, and the lifecycle that ties them together. Companion to `README.md` (which is the install/usage surface).
 
-Current release line: **v1.12.0**. Canonical evidence, P### pattern
+Current release line: **v1.13.2**. Canonical evidence, P### pattern
 identity, H### hypotheses, and durable memory are repository-owned Markdown.
 `BOARD.md`, `GRAPH.yml`, context briefs, value reports, HTML, and
 `.engineering-board/cache/` are derived or disposable views. Milestone D adds
@@ -17,11 +17,12 @@ TDD/review/validate loop remains supporting verification behavior. See
 ## 1. The 30-second mental model
 
 The plugin turns `engineering-board/<project>/` Markdown into a repository
-pattern-memory system. SessionStart and relevant prompts retrieve systemic
-memory before an agent selects a fix. Explicit fix outcomes improve later
-hypothesis and Learning memory.
+pattern-memory system. In Claude Code, SessionStart and relevant prompts
+retrieve systemic memory before an agent selects a fix. Codex and other MCP
+clients call `board_context` explicitly through their agent workflow. Explicit
+fix outcomes improve later hypothesis and Learning memory.
 
-Three optional session modes control capture and work:
+Three optional Claude Code session modes control capture and work:
 
 | Mode | Set by | Stop hook dispatches | Purpose |
 |---|---|---|---|
@@ -30,6 +31,11 @@ Three optional session modes control capture and work:
 | **Worker** | `/worker-start --discipline <tdd\|review\|validate>` | one of: `tdd-builder`, `code-reviewer`, `validator` (claim-locked per entry) | Drive `needs:` state machine on live entries until resolved |
 
 Mode is persisted in `.engineering-board/session-mode.json` and read on every Stop event by `hooks/scripts/board-stop-gate.sh`. The `Stop` hook in `hooks/hooks.json` is the routing entry point. the actual procedure the model executes is in `hooks/stop-hook-procedure.md`.
+
+Codex uses the same five skills and 19-tool MCP server without this automatic
+hook workflow. `.codex-plugin/plugin.json` selects the separate empty
+`hooks/codex-hooks.json` source, so Codex does not auto-discover the Claude
+hook manifest.
 
 ---
 
@@ -52,7 +58,8 @@ engineering-board/
 ├── commands/                       # 21 slash commands
 ├── evaluation/                     # Repository-only Milestone D.1 proof harness and sanitized corpus
 ├── hooks/
-│   ├── hooks.json                  # 4 hook events wired
+│   ├── codex-hooks.json            # Explicit empty Codex hook source
+│   ├── hooks.json                  # 4 Claude Code hook events wired
 │   ├── stop-hook-procedure.md      # Canonical Stop procedure (passive/PM/worker)
 │   └── scripts/                    # 30 bash + 7 python scripts
 ├── mcp-server/                     # shared zero-dep core + 19-tool MCP adapter (stdio) + tests
@@ -148,9 +155,13 @@ hold path.
 
 ---
 
-## 5. Hooks (`hooks/`)
+## 5. Claude Code hooks (`hooks/`)
 
-### `hooks.json`: 4 events wired
+The Codex plugin does not load these adapters. Its explicit
+`codex-hooks.json` source is empty. Claude Code continues to use
+`hooks.json` and the workflow below.
+
+### `hooks.json`: 4 Claude Code events wired
 | Event | Matcher | Script | Timeout | Purpose |
 |---|---|---|---|---|
 | `SessionStart` | `*` | `board-session-start.sh` | 10s | Surface open state and at most three relevant systemic-memory results through the shared context core |
@@ -174,7 +185,8 @@ Board-location resolution lives in one place: **`board-paths.sh`** (sourced help
 **Hook-triggered (4):**
 - `board-session-start.sh`: SessionStart. It sends bounded current-directory,
   changed-file, and active-entry signals to `board-context.py`. Retrieval is
-  read-only and has a 3.8-second internal deadline.
+  read-only and has a 3.8-second internal deadline. Its board snapshot reads
+  canonical entry rows only from the exact `## Open` section of `BOARD.md`.
 - `board-validate-entry.sh`: PostToolUse(Write). v0.3.0 validates `learnings/*.md` against the Learning schema.
 - `board-prompt-guard.sh`: UserPromptSubmit. It is silent for unrelated
   prompts. It truncates relevant prompt text to 4,000 characters, treats each
@@ -313,8 +325,10 @@ If a task-only request does not identify eligible memory, the core returns a
 warning that tells the caller to add a file, entry identifier, or current
 directory. This diagnostic does not change eligibility or ranking.
 
-Context contract version `2` identifies the additive memory-content payload.
-Ranking rule version `1` remains unchanged. A cluster summary describes
+Context contract version `3` identifies the additive memory-content payload
+and exposes confidence where the canonical memory defines it. Ranking rule
+version `2` derives path context from selected entries and gives direct
+Learning pattern and `applies_to` matches structural eligibility. A cluster summary describes
 structural scope. A hypothesis summary remains a proposed root cause unless
 its separate status records stronger evidence.
 
@@ -335,7 +349,10 @@ confidence only within that outcome state.
 The value report reads canonical H### outcome history and L### outcome fields.
 It does not count prompts, sessions, searches, or other activity.
 
-### Default session (passive)
+The three flows below are Claude Code hook workflows. Codex uses explicit MCP
+calls instead.
+
+### Claude Code default session (passive)
 ```
 SessionStart   → board-session-start.sh prints board snapshot + bounded context
 UserPrompt     → board-prompt-guard.sh maybe injects bounded context + reminder
@@ -407,10 +424,11 @@ authoritative list. `spike/` is a standalone mini-plugin check.
 | `permissions/` | required-permissions.json schema + self-check exit codes + allowlist coverage vs invoked scripts | `bash tests/permissions/automated.sh` |
 | `orchestration/` | PM and Worker pipelines plus `/board-demo`, Milestone B pattern identity, the Milestone C ranking/hypothesis lifecycle matrix, command structural lint, registry lifecycle, learnings curator, migrate, pause/resume, and subagent contracts | `bash tests/orchestration/automated.sh` |
 | `security/reject-filter.sh` | drives every `fixtures/adversarial-paste/` (≥30) and `fixtures/benign-findings/` (≥20) fixture through the canonical `board_reject_check.py` filter. 100% reject (with declared reason) + 100% accept | `bash tests/security/reject-filter.sh` |
-| `session-start/` | SessionStart correctness (empty-board count, blocking map) + a perf guard (1200-entry board < 10s) | `bash tests/session-start/automated.sh` |
+| `session-start/` | SessionStart exact-Open-section correctness with the standard Conventions footer, blocking map, and a 1200-entry performance guard below 10 seconds | `bash tests/session-start/automated.sh` |
 | `view/` | `/board-view` HTML generator: document structure, pipeline columns, byte-determinism, HTML-escaping of untrusted entry text | `bash tests/view/automated.sh` |
 | `version-coherence` | Plugin versions and both marketplaces align; Claude stays relative and Codex pins the matching release tag | `bash tests/version-coherence.sh` |
-| `release-preparation` | Release-plan validation, Codex version/ref advancement, and reproducible bundle preparation | `bash tests/release-preparation.sh` |
+| `release-preparation` | Release-plan validation, coordinated runtime and current-document version advancement, Codex tag-ref advancement, and reproducible bundle preparation | `bash tests/release-preparation.sh` |
+| `codex-plugin` | Codex manifest host boundary, immutable marketplace pin, isolated MCP launcher, and 19-tool surface | `bash tests/codex-plugin.sh` |
 | `docs-coherence` | current documentation links, counts, and contract markers | `bash tests/docs-coherence.sh` |
 | `token-coherence` | content-bound plan token behavior | `bash tests/token-coherence.sh` |
 | `evaluation-harness` | frozen corpus, isolated pairs, exclusive-create attempts, product gates, and bounded reports | `bash tests/evaluation/automated.sh` |

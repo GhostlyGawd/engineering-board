@@ -19,6 +19,7 @@ import sys
 
 root = pathlib.Path(sys.argv[1])
 manifest = json.loads((root / ".codex-plugin/plugin.json").read_text())
+codex_hooks = json.loads((root / "hooks/codex-hooks.json").read_text())
 mcp = json.loads((root / ".mcp.json").read_text())
 claude = json.loads((root / ".claude-plugin/plugin.json").read_text())
 claude_market = json.loads((root / ".claude-plugin/marketplace.json").read_text())
@@ -28,6 +29,8 @@ assert manifest["name"] == claude["name"] == "engineering-board"
 assert manifest["version"] == claude["version"]
 assert manifest["skills"] == "./skills/"
 assert manifest["mcpServers"] == "./.mcp.json"
+assert manifest["hooks"] == "./hooks/codex-hooks.json"
+assert codex_hooks == {"hooks": {}}
 assert claude_market["plugins"][0]["source"] == "./"
 assert codex_market["name"] == "engineering-board"
 assert codex_market["interface"]["displayName"] == "Engineering Board"
@@ -91,4 +94,4 @@ assert missing_root["isError"] is True
 assert "missing required argument: root" in missing_root["content"][0]["text"]
 PY
 
-echo "codex-plugin: pinned marketplace, manifest, isolated MCP configuration, launcher, and 19 tools verified"
+echo "codex-plugin: pinned marketplace, host-safe hook boundary, isolated MCP configuration, launcher, and 19 tools verified"

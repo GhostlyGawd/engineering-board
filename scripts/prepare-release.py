@@ -220,6 +220,35 @@ def plan_text_changes(
         "README version badge",
     )
 
+    architecture_path = root / "ARCHITECTURE.md"
+    changes[architecture_path] = replace_once(
+        architecture_path.read_text(encoding="utf-8"),
+        rf"(Current release line: \*\*v){re.escape(current)}(\*\*)",
+        rf"\g<1>{target}\g<2>",
+        "ARCHITECTURE current release line",
+    )
+
+    product_spec_path = root / "docs" / "PRODUCT_EVOLUTION_SPEC.md"
+    changes[product_spec_path] = replace_once(
+        product_spec_path.read_text(encoding="utf-8"),
+        rf"(_Current release boundary: `v){re.escape(current)}(`_)",
+        rf"\g<1>{target}\g<2>",
+        "product-spec current release boundary",
+    )
+
+    security_path = root / "SECURITY.md"
+    current_minor = f"{current_version[0]}.{current_version[1]}.x"
+    target_minor = f"{target_version[0]}.{target_version[1]}.x"
+    security = security_path.read_text(encoding="utf-8")
+    updated_security = replace_once(
+        security,
+        rf"(Current minor release, ){re.escape(current_minor)}(\s*\|)",
+        rf"\g<1>{target_minor}\g<2>",
+        "SECURITY supported minor",
+    )
+    if updated_security != security:
+        changes[security_path] = updated_security
+
     changelog_path = root / "CHANGELOG.md"
     changelog = changelog_path.read_text(encoding="utf-8")
     changes[changelog_path] = (

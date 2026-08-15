@@ -17,4 +17,9 @@ __pycache__/
 # Build output (MCP bundle) — a release asset, not source
 dist/
 .codeweb/
-.engineering-board/cache/
+
+# Engineering Board runtime state — canonical board content stays tracked
+.engineering-board/
+engineering-board/*/_sessions/
+engineering-board/*/_claims/
+engineering-board/*/_migrate-snapshot/

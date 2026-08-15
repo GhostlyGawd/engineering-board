@@ -5,7 +5,8 @@ set -uo pipefail
 
 ROOT="${1:-$(cd "$(dirname "$0")/.." && pwd)}"
 TMP="$(mktemp -d)"
-trap 'rm -rf "$TMP"' EXIT
+MINOR_TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP" "$MINOR_TMP"' EXIT
 
 PASS=0
 FAIL=0
@@ -21,7 +22,7 @@ fail() {
 }
 
 mkdir -p "$TMP/.agents/plugins" "$TMP/.claude-plugin" "$TMP/.codex-plugin" \
-  "$TMP/mcp-server" "$TMP/hooks" "$TMP/scripts"
+  "$TMP/mcp-server" "$TMP/hooks" "$TMP/scripts" "$TMP/docs"
 cp -R "$ROOT/hooks/scripts" "$TMP/hooks/scripts"
 cp "$ROOT/.claude-plugin/plugin.json" "$TMP/.claude-plugin/plugin.json"
 cp "$ROOT/.claude-plugin/marketplace.json" "$TMP/.claude-plugin/marketplace.json"
@@ -34,6 +35,8 @@ for source in "$ROOT"/mcp-server/*; do
 done
 cp "$ROOT/scripts/prepare-release.py" "$TMP/scripts/prepare-release.py"
 cp "$ROOT/README.md" "$ROOT/CHANGELOG.md" "$ROOT/LICENSE" "$TMP/"
+cp "$ROOT/ARCHITECTURE.md" "$ROOT/SECURITY.md" "$TMP/"
+cp "$ROOT/docs/PRODUCT_EVOLUTION_SPEC.md" "$TMP/docs/PRODUCT_EVOLUTION_SPEC.md"
 
 TARGET_VERSION="$(
   python3 - "$TMP/.claude-plugin/plugin.json" <<'PY'
@@ -85,6 +88,9 @@ import json, pathlib, sys
 preview = json.loads(pathlib.Path(sys.argv[1]).read_text())
 assert preview["status"] == "preview"
 assert ".agents/plugins/marketplace.json" in preview["changed_files"]
+assert "ARCHITECTURE.md" in preview["changed_files"]
+assert "docs/PRODUCT_EVOLUTION_SPEC.md" in preview["changed_files"]
+assert "SECURITY.md" not in preview["changed_files"]
 PY
 then
   pass "preview plans the Codex marketplace version and ref update"
@@ -112,6 +118,9 @@ server = json.loads((root / "mcp-server/server.json").read_text())
 pyproject = (root / "mcp-server/pyproject.toml").read_text()
 readme = (root / "README.md").read_text()
 changelog = (root / "CHANGELOG.md").read_text()
+architecture = (root / "ARCHITECTURE.md").read_text()
+security = (root / "SECURITY.md").read_text()
+product = (root / "docs/PRODUCT_EVOLUTION_SPEC.md").read_text()
 assert plugin["version"] == target
 assert codex_plugin["name"] == plugin["name"]
 assert codex_plugin["version"] == target
@@ -130,6 +139,10 @@ assert f"/v{target}/" in server["packages"][0]["identifier"]
 assert re.search(rf'^version = "{re.escape(target)}"$', pyproject, re.M)
 assert f"badge/version-{target}-" in readme
 assert f"## [Unreleased]\n\n## [{target}] — 2026-07-28" in changelog
+assert f"Current release line: **v{target}**" in architecture
+major, minor, _patch = target.split(".")
+assert f"Current minor release, {major}.{minor}.x" in security
+assert f"_Current release boundary: `v{target}`_" in product
 PY
 then
   pass "all versioned surfaces align"
@@ -144,6 +157,58 @@ if [ "$PIN" = "$BUILT" ]; then
   pass "pinned MCP bundle checksum reproduces"
 else
   fail "pinned MCP bundle checksum reproduces"
+fi
+
+# A patch release keeps the supported minor unchanged. Use an independent
+# disposable minor release to prove that SECURITY.md advances when required.
+cp -R "$TMP/." "$MINOR_TMP/"
+MINOR_TARGET="$(
+  python3 - "$MINOR_TMP/.claude-plugin/plugin.json" <<'PY'
+import json
+import pathlib
+import sys
+
+version = json.loads(pathlib.Path(sys.argv[1]).read_text())["version"]
+major, minor, _patch = (int(part) for part in version.split("."))
+print(f"{major}.{minor + 1}.0")
+PY
+)"
+python3 - "$MINOR_TMP/CHANGELOG.md" <<'PY'
+import pathlib
+import sys
+
+path = pathlib.Path(sys.argv[1])
+marker = "## [Unreleased]\n"
+note = "\n### Changed\n\n- Added an independent minor-release fixture.\n"
+path.write_text(path.read_text().replace(marker, marker + note, 1))
+PY
+if python3 "$ROOT/scripts/prepare-release.py" "$MINOR_TARGET" \
+    --root "$MINOR_TMP" --date 2026-07-29 --apply --json \
+    > "$MINOR_TMP/minor-applied.json"; then
+  pass "independent minor release apply succeeds"
+else
+  fail "independent minor release apply succeeds"
+fi
+if python3 - "$MINOR_TMP" "$MINOR_TARGET" <<'PY'
+import json
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1])
+target = sys.argv[2]
+major, minor, _patch = target.split(".")
+result = json.loads((root / "minor-applied.json").read_text())
+assert "SECURITY.md" in result["changed_files"]
+assert f"Current minor release, {major}.{minor}.x" in (root / "SECURITY.md").read_text()
+assert f"Current release line: **v{target}**" in (root / "ARCHITECTURE.md").read_text()
+assert f"_Current release boundary: `v{target}`_" in (
+    root / "docs/PRODUCT_EVOLUTION_SPEC.md"
+).read_text()
+PY
+then
+  pass "minor release advances the supported minor and current release markers"
+else
+  fail "minor release advances the supported minor and current release markers"
 fi
 
 printf "\nApproved review change.\n" >> "$TMP/mcp-server/README.md"

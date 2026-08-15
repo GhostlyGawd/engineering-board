@@ -1,5 +1,12 @@
 # Social Proof & Credibility — engineering-board
 
+> **Historical snapshot (2026-07-08).** This audit preserves the observations
+> made on that date. It is not current normative product truth. Current behavior
+> and release boundaries live in the [product-direction spec](docs/PRODUCT_EVOLUTION_SPEC.md),
+> [README](README.md), [architecture](ARCHITECTURE.md), [security policy](SECURITY.md),
+> and [changelog](CHANGELOG.md). Counts, versions, paths, and runtime claims below
+> may be superseded.
+
 _Read-only pass, 2026-07-08. Mission: audit the evidence this product offers a
 **skeptical stranger** — proof that it's real, works, and is safe to let near their
 repo — and find where doubt wins. Claims persuade no one; proof does._
