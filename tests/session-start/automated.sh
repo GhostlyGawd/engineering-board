@@ -24,7 +24,7 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
 make_board() {
-  # make_board <project-dir> — scaffold a minimal router + empty board.
+  # make_board <project-dir> — scaffold the standard router + empty board.
   local proj="$1"
   mkdir -p "$proj/engineering-board/demo"/{bugs,features,questions,observations,learnings}
   cat > "$proj/engineering-board/BOARD-ROUTER.md" <<'EOF'
@@ -37,9 +37,19 @@ EOF
   cat > "$proj/engineering-board/demo/BOARD.md" <<'EOF'
 # demo — Board
 
+Live index of open items. Resolved items move to ARCHIVE.md.
+
 ## Open
 
 (none)
+
+## Conventions
+
+- Bug/Feature lines: `- B### P# | [title](bugs/filename.md)` (append `⊘ Q###` when blocked)
+- Question lines: `- Q### | [title](questions/filename.md)`
+- Observation lines: `- O### | [title](observations/filename.md)`
+- Learning lines: `- L### | [title](learnings/filename.md)` (v0.3.0)
+- Order within each section: P0 → P1 → P2 → P3 → unranked
 EOF
 }
 
@@ -58,6 +68,36 @@ if printf '%s\n' "$OUT1" | grep -qxE '0'; then
   fail "T2: stray bare '0' line present (D6 double-zero regression)"
 else
   pass "T2: no stray bare '0' line"
+fi
+if printf '%s\n' "$OUT1" | grep -qE 'Bug/Feature lines|Question lines|Observation lines|Learning lines|Order within'; then
+  fail "T2b: empty board rendered a Conventions example as an open entry"
+else
+  pass "T2b: empty board renders no Conventions examples"
+fi
+
+# ── Test 2c: one canonical Open row is counted without footer examples ───────
+P2C="$TMP/one-open"
+make_board "$P2C"
+python3 - "$P2C/engineering-board/demo/BOARD.md" <<'PY'
+from pathlib import Path
+import sys
+
+board = Path(sys.argv[1])
+board.write_text(
+    board.read_text().replace(
+        "\n(none)\n",
+        "\n- B001 P1 | [real open entry](bugs/B001.md)\n",
+        1,
+    )
+)
+PY
+OUT2C="$(CLAUDE_PROJECT_DIR="$P2C" bash "$SESSION_START" 2>/dev/null || true)"
+if printf '%s\n' "$OUT2C" | grep -qE '^\[ demo \] — 1 open item\(s\):$' &&
+   printf '%s\n' "$OUT2C" | grep -qF -- '- B001 P1 | [real open entry](bugs/B001.md)' &&
+   ! printf '%s\n' "$OUT2C" | grep -qE 'Bug/Feature lines|Question lines|Observation lines|Learning lines|Order within'; then
+  pass "T2c: one canonical Open row is the only rendered entry"
+else
+  fail "T2c: one-row board count or rendering included non-Open content"
 fi
 
 # ── Test 3: blocking relationships are correct (functional preservation) ─────

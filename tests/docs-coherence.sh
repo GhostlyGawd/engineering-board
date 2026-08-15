@@ -9,7 +9,9 @@
 #       actual count of '"name": "board_' tools in the MCP server source
 #       (each of those four files must state the count at least once);
 #   (b) the "Commands (N)" figure in README.md equals the command-file count;
-#   (c) the "Skills (N)" figure in README.md equals the skill-file count.
+#   (c) the "Skills (N)" figure in README.md equals the skill-file count;
+#   (d) current release and context-contract markers match source truth;
+#   (e) root audit snapshots carry an explicit historical boundary.
 #
 # Usage:
 #   bash tests/docs-coherence.sh [plugin-root]
@@ -30,9 +32,21 @@ DOC_FILES=(
   "$ROOT/mcp-server/README.md"
   "$ROOT/docs/llms.txt"
 )
+CURRENT_DOC_FILES=(
+  "$ROOT/ARCHITECTURE.md"
+  "$ROOT/SECURITY.md"
+  "$ROOT/docs/PRODUCT_EVOLUTION_SPEC.md"
+)
+HISTORICAL_AUDITS=(
+  "$ROOT/COMPREHENSION.md"
+  "$ROOT/RETENTION.md"
+  "$ROOT/PROOF.md"
+)
 
 for f in "$SERVER" "$ROOT/README.md" "$ROOT/docs/index.html" \
-         "$ROOT/mcp-server/README.md" "$ROOT/docs/llms.txt"; do
+         "$ROOT/mcp-server/README.md" "$ROOT/docs/llms.txt" \
+         "$ROOT/.claude-plugin/plugin.json" \
+         "${CURRENT_DOC_FILES[@]}" "${HISTORICAL_AUDITS[@]}"; do
   if [ ! -f "$f" ]; then
     echo "docs-coherence: MISSING $f" >&2
     exit 1
@@ -62,14 +76,15 @@ if [ "$TOOL_COUNT" -lt 1 ] || [ "$COMMAND_COUNT" -lt 1 ] || [ "$SKILL_COUNT" -lt
 fi
 
 EXIT=0
-RESULT="$(python3 - "$TOOL_COUNT" "$COMMAND_COUNT" "$SKILL_COUNT" "$ROOT/README.md" "${DOC_FILES[@]}" <<'PY'
-import re, sys
+RESULT="$(python3 - "$TOOL_COUNT" "$COMMAND_COUNT" "$SKILL_COUNT" "$ROOT" "$ROOT/README.md" "${DOC_FILES[@]}" <<'PY'
+import json, pathlib, re, sys
 
 tool_count = int(sys.argv[1])
 command_count = int(sys.argv[2])
 skill_count = int(sys.argv[3])
-readme_path = sys.argv[4]
-doc_paths = sys.argv[5:]
+root = pathlib.Path(sys.argv[4])
+readme_path = sys.argv[5]
+doc_paths = sys.argv[6:]
 
 # The parseable count patterns docs MUST use (normalize the prose if a new
 # phrasing can't be matched — that keeps this test able to see every figure):
@@ -116,6 +131,67 @@ elif int(match.group(1)) != skill_count:
     fail = True
 else:
     print("OK   %s: Skills (%d) == skills/*/SKILL.md count" % (readme_path, skill_count))
+
+version = json.loads((root / ".claude-plugin/plugin.json").read_text())["version"]
+major, minor, _patch = version.split(".")
+architecture = (root / "ARCHITECTURE.md").read_text()
+security = (root / "SECURITY.md").read_text()
+product = (root / "docs/PRODUCT_EVOLUTION_SPEC.md").read_text()
+core = (root / "mcp-server/engineering_board_core.py").read_text()
+
+current_markers = {
+    "ARCHITECTURE release": (architecture, f"Current release line: **v{version}**"),
+    "product release boundary": (product, f"_Current release boundary: `v{version}`_"),
+    "SECURITY supported minor": (security, f"Current minor release, {major}.{minor}.x"),
+}
+for label, (text, marker) in current_markers.items():
+    if marker not in text:
+        print(f"FAIL {label} is not aligned to {version}: missing {marker}")
+        fail = True
+    else:
+        print(f"OK   {label} == {version}")
+
+contract = re.search(r'^CONTEXT_CONTRACT_VERSION = "([^"]+)"$', core, re.M)
+ranking = re.search(r'^CONTEXT_RANKING_RULE_VERSION = "([^"]+)"$', core, re.M)
+if not contract or not ranking:
+    print("FAIL context contract source constants are missing")
+    fail = True
+else:
+    contract_marker = f"Context contract version `{contract.group(1)}`"
+    ranking_pattern = rf"Ranking rule\s+version `{re.escape(ranking.group(1))}`"
+    if contract_marker not in architecture or not re.search(ranking_pattern, architecture):
+        print(
+            "FAIL ARCHITECTURE context markers do not match core "
+            f"(contract={contract.group(1)} ranking={ranking.group(1)})"
+        )
+        fail = True
+    else:
+        print(
+            "OK   ARCHITECTURE context markers match core "
+            f"(contract={contract.group(1)} ranking={ranking.group(1)})"
+        )
+
+section_five = product.split("## 5. What exists today", 1)[1].split("## 6.", 1)[0]
+stale_current_claims = (
+    "graph builder is a command procedure",
+    "Retrieval is path-centric",
+    "does not yet record whether the suspected root cause was confirmed",
+)
+for claim in stale_current_claims:
+    if claim in section_five:
+        print(f"FAIL product current-behavior table retains superseded claim: {claim}")
+        fail = True
+if not any(claim in section_five for claim in stale_current_claims):
+    print("OK   product current-behavior table excludes superseded B/D limitations")
+
+historical_marker = "**Historical snapshot (2026-07-08).**"
+for name in ("COMPREHENSION.md", "RETENTION.md", "PROOF.md"):
+    text = (root / name).read_text()
+    if historical_marker not in "\n".join(text.splitlines()[:12]):
+        print(f"FAIL {name} lacks the opening historical-snapshot boundary")
+        fail = True
+    else:
+        print(f"OK   {name} has the opening historical-snapshot boundary")
 
 sys.exit(1 if fail else 0)
 PY

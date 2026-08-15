@@ -75,7 +75,14 @@ for i in "${!BOARD_PATHS[@]}"; do
     continue
   fi
 
-  open_items=$(grep "^- [BFQO]" "${BOARD_FILE}" 2>/dev/null || true)
+  # BOARD.md is a structured derived view. Read only its canonical Open
+  # section; the standard Conventions footer contains example rows that begin
+  # with the same B/F/Q/O characters and must never be reported as live work.
+  open_items=$(awk '
+    /^## Open[[:space:]]*$/ { in_open = 1; next }
+    in_open && /^##[[:space:]]/ { exit }
+    in_open && /^- [BFQO]/ { print }
+  ' "${BOARD_FILE}" 2>/dev/null || true)
   # Count open lines. grep -c on empty input prints 0 AND exits 1, so a naive
   # `|| echo 0` fallback double-counts to "0\n0" and garbles the header (D6);
   # gate on emptiness instead.

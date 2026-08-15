@@ -28,7 +28,7 @@ Security corrections apply to the current minor release.
 
 | Version | Support |
 |---|---|
-| Current minor release, 1.12.x | Supported |
+| Current minor release, 1.13.x | Supported |
 | Earlier releases | Not supported |
 
 Install the latest release to receive a security correction.
@@ -140,6 +140,12 @@ The Codex plugin process cannot infer the active workspace. The launcher makes
 the absolute `root` tool argument mandatory. This rule prevents an omitted root
 from selecting the installed plugin cache as a write target.
 
+The Codex manifest explicitly selects `hooks/codex-hooks.json`. That source is
+empty, so Codex does not auto-discover or execute the Claude Code adapters in
+`hooks/hooks.json`. Claude Code continues to use those adapters. This host
+boundary prevents unsupported prompt hooks and unintended automatic hook reads
+or writes in Codex.
+
 Claim acquisition uses one atomic claim-directory creation. Claim release
 checks the recorded session owner and retries a failed directory removal. The
 Python implementation gives the MCP package the same ownership and stale-claim
@@ -195,8 +201,9 @@ one new evidence identifier from the current cluster.
 
 ## Bound automatic context retrieval
 
-SessionStart and UserPromptSubmit can retrieve systemic memory automatically.
-This operation is read-only.
+Claude Code SessionStart and UserPromptSubmit can retrieve systemic memory
+automatically. Codex uses an explicit `board_context` MCP call instead. Both
+paths use the same read-only shared core.
 
 The shared core accepts bounded inputs:
 
@@ -218,9 +225,10 @@ A task-only request that has no eligible result returns a bounded diagnostic.
 The diagnostic tells the caller to add a file, entry identifier, or current
 directory. It does not treat task text as structural evidence.
 
-The hook adapters use a 3.8-second internal deadline. A timeout or malformed
-record produces a bounded warning. An unrelated prompt produces no context
-message. The adapters label titles and summaries as untrusted repository data.
+The Claude Code hook adapters use a 3.8-second internal deadline. A timeout or
+malformed record produces a bounded warning. An unrelated prompt produces no
+context message. The adapters label titles and summaries as untrusted
+repository data.
 
 The core flattens line and control separators before it returns a title or
 summary. It derives cluster scope from typed graph fields, H### content from

@@ -41,7 +41,10 @@ script uses it as the current version and updates these mirrors together:
 - `mcp-server/manifest.json`;
 - `mcp-server/server.json` and its package record;
 - `mcp-server/pyproject.toml`;
-- the README version badge.
+- the README version badge;
+- the current release line in `ARCHITECTURE.md`;
+- the current release boundary in `docs/PRODUCT_EVOLUTION_SPEC.md`;
+- the supported minor in `SECURITY.md` when the minor changes.
 
 The marketplace source contracts are intentionally different. The Claude
 marketplace keeps the legacy repository-relative `source: "./"`. The Codex
@@ -101,11 +104,14 @@ The script updates:
 - `mcp-server/server.json`;
 - `mcp-server/pyproject.toml`;
 - the README version badge;
+- the architecture and product-spec current release markers;
+- the security supported-minor marker when applicable;
 - `CHANGELOG.md`;
 - the MCP bundle checksum and release URL.
 
 The script refuses the release when the Codex and Claude plugin names or
-current versions differ. A later release therefore updates both plugin hosts
+current versions differ or a required current-truth marker is missing. A later
+release therefore updates both plugin hosts and the normative release markers
 from one coordinated version change.
 
 The prepared Codex ref names the future release tag. Do not test a fresh

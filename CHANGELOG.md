@@ -9,6 +9,28 @@ increases.
 
 ## [Unreleased]
 
+### Fixed
+
+- The Codex plugin now selects an explicit empty hook source instead of
+  auto-discovering the Claude Code hook manifest. Fresh Codex turns no longer
+  invoke the Claude SessionStart adapter, skip its prompt Stop handler, or
+  report the resulting Stop failure.
+- Claude Code SessionStart now reads live rows only from the exact `## Open`
+  section. The standard Conventions examples no longer inflate the open count
+  or render as live work.
+- This repository now ignores its documented Engineering Board runtime paths.
+  Claims, scratch capture, migration snapshots, and derived local cache state
+  no longer dirty the self-hosted worktree; canonical board memory remains
+  tracked.
+- Release preparation now advances the Architecture release line, authoritative
+  product-spec release boundary, and Security supported minor with the runtime
+  manifests. Semantic current-version drift no longer survives an otherwise
+  coherent release.
+- The authoritative current-behavior table now describes the shipped shared
+  graph, context version 3, and explicit outcome feedback. The three dated root
+  audits now identify themselves as historical snapshots instead of appearing
+  to override current product, architecture, security, or release truth.
+
 ## [1.13.1] — 2026-08-15
 
 ### Fixed

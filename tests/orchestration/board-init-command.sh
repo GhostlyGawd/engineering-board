@@ -24,6 +24,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="${1:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 
 CMD="$ROOT/commands/board-init.md"
+REPO_GITIGNORE="$ROOT/.gitignore"
 
 if [ ! -f "$CMD" ]; then
   echo "MISSING FILE: $CMD" >&2
@@ -60,6 +61,42 @@ check_re() {
   fi
 }
 
+check_file() {
+  local label="$1" file="$2" needle="$3"
+  if grep -qxF -- "$needle" "$file"; then
+    report 0 "$label"
+  else
+    report 1 "$label" "missing from ${file#$ROOT/}: $needle"
+  fi
+}
+
+check_not_ignored() {
+  local label="$1" path="$2"
+  if git -C "$ROOT" check-ignore --no-index -q -- "$path"; then
+    report 1 "$label" "canonical path is ignored: $path"
+  else
+    report 0 "$label"
+  fi
+}
+
+check_ignored() {
+  local label="$1" path="$2"
+  if git -C "$ROOT" check-ignore --no-index -q -- "$path"; then
+    report 0 "$label"
+  else
+    report 1 "$label" "runtime path is not ignored: $path"
+  fi
+}
+
+check_tracked() {
+  local label="$1" path="$2"
+  if git -C "$ROOT" ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
+    report 0 "$label"
+  else
+    report 1 "$label" "canonical path is not tracked: $path"
+  fi
+}
+
 # ── Frontmatter ─────────────────────────────────────────────────────────────
 if head -1 "$CMD" | grep -qF -- "---"; then
   report 0 "board-init.md has frontmatter delimiter"
@@ -89,6 +126,23 @@ check "gitignore: runtime _migrate-snapshot/ ignored"  "engineering-board/*/_mig
 check "gitignore: hidden runtime folder ignored"       ".engineering-board/"
 check "gitignore: consolidation.log stays committed"   "consolidation.log"
 check "gitignore: print-only (does not auto-edit)"     "do not edit \`.gitignore\` automatically"
+
+# The plugin repository dogfoods its own board. It must apply the same runtime
+# exclusions that the command prints for consuming repositories.
+check_file "self-host: hidden runtime ignored"          "$REPO_GITIGNORE" ".engineering-board/"
+check_file "self-host: runtime _sessions/ ignored"      "$REPO_GITIGNORE" "engineering-board/*/_sessions/"
+check_file "self-host: runtime _claims/ ignored"        "$REPO_GITIGNORE" "engineering-board/*/_claims/"
+check_file "self-host: runtime migration state ignored" "$REPO_GITIGNORE" "engineering-board/*/_migrate-snapshot/"
+check_ignored "self-host: scratch path matches ignore policy" "engineering-board/eb-self/_sessions/check.md"
+check_ignored "self-host: claim path matches ignore policy" "engineering-board/eb-self/_claims/B999/owner.txt"
+check_ignored "self-host: migration path matches ignore policy" "engineering-board/eb-self/_migrate-snapshot/state.json"
+check_ignored "self-host: hidden runtime path matches ignore policy" ".engineering-board/session-mode.json"
+check_not_ignored "self-host: canonical board remains tracked" "engineering-board/eb-self/BOARD.md"
+check_not_ignored "self-host: canonical graph remains tracked" "engineering-board/eb-self/GRAPH.yml"
+check_not_ignored "self-host: consolidation receipt remains tracked" "engineering-board/eb-self/consolidation.log"
+check_tracked "self-host: canonical board is in the index" "engineering-board/eb-self/BOARD.md"
+check_tracked "self-host: canonical graph is in the index" "engineering-board/eb-self/GRAPH.yml"
+check_tracked "self-host: consolidation receipt is in the index" "engineering-board/eb-self/consolidation.log"
 
 # ── --private full-tree opt-out ─────────────────────────────────────────────
 check "private: full-tree opt-out documented"          "# engineering-board (private"

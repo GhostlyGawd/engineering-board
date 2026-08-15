@@ -17,7 +17,8 @@ independently.
 1. Read `docs/RELEASING.md`.
 2. Confirm that the release branch is clean.
 3. Confirm that the Codex manifest, Claude manifest, marketplace, Python
-   package, MCP manifests, and README badge have the current version.
+   package, MCP manifests, README badge, architecture release line, product
+   release boundary, and security support line have the current version.
 4. Select the next Semantic Versioning value from the `[Unreleased]` changes.
 5. Preview the coordinated change:
 
@@ -25,7 +26,8 @@ independently.
    python3 scripts/prepare-release.py <version>
    ```
 
-6. Review every listed file and the prospective MCP bundle checksum.
+6. Review every listed file, including the current-truth documentation, and
+   the prospective MCP bundle checksum.
 7. Apply the same plan:
 
    ```bash
