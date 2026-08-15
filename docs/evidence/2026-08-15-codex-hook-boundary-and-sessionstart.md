@@ -77,7 +77,7 @@ diagnosis-effect gate, whose latest locked evidence remained below its accepted
 | SessionStart reports only canonical open rows | Required | Restrict `board-session-start.sh` to the exact `## Open` section | Add empty and one-entry fixtures with the standard Conventions footer | Architecture test matrix, changelog | Local validation and independent review passed; merged-main check pending |
 | Self-hosted runtime paths do not dirty repository status | Required | Apply the documented runtime exclusions in `.gitignore` | Pin the self-host exclusions in the board-init contract test and inspect `git check-ignore` | Changelog and this dated evidence | Local validation and independent review passed; merged-main check pending |
 | Current behavior and historical snapshots remain distinguishable | Required | No runtime change | Reject superseded section-5 claims and require opening audit banners in `tests/docs-coherence.sh` | Product spec and three dated root audits | Local validation and independent review passed; merged-main check pending |
-| Release preparation advances semantic version markers | Required | Update `scripts/prepare-release.py` with Architecture, product-spec, and supported-minor markers | Immediate patch fixture, independent minor fixture, and documentation coherence | Release skill, release procedure, architecture, changelog | Patch and minor controls passed; release apply pending |
+| Release preparation advances semantic version markers | Required | Update `scripts/prepare-release.py` with Architecture, product-spec, and supported-minor markers | Immediate patch fixture, independent minor fixture, and documentation coherence | Release skill, release procedure, architecture, changelog | 1.13.2 plan applied; merge and publication pending |
 | B071 through B076 have falsifiable completion evidence | Required | Update canonical entry lifecycle only after validation | Baseline, negative control, post-change, merged-main, and installed-artifact checks | This dated evidence file | In progress |
 | Current versions and context-contract descriptions agree | Required | No runtime change | Version and documentation coherence checks plus semantic review | Architecture, security, and product-direction spec | Corrected locally; release version pending |
 | Release and installation claims name exact immutable evidence | Required | Use the documented patch-release process only after merged-main validation | Release workflow, asset checksum, registries, fresh WSL install | Changelog and closeout evidence | Post-merge pending |
@@ -139,6 +139,13 @@ diagnosis-effect gate, whose latest locked evidence remained below its accepted
   same result and found no release blocker. These results prove repository
   checks only; installed Codex behavior, pull-request CI, merged-main CI, and
   release publication remain separate gates.
+- Coordinated release preparation applied version 1.13.2 on 2026-08-15. The
+  prospective and applied MCP bundle SHA-256 is
+  `afd0b48b4c7c9ed2bef1b056f3908aeb5e9bdbecf4285e81f4415ad921fb3a9e`.
+  Security remained on supported minor 1.13.x, as required for a patch release.
+- The exact 1.13.2 release-prepared tree produced 21 passing suites and no
+  failures in 55.7 seconds. Version coherence reported 1.13.2, release
+  preparation reported 16 passes, and the Codex plugin still exposed 19 tools.
 
 ## Delivery state
 

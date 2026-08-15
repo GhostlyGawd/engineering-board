@@ -9,6 +9,8 @@ increases.
 
 ## [Unreleased]
 
+## [1.13.2] — 2026-08-15
+
 ### Fixed
 
 - The Codex plugin now selects an explicit empty hook source instead of

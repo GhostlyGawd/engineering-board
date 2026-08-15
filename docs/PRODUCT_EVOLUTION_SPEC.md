@@ -16,7 +16,7 @@ _Started: 2026-07-27_
 _Last direction revision: 2026-08-15_
 _Product owner: GhostlyGawd_
 _Repository: `GhostlyGawd/engineering-board`_
-_Current release boundary: `v1.13.1`_
+_Current release boundary: `v1.13.2`_
 _Portfolio context: inventory-only. audit source `GhostlyGawd/repo-audit` at
 `0ced6f4136b12c6251439ff72ca8f22b6dec9b61`_
 
