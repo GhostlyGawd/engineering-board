@@ -143,8 +143,44 @@ def plan_text_changes(
     ]
     if len(matching) != 1:
         raise ReleaseError("marketplace.json must have one matching plugin entry")
+    if str(matching[0].get("version", "")) != current:
+        raise ReleaseError("Claude marketplace version must match the current version")
+    if matching[0].get("source") != "./":
+        raise ReleaseError("Claude marketplace source must remain './'")
     matching[0]["version"] = target
     changes[marketplace_path] = dump_json(marketplace)
+
+    codex_marketplace_path = root / ".agents" / "plugins" / "marketplace.json"
+    codex_marketplace = load_json(codex_marketplace_path)
+    if codex_marketplace.get("name") != plugin.get("name"):
+        raise ReleaseError("Codex marketplace name must match the plugin name")
+    codex_entries = codex_marketplace.get("plugins")
+    if not isinstance(codex_entries, list):
+        raise ReleaseError("Codex marketplace.json has no plugins list")
+    codex_matching = [
+        entry
+        for entry in codex_entries
+        if isinstance(entry, dict) and entry.get("name") == plugin.get("name")
+    ]
+    if len(codex_matching) != 1:
+        raise ReleaseError(
+            "Codex marketplace.json must have one matching plugin entry"
+        )
+    codex_entry = codex_matching[0]
+    if str(codex_entry.get("version", "")) != current:
+        raise ReleaseError("Codex marketplace version must match the current version")
+    expected_codex_source = {
+        "source": "url",
+        "url": "https://github.com/GhostlyGawd/engineering-board.git",
+        "ref": f"v{current}",
+    }
+    if codex_entry.get("source") != expected_codex_source:
+        raise ReleaseError(
+            "Codex marketplace source must use the exact release URL and current tag"
+        )
+    codex_entry["version"] = target
+    codex_entry["source"]["ref"] = f"v{target}"
+    changes[codex_marketplace_path] = dump_json(codex_marketplace)
 
     manifest_path = root / "mcp-server" / "manifest.json"
     manifest = load_json(manifest_path)

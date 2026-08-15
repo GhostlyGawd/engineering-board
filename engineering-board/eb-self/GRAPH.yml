@@ -1,0 +1,42 @@
+{
+  "schema_version": "3",
+  "generated_at": "2026-08-15T02:04:46Z",
+  "source_fingerprint": "0c3a66637cb390221ffe6b46aad4744c9bbadfee77089cbc01361d92879c7c43",
+  "build_mode": "full",
+  "project": "eb-self",
+  "entries_analyzed": {
+    "open": 1,
+    "archived": 0,
+    "total": 1
+  },
+  "nodes": {
+    "B070": {
+      "type": "bug",
+      "title": "Fresh Codex marketplace installs mutable main under a released version label",
+      "source": "bugs/B070-fresh-codex-marketplace-installs-mutable-main-under-a-releas.md",
+      "priority": "P2",
+      "status": "open",
+      "affects": ".agents/plugins/marketplace.json",
+      "discovered": "2026-08-15"
+    }
+  },
+  "edges": [],
+  "topology": {
+    "clusters": [],
+    "isolated": [
+      "B070"
+    ],
+    "cross_cluster_bridges": []
+  },
+  "unresolved_patterns": [],
+  "findings": [
+    {
+      "type": "isolated-node",
+      "node": "B070"
+    }
+  ],
+  "read_order": [
+    "B070"
+  ],
+  "drill_in": {}
+}

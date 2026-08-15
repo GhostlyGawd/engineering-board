@@ -155,6 +155,10 @@ Install the plugin:
 codex plugin add engineering-board@engineering-board
 ```
 
+The Codex marketplace installs the repository root from the immutable Git tag
+that matches the advertised plugin version. Refresh the marketplace before
+installing a newer released version.
+
 Start a new Codex session. The plugin supplies five board skills and starts the
 19-tool Engineering Board MCP server. It does not require a model-provider
 account. Codex reviews plugin hooks separately; Engineering Board does not

@@ -20,11 +20,13 @@ fail() {
   FAIL=$((FAIL + 1))
 }
 
-mkdir -p "$TMP/.claude-plugin" "$TMP/.codex-plugin" "$TMP/mcp-server" "$TMP/hooks" "$TMP/scripts"
+mkdir -p "$TMP/.agents/plugins" "$TMP/.claude-plugin" "$TMP/.codex-plugin" \
+  "$TMP/mcp-server" "$TMP/hooks" "$TMP/scripts"
 cp -R "$ROOT/hooks/scripts" "$TMP/hooks/scripts"
 cp "$ROOT/.claude-plugin/plugin.json" "$TMP/.claude-plugin/plugin.json"
 cp "$ROOT/.claude-plugin/marketplace.json" "$TMP/.claude-plugin/marketplace.json"
 cp "$ROOT/.codex-plugin/plugin.json" "$TMP/.codex-plugin/plugin.json"
+cp "$ROOT/.agents/plugins/marketplace.json" "$TMP/.agents/plugins/marketplace.json"
 for source in "$ROOT"/mcp-server/*; do
   if [ -f "$source" ]; then
     cp "$source" "$TMP/mcp-server/"
@@ -56,6 +58,7 @@ path.write_text(path.read_text().replace(marker, marker + fixture, 1))
 PY
 
 BEFORE="$(sha256sum "$TMP/.claude-plugin/plugin.json" | awk '{print $1}')"
+CODEX_MARKET_BEFORE="$(sha256sum "$TMP/.agents/plugins/marketplace.json" | awk '{print $1}')"
 if python3 "$ROOT/scripts/prepare-release.py" "$TARGET_VERSION" \
     --root "$TMP" --date 2026-07-28 --json > "$TMP/preview.json"; then
   pass "preview succeeds"
@@ -64,10 +67,29 @@ else
 fi
 
 AFTER="$(sha256sum "$TMP/.claude-plugin/plugin.json" | awk '{print $1}')"
+CODEX_MARKET_AFTER="$(sha256sum "$TMP/.agents/plugins/marketplace.json" | awk '{print $1}')"
 if [ "$BEFORE" = "$AFTER" ]; then
   pass "preview does not write files"
 else
   fail "preview does not write files"
+fi
+
+if [ "$CODEX_MARKET_BEFORE" = "$CODEX_MARKET_AFTER" ]; then
+  pass "preview does not write the Codex marketplace"
+else
+  fail "preview does not write the Codex marketplace"
+fi
+
+if python3 - "$TMP/preview.json" <<'PY'
+import json, pathlib, sys
+preview = json.loads(pathlib.Path(sys.argv[1]).read_text())
+assert preview["status"] == "preview"
+assert ".agents/plugins/marketplace.json" in preview["changed_files"]
+PY
+then
+  pass "preview plans the Codex marketplace version and ref update"
+else
+  fail "preview plans the Codex marketplace version and ref update"
 fi
 
 if python3 "$ROOT/scripts/prepare-release.py" "$TARGET_VERSION" \
@@ -84,6 +106,7 @@ target = sys.argv[2]
 plugin = json.loads((root / ".claude-plugin/plugin.json").read_text())
 codex_plugin = json.loads((root / ".codex-plugin/plugin.json").read_text())
 market = json.loads((root / ".claude-plugin/marketplace.json").read_text())
+codex_market = json.loads((root / ".agents/plugins/marketplace.json").read_text())
 manifest = json.loads((root / "mcp-server/manifest.json").read_text())
 server = json.loads((root / "mcp-server/server.json").read_text())
 pyproject = (root / "mcp-server/pyproject.toml").read_text()
@@ -93,6 +116,13 @@ assert plugin["version"] == target
 assert codex_plugin["name"] == plugin["name"]
 assert codex_plugin["version"] == target
 assert market["plugins"][0]["version"] == target
+assert market["plugins"][0]["source"] == "./"
+assert codex_market["plugins"][0]["version"] == target
+assert codex_market["plugins"][0]["source"] == {
+    "source": "url",
+    "url": "https://github.com/GhostlyGawd/engineering-board.git",
+    "ref": f"v{target}",
+}
 assert manifest["version"] == target
 assert server["version"] == target
 assert server["packages"][0]["version"] == target
@@ -160,6 +190,20 @@ if python3 "$ROOT/scripts/prepare-release.py" "${TARGET_VERSION%.*}.999" \
   fail "refresh with another version is refused"
 else
   pass "refresh with another version is refused"
+fi
+
+python3 - "$TMP/.agents/plugins/marketplace.json" <<'PY'
+import json, pathlib, sys
+path = pathlib.Path(sys.argv[1])
+market = json.loads(path.read_text())
+market["plugins"][0]["source"]["ref"] = "main"
+path.write_text(json.dumps(market, indent=2) + "\n")
+PY
+if python3 "$ROOT/scripts/prepare-release.py" "$TARGET_VERSION" \
+    --root "$TMP" --date 2026-07-28 --refresh >/dev/null 2>&1; then
+  fail "drifted Codex marketplace ref is refused"
+else
+  pass "drifted Codex marketplace ref is refused"
 fi
 
 printf "\nrelease-preparation: %d pass, %d fail\n" "$PASS" "$FAIL"

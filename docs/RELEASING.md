@@ -36,11 +36,19 @@ product version. The MCP runtime reads that field. The release-preparation
 script uses it as the current version and updates these mirrors together:
 
 - `.codex-plugin/plugin.json`;
+- `.agents/plugins/marketplace.json`;
 - `.claude-plugin/marketplace.json`;
 - `mcp-server/manifest.json`;
 - `mcp-server/server.json` and its package record;
 - `mcp-server/pyproject.toml`;
 - the README version badge.
+
+The marketplace source contracts are intentionally different. The Claude
+marketplace keeps the legacy repository-relative `source: "./"`. The Codex
+marketplace uses the repository root through the exact Git URL and pins
+`ref: v<version>`. Its entry version and tag ref must match the authoritative
+product version. Release preparation refuses either source contract when it
+has drifted.
 
 Do not use the product version for an independent protocol, schema, or data
 format. Examples include the MCP protocol date, worker `schema_version`
@@ -87,6 +95,7 @@ The script updates:
 
 - `.claude-plugin/plugin.json`;
 - `.codex-plugin/plugin.json`;
+- `.agents/plugins/marketplace.json` and its `v<version>` Git ref;
 - `.claude-plugin/marketplace.json`;
 - `mcp-server/manifest.json`;
 - `mcp-server/server.json`;
@@ -98,6 +107,10 @@ The script updates:
 The script refuses the release when the Codex and Claude plugin names or
 current versions differ. A later release therefore updates both plugin hosts
 from one coordinated version change.
+
+The prepared Codex ref names the future release tag. Do not test a fresh
+remote install or advertise the prepared version until the publication
+workflow creates that tag at the exact prepared `main` commit.
 
 Then, run:
 

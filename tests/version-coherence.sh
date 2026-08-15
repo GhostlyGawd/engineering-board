@@ -22,7 +22,8 @@ ROOT="${1:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 
 PLUGIN_JSON="$ROOT/.claude-plugin/plugin.json"
 CODEX_PLUGIN_JSON="$ROOT/.codex-plugin/plugin.json"
-MARKETPLACE_JSON="$ROOT/.claude-plugin/marketplace.json"
+CLAUDE_MARKETPLACE_JSON="$ROOT/.claude-plugin/marketplace.json"
+CODEX_MARKETPLACE_JSON="$ROOT/.agents/plugins/marketplace.json"
 MCP_SERVER_JSON="$ROOT/mcp-server/server.json"
 MCP_MANIFEST_JSON="$ROOT/mcp-server/manifest.json"
 PYPROJECT_TOML="$ROOT/mcp-server/pyproject.toml"
@@ -32,7 +33,8 @@ RELEASING_MD="$ROOT/docs/RELEASING.md"
 AGENTS_DIR="$ROOT/agents"
 SKILLS_DIR="$ROOT/skills"
 
-for f in "$PLUGIN_JSON" "$CODEX_PLUGIN_JSON" "$MARKETPLACE_JSON" \
+for f in "$PLUGIN_JSON" "$CODEX_PLUGIN_JSON" "$CLAUDE_MARKETPLACE_JSON" \
+  "$CODEX_MARKETPLACE_JSON" \
   "$MCP_SERVER_JSON" "$MCP_MANIFEST_JSON" "$PYPROJECT_TOML" "$README_MD" \
   "$PERMISSIONS_JSON" "$RELEASING_MD"; do
   if [ ! -f "$f" ]; then
@@ -56,14 +58,16 @@ fi
 # Capture without aborting on a nonzero python exit, so the FAIL diagnostic the
 # python block prints is actually echoed instead of set -e killing us silently.
 set +e
-RESULT="$(python3 - "$PLUGIN_JSON" "$CODEX_PLUGIN_JSON" "$MARKETPLACE_JSON" \
+RESULT="$(python3 - "$PLUGIN_JSON" "$CODEX_PLUGIN_JSON" \
+  "$CLAUDE_MARKETPLACE_JSON" "$CODEX_MARKETPLACE_JSON" \
   "$MCP_SERVER_JSON" "$MCP_MANIFEST_JSON" "$PYPROJECT_TOML" "$README_MD" \
   "$PERMISSIONS_JSON" "$RELEASING_MD" "$AGENTS_DIR" "$SKILLS_DIR" <<'PY'
 import json, pathlib, re, sys
 (
     plugin_path,
     codex_plugin_path,
-    marketplace_path,
+    claude_marketplace_path,
+    codex_marketplace_path,
     mcp_server_path,
     mcp_manifest_path,
     pyproject_path,
@@ -77,8 +81,10 @@ with open(plugin_path, "r", encoding="utf-8") as f:
     plugin = json.load(f)
 with open(codex_plugin_path, "r", encoding="utf-8") as f:
     codex_plugin = json.load(f)
-with open(marketplace_path, "r", encoding="utf-8") as f:
+with open(claude_marketplace_path, "r", encoding="utf-8") as f:
     market = json.load(f)
+with open(codex_marketplace_path, "r", encoding="utf-8") as f:
+    codex_market = json.load(f)
 with open(mcp_server_path, "r", encoding="utf-8") as f:
     mcp_server = json.load(f)
 with open(mcp_manifest_path, "r", encoding="utf-8") as f:
@@ -120,6 +126,48 @@ if len(match) > 1:
 market_version = match[0].get("version", "")
 if market_version != plugin_version:
     print(f"FAIL version mismatch: plugin.json={plugin_version!r} vs marketplace.json={market_version!r}")
+    sys.exit(1)
+if match[0].get("source") != "./":
+    print("FAIL Claude marketplace source must remain './'")
+    sys.exit(1)
+
+if codex_market.get("name") != plugin_name:
+    print(f"FAIL Codex marketplace name={codex_market.get('name')!r} vs plugin={plugin_name!r}")
+    sys.exit(1)
+if codex_market.get("interface", {}).get("displayName") != "Engineering Board":
+    print("FAIL Codex marketplace displayName must be 'Engineering Board'")
+    sys.exit(1)
+codex_entries = codex_market.get("plugins", [])
+codex_match = [
+    entry for entry in codex_entries
+    if isinstance(entry, dict) and entry.get("name") == plugin_name
+]
+if len(codex_entries) != 1 or len(codex_match) != 1:
+    print("FAIL Codex marketplace must contain exactly one engineering-board entry")
+    sys.exit(1)
+codex_entry = codex_match[0]
+if codex_entry.get("version") != plugin_version:
+    print(
+        f"FAIL version mismatch: plugin.json={plugin_version!r} "
+        f"vs Codex marketplace={codex_entry.get('version')!r}"
+    )
+    sys.exit(1)
+expected_codex_source = {
+    "source": "url",
+    "url": "https://github.com/GhostlyGawd/engineering-board.git",
+    "ref": f"v{plugin_version}",
+}
+if codex_entry.get("source") != expected_codex_source:
+    print(
+        "FAIL Codex marketplace source must use the exact repository URL "
+        f"and ref v{plugin_version}"
+    )
+    sys.exit(1)
+if codex_entry.get("policy") != match[0].get("policy"):
+    print("FAIL Codex and Claude marketplace policies must match")
+    sys.exit(1)
+if codex_entry.get("category") != match[0].get("category"):
+    print("FAIL Codex and Claude marketplace categories must match")
     sys.exit(1)
 
 # pyproject.toml (C3 PyPI package) must be in the same lockstep. Parsed with a
@@ -207,7 +255,7 @@ if failures:
 
 print(
     f"OK plugin={plugin_name} version={plugin_version} "
-    "(authoritative Claude manifest + Codex + marketplace + MCP + PyPI + README)"
+    "(authoritative Claude manifest + Codex + both marketplaces + MCP + PyPI + README)"
 )
 sys.exit(0)
 PY
