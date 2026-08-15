@@ -9,6 +9,15 @@ increases.
 
 ## [Unreleased]
 
+## [1.13.1] — 2026-08-15
+
+### Fixed
+
+- Fresh Codex marketplace installs now resolve the repository root from the
+  immutable `v<version>` Git tag. Release preparation and coherence tests
+  advance and enforce the Codex marketplace version and ref together while
+  preserving the Claude marketplace's legacy relative source.
+
 ## [1.13.0] — 2026-08-14
 
 ### Added

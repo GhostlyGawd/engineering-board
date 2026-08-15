@@ -14,7 +14,7 @@ _The board is the database._
 
 [![Website](https://img.shields.io/badge/website-ghostlygawd.github.io-E6A94E.svg)](https://ghostlygawd.github.io/engineering-board/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.13.0-E6A94E.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.13.1-E6A94E.svg)](CHANGELOG.md)
 [![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
 [![Codex plugin](https://img.shields.io/badge/Codex-plugin-171719.svg)](https://developers.openai.com/codex/plugins)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
@@ -154,6 +154,10 @@ Install the plugin:
 ```sh
 codex plugin add engineering-board@engineering-board
 ```
+
+The Codex marketplace installs the repository root from the immutable Git tag
+that matches the advertised plugin version. Refresh the marketplace before
+installing a newer released version.
 
 Start a new Codex session. The plugin supplies five board skills and starts the
 19-tool Engineering Board MCP server. It does not require a model-provider

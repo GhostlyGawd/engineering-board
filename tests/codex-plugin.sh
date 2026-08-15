@@ -21,11 +21,28 @@ root = pathlib.Path(sys.argv[1])
 manifest = json.loads((root / ".codex-plugin/plugin.json").read_text())
 mcp = json.loads((root / ".mcp.json").read_text())
 claude = json.loads((root / ".claude-plugin/plugin.json").read_text())
+claude_market = json.loads((root / ".claude-plugin/marketplace.json").read_text())
+codex_market = json.loads((root / ".agents/plugins/marketplace.json").read_text())
 
 assert manifest["name"] == claude["name"] == "engineering-board"
 assert manifest["version"] == claude["version"]
 assert manifest["skills"] == "./skills/"
 assert manifest["mcpServers"] == "./.mcp.json"
+assert claude_market["plugins"][0]["source"] == "./"
+assert codex_market["name"] == "engineering-board"
+assert codex_market["interface"]["displayName"] == "Engineering Board"
+assert len(codex_market["plugins"]) == 1
+codex_entry = codex_market["plugins"][0]
+claude_entry = claude_market["plugins"][0]
+assert codex_entry["name"] == manifest["name"]
+assert codex_entry["version"] == manifest["version"]
+assert codex_entry["source"] == {
+    "source": "url",
+    "url": "https://github.com/GhostlyGawd/engineering-board.git",
+    "ref": f"v{manifest['version']}",
+}
+assert codex_entry["policy"] == claude_entry["policy"]
+assert codex_entry["category"] == claude_entry["category"]
 assert set(mcp["mcpServers"]) == {"engineering-board"}
 server = mcp["mcpServers"]["engineering-board"]
 assert server == {
@@ -74,4 +91,4 @@ assert missing_root["isError"] is True
 assert "missing required argument: root" in missing_root["content"][0]["text"]
 PY
 
-echo "codex-plugin: manifest, isolated MCP configuration, launcher, and 19 tools verified"
+echo "codex-plugin: pinned marketplace, manifest, isolated MCP configuration, launcher, and 19 tools verified"

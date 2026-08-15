@@ -37,6 +37,8 @@ Mode is persisted in `.engineering-board/session-mode.json` and read on every St
 
 ```
 engineering-board/
+├── .agents/
+│   └── plugins/marketplace.json    # Codex catalog; root Git source pinned to v<version>
 ├── .codex-plugin/
 │   └── plugin.json                 # Codex manifest and product interface
 ├── .claude-plugin/
@@ -407,8 +409,8 @@ authoritative list. `spike/` is a standalone mini-plugin check.
 | `security/reject-filter.sh` | drives every `fixtures/adversarial-paste/` (≥30) and `fixtures/benign-findings/` (≥20) fixture through the canonical `board_reject_check.py` filter. 100% reject (with declared reason) + 100% accept | `bash tests/security/reject-filter.sh` |
 | `session-start/` | SessionStart correctness (empty-board count, blocking map) + a perf guard (1200-entry board < 10s) | `bash tests/session-start/automated.sh` |
 | `view/` | `/board-view` HTML generator: document structure, pipeline columns, byte-determinism, HTML-escaping of untrusted entry text | `bash tests/view/automated.sh` |
-| `version-coherence` | `plugin.json` == `marketplace.json` version lockstep | `bash tests/version-coherence.sh` |
-| `release-preparation` | release-plan validation, version coherence, and reproducible bundle preparation | `bash tests/release-preparation.sh` |
+| `version-coherence` | Plugin versions and both marketplaces align; Claude stays relative and Codex pins the matching release tag | `bash tests/version-coherence.sh` |
+| `release-preparation` | Release-plan validation, Codex version/ref advancement, and reproducible bundle preparation | `bash tests/release-preparation.sh` |
 | `docs-coherence` | current documentation links, counts, and contract markers | `bash tests/docs-coherence.sh` |
 | `token-coherence` | content-bound plan token behavior | `bash tests/token-coherence.sh` |
 | `evaluation-harness` | frozen corpus, isolated pairs, exclusive-create attempts, product gates, and bounded reports | `bash tests/evaluation/automated.sh` |
