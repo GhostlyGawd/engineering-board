@@ -1,7 +1,7 @@
 ---
 id: B074
 type: bug
-status: in_progress
+status: resolved
 needs: validate
 priority: P2
 title: Self-hosted claim locks dirty the repository because runtime board paths are not ignored
@@ -29,3 +29,7 @@ promoted_from: [mcp:_sessions/mcp-2026-08-15.md:dec01777b4997312]
 - **goal-hooks-20260815** 2026-08-15T03:46:38Z: Claimed after the released MCP workflow reproduced unignored self-hosted runtime state; the printed board-init stanza is the expected contract.
 - **goal-hooks-20260815** 2026-08-15T04:05:39Z: Focused checks and the settled complete suite pass. Advanced from TDD to independent review; merged-main and installed-artifact gates remain open.
 - **goal-hooks-20260815** 2026-08-15T04:07:31Z: Independent read-only review found no remaining release blocker after patch and minor release-path coverage. Advanced to validation; installed and merged-main gates remain open.
+
+## Release validation — 2026-08-15
+
+Claims plus the B077 capture and promotion produced no visible claim, live session, migration snapshot, or derived-cache path in git status; canonical state remained visible. See docs/evidence/2026-08-15-v1.13.2-release-and-installed-validation.md.
