@@ -9,6 +9,8 @@ increases.
 
 ## [Unreleased]
 
+## [1.13.1] — 2026-08-15
+
 ### Fixed
 
 - Fresh Codex marketplace installs now resolve the repository root from the
