@@ -2,6 +2,12 @@
 
 Resolved entries. Newest at the top.
 
+- B076 | Dated root audit snapshots can be mistaken for current product truth | resolved: 2026-08-15
+- B075 | Authoritative current-behavior table describes superseded graph context and outcome limitations | resolved: 2026-08-15
+- B074 | Self-hosted claim locks dirty the repository because runtime board paths are not ignored | resolved: 2026-08-15
+- B073 | SessionStart counts BOARD convention examples as open entries | resolved: 2026-08-15
+- B072 | Codex skips the prompt Stop hook and reports failure after every turn | resolved: 2026-08-15
+- B071 | Codex auto-loads Claude hook adapters that require CLAUDE_PROJECT_DIR | resolved: 2026-08-15
 - B070 | Fresh Codex marketplace installs mutable main under a released version label | resolved: 2026-08-15
 - F003 | Surface matched Learnings at the moment of need (session summary + viewer panel) | pattern: learnings-surfacing | resolved: 2026-08-14
 - B020 | board-migrate is two unrelated operations under one verb | pattern: surface-overload | resolved: 2026-08-14

@@ -160,3 +160,19 @@ request.
 
 Terminal action: keep B071 through B076 open until merged-main and installed
 behavior satisfy their named criteria.
+
+## Superseding closeout
+
+The post-merge gates completed later on 2026-08-15. PR #150 merged as
+`2db7cd13fb1337e98e31e6fa3bf33390520ad995`; exact merged-main tests, Pages,
+dependency-graph, release workflow, GitHub Release, PyPI, MCP Registry, WSL
+reinstall, installed hook-boundary checks, installed SessionStart, and direct
+installed MCP checks passed. The separate
+`2026-08-15-v1.13.2-release-and-installed-validation.md` record contains the
+immutable values and evidence boundaries. B071 through B076 can resolve.
+
+The installed dogfood pass also found that non-interactive Codex tool calls
+were cancelled during approval elicitation. A separate `tools/list` check
+showed no read/write annotations. B077 records both observations and requires a
+controlled test before it attributes causality. The cancelled calls are not
+counted as a pass for the successful-call gate.

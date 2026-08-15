@@ -1,7 +1,7 @@
 ---
 id: B076
 type: bug
-status: in_progress
+status: resolved
 needs: validate
 priority: P2
 title: Dated root audit snapshots can be mistaken for current product truth
@@ -29,3 +29,7 @@ promoted_from: [mcp:_sessions/mcp-2026-08-15.md:183b41979669e676]
 - **goal-hooks-20260815** 2026-08-15T03:58:52Z: Claimed after semantic review confirmed that dated audit snapshots lacked an explicit historical and supersession boundary.
 - **goal-hooks-20260815** 2026-08-15T04:05:39Z: Focused checks and the settled complete suite pass. Advanced from TDD to independent review; merged-main and installed-artifact gates remain open.
 - **goal-hooks-20260815** 2026-08-15T04:07:31Z: Independent read-only review found no remaining release blocker after patch and minor release-path coverage. Advanced to validation; installed and merged-main gates remain open.
+
+## Release validation — 2026-08-15
+
+The released root audits now identify themselves as historical snapshots and point to current normative sources. See docs/evidence/2026-08-15-v1.13.2-release-and-installed-validation.md.

@@ -1,7 +1,7 @@
 ---
 id: B075
 type: bug
-status: in_progress
+status: resolved
 needs: validate
 priority: P2
 title: Authoritative current-behavior table describes superseded graph context and outcome limitations
@@ -29,3 +29,7 @@ promoted_from: [mcp:_sessions/mcp-2026-08-15.md:f44c98e116cd5a32]
 - **goal-hooks-20260815** 2026-08-15T03:58:52Z: Claimed after semantic review confirmed that the authoritative current-behavior table contradicted shipped graph, context, and outcome behavior.
 - **goal-hooks-20260815** 2026-08-15T04:05:39Z: Focused checks and the settled complete suite pass. Advanced from TDD to independent review; merged-main and installed-artifact gates remain open.
 - **goal-hooks-20260815** 2026-08-15T04:07:31Z: Independent read-only review found no remaining release blocker after patch and minor release-path coverage. Advanced to validation; installed and merged-main gates remain open.
+
+## Release validation — 2026-08-15
+
+The released specification and coherence gates now describe shipped graph memory, context contract v3, ranking v2, structured outcomes, and the failed D.1 claim boundary. See docs/evidence/2026-08-15-v1.13.2-release-and-installed-validation.md.

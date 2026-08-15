@@ -1,7 +1,7 @@
 ---
 id: B073
 type: bug
-status: in_progress
+status: resolved
 needs: validate
 priority: P2
 title: SessionStart counts BOARD convention examples as open entries
@@ -29,3 +29,7 @@ promoted_from: [mcp:_sessions/mcp-2026-08-15.md:337b5dbe8dcecf8d]
 - **goal-hooks-20260815** 2026-08-15T03:40:12Z: Claimed for the section-bounded SessionStart checkpoint; the standard Conventions footer is the negative control.
 - **goal-hooks-20260815** 2026-08-15T04:05:39Z: Focused checks and the settled complete suite pass. Advanced from TDD to independent review; merged-main and installed-artifact gates remain open.
 - **goal-hooks-20260815** 2026-08-15T04:07:31Z: Independent read-only review found no remaining release blocker after patch and minor release-path coverage. Advanced to validation; installed and merged-main gates remain open.
+
+## Release validation — 2026-08-15
+
+The installed v1.13.2 Claude SessionStart path rendered exactly B071 through B076 from the Open section and no Conventions row. See docs/evidence/2026-08-15-v1.13.2-release-and-installed-validation.md.
