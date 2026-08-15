@@ -4,7 +4,9 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ## Open
 
-- B070 P2 | [Fresh Codex marketplace installs mutable main under a released version label](bugs/B070-fresh-codex-marketplace-installs-mutable-main-under-a-releas.md)
+- B071 P2 | [Codex hook adapters fail to derive the repository root without CLAUDE_PROJECT_DIR](bugs/B071-codex-hook-adapters-fail-to-derive-the-repository-root-witho.md)
+- B072 P2 | [Codex skips the prompt Stop hook and reports failure after every turn](bugs/B072-codex-skips-the-prompt-stop-hook-and-reports-failure-after-e.md)
+- B073 P2 | [SessionStart counts BOARD convention examples as open entries](bugs/B073-sessionstart-counts-board-convention-examples-as-open-entrie.md)
 - L001 | [Ship every deterministic guard with a test that drives its real fixtures and call-sites](learnings/L001-guards-need-tests-that-drive-real-callsites.md)
 - L002 | [Board health invariants must respect the open-vs-resolved entry lifecycle](learnings/L002-invariants-must-respect-the-entry-lifecycle.md)
 - L003 | [The newest surface carries the most risk — red-team it hardest](learnings/L003-newest-surfaces-carry-the-most-risk.md)

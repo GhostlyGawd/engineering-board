@@ -1,42 +1,167 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-08-15T02:04:46Z",
-  "source_fingerprint": "0c3a66637cb390221ffe6b46aad4744c9bbadfee77089cbc01361d92879c7c43",
+  "generated_at": "2026-08-15T02:45:35Z",
+  "source_fingerprint": "cf5a1f67ed439fcbdf522f830ee902d1aa3c4dccb63079b357ca1b9249d2509c",
   "build_mode": "full",
   "project": "eb-self",
   "entries_analyzed": {
-    "open": 1,
+    "open": 3,
     "archived": 0,
-    "total": 1
+    "total": 3
   },
   "nodes": {
-    "B070": {
+    "B071": {
       "type": "bug",
-      "title": "Fresh Codex marketplace installs mutable main under a released version label",
-      "source": "bugs/B070-fresh-codex-marketplace-installs-mutable-main-under-a-releas.md",
+      "title": "Codex hook adapters fail to derive the repository root without CLAUDE_PROJECT_DIR",
+      "source": "bugs/B071-codex-hook-adapters-fail-to-derive-the-repository-root-witho.md",
       "priority": "P2",
       "status": "open",
-      "affects": ".agents/plugins/marketplace.json",
+      "affects": "hooks/scripts/board-paths.sh",
+      "discovered": "2026-08-15"
+    },
+    "B072": {
+      "type": "bug",
+      "title": "Codex skips the prompt Stop hook and reports failure after every turn",
+      "source": "bugs/B072-codex-skips-the-prompt-stop-hook-and-reports-failure-after-e.md",
+      "priority": "P2",
+      "status": "open",
+      "affects": "hooks/hooks.json",
+      "discovered": "2026-08-15"
+    },
+    "B073": {
+      "type": "bug",
+      "title": "SessionStart counts BOARD convention examples as open entries",
+      "source": "bugs/B073-sessionstart-counts-board-convention-examples-as-open-entrie.md",
+      "priority": "P2",
+      "status": "open",
+      "affects": "hooks/scripts/board-session-start.sh",
       "discovered": "2026-08-15"
     }
   },
-  "edges": [],
+  "edges": [
+    {
+      "from": "B071",
+      "to": "B072",
+      "kind": "shared-affects-prefix",
+      "value": "hooks/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B071",
+          "field": "affects",
+          "source": "bugs/B071-codex-hook-adapters-fail-to-derive-the-repository-root-witho.md"
+        },
+        {
+          "entry": "B072",
+          "field": "affects",
+          "source": "bugs/B072-codex-skips-the-prompt-stop-hook-and-reports-failure-after-e.md"
+        }
+      ]
+    },
+    {
+      "from": "B071",
+      "to": "B073",
+      "kind": "shared-affects-prefix",
+      "value": "hooks/scripts/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B071",
+          "field": "affects",
+          "source": "bugs/B071-codex-hook-adapters-fail-to-derive-the-repository-root-witho.md"
+        },
+        {
+          "entry": "B073",
+          "field": "affects",
+          "source": "bugs/B073-sessionstart-counts-board-convention-examples-as-open-entrie.md"
+        }
+      ]
+    },
+    {
+      "from": "B072",
+      "to": "B073",
+      "kind": "shared-affects-prefix",
+      "value": "hooks/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B072",
+          "field": "affects",
+          "source": "bugs/B072-codex-skips-the-prompt-stop-hook-and-reports-failure-after-e.md"
+        },
+        {
+          "entry": "B073",
+          "field": "affects",
+          "source": "bugs/B073-sessionstart-counts-board-convention-examples-as-open-entrie.md"
+        }
+      ]
+    }
+  ],
   "topology": {
-    "clusters": [],
-    "isolated": [
-      "B070"
+    "clusters": [
+      {
+        "id": "C001",
+        "fingerprint": "c-6e8674cea31b2d37",
+        "members": [
+          "B071",
+          "B072",
+          "B073"
+        ],
+        "pattern_ids": [],
+        "patterns": [],
+        "affected_domains": [
+          "hooks"
+        ],
+        "signals": [
+          {
+            "kind": "shared-affects-prefix",
+            "value": "hooks/",
+            "members": [
+              "B071",
+              "B072",
+              "B073"
+            ]
+          },
+          {
+            "kind": "shared-affects-prefix",
+            "value": "hooks/scripts/",
+            "members": [
+              "B071",
+              "B073"
+            ]
+          }
+        ],
+        "density": 1.0
+      }
     ],
+    "isolated": [],
     "cross_cluster_bridges": []
   },
   "unresolved_patterns": [],
   "findings": [
     {
-      "type": "isolated-node",
-      "node": "B070"
+      "type": "dense-cluster",
+      "cluster_id": "C001",
+      "members": [
+        "B071",
+        "B072",
+        "B073"
+      ],
+      "density": 1.0,
+      "shared_dimensions": {
+        "patterns": []
+      },
+      "internal_edges": 3
     }
   ],
   "read_order": [
-    "B070"
+    "C001"
   ],
-  "drill_in": {}
+  "drill_in": {
+    "C001": [
+      "B071",
+      "B072",
+      "B073"
+    ]
+  }
 }

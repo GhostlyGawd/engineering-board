@@ -2,6 +2,7 @@
 
 Resolved entries. Newest at the top.
 
+- B070 | Fresh Codex marketplace installs mutable main under a released version label | resolved: 2026-08-15
 - F003 | Surface matched Learnings at the moment of need (session summary + viewer panel) | pattern: learnings-surfacing | resolved: 2026-08-14
 - B020 | board-migrate is two unrelated operations under one verb | pattern: surface-overload | resolved: 2026-08-14
 - B069 | Resolved entries append below older archive rows despite newest-first contract | resolved: 2026-08-14
