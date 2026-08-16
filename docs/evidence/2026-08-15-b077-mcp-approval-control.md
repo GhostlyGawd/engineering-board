@@ -4,8 +4,9 @@
 
 This file is the durable workpad and dated evidence record for B077. The
 authoritative repository is `GhostlyGawd/engineering-board`. The live default
-branch is `main` at `ead021f3489f855e0a7dc6c03ee6ec3103a93df4`. The current
-worker branch is `codex/b077-mcp-approval-control` from that commit.
+branch released v1.13.3 at
+`f4b44d9c8b63def225be2f3e9daa22309713768f`. The current closeout branch is
+`codex/v1.13.3-release-evidence` from that commit.
 
 Engineering Board must deliver relevant, source-linked repository memory when
 an agent makes an engineering decision. Approval behavior supports this outcome
@@ -23,9 +24,9 @@ the product outcome.
 - [x] Implement the smallest supported change only if the control supports it.
 - [x] Run focused checks and the complete maintained suite on the final
   reviewed diff.
-- [ ] Complete independent review, pull-request CI, merged-main CI, release,
+- [x] Complete independent review, pull-request CI, merged-main CI, release,
   reinstall, and installed-host validation when a product change ships.
-- [ ] Run two consecutive representative installed dogfood passes before B077
+- [x] Run two consecutive representative installed dogfood passes before B077
   resolves.
 
 ## Acceptance criteria
@@ -44,16 +45,16 @@ the product outcome.
 
 ### Post-merge phase
 
-- [ ] Pull-request checks and exact merged-main checks pass.
-- [ ] The immutable release tag, bundle, registry records, and package records
+- [x] Pull-request checks and exact merged-main checks pass.
+- [x] The immutable release tag, bundle, registry records, and package records
   identify the same merged commit if a release is required.
 
 ### Closeout phase
 
-- [ ] A fresh installed Codex process completes `board_status` and
+- [x] A fresh installed Codex process completes `board_status` and
   `board_context` without a per-call prompt.
-- [ ] A mutating board control remains approval-gated or denied.
-- [ ] Two consecutive representative passes cover initialization, capture and
+- [x] A mutating board control remains approval-gated or denied.
+- [x] Two consecutive representative passes cover initialization, capture and
   claim, graph and context retrieval, hooks, and installation without a new
   reproducible blocker, false state, data-loss risk, recurring error, or
   undocumented workaround.
@@ -103,11 +104,11 @@ read-only sandbox.
 
 | Contract item | Normative level | Implementation | Test | Docs/example | Status |
 |---|---|---|---|---|---|
-| Read-only context retrieval can run under the supported Codex `writes` policy | Required | Six pure-read tools expose `readOnlyHint: true`; Codex-specific config selects `writes` | Annotated versus unannotated host control passed; installed `board_status`/`board_context` pending | README, MCP server guide, architecture, security, LLM guidance, changelog, dated evidence | Worker evidence passed; installed gate pending |
-| Mutating board operations remain approval-gated or denied | Required | Every tool with a write-capable branch exposes `readOnlyHint: false` | Equivalent mutating control passed; installed board mutation control pending | Security, MCP server guide, dated evidence | Worker evidence passed; installed gate pending |
+| Read-only context retrieval can run under the supported Codex `writes` policy | Required | Six pure-read tools expose `readOnlyHint: true`; Codex-specific config selects `writes` | Annotated versus unannotated host control and installed `board_status`/`board_context` passed | README, MCP server guide, architecture, security, LLM guidance, changelog, dated evidence | Installed gate passed |
+| Mutating board operations remain approval-gated or denied | Required | Every tool with a write-capable branch exposes `readOnlyHint: false` | Equivalent source and installed board mutation controls cancelled before execution | Security, MCP server guide, dated evidence | Installed gate passed |
 | Public tool metadata describes actual side effects conservatively | Required | All 19 tools expose four Boolean annotations; mixed tools use maximum capability | Exact and repeated `tools/list` assertions plus paths-and-bytes snapshots for every declared read tool and one mutating detector control | MCP server guide, architecture, changelog | Focused checks passed |
 | Product memory semantics remain unchanged | Required | Graph, context, hypotheses, outcomes, entries, and claims retain their existing handlers | Existing graph, context, outcome, evaluation, lifecycle, and security suites | Product evolution specification, examples, visuals | Complete regression suite passed |
-| Release and installation claims identify immutable artifacts | Required if a release ships | Use the documented patch-release process after merged-main checks | Version coherence, release workflow, registry and installed-revision checks | Release guide, changelog, closeout evidence | Post-merge pending |
+| Release and installation claims identify immutable artifacts | Required if a release ships | Used the documented patch-release process after merged-main checks | Version coherence, release workflow, registry, asset checksum, and installed-revision checks | Release guide, changelog, closeout evidence | Published and installed |
 
 ## Implementation progress
 
@@ -162,6 +163,17 @@ read-only sandbox.
 - Strict Claude validation exposed a separate, pre-existing ignored
   `plugins[0].policy` field. The board captured and promoted that finding as
   B078 instead of folding it into B077 or hiding it behind normal validation.
+- Release workflow `31917453698` published v1.13.3 from merged main
+  `f4b44d9c8b63def225be2f3e9daa22309713768f`. The immutable tag, 66,718-byte
+  bundle, SHA-256 pin, MCP Registry latest record, PyPI files, and installed
+  revision align.
+- A fresh installed Codex process completed real `board_status` and
+  `board_context` calls without a prompt. The installed write control was
+  cancelled before server execution.
+- Two counted isolated passes retrieved path-scoped L001 memory through both
+  MCP context and installed SessionStart, with no warning. Both passes covered
+  initialization, capture, promotion, claim, graph, context, hook, release,
+  and automatic temporary-repository cleanup.
 
 ## Uncertainties and assumptions
 
@@ -170,13 +182,13 @@ read-only sandbox.
   remain separate gates.
 - Tool-level annotations cannot vary by input. A tool that has both preview
   and mutation modes must be classified by its possible mutating behavior.
-- Codex 0.145.0 accepts the bundled `writes` default, but only a fresh released
-  installation can prove the packaged path and user-policy overlay together.
+- The installed controls prove Codex 0.145.0 uses the packaged `writes`
+  default. A user or managed environment can still choose a stricter policy.
 
 ## Blockers
 
-No human action is required. The remaining gates are repository regression,
-review, delivery, release, reinstall, and installed-host validation.
+No human action is required. The remaining gate is the evidence pull request,
+its merged-main checks, and final canonical B077 revalidation.
 
 ## Handoff and resume route
 
@@ -184,16 +196,16 @@ Completion state: `post-merge-pending`.
 
 Next owner: the primary dogfood loop.
 
-Remaining gates: pull-request CI, merged-main CI, release and registry checks,
-reinstall, installed positive and negative controls, and two representative
-passes.
+Remaining gates: merge the release-evidence pull request, pass its exact
+merged-main checks, and revalidate B077 from canonical main.
 
 Evidence destination: this file for worker and post-merge evidence; append a
 separate dated closeout record only when release and installed evidence require
 a follow-up pull request.
 
-Resume route: proceed through the normal pull-request and patch-release
-lifecycle, then run the installed controls from fresh Codex processes.
+Resume route: deliver the release-evidence pull request, then revalidate the
+canonical entry from merged main and resolve it through a final lifecycle
+change.
 
 Terminal action: `keep-open`. Keep B077 open until every closeout criterion
 passes.
