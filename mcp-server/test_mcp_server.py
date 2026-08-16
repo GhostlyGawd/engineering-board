@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pure-python3 test for the engineering-board MCP server (zero third-party deps).
 
-Two suites:
+Core suites include:
 
   1. A REAL end-to-end stdio session: spawn engineering_board_mcp.py as a
      subprocess, drive initialize -> notifications/initialized -> tools/list ->
@@ -12,6 +12,10 @@ Two suites:
      board_rebuild -> board_status -> board_capture_finding -> board_claim /
      board_release. Every created entry file is checked against the REAL
      hooks/scripts/board-validate-entry.sh.
+
+  3. A filesystem side-effect contract: every tool declared read-only runs
+     against a real board while a paths-and-bytes snapshot stays unchanged.
+     One mutating tool proves that the snapshot detector observes writes.
 
 Exit 0 on all-pass; non-zero with a diff/detail on the first failure.
 Runnable as: python3 mcp-server/test_mcp_server.py
@@ -31,6 +35,38 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SERVER_PATH = os.path.join(HERE, "engineering_board_mcp.py")
 PLUGIN_ROOT = os.path.dirname(HERE)
 VALIDATE_SCRIPT = os.path.join(PLUGIN_ROOT, "hooks", "scripts", "board-validate-entry.sh")
+
+EXPECTED_TOOL_ANNOTATIONS = {
+    "board_init": (False, True, True, False),
+    "board_list_projects": (True, False, True, False),
+    "board_create_entry": (False, True, False, False),
+    "board_list_entries": (True, False, True, False),
+    "board_get_entry": (True, False, True, False),
+    "board_update_entry": (False, True, False, False),
+    "board_graph": (False, True, False, False),
+    "board_insights": (True, False, True, False),
+    "board_context": (True, False, True, False),
+    "board_outcomes": (False, True, True, False),
+    "board_hypotheses": (False, True, True, False),
+    "board_patterns": (False, True, True, False),
+    "board_promote_findings": (False, True, False, False),
+    "board_rebuild": (False, True, True, False),
+    "board_capture_finding": (False, False, False, False),
+    "board_claim": (False, False, True, False),
+    "board_release": (False, True, True, False),
+    "board_remember": (False, True, False, False),
+    "board_status": (True, False, True, False),
+}
+
+
+def expected_annotations(values):
+    read_only, destructive, idempotent, open_world = values
+    return {
+        "readOnlyHint": read_only,
+        "destructiveHint": destructive,
+        "idempotentHint": idempotent,
+        "openWorldHint": open_world,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -114,17 +150,23 @@ def suite_stdio(tmp_repo):
         r = recv()
         tools = r.get("result", {}).get("tools", [])
         names = {t["name"] for t in tools}
-        expected = {"board_init", "board_list_projects", "board_create_entry",
-                    "board_list_entries", "board_get_entry", "board_update_entry",
-                    "board_rebuild", "board_capture_finding", "board_claim",
-                    "board_release", "board_status", "board_remember",
-                    "board_graph", "board_patterns", "board_promote_findings",
-                    "board_insights", "board_hypotheses"}
-        check(expected <= names, "tools/list exposes all expected tools",
-              "missing: %s" % (expected - names))
+        expected = set(EXPECTED_TOOL_ANNOTATIONS)
+        check(names == expected, "tools/list exposes the exact 19-tool contract",
+              "missing: %s; unexpected: %s" % (expected - names, names - expected))
         for t in tools:
             check(isinstance(t.get("inputSchema"), dict) and t["inputSchema"].get("type") == "object",
                   "tool %s has object inputSchema" % t["name"])
+            check(set(t) == {"name", "description", "inputSchema", "annotations"},
+                  "tool %s exposes only public schema fields" % t["name"],
+                  "fields: %s" % sorted(t))
+            check(t.get("annotations") == expected_annotations(
+                      EXPECTED_TOOL_ANNOTATIONS[t["name"]]),
+                  "tool %s annotations match side effects" % t["name"],
+                  json.dumps(t.get("annotations"), sort_keys=True))
+
+        send({"jsonrpc": "2.0", "id": 30, "method": "tools/list"})
+        repeated = recv().get("result", {}).get("tools", [])
+        check(repeated == tools, "repeated tools/list is value-stable")
 
         # tools/call board_init via stdio
         send({"jsonrpc": "2.0", "id": 4, "method": "tools/call",
@@ -550,6 +592,24 @@ def suite_lifecycle(mod, tmp_repo):
     cl = mod.tool_board_claim({"project": "atlas", "root": root, "entry_id": "B001",
                                "session_id": "sess-test-1"})
     check(cl["acquired"] is True and cl["exit_code"] == 0, "board_claim acquired", json.dumps(cl))
+    claim_dir = Path(root, "engineering-board", "atlas", "_claims", "B001")
+    claim_snapshot = {
+        path.name: path.read_bytes()
+        for path in sorted(claim_dir.iterdir())
+        if path.is_file()
+    }
+    cl_replay = mod.tool_board_claim(
+        {"project": "atlas", "root": root, "entry_id": "B001",
+         "session_id": "sess-test-1"}
+    )
+    replay_snapshot = {
+        path.name: path.read_bytes()
+        for path in sorted(claim_dir.iterdir())
+        if path.is_file()
+    }
+    check(cl_replay["exit_code"] == 1 and replay_snapshot == claim_snapshot,
+          "same-session board_claim replay adds no environment effect",
+          json.dumps(cl_replay))
     # second claim by a different session -> contended (exit 1)
     cl2 = mod.tool_board_claim({"project": "atlas", "root": root, "entry_id": "B001",
                                 "session_id": "sess-test-2"})
@@ -558,6 +618,16 @@ def suite_lifecycle(mod, tmp_repo):
     rel = mod.tool_board_release({"project": "atlas", "root": root, "entry_id": "B001",
                                   "session_id": "sess-test-1"})
     check(rel["released"] is True and rel["exit_code"] == 0, "board_release released", json.dumps(rel))
+    claims_dir = claim_dir.parent
+    release_snapshot = sorted(path.name for path in claims_dir.iterdir())
+    rel_replay = mod.tool_board_release(
+        {"project": "atlas", "root": root, "entry_id": "B001",
+         "session_id": "sess-test-1"}
+    )
+    check(rel_replay["exit_code"] == 3
+          and sorted(path.name for path in claims_dir.iterdir()) == release_snapshot,
+          "board_release replay adds no environment effect",
+          json.dumps(rel_replay))
 
     observation = mod.tool_board_create_entry({
         "project": "atlas", "root": root, "type": "observation",
@@ -635,6 +705,95 @@ def suite_lifecycle(mod, tmp_repo):
     })
     rc, err = run_validate(os.path.join(root, learn["file"]), root)
     check(rc == 0, "created learning passes board-validate-entry.sh", err)
+
+
+# ---------------------------------------------------------------------------
+# Suite: annotated read-only tools leave repository bytes unchanged
+# ---------------------------------------------------------------------------
+def _tree_snapshot(root):
+    """Return all relative directory paths and file bytes under root."""
+    base = Path(root)
+    directories = []
+    files = {}
+    for path in sorted(base.rglob("*")):
+        relative = path.relative_to(base).as_posix()
+        if path.is_dir():
+            directories.append(relative + "/")
+        elif path.is_file():
+            files[relative] = path.read_bytes()
+    return tuple(directories), files
+
+
+def suite_read_only_side_effects(mod):
+    """Tie readOnlyHint declarations to observed repository behavior."""
+    print("\n== Suite: annotated read-only side effects ==")
+    root = tempfile.mkdtemp(prefix="eb-mcp-read-only-")
+    project = "read-only"
+    try:
+        mod.tool_board_init({"project": project, "root": root,
+                             "agents_md": False})
+        created = mod.tool_board_create_entry({
+            "project": project,
+            "root": root,
+            "type": "bug",
+            "title": "Read tools preserve repository bytes",
+            "priority": "P2",
+            "affects": "src/read.py",
+            "done_when": ["Every declared read tool leaves paths and bytes unchanged."],
+        })
+        mod.tool_board_graph({"project": project, "root": root, "full": True})
+
+        arguments = {
+            "board_list_projects": {"root": root},
+            "board_list_entries": {"project": project, "root": root},
+            "board_get_entry": {
+                "project": project, "root": root, "entry_id": created["id"],
+            },
+            "board_insights": {"project": project, "root": root},
+            "board_context": {
+                "project": project,
+                "root": root,
+                "task": "Inspect src/read.py without changing repository state.",
+                "files": ["src/read.py"],
+                "entry_ids": [created["id"]],
+                "cwd": root,
+            },
+            "board_status": {"project": project, "root": root},
+        }
+        declared = {
+            tool["name"]: tool
+            for tool in mod.TOOLS
+            if tool["annotations"]["readOnlyHint"] is True
+        }
+        check(set(declared) == set(arguments),
+              "behavior fixture covers every declared read-only tool",
+              "declared=%s fixture=%s" %
+              (sorted(declared), sorted(arguments)))
+
+        baseline = _tree_snapshot(root)
+        for name in sorted(declared):
+            declared[name]["handler"](arguments[name])
+            check(_tree_snapshot(root) == baseline,
+                  "%s leaves repository paths and bytes unchanged" % name)
+
+        mutating = next(
+            tool for tool in mod.TOOLS
+            if tool["name"] == "board_capture_finding"
+        )
+        check(mutating["annotations"]["readOnlyHint"] is False,
+              "mutation control is not declared read-only")
+        mutating["handler"]({
+            "project": project,
+            "root": root,
+            "kind": "observation",
+            "title": "Snapshot mutation control",
+            "affects": "src/read.py",
+            "evidence": "The detector must observe this scratch write.",
+        })
+        check(_tree_snapshot(root) != baseline,
+              "paths-and-bytes detector observes the mutation control")
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
 
 
 # ---------------------------------------------------------------------------
@@ -1170,6 +1329,7 @@ def main():
     try:
         suite_stdio(tmp1)
         suite_lifecycle(mod, tmp2)
+        suite_read_only_side_effects(mod)
         suite_ready(mod)
         suite_remember(mod)
         suite_comments_parent(mod)

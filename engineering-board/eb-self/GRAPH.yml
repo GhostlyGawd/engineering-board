@@ -1,13 +1,13 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-08-15T04:44:47Z",
-  "source_fingerprint": "8cde9c7dfcd7302ca18e53449948abc56d0a687fc37d932ecc9deb0a15f7deb5",
+  "generated_at": "2026-08-16T00:20:08Z",
+  "source_fingerprint": "10861fe3550d1b2b668c4344505189e5034f3236c75989a1b2cd753ebc2e8dfa",
   "build_mode": "full",
   "project": "eb-self",
   "entries_analyzed": {
-    "open": 1,
+    "open": 2,
     "archived": 0,
-    "total": 1
+    "total": 2
   },
   "nodes": {
     "B077": {
@@ -15,8 +15,17 @@
       "title": "Codex exec cancels read-only board tools while MCP schemas omit approval annotations",
       "source": "bugs/B077-codex-exec-cancels-read-only-board-tools-while-mcp-schemas.md",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "affects": "mcp-server/engineering_board_mcp.py",
+      "discovered": "2026-08-15"
+    },
+    "B078": {
+      "type": "bug",
+      "title": "Claude strict plugin validation rejects the ignored marketplace policy field",
+      "source": "bugs/B078-claude-strict-plugin-validation-rejects-the-ignored-marketpl.md",
+      "priority": "P2",
+      "status": "open",
+      "affects": ".claude-plugin/marketplace.json",
       "discovered": "2026-08-15"
     }
   },
@@ -24,7 +33,8 @@
   "topology": {
     "clusters": [],
     "isolated": [
-      "B077"
+      "B077",
+      "B078"
     ],
     "cross_cluster_bridges": []
   },
@@ -33,10 +43,15 @@
     {
       "type": "isolated-node",
       "node": "B077"
+    },
+    {
+      "type": "isolated-node",
+      "node": "B078"
     }
   ],
   "read_order": [
-    "B077"
+    "B077",
+    "B078"
   ],
   "drill_in": {}
 }

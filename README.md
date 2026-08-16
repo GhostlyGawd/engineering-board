@@ -312,8 +312,11 @@ For Claude Desktop, add this object to `claude_desktop_config.json`:
 [`mcp-server/README.md`](mcp-server/README.md) also contains setup procedures
 for Codex CLI, Gemini CLI, and Cursor.
 
-Both plugins register the server through [`.mcp.json`](.mcp.json). This file
-starts only Engineering Board through a cross-platform launcher.
+The Claude Code plugin registers the server through [`.mcp.json`](.mcp.json).
+The Codex manifest selects [codex-mcp.json](codex-mcp.json). Both files start
+only Engineering Board through the same cross-platform launcher. The
+Codex-specific file uses the `writes` approval policy: read-only memory tools
+can run without a per-call prompt, while every write-capable tool stays gated.
 
 ## Product surfaces
 
@@ -370,6 +373,16 @@ same deterministic core.
 | `board_release` | Release an entry claim |
 | `board_remember` | Save a learning |
 | `board_status` | Show board state and ready work |
+
+The six pure-read tools are `board_list_projects`, `board_list_entries`,
+`board_get_entry`, `board_insights`, `board_context`, and `board_status`. Their
+MCP schemas set `readOnlyHint: true`. Every other tool is classified by its
+maximum capability. A tool that can preview and apply a change is therefore
+write-capable for approval purposes. The Codex plugin's `writes` approval
+policy lets the six pure-read tools run without a prompt and keeps every
+write-capable tool approval-gated. These annotations are advisory metadata.
+They do not replace host policy, root containment, content-bound plans, or
+claim ownership.
 
 ## Architecture boundary
 

@@ -146,6 +146,18 @@ empty, so Codex does not auto-discover or execute the Claude Code adapters in
 boundary prevents unsupported prompt hooks and unintended automatic hook reads
 or writes in Codex.
 
+The Codex manifest also selects `codex-mcp.json`. Its `writes` approval mode
+lets a tool marked `readOnlyHint: true` run without a per-call prompt and gates
+every tool that can write. The six pure-read tools expose that hint. A tool
+with both preview and apply modes advertises its maximum write capability.
+
+Tool annotations are advisory MCP hints from the server. They are not trusted
+authorization facts and do not replace host approval, repository-root
+containment, safe path validation, content-bound plan tokens, atomic claims,
+or apply-time revalidation. The generic `.mcp.json` does not impose Codex
+policy on Claude Code. Users and managed environments can apply stricter host
+policy.
+
 Claim acquisition uses one atomic claim-directory creation. Claim release
 checks the recorded session owner and retries a failed directory removal. The
 Python implementation gives the MCP package the same ownership and stale-claim
