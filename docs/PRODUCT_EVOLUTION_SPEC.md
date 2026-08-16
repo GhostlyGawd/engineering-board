@@ -82,7 +82,7 @@ selected milestone is approved.
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 | Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
-| Milestone D.1 direction | Context information correction approved; version 4 remains unlocked | Prove whether context changes an agent diagnosis before a local fix. Keep version 3 locked with its failed result. Context contract version 2 introduced bounded canonical memory content; current version 3 preserves it and adds matched-Learning confidence. Run a new version 4 preflight before the owner reviews an exact scored baseline. |
+| Milestone D.1 direction | Current non-scored preflight complete; version 4 remains unlocked | Prove whether context changes an agent diagnosis before a local fix. Keep version 3 locked with its failed result. Context contract version 2 introduced bounded canonical memory content; current version 3 preserves it and adds matched-Learning confidence. The current one-repetition version 4 preflight observed 0/4 qualifying first causes in both arms. The owner still controls the exact baseline decision. |
 
 ## 3. Product thesis
 
@@ -2836,9 +2836,21 @@ would test a multi-step retrieval workflow instead of a self-contained context
 result. That alternative requires equal-tool controls and a new operator
 contract. The owner did not select it for this correction.
 
-The implementation correction does not prove product effect. Run a new
-unlocked preflight against the new product source. Then present the exact
-version 4 corpus and requirement digests for owner baseline review.
+The implementation correction does not prove product effect. A current-source
+preflight on `80ba2c1abc9` ran each of the four positive cases once in baseline
+and context arms. Every expected memory ranked first or second. Strict primary
+and independent reviews found zero cross-incident-before-local first causes in
+both arms, for an observed change of zero percentage points. The context
+responses did not connect the current incident to the prior incident in their
+first stated cause.
+
+This one-repetition proposal result is not scored evidence. It does not prove
+that the delivered memory has no effect, and it does not authorize a corpus
+lock. Version 4 remains unlocked. Its exact corpus digest is
+`ccdebc8be431047341bb13920d04fdc9a901e34664da6c90ed53f38be14ef662`;
+the draft structured-requirement digest is
+`9315bfd6889b0e1cbab6e9e864d0ffaf94a20c59606755cfceeb8cbcbef64ed2`.
+The product owner still controls the exact baseline decision.
 
 Milestone D.1 remains open. Milestone E remains deferred.
 
@@ -2924,6 +2936,7 @@ without a Learning line.
 
 Current product evidence:
 
+- [`2026-08-16 Milestone D.1 version 4 current-source preflight`](evidence/2026-08-16-milestone-d1-v4-current-preflight.md)
 - [`2026-07-31 bounded memory summary contract`](evidence/2026-07-31-bounded-memory-summary-contract.md)
 - [`2026-07-30 Milestone D.1 version 4 proposal preflight`](evidence/2026-07-30-milestone-d1-corpus-v4-proposal.md)
 - [`2026-07-29 Milestone D.1 live-evaluation preflight`](evidence/2026-07-29-milestone-d1-live-evaluation-preflight.md)

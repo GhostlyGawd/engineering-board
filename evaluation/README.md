@@ -161,6 +161,12 @@ python3 evaluation/harness.py score \
 Keep run directories outside the source tree. Do not put raw prompts, private
 repository content, credentials, or unrelated user data in an attempt record.
 Preserve failed cases and infrastructure failures as evaluation evidence.
+For a custom proposal preflight outside a prepared harness run, create an
+exclusive start receipt before each arm and append an end receipt after the
+process exits. Bind the exact arguments and prompt, schema, runner, response,
+and stream hashes. Record the process exit code. Refuse an arm when its start
+receipt already exists. A post-run manifest cannot prove exit status or the
+absence of an earlier deleted attempt.
 The recorder verifies that each context attempt names the exact memory results
 and ranks in the frozen context brief. Outcome-loop evidence comes from the
 frozen product comparison in the run manifest, not from an agent claim.
@@ -183,13 +189,21 @@ found no cross-incident diagnosis in either arm. The frozen v1.11.0 product
 ranked each expected memory within the first three results, but it omitted the
 hypothesis title, proposed cause, and bounded summary.
 
-Context contract version `2` corrects that product-information boundary. Each
-result now contains a stable title and typed bounded summary while it preserves
-the separate memory kind, epistemic status, match reasons, and canonical
-sources. This implementation result is verification evidence. It is not a
-product-effect result.
+Context contract version `2` corrected that product-information boundary.
+Current contract version `3` preserves the stable title and typed bounded
+summary and adds matched-memory confidence.
+
+A current-source, one-repetition preflight then ran the four positive version 4
+cases once in baseline and context arms. Every expected memory ranked first or
+second. Strict review found zero cross-incident-before-local first causes in
+both arms, for an observed change of zero percentage points. The context
+responses did not explicitly connect the visible incident to the prior
+incident. The result does not distinguish a stable product limitation from
+one-sample model variation or an operator-output limitation.
 
 Engineering Board does not claim that Milestone D context improves agent
-diagnoses. Version 4 remains an unlocked proposal. Run a new non-scored
-preflight against the new product source before the owner reviews an exact
-version 4 baseline digest. Do not prepare a scored run before that approval.
+diagnoses. Version 4 remains an unlocked proposal. Its exact corpus digest and
+the draft structured-requirement digest are recorded in the current dated
+preflight evidence for product-owner review. Do not prepare a scored run before
+that approval. See
+[`2026-08-16 Milestone D.1 version 4 current-source preflight`](../docs/evidence/2026-08-16-milestone-d1-v4-current-preflight.md).
