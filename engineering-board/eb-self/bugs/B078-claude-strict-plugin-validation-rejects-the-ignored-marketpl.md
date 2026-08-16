@@ -1,7 +1,7 @@
 ---
 id: B078
 type: bug
-status: in_progress
+status: resolved
 needs: tdd
 priority: P2
 title: Claude strict plugin validation rejects the ignored marketplace policy field
@@ -30,3 +30,5 @@ promoted_from: [mcp:_sessions/mcp-2026-08-15.md:b79036623cfe40f5]
 - **goal-b078-20260816** 2026-08-16T01:00:47Z: Claimed after B077 closeout. Claude Code 2.1.200 normal validation passes with one ignored policy warning; strict validation fails on that warning. The approved bounded direction is a host-specific manifest contract with a failing test before the manifest edit.
 - **goal-b078-20260816** 2026-08-16T01:04:00Z: Red tests rejected the copied Claude policy, then the one-field removal made normal and strict Claude validation pass without warnings. Codex policy assertions and release-preparation checks pass; full-suite and delivery gates remain open.
 - **goal-b078-20260816** 2026-08-16T01:37:59Z: v1.13.4 published from exact merged main e151d3b7a3db. GitHub asset, MCP Registry, and PyPI records align; released Codex and Claude installs match prepared manifest hashes. Claude normal/strict validation and a fresh Codex board_status call pass. Keep open until this evidence merges and exact main revalidation passes.
+- **goal-b078-20260816** 2026-08-16T01:50:33Z: PR #158 merged as 46e6690c61e0; exact main run 31920249216 passed. All Done-when criteria are met, canonical revalidation agrees, and no active B078 claim remains; resolving and archiving.
+- **goal-b078-20260816** 2026-08-16T01:55:27Z: Closeout correction: independent audit found the ignored _claims/B078 directory remained after a shallow file-only check. board_release with the owning session returned exit 0 and removed it; canonical state was then rebuilt and reverified.

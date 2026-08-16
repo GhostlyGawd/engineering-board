@@ -1,42 +1,23 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-08-16T01:38:07Z",
-  "source_fingerprint": "661f65f9e91208e8027e2cb1147ec84584d7e13c1d12594411464074c699556a",
+  "generated_at": "2026-08-16T01:55:27Z",
+  "source_fingerprint": "068e2a3fa80663c9bca9bd1445f2f8e2c961079b871e70117ea50db4cee2974d",
   "build_mode": "full",
   "project": "eb-self",
   "entries_analyzed": {
-    "open": 1,
+    "open": 0,
     "archived": 0,
-    "total": 1
+    "total": 0
   },
-  "nodes": {
-    "B078": {
-      "type": "bug",
-      "title": "Claude strict plugin validation rejects the ignored marketplace policy field",
-      "source": "bugs/B078-claude-strict-plugin-validation-rejects-the-ignored-marketpl.md",
-      "priority": "P2",
-      "status": "in_progress",
-      "affects": ".claude-plugin/marketplace.json",
-      "discovered": "2026-08-15"
-    }
-  },
+  "nodes": {},
   "edges": [],
   "topology": {
     "clusters": [],
-    "isolated": [
-      "B078"
-    ],
+    "isolated": [],
     "cross_cluster_bridges": []
   },
   "unresolved_patterns": [],
-  "findings": [
-    {
-      "type": "isolated-node",
-      "node": "B078"
-    }
-  ],
-  "read_order": [
-    "B078"
-  ],
+  "findings": [],
+  "read_order": [],
   "drill_in": {}
 }

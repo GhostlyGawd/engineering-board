@@ -2,6 +2,7 @@
 
 Resolved entries. Newest at the top.
 
+- B078 | Claude strict plugin validation rejects the ignored marketplace policy field | resolved: 2026-08-16
 - B077 | Codex exec cancels read-only board tools while MCP schemas omit approval annotations | resolved: 2026-08-16
 - B076 | Dated root audit snapshots can be mistaken for current product truth | resolved: 2026-08-15
 - B075 | Authoritative current-behavior table describes superseded graph context and outcome limitations | resolved: 2026-08-15
