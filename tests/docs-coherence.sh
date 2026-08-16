@@ -138,6 +138,9 @@ architecture = (root / "ARCHITECTURE.md").read_text()
 security = (root / "SECURITY.md").read_text()
 product = (root / "docs/PRODUCT_EVOLUTION_SPEC.md").read_text()
 core = (root / "mcp-server/engineering_board_core.py").read_text()
+mcp_readme = (root / "mcp-server/README.md").read_text()
+llms = (root / "docs/llms.txt").read_text()
+landing = (root / "docs/index.html").read_text()
 
 current_markers = {
     "ARCHITECTURE release": (architecture, f"Current release line: **v{version}**"),
@@ -159,17 +162,37 @@ if not contract or not ranking:
 else:
     contract_marker = f"Context contract version `{contract.group(1)}`"
     ranking_pattern = rf"Ranking rule\s+version `{re.escape(ranking.group(1))}`"
-    if contract_marker not in architecture or not re.search(ranking_pattern, architecture):
-        print(
-            "FAIL ARCHITECTURE context markers do not match core "
-            f"(contract={contract.group(1)} ranking={ranking.group(1)})"
-        )
+    for label, text in {
+        "ARCHITECTURE": architecture,
+        "mcp-server/README": mcp_readme,
+    }.items():
+        if contract_marker not in text or not re.search(ranking_pattern, text):
+            print(
+                f"FAIL {label} context markers do not match core "
+                f"(contract={contract.group(1)} ranking={ranking.group(1)})"
+            )
+            fail = True
+        else:
+            print(
+                f"OK   {label} context markers match core "
+                f"(contract={contract.group(1)} ranking={ranking.group(1)})"
+            )
+
+approval_doc_markers = {
+    "README": (readme, "`writes` approval policy"),
+    "ARCHITECTURE": (architecture, "maximum capability"),
+    "SECURITY": (security, "advisory MCP hints"),
+    "product spec": (product, "maximum-capability annotations"),
+    "MCP README": (mcp_readme, "`readOnlyHint`"),
+    "LLM guidance": (llms, "six pure-read tools"),
+    "landing page": (landing, "write-capable tools remain approval-gated"),
+}
+for label, (text, marker) in approval_doc_markers.items():
+    if marker not in text:
+        print(f"FAIL {label} omits MCP approval marker: {marker}")
         fail = True
     else:
-        print(
-            "OK   ARCHITECTURE context markers match core "
-            f"(contract={contract.group(1)} ranking={ranking.group(1)})"
-        )
+        print(f"OK   {label} includes MCP approval marker")
 
 section_five = product.split("## 5. What exists today", 1)[1].split("## 6.", 1)[0]
 stale_current_claims = (

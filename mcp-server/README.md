@@ -18,6 +18,9 @@ on-disk format the plugin's hooks and skills expect.
   `2025-06-18`. Only JSON-RPC messages go to stdout. diagnostics go to stderr.
 - `board_claim` and `board_release` use atomic claim directories in Python.
   They do not require Bash or plugin hook scripts.
+- Every public tool exposes explicit MCP side-effect annotations. These values
+  describe maximum capability and remain advisory, untrusted hints. They do
+  not authorize a write.
 - Timestamps are real UTC ISO-8601 (second precision) via `datetime.now(timezone.utc)`.
 
 The board location for a `project` is resolved via `engineering-board/BOARD-ROUTER.md`
@@ -41,7 +44,7 @@ the current working directory, and can be overridden per-call with a `root` argu
 | `board_hypotheses` | List H### records or preview/apply propose, evaluate, reopen, split, and merge operations. Mutations require an unchanged self-contained plan token and cited evidence. |
 | `board_outcomes` | Preview or apply a structured H### fix outcome. It also applies one returned L### Learning plan, curates eligible Learning feedback under PM authority, or returns the derived value report. |
 | `board_patterns` | List canonical pattern records or preview/apply create, alias, assign, and correction operations. Every mutation requires the unchanged content-bound plan id. |
-| `board_promote_findings` | Preview or apply captured scratch findings with typed created/deduplicated/rejected/already-applied outcomes, durable provenance, idempotent receipts, and identifier allocation across open and resolved entries. An unchanged plan id restores a session-scoped preview when apply omits the optional session selector. |
+| `board_promote_findings` | Preview or apply captured scratch findings with typed created/deduplicated/rejected/already-applied outcomes, durable provenance, durable receipts, and identifier allocation across open and resolved entries. An unchanged plan id restores a session-scoped preview when apply omits the optional session selector. |
 | `board_rebuild` | Deterministically regenerate `BOARD.md` from entry files (P0 to P3 ordering, `⊘ Q###` when blocked, `↳` child rows under parents, resolved omitted). Idempotent. |
 | `board_capture_finding` | Append a finding to the scratch inbox `_sessions/mcp-<UTC-date>.md`. |
 | `board_claim` | Acquire an atomic entry claim. Results: 0=acquired, 1=contended, 2=stale. |
@@ -53,9 +56,26 @@ All 19 tools use the same canonical Markdown format. Pattern, promotion, graph,
 ranking, context, hypothesis, outcome, and Learning behavior delegates to the
 same zero-dependency core used by the plugin.
 
+### Approval and side-effect metadata
+
+The six pure-read tools are `board_list_projects`, `board_list_entries`,
+`board_get_entry`, `board_insights`, `board_context`, and `board_status`. They
+set `readOnlyHint: true`. All 19 tools set explicit `destructiveHint`,
+`idempotentHint`, and `openWorldHint` values. Every tool is local to the
+caller-selected repository, so `openWorldHint` is false.
+
+Annotations are static for one tool. `board_outcomes`, `board_hypotheses`,
+`board_patterns`, and `board_promote_findings` can both preview and apply, so
+their schemas use the maximum write capability even when one invocation only
+previews. The annotations are advisory MCP hints, not an authorization or
+security boundary.
+
 `board_context` is read-only. Its token proves which repository memory the
-system surfaced. Context contract version `2` adds a one-line title of at most
-160 characters and a typed one-line summary of at most 2,000 characters.
+system surfaced. Context contract version `3` preserves the bounded title and
+typed summary and adds confidence when canonical memory defines it. Ranking rule
+version `2` derives path context from selected entries and gives direct
+Learning pattern and `applies_to` matches structural eligibility. Titles are
+at most 160 characters, and summaries are at most 2,000 characters.
 Cluster summaries state structural scope. H### summaries state a proposed root
 cause. L### summaries state a Takeaway. The separate status field preserves
 epistemic authority. The token binds the context-contract and ranking-rule
@@ -115,6 +135,7 @@ Add to `~/.codex/config.toml`:
 [mcp_servers.engineering-board]
 command = "uvx"
 args = ["engineering-board-mcp"]
+default_tools_approval_mode = "writes"
 ```
 
 Or one line: `codex mcp add engineering-board -- uvx engineering-board-mcp`.
@@ -170,10 +191,12 @@ Add to `claude_desktop_config.json` (macOS:
 (Clone fallback: `"command": "python3"`, `"args":
 ["/abs/path/to/engineering-board/mcp-server/engineering_board_mcp.py"]`.)
 
-### Bundled with the Claude Code plugin (automatic)
+### Bundled with the plugins (automatic)
 
-Installing the `engineering-board` plugin auto-registers this server through
-the repository-root [`.mcp.json`](../.mcp.json):
+The Claude Code plugin auto-registers this server through the repository-root
+[`.mcp.json`](../.mcp.json). The Codex plugin selects
+[`codex-mcp.json`](../codex-mcp.json), which adds
+`default_tools_approval_mode: writes`. Both files use this transport:
 
 ```json
 {
@@ -191,21 +214,26 @@ The plugins use `scripts/engineering-board-mcp-launcher.mjs`. The launcher selec
 `python`, or the Windows `py -3` launcher without using a shell. Set `PYTHON`
 to an executable path when Python is not on `PATH`.
 
+The Codex `writes` policy uses `readOnlyHint` to let pure reads proceed and
+prompts for every tool that can write. A user can override that policy through
+Codex configuration. The Claude Code host continues to apply its own MCP
+approval policy.
+
 No separate install step is needed when the plugin is installed.
 
 ## Distribution channels
 
-The server ships from this repo tree (it shells out to sibling
-`hooks/scripts/board-claim-*.sh` for locking. every other tool is
-self-contained). Beyond cloning the repo, the packaged channels:
+The server ships as a self-contained Python adapter and shared core. Claim
+acquisition and release do not require the Claude Code hook scripts. Beyond
+cloning the repo, the packaged channels are:
 
 - **PyPI (`engineering-board-mcp`)**: the uvx one-liner above. Published from
   v1.7.0 by the release workflow via PyPI trusted publishing (OIDC, no stored
   secret). [`pyproject.toml`](pyproject.toml) is the package manifest.
 - **MCP bundle (`.mcpb`)**: `bash mcp-server/build-mcpb.sh` produces
-  `dist/engineering-board-mcp.mcpb`, a self-contained bundle (server + the hook
-  scripts it calls + [`manifest.json`](manifest.json)) for one-click install in
-  MCP-bundle-aware clients. The bundle is a release asset, not committed source.
+  `dist/engineering-board-mcp.mcpb`, a self-contained bundle (adapter, shared
+  core, metadata, reference, and license) for one-click install in MCP-bundle-
+  aware clients. The bundle is a release asset, not committed source.
 - **MCP Registry: live**: published as
   [`io.github.GhostlyGawd/engineering-board`](https://registry.modelcontextprotocol.io/?search=engineering-board).
   [`server.json`](server.json) is the registry manifest, pointing at the `.mcpb`

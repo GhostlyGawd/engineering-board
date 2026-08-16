@@ -9,6 +9,15 @@ increases.
 
 ## [Unreleased]
 
+### Fixed
+
+- All 19 MCP tools now publish explicit read-only, destructive, idempotent,
+  and open-world hints that match their maximum capability. The Codex plugin
+  uses a Codex-specific `writes` approval default, so pure repository-memory
+  reads can run without a per-call prompt while every tool that can write
+  remains approval-gated. Tool annotations remain advisory metadata and do not
+  replace host policy or repository safety controls.
+
 ## [1.13.2] — 2026-08-15
 
 ### Fixed

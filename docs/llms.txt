@@ -63,6 +63,9 @@ Codex plugin (five skills and the 19-tool MCP server):
 Start a new Codex session after installation. Pass the absolute repository
 root in each bundled-plugin MCP call.
 
+The Codex plugin uses a writes-only approval default. Its six pure-read tools
+can run without a per-call prompt. Every tool that can write remains gated.
+
 Claude Code plugin (full autonomous pipeline. requires Claude Code, free):
 
     /plugin marketplace add GhostlyGawd/engineering-board
@@ -120,6 +123,12 @@ https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
   curator's recurrence threshold).
 - board_status: open counts, in_progress/blocked ids, the ready queue,
   dangling-blocker warnings, un-promoted scratch count.
+
+The six pure-read tools are board_list_projects, board_list_entries,
+board_get_entry, board_insights, board_context, and board_status. Mixed
+preview/apply tools advertise their maximum write capability. MCP annotations
+are advisory hints, not write authority. Host policy, repository-root
+containment, content-bound plans, and claims remain authoritative controls.
 
 ## Key links
 

@@ -20,7 +20,8 @@ import sys
 root = pathlib.Path(sys.argv[1])
 manifest = json.loads((root / ".codex-plugin/plugin.json").read_text())
 codex_hooks = json.loads((root / "hooks/codex-hooks.json").read_text())
-mcp = json.loads((root / ".mcp.json").read_text())
+codex_mcp = json.loads((root / "codex-mcp.json").read_text())
+claude_mcp = json.loads((root / ".mcp.json").read_text())
 claude = json.loads((root / ".claude-plugin/plugin.json").read_text())
 claude_market = json.loads((root / ".claude-plugin/marketplace.json").read_text())
 codex_market = json.loads((root / ".agents/plugins/marketplace.json").read_text())
@@ -28,7 +29,7 @@ codex_market = json.loads((root / ".agents/plugins/marketplace.json").read_text(
 assert manifest["name"] == claude["name"] == "engineering-board"
 assert manifest["version"] == claude["version"]
 assert manifest["skills"] == "./skills/"
-assert manifest["mcpServers"] == "./.mcp.json"
+assert manifest["mcpServers"] == "./codex-mcp.json"
 assert manifest["hooks"] == "./hooks/codex-hooks.json"
 assert codex_hooks == {"hooks": {}}
 assert claude_market["plugins"][0]["source"] == "./"
@@ -46,12 +47,22 @@ assert codex_entry["source"] == {
 }
 assert codex_entry["policy"] == claude_entry["policy"]
 assert codex_entry["category"] == claude_entry["category"]
-assert set(mcp["mcpServers"]) == {"engineering-board"}
-server = mcp["mcpServers"]["engineering-board"]
+assert set(codex_mcp["mcpServers"]) == {"engineering-board"}
+server = codex_mcp["mcpServers"]["engineering-board"]
 assert server == {
     "command": "node",
     "args": ["scripts/engineering-board-mcp-launcher.mjs"],
     "cwd": ".",
+    "default_tools_approval_mode": "writes",
+}
+assert claude_mcp == {
+    "mcpServers": {
+        "engineering-board": {
+            "command": "node",
+            "args": ["scripts/engineering-board-mcp-launcher.mjs"],
+            "cwd": ".",
+        }
+    }
 }
 consolidate_skill = (root / "skills/board-consolidate/SKILL.md").read_text()
 assert "server restores the preview session scope" in consolidate_skill
@@ -78,13 +89,37 @@ responses = {
 }
 assert responses[1]["result"]["protocolVersion"] == "2025-06-18"
 tools = responses[2]["result"]["tools"]
-assert len(tools) == 19
-assert {tool["name"] for tool in tools} >= {
-    "board_context",
-    "board_claim",
-    "board_release",
-    "board_promote_findings",
+expected = {
+    "board_init": (False, True, True, False),
+    "board_list_projects": (True, False, True, False),
+    "board_create_entry": (False, True, False, False),
+    "board_list_entries": (True, False, True, False),
+    "board_get_entry": (True, False, True, False),
+    "board_update_entry": (False, True, False, False),
+    "board_graph": (False, True, False, False),
+    "board_insights": (True, False, True, False),
+    "board_context": (True, False, True, False),
+    "board_outcomes": (False, True, True, False),
+    "board_hypotheses": (False, True, True, False),
+    "board_patterns": (False, True, True, False),
+    "board_promote_findings": (False, True, False, False),
+    "board_rebuild": (False, True, True, False),
+    "board_capture_finding": (False, False, False, False),
+    "board_claim": (False, False, True, False),
+    "board_release": (False, True, True, False),
+    "board_remember": (False, True, False, False),
+    "board_status": (True, False, True, False),
 }
+assert {tool["name"] for tool in tools} == set(expected)
+for tool in tools:
+    read_only, destructive, idempotent, open_world = expected[tool["name"]]
+    assert set(tool) == {"name", "description", "inputSchema", "annotations"}
+    assert tool["annotations"] == {
+        "readOnlyHint": read_only,
+        "destructiveHint": destructive,
+        "idempotentHint": idempotent,
+        "openWorldHint": open_world,
+    }
 promote = next(tool for tool in tools if tool["name"] == "board_promote_findings")
 properties = promote["inputSchema"]["properties"]
 assert "restores that preview's session scope" in properties["apply"]["description"]
