@@ -1,7 +1,7 @@
 ---
 id: B077
 type: bug
-status: in_progress
+status: resolved
 needs: tdd
 priority: P2
 title: Codex exec cancels read-only board tools while MCP schemas omit approval annotations
@@ -45,3 +45,4 @@ control must falsify or support this explanation before implementation.
 - **goal-b077-20260815** 2026-08-15T05:24:52Z: The settled worker diff passed all 21 maintained suites in 59.99 seconds. Independent review, delivery, release, reinstall, and installed-host gates remain open.
 - **goal-b077-20260815** 2026-08-16T00:19:33Z: Independent review required the missing auto plus omitted-annotation cell and a non-circular side-effect guard. The matched cell cancelled, and all six declared read handlers preserved a full paths-and-bytes snapshot while the mutation control changed it. The focused MCP suite passes 230 checks; the final complete-suite rerun remains open.
 - **goal-b077-20260815** 2026-08-16T00:43:01Z: v1.13.3 published and reinstalled at the exact release commit. Fresh installed Codex reads completed, the write control remained gated, and two non-empty representative passes succeeded. Keep open until the release-evidence merge and exact merged-main revalidation pass.
+- **goal-b077-20260815** 2026-08-16T00:50:50Z: PR #154 merged as 9443daa331c3; exact merged-main test run 31918032704 passed. Fresh canonical revalidation confirms every Done-when criterion is met. The claim is released; resolving and archiving B077.
