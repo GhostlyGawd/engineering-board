@@ -1,7 +1,7 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-08-16T00:20:08Z",
-  "source_fingerprint": "10861fe3550d1b2b668c4344505189e5034f3236c75989a1b2cd753ebc2e8dfa",
+  "generated_at": "2026-08-16T00:43:16Z",
+  "source_fingerprint": "ca1ee2f509e4b083614b1a4c8db285213c4befa9c9249889ccd40ad3ea143a73",
   "build_mode": "full",
   "project": "eb-self",
   "entries_analyzed": {
