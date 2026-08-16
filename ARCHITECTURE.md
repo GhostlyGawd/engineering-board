@@ -44,12 +44,12 @@ hook manifest.
 ```
 engineering-board/
 ├── .agents/
-│   └── plugins/marketplace.json    # Codex catalog; root Git source pinned to v<version>
+│   └── plugins/marketplace.json    # Codex catalog; pinned Git source plus Codex policy
 ├── .codex-plugin/
 │   └── plugin.json                 # Codex interface; selects Codex hooks and MCP config
 ├── .claude-plugin/
 │   ├── plugin.json                 # Plugin manifest (version, description)
-│   └── marketplace.json            # Marketplace entry
+│   └── marketplace.json            # Claude entry; relative source and Claude fields only
 ├── README.md                       # Install + usage (user-facing)
 ├── ARCHITECTURE.md                 # This file (contributor-facing)
 ├── LICENSE                         # MIT
@@ -441,7 +441,7 @@ authoritative list. `spike/` is a standalone mini-plugin check.
 | `security/reject-filter.sh` | drives every `fixtures/adversarial-paste/` (≥30) and `fixtures/benign-findings/` (≥20) fixture through the canonical `board_reject_check.py` filter. 100% reject (with declared reason) + 100% accept | `bash tests/security/reject-filter.sh` |
 | `session-start/` | SessionStart exact-Open-section correctness with the standard Conventions footer, blocking map, and a 1200-entry performance guard below 10 seconds | `bash tests/session-start/automated.sh` |
 | `view/` | `/board-view` HTML generator: document structure, pipeline columns, byte-determinism, HTML-escaping of untrusted entry text | `bash tests/view/automated.sh` |
-| `version-coherence` | Plugin versions and both marketplaces align; Claude stays relative and Codex pins the matching release tag | `bash tests/version-coherence.sh` |
+| `version-coherence` | Plugin versions align; Claude stays relative and excludes Codex-only policy, while Codex pins the matching release tag and exact policy | `bash tests/version-coherence.sh` |
 | `release-preparation` | Release-plan validation, coordinated runtime and current-document version advancement, Codex tag-ref advancement, and reproducible bundle preparation | `bash tests/release-preparation.sh` |
 | `codex-plugin` | Codex manifest host boundary, immutable marketplace pin, Codex-specific `writes` policy, isolated launcher, and exact 19-tool annotation surface | `bash tests/codex-plugin.sh` |
 | `docs-coherence` | current documentation links, counts, and contract markers | `bash tests/docs-coherence.sh` |

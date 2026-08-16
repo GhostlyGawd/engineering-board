@@ -45,7 +45,11 @@ assert codex_entry["source"] == {
     "url": "https://github.com/GhostlyGawd/engineering-board.git",
     "ref": f"v{manifest['version']}",
 }
-assert codex_entry["policy"] == claude_entry["policy"]
+assert "policy" not in claude_entry
+assert codex_entry["policy"] == {
+    "installation": "AVAILABLE",
+    "authentication": "ON_INSTALL",
+}
 assert codex_entry["category"] == claude_entry["category"]
 assert set(codex_mcp["mcpServers"]) == {"engineering-board"}
 server = codex_mcp["mcpServers"]["engineering-board"]

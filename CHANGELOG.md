@@ -9,6 +9,12 @@ increases.
 
 ## [Unreleased]
 
+### Fixed
+
+- The Claude marketplace manifest no longer copies Codex-only installation and
+  authentication policy. Claude strict validation now passes without an
+  ignored-field warning, while the Codex marketplace retains its policy.
+
 ## [1.13.3] — 2026-08-16
 
 ### Fixed

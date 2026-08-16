@@ -30,15 +30,23 @@ PYPROJECT_TOML="$ROOT/mcp-server/pyproject.toml"
 README_MD="$ROOT/README.md"
 PERMISSIONS_JSON="$ROOT/references/required-permissions.json"
 RELEASING_MD="$ROOT/docs/RELEASING.md"
+RELEASE_SKILL_MD="$ROOT/maintainers/skills/release-engineering-board/SKILL.md"
 AGENTS_DIR="$ROOT/agents"
 SKILLS_DIR="$ROOT/skills"
 
 for f in "$PLUGIN_JSON" "$CODEX_PLUGIN_JSON" "$CLAUDE_MARKETPLACE_JSON" \
   "$CODEX_MARKETPLACE_JSON" \
   "$MCP_SERVER_JSON" "$MCP_MANIFEST_JSON" "$PYPROJECT_TOML" "$README_MD" \
-  "$PERMISSIONS_JSON" "$RELEASING_MD"; do
+  "$PERMISSIONS_JSON" "$RELEASING_MD" "$RELEASE_SKILL_MD"; do
   if [ ! -f "$f" ]; then
     echo "version-coherence: MISSING $f" >&2
+    exit 1
+  fi
+done
+
+for f in "$RELEASING_MD" "$RELEASE_SKILL_MD"; do
+  if ! grep -Fq 'claude plugin validate --strict .' "$f"; then
+    echo "version-coherence: FAIL $f omits strict Claude marketplace validation" >&2
     exit 1
   fi
 done
@@ -163,8 +171,15 @@ if codex_entry.get("source") != expected_codex_source:
         f"and ref v{plugin_version}"
     )
     sys.exit(1)
-if codex_entry.get("policy") != match[0].get("policy"):
-    print("FAIL Codex and Claude marketplace policies must match")
+if "policy" in match[0]:
+    print("FAIL Claude marketplace must not contain Codex-only policy")
+    sys.exit(1)
+expected_codex_policy = {
+    "installation": "AVAILABLE",
+    "authentication": "ON_INSTALL",
+}
+if codex_entry.get("policy") != expected_codex_policy:
+    print("FAIL Codex marketplace policy does not match the supported contract")
     sys.exit(1)
 if codex_entry.get("category") != match[0].get("category"):
     print("FAIL Codex and Claude marketplace categories must match")

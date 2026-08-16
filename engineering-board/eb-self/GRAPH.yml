@@ -1,7 +1,7 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-08-16T00:51:58Z",
-  "source_fingerprint": "5645ad0641e2da6b943cc6a14db1ea9ca89188f3cf19b7b891ebbd0e3eaf7098",
+  "generated_at": "2026-08-16T01:04:06Z",
+  "source_fingerprint": "bf3d3cf6f98b2712559e94223133312e787a1fc7c1410a4a9e5c92674c17cf0e",
   "build_mode": "full",
   "project": "eb-self",
   "entries_analyzed": {
@@ -15,7 +15,7 @@
       "title": "Claude strict plugin validation rejects the ignored marketplace policy field",
       "source": "bugs/B078-claude-strict-plugin-validation-rejects-the-ignored-marketpl.md",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "affects": ".claude-plugin/marketplace.json",
       "discovered": "2026-08-15"
     }
