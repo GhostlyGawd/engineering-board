@@ -44,8 +44,8 @@ proposes another symptom-only correction.
 - [x] Preserve raw evidence and append a bounded result without editing the
   proposal corpus or historical version 3 evidence.
 - [x] Run focused and full repository checks plus independent pre-PR review.
-- [ ] Pass pull-request and exact merged-main checks.
-- [ ] Resolve and archive Q002 only after the evidence merge and current
+- [x] Pass pull-request and exact merged-main checks.
+- [x] Resolve and archive Q002 only after the evidence merge and current
   canonical revalidation.
 
 ## Acceptance criteria
@@ -71,8 +71,8 @@ proposes another symptom-only correction.
 
 ### Post-merge phase
 
-- [ ] Pull-request checks and the exact merged-main check pass.
-- [ ] Canonical Q002, BOARD, and GRAPH state agree with the evidence state.
+- [x] Pull-request checks and the exact merged-main check pass.
+- [x] Canonical Q002, BOARD, and GRAPH state agree with the evidence state.
 
 ### Closeout phase
 
@@ -82,7 +82,7 @@ proposes another symptom-only correction.
 
 ## Implementation progress
 
-- Q002 remains claimed and `in_progress` until merged-main revalidation.
+- Q002 is resolved and archived after merged-main revalidation.
 - The proposal validates unchanged on current main.
 - Eight immutable prompt arms were generated outside the repository. Pairwise
   common-input digests match. Before launch, each arm directory contained only
@@ -144,6 +144,27 @@ proposes another symptom-only correction.
   `83987dfef62839ec142c7b70ff56fe849fce022a507f40348476365277fd484f`.
   It renders Q002 as `in_progress`, reports one open question, and the focused
   board-view suite passed 52 of 52 checks.
+- Evidence PR #160 merged normally as `af82d41adf1d`. Both pull-request
+  `run-all` jobs passed. Exact merged-main run `31922615107` then passed against
+  that merge commit. Canonical revalidation found Q002 `in_progress`, four
+  checked criteria, its durable Finding, matching BOARD/GRAPH state, and the
+  owning claim still present before closeout.
+- The question-close protocol found no `blocked_by: Q002` dependent and no
+  cascade candidate: the only remaining BOARD rows are five Learnings, which
+  have no Done-when criteria. Q002 changed to `resolved`, received exactly one
+  newest ARCHIVE row, and disappeared from BOARD and GRAPH. The rebuilt graph
+  has fingerprint
+  `f71fe049765bcbf7a0b9123c94cc92c62f6baa07d0797f95560ed3ee2a66361a`
+  and zero active nodes.
+- Owning-session `board_release` returned exit 0 and removed `_claims/Q002`.
+  The regenerated self-board HTML is byte-deterministic at SHA-256
+  `5973cdec835b31bf914de0112c20aa13eb8e0ab5b394c513ada9ab8943fc80fe`.
+  Final `board_status` reports zero open bugs, features, questions, and
+  observations; five Learnings; no ready item; and one preserved unpromoted
+  scratch finding.
+- The lifecycle-only closeout diff passed the complete maintained suite: 21 of
+  21 suites in 69.5 seconds, including board view 52/52, evaluation 22/22, and
+  documentation coherence.
 
 ## Bounded result
 
@@ -181,12 +202,16 @@ Version 4 remains an unlocked proposal and no scored run is prepared.
 | Agent-usable memory content | Required | Context contract version 3 returns title and typed bounded summary | Current frozen context payload inspection | Product spec sections 21.14-21.15 | Deterministic gate passed |
 | No scored product claim | Required | One repetition per positive arm; corpus remains proposal | Absence of locked run/score artifacts | This workpad and final evidence | Enforced |
 | Owner baseline authority | Required | Exact corpus and requirement digests are presented, not approved by the agent | Final state inspection | Product spec and handoff | Presented; owner decision pending |
+| Lifecycle closeout | Required after evidence merge | Resolve Q002 only after its Finding, evidence merge, exact-main pass, rebuild, and owning-session claim release | Newest archive row, BOARD/GRAPH absence, source fingerprint, deterministic HTML, claim absence, board status, full suite | Q002, ARCHIVE, BOARD, GRAPH, self-board HTML, this workpad | Closeout patch ready; PR and exact-main gate pending |
 
 ## Documentation impact
 
-- Changed: this dated workpad, Q002, BOARD, GRAPH, the authoritative product
-  spec, the evaluation guide, the root README, and the generated self-board
-  HTML now record the bounded current result, open question, and owner gate.
+- Changed across the checkpoint: this dated workpad, Q002, ARCHIVE, BOARD,
+  GRAPH, the authoritative product spec, the evaluation guide, the root README,
+  and the generated self-board HTML record the bounded result and owner gate.
+  The lifecycle closeout now records Q002 as resolved and newest-first archived;
+  BOARD/GRAPH have no active question, and the HTML reports zero open questions
+  and no active claims.
 - Reviewed and unaffected: runtime core,
   MCP schemas, plugin manifests, setup, README commands, architecture,
   security/privacy, release versions, and published package artifacts. This
@@ -240,19 +265,18 @@ launch or trial failure stops the campaign for owner review.
 
 ## Handoff and resume route
 
-Completion state: `post-merge-pending`.
+Completion state: `closeout`.
 
 Next owner: the primary dogfood loop.
 
-Remaining gates: run repository and pull-request checks, merge the evidence
-pull request, pass exact merged-main checks, and revalidate Q002 before
-resolution. The separate version 4 baseline decision remains with the owner.
+Remaining gate: merge the lifecycle-only closeout pull request and confirm its
+exact merged-main check. The separate version 4 baseline decision remains with
+the owner.
 
 Evidence destination: this Markdown workpad and the preserved bounded trial
 artifacts under `$WSL_SCRATCH`.
 
-Resume route: validate the settled documentation and board state, deliver the
-evidence pull request, then revalidate and close Q002 without changing the
-unlocked corpus.
+Resume route: deliver the lifecycle-only closeout patch, confirm exact main,
+then stop at the owner baseline gate without changing the unlocked corpus.
 
-Terminal action: `keep-open`.
+Terminal action: `resolve-and-archive`.

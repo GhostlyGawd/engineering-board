@@ -1,41 +1,23 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-08-16T02:34:23Z",
-  "source_fingerprint": "d7f0e279a9c2db30ef9dfe5e80cc6cf1d8ce4e079ab8f14332fc853b0082e453",
+  "generated_at": "2026-08-16T02:48:33Z",
+  "source_fingerprint": "f71fe049765bcbf7a0b9123c94cc92c62f6baa07d0797f95560ed3ee2a66361a",
   "build_mode": "full",
   "project": "eb-self",
   "entries_analyzed": {
-    "open": 1,
+    "open": 0,
     "archived": 0,
-    "total": 1
+    "total": 0
   },
-  "nodes": {
-    "Q002": {
-      "type": "question",
-      "title": "Does current D.1 version 4 context change cross-incident diagnosis?",
-      "source": "questions/Q002-does-current-d-1-version-4-context-change-cross-incident-dia.md",
-      "status": "in_progress",
-      "affects": "evaluation/",
-      "discovered": "2026-08-16"
-    }
-  },
+  "nodes": {},
   "edges": [],
   "topology": {
     "clusters": [],
-    "isolated": [
-      "Q002"
-    ],
+    "isolated": [],
     "cross_cluster_bridges": []
   },
   "unresolved_patterns": [],
-  "findings": [
-    {
-      "type": "isolated-node",
-      "node": "Q002"
-    }
-  ],
-  "read_order": [
-    "Q002"
-  ],
+  "findings": [],
+  "read_order": [],
   "drill_in": {}
 }
