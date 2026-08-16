@@ -9,6 +9,8 @@ increases.
 
 ## [Unreleased]
 
+## [1.13.3] — 2026-08-16
+
 ### Fixed
 
 - All 19 MCP tools now publish explicit read-only, destructive, idempotent,
