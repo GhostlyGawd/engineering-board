@@ -5,8 +5,9 @@
 This file is the durable workpad and dated evidence record for B078. The
 authoritative repository is `GhostlyGawd/engineering-board`. Work started from
 merged main `7516eaecdabf85c3339b5705442ef654770d29d1`. The released closeout
-commit is `e151d3b7a3db019cac5188b12466727b43f90ef2`; the current evidence branch
-is `codex/v1.13.4-release-evidence` from that commit.
+commit is `e151d3b7a3db019cac5188b12466727b43f90ef2`. Release-evidence PR #158
+merged as authoritative main `46e6690c61e09e9233129f3be3b733f8c24fe4e8`; the current closeout branch
+is `codex/b078-resolve` from that commit.
 
 Engineering Board must install and validate truthfully on every supported
 host. A green cross-host test is not useful if it makes two different manifest
@@ -35,6 +36,9 @@ higher validation count.
 - [x] Complete independent review, PR checks, and exact merged-main checks.
 - [x] Publish a patch release and validate the released Claude and Codex
   installations.
+- [x] Merge release evidence, pass its exact merged-main check, and revalidate
+  canonical B078 state.
+- [x] Resolve and archive B078 after every named gate passes.
 
 ## Acceptance criteria
 
@@ -84,10 +88,16 @@ higher validation count.
 ## Campaign controls
 
 - Start: `2026-08-16T01:00:06Z`.
-- Correction cycles used: 1 of 2. Independent review added the host-native
-  strict validator to the documented release gate and a deterministic guard
-  for that instruction.
-- Unexpected live failures: 0 of 1.
+- Correction cycles used: 2 of 2. Independent review first added the
+  host-native strict validator and its deterministic release-instruction
+  guard. The final closeout audit then caught an ignored claim directory that
+  a shallow file-only check had missed.
+- Unexpected live failures: 1 of 1. The released `board_release` tool returned
+  exit 0 for the owning session and removed the exact B078 claim directory.
+- Alignment renewed at `2026-08-16T01:55:27Z`: scope remains the B078
+  lifecycle-only closeout; no product behavior, version, release, or authority
+  change is permitted. Any further unexpected failure requires a new bounded
+  assessment before mutation.
 - Elapsed-time limit: 120 minutes.
 - Renew alignment before another correction cycle, branch, PR, or external
   mutation if one unexpected live failure occurs, two correction cycles occur,
@@ -160,16 +170,32 @@ higher validation count.
   installed-path validation pass without warnings. Both host caches match the
   three prepared manifest hashes recorded in
   `2026-08-16-v1.13.4-release-and-installed-validation.md`.
+- Release-evidence PR #158 merged as `46e6690c61e0`; exact main run
+  `31920249216` passed. A fresh canonical read from that commit found all B078
+  Done-when criteria checked and BOARD and GRAPH consistent. The released
+  v1.13.4 MCP performed the terminal status update, inserted one archive row,
+  rebuilt BOARD and GRAPH, and reported zero open bug, feature, question, or
+  observation entries.
+- Independent closeout review found that the initial file-only claim check had
+  missed the ignored `_claims/B078/` directory. The released v1.13.4
+  `board_release` tool returned exit 0 for `goal-b078-20260816` and removed it.
+  The MCP appended a correction comment and rebuilt BOARD and GRAPH. A direct
+  path check then confirmed that no B078 claim remained.
+- The corrected lifecycle diff passed all 21 maintained suites in 55.9
+  seconds. This supersedes the pre-correction run and includes canonical board,
+  archive, graph, documentation, release, Codex packaging, session-start,
+  evaluation, claim, and MCP server checks.
 
 ## Implementation progress
 
-- B078 is claimed and `in_progress`.
+- B078 is resolved and archived. Independent review caught the still-active
+  ignored claim, and the owning session released it before delivery.
 - The unsupported Claude policy block is removed. The Codex policy and both
   MCP transport files are unchanged.
 - Three deterministic test surfaces now assert the host contracts separately.
 - Architecture, release operations, changelog, canonical board state, and
-  dated evidence are aligned. Release and installed-host proof passed; B078
-  remains open only for this evidence merge and final canonical revalidation.
+  dated evidence are aligned. Release, installed-host, evidence-merge, and
+  final canonical revalidation gates passed.
 
 ## Documentation impact
 
@@ -200,19 +226,20 @@ higher validation count.
 
 ## Blockers
 
-No human action is required. The remaining normal gates are the release-evidence
-pull request, its exact merged-main check, and final canonical revalidation.
+No human action is required. All B078 acceptance gates passed.
 
 ## Handoff and resume route
 
-Completion state: `post-merge-pending`.
+Completion state: `closeout`.
 
 Next owner: the primary dogfood loop.
 
-Remaining gates: merge the release-evidence pull request, pass its exact
-merged-main check, and revalidate canonical B078 before resolution.
+Remaining gates: merge this lifecycle-only closeout pull request and confirm
+its exact merged-main delivery. That confirmation does not reopen B078 or
+require another B078 repository change.
 
-Resume route: deliver this evidence branch, revalidate canonical B078 from
-merged main, then resolve and archive it through the normal lifecycle.
+Resume route: verify exactly one B078 archive row, no B078 BOARD or GRAPH node,
+and passing merged-main checks. Then inspect the authoritative board for the
+next evidence-backed dogfood item.
 
-Terminal action: `keep-open`.
+Terminal action: `resolve-and-archive`.
