@@ -40,7 +40,18 @@ independently.
    bash tests/run-all.sh
    ```
 
-9. Commit and push the release-preparation change.
+9. From a host with Claude Code installed, validate the prepared Claude
+   marketplace with warnings treated as errors:
+
+   ```bash
+   claude plugin validate --strict .
+   ```
+
+   Stop if the validator is unavailable, reports a warning, or exits nonzero.
+   Keep this host-native release gate separate from the dependency-free CI
+   toolchain.
+
+10. Commit and push the release-preparation change.
 
 If approved review changes modify the prepared bundle, use `--refresh` with
 the current prepared version. Preview the refresh before you apply it. Refresh

@@ -114,6 +114,11 @@ current versions differ or a required current-truth marker is missing. A later
 release therefore updates both plugin hosts and the normative release markers
 from one coordinated version change.
 
+Version and product identity stay synchronized, but host-specific manifest
+fields do not. Keep the Codex installation and authentication policy in
+`.agents/plugins/marketplace.json`; Claude strict validation rejects that field
+in `.claude-plugin/marketplace.json`.
+
 The prepared Codex ref names the future release tag. Do not test a fresh
 remote install or advertise the prepared version until the publication
 workflow creates that tag at the exact prepared `main` commit.
@@ -123,6 +128,17 @@ Then, run:
 ```bash
 bash tests/run-all.sh
 ```
+
+From a host with Claude Code installed, also run the host-native marketplace
+schema gate:
+
+```bash
+claude plugin validate --strict .
+```
+
+Stop if that command is unavailable, reports a warning, or exits nonzero. The
+Claude CLI is a release-host prerequisite, not a dependency of the portable
+repository test suite.
 
 Commit and push the prepared release. Merge it through the normal review
 process.

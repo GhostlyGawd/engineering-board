@@ -4,7 +4,7 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ## Open
 
-- B078 P2 | [Claude strict plugin validation rejects the ignored marketplace policy field](bugs/B078-claude-strict-plugin-validation-rejects-the-ignored-marketpl.md)
+- B078 P2 | [Claude strict plugin validation rejects the ignored marketplace policy field](bugs/B078-claude-strict-plugin-validation-rejects-the-ignored-marketpl.md) (in_progress)
 - L001 | [Ship every deterministic guard with a test that drives its real fixtures and call-sites](learnings/L001-guards-need-tests-that-drive-real-callsites.md)
 - L002 | [Board health invariants must respect the open-vs-resolved entry lifecycle](learnings/L002-invariants-must-respect-the-entry-lifecycle.md)
 - L003 | [The newest surface carries the most risk — red-team it hardest](learnings/L003-newest-surfaces-carry-the-most-risk.md)

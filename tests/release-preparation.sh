@@ -126,11 +126,16 @@ assert codex_plugin["name"] == plugin["name"]
 assert codex_plugin["version"] == target
 assert market["plugins"][0]["version"] == target
 assert market["plugins"][0]["source"] == "./"
+assert "policy" not in market["plugins"][0]
 assert codex_market["plugins"][0]["version"] == target
 assert codex_market["plugins"][0]["source"] == {
     "source": "url",
     "url": "https://github.com/GhostlyGawd/engineering-board.git",
     "ref": f"v{target}",
+}
+assert codex_market["plugins"][0]["policy"] == {
+    "installation": "AVAILABLE",
+    "authentication": "ON_INSTALL",
 }
 assert manifest["version"] == target
 assert server["version"] == target
