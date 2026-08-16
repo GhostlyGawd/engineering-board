@@ -9,6 +9,8 @@ increases.
 
 ## [Unreleased]
 
+## [1.13.4] — 2026-08-16
+
 ### Fixed
 
 - The Claude marketplace manifest no longer copies Codex-only installation and

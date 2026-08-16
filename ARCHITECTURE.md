@@ -2,7 +2,7 @@
 
 A complete structural map of the plugin: what every file does, how the pieces connect, and the lifecycle that ties them together. Companion to `README.md` (which is the install/usage surface).
 
-Current release line: **v1.13.3**. Canonical evidence, P### pattern
+Current release line: **v1.13.4**. Canonical evidence, P### pattern
 identity, H### hypotheses, and durable memory are repository-owned Markdown.
 `BOARD.md`, `GRAPH.yml`, context briefs, value reports, HTML, and
 `.engineering-board/cache/` are derived or disposable views. Milestone D adds
