@@ -2,6 +2,7 @@
 
 Resolved entries. Newest at the top.
 
+- B077 | Codex exec cancels read-only board tools while MCP schemas omit approval annotations | resolved: 2026-08-16
 - B076 | Dated root audit snapshots can be mistaken for current product truth | resolved: 2026-08-15
 - B075 | Authoritative current-behavior table describes superseded graph context and outcome limitations | resolved: 2026-08-15
 - B074 | Self-hosted claim locks dirty the repository because runtime board paths are not ignored | resolved: 2026-08-15

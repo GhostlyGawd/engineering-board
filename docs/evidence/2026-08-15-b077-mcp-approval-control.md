@@ -5,8 +5,9 @@
 This file is the durable workpad and dated evidence record for B077. The
 authoritative repository is `GhostlyGawd/engineering-board`. The live default
 branch released v1.13.3 at
-`f4b44d9c8b63def225be2f3e9daa22309713768f`. The current closeout branch is
-`codex/v1.13.3-release-evidence` from that commit.
+`f4b44d9c8b63def225be2f3e9daa22309713768f` and contains the release and installed
+evidence through `9443daa331c3bfb5c916df729402423b9c62c30a`. The current lifecycle
+branch is `codex/b077-resolve` from that commit.
 
 Engineering Board must deliver relevant, source-linked repository memory when
 an agent makes an engineering decision. Approval behavior supports this outcome
@@ -58,7 +59,7 @@ the product outcome.
   claim, graph and context retrieval, hooks, and installation without a new
   reproducible blocker, false state, data-loss risk, recurring error, or
   undocumented workaround.
-- [ ] B077 is revalidated from its canonical entry after closeout merges and
+- [x] B077 is revalidated from its canonical entry after closeout merges and
   merged-main checks pass.
 
 ## Control evidence matrix
@@ -112,7 +113,8 @@ read-only sandbox.
 
 ## Implementation progress
 
-- B077 is claimed and is `in_progress`.
+- B077 is resolved and archived after the release-evidence merge, its exact
+  merged-main check, fresh canonical revalidation, and claim release passed.
 - `TOOLS` now stores explicit annotations for all 19 tools. `public_tools()`
   returns those values and still omits the internal handler.
 - The Codex manifest selects `codex-mcp.json`, whose `writes` default gates
@@ -174,12 +176,20 @@ read-only sandbox.
   MCP context and installed SessionStart, with no warning. Both passes covered
   initialization, capture, promotion, claim, graph, context, hook, release,
   and automatic temporary-repository cleanup.
+- Release-evidence PR #154 merged as
+  `9443daa331c3bfb5c916df729402423b9c62c30a`. Exact merged-main test run
+  `31918032704` passed. A fresh canonical B077 check then confirmed that every
+  Done-when criterion was checked before the claim was released and the entry
+  was resolved.
+- The final five-file canonical lifecycle diff passed all 21 maintained suites
+  in 58.6 seconds. An independent read-only audit matched BOARD, ARCHIVE, GRAPH,
+  claim absence, canonical fingerprints, and terminal workpad state.
 
 ## Uncertainties and assumptions
 
 - The controlled comparison supports missing annotations as the cause of the
-  read-only cancellation. Release packaging and installed-plugin behavior
-  remain separate gates.
+  read-only cancellation. Release packaging and installed-plugin behavior were
+  separate gates, and both passed before resolution.
 - Tool-level annotations cannot vary by input. A tool that has both preview
   and mutation modes must be classified by its possible mutating behavior.
 - The installed controls prove Codex 0.145.0 uses the packaged `writes`
@@ -187,25 +197,24 @@ read-only sandbox.
 
 ## Blockers
 
-No human action is required. The remaining gate is the evidence pull request,
-its merged-main checks, and final canonical B077 revalidation.
+No human action is required. No B077 product, evidence, release, installation,
+or canonical revalidation gate remains.
 
 ## Handoff and resume route
 
-Completion state: `post-merge-pending`.
+Completion state: `closeout`.
 
-Next owner: the primary dogfood loop.
+Next owner: the primary dogfood loop on B078.
 
-Remaining gates: merge the release-evidence pull request, pass its exact
-merged-main checks, and revalidate B077 from canonical main.
+Remaining gates: no B077 acceptance gate remains. Merge this canonical
+lifecycle transition and confirm its exact merged-main check as the delivery
+record; those delivery actions do not reopen B077.
 
-Evidence destination: this file for worker and post-merge evidence; append a
-separate dated closeout record only when release and installed evidence require
-a follow-up pull request.
+Evidence destination: this workpad and
+`docs/evidence/2026-08-16-v1.13.3-release-and-installed-validation.md`.
 
-Resume route: deliver the release-evidence pull request, then revalidate the
-canonical entry from merged main and resolve it through a final lifecycle
-change.
+Resume route: deliver this canonical lifecycle transition, verify B077 is
+absent from the live board and present once in the archive on merged main, then
+continue the dogfood loop with B078.
 
-Terminal action: `keep-open`. Keep B077 open until every closeout criterion
-passes.
+Terminal action: `resolve-and-archive`.

@@ -4,7 +4,6 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ## Open
 
-- B077 P2 | [Codex exec cancels read-only board tools while MCP schemas omit approval annotations](bugs/B077-codex-exec-cancels-read-only-board-tools-while-mcp-schemas.md) (in_progress)
 - B078 P2 | [Claude strict plugin validation rejects the ignored marketplace policy field](bugs/B078-claude-strict-plugin-validation-rejects-the-ignored-marketpl.md)
 - L001 | [Ship every deterministic guard with a test that drives its real fixtures and call-sites](learnings/L001-guards-need-tests-that-drive-real-callsites.md)
 - L002 | [Board health invariants must respect the open-vs-resolved entry lifecycle](learnings/L002-invariants-must-respect-the-entry-lifecycle.md)
