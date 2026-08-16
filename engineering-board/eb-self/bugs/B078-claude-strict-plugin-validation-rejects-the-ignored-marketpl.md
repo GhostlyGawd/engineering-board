@@ -17,7 +17,7 @@ promoted_from: [mcp:_sessions/mcp-2026-08-15.md:b79036623cfe40f5]
 
 - [x] `claude plugin validate --strict .` accepts the Claude marketplace manifest with no ignored-field warning.
 - [x] The Claude marketplace manifest contains only fields supported by Claude Code, while Codex-specific policy remains on a Codex-owned surface.
-- [ ] Normal Claude and Codex plugin validation, packaging, and install checks still pass.
+- [x] Normal Claude and Codex plugin validation, packaging, and install checks still pass.
 
 ## Evidence
 
@@ -29,3 +29,4 @@ promoted_from: [mcp:_sessions/mcp-2026-08-15.md:b79036623cfe40f5]
 
 - **goal-b078-20260816** 2026-08-16T01:00:47Z: Claimed after B077 closeout. Claude Code 2.1.200 normal validation passes with one ignored policy warning; strict validation fails on that warning. The approved bounded direction is a host-specific manifest contract with a failing test before the manifest edit.
 - **goal-b078-20260816** 2026-08-16T01:04:00Z: Red tests rejected the copied Claude policy, then the one-field removal made normal and strict Claude validation pass without warnings. Codex policy assertions and release-preparation checks pass; full-suite and delivery gates remain open.
+- **goal-b078-20260816** 2026-08-16T01:37:59Z: v1.13.4 published from exact merged main e151d3b7a3db. GitHub asset, MCP Registry, and PyPI records align; released Codex and Claude installs match prepared manifest hashes. Claude normal/strict validation and a fresh Codex board_status call pass. Keep open until this evidence merges and exact main revalidation passes.

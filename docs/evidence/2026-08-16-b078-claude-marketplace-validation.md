@@ -3,9 +3,10 @@
 ## Identity and authoritative state
 
 This file is the durable workpad and dated evidence record for B078. The
-authoritative repository is `GhostlyGawd/engineering-board`. Work starts from
-merged main `7516eaecdabf85c3339b5705442ef654770d29d1` on branch
-`codex/b078-claude-manifest-policy`.
+authoritative repository is `GhostlyGawd/engineering-board`. Work started from
+merged main `7516eaecdabf85c3339b5705442ef654770d29d1`. The released closeout
+commit is `e151d3b7a3db019cac5188b12466727b43f90ef2`; the current evidence branch
+is `codex/v1.13.4-release-evidence` from that commit.
 
 Engineering Board must install and validate truthfully on every supported
 host. A green cross-host test is not useful if it makes two different manifest
@@ -31,8 +32,8 @@ higher validation count.
 - [x] Remove the unsupported Claude field without changing Codex policy.
 - [x] Run focused validation and the complete maintained suite.
 - [x] Reconcile affected documentation and record reviewed-unaffected surfaces.
-- [ ] Complete independent review, PR checks, and exact merged-main checks.
-- [ ] Publish a patch release and validate the released Claude and Codex
+- [x] Complete independent review, PR checks, and exact merged-main checks.
+- [x] Publish a patch release and validate the released Claude and Codex
   installations.
 
 ## Acceptance criteria
@@ -50,14 +51,14 @@ higher validation count.
 
 ### Post-merge phase
 
-- [ ] Pull-request checks and the exact merged-main check pass.
-- [ ] Canonical BOARD, GRAPH, and B078 state agree after all entry edits.
+- [x] Pull-request checks and the exact merged-main check pass.
+- [x] Canonical BOARD, GRAPH, and B078 state agree after all entry edits.
 
 ### Closeout phase
 
-- [ ] The new immutable patch-release artifact contains the corrected Claude
+- [x] The new immutable patch-release artifact contains the corrected Claude
   manifest and the preserved Codex policy.
-- [ ] Fresh released Claude and Codex plugin installations pass their normal
+- [x] Fresh released Claude and Codex plugin installations pass their normal
   host validation without an undocumented workaround.
 
 ## Evidence matrix
@@ -78,7 +79,7 @@ higher validation count.
 | Codex marketplace retains its host policy | Required | `.agents/plugins/marketplace.json` remains unchanged | Exact policy assertions in Codex, version, and release-preparation tests | Architecture, release guides, this workpad | Worker gate passed |
 | Release preparation preserves the host boundary | Required | Version script updates each manifest independently | Release-preparation 16-check suite plus release-instruction guard | Both release guides and changelog | Worker gate passed |
 | Runtime product behavior remains unchanged | Required | MCP transport, hooks, tools, context, graph, and outcomes are untouched | Complete maintained suite | Reviewed-unaffected rationale below | Regression gate passed |
-| Installed claims identify an immutable corrected artifact | Required for closeout | Patch release from merged main | Release workflow plus fresh Claude and Codex installs | Dated closeout evidence | Pending release |
+| Installed claims identify an immutable corrected artifact | Required for closeout | Patch release from merged main | Release workflow plus fresh Claude and Codex installs | Dated closeout evidence | Passed on v1.13.4 |
 
 ## Campaign controls
 
@@ -140,6 +141,26 @@ higher validation count.
   supersedes the earlier complete-suite run from before the release-gate
   correction.
 
+## Release and installed validation evidence
+
+- Worker PR #156 merged as `a9f21ce67b3a`; exact main run `31919205651`
+  passed. Release PR #157 merged as `e151d3b7a3db`; exact main run
+  `31919614516` passed.
+- Release workflow `31919668638` published v1.13.4 from exact merged main.
+  The tag dereferences to `e151d3b7a3db`, and the 66,718-byte GitHub asset
+  matches pinned SHA-256
+  `7101ce40cee2b5023ef162d9d0cbd637edfdd2c94abd51ff2dd7cbe2509d1705`.
+- MCP Registry reports v1.13.4 active and latest with the same asset and
+  checksum. PyPI reports v1.13.4 latest with one unyanked wheel and one
+  unyanked source distribution.
+- The released Codex plugin is the exact tag commit, registers one MCP server
+  from its 1.13.4 cache, passes the packaged 19-tool check, and completes a
+  fresh read-only `board_status` call.
+- The released Claude plugin lists as enabled at 1.13.4. Normal and strict
+  installed-path validation pass without warnings. Both host caches match the
+  three prepared manifest hashes recorded in
+  `2026-08-16-v1.13.4-release-and-installed-validation.md`.
+
 ## Implementation progress
 
 - B078 is claimed and `in_progress`.
@@ -147,7 +168,8 @@ higher validation count.
   MCP transport files are unchanged.
 - Three deterministic test surfaces now assert the host contracts separately.
 - Architecture, release operations, changelog, canonical board state, and
-  dated evidence are aligned. Release and installed-host proof remain open.
+  dated evidence are aligned. Release and installed-host proof passed; B078
+  remains open only for this evidence merge and final canonical revalidation.
 
 ## Documentation impact
 
@@ -165,21 +187,21 @@ higher validation count.
 
 ## Uncertainties and assumptions
 
-- Codex CLI 0.145.0 has no plugin-validation command. Its source contract is
-  covered structurally now; its truthful installed-artifact proof must use the
-  next immutable release because the active catalog still pins v1.13.3.
+- Codex CLI 0.145.0 has no plugin-validation command. Installed proof therefore
+  uses exact tag commit and manifest hashes, marketplace identity, MCP
+  registration, the packaged validation test, and a fresh read-only tool call.
 - Claude Code is available on the Windows host, not inside WSL. Strict release
   validation therefore uses an exact hash-bound disposable Windows-native copy
   under `D:\Codex\Scratch`; repository edits and portable tests remain in WSL.
   The validator remains a documented release-host prerequisite.
-- The ignored Claude field had no runtime effect. The patch release is still
-  required because an unreleased checkout must not be substituted for an
-  installed release claim.
+- The ignored Claude field had no runtime effect. v1.13.4 nevertheless proves
+  the fix through immutable installed artifacts instead of an unreleased
+  checkout.
 
 ## Blockers
 
-No human action is required. Worker review, PR delivery, patch release, and
-fresh installed-host validation remain normal authorized gates.
+No human action is required. The remaining normal gates are the release-evidence
+pull request, its exact merged-main check, and final canonical revalidation.
 
 ## Handoff and resume route
 
@@ -187,11 +209,10 @@ Completion state: `post-merge-pending`.
 
 Next owner: the primary dogfood loop.
 
-Remaining gates: final independent review, worker PR checks, exact merged-main
-checks, patch release, and fresh Claude and Codex installed-host validation.
+Remaining gates: merge the release-evidence pull request, pass its exact
+merged-main check, and revalidate canonical B078 before resolution.
 
-Resume route: finish the independent worker audit, deliver the worker PR, then
-prepare and publish the next patch release from exact merged main before any
-installed claim.
+Resume route: deliver this evidence branch, revalidate canonical B078 from
+merged main, then resolve and archive it through the normal lifecycle.
 
 Terminal action: `keep-open`.
