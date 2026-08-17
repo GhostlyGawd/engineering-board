@@ -1,23 +1,41 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-08-16T02:48:33Z",
-  "source_fingerprint": "f71fe049765bcbf7a0b9123c94cc92c62f6baa07d0797f95560ed3ee2a66361a",
+  "generated_at": "2026-08-17T00:20:30Z",
+  "source_fingerprint": "f14345b57eea64d9517e7fa1d60158e9923ee00e37af78b132c92b32da5ad8db",
   "build_mode": "full",
   "project": "eb-self",
   "entries_analyzed": {
-    "open": 0,
+    "open": 1,
     "archived": 0,
-    "total": 0
+    "total": 1
   },
-  "nodes": {},
+  "nodes": {
+    "Q003": {
+      "type": "question",
+      "title": "Does context presentation prevent cross-incident first causes?",
+      "source": "questions/Q003-does-context-presentation-prevent-cross-incident-first-cause.md",
+      "status": "in_progress",
+      "affects": "evaluation/operator-instructions.md",
+      "discovered": "2026-08-16"
+    }
+  },
   "edges": [],
   "topology": {
     "clusters": [],
-    "isolated": [],
+    "isolated": [
+      "Q003"
+    ],
     "cross_cluster_bridges": []
   },
   "unresolved_patterns": [],
-  "findings": [],
-  "read_order": [],
+  "findings": [
+    {
+      "type": "isolated-node",
+      "node": "Q003"
+    }
+  ],
+  "read_order": [
+    "Q003"
+  ],
   "drill_in": {}
 }
