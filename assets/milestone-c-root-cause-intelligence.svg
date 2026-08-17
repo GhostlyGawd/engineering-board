@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Milestone C root-cause intelligence validation</title>
+  <desc id="desc">A sanitized terminal-style capture shows fifteen lifecycle checks passed for deterministic cluster ranking, evidence-cited hypotheses, rejected-claim memory, stale-plan refusal, offline parity, and escaped read-only rendering.</desc>
+  <rect width="1200" height="680" rx="24" fill="#10131a"/>
+  <rect x="1" y="1" width="1198" height="678" rx="23" fill="none" stroke="#343b4a" stroke-width="2"/>
+  <rect x="1" y="1" width="1198" height="58" rx="23" fill="#1a1f2a"/>
+  <rect x="1" y="36" width="1198" height="23" fill="#1a1f2a"/>
+  <circle cx="32" cy="30" r="7" fill="#ff6b6b"/>
+  <circle cx="56" cy="30" r="7" fill="#f6c453"/>
+  <circle cx="80" cy="30" r="7" fill="#48c78e"/>
+  <text x="600" y="36" text-anchor="middle" fill="#aab2c2" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="16">milestone-c-root-cause-intelligence</text>
+
+  <text x="54" y="105" fill="#8993a7" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">$ bash tests/orchestration/milestone-c-root-cause-intelligence.sh</text>
+  <text x="54" y="148" fill="#7ee2a8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="20">Milestone C root-cause intelligence matrix: 15 checks passed</text>
+
+  <text x="54" y="210" fill="#e6a94e" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">ranking</text>
+  <text x="260" y="210" fill="#f2f4f8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">rule v1 · score 0–100 · deterministic tie order</text>
+
+  <text x="54" y="254" fill="#e6a94e" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">H001 lifecycle</text>
+  <text x="260" y="254" fill="#f2f4f8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">proposed → rejected → reopened → split</text>
+
+  <text x="54" y="298" fill="#e6a94e" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">negative memory</text>
+  <text x="260" y="298" fill="#f2f4f8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">reproposal blocked · no apply token · rejected evidence retained</text>
+
+  <text x="54" y="342" fill="#e6a94e" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">lineage</text>
+  <text x="260" y="342" fill="#f2f4f8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">split without implicit children · explicit merge with merged_from</text>
+
+  <text x="54" y="386" fill="#e6a94e" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">authority</text>
+  <text x="260" y="386" fill="#f2f4f8" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">preview writes 0 files · stale token writes 0 files</text>
+
+  <text x="54" y="448" fill="#7aa2f7" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="17">shared core == CLI == MCP ranked output</text>
+  <text x="54" y="484" fill="#7aa2f7" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="17">cache-present == cache-deleted rebuild · invalid proxy stays offline</text>
+  <text x="54" y="520" fill="#7aa2f7" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="17">HTML escapes hypothesis content · stale binding visible · no mutation control</text>
+  <text x="54" y="556" fill="#7aa2f7" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="17">confirmation and reopening require cited canonical evidence</text>
+
+  <line x1="54" y1="604" x2="1146" y2="604" stroke="#343b4a"/>
+  <text x="54" y="638" fill="#8993a7" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="14">sanitized automated fixture · 2026-07-28 · tests/orchestration/milestone-c-root-cause-intelligence.sh</text>
+</svg>

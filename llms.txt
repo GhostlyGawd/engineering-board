@@ -1,0 +1,147 @@
+# engineering-board
+
+> A repository-owned pattern-intelligence system for engineering agents.
+> Findings, hypotheses, and learnings live as visible Markdown evidence.
+> deterministic graph views connect recurring signals across domains so agents
+> can retrieve shared root-cause memory before they repeatedly patch symptoms.
+> Explicit fix outcomes improve later Learning state and confidence.
+> No hidden database, external service, or daemon. Ships as Codex and Claude
+> Code plugins and as a zero-dependency MCP server (19 tools over stdio,
+> protocol 2025-06-18).
+
+## What it is
+
+engineering-board turns a committed markdown tree (engineering-board/<project>/)
+into durable, correctable engineering memory:
+
+- Findings (bugs, features, questions, observations) can be captured through
+  MCP in any supported client. The Claude Code plugin can also capture them
+  passively with a Stop hook.
+- Exact patterns and affected domains form explainable graph edges and clusters.
+  Graph structure is deterministic. agent-authored causal interpretations remain
+  separate, evidence-cited hypotheses.
+- /board-insights ranks clusters with a versioned, transparent 0-100
+  investigation-priority score. /board-hypothesis preserves cited H### state,
+  alternatives, falsifiers, lineage, and rejected-claim negative memory.
+- /board-context retrieves a bounded and explainable brief from task, path,
+  entry, and current-directory signals. Claude Code SessionStart and relevant
+  prompts use the same read-only core automatically. Codex calls board_context
+  explicitly through MCP.
+- /board-outcome records an explicit held, failed, partial, or inconclusive fix
+  result against H### memory. Separate content-bound plans update L### outcome
+  state and confidence.
+- The contained /board-demo sample shows three cross-domain symptoms becoming
+  cluster C001 and a proposed H001 with alternatives and a falsifier. It uses
+  synthetic local data only and prints manifest-verified cleanup.
+- A PM pipeline consolidates findings into real board entries, deterministically.
+- Worker agents drive each entry through a tdd -> review -> validate state
+  machine under atomic claim locking when fix verification is useful. This is a
+  supporting proof loop, not the required first experience.
+- Recurring lessons promote into committed Learning entries (L###) that survive
+  session boundaries. board_remember / /board-remember saves one on demand.
+- BOARD.md (the index) and board.html (ranked pattern intelligence plus a
+  themed Kanban with search, filters, stats, and coordination panels) are
+  regenerated deterministically.
+
+Who it is for: developers running Codex, Claude Code, or another MCP client who want their
+agents' task state and memory to be repo-committed, PR-reviewable, and shared
+with the team: instead of per-user state in ~/.claude/ or a local database.
+
+How it differs from the 2026 field (beads, Backlog.md, Task Master, Claude
+Code's built-in Tasks, claude-mem): its center is evidence-linked cross-domain
+pattern intelligence over repository-visible state. Durable memory, atomic
+claims, passive capture, verification, and a published board support that
+substrate.
+
+## Install
+
+Codex plugin (five skills and the 19-tool MCP server):
+
+    codex plugin marketplace add GhostlyGawd/engineering-board
+    codex plugin add engineering-board@engineering-board
+
+Start a new Codex session after installation. Pass the absolute repository
+root in each bundled-plugin MCP call.
+
+The Codex plugin uses a writes-only approval default. Its six pure-read tools
+can run without a per-call prompt. Every tool that can write remains gated.
+
+Claude Code plugin (full autonomous pipeline. requires Claude Code, free):
+
+    /plugin marketplace add GhostlyGawd/engineering-board
+    /plugin install engineering-board
+    /board-setup
+    /board-demo
+
+MCP server, primary path: one line from PyPI:
+
+    claude mcp add engineering-board -- uvx engineering-board-mcp
+
+MCP server, fallback: run from a clone:
+
+    git clone https://github.com/GhostlyGawd/engineering-board
+    claude mcp add engineering-board -- python3 "$(pwd)/engineering-board/mcp-server/engineering_board_mcp.py"
+
+Works with any MCP client: Codex CLI, Gemini CLI, Cursor, Claude Desktop
+config blocks:
+https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
+
+## MCP tools (19)
+
+- board_init: scaffold a project board. optional agents_md writes a usage block
+  into the repo's AGENTS.md for hook-less agents.
+- board_list_projects: list projects from BOARD-ROUTER.md.
+- board_create_entry: create a validated entry, allocate the next id, rebuild
+  the index. optional parent links a subtask.
+- board_list_entries: list entries. filters project/type/status/needs/ready
+  (ready = open with all existing blockers resolved).
+- board_get_entry: full markdown + parsed frontmatter of one entry.
+- board_update_entry: update frontmatter (status, needs, priority, blocked_by,
+  parent), append a section, or append a timestamped comment. A new resolved
+  state inserts one durable ARCHIVE.md row before all older rows.
+- board_graph: build the deterministic provenance-linked pattern graph through
+  the shared full/incremental engine.
+- board_context: retrieve bounded systemic memory with exposed relevance
+  components, reasons, state, confidence, and canonical sources. Selected
+  entries contribute their affects paths to Learning scope matching.
+- board_insights: rank clusters with exposed score components and return linked
+  hypotheses and rejected negative-memory references.
+- board_hypotheses: list H### records or preview/apply evidence-cited proposal,
+  evaluation, reopen, split, and merge operations.
+- board_outcomes: preview/apply structured H### fix outcomes, apply returned
+  L### Learning plans, curate eligible Learning feedback, or derive a value
+  report.
+- board_patterns: list patterns or preview/apply P### create, alias, assignment,
+  and correction operations.
+- board_promote_findings: preview/apply scratch promotion with a content-bound
+  plan, typed per-finding outcomes, and durable provenance.
+- board_rebuild: deterministically regenerate BOARD.md.
+- board_capture_finding: append a finding to the scratch inbox _sessions/.
+- board_claim: acquire an entry's atomic claim lock.
+- board_release: release an entry's claim lock.
+- board_remember: save a durable insight straight to learnings/ (bypasses the
+  curator's recurrence threshold).
+- board_status: open counts, in_progress/blocked ids, the ready queue,
+  dangling-blocker warnings, un-promoted scratch count.
+
+The six pure-read tools are board_list_projects, board_list_entries,
+board_get_entry, board_insights, board_context, and board_status. Mixed
+preview/apply tools advertise their maximum write capability. MCP annotations
+are advisory hints, not write authority. Host policy, repository-root
+containment, content-bound plans, and claims remain authoritative controls.
+
+## Key links
+
+- Repository: https://github.com/GhostlyGawd/engineering-board
+- README (full docs): https://github.com/GhostlyGawd/engineering-board#readme
+- Landing page: https://ghostlygawd.github.io/engineering-board/
+- Live board (this repo's own, republished on every merge):
+  https://ghostlygawd.github.io/engineering-board/board.html
+- MCP server reference: https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md
+- PyPI package: https://pypi.org/project/engineering-board-mcp/
+- MCP Registry entry (io.github.GhostlyGawd/engineering-board):
+  https://registry.modelcontextprotocol.io/?search=engineering-board
+- Changelog: https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELOG.md
+- Architecture: https://github.com/GhostlyGawd/engineering-board/blob/main/ARCHITECTURE.md
+- Security posture: https://github.com/GhostlyGawd/engineering-board/blob/main/SECURITY.md
+- License: MIT
