@@ -220,6 +220,13 @@ def validate_repository_contract(root: Path) -> dict[str, Any]:
         _require(isinstance(row_tools, list) and set(row_tools) <= set(tools), f"unknown tool in {row.get('id')}")
         surfaces = row.get("surfaces")
         _require(isinstance(surfaces, list) and surfaces, f"{row.get('id')} has no surfaces")
+        surface_ids = {
+            surface.get("id") for surface in surfaces if isinstance(surface, dict)
+        }
+        _require(
+            "bootstrap-check" in surface_ids,
+            f"{row.get('id')} has no bootstrap-check surface",
+        )
         for surface in surfaces:
             skips = surface.get("permitted_skip_reasons")
             _require(isinstance(skips, list) and set(skips) <= allowed_skips, f"invalid skip reason in {row.get('id')}")
@@ -227,6 +234,10 @@ def validate_repository_contract(root: Path) -> dict[str, Any]:
         if row["os"]["family"] == "windows":
             command_text = "\n".join(surface["command"] for surface in surfaces)
             _require("platform_test.py" in command_text, f"{row['id']} must use the Python launcher")
+            _require(
+                "bootstrap_dev.py --check" in command_text,
+                f"{row['id']} must use the Python bootstrap check",
+            )
             _require("bash" not in command_text.lower(), f"{row['id']} cannot use Bash as native evidence")
 
     limits = matrix.get("limits")
@@ -253,6 +264,31 @@ def validate_repository_contract(root: Path) -> dict[str, Any]:
         re.search(r"Git Bash.+not native Windows", docs, re.IGNORECASE | re.DOTALL)
         is not None,
         "Git Bash is not classified separately",
+    )
+
+    toolchain = _load_object(root / "support" / "dev-tools" / "toolchain.json")
+    _require(
+        toolchain.get("schema_version") == "1",
+        "unsupported development toolchain schema",
+    )
+    artifact_platforms = {
+        artifact.get("platform")
+        for artifact in toolchain.get("artifacts", [])
+        if isinstance(artifact, dict)
+    }
+    _require(
+        artifact_platforms
+        == {"darwin-arm64", "linux-x86_64", "windows-x86_64"},
+        "development tool artifacts do not cover every supported host",
+    )
+    devcontainer = _load_object(root / ".devcontainer" / "devcontainer.json")
+    _require(
+        devcontainer.get("workspaceFolder") == "/workspaces/engineering-board",
+        "devcontainer workspace path is not canonical",
+    )
+    _require(
+        devcontainer.get("remoteUser") == "vscode",
+        "devcontainer user is not canonical",
     )
 
     return {

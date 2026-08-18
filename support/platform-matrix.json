@@ -45,6 +45,12 @@
       ],
       "surfaces": [
         {
+          "id": "bootstrap-check",
+          "required": true,
+          "command": "bash scripts/bootstrap-dev.sh --check",
+          "permitted_skip_reasons": []
+        },
+        {
           "id": "compatibility",
           "required": true,
           "command": "bash tests/run-all.sh",
@@ -77,6 +83,12 @@
       ],
       "surfaces": [
         {
+          "id": "bootstrap-check",
+          "required": true,
+          "command": "bash scripts/bootstrap-dev.sh --check",
+          "permitted_skip_reasons": []
+        },
+        {
           "id": "compatibility",
           "required": true,
           "command": "bash tests/run-all.sh",
@@ -102,6 +114,12 @@
         "git"
       ],
       "surfaces": [
+        {
+          "id": "bootstrap-check",
+          "required": true,
+          "command": "python scripts/bootstrap_dev.py --check",
+          "permitted_skip_reasons": []
+        },
         {
           "id": "platform-neutral-runtime",
           "required": true,
@@ -130,6 +148,12 @@
         "git"
       ],
       "surfaces": [
+        {
+          "id": "bootstrap-check",
+          "required": true,
+          "command": "python scripts\\bootstrap_dev.py --check",
+          "permitted_skip_reasons": []
+        },
         {
           "id": "platform-neutral-runtime",
           "required": true,

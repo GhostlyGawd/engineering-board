@@ -36,5 +36,14 @@ jobs:
           bash --version | head -1
           python3 --version
 
+      - name: Provision pinned development tools
+        run: bash scripts/bootstrap-dev.sh
+
+      - name: Verify pinned development tools offline
+        env:
+          UV_OFFLINE: "1"
+          npm_config_offline: "true"
+        run: bash scripts/bootstrap-dev.sh --check
+
       - name: Run full test suite
         run: bash tests/run-all.sh

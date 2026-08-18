@@ -8,6 +8,46 @@ run the tests.
 
 Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for the system structure.
 
+## Set up the pinned development tools
+
+On macOS or Linux, install the repository-pinned development inventory:
+
+```sh
+bash scripts/bootstrap-dev.sh
+```
+
+Verify it later without network access or filesystem changes:
+
+```sh
+bash scripts/bootstrap-dev.sh --check
+```
+
+On native Windows, run `python scripts/bootstrap_dev.py` to install, then run
+`python scripts/bootstrap_dev.py --check` directly from PowerShell or
+`python scripts\bootstrap_dev.py --check` from `cmd.exe`. Git Bash and WSL are
+compatibility environments, not native Windows evidence.
+
+The first installation requires Python and access to the public pinned
+sources. It installs below ignored `.engineering-board/dev-tools/`. Exact
+versions, lock files, immutable download URLs, and SHA-256 values are in
+[`support/dev-tools/`](support/dev-tools/). A failure names the missing or
+mismatched prerequisite and the recovery command. The development inventory
+does not change the zero-dependency MCP runtime metadata.
+
+To use the containerized workspace, open the repository in a Dev Container or
+build it with:
+
+```sh
+docker build --no-cache --platform linux/amd64 \
+  -f .devcontainer/Dockerfile \
+  -t engineering-board-devcontainer .
+```
+
+The container uses user `vscode` and workspace
+`/workspaces/engineering-board`. Its post-create command checks the pinned
+inventory. The later quality-gate feature owns the additional stable selector
+commands, so this image does not claim those gates yet.
+
 ## Run the test suite
 
 Run the full test suite:

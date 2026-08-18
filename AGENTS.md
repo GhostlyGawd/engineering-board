@@ -16,3 +16,16 @@ Engineering Board plugin.
 
 The owner approved the current controlled-English text. Do not claim formal
 ASD-STE100 compliance without a separate qualified verification.
+
+## Development environment
+
+Use `bash scripts/bootstrap-dev.sh` on macOS/Linux or
+`python scripts/bootstrap_dev.py` on native Windows. The offline read-only
+check is `bash scripts/bootstrap-dev.sh --check` on macOS/Linux and
+`python scripts/bootstrap_dev.py --check` from PowerShell or `cmd.exe`.
+Development tools are pinned in `support/dev-tools/` and installed only below
+ignored `.engineering-board/dev-tools/`.
+
+The devcontainer uses the `vscode` user and
+`/workspaces/engineering-board`. Do not add host credentials, host-specific
+mounts, or private configuration to `.devcontainer/`.

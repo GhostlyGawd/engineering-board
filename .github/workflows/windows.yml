@@ -44,6 +44,19 @@ jobs:
           git --version
           python -c "import os, platform; print(os.name, platform.platform())"
 
+      - name: Provision pinned development tools from PowerShell
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: python scripts/bootstrap_dev.py
+
+      - name: Verify pinned development tools from PowerShell
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        env:
+          UV_OFFLINE: "1"
+          npm_config_offline: "true"
+        run: python scripts/bootstrap_dev.py --check
+
       - name: Validate from PowerShell
         if: matrix.native_shell == 'powershell'
         shell: pwsh
@@ -58,6 +71,19 @@ jobs:
           node --version
           git --version
           python -c "import os, platform; print(os.name, platform.platform())"
+
+      - name: Provision pinned development tools from cmd.exe
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: python scripts\bootstrap_dev.py
+
+      - name: Verify pinned development tools from cmd.exe
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        env:
+          UV_OFFLINE: "1"
+          npm_config_offline: "true"
+        run: python scripts\bootstrap_dev.py --check
 
       - name: Validate from cmd.exe
         if: matrix.native_shell == 'cmd'

@@ -97,6 +97,16 @@ PowerShell and `cmd.exe` on a GitHub-hosted Windows runner. Repository
 validators share `scripts/validator_resources.py`: at most two top-level
 sessions, with exclusive aggregate, browser, OTLP, and port locks.
 
+Pinned development provisioning is owned by `scripts/bootstrap_dev.py` with
+the Bash adapter `scripts/bootstrap-dev.sh`. `support/dev-tools/toolchain.json`
+binds the normalized inventory to exact versions and checksum-verified
+platform archives. The Python and Node dependency graphs are locked below
+`support/dev-tools/`. Installations stay below ignored
+`.engineering-board/dev-tools/`; check mode reads the completion binding and
+tool versions without downloads or writes. `.devcontainer/` builds the same
+inventory for `linux/amd64`, user `vscode`, and workspace
+`/workspaces/engineering-board`.
+
 This is the plugin's *source* tree. In a **consuming** repo, the plugin creates and reads board *content* at a visible, committed-by-default `engineering-board/<project>/` (the 1.1.0 default: resolved ahead of the pre-1.1.0 `docs/boards/` and legacy `docs/board/` fallbacks. see §6.1 of `specs/board-relocation.md`). Do not confuse that with the hidden, gitignored `.engineering-board/` (leading dot) runtime dir that holds ephemeral session state (`session-mode.json`, `last-stop-stdin.json`, `active-workers.json`). Visible twin (no dot) = committed board. hidden twin (dot) = its runtime scratch.
 
 ---

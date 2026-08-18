@@ -14,6 +14,9 @@ increases.
 - Added a schema-validated supported-platform matrix, a platform-neutral test
   launcher, native PowerShell and `cmd.exe` validation on GitHub-hosted
   Windows, and globally bounded validator resource locks.
+- Added checksum-verified pinned development bootstrap tooling for macOS,
+  Linux, native Windows, and a digest-pinned reproducible devcontainer with a
+  stable workspace, user, and normalized tool inventory.
 
 ### Fixed
 

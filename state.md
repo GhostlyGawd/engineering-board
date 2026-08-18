@@ -98,6 +98,12 @@ _Last updated: 2026-07-10_
   are compatibility rows only. Repository validators use
   `scripts/validator_resources.py` for the global two-session cap and
   exclusive aggregate/browser/OTLP/port locks.
+- **Pinned development environment:** `support/dev-tools/` owns the exact
+  inventory, dependency locks, immutable download URLs, and checksums.
+  `scripts/bootstrap-dev.sh` is the macOS/Linux interface;
+  `scripts/bootstrap_dev.py` is the native-Windows interface. Check mode is
+  offline/read-only. `.devcontainer/` uses the same inventory at
+  `/workspaces/engineering-board` as user `vscode`.
 - **Board location resolves in ONE place now:** source `hooks/scripts/board-paths.sh` and call `eb_board_dirs` / `eb_board_rows` / `eb_router_path`. Do **not** re-hardcode `docs/boards/` in scripts.
 - **Version bumps** must touch *both* `.claude-plugin/plugin.json` and `marketplace.json` (coherence-checked), and a fix only reaches installs when the version *increases*.
 - New `hooks/scripts/*.sh` must pass `tests/crosscompat-lint.sh`: shebang exactly `#!/usr/bin/env bash`, no `date -d`/`date -j -f`, no `jq`, no drive letters (use python3 for JSON + timestamps).

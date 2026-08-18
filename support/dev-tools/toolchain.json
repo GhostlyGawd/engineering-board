@@ -1,0 +1,104 @@
+{
+  "schema_version": "1",
+  "python_version": "3.14.7",
+  "node_version": "26.7.0",
+  "tools": [
+    {"id": "actionlint", "version": "1.7.12", "provider": "python", "executable": "actionlint", "version_args": ["--version"]},
+    {"id": "check-jsonschema", "version": "0.38.0", "provider": "python", "executable": "check-jsonschema", "version_args": ["--version"]},
+    {"id": "coverage", "version": "7.15.4", "provider": "python", "executable": "coverage", "version_args": ["--version"]},
+    {"id": "cyclonedx-py", "version": "7.3.1", "provider": "python", "executable": "cyclonedx-py", "version_args": ["--version"]},
+    {"id": "jscpd", "version": "5.0.16", "provider": "node-package", "executable": "jscpd", "version_args": ["--version"], "verify": "file-sha256"},
+    {"id": "markdownlint-cli2", "version": "0.23.2", "provider": "node-package", "executable": "markdownlint-cli2", "version_args": ["--version"], "verify": "file-sha256"},
+    {"id": "mypy", "version": "2.3.1", "provider": "python", "executable": "mypy", "version_args": ["--version"]},
+    {"id": "node", "version": "26.7.0", "provider": "node", "executable": "node", "version_args": ["--version"], "verify": "file-sha256"},
+    {"id": "npm", "version": "11.19.0", "provider": "node", "executable": "npm", "version_args": ["--version"], "verify": "file-sha256"},
+    {"id": "pip-audit", "version": "2.10.1", "provider": "python", "executable": "pip-audit", "version_args": ["--version"]},
+    {"id": "pre-commit", "version": "4.6.2", "provider": "python", "executable": "pre-commit", "version_args": ["--version"]},
+    {"id": "pyright", "version": "1.1.413", "provider": "node-package", "executable": "pyright", "version_args": ["--version"], "verify": "file-sha256"},
+    {"id": "pytest", "version": "9.1.1", "provider": "python", "executable": "pytest", "version_args": ["--version"]},
+    {"id": "python", "version": "3.14.7", "provider": "python", "executable": "python", "version_args": ["--version"]},
+    {"id": "radon", "version": "6.0.1", "provider": "python", "executable": "radon", "version_args": ["--version"]},
+    {"id": "ruff", "version": "0.16.3", "provider": "python", "executable": "ruff", "version_args": ["--version"]},
+    {"id": "shellcheck", "version": "0.11.0", "provider": "python", "executable": "shellcheck", "version_args": ["--version"], "package": "shellcheck-py", "package_version": "0.11.0.1"},
+    {"id": "shfmt", "version": "3.13.0", "provider": "python", "executable": "shfmt", "version_args": ["--version"]},
+    {"id": "syft", "version": "1.51.0", "provider": "artifact", "executable": "syft", "version_args": ["version"], "verify": "file-sha256"},
+    {"id": "uv", "version": "0.12.3", "provider": "uv", "executable": "uv", "version_args": ["--version"]},
+    {"id": "vulture", "version": "2.16", "provider": "python", "executable": "vulture", "version_args": ["--version"]},
+    {"id": "yamllint", "version": "1.38.0", "provider": "python", "executable": "yamllint", "version_args": ["--version"]},
+    {"id": "zizmor", "version": "1.29.0", "provider": "python", "executable": "zizmor", "version_args": ["--version"]}
+  ],
+  "artifacts": [
+    {
+      "id": "uv",
+      "version": "0.12.3",
+      "platform": "darwin-arm64",
+      "url": "https://github.com/astral-sh/uv/releases/download/0.12.3/uv-aarch64-apple-darwin.tar.gz",
+      "sha256": "546f7f8a6c70ff13a3a9d2bc958db3427298cebf3e0cb756f9177133b7068843",
+      "strip_components": 1
+    },
+    {
+      "id": "uv",
+      "version": "0.12.3",
+      "platform": "linux-x86_64",
+      "url": "https://github.com/astral-sh/uv/releases/download/0.12.3/uv-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "600cf9a742aca00d292673b16b5acffaa7b8c269a364ad0c2e79498dcb1fe101",
+      "strip_components": 1
+    },
+    {
+      "id": "uv",
+      "version": "0.12.3",
+      "platform": "windows-x86_64",
+      "url": "https://github.com/astral-sh/uv/releases/download/0.12.3/uv-x86_64-pc-windows-msvc.zip",
+      "sha256": "b23350c79e8ad0192b8124af13a0f17e8d4e4549524785e1aef389ae5a06990e",
+      "strip_components": 0
+    },
+    {
+      "id": "node",
+      "version": "26.7.0",
+      "platform": "darwin-arm64",
+      "url": "https://nodejs.org/dist/v26.7.0/node-v26.7.0-darwin-arm64.tar.gz",
+      "sha256": "7ee659a7768e641bbfd5360940660b8e8fd0052f77488f365562bac522fc15d4",
+      "strip_components": 1
+    },
+    {
+      "id": "node",
+      "version": "26.7.0",
+      "platform": "linux-x86_64",
+      "url": "https://nodejs.org/dist/v26.7.0/node-v26.7.0-linux-x64.tar.xz",
+      "sha256": "982aa24dd8be4c889c6a8ab337ddff3b0896645b20f4239356e80552c16277ee",
+      "strip_components": 1
+    },
+    {
+      "id": "node",
+      "version": "26.7.0",
+      "platform": "windows-x86_64",
+      "url": "https://nodejs.org/dist/v26.7.0/node-v26.7.0-win-x64.zip",
+      "sha256": "d3bd72755141ed32bbcd841228ee81897c8a98d50dfa7dae2179399a0a7c90f8",
+      "strip_components": 1
+    },
+    {
+      "id": "syft",
+      "version": "1.51.0",
+      "platform": "darwin-arm64",
+      "url": "https://github.com/anchore/syft/releases/download/v1.51.0/syft_1.51.0_darwin_arm64.tar.gz",
+      "sha256": "4f37f4c7fefce0a68e4cf71ba3f5f9829a99e65d89b29f7ee41b8c2c10ea8c59",
+      "strip_components": 0
+    },
+    {
+      "id": "syft",
+      "version": "1.51.0",
+      "platform": "linux-x86_64",
+      "url": "https://github.com/anchore/syft/releases/download/v1.51.0/syft_1.51.0_linux_amd64.tar.gz",
+      "sha256": "2a2e837a2c8d59ec9af5472ee22d3b04ee463c4e44476ecf993fd1e5ab6ebc7f",
+      "strip_components": 0
+    },
+    {
+      "id": "syft",
+      "version": "1.51.0",
+      "platform": "windows-x86_64",
+      "url": "https://github.com/anchore/syft/releases/download/v1.51.0/syft_1.51.0_windows_amd64.zip",
+      "sha256": "fc5ffaeffb993576ece9c791da5a688fb2c8969a1479bbfe58583672c64da336",
+      "strip_components": 0
+    }
+  ]
+}

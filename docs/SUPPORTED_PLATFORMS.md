@@ -10,15 +10,22 @@ and GitHub Actions together.
 
 | Row | Native shell | Required validation |
 |---|---|---|
-| `macos-arm64-bash` | Bash | `bash tests/run-all.sh` and `python3 scripts/platform_test.py --workers 2 --shell bash` |
-| `linux-x86_64-bash` | Bash | `bash tests/run-all.sh` on `ubuntu-24.04` |
-| `windows-x86_64-powershell` | PowerShell | `python scripts/platform_test.py --workers 2 --shell powershell` on `windows-2025` |
-| `windows-x86_64-cmd` | `cmd.exe` | `python scripts\platform_test.py --workers 2 --shell cmd` on `windows-2025` |
+| `macos-arm64-bash` | Bash | `bash scripts/bootstrap-dev.sh --check`, `bash tests/run-all.sh`, and `python3 scripts/platform_test.py --workers 2 --shell bash` |
+| `linux-x86_64-bash` | Bash | `bash scripts/bootstrap-dev.sh --check` and `bash tests/run-all.sh` on `ubuntu-24.04` |
+| `windows-x86_64-powershell` | PowerShell | `python scripts/bootstrap_dev.py --check` and `python scripts/platform_test.py --workers 2 --shell powershell` on `windows-2025` |
+| `windows-x86_64-cmd` | `cmd.exe` | `python scripts\bootstrap_dev.py --check` and `python scripts\platform_test.py --workers 2 --shell cmd` on `windows-2025` |
 
 The matrix declares minimum and current versions for Python, Node.js, Git,
 Claude Code, Codex CLI, supported operating systems, and the devcontainer
 combination. A skip is valid only when its reason is in the matrix and the
 surface permits that reason.
+
+The first bootstrap needs Python and network access to the public pinned
+sources. It installs below the ignored repository runtime root. The check
+commands above make no network request and do not change the installation or
+checkout. Tool versions, Python and Node lock files, download URLs, and
+SHA-256 values are tracked in [`support/dev-tools/`](../support/dev-tools/).
+The development inventory does not add a dependency to the MCP package.
 
 Git Bash is a compatibility environment, not native Windows evidence. WSL is
 also a compatibility environment, not native Windows evidence. Required
@@ -29,6 +36,17 @@ locks, evaluation harness, and a real zero-dependency MCP stdio lifecycle. It
 writes a commit-bound result manifest below
 `.engineering-board/validation/platform/`; native Windows CI retains that
 manifest as a workflow artifact.
+
+## Devcontainer
+
+The required devcontainer row is `devcontainer-linux-x86_64`. The configuration
+is [`.devcontainer/devcontainer.json`](../.devcontainer/devcontainer.json).
+It builds for `linux/amd64`, opens the checkout at
+`/workspaces/engineering-board`, and runs as user `vscode`. Base images use
+immutable digests. The image installs the same repository-pinned inventory and
+runs `bash scripts/bootstrap-dev.sh --check` when the workspace is created.
+The build context excludes Git state, ignored runtime state, environment
+files, private-key filename patterns, and host editor files.
 
 ## Validator resources
 
