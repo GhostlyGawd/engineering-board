@@ -1,0 +1,181 @@
+{
+  "$schema": "./platform-matrix.schema.json",
+  "schema_version": "1",
+  "tools": {
+    "python": {
+      "minimum": "3.8",
+      "current": "3.14"
+    },
+    "node": {
+      "minimum": "20",
+      "current": "26"
+    },
+    "git": {
+      "minimum": "2.39",
+      "current": "2.50"
+    },
+    "claude-code": {
+      "minimum": "2.1",
+      "current": "2.1.235"
+    },
+    "codex-cli": {
+      "minimum": "0.147",
+      "current": "0.147"
+    }
+  },
+  "platforms": [
+    {
+      "id": "macos-arm64-bash",
+      "required": true,
+      "ci_required": false,
+      "os": {
+        "family": "macos",
+        "minimum": "13",
+        "current": "26"
+      },
+      "architecture": "arm64",
+      "native_shell": "bash",
+      "runner": "local-supported-host",
+      "tools": [
+        "python",
+        "node",
+        "git",
+        "claude-code",
+        "codex-cli"
+      ],
+      "surfaces": [
+        {
+          "id": "compatibility",
+          "required": true,
+          "command": "bash tests/run-all.sh",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "platform-neutral-runtime",
+          "required": true,
+          "command": "python3 scripts/platform_test.py --workers 2 --shell bash",
+          "permitted_skip_reasons": []
+        }
+      ]
+    },
+    {
+      "id": "linux-x86_64-bash",
+      "required": true,
+      "ci_required": true,
+      "os": {
+        "family": "linux",
+        "minimum": "ubuntu-22.04",
+        "current": "ubuntu-24.04"
+      },
+      "architecture": "x86_64",
+      "native_shell": "bash",
+      "runner": "ubuntu-24.04",
+      "tools": [
+        "python",
+        "node",
+        "git"
+      ],
+      "surfaces": [
+        {
+          "id": "compatibility",
+          "required": true,
+          "command": "bash tests/run-all.sh",
+          "permitted_skip_reasons": []
+        }
+      ]
+    },
+    {
+      "id": "windows-x86_64-powershell",
+      "required": true,
+      "ci_required": true,
+      "os": {
+        "family": "windows",
+        "minimum": "server-2022",
+        "current": "server-2025"
+      },
+      "architecture": "x86_64",
+      "native_shell": "powershell",
+      "runner": "windows-2025",
+      "tools": [
+        "python",
+        "node",
+        "git"
+      ],
+      "surfaces": [
+        {
+          "id": "platform-neutral-runtime",
+          "required": true,
+          "command": "python scripts/platform_test.py --workers 2 --shell powershell",
+          "permitted_skip_reasons": [
+            "posix-bash-only"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "windows-x86_64-cmd",
+      "required": true,
+      "ci_required": true,
+      "os": {
+        "family": "windows",
+        "minimum": "server-2022",
+        "current": "server-2025"
+      },
+      "architecture": "x86_64",
+      "native_shell": "cmd",
+      "runner": "windows-2025",
+      "tools": [
+        "python",
+        "node",
+        "git"
+      ],
+      "surfaces": [
+        {
+          "id": "platform-neutral-runtime",
+          "required": true,
+          "command": "python scripts\\platform_test.py --workers 2 --shell cmd",
+          "permitted_skip_reasons": [
+            "posix-bash-only"
+          ]
+        }
+      ]
+    }
+  ],
+  "containers": [
+    {
+      "id": "devcontainer-linux-x86_64",
+      "required": true,
+      "host_os": [
+        "linux",
+        "macos"
+      ],
+      "architecture": "x86_64",
+      "runtime": {
+        "name": "docker",
+        "minimum": "27",
+        "current": "28"
+      },
+      "surface": "devcontainer",
+      "permitted_skip_reasons": []
+    }
+  ],
+  "limits": {
+    "validator_sessions": 2,
+    "exclusive_resources": [
+      "aggregate",
+      "browser",
+      "otlp"
+    ],
+    "ports": [
+      4173,
+      4318
+    ],
+    "mcp_fanout": 5,
+    "claude_fanout": 3
+  },
+  "permitted_skip_reasons": [
+    "host-application-unavailable",
+    "optional-container-surface",
+    "posix-bash-only"
+  ]
+}

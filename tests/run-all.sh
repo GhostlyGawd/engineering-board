@@ -23,6 +23,13 @@ set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="${1:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 
+if [ -z "${ENGINEERING_BOARD_VALIDATOR_SESSION:-}" ]; then
+  exec python3 "$ROOT/scripts/validator_resources.py" \
+    --state-root "$ROOT/.engineering-board/validator-locks" \
+    run --label legacy-run-all --exclusive aggregate -- \
+    bash "$0" "$ROOT"
+fi
+
 # Sub-suite manifest. Each entry: "<label>|<command>".
 # Commands are run from $ROOT with $ROOT passed as their argument.
 SUITES=(
@@ -41,6 +48,7 @@ SUITES=(
   "docs-coherence|bash tests/docs-coherence.sh"
   "token-coherence|bash tests/token-coherence.sh"
   "crosscompat-lint|bash tests/crosscompat-lint.sh"
+  "platform-portability|bash tests/platform/automated.sh"
   "evaluation-harness|bash tests/evaluation/automated.sh"
   "reject-filter|bash tests/security/reject-filter.sh"
   "session-start|bash tests/session-start/automated.sh"

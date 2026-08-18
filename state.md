@@ -92,6 +92,12 @@ _Last updated: 2026-07-10_
 ## Repo working notes (any session)
 
 - **Always** finish with `bash tests/run-all.sh` green before pushing; CI enforces it.
+- **Platform contract:** `support/platform-matrix.json` is the machine-readable
+  OS/shell/runtime source of truth. Native Windows uses
+  `scripts/platform_test.py` from PowerShell and `cmd.exe`; Git Bash and WSL
+  are compatibility rows only. Repository validators use
+  `scripts/validator_resources.py` for the global two-session cap and
+  exclusive aggregate/browser/OTLP/port locks.
 - **Board location resolves in ONE place now:** source `hooks/scripts/board-paths.sh` and call `eb_board_dirs` / `eb_board_rows` / `eb_router_path`. Do **not** re-hardcode `docs/boards/` in scripts.
 - **Version bumps** must touch *both* `.claude-plugin/plugin.json` and `marketplace.json` (coherence-checked), and a fix only reaches installs when the version *increases*.
 - New `hooks/scripts/*.sh` must pass `tests/crosscompat-lint.sh`: shebang exactly `#!/usr/bin/env bash`, no `date -d`/`date -j -f`, no `jq`, no drive letters (use python3 for JSON + timestamps).

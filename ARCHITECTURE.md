@@ -90,6 +90,13 @@ retrieve declared rejected memory. Each prepared run contains the corpus
 identity, version, digest, fingerprinted inputs, and isolated workspaces. Keep
 dated run data outside the source tree.
 
+The versioned platform contract lives in `support/platform-matrix.json`.
+Unix/macOS compatibility remains Bash-first. Native Windows validation uses
+the platform-neutral `scripts/platform_test.py` launcher directly from
+PowerShell and `cmd.exe` on a GitHub-hosted Windows runner. Repository
+validators share `scripts/validator_resources.py`: at most two top-level
+sessions, with exclusive aggregate, browser, OTLP, and port locks.
+
 This is the plugin's *source* tree. In a **consuming** repo, the plugin creates and reads board *content* at a visible, committed-by-default `engineering-board/<project>/` (the 1.1.0 default: resolved ahead of the pre-1.1.0 `docs/boards/` and legacy `docs/board/` fallbacks. see §6.1 of `specs/board-relocation.md`). Do not confuse that with the hidden, gitignored `.engineering-board/` (leading dot) runtime dir that holds ephemeral session state (`session-mode.json`, `last-stop-stdin.json`, `active-workers.json`). Visible twin (no dot) = committed board. hidden twin (dot) = its runtime scratch.
 
 ---

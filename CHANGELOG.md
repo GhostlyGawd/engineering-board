@@ -9,6 +9,18 @@ increases.
 
 ## [Unreleased]
 
+### Added
+
+- Added a schema-validated supported-platform matrix, a platform-neutral test
+  launcher, native PowerShell and `cmd.exe` validation on GitHub-hosted
+  Windows, and globally bounded validator resource locks.
+
+### Fixed
+
+- The evaluation harness now accepts fixed macOS system aliases such as
+  `/var` to `/private/var` without accepting user-created symbolic-link,
+  junction, or reparse-point escapes.
+
 ## [1.13.4] — 2026-08-16
 
 ### Fixed

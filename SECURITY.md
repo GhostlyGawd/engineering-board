@@ -79,6 +79,11 @@ The harness applies these controls:
 These controls protect evaluation integrity. They do not make an unsafe live
 
 client or unsafe case data acceptable.
+
+On macOS, the harness accepts only the operating system's fixed `/var`,
+`/tmp`, and `/etc` aliases when they resolve to their matching `/private`
+locations. It still rejects a user-created symbolic-link ancestor. On Windows,
+it also rejects junction and reparse-point ancestors before creating output.
 ## Filter and sanitize a promoted finding
 
 The promotion process sends each scratch finding to the deterministic reject

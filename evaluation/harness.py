@@ -13,6 +13,7 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 from typing import Any
 
@@ -96,8 +97,46 @@ def _is_within(path: Path, parent: Path) -> bool:
 def _reject_linked_path(path: Path) -> None:
     current = path.absolute()
     for candidate in (current, *current.parents):
-        if candidate.is_symlink():
+        if _is_approved_macos_system_alias(candidate):
+            continue
+        if _is_link_or_reparse_point(candidate):
             raise EvaluationError(f"linked path is not allowed: {candidate}")
+
+
+def _is_approved_macos_system_alias(path: Path) -> bool:
+    """Accept only Apple's fixed root aliases, never user-created links."""
+    if sys.platform != "darwin":
+        return False
+    expected = {
+        "/etc": "/private/etc",
+        "/tmp": "/private/tmp",
+        "/var": "/private/var",
+    }.get(str(path))
+    if expected is None or not path.is_symlink():
+        return False
+    return os.path.realpath(path) == expected
+
+
+def _is_link_or_reparse_point(path: Path) -> bool:
+    """Detect symbolic links plus Windows junction and reparse ancestors."""
+    if path.is_symlink():
+        return True
+    is_junction = getattr(path, "is_junction", None)
+    if is_junction is not None:
+        try:
+            if is_junction():
+                return True
+        except OSError:
+            return True
+    if os.name == "nt":
+        try:
+            attributes = path.lstat().st_file_attributes
+        except (AttributeError, FileNotFoundError):
+            return False
+        except OSError:
+            return True
+        return bool(attributes & 0x400)
+    return False
 
 
 def _atomic_text(path: Path, payload: str, exclusive: bool = False) -> None:

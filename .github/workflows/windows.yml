@@ -1,0 +1,73 @@
+name: native-windows
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  platform:
+    name: ${{ matrix.support_row }}
+    runs-on: windows-2025
+    env:
+      ENGINEERING_BOARD_SUPPORT_ROW: ${{ matrix.support_row }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - support_row: windows-x86_64-powershell
+            native_shell: powershell
+          - support_row: windows-x86_64-cmd
+            native_shell: cmd
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Select supported Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Select supported Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "26"
+
+      - name: Show native process identity
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: |
+          $PSVersionTable
+          python --version
+          node --version
+          git --version
+          python -c "import os, platform; print(os.name, platform.platform())"
+
+      - name: Validate from PowerShell
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: python scripts/platform_test.py --workers 2 --shell powershell
+
+      - name: Show native process identity
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: |
+          ver
+          python --version
+          node --version
+          git --version
+          python -c "import os, platform; print(os.name, platform.platform())"
+
+      - name: Validate from cmd.exe
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: python scripts\platform_test.py --workers 2 --shell cmd
+
+      - name: Retain platform result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: platform-result-${{ matrix.support_row }}
+          path: .engineering-board/validation/platform/${{ matrix.native_shell }}.json
+          if-no-files-found: error

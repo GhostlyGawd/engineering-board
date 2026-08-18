@@ -20,7 +20,9 @@ on:
 jobs:
   test:
     name: run-all
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    env:
+      ENGINEERING_BOARD_SUPPORT_ROW: linux-x86_64-bash
     steps:
       - name: Checkout
         uses: actions/checkout@v7

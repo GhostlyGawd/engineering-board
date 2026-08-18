@@ -17,6 +17,11 @@ bash tests/run-all.sh
 ```
 
 The continuous integration (CI) workflow runs this command for each push.
+Supported host, shell, runtime, and container versions are declared in
+[`support/platform-matrix.json`](support/platform-matrix.json) and documented
+in [`docs/SUPPORTED_PLATFORMS.md`](docs/SUPPORTED_PLATFORMS.md). Native
+Windows validation uses `scripts/platform_test.py` directly from PowerShell
+and `cmd.exe`; Git Bash and WSL are compatibility environments only.
 
 Add tests for new behavior. Change the tests when you change behavior.
 
