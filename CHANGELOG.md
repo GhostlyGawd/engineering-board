@@ -26,6 +26,10 @@ increases.
   coverage thresholds plus named fail-closed dependency, secret, workflow,
   immutable-pin, checksum-integrity, and reject-filter security families with
   advisory diagnostics and secret-value redaction.
+- Added a deterministic zero-dependency Python package backend and package
+  runtime matrix that reproduces wheel, sdist, and MCPB artifacts, installs
+  wheel and sdist on Python 3.8 and current Python, runs MCP stdio from every
+  distribution, and emits schema-valid digest-bound CycloneDX SBOMs.
 
 ### Fixed
 

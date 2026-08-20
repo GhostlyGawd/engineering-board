@@ -100,6 +100,8 @@ _Last updated: 2026-07-10_
   exclusive aggregate/browser/OTLP/port locks.
 - **Pinned development environment:** `support/dev-tools/` owns the exact
   inventory, dependency locks, immutable download URLs, and checksums.
+  The bootstrap also provisions the declared Python 3.8 and current package
+  test runtimes below the same ignored tool root.
   `scripts/bootstrap-dev.sh` is the macOS/Linux interface;
   `scripts/bootstrap_dev.py` is the native-Windows interface. Check mode is
   offline/read-only. `.devcontainer/` uses the same inventory at
@@ -117,6 +119,13 @@ _Last updated: 2026-07-10_
   gate reports fail-closed dependency, secret, workflow, immutable-pin,
   supply-chain-policy, checksum-integrity, and reject-filter families and
   redacts secret values.
+- **Package runtime contract:** `scripts/package_gate.py` orchestrates the
+  focused `package_contract.py` and `package_runtime.py` modules with the
+  zero-dependency `mcp-server/engineering_board_build_backend.py`. Together
+  they reproduce wheel, sdist, and MCPB bytes, enforce exact archive contents
+  and coherent manifests, install wheel and sdist on Python 3.8/current, smoke
+  every MCP distribution over stdio, and write digest-bound CycloneDX evidence
+  below `.engineering-board/validation/package/`.
 - **Board location resolves in ONE place now:** source `hooks/scripts/board-paths.sh` and call `eb_board_dirs` / `eb_board_rows` / `eb_router_path`. Do **not** re-hardcode `docs/boards/` in scripts.
 - **Version bumps** must touch *both* `.claude-plugin/plugin.json` and `marketplace.json` (coherence-checked), and a fix only reaches installs when the version *increases*.
 - New `hooks/scripts/*.sh` must pass `tests/crosscompat-lint.sh`: shebang exactly `#!/usr/bin/env bash`, no `date -d`/`date -j -f`, no `jq`, no drive letters (use python3 for JSON + timestamps).

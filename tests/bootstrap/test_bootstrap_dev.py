@@ -65,6 +65,8 @@ class BootstrapManifestTests(unittest.TestCase):
     def test_manifest_is_complete_and_fully_pinned(self) -> None:
         value = bootstrap_dev.load_manifest(MANIFEST)
         self.assertEqual(value["schema_version"], "1")
+        self.assertEqual(value["python_runtimes"], ["3.8.20", "3.14.7"])
+        self.assertEqual(value["python_version"], value["python_runtimes"][-1])
         tools = value["tools"]
         self.assertEqual({tool["id"] for tool in tools}, EXPECTED_TOOLS)
         self.assertEqual(len(tools), len(EXPECTED_TOOLS))

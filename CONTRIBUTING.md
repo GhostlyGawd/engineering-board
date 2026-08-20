@@ -32,7 +32,8 @@ sources. It installs below ignored `.engineering-board/dev-tools/`. Exact
 versions, lock files, immutable download URLs, and SHA-256 values are in
 [`support/dev-tools/`](support/dev-tools/). A failure names the missing or
 mismatched prerequisite and the recovery command. The development inventory
-does not change the zero-dependency MCP runtime metadata.
+also provisions the minimum and current Python package-test runtimes. It does
+not change the zero-dependency MCP runtime metadata.
 
 To use the containerized workspace, open the repository in a Dev Container or
 build it with:
@@ -109,6 +110,14 @@ SHAs and immutable download URLs, verifies checksums and the installed tool
 inventory, enforces the tracked supply-chain policy, and exercises the
 canonical reject filter. It reports each family separately. Secret
 diagnostics show `<redacted>` instead of the detected value.
+
+The `package` selector builds the Python wheel and source distribution through
+the repository-owned zero-dependency PEP 517 backend. It also builds the MCPB,
+checks byte reproducibility and exact archive contents, installs the wheel and
+sdist separately on Python 3.8 and the matrix current Python, and runs the MCP
+stdio lifecycle from each distribution. Matching schema-valid CycloneDX SBOMs
+and the package report are written below ignored
+`.engineering-board/validation/package/`.
 
 Supported host, shell, runtime, and container versions are declared in
 [`support/platform-matrix.json`](support/platform-matrix.json) and documented

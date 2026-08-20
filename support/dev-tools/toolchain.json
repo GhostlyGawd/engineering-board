@@ -1,6 +1,7 @@
 {
   "schema_version": "1",
   "python_version": "3.14.7",
+  "python_runtimes": ["3.8.20", "3.14.7"],
   "node_version": "26.7.0",
   "tools": [
     {"id": "actionlint", "version": "1.7.12", "provider": "python", "executable": "actionlint", "version_args": ["--version"]},

@@ -25,6 +25,8 @@ check is `bash scripts/bootstrap-dev.sh --check` on macOS/Linux and
 `python scripts/bootstrap_dev.py --check` from PowerShell or `cmd.exe`.
 Development tools are pinned in `support/dev-tools/` and installed only below
 ignored `.engineering-board/dev-tools/`.
+The same bootstrap provisions the declared minimum and current Python package
+test runtimes below that tool root.
 
 The devcontainer uses the `vscode` user and
 `/workspaces/engineering-board`. Do not add host credentials, host-specific
@@ -64,3 +66,10 @@ immutable pin, supply-chain policy, checksum integrity, and reject-filter
 families separately.
 Security diagnostics name rules and advisories but redact detected secret
 values.
+
+The `package` selector uses the repository-owned zero-dependency PEP 517
+backend. It reproduces the wheel, sdist, and MCPB bytes, validates Claude,
+Codex, and MCP manifests, installs wheel and sdist separately on Python 3.8
+and the matrix current Python, runs MCP stdio smoke tests for every
+distribution, and writes matching CycloneDX SBOM evidence below ignored
+`.engineering-board/validation/package/`.

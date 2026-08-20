@@ -245,6 +245,14 @@ cloning the repo, the packaged channels are:
 `.claude-plugin/plugin.json`. The MCP test suite prevents silent drift.
 `smithery.yaml` is version-agnostic launch configuration.
 
+The Python wheel and sdist use the repository-owned
+`engineering_board_build_backend.py` PEP 517 backend. The backend has no build
+dependency and normalizes archive ordering, timestamps, permissions, and
+metadata. The stable package gate builds each byte-oriented artifact twice,
+checks the exact allowlist, installs wheel and sdist on Python 3.8 and the
+matrix current Python, runs the MCP lifecycle from wheel, sdist, and MCPB, and
+generates one digest-bound CycloneDX SBOM per artifact.
+
 ## Multi-client: two clients, one board
 
 Driving the same board from two MCP clients simultaneously (e.g. Claude Code
@@ -272,10 +280,16 @@ bash scripts/quality-gate.sh package
 ```
 
 Native Windows uses `python scripts/quality_gate.py` with the same selectors.
-The strict typed MCP scope is `engineering_board_core.py`.
+The strict typed MCP scope includes `engineering_board_core.py` and
+`engineering_board_build_backend.py`.
 `engineering_board_mcp.py` is a tracked staged exclusion in
 `support/quality/typing-policy.json`. Development checks do not add a runtime
 dependency to the wheel, source archive, or MCP bundle.
+
+Successful package validation writes ignored evidence to
+`.engineering-board/validation/package/`. The report records the two declared
+Python runtimes, exact artifact SHA-256 values, matching SBOM names and
+digests, and the empty runtime dependency set.
 
 The MCP compatibility suite remains:
 

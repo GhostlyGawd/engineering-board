@@ -27,12 +27,16 @@ ANALYSIS_DIRECTORIES = ("scripts", "hooks/scripts", "mcp-server", "evaluation")
 ANALYSIS_EXCLUSIONS = {"mcp-server/test_mcp_server.py"}
 TYPED_PATHS = (
     "scripts/coverage_gate.py",
+    "scripts/package_contract.py",
+    "scripts/package_gate.py",
+    "scripts/package_runtime.py",
     "scripts/platform_contract.py",
     "scripts/quality_checks.py",
     "scripts/quality_gate.py",
     "scripts/security_gate.py",
     "scripts/validator_resources.py",
     "hooks/scripts/board_demo.py",
+    "mcp-server/engineering_board_build_backend.py",
     "mcp-server/engineering_board_core.py",
 )
 EXPECTED_TYPING_POLICY = {
@@ -45,6 +49,9 @@ EXPECTED_TYPING_POLICY = {
             "typed_paths": [
                 "hooks/scripts/board_demo.py",
                 "scripts/coverage_gate.py",
+                "scripts/package_contract.py",
+                "scripts/package_gate.py",
+                "scripts/package_runtime.py",
                 "scripts/platform_contract.py",
                 "scripts/quality_checks.py",
                 "scripts/quality_gate.py",
@@ -68,7 +75,10 @@ EXPECTED_TYPING_POLICY = {
         },
         {
             "id": "mcp-server",
-            "typed_paths": ["mcp-server/engineering_board_core.py"],
+            "typed_paths": [
+                "mcp-server/engineering_board_build_backend.py",
+                "mcp-server/engineering_board_core.py",
+            ],
             "staged_exclusions": ["mcp-server/engineering_board_mcp.py"],
         },
     ],
@@ -609,14 +619,17 @@ class QualityRunner:
         print("quality-gate: pass security", flush=True)
 
     def package(self) -> None:
-        command = (
-            "import pathlib,sys;"
-            "root=pathlib.Path.cwd();"
-            "sys.path.insert(0,str(root/'mcp-server'));"
-            "import test_mcp_server as tests;"
-            "tests.suite_distribution()"
+        self._run(
+            "package-runtime-matrix",
+            [
+                sys.executable,
+                "scripts/package_gate.py",
+                "--root",
+                self.root,
+                "--tool-root",
+                self.toolchain.root,
+            ],
         )
-        self._run("mcp-distribution", [sys.executable, "-c", command])
 
     def run(self, selector: str, workers: int) -> int:
         if selector == "format":

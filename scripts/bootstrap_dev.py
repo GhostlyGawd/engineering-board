@@ -75,6 +75,21 @@ def load_manifest(path: Path) -> Dict[str, Any]:
         isinstance(artifacts, list) and artifacts,
         "toolchain manifest has no artifacts",
     )
+    python_runtimes = value.get("python_runtimes")
+    _require(
+        isinstance(python_runtimes, list) and len(python_runtimes) >= 2,
+        "toolchain manifest must declare minimum and current Python runtimes",
+    )
+    for runtime in python_runtimes:
+        _require(
+            isinstance(runtime, str)
+            and re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", runtime) is not None,
+            f"invalid Python runtime version: {runtime!r}",
+        )
+    _require(
+        value.get("python_version") == python_runtimes[-1],
+        "toolchain current Python must be the final declared runtime",
+    )
     seen = set()
     for tool in tools:
         _require(isinstance(tool, dict), "tool entry must be an object")
@@ -224,6 +239,60 @@ def _run_tool_version(
     return tool["version"]
 
 
+def _check_python_runtimes(
+    install_root: Path,
+    manifest: Dict[str, Any],
+    selected_platform: str,
+) -> None:
+    uv = _provider_command(
+        next(tool for tool in manifest["tools"] if tool["id"] == "uv"),
+        install_root,
+        selected_platform,
+    )
+    environment = os.environ.copy()
+    environment.update(
+        {
+            "UV_PYTHON_DOWNLOADS": "never",
+            "UV_PYTHON_INSTALL_DIR": str(install_root / "python"),
+        }
+    )
+    runtime_root = (install_root / "python").resolve()
+    for runtime in manifest["python_runtimes"]:
+        result = subprocess.run(
+            [str(uv), "python", "find", runtime],
+            env=environment,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=30,
+        )
+        path = Path(result.stdout.strip())
+        try:
+            contained = os.path.commonpath([str(runtime_root), str(path.resolve())]) == str(
+                runtime_root
+            )
+        except ValueError:
+            contained = False
+        if result.returncode != 0 or not path.is_file() or not contained:
+            raise BootstrapError(
+                f"missing pinned Python runtime {runtime}; run: {recovery_command()}"
+            )
+        version_result = subprocess.run(
+            [str(path), "--version"],
+            env=environment,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=30,
+        )
+        output = (version_result.stdout + version_result.stderr).strip()
+        if version_result.returncode != 0 or output != f"Python {runtime}":
+            raise BootstrapError(
+                f"Python runtime mismatch: expected {runtime}, got "
+                f"{output or '<empty output>'}; run: {recovery_command()}"
+            )
+
+
 def check_installation(
     root: Path,
     install_root: Path,
@@ -276,6 +345,8 @@ def check_installation(
         else:
             version = command_runner(tool, install_root)
         inventory[tool["id"]] = version
+    if command_runner is None:
+        _check_python_runtimes(install_root, manifest, selected_platform)
     return dict(sorted(inventory.items()))
 
 
@@ -470,19 +541,20 @@ def install_toolchain(
         }
     )
     python_version = manifest["python_version"]
-    _run_install(
-        [
-            str(uv_target),
-            "python",
-            "install",
-            python_version,
-            "--install-dir",
-            str(install_root / "python"),
-            "--no-bin",
-            "--no-registry",
-        ],
-        environment=environment,
-    )
+    for runtime in manifest["python_runtimes"]:
+        _run_install(
+            [
+                str(uv_target),
+                "python",
+                "install",
+                runtime,
+                "--install-dir",
+                str(install_root / "python"),
+                "--no-bin",
+                "--no-registry",
+            ],
+            environment=environment,
+        )
     environment["UV_PROJECT_ENVIRONMENT"] = str(install_root / "python-tools")
     _run_install(
         [

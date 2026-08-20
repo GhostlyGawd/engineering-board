@@ -51,6 +51,7 @@ SUITES=(
   "platform-portability|bash tests/platform/automated.sh"
   "bootstrap-devcontainer|bash tests/bootstrap/automated.sh"
   "quality-command-contract|bash tests/quality/automated.sh"
+  "package-runtime-matrix|bash tests/packaging/automated.sh"
   "evaluation-harness|bash tests/evaluation/automated.sh"
   "reject-filter|bash tests/security/reject-filter.sh"
   "session-start|bash tests/session-start/automated.sh"
