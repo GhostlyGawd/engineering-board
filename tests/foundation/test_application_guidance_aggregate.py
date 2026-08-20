@@ -135,6 +135,10 @@ class ApplicationContractTests(unittest.TestCase):
             report = json.loads(output.read_text(encoding="utf-8"))
             self.assertTrue(report["documented_commands_pass"])
             self.assertEqual(
+                {item["platform"] for item in report["documented_commands"]},
+                {"posix"},
+            )
+            self.assertEqual(
                 [item["id"] for item in report["applications"]],
                 ["root-plugin", "mcp-server"],
             )

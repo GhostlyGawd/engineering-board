@@ -113,7 +113,7 @@ class BootstrapCliTests(unittest.TestCase):
             after = tree_fingerprint(install_root)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("development toolchain is not installed", result.stderr)
-            self.assertIn("bash scripts/bootstrap-dev.sh", result.stderr)
+            self.assertIn(bootstrap_dev.recovery_command(), result.stderr)
             self.assertEqual(before, after)
             self.assertFalse((install_root / ".complete.json").exists())
 

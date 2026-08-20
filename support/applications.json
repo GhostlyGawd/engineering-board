@@ -59,21 +59,47 @@
     }
   ],
   "documented_command_smokes": [
-    [
-      "bash",
-      "scripts/bootstrap-dev.sh",
-      "--check"
-    ],
-    [
-      "bash",
-      "scripts/quality-gate.sh",
-      "--help"
-    ],
-    [
-      "{python}",
-      "scripts/quality_gate.py",
-      "--help"
-    ]
+    {
+      "command": [
+        "bash",
+        "scripts/bootstrap-dev.sh",
+        "--check"
+      ],
+      "platforms": [
+        "posix"
+      ]
+    },
+    {
+      "command": [
+        "{python}",
+        "scripts/bootstrap_dev.py",
+        "--check"
+      ],
+      "platforms": [
+        "windows"
+      ]
+    },
+    {
+      "command": [
+        "bash",
+        "scripts/quality-gate.sh",
+        "--help"
+      ],
+      "platforms": [
+        "posix"
+      ]
+    },
+    {
+      "command": [
+        "{python}",
+        "scripts/quality_gate.py",
+        "--help"
+      ],
+      "platforms": [
+        "posix",
+        "windows"
+      ]
+    }
   ],
   "workflow_names": {
     ".github/workflows/test.yml": "tests",

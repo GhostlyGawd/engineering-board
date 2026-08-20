@@ -7,6 +7,7 @@ import argparse
 from dataclasses import dataclass
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -204,7 +205,12 @@ def shared_contract_fingerprint(root: Path) -> str:
 def smoke_documented_commands(root: Path) -> list[dict[str, object]]:
     policy = _load_policy(root)
     results: list[dict[str, object]] = []
-    for raw_command in policy["documented_command_smokes"]:
+    platform_name = "windows" if os.name == "nt" else "posix"
+    for raw in policy["documented_command_smokes"]:
+        platforms = tuple(str(value) for value in raw["platforms"])
+        if platform_name not in platforms:
+            continue
+        raw_command = tuple(str(value) for value in raw["command"])
         command = [sys.executable if value == "{python}" else str(value) for value in raw_command]
         result = subprocess.run(
             command,
@@ -219,6 +225,7 @@ def smoke_documented_commands(root: Path) -> list[dict[str, object]]:
             {
                 "command": " ".join(str(value) for value in raw_command),
                 "exit_code": result.returncode,
+                "platform": platform_name,
             }
         )
         if result.returncode != 0:
