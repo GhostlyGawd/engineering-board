@@ -102,7 +102,10 @@ The `test` selector writes ignored coverage evidence below
 branch, root-plugin, MCP-server, and changed-line thresholds in
 `support/quality/coverage-policy.json`. Pull-request runs compare with the
 base branch. Local runs compare with the previous commit unless
-`ENGINEERING_BOARD_COVERAGE_BASE` names an explicit base.
+`ENGINEERING_BOARD_COVERAGE_BASE` names an explicit base. Both modes include
+staged, unstaged, and untracked Python changes in the reported identity and
+uncovered-line decision. Eligible changed source missing from the coverage
+report fails instead of being skipped.
 
 The `security` selector audits the complete pinned Python lock, scans for
 secret signatures, runs the pinned workflow analyzer, requires full action

@@ -126,6 +126,11 @@ _Last updated: 2026-07-10_
   and coherent manifests, install wheel and sdist on Python 3.8/current, smoke
   every MCP distribution over stdio, and write digest-bound CycloneDX evidence
   below `.engineering-board/validation/package/`.
+- **Changed-line coverage identity:** the test selector instruments portable
+  Python test subprocesses, including package backend/runtime tests, and binds
+  committed, staged, unstaged, and untracked Python changes into one
+  deterministic identity. Eligible measured source missing from the coverage
+  report fails closed instead of disappearing from the denominator.
 - **Board location resolves in ONE place now:** source `hooks/scripts/board-paths.sh` and call `eb_board_dirs` / `eb_board_rows` / `eb_router_path`. Do **not** re-hardcode `docs/boards/` in scripts.
 - **Version bumps** must touch *both* `.claude-plugin/plugin.json` and `marketplace.json` (coherence-checked), and a fix only reaches installs when the version *increases*.
 - New `hooks/scripts/*.sh` must pass `tests/crosscompat-lint.sh`: shebang exactly `#!/usr/bin/env bash`, no `date -d`/`date -j -f`, no `jq`, no drive letters (use python3 for JSON + timestamps).

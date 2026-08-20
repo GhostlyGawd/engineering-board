@@ -152,6 +152,9 @@ def _rpc_smoke(command: Sequence[str | Path], repository: Path, label: str) -> N
         if process.poll() is None:
             process.kill()
             process.wait()
+        stdin.close()
+        stdout.close()
+        stderr_stream.close()
 
 
 def _installed_metadata(

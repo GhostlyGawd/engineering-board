@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -30,12 +32,35 @@ PORTABLE_COVERAGE_COMMANDS: tuple[tuple[str, ...], ...] = (
     (sys.executable, "tests/platform/test_foundation_portability.py"),
     (sys.executable, "tests/bootstrap/test_bootstrap_dev.py"),
     (sys.executable, "tests/evaluation/test_harness.py"),
+    (sys.executable, "tests/packaging/test_package_gate.py"),
     (sys.executable, "mcp-server/test_mcp_server.py"),
 )
 
 
 class CoverageGateError(Exception):
     """A deterministic coverage collection or threshold failure."""
+
+
+@dataclass(frozen=True)
+class ChangedLineSnapshot:
+    """One deterministic identity for committed and local Python changes."""
+
+    base: str
+    head: str
+    identity: str
+    lines: dict[str, set[int]]
+
+
+@dataclass(frozen=True)
+class ChangedLineDecision:
+    """Coverage result for one changed-line snapshot."""
+
+    covered: int
+    measured: int
+    percent: float
+    uncovered: list[str]
+    missing_from_report: list[str]
+    passed: bool
 
 
 def _tool_root(root: Path) -> Path:
@@ -124,10 +149,7 @@ def _base_and_head(root: Path) -> tuple[str, str]:
     return head, head
 
 
-def _changed_lines(root: Path, base: str, head: str) -> dict[str, set[int]]:
-    if base == head:
-        return {}
-    diff = _git(root, "diff", "--unified=0", f"{base}...{head}", "--", "*.py")
+def _parse_changed_lines(diff: str) -> dict[str, set[int]]:
     changed: dict[str, set[int]] = {}
     current = ""
     new_line = 0
@@ -148,6 +170,110 @@ def _changed_lines(root: Path, base: str, head: str) -> dict[str, set[int]]:
         elif line.startswith(" "):
             new_line += 1
     return changed
+
+
+def _changed_line_snapshot(root: Path) -> ChangedLineSnapshot:
+    base, head = _base_and_head(root)
+    diff = _git(root, "diff", "--unified=0", base, "--", "*.py")
+    changed = _parse_changed_lines(diff)
+    untracked = _git(
+        root,
+        "ls-files",
+        "--others",
+        "--exclude-standard",
+        "--",
+        "*.py",
+    ).splitlines()
+    for relative in sorted(path for path in untracked if path):
+        path = root / relative
+        try:
+            line_count = len(path.read_text(encoding="utf-8").splitlines())
+        except (OSError, UnicodeError) as exc:
+            raise CoverageGateError(
+                f"cannot determine changed-line identity for {relative}: {exc}"
+            ) from exc
+        changed[relative] = set(range(1, line_count + 1))
+
+    files: list[dict[str, Any]] = []
+    for relative, lines in sorted(changed.items()):
+        path = root / relative
+        try:
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        except OSError as exc:
+            raise CoverageGateError(
+                f"cannot determine changed-line identity for {relative}: {exc}"
+            ) from exc
+        files.append(
+            {
+                "path": relative,
+                "lines": sorted(lines),
+                "sha256": digest,
+            }
+        )
+    payload = json.dumps(
+        {
+            "schema_version": "1",
+            "base": base,
+            "head": head,
+            "files": files,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return ChangedLineSnapshot(
+        base=base,
+        head=head,
+        identity=hashlib.sha256(payload).hexdigest(),
+        lines=changed,
+    )
+
+
+def _matches_path_policy(path: str, policy: dict[str, Any]) -> bool:
+    omitted = [str(value) for value in policy.get("measurement", {}).get("omitted_paths", [])]
+    if any(path.startswith(value) if value.endswith("/") else path == value for value in omitted):
+        return False
+    return any(
+        path.startswith(str(prefix))
+        for application in policy["applications"]
+        for prefix in application["paths"]
+    )
+
+
+def _changed_line_decision(
+    snapshot: ChangedLineSnapshot,
+    files: dict[str, Any],
+    policy: dict[str, Any],
+) -> ChangedLineDecision:
+    changed_measured = 0
+    changed_covered = 0
+    uncovered: list[str] = []
+    missing_from_report: list[str] = []
+    for path, lines in sorted(snapshot.lines.items()):
+        if not _matches_path_policy(path, policy):
+            continue
+        value = files.get(path)
+        if value is None:
+            missing_from_report.append(path)
+            changed_measured += len(lines)
+            uncovered.append(f"{path}:<missing-report>")
+            continue
+        executable_lines = set(value["executed_lines"]) | set(value["missing_lines"])
+        relevant = lines & executable_lines
+        missing = relevant & set(value["missing_lines"])
+        changed_measured += len(relevant)
+        changed_covered += len(relevant) - len(missing)
+        if missing:
+            uncovered.append(f"{path}:{','.join(str(line) for line in sorted(missing))}")
+    changed_percent = _percent(changed_covered, changed_measured)
+    changed_threshold = float(policy["changed_lines"]["line_percent"])
+    return ChangedLineDecision(
+        covered=changed_covered,
+        measured=changed_measured,
+        percent=changed_percent,
+        uncovered=uncovered,
+        missing_from_report=missing_from_report,
+        passed=changed_percent >= changed_threshold and not missing_from_report,
+    )
 
 
 def _percent(covered: int, measured: int) -> float:
@@ -219,9 +345,21 @@ def _collect_report(
         commands = PORTABLE_COVERAGE_COMMANDS
         if os.name != "nt":
             commands = POSIX_COVERAGE_COMMANDS + commands
+        instrumented_commands = tuple(
+            (
+                str(executable),
+                "run",
+                "--parallel-mode",
+                f"--rcfile={config}",
+                *command[1:],
+            )
+            if command[0] == sys.executable
+            else command
+            for command in commands
+        )
         driver.write_text(
             "import os, subprocess, sys\n"
-            f"commands = {commands!r}\n"
+            f"commands = {instrumented_commands!r}\n"
             "environment = os.environ.copy()\n"
             "for command in commands:\n"
             "    result = subprocess.run(command, env=environment, "
@@ -329,46 +467,36 @@ def run_coverage(root: Path) -> None:
             }
         )
 
-    base, head = _base_and_head(root)
-    changed = _changed_lines(root, base, head)
-    changed_measured = 0
-    changed_covered = 0
-    uncovered: list[str] = []
-    for path, lines in changed.items():
-        value = files.get(path)
-        if value is None:
-            continue
-        executable_lines = set(value["executed_lines"]) | set(value["missing_lines"])
-        relevant = lines & executable_lines
-        missing = relevant & set(value["missing_lines"])
-        changed_measured += len(relevant)
-        changed_covered += len(relevant) - len(missing)
-        if missing:
-            uncovered.append(f"{path}:{','.join(str(line) for line in sorted(missing))}")
-    changed_percent = _percent(changed_covered, changed_measured)
+    snapshot = _changed_line_snapshot(root)
+    changed_decision = _changed_line_decision(snapshot, files, policy)
     changed_threshold = float(policy["changed_lines"]["line_percent"])
-    changed_pass = changed_percent >= changed_threshold
-    suffix = f" uncovered={'; '.join(uncovered)}" if uncovered else ""
-    print(
-        f"quality-gate: coverage changed-lines: {'pass' if changed_pass else 'fail'} "
-        f"measured={changed_percent:.2f}% threshold={changed_threshold:.2f}% "
-        f"base={base} head={head} lines={changed_covered}/{changed_measured}{suffix}"
+    suffix = (
+        f" uncovered={'; '.join(changed_decision.uncovered)}" if changed_decision.uncovered else ""
     )
-    passes.append(changed_pass)
+    print(
+        "quality-gate: coverage changed-lines: "
+        f"{'pass' if changed_decision.passed else 'fail'} "
+        f"measured={changed_decision.percent:.2f}% threshold={changed_threshold:.2f}% "
+        f"base={snapshot.base} head={snapshot.head} identity={snapshot.identity} "
+        f"lines={changed_decision.covered}/{changed_decision.measured}{suffix}"
+    )
+    passes.append(changed_decision.passed)
     decisions = {
         "schema_version": "1",
-        "base": base,
-        "head": head,
+        "base": snapshot.base,
+        "head": snapshot.head,
+        "identity": snapshot.identity,
         "total": {
             "line_percent": _percent(covered_lines, measured_lines),
             "branch_percent": _percent(covered_branches, measured_branches),
         },
         "applications": application_results,
         "changed_lines": {
-            "covered": changed_covered,
-            "measured": changed_measured,
-            "percent": changed_percent,
-            "uncovered": uncovered,
+            "covered": changed_decision.covered,
+            "measured": changed_decision.measured,
+            "percent": changed_decision.percent,
+            "uncovered": changed_decision.uncovered,
+            "missing_from_report": changed_decision.missing_from_report,
         },
         "passed": all(passes),
     }

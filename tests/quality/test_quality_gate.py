@@ -18,6 +18,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+import coverage_gate  # noqa: E402
 from quality_checks import QualityRunner  # noqa: E402
 
 
@@ -248,8 +249,15 @@ class QualityCommandContractTests(unittest.TestCase):
             "coverage changed-lines:",
             "base=",
             "head=",
+            "identity=",
         ):
             self.assertIn(token, diagnostic)
+
+    def test_portable_coverage_executes_package_runtime_tests(self) -> None:
+        self.assertIn(
+            (sys.executable, "tests/packaging/test_package_gate.py"),
+            coverage_gate.PORTABLE_COVERAGE_COMMANDS,
+        )
 
     def test_security_selector_reports_every_named_family(self) -> None:
         environment = os.environ.copy()
@@ -596,6 +604,11 @@ class QualityCommandContractTests(unittest.TestCase):
                 cwd=fixture,
                 check=True,
             )
+            baseline = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"],
+                cwd=fixture,
+                text=True,
+            ).strip()
 
             target = fixture / "hooks" / "scripts" / "board_demo.py"
             target.write_text(
@@ -612,6 +625,7 @@ class QualityCommandContractTests(unittest.TestCase):
 
             environment = os.environ.copy()
             environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)
+            environment["ENGINEERING_BOARD_COVERAGE_BASE"] = baseline
             result = subprocess.run(
                 [sys.executable, str(INTERNAL_COVERAGE_ENTRY), "--root", str(fixture)],
                 cwd=fixture,
@@ -628,6 +642,106 @@ class QualityCommandContractTests(unittest.TestCase):
             self.assertIn("coverage changed-lines: fail", diagnostic)
             self.assertIn("hooks/scripts/board_demo.py", diagnostic)
             self.assertIn("reachable_but_untested_regression", target.read_text(encoding="utf-8"))
+
+    def test_changed_line_identity_includes_every_local_git_state(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb coverage identity ") as temp:
+            fixture = self.copy_repository_with_history(Path(temp))
+            subprocess.run(
+                ["git", "config", "user.name", "Coverage Fixture"], cwd=fixture, check=True
+            )
+            subprocess.run(
+                ["git", "config", "user.email", "coverage-fixture@example.invalid"],
+                cwd=fixture,
+                check=True,
+            )
+
+            committed = fixture / "scripts" / "coverage_committed_fixture.py"
+            committed.write_text("committed_value = 1\n", encoding="utf-8")
+            subprocess.run(["git", "add", committed], cwd=fixture, check=True)
+            subprocess.run(
+                ["git", "commit", "-qm", "add committed coverage fixture"],
+                cwd=fixture,
+                check=True,
+            )
+
+            staged = fixture / "scripts" / "coverage_staged_fixture.py"
+            staged.write_text("staged_value = 2\n", encoding="utf-8")
+            subprocess.run(["git", "add", staged], cwd=fixture, check=True)
+
+            unstaged = fixture / "hooks" / "scripts" / "board_demo.py"
+            unstaged.write_text(
+                unstaged.read_text(encoding="utf-8") + "\nunstaged_value = 3\n",
+                encoding="utf-8",
+            )
+
+            untracked = fixture / "scripts" / "coverage_untracked_fixture.py"
+            untracked.write_text("untracked_value = 4\n", encoding="utf-8")
+
+            first = coverage_gate._changed_line_snapshot(fixture)
+            second = coverage_gate._changed_line_snapshot(fixture)
+            self.assertEqual(first.identity, second.identity)
+            self.assertRegex(first.identity, r"^[0-9a-f]{64}$")
+            self.assertEqual(
+                first.head,
+                subprocess.check_output(
+                    ["git", "rev-parse", "HEAD"], cwd=fixture, text=True
+                ).strip(),
+            )
+            for relative in (
+                "scripts/coverage_committed_fixture.py",
+                "scripts/coverage_staged_fixture.py",
+                "hooks/scripts/board_demo.py",
+                "scripts/coverage_untracked_fixture.py",
+            ):
+                with self.subTest(relative=relative):
+                    self.assertIn(relative, first.lines)
+                    self.assertTrue(first.lines[relative])
+
+            files = {
+                path: {
+                    "executed_lines": [],
+                    "missing_lines": sorted(lines),
+                }
+                for path, lines in first.lines.items()
+            }
+            decision = coverage_gate._changed_line_decision(
+                first,
+                files,
+                coverage_gate._load_policy(fixture),
+            )
+            self.assertFalse(decision.passed)
+            for relative in (
+                "scripts/coverage_committed_fixture.py",
+                "scripts/coverage_staged_fixture.py",
+                "hooks/scripts/board_demo.py",
+                "scripts/coverage_untracked_fixture.py",
+            ):
+                self.assertTrue(
+                    any(item.startswith(f"{relative}:") for item in decision.uncovered),
+                    decision.uncovered,
+                )
+
+    def test_eligible_changed_source_missing_from_report_fails(self) -> None:
+        snapshot = coverage_gate.ChangedLineSnapshot(
+            base="a" * 40,
+            head="b" * 40,
+            identity="c" * 64,
+            lines={"scripts/reachable_missing_report.py": {1, 2}},
+        )
+        decision = coverage_gate._changed_line_decision(
+            snapshot,
+            {},
+            coverage_gate._load_policy(ROOT),
+        )
+        self.assertFalse(decision.passed)
+        self.assertEqual(
+            decision.missing_from_report,
+            ["scripts/reachable_missing_report.py"],
+        )
+        self.assertEqual(
+            decision.uncovered,
+            ["scripts/reachable_missing_report.py:<missing-report>"],
+        )
 
     def test_security_families_fail_closed_and_redact_secret_values(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb security regression ") as temp:

@@ -33,6 +33,10 @@ increases.
 
 ### Fixed
 
+- Changed-line coverage now executes the package backend, contract, gate, and
+  runtime tests under the pinned collector; includes committed, staged,
+  unstaged, and untracked Python changes in one deterministic identity; and
+  fails when eligible changed source is absent from the coverage report.
 - Native Windows validator lock probes now inspect process state without
   signaling the lock owner, so occupied-resource checks fail promptly instead
   of interrupting the workflow process tree.
