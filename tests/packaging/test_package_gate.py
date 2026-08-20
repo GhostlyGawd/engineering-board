@@ -401,9 +401,10 @@ class PackageGateTests(unittest.TestCase):
             temporary = Path(temp)
             tool_root = temporary / "tools"
             (tool_root / "bin").mkdir(parents=True)
-            (tool_root / "python-tools" / "bin").mkdir(parents=True)
-            uv = tool_root / "bin" / "uv"
-            python_tool = tool_root / "python-tools" / "bin" / "python"
+            python_tools = tool_root / "python-tools" / ("Scripts" if os.name == "nt" else "bin")
+            python_tools.mkdir(parents=True)
+            uv = tool_root / "bin" / ("uv.exe" if os.name == "nt" else "uv")
+            python_tool = python_tools / ("python.exe" if os.name == "nt" else "python")
             uv.write_text("", encoding="utf-8")
             python_tool.write_text("", encoding="utf-8")
             self.assertEqual(package_runtime.tool_path(tool_root, "uv"), uv)
@@ -455,9 +456,20 @@ class PackageGateTests(unittest.TestCase):
                 values = [str(value) for value in command]  # type: ignore[arg-type]
                 if "venv" in values:
                     venv = Path(values[-1])
-                    (venv / "bin").mkdir(parents=True)
-                    (venv / "bin" / "python").write_text("", encoding="utf-8")
-                    (venv / "bin" / "engineering-board-mcp").write_text("", encoding="utf-8")
+                    scripts = venv / ("Scripts" if os.name == "nt" else "bin")
+                    scripts.mkdir(parents=True)
+                    (scripts / ("python.exe" if os.name == "nt" else "python")).write_text(
+                        "",
+                        encoding="utf-8",
+                    )
+                    (
+                        scripts
+                        / (
+                            "engineering-board-mcp.exe"
+                            if os.name == "nt"
+                            else "engineering-board-mcp"
+                        )
+                    ).write_text("", encoding="utf-8")
                 return subprocess.CompletedProcess(values, 0, "", "")
 
             with (
