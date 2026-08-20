@@ -761,6 +761,24 @@ class QualityCommandContractTests(unittest.TestCase):
             ["scripts/reachable_missing_report.py:<missing-report>"],
         )
 
+    def test_coverage_report_paths_are_platform_neutral(self) -> None:
+        report = coverage_gate._normalize_report_paths(
+            ROOT,
+            {
+                "files": {
+                    r"scripts\quality_gate.py": {"executed_lines": [1]},
+                    "mcp-server/engineering_board_core.py": {"executed_lines": [1]},
+                }
+            },
+        )
+        self.assertEqual(
+            set(report["files"]),
+            {
+                "scripts/quality_gate.py",
+                "mcp-server/engineering_board_core.py",
+            },
+        )
+
     def test_security_families_fail_closed_and_redact_secret_values(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb security regression ") as temp:
             fixture = self.copy_repository(Path(temp))

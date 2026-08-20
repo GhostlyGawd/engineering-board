@@ -405,7 +405,30 @@ def _collect_report(
         report = json.loads(report_path.read_text(encoding="utf-8"))
     if not isinstance(report, dict):
         raise CoverageGateError("coverage JSON report must be an object")
-    return cast(dict[str, Any], report)
+    return _normalize_report_paths(root, cast(dict[str, Any], report))
+
+
+def _normalize_report_paths(root: Path, report: dict[str, Any]) -> dict[str, Any]:
+    files = report.get("files")
+    if not isinstance(files, dict):
+        raise CoverageGateError("coverage JSON report files must be an object")
+    normalized: dict[str, Any] = {}
+    for raw, value in files.items():
+        candidate = Path(str(raw).replace("\\", "/"))
+        if candidate.is_absolute():
+            try:
+                candidate = candidate.resolve().relative_to(root)
+            except ValueError as exc:
+                raise CoverageGateError(
+                    f"coverage report path is outside repository: {raw}"
+                ) from exc
+        relative = candidate.as_posix()
+        if relative.startswith("./"):
+            relative = relative[2:]
+        if relative in normalized:
+            raise CoverageGateError(f"coverage report path collision: {relative}")
+        normalized[relative] = value
+    return {**report, "files": normalized}
 
 
 def run_coverage(root: Path) -> None:
