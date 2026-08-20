@@ -168,6 +168,19 @@ class QualityCommandContractTests(unittest.TestCase):
                 self.assertNotIn("\n    secrets:", workflow)
                 self.assertNotIn("\n    environment:", workflow)
 
+        windows = (ROOT / ".github" / "workflows" / "windows.yml").read_text(encoding="utf-8")
+        for shell_name, command_path in (
+            ("PowerShell", "scripts/quality_gate.py"),
+            ("cmd.exe", r"scripts\quality_gate.py"),
+        ):
+            self.assertIn(f"Exercise quality command contract from {shell_name}", windows)
+            for arguments in ("--help", "format", "lint", "typecheck"):
+                self.assertIn(f"python {command_path} {arguments}", windows)
+            self.assertIn(
+                f"python {command_path} invalid-quality-selector",
+                windows,
+            )
+
     def test_long_tool_inputs_are_batched_with_utf8_output(self) -> None:
         runner = QualityRunner.__new__(QualityRunner)
         runner.root = ROOT

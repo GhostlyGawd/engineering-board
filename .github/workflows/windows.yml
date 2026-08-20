@@ -63,6 +63,22 @@ jobs:
         shell: pwsh
         run: python scripts/bootstrap_dev.py
 
+      - name: Exercise quality command contract from PowerShell
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: |
+          python scripts/quality_gate.py --help
+          python scripts/quality_gate.py format
+          python scripts/quality_gate.py lint
+          python scripts/quality_gate.py typecheck
+          python scripts/quality_gate.py invalid-quality-selector
+          $invalidExit = $LASTEXITCODE
+          if ($invalidExit -eq 0) {
+            throw "invalid quality selector unexpectedly passed"
+          }
+          Write-Host "invalid-selector-exit=$invalidExit"
+          $global:LASTEXITCODE = 0
+
       - name: Validate from PowerShell
         if: matrix.native_shell == 'powershell'
         shell: pwsh
@@ -90,6 +106,23 @@ jobs:
         if: matrix.native_shell == 'cmd'
         shell: cmd
         run: python scripts\bootstrap_dev.py
+
+      - name: Exercise quality command contract from cmd.exe
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: |
+          python scripts\quality_gate.py --help
+          if errorlevel 1 exit /b 1
+          python scripts\quality_gate.py format
+          if errorlevel 1 exit /b 1
+          python scripts\quality_gate.py lint
+          if errorlevel 1 exit /b 1
+          python scripts\quality_gate.py typecheck
+          if errorlevel 1 exit /b 1
+          python scripts\quality_gate.py invalid-quality-selector
+          if not errorlevel 1 exit /b 1
+          echo invalid-selector-exit=%errorlevel%
+          exit /b 0
 
       - name: Validate from cmd.exe
         if: matrix.native_shell == 'cmd'

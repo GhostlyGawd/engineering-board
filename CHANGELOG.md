@@ -33,7 +33,8 @@ increases.
   head and retain exact-head result manifests for the temporary foundation
   evidence flow.
 - Temporary foundation evidence workflows now accept only pull-request open
-  and synchronization events with read-only repository contents permission.
+  and synchronization events with read-only repository contents permission,
+  and exercise explicit native-shell quality help, selectors, and rejection.
 - Native Windows quality checks now batch long repository file lists and
   decode validator output as UTF-8 instead of the active console code page.
 - The evaluation harness now accepts fixed macOS system aliases such as
