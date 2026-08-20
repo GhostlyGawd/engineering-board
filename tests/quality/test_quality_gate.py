@@ -353,11 +353,11 @@ class QualityCommandContractTests(unittest.TestCase):
             json_path.unlink()
 
             workflow = fixture / ".github" / "workflows" / "quality-fixture.yml"
-            workflow.write_text(
-                "name: broken\non: push\njobs:\n  build:\n    runs-on: ubuntu-latest\n"
-                "    steps:\n      - run: ${{ unknown.context }}\n",
-                encoding="utf-8",
-            )
+            with workflow.open("w", encoding="utf-8", newline="\n") as stream:
+                stream.write(
+                    "name: broken\non: push\njobs:\n  build:\n    runs-on: ubuntu-latest\n"
+                    "    steps:\n      - run: ${{ unknown.context }}\n"
+                )
             self.assert_fixture_failure(
                 fixture,
                 "lint",
