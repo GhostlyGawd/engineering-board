@@ -222,6 +222,8 @@ class QualityRunner:
             cwd=self.root,
             env=self.environment,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             capture_output=capture,
             check=False,
         )
@@ -234,6 +236,48 @@ class QualityRunner:
             raise QualityError(f"{name} failed with exit {result.returncode}")
         print(f"quality-gate: pass {name}", flush=True)
         return result
+
+    def _run_batched(
+        self,
+        name: str,
+        command: Sequence[str | Path],
+        items: Sequence[str | Path],
+        *,
+        max_command_chars: int | None = None,
+    ) -> None:
+        limit = max_command_chars or (7_000 if self.toolchain.windows else 120_000)
+        prefix = [str(value) for value in command]
+        batches: list[list[str]] = []
+        batch: list[str] = []
+        batch_chars = sum(len(value) + 3 for value in prefix)
+        for item_value in items:
+            item = str(item_value)
+            item_chars = len(item) + 3
+            if batch and batch_chars + item_chars > limit:
+                batches.append(batch)
+                batch = []
+                batch_chars = sum(len(value) + 3 for value in prefix)
+            if batch_chars + item_chars > limit:
+                raise QualityError(f"{name} input path exceeds the command-length limit: {item}")
+            batch.append(item)
+            batch_chars += item_chars
+        if batch:
+            batches.append(batch)
+
+        self._stage(name)
+        for values in batches:
+            result = subprocess.run(
+                [*prefix, *values],
+                cwd=self.root,
+                env=self.environment,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            if result.returncode != 0:
+                raise QualityError(f"{name} failed with exit {result.returncode}")
+        print(f"quality-gate: pass {name}", flush=True)
 
     def _files(self, suffixes: set[str], directories: Iterable[str] = (".",)) -> list[Path]:
         found: set[Path] = set()
@@ -309,14 +353,14 @@ class QualityRunner:
                 *shell_files,
             ],
         )
-        self._run(
+        self._run_batched(
             "markdown-format",
             [
                 self.toolchain.executable("markdownlint-cli2"),
                 "--config",
                 "support/quality/markdownlint.jsonc",
-                *markdown_files,
             ],
+            markdown_files,
         )
         self._validate_structured_format()
 

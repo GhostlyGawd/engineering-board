@@ -34,6 +34,8 @@ increases.
   evidence flow.
 - Temporary foundation evidence workflows now accept only pull-request open
   and synchronization events with read-only repository contents permission.
+- Native Windows quality checks now batch long repository file lists and
+  decode validator output as UTF-8 instead of the active console code page.
 - The evaluation harness now accepts fixed macOS system aliases such as
   `/var` to `/private/var` without accepting user-created symbolic-link,
   junction, or reparse-point escapes.

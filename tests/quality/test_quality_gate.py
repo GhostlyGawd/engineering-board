@@ -12,9 +12,15 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from quality_checks import QualityRunner  # noqa: E402
+
+
 PYTHON_ENTRY = ROOT / "scripts" / "quality_gate.py"
 BASH_ENTRY = ROOT / "scripts" / "quality-gate.sh"
 STABLE_SELECTORS = ("format", "lint", "typecheck", "test", "security", "package", "all")
@@ -32,6 +38,8 @@ class QualityCommandContractTests(unittest.TestCase):
             cwd=ROOT,
             env=environment,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             capture_output=True,
             check=False,
         )
@@ -41,6 +49,8 @@ class QualityCommandContractTests(unittest.TestCase):
             ["bash", str(BASH_ENTRY), *arguments],
             cwd=ROOT,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             capture_output=True,
             check=False,
         )
@@ -157,6 +167,33 @@ class QualityCommandContractTests(unittest.TestCase):
                 self.assertNotIn("pull_request_target", workflow)
                 self.assertNotIn("\n    secrets:", workflow)
                 self.assertNotIn("\n    environment:", workflow)
+
+    def test_long_tool_inputs_are_batched_with_utf8_output(self) -> None:
+        runner = QualityRunner.__new__(QualityRunner)
+        runner.root = ROOT
+        runner.environment = {}
+        items = [f"docs/{number:03d}-{'x' * 25}.md" for number in range(12)]
+        completed = subprocess.CompletedProcess([], 0, "", "")
+        with (
+            mock.patch.object(runner, "_stage"),
+            mock.patch("quality_checks.subprocess.run", return_value=completed) as run,
+        ):
+            runner._run_batched(
+                "markdown-format",
+                ["markdownlint-cli2", "--config", "support/quality/markdownlint.jsonc"],
+                items,
+                max_command_chars=160,
+            )
+
+        self.assertGreater(run.call_count, 1)
+        flattened: list[str] = []
+        for call in run.call_args_list:
+            command = call.args[0]
+            self.assertLessEqual(sum(len(value) + 3 for value in command), 160)
+            self.assertEqual(call.kwargs["encoding"], "utf-8")
+            self.assertEqual(call.kwargs["errors"], "replace")
+            flattened.extend(command[3:])
+        self.assertEqual(flattened, items)
 
     def test_clean_format_lint_type_security_and_package_selectors_pass(self) -> None:
         environment = os.environ.copy()
