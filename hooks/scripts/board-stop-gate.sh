@@ -16,7 +16,7 @@ mkdir -p "$EB_DIR"
 
 # Read and save stdin (Stop payload) — preserve existing behavior.
 PAYLOAD=$(cat)
-printf '%s' "$PAYLOAD" > "$EB_DIR/last-stop-stdin.json"
+printf '%s' "$PAYLOAD" >"$EB_DIR/last-stop-stdin.json"
 
 # Gate 1: paused mode — suppress prompt entirely.
 MODE_FILE="$EB_DIR/session-mode.json"

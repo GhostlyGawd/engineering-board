@@ -66,10 +66,11 @@ fi
 # Capture without aborting on a nonzero python exit, so the FAIL diagnostic the
 # python block prints is actually echoed instead of set -e killing us silently.
 set +e
-RESULT="$(python3 - "$PLUGIN_JSON" "$CODEX_PLUGIN_JSON" \
-  "$CLAUDE_MARKETPLACE_JSON" "$CODEX_MARKETPLACE_JSON" \
-  "$MCP_SERVER_JSON" "$MCP_MANIFEST_JSON" "$PYPROJECT_TOML" "$README_MD" \
-  "$PERMISSIONS_JSON" "$RELEASING_MD" "$AGENTS_DIR" "$SKILLS_DIR" <<'PY'
+RESULT="$(
+  python3 - "$PLUGIN_JSON" "$CODEX_PLUGIN_JSON" \
+    "$CLAUDE_MARKETPLACE_JSON" "$CODEX_MARKETPLACE_JSON" \
+    "$MCP_SERVER_JSON" "$MCP_MANIFEST_JSON" "$PYPROJECT_TOML" "$README_MD" \
+    "$PERMISSIONS_JSON" "$RELEASING_MD" "$AGENTS_DIR" "$SKILLS_DIR" <<'PY'
 import json, pathlib, re, sys
 (
     plugin_path,

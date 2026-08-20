@@ -59,7 +59,7 @@ fixture() {
   if [ -z "$body" ]; then
     rm -f "$SF"
   else
-    printf '%s' "$body" > "$SF"
+    printf '%s' "$body" >"$SF"
   fi
 }
 
@@ -82,42 +82,42 @@ expect() {
 
 # ── Row 1: no session-mode.json (fresh / unset / null) ───────────────────────
 fixture ""
-expect "fresh → /pm-start ALLOW"                        0 "CURRENT_MODE=null" pm
-expect "fresh → /worker-start --discipline tdd ALLOW"   0 "CURRENT_MODE=null" worker --discipline tdd
-expect "fresh → /board-pause ALLOW (prev=null)"         0 "PREVIOUS_MODE=null" paused
-expect "fresh → /board-resume NOOP"                     2 "not currently paused" resumed
+expect "fresh → /pm-start ALLOW" 0 "CURRENT_MODE=null" pm
+expect "fresh → /worker-start --discipline tdd ALLOW" 0 "CURRENT_MODE=null" worker --discipline tdd
+expect "fresh → /board-pause ALLOW (prev=null)" 0 "PREVIOUS_MODE=null" paused
+expect "fresh → /board-resume NOOP" 2 "not currently paused" resumed
 
 # ── Row 2: mode=pm ───────────────────────────────────────────────────────────
 fixture '{"mode":"pm","previous_mode":null,"started_at":"2026-05-29T00:00:00Z","session_id":"s1"}'
-expect "pm → /pm-start NOOP"                            2 "already in PM mode" pm
-expect "pm → /worker-start --discipline tdd REFUSE"     3 "currently in PM mode" worker --discipline tdd
-expect "pm → /board-pause ALLOW (prev=pm)"              0 "PREVIOUS_MODE=pm" paused
-expect "pm → /board-resume NOOP"                        2 "not currently paused" resumed
+expect "pm → /pm-start NOOP" 2 "already in PM mode" pm
+expect "pm → /worker-start --discipline tdd REFUSE" 3 "currently in PM mode" worker --discipline tdd
+expect "pm → /board-pause ALLOW (prev=pm)" 0 "PREVIOUS_MODE=pm" paused
+expect "pm → /board-resume NOOP" 2 "not currently paused" resumed
 
 # ── Row 3: mode=worker, discipline=tdd ───────────────────────────────────────
 fixture '{"mode":"worker","discipline":"tdd","previous_mode":null,"started_at":"2026-05-29T00:00:00Z","session_id":"s2"}'
-expect "worker:tdd → /pm-start REFUSE"                  3 "currently in worker mode" pm
-expect "worker:tdd → /worker-start tdd NOOP"            2 "already in worker mode (discipline=tdd)" worker --discipline tdd
-expect "worker:tdd → /worker-start review REFUSE"       3 "Restart the session to switch to discipline=review" worker --discipline review
-expect "worker:tdd → /board-pause ALLOW (prev=worker)"  0 "PREVIOUS_MODE=worker" paused
-expect "worker:tdd → /board-pause preserves disc"       0 "PREVIOUS_DISCIPLINE=tdd" paused
-expect "worker:tdd → /board-resume NOOP"                2 "not currently paused" resumed
+expect "worker:tdd → /pm-start REFUSE" 3 "currently in worker mode" pm
+expect "worker:tdd → /worker-start tdd NOOP" 2 "already in worker mode (discipline=tdd)" worker --discipline tdd
+expect "worker:tdd → /worker-start review REFUSE" 3 "Restart the session to switch to discipline=review" worker --discipline review
+expect "worker:tdd → /board-pause ALLOW (prev=worker)" 0 "PREVIOUS_MODE=worker" paused
+expect "worker:tdd → /board-pause preserves disc" 0 "PREVIOUS_DISCIPLINE=tdd" paused
+expect "worker:tdd → /board-resume NOOP" 2 "not currently paused" resumed
 
 # ── Row 4: mode=paused, previous_mode=null ───────────────────────────────────
 fixture '{"mode":"paused","previous_mode":null,"previous_discipline":null,"paused_at":"2026-05-29T00:00:00Z","session_id":"s3"}'
-expect "paused(prev=null) → /pm-start REFUSE"           3 "currently paused" pm
-expect "paused(prev=null) → /worker-start REFUSE"       3 "currently paused" worker --discipline tdd
-expect "paused(prev=null) → /board-pause NOOP"          2 "already paused" paused
-expect "paused(prev=null) → /board-resume ALLOW"        0 "RESTORE_MODE=null" resumed
+expect "paused(prev=null) → /pm-start REFUSE" 3 "currently paused" pm
+expect "paused(prev=null) → /worker-start REFUSE" 3 "currently paused" worker --discipline tdd
+expect "paused(prev=null) → /board-pause NOOP" 2 "already paused" paused
+expect "paused(prev=null) → /board-resume ALLOW" 0 "RESTORE_MODE=null" resumed
 
 # ── Row 5: mode=paused, previous_mode=pm ─────────────────────────────────────
 fixture '{"mode":"paused","previous_mode":"pm","previous_discipline":null,"paused_at":"2026-05-29T00:00:00Z","session_id":"s4"}'
-expect "paused(prev=pm) → /pm-start REFUSE"             3 "currently paused" pm
+expect "paused(prev=pm) → /pm-start REFUSE" 3 "currently paused" pm
 expect "paused(prev=pm) → /board-resume ALLOW (restore pm)" 0 "RESTORE_MODE=pm" resumed
 
 # ── Row 6: mode=paused, previous_mode=worker, previous_discipline=review ─────
 fixture '{"mode":"paused","previous_mode":"worker","previous_discipline":"review","paused_at":"2026-05-29T00:00:00Z","session_id":"s5"}'
-expect "paused(prev=worker:review) → /pm-start REFUSE"  3 "currently paused" pm
+expect "paused(prev=worker:review) → /pm-start REFUSE" 3 "currently paused" pm
 expect "paused(prev=worker:review) → /board-resume ALLOW (restore worker)" 0 "RESTORE_MODE=worker" resumed
 expect "paused(prev=worker:review) → restores disc=review" 0 "RESTORE_DISCIPLINE=review" resumed
 
@@ -137,7 +137,7 @@ if [ "$rc" = "1" ]; then report 0 "unknown target → exit 1"; else report 1 "un
 
 # ── Robustness: corrupt session-mode.json treated as fresh ───────────────────
 fixture 'this is not json {{{'
-expect "corrupt JSON → /pm-start ALLOW (treated as null)"  0 "CURRENT_MODE=null" pm
+expect "corrupt JSON → /pm-start ALLOW (treated as null)" 0 "CURRENT_MODE=null" pm
 
 # Unrecognized mode value normalized to null.
 fixture '{"mode":"chimera"}'

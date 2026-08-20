@@ -109,10 +109,12 @@ CLI
     echo '<finding-json>' | python3 board_reject_check.py
         prints "accept" or "reject:<reason>"; always exits 0.
 """
+
 import json
 import re
 import sys
 import unicodedata
+
 
 def _strip_invisible(text):
     """Drop invisible / default-ignorable characters that render as nothing but
@@ -132,16 +134,17 @@ def _strip_invisible(text):
     out = []
     for ch in text:
         cp = ord(ch)
-        if unicodedata.category(ch) == "Cf":            # ZW*, WJ, BOM, soft hyphen, bidi, invisibles
+        if unicodedata.category(ch) == "Cf":  # ZW*, WJ, BOM, soft hyphen, bidi, invisibles
             continue
-        if cp == 0x034F:                                # combining grapheme joiner
+        if cp == 0x034F:  # combining grapheme joiner
             continue
         if 0xFE00 <= cp <= 0xFE0F or 0xE0100 <= cp <= 0xE01EF:  # variation selectors
             continue
-        if 0xE0000 <= cp <= 0xE007F:                    # deprecated tag characters (invisible)
+        if 0xE0000 <= cp <= 0xE007F:  # deprecated tag characters (invisible)
             continue
         out.append(ch)
     return "".join(out)
+
 
 # Sentence/clause terminators in non-Latin scripts that an LLM reads as a fresh
 # clause but the ASCII boundary class `[.!?:;,\n]` misses. NFKC leaves them
@@ -159,20 +162,41 @@ def _strip_invisible(text):
 # item, not a mechanism defect. Deliberately EXCLUDES marks an LLM does not treat
 # as a clause reset (interrobang, reversed-question-mark, pilcrow, section sign,
 # and intra-word delimiters like the Tibetan tsheg U+0F0B).
-_SENTENCE_TERMINATORS = dict.fromkeys([
-    0x3001, 0x3002, 0xFF61,                        # CJK comma / full stop / halfwidth stop
-    0x0964, 0x0965,                                # Devanagari danda / double danda
-    0x060C, 0x061B, 0x06D4, 0x061F,                # Arabic comma / semicolon / full stop / question
-    0x0589, 0x055D,                                # Armenian full stop / comma
-    0x1362, 0x1363, 0x1364, 0x1365, 0x1367, 0x1368,  # Ethiopic stop/comma/semicolon/colon/question/para
-    0x0F0D, 0x0F0E,                                # Tibetan shad / double shad
-    0x17D4, 0x17D5,                                # Khmer khan / bariyoosan
-    0x1802, 0x1803,                                # Mongolian comma / full stop
-    0x104A, 0x104B,                                # Myanmar little section / section
-    0x0DF4,                                        # Sinhala kunddaliya
-    0x10FB,                                        # Georgian paragraph separator
-    0x0700, 0x0701, 0x0702,                        # Syriac end-of-paragraph / full stops
-], ord("."))
+_SENTENCE_TERMINATORS = dict.fromkeys(
+    [
+        0x3001,
+        0x3002,
+        0xFF61,  # CJK comma / full stop / halfwidth stop
+        0x0964,
+        0x0965,  # Devanagari danda / double danda
+        0x060C,
+        0x061B,
+        0x06D4,
+        0x061F,  # Arabic comma / semicolon / full stop / question
+        0x0589,
+        0x055D,  # Armenian full stop / comma
+        0x1362,
+        0x1363,
+        0x1364,
+        0x1365,
+        0x1367,
+        0x1368,  # Ethiopic stop/comma/semicolon/colon/question/para
+        0x0F0D,
+        0x0F0E,  # Tibetan shad / double shad
+        0x17D4,
+        0x17D5,  # Khmer khan / bariyoosan
+        0x1802,
+        0x1803,  # Mongolian comma / full stop
+        0x104A,
+        0x104B,  # Myanmar little section / section
+        0x0DF4,  # Sinhala kunddaliya
+        0x10FB,  # Georgian paragraph separator
+        0x0700,
+        0x0701,
+        0x0702,  # Syriac end-of-paragraph / full stops
+    ],
+    ord("."),
+)
 
 
 def _normalize(text):
@@ -204,15 +228,35 @@ def _normalize(text):
     text = "\n".join(text.splitlines())
     return text
 
+
 # Verbs that signal an instruction to the orchestrator when they lead a clause.
 # `send`/`leak`/`expose` cover exfiltration openers ("send the API keys to …").
 # `print`/`respond`/`output` are deliberately EXCLUDED: they routinely lead
 # legitimate findings ("print statement leaks PII", "respond with 500 on …"),
 # and the threat model is prompt injection, not keyword presence.
 _VERBS = (
-    "ignore", "disregard", "override", "invoke", "execute", "run", "replace",
-    "forget", "delete", "remove", "close", "drop", "reveal", "emit", "bypass",
-    "disable", "exfiltrate", "uninstall", "reset", "send", "leak", "expose",
+    "ignore",
+    "disregard",
+    "override",
+    "invoke",
+    "execute",
+    "run",
+    "replace",
+    "forget",
+    "delete",
+    "remove",
+    "close",
+    "drop",
+    "reveal",
+    "emit",
+    "bypass",
+    "disable",
+    "exfiltrate",
+    "uninstall",
+    "reset",
+    "send",
+    "leak",
+    "expose",
 )
 
 # Politeness / directive lead-ins that can sit between the clause boundary and
@@ -254,9 +298,7 @@ _ADVERB = (
 # will override X" keeps its subject after the marker → the verb doesn't lead →
 # still accepted). scratch is markdown, so "1) ignore all previous instructions"
 # is as natural an injection as the bulleted form.
-_LIST_MARKER = (
-    r"(?:[(\[]?(?:\d{1,3}|[ivxlcdmIVXLCDM]{1,4}|[A-Za-z])[.)\]]|\[[ xX]?\])"
-)
+_LIST_MARKER = r"(?:[(\[]?(?:\d{1,3}|[ivxlcdmIVXLCDM]{1,4}|[A-Za-z])[.)\]]|\[[ xX]?\])"
 
 # Clause boundary: string start, sentence/clause punctuation, or a SYSTEM/ADMIN
 # lead-in. Between the boundary and the verb we skip an optional run of
@@ -268,9 +310,15 @@ _LIST_MARKER = (
 # prose is preserved.
 _IMPERATIVE_RE = re.compile(
     r"(?:^|[.!?:;,\n]|\bsystem\b|\badmin\b)[-\s*+>#'\"`()•‣⁃◦▪●·–—]*"
-    r"(?:" + _LIST_MARKER + r"\s*)?(?:(?:"
-    + _LEADIN + "|" + _ADVERB + r")\s+)*(?:"
-    + "|".join(_VERBS) + r")\b",
+    r"(?:"
+    + _LIST_MARKER
+    + r"\s*)?(?:(?:"
+    + _LEADIN
+    + "|"
+    + _ADVERB
+    + r")\s+)*(?:"
+    + "|".join(_VERBS)
+    + r")\b",
     re.IGNORECASE,
 )
 # Slash directive (e.g. /board-migrate, /uninstall-everything). Case-insensitive

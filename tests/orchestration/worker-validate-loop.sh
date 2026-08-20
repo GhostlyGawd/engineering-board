@@ -36,11 +36,11 @@ BOARD_DIR="$PROJECT/engineering-board/demo"
 SESSION_ID="worker-validate-test-session"
 mkdir -p "$BOARD_DIR/bugs" "$BOARD_DIR/features" "$BOARD_DIR/_claims" "$PROJECT/.engineering-board"
 
-cat > "$PROJECT/.engineering-board/session-mode.json" <<EOF
+cat >"$PROJECT/.engineering-board/session-mode.json" <<EOF
 {"mode":"worker","discipline":"validate","session_id":"$SESSION_ID","started_at":"2026-05-11T12:00:00Z"}
 EOF
 
-cat > "$BOARD_DIR/bugs/B300-resolves.md" <<'EOF'
+cat >"$BOARD_DIR/bugs/B300-resolves.md" <<'EOF'
 ---
 id: B300
 type: bug
@@ -55,7 +55,7 @@ needs: validate
 # Resolves
 EOF
 
-cat > "$BOARD_DIR/bugs/B301-regresses.md" <<'EOF'
+cat >"$BOARD_DIR/bugs/B301-regresses.md" <<'EOF'
 ---
 id: B301
 type: bug
@@ -71,7 +71,7 @@ needs: validate
 EOF
 
 # Wrong-discipline guard: needs: tdd entry must not be processed.
-cat > "$BOARD_DIR/bugs/B302-other.md" <<'EOF'
+cat >"$BOARD_DIR/bugs/B302-other.md" <<'EOF'
 ---
 id: B302
 type: bug
@@ -110,7 +110,7 @@ mock_next_needs() {
   case "$1" in
     B300) echo "resolved" ;;
     B301) echo "tdd" ;;
-    *)    echo "resolved" ;;
+    *) echo "resolved" ;;
   esac
 }
 
@@ -133,7 +133,7 @@ while :; do
   ENTRY_ID="$(grep -E '^id:' "$ENTRY_FILE" | head -1 | awk '{print $2}')"
   SUGGESTED_NEXT="$(mock_next_needs "$ENTRY_ID")"
 
-  bash "$ACQUIRE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" > "$TMP/acq.$ITER.stdout" 2> "$TMP/acq.$ITER.stderr"
+  bash "$ACQUIRE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" >"$TMP/acq.$ITER.stdout" 2>"$TMP/acq.$ITER.stderr"
   report 0 "iter $ITER: claim acquired for $ENTRY_ID"
 
   python3 - "$ENTRY_FILE" "$SUGGESTED_NEXT" <<'PY'
@@ -149,7 +149,7 @@ with open(path, "w", encoding="utf-8") as f:
 PY
 
   REL_RC=0
-  bash "$RELEASE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" > "$TMP/rel.$ITER.stdout" 2> "$TMP/rel.$ITER.stderr" || REL_RC=$?
+  bash "$RELEASE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" >"$TMP/rel.$ITER.stdout" 2>"$TMP/rel.$ITER.stderr" || REL_RC=$?
   if [ "$REL_RC" -eq 0 ]; then
     report 0 "iter $ITER: claim released for $ENTRY_ID"
   else

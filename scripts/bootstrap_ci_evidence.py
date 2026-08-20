@@ -155,11 +155,7 @@ def main() -> int:
     args = parser.parse_args()
 
     install_root = (
-        ROOT
-        / ".engineering-board"
-        / "validation"
-        / "bootstrap"
-        / f"{args.shell} tool root"
+        ROOT / ".engineering-board" / "validation" / "bootstrap" / f"{args.shell} tool root"
     )
     missing_root = install_root.with_name(f"{args.shell} missing root")
     checkout_root = install_root.with_name(f"{args.shell} checkout with spaces")
@@ -263,9 +259,7 @@ def main() -> int:
 
     status_after = _git("status", "--porcelain=v1", "--untracked-files=all")
     inventories = [
-        stage.get("inventory_sha256")
-        for stage in stages[:4]
-        if stage.get("exit_code") == 0
+        stage.get("inventory_sha256") for stage in stages[:4] if stage.get("exit_code") == 0
     ]
     expected_exit_codes = [0, 0, 0, 0, 2, 2]
     observed_exit_codes = [stage["exit_code"] for stage in stages]

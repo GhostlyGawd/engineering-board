@@ -33,7 +33,8 @@ if ! command -v python3 >/dev/null 2>&1; then
   exit 1
 fi
 
-ROOT_A=""; ROOT_B=""
+ROOT_A=""
+ROOT_B=""
 cleanup() { rm -rf "$ROOT_A" "$ROOT_B" 2>/dev/null || true; }
 trap cleanup EXIT
 
@@ -41,9 +42,11 @@ PASS=0
 FAIL=0
 report() {
   if [ "$1" = "0" ]; then
-    printf "  [PASS] %s\n" "$2"; PASS=$((PASS + 1))
+    printf "  [PASS] %s\n" "$2"
+    PASS=$((PASS + 1))
   else
-    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"; FAIL=$((FAIL + 1))
+    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"
+    FAIL=$((FAIL + 1))
   fi
 }
 
@@ -67,31 +70,31 @@ INSIGHT="Always flush the buffer before close"
 CONTEXT="Applies to every buffered writer in exporters."
 
 # ── Fixture: two identical boards, init'd through the same code path ────────
-ROOT_A="$(mktmp)"   # MCP remember
-ROOT_B="$(mktmp)"   # script remember
+ROOT_A="$(mktmp)" # MCP remember
+ROOT_B="$(mktmp)" # script remember
 eb_tool "$ROOT_A" board_init '{"project":"demo"}' >/dev/null
 eb_tool "$ROOT_B" board_init '{"project":"demo"}' >/dev/null
 
 # ── 1. Equivalence: MCP on A, script on B ───────────────────────────────────
 MCP_OUT="$(eb_tool "$ROOT_A" board_remember \
   "{\"project\":\"demo\",\"insight\":\"$INSIGHT\",\"context\":\"$CONTEXT\"}")"
-echo "$MCP_OUT" | grep -q '"id": "L001"' && report 0 "mcp: remember allocated L001" \
-  || report 1 "mcp: remember allocated L001" "$MCP_OUT"
+echo "$MCP_OUT" | grep -q '"id": "L001"' && report 0 "mcp: remember allocated L001" ||
+  report 1 "mcp: remember allocated L001" "$MCP_OUT"
 
 SCRIPT_OUT="$(CLAUDE_PROJECT_DIR="$ROOT_B" bash "$REMEMBER" "$INSIGHT" "$CONTEXT")"
-echo "$SCRIPT_OUT" | grep -q '"id": "L001"' && report 0 "script: remember allocated L001" \
-  || report 1 "script: remember allocated L001" "$SCRIPT_OUT"
-echo "$SCRIPT_OUT" | grep -q '"source": "remember"' && report 0 "script: JSON carries source=remember" \
-  || report 1 "script: JSON carries source=remember" "$SCRIPT_OUT"
+echo "$SCRIPT_OUT" | grep -q '"id": "L001"' && report 0 "script: remember allocated L001" ||
+  report 1 "script: remember allocated L001" "$SCRIPT_OUT"
+echo "$SCRIPT_OUT" | grep -q '"source": "remember"' && report 0 "script: JSON carries source=remember" ||
+  report 1 "script: JSON carries source=remember" "$SCRIPT_OUT"
 
 L_A="$(compgen -G "$ROOT_A/engineering-board/demo/learnings/L001-*.md" | head -1 || true)"
 L_B="$(compgen -G "$ROOT_B/engineering-board/demo/learnings/L001-*.md" | head -1 || true)"
-[ -n "$L_A" ] && [ -n "$L_B" ] && report 0 "both twins wrote an L001 learning file" \
-  || report 1 "both twins wrote an L001 learning file" "A=$L_A B=$L_B"
+[ -n "$L_A" ] && [ -n "$L_B" ] && report 0 "both twins wrote an L001 learning file" ||
+  report 1 "both twins wrote an L001 learning file" "A=$L_A B=$L_B"
 
-[ "$(basename "$L_A")" = "$(basename "$L_B")" ] \
-  && report 0 "equivalence: identical filename (same slug)" \
-  || report 1 "equivalence: identical filename" "$(basename "$L_A") vs $(basename "$L_B")"
+[ "$(basename "$L_A")" = "$(basename "$L_B")" ] &&
+  report 0 "equivalence: identical filename (same slug)" ||
+  report 1 "equivalence: identical filename" "$(basename "$L_A") vs $(basename "$L_B")"
 
 # Byte equivalence modulo timestamps: normalize YYYY-MM-DD dates on both sides.
 norm() { sed -E 's/[0-9]{4}-[0-9]{2}-[0-9]{2}/DATE/g' "$1"; }
@@ -102,8 +105,8 @@ else
     "$(diff <(norm "$L_A") <(norm "$L_B") | head -5)"
 fi
 
-grep -q "^source: remember$" "$L_B" && report 0 "script: frontmatter has source: remember" \
-  || report 1 "script: frontmatter has source: remember"
+grep -q "^source: remember$" "$L_B" && report 0 "script: frontmatter has source: remember" ||
+  report 1 "script: frontmatter has source: remember"
 
 # BOARD.md treatment equivalence: full-rebuild (MCP) vs row-insert (script)
 # must land on identical bytes for identical fixtures.
@@ -113,9 +116,9 @@ else
   report 1 "equivalence: BOARD.md treatment byte-identical" \
     "$(diff "$ROOT_A/engineering-board/demo/BOARD.md" "$ROOT_B/engineering-board/demo/BOARD.md" | head -5)"
 fi
-grep -q "^- L001 | \[" "$ROOT_B/engineering-board/demo/BOARD.md" \
-  && report 0 "script: BOARD.md gained the L001 open row" \
-  || report 1 "script: BOARD.md gained the L001 open row"
+grep -q "^- L001 | \[" "$ROOT_B/engineering-board/demo/BOARD.md" &&
+  report 0 "script: BOARD.md gained the L001 open row" ||
+  report 1 "script: BOARD.md gained the L001 open row"
 
 # ── 2. Index-check stays green post-remember ────────────────────────────────
 if CLAUDE_PROJECT_DIR="$ROOT_B" bash "$INDEX_CHECK" >/dev/null 2>&1; then
@@ -125,39 +128,39 @@ else
 fi
 
 # ── 3. Validator accepts the script-produced learning ───────────────────────
-VOUT="$(printf '{"tool_input":{"file_path":"%s"}}' "$L_B" \
-  | CLAUDE_PROJECT_DIR="$ROOT_B" bash "$VALIDATE" 2>&1)" \
-  && report 0 "board-validate-entry.sh accepts the script-produced learning" \
-  || report 1 "board-validate-entry.sh accepts the script-produced learning" "$VOUT"
+VOUT="$(printf '{"tool_input":{"file_path":"%s"}}' "$L_B" |
+  CLAUDE_PROJECT_DIR="$ROOT_B" bash "$VALIDATE" 2>&1)" &&
+  report 0 "board-validate-entry.sh accepts the script-produced learning" ||
+  report 1 "board-validate-entry.sh accepts the script-produced learning" "$VOUT"
 
 # ── 4. Id sequencing ─────────────────────────────────────────────────────────
 OUT2="$(CLAUDE_PROJECT_DIR="$ROOT_B" bash "$REMEMBER" "Second durable insight")"
-echo "$OUT2" | grep -q '"id": "L002"' && report 0 "second remember allocates L002" \
-  || report 1 "second remember allocates L002" "$OUT2"
-CLAUDE_PROJECT_DIR="$ROOT_B" bash "$INDEX_CHECK" >/dev/null 2>&1 \
-  && report 0 "index-check still green after second remember" \
-  || report 1 "index-check still green after second remember"
+echo "$OUT2" | grep -q '"id": "L002"' && report 0 "second remember allocates L002" ||
+  report 1 "second remember allocates L002" "$OUT2"
+CLAUDE_PROJECT_DIR="$ROOT_B" bash "$INDEX_CHECK" >/dev/null 2>&1 &&
+  report 0 "index-check still green after second remember" ||
+  report 1 "index-check still green after second remember"
 
 # ── 5. --board-dir override (no CLAUDE_PROJECT_DIR needed) ──────────────────
 OUT3="$(env -u CLAUDE_PROJECT_DIR bash "$REMEMBER" --board-dir "$ROOT_B/engineering-board/demo" "Third insight via explicit dir")"
-echo "$OUT3" | grep -q '"id": "L003"' && report 0 "--board-dir override works" \
-  || report 1 "--board-dir override works" "$OUT3"
+echo "$OUT3" | grep -q '"id": "L003"' && report 0 "--board-dir override works" ||
+  report 1 "--board-dir override works" "$OUT3"
 
 # ── 6. Error paths ───────────────────────────────────────────────────────────
 if CLAUDE_PROJECT_DIR="$ROOT_B" bash "$REMEMBER" >/dev/null 2>&1; then
   report 1 "missing insight -> exit 1" "exited 0"
 else
   rc=$?
-  [ "$rc" = "1" ] && report 0 "missing insight -> exit 1" \
-    || report 1 "missing insight -> exit 1" "exit=$rc"
+  [ "$rc" = "1" ] && report 0 "missing insight -> exit 1" ||
+    report 1 "missing insight -> exit 1" "exit=$rc"
 fi
 NOBOARD="$(mktmp)"
 if CLAUDE_PROJECT_DIR="$NOBOARD" bash "$REMEMBER" "insight" >/dev/null 2>&1; then
   report 1 "no board -> exit 2" "exited 0"
 else
   rc=$?
-  [ "$rc" = "2" ] && report 0 "no board -> exit 2" \
-    || report 1 "no board -> exit 2" "exit=$rc"
+  [ "$rc" = "2" ] && report 0 "no board -> exit 2" ||
+    report 1 "no board -> exit 2" "exit=$rc"
 fi
 rm -rf "$NOBOARD"
 

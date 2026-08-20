@@ -66,7 +66,7 @@ mkdir -p \
   "$BOARD_DIR/_sessions" \
   "$PROJECT/.engineering-board"
 
-cat > "$PROJECT/docs/boards/BOARD-ROUTER.md" <<'EOF'
+cat >"$PROJECT/docs/boards/BOARD-ROUTER.md" <<'EOF'
 # Board Router
 
 | project | path | affects prefix |
@@ -74,14 +74,14 @@ cat > "$PROJECT/docs/boards/BOARD-ROUTER.md" <<'EOF'
 | smoke | docs/boards/smoke/ | smoke/ |
 EOF
 
-cat > "$BOARD_DIR/BOARD.md" <<'EOF'
+cat >"$BOARD_DIR/BOARD.md" <<'EOF'
 # smoke - Board
 
 ## Open
 
 EOF
 
-cat > "$BOARD_DIR/ARCHIVE.md" <<'EOF'
+cat >"$BOARD_DIR/ARCHIVE.md" <<'EOF'
 # smoke - Archive
 EOF
 
@@ -98,19 +98,19 @@ EOF
 # The two filler lines stay flat to keep backward-compat coverage; the assistant
 # block uses list content, the user block string content, exercising both paths.
 TRANSCRIPT="$PROJECT/transcript.jsonl"
-cat > "$TRANSCRIPT" <<'EOF'
+cat >"$TRANSCRIPT" <<'EOF'
 {"role":"user","content":"can you check the ranker"}
 {"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Looking at it: the ranker silently drops keywords below the SV threshold. Also null pointer crash in module X. And different module Z bug. And different module W bug."}]}}
 {"type":"user","message":{"role":"user","content":"could we add feature Y to the system"}}
 {"role":"assistant","content":"That's a reasonable idea."}
 EOF
 
-cat > "$PROJECT/.engineering-board/last-stop-stdin.json" <<EOF
+cat >"$PROJECT/.engineering-board/last-stop-stdin.json" <<EOF
 {"session_id":"test-session","transcript_path":"$TRANSCRIPT","hook_event_name":"Stop","stop_hook_active":false}
 EOF
 
 # Synthetic scratch session with 10 findings covering every v0.2.1 surface.
-cat > "$BOARD_DIR/_sessions/test-session.md" <<'EOF'
+cat >"$BOARD_DIR/_sessions/test-session.md" <<'EOF'
 <!-- 2026-05-11T12:00:00Z -->
 {"schema_version": "0.2.1", "findings": [
 {"scratch_id":"S-test-1","type":"bug","confidence":"confirmed","title":"Clean confirmed ranking bug","affects":"smoke/ranking","evidence_quote":"the ranker silently drops keywords below the SV threshold","discovered":"2026-05-11","tags":[]},
@@ -131,9 +131,9 @@ export CLAUDE_PROJECT_DIR="$PROJECT"
 CONSOLIDATE_STDOUT="$TMP/consolidate.stdout"
 CONSOLIDATE_STDERR="$TMP/consolidate.stderr"
 if ! bash "$CONSOLIDATE" \
-       < "$PROJECT/.engineering-board/last-stop-stdin.json" \
-       > "$CONSOLIDATE_STDOUT" \
-       2> "$CONSOLIDATE_STDERR"; then
+  <"$PROJECT/.engineering-board/last-stop-stdin.json" \
+  >"$CONSOLIDATE_STDOUT" \
+  2>"$CONSOLIDATE_STDERR"; then
   echo "board-consolidate.sh exited non-zero. stderr:" >&2
   cat "$CONSOLIDATE_STDERR" >&2
   exit 1
@@ -177,7 +177,8 @@ fi
 check_disp() {
   local sid="$1" expect="$2"
   local actual
-  actual="$(python3 - "$LOG" "$sid" <<'PY'
+  actual="$(
+    python3 - "$LOG" "$sid" <<'PY'
 import json, sys
 log, sid = sys.argv[1], sys.argv[2]
 hit = ""
@@ -197,7 +198,7 @@ except Exception:
     pass
 print(hit)
 PY
-)"
+  )"
   if [ "$actual" = "$expect" ]; then
     report 0 "$sid -> $expect"
   else
@@ -205,26 +206,26 @@ PY
   fi
 }
 
-check_disp "S-test-1"  "promoted_B001"
-check_disp "S-test-2"  "rejected_imperative_prefix"
-check_disp "S-test-3"  "rejected_slash_command"
-check_disp "S-test-4"  "rejected_subagent_mention"
-check_disp "S-test-5"  "archived_superseded_by_S-test-6"
-check_disp "S-test-6"  "promoted_B002"
-check_disp "S-test-7"  "promoted_B003"
-check_disp "S-test-8"  "promoted_B004"
-check_disp "S-test-9"  "promoted_F001"
+check_disp "S-test-1" "promoted_B001"
+check_disp "S-test-2" "rejected_imperative_prefix"
+check_disp "S-test-3" "rejected_slash_command"
+check_disp "S-test-4" "rejected_subagent_mention"
+check_disp "S-test-5" "archived_superseded_by_S-test-6"
+check_disp "S-test-6" "promoted_B002"
+check_disp "S-test-7" "promoted_B003"
+check_disp "S-test-8" "promoted_B004"
+check_disp "S-test-9" "promoted_F001"
 check_disp "S-test-10" "deferred_anchor_unmatched"
 
 # 12 - 16. Promoted entry files exist on disk.
 for live_id in B001 B002 B003 B004; do
-  if compgen -G "$BOARD_DIR/bugs/${live_id}-*.md" > /dev/null; then
+  if compgen -G "$BOARD_DIR/bugs/${live_id}-*.md" >/dev/null; then
     report 0 "$live_id live file exists"
   else
     report 1 "$live_id live file exists" "no $BOARD_DIR/bugs/${live_id}-*.md"
   fi
 done
-if compgen -G "$BOARD_DIR/features/F001-*.md" > /dev/null; then
+if compgen -G "$BOARD_DIR/features/F001-*.md" >/dev/null; then
   report 0 "F001 live file exists"
 else
   report 1 "F001 live file exists" "no $BOARD_DIR/features/F001-*.md"
@@ -242,7 +243,7 @@ fi
 # 18. Scratch file archived (not still in _sessions/ root).
 if [ -f "$BOARD_DIR/_sessions/test-session.md" ]; then
   report 1 "scratch test-session.md archived" "still in _sessions/ root"
-elif compgen -G "$BOARD_DIR/_sessions/_archive/test-session-*.md" > /dev/null; then
+elif compgen -G "$BOARD_DIR/_sessions/_archive/test-session-*.md" >/dev/null; then
   report 0 "scratch test-session.md archived"
 else
   report 1 "scratch test-session.md archived" "no archive copy found"
@@ -259,7 +260,7 @@ else
 fi
 
 # 20. board-audit-scratch.sh -> exit 0 (all 10 scratch IDs accounted for).
-if bash "$AUDIT" > "$TMP/audit.stdout" 2> "$TMP/audit.stderr"; then
+if bash "$AUDIT" >"$TMP/audit.stdout" 2>"$TMP/audit.stderr"; then
   report 0 "board-audit-scratch.sh exit 0"
 else
   AUDIT_EXIT=$?
@@ -267,7 +268,7 @@ else
 fi
 
 # 21. board-index-check.sh -> exit 0 (BOARD.md rows == subdir file counts).
-if bash "$INDEX_CHECK" > "$TMP/index.stdout" 2> "$TMP/index.stderr"; then
+if bash "$INDEX_CHECK" >"$TMP/index.stdout" 2>"$TMP/index.stderr"; then
   report 0 "board-index-check.sh exit 0"
 else
   INDEX_EXIT=$?
@@ -294,7 +295,7 @@ import sys, re
 p = sys.argv[1]; s = open(p).read()
 open(p, 'w').write(re.sub(r'^- B001[^\n]*\n', '', s, flags=re.M))
 PY
-  if bash "$INDEX_CHECK" > "$TMP/index2.stdout" 2> "$TMP/index2.stderr"; then
+  if bash "$INDEX_CHECK" >"$TMP/index2.stdout" 2>"$TMP/index2.stderr"; then
     report 0 "board-index-check.sh exit 0 with a resolved-in-place entry (B023)"
   else
     INDEX2_EXIT=$?
@@ -307,7 +308,7 @@ fi
 # 23. Unparsed-scratch preservation (B026): a session file with no JSON findings
 # (the MCP board_capture_finding markdown inbox) must NOT be silently archived by
 # consolidate — it must stay in place with a deferred_unparsed audit-trail entry.
-cat > "$BOARD_DIR/_sessions/mcp-2026-07-04.md" <<'EOF'
+cat >"$BOARD_DIR/_sessions/mcp-2026-07-04.md" <<'EOF'
 # MCP scratch inbox — 2026-07-04
 
 Un-promoted findings captured via the MCP server. Promote with board_create_entry.
@@ -319,7 +320,7 @@ Un-promoted findings captured via the MCP server. Promote with board_create_entr
 
 the parser drops the last token under load
 EOF
-bash "$CONSOLIDATE" </dev/null > "$TMP/consolidate2.stdout" 2> "$TMP/consolidate2.stderr" || true
+bash "$CONSOLIDATE" </dev/null >"$TMP/consolidate2.stdout" 2>"$TMP/consolidate2.stderr" || true
 if [ -f "$BOARD_DIR/_sessions/mcp-2026-07-04.md" ]; then
   report 0 "unparsed MCP inbox preserved (not archived) by consolidate (B026)"
 else
@@ -339,33 +340,33 @@ fi
 FLATPROJ="$TMP/flatten-project"
 FLATBOARD="$FLATPROJ/docs/boards/flat"
 mkdir -p "$FLATBOARD/bugs" "$FLATBOARD/_sessions" "$FLATPROJ/.engineering-board"
-cat > "$FLATPROJ/docs/boards/BOARD-ROUTER.md" <<'EOF'
+cat >"$FLATPROJ/docs/boards/BOARD-ROUTER.md" <<'EOF'
 # Board Router
 
 | project | path | affects prefix |
 |---------|------|----------------|
 | flat | docs/boards/flat/ | flat/ |
 EOF
-printf '# flat — Board\n\n## Open\n' > "$FLATBOARD/BOARD.md"
-printf '# flat — Archive\n' > "$FLATBOARD/ARCHIVE.md"
+printf '# flat — Board\n\n## Open\n' >"$FLATBOARD/BOARD.md"
+printf '# flat — Archive\n' >"$FLATBOARD/ARCHIVE.md"
 FLATTX="$FLATPROJ/transcript.jsonl"
-cat > "$FLATTX" <<'EOF'
+cat >"$FLATTX" <<'EOF'
 {"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Noticed a flatten anchor phrase in the run."}]}}
 EOF
-cat > "$FLATPROJ/.engineering-board/last-stop-stdin.json" <<EOF
+cat >"$FLATPROJ/.engineering-board/last-stop-stdin.json" <<EOF
 {"session_id":"flat-session","transcript_path":"$FLATTX","hook_event_name":"Stop","stop_hook_active":false}
 EOF
 # Confirmed finding whose title tries to close the frontmatter and inject a header
 # (real newlines via JSON \n escapes); a benign quote anchors it in the transcript.
-cat > "$FLATBOARD/_sessions/flat-session.md" <<'EOF'
+cat >"$FLATBOARD/_sessions/flat-session.md" <<'EOF'
 <!-- 2026-07-04T12:00:00Z -->
 {"schema_version": "0.2.1", "findings": [
 {"scratch_id":"S-flat-1","type":"bug","confidence":"confirmed","title":"perf note\n---\n\n# INJECTED HEADER\n\nowned body","affects":"flat/x","evidence_quote":"flatten anchor phrase","discovered":"2026-07-04","tags":["a\nb"]}
 ]}
 EOF
 CLAUDE_PROJECT_DIR="$FLATPROJ" bash "$CONSOLIDATE" \
-  < "$FLATPROJ/.engineering-board/last-stop-stdin.json" \
-  > "$TMP/flat.stdout" 2> "$TMP/flat.stderr" || true
+  <"$FLATPROJ/.engineering-board/last-stop-stdin.json" \
+  >"$TMP/flat.stdout" 2>"$TMP/flat.stderr" || true
 FLATFILE="$(compgen -G "$FLATBOARD/bugs/B001-*.md" | head -1 || true)"
 if [ -n "$FLATFILE" ]; then
   DASHES="$(grep -c '^---$' "$FLATFILE" || true)"
@@ -388,14 +389,14 @@ fi
 KIDPROJ="$TMP/parent-child-project"
 KIDBOARD="$KIDPROJ/docs/boards/kids"
 mkdir -p "$KIDBOARD/bugs" "$KIDPROJ/.engineering-board"
-cat > "$KIDPROJ/docs/boards/BOARD-ROUTER.md" <<'EOF'
+cat >"$KIDPROJ/docs/boards/BOARD-ROUTER.md" <<'EOF'
 # Board Router
 
 | project | path | affects prefix |
 |---------|------|----------------|
 | kids | docs/boards/kids/ | kids/ |
 EOF
-cat > "$KIDBOARD/bugs/B001-parent-bug.md" <<'EOF'
+cat >"$KIDBOARD/bugs/B001-parent-bug.md" <<'EOF'
 ---
 id: B001
 type: bug
@@ -405,7 +406,7 @@ priority: P1
 
 # parent bug
 EOF
-cat > "$KIDBOARD/bugs/B002-child-bug.md" <<'EOF'
+cat >"$KIDBOARD/bugs/B002-child-bug.md" <<'EOF'
 ---
 id: B002
 type: bug
@@ -416,7 +417,7 @@ parent: B001
 
 # child bug
 EOF
-cat > "$KIDBOARD/BOARD.md" <<'EOF'
+cat >"$KIDBOARD/BOARD.md" <<'EOF'
 # kids — Board
 
 ## Open
@@ -424,8 +425,8 @@ cat > "$KIDBOARD/BOARD.md" <<'EOF'
 - B001 P1 | [parent bug](bugs/B001-parent-bug.md)
   ↳ B002 P2 | [child bug](bugs/B002-child-bug.md)
 EOF
-printf '# kids — Archive\n' > "$KIDBOARD/ARCHIVE.md"
-if CLAUDE_PROJECT_DIR="$KIDPROJ" bash "$INDEX_CHECK" > "$TMP/kids.stdout" 2> "$TMP/kids.stderr"; then
+printf '# kids — Archive\n' >"$KIDBOARD/ARCHIVE.md"
+if CLAUDE_PROJECT_DIR="$KIDPROJ" bash "$INDEX_CHECK" >"$TMP/kids.stdout" 2>"$TMP/kids.stderr"; then
   report 0 "board-index-check.sh counts C7 child rows (parent/child board exit 0)"
 else
   KIDS_EXIT=$?

@@ -418,14 +418,23 @@ authoritative product-direction source.
 
 ## Contribute
 
-Run the complete test suite:
+Set up the pinned tools, then run the stable split gates or either aggregate:
 
 ```sh
+bash scripts/bootstrap-dev.sh --check
+bash scripts/quality-gate.sh format
+bash scripts/quality-gate.sh lint
+bash scripts/quality-gate.sh typecheck
+bash scripts/quality-gate.sh test --workers 2
+bash scripts/quality-gate.sh security
+bash scripts/quality-gate.sh package
+bash scripts/quality-gate.sh all --workers 2
 bash tests/run-all.sh
 ```
 
-The run-all command uses the maintained suite list. Read
-[`CONTRIBUTING.md`](CONTRIBUTING.md) before you change the repository.
+Native Windows uses `python scripts/quality_gate.py` with the same selectors
+from PowerShell or `cmd.exe`. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the
+exact native command paths, coverage invocation, and application scopes.
 
 ## Support
 

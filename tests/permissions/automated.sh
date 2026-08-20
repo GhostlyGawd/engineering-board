@@ -34,8 +34,14 @@ CMD_RELEASE="$PLUGIN_ROOT/commands/board-claim-release.md"
 PASS=0
 FAIL=0
 
-pass() { printf "[PASS] %s\n" "$1"; PASS=$((PASS + 1)); }
-fail() { printf "[FAIL] %s\n" "$1"; FAIL=$((FAIL + 1)); }
+pass() {
+  printf "[PASS] %s\n" "$1"
+  PASS=$((PASS + 1))
+}
+fail() {
+  printf "[FAIL] %s\n" "$1"
+  FAIL=$((FAIL + 1))
+}
 
 assert_exit() {
   local label="$1" expected="$2"
@@ -98,7 +104,8 @@ make_home() {
 
 T03_HOME="$(make_home "$FIXTURES/settings-empty.json")"
 out="$(CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T03_HOME" bash "$SELF_CHECK" 2>&1 || true)"
-ec=0; CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T03_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
+ec=0
+CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T03_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
 if [ "$ec" -eq 1 ] && echo "$out" | grep -qF "0 installed, $TOTAL missing"; then
   pass "T03: empty settings -> 0 installed, $TOTAL missing, exit 1"
 else
@@ -109,7 +116,8 @@ rm -rf "$T03_HOME"
 # ── Test 3: all-patterns settings -> 0 missing, exit 0 ───────────────────────
 T04_HOME="$(make_home "$FIXTURES/settings-all-patterns.json")"
 out="$(CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T04_HOME" bash "$SELF_CHECK" 2>&1 || true)"
-ec=0; CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T04_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
+ec=0
+CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T04_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
 if [ "$ec" -eq 0 ] && echo "$out" | grep -qF "0 missing"; then
   pass "T04: all-patterns settings -> 0 missing, exit 0"
 else
@@ -123,7 +131,8 @@ PARTIAL_MISSING=$((TOTAL - PARTIAL_INSTALLED))
 
 T05_HOME="$(make_home "$FIXTURES/settings-partial.json")"
 out="$(CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T05_HOME" bash "$SELF_CHECK" 2>&1 || true)"
-ec=0; CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T05_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
+ec=0
+CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T05_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
 if [ "$ec" -eq 1 ] && echo "$out" | grep -qF "$PARTIAL_INSTALLED installed, $PARTIAL_MISSING missing"; then
   pass "T05: partial settings -> $PARTIAL_MISSING missing, exit 1"
 else
@@ -143,7 +152,8 @@ rm -rf "$T05_HOME"
 # file must report every pattern MISSING (installed 0, exit 1).
 T05B_HOME="$(make_home "$FIXTURES/settings-bare-legacy.json")"
 out="$(CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T05B_HOME" bash "$SELF_CHECK" 2>&1 || true)"
-ec=0; CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T05B_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
+ec=0
+CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T05B_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
 if [ "$ec" -eq 1 ] && echo "$out" | grep -qF "0 installed, $TOTAL missing"; then
   pass "T05b: bare (unwrapped) rules report all missing, not a false green (B046)"
 else
@@ -153,7 +163,8 @@ rm -rf "$T05B_HOME"
 
 # ── Test 5: missing settings.json -> treated as empty, exit 1 ────────────────
 T07_HOME="$(make_home "")"
-ec=0; CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T07_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
+ec=0
+CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T07_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
 if [ "$ec" -eq 1 ]; then
   pass "T07: missing settings.json treated as empty -> exit 1"
 else
@@ -163,7 +174,8 @@ rm -rf "$T07_HOME"
 
 # ── Test 6: invalid settings.json -> exit 3 ──────────────────────────────────
 T08_HOME="$(make_home "$FIXTURES/settings-invalid.json")"
-ec=0; CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T08_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
+ec=0
+CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" HOME="$T08_HOME" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
 if [ "$ec" -eq 3 ]; then
   pass "T08: invalid settings.json -> exit 3"
 else
@@ -174,8 +186,9 @@ rm -rf "$T08_HOME"
 # ── Test 7: invalid manifest -> exit 2 ───────────────────────────────────────
 TMPROOT="$(mktemp -d)"
 mkdir -p "$TMPROOT/references" "$TMPROOT/.claude"
-echo "{{bad json" > "$TMPROOT/references/required-permissions.json"
-ec=0; CLAUDE_PLUGIN_ROOT="$TMPROOT" HOME="$TMPROOT" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
+echo "{{bad json" >"$TMPROOT/references/required-permissions.json"
+ec=0
+CLAUDE_PLUGIN_ROOT="$TMPROOT" HOME="$TMPROOT" bash "$SELF_CHECK" >/dev/null 2>&1 || ec=$?
 if [ "$ec" -eq 2 ]; then
   pass "T09: invalid manifest -> exit 2"
 else
@@ -275,7 +288,8 @@ fi
 #       commands/*.md has a Bash pattern in required-permissions.json, and
 #   (b) every Bash pattern uses the $CLAUDE_PLUGIN_ROOT/hooks/scripts/ form that
 #       matches the real invocations.
-COVERAGE_OUT="$(python3 - "$PLUGIN_ROOT" <<'PY'
+COVERAGE_OUT="$(
+  python3 - "$PLUGIN_ROOT" <<'PY'
 import json, os, re, sys, glob
 root = sys.argv[1]
 manifest = json.load(open(os.path.join(root, "references", "required-permissions.json")))

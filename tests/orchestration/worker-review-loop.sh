@@ -34,12 +34,12 @@ BOARD_DIR="$PROJECT/engineering-board/demo"
 SESSION_ID="worker-review-test-session"
 mkdir -p "$BOARD_DIR/bugs" "$BOARD_DIR/features" "$BOARD_DIR/_claims" "$PROJECT/.engineering-board"
 
-cat > "$PROJECT/.engineering-board/session-mode.json" <<EOF
+cat >"$PROJECT/.engineering-board/session-mode.json" <<EOF
 {"mode":"worker","discipline":"review","session_id":"$SESSION_ID","started_at":"2026-05-11T12:00:00Z"}
 EOF
 
 # Two needs:review entries (one approved, one regressed) + one wrong-discipline.
-cat > "$BOARD_DIR/bugs/B200-approved.md" <<'EOF'
+cat >"$BOARD_DIR/bugs/B200-approved.md" <<'EOF'
 ---
 id: B200
 type: bug
@@ -54,7 +54,7 @@ needs: review
 # Approved
 EOF
 
-cat > "$BOARD_DIR/bugs/B201-regressed.md" <<'EOF'
+cat >"$BOARD_DIR/bugs/B201-regressed.md" <<'EOF'
 ---
 id: B201
 type: bug
@@ -69,7 +69,7 @@ needs: review
 # Regressed
 EOF
 
-cat > "$BOARD_DIR/features/F200-other-discipline.md" <<'EOF'
+cat >"$BOARD_DIR/features/F200-other-discipline.md" <<'EOF'
 ---
 id: F200
 type: feature
@@ -108,7 +108,7 @@ mock_next_needs() {
   case "$1" in
     B200) echo "validate" ;;
     B201) echo "tdd" ;;
-    *)    echo "validate" ;;
+    *) echo "validate" ;;
   esac
 }
 
@@ -131,7 +131,7 @@ while :; do
   ENTRY_ID="$(grep -E '^id:' "$ENTRY_FILE" | head -1 | awk '{print $2}')"
   SUGGESTED_NEXT="$(mock_next_needs "$ENTRY_ID")"
 
-  bash "$ACQUIRE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" > "$TMP/acq.$ITER.stdout" 2> "$TMP/acq.$ITER.stderr"
+  bash "$ACQUIRE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" >"$TMP/acq.$ITER.stdout" 2>"$TMP/acq.$ITER.stderr"
   report 0 "iter $ITER: claim acquired for $ENTRY_ID"
 
   python3 - "$ENTRY_FILE" "$SUGGESTED_NEXT" <<'PY'
@@ -147,7 +147,7 @@ with open(path, "w", encoding="utf-8") as f:
 PY
 
   REL_RC=0
-  bash "$RELEASE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" > "$TMP/rel.$ITER.stdout" 2> "$TMP/rel.$ITER.stderr" || REL_RC=$?
+  bash "$RELEASE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" >"$TMP/rel.$ITER.stdout" 2>"$TMP/rel.$ITER.stderr" || REL_RC=$?
   if [ "$REL_RC" -eq 0 ]; then
     report 0 "iter $ITER: claim released for $ENTRY_ID"
   else

@@ -12,26 +12,34 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="${1:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 VIEW="$ROOT/hooks/scripts/board-view.sh"
 
-PASS=0; FAIL=0
-pass(){ printf "  [PASS] %s\n" "$1"; PASS=$((PASS+1)); }
-fail(){ printf "  [FAIL] %s\n" "$1"; FAIL=$((FAIL+1)); }
+PASS=0
+FAIL=0
+pass() {
+  printf "  [PASS] %s\n" "$1"
+  PASS=$((PASS + 1))
+}
+fail() {
+  printf "  [FAIL] %s\n" "$1"
+  FAIL=$((FAIL + 1))
+}
 
-TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
 P="$TMP/proj"
 mkdir -p "$P/engineering-board/demo"/{bugs,features,questions,observations,learnings}
-cat > "$P/engineering-board/BOARD-ROUTER.md" <<'EOF'
+cat >"$P/engineering-board/BOARD-ROUTER.md" <<'EOF'
 # Board Router
 
 | project | path | affects prefix |
 |---------|------|----------------|
 | demo | engineering-board/demo | demo/ |
 EOF
-cat > "$P/engineering-board/demo/BOARD.md" <<'EOF'
+cat >"$P/engineering-board/demo/BOARD.md" <<'EOF'
 # demo — Board
 ## Open
 EOF
 # One card per pipeline column + an XSS attempt in a title.
-mk(){ cat > "$P/engineering-board/demo/$1"; }
+mk() { cat >"$P/engineering-board/demo/$1"; }
 mk bugs/B001.md <<'EOF'
 ---
 id: B001
@@ -135,13 +143,13 @@ else
   fail "learning confidence/recurrence not surfaced"
 fi
 if echo "$OUT" | grep -qF '>supported<' &&
-   echo "$OUT" | grep -qF 'Four resolved sources and one held fix outcome.'; then
+  echo "$OUT" | grep -qF 'Four resolved sources and one held fix outcome.'; then
   pass "Learning outcome state and confidence basis surfaced"
 else
   fail "Learning outcome state or confidence basis missing"
 fi
 if echo "$OUT" | grep -qF 'useful resurfacing' &&
-   echo "$OUT" | grep -qF 'confirmed systemic fixes'; then
+  echo "$OUT" | grep -qF 'confirmed systemic fixes'; then
   pass "canonical outcome-value strip surfaced"
 else
   fail "outcome-value strip missing"
@@ -265,19 +273,19 @@ fi
 
 # Coordination with a real claim dir: owner + entry id shown, escaped.
 mkdir -p "$P/engineering-board/demo/_claims/B001"
-cat > "$P/engineering-board/demo/_claims/B001/owner.txt" <<'EOF'
+cat >"$P/engineering-board/demo/_claims/B001/owner.txt" <<'EOF'
 session_id: sess-abc123 <b>evil</b>
 timestamp: 2026-07-04T00:00:00Z
 cwd: /tmp/x
 EOF
 # _reclaimed.log: one malformed line (skipped, not fatal) + one valid line.
-cat > "$P/engineering-board/demo/_claims/_reclaimed.log" <<'EOF'
+cat >"$P/engineering-board/demo/_claims/_reclaimed.log" <<'EOF'
 this is not json {{{
 {"reclaimed_at": "2026-07-03T12:00:00Z", "entry_id": "B002", "reason": "stale_no_heartbeat", "age_sec": 999.0, "stale_threshold_sec": 600, "owner_info": "session_id: old-sess"}
 EOF
 # Active-workers registry (project-level runtime state).
 mkdir -p "$P/.engineering-board"
-cat > "$P/.engineering-board/active-workers.json" <<'EOF'
+cat >"$P/.engineering-board/active-workers.json" <<'EOF'
 [{"session_id": "worker-1234567890", "started_at": "2026-07-04T00:00:00Z", "last_seen": "2026-07-04T00:05:00Z", "mode": "worker", "discipline": "tdd", "cwd": "/tmp/x", "claim_ids_held": ["B001"], "paused": false}]
 EOF
 COORD="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
@@ -290,16 +298,17 @@ fi
 echo "$COORD" | grep -qF '<b>evil</b>' && fail "C12: owner.txt content injected raw (XSS)" || pass "C12: claim owner content is HTML-escaped"
 echo "$COORD" | grep -qF 'B002 · 2026-07-03T12:00:00Z' && pass "C12: valid reclaim line rendered (entry id + time)" || fail "C12: reclaim line missing"
 echo "$COORD" | grep -qF 'this is not json' && fail "C12: malformed reclaim line leaked into output" || pass "C12: malformed reclaimed.log line skipped, not fatal"
-if echo "$COORD" | grep -qF 'worker-1234' && echo "$COORD" | grep -qF '>worker' ; then
+if echo "$COORD" | grep -qF 'worker-1234' && echo "$COORD" | grep -qF '>worker'; then
   pass "C12: active worker rendered (mode + session)"
 else
   fail "C12: active worker missing"
 fi
 
 # Garbled runtime files must never fail the render.
-echo 'garbage{{{' > "$P/.engineering-board/active-workers.json"
-echo 'not even close' > "$P/engineering-board/demo/_claims/B001/owner.txt"
-GARBLED="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"; RC=$?
+echo 'garbage{{{' >"$P/.engineering-board/active-workers.json"
+echo 'not even close' >"$P/engineering-board/demo/_claims/B001/owner.txt"
+GARBLED="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
+RC=$?
 if [ "$RC" -eq 0 ] && echo "$GARBLED" | grep -q '<!doctype html>'; then
   pass "C12: garbled owner.txt + registry degrade gracefully (render still ok)"
 else

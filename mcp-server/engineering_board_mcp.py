@@ -223,11 +223,13 @@ def parse_router(root):
                 continue
             if cells[0].lower() == "project" or set(cells[0]) <= set("-: "):
                 continue
-            rows.append({
-                "project": cells[0],
-                "path": cells[1],
-                "affects": cells[2] if len(cells) > 2 else "",
-            })
+            rows.append(
+                {
+                    "project": cells[0],
+                    "path": cells[1],
+                    "affects": cells[2] if len(cells) > 2 else "",
+                }
+            )
     return rows
 
 
@@ -248,7 +250,8 @@ def validate_project(project):
     if not _SAFE_PROJECT_RE.match(project) or ".." in project:
         raise ToolError(
             "invalid project name %r: use letters, digits, '.', '_', '-' only "
-            "(no path separators, no '..', no leading '~' or '.')" % project)
+            "(no path separators, no '..', no leading '~' or '.')" % project
+        )
     return project
 
 
@@ -267,7 +270,8 @@ def validate_entry_id(entry_id):
     if not _SAFE_ENTRY_RE.match(entry_id) or ".." in entry_id:
         raise ToolError(
             "invalid entry_id %r: use letters, digits, '.', '_', '-' only "
-            "(no path separators, no '..')" % entry_id)
+            "(no path separators, no '..')" % entry_id
+        )
     return entry_id
 
 
@@ -322,8 +326,7 @@ def board_dir_for(root, project):
 def ensure_board_exists(root, project):
     bd = board_dir_for(root, project)
     if not os.path.isdir(bd):
-        raise ToolError(
-            "no board for project %r under %s — run board_init first" % (project, root))
+        raise ToolError("no board for project %r under %s — run board_init first" % (project, root))
     return bd
 
 
@@ -355,7 +358,7 @@ def parse_frontmatter(text):
         key = key.strip()
         val = val.strip()
         fm[key] = _parse_scalar(val)
-    body = "\n".join(lines[end + 1:])
+    body = "\n".join(lines[end + 1 :])
     return fm, body
 
 
@@ -409,7 +412,7 @@ def serialize_frontmatter(fields):
 # ---------------------------------------------------------------------------
 def iter_entry_files(board_dir, subdirs=None):
     """Yield (subdir, filename, fullpath) for entry .md files, sorted."""
-    for sub in (subdirs or SUBDIRS):
+    for sub in subdirs or SUBDIRS:
         d = os.path.join(board_dir, sub)
         if not os.path.isdir(d):
             continue
@@ -474,8 +477,7 @@ def compute_ready(entries):
             dangling.append({"entry": e.get("id", ""), "missing": missing})
         if status != "open":
             continue  # in_progress / blocked / no-status entries are never ready
-        if all(by_id[b].get("status") == "resolved"
-               for b in blockers if b in by_id):
+        if all(by_id[b].get("status") == "resolved" for b in blockers if b in by_id):
             ready.append(e.get("id", ""))
     return sorted(ready), sorted(dangling, key=lambda w: w["entry"])
 
@@ -524,10 +526,7 @@ BOARD_SKELETON = (
     "- Order within each section: P0 → P1 → P2 → P3 → unranked\n"
 )
 
-ARCHIVE_SKELETON = (
-    "# {project} — Archive\n\n"
-    "Resolved entries. Newest at the top.\n"
-)
+ARCHIVE_SKELETON = "# {project} — Archive\n\nResolved entries. Newest at the top.\n"
 
 # C8: marker-fenced AGENTS.md block. board_init writes/updates ONLY what sits
 # between the markers; content outside them is never touched. The block tells
@@ -555,7 +554,8 @@ AGENTS_MD_BLOCK = (
     "- When done: `board_update_entry` to the new status, then `board_release`.\n"
     "\n"
     "Read one entry with `board_get_entry`; get an overview with `board_status`.\n"
-    + AGENTS_MD_END + "\n"
+    + AGENTS_MD_END
+    + "\n"
 )
 
 
@@ -572,8 +572,7 @@ def upsert_agents_md(root):
     start = text.find(AGENTS_MD_START)
     end = text.find(AGENTS_MD_END)
     if start != -1 and end != -1 and end >= start:
-        new = (text[:start] + AGENTS_MD_BLOCK.rstrip("\n")
-               + text[end + len(AGENTS_MD_END):])
+        new = text[:start] + AGENTS_MD_BLOCK.rstrip("\n") + text[end + len(AGENTS_MD_END) :]
     else:
         new = text.rstrip("\n") + "\n\n" + AGENTS_MD_BLOCK
     if new == text:
@@ -678,13 +677,18 @@ def tool_board_init(params):
 def tool_board_list_projects(params):
     root = resolve_root(params)
     rows = parse_router(root)
-    projects = [{
-        "id": r["project"],
-        "path": r["path"],
-        "affects_prefix": r["affects"],
-    } for r in rows]
-    return {"router": os.path.relpath(router_path(root), root) if router_path(root) else None,
-            "projects": projects}
+    projects = [
+        {
+            "id": r["project"],
+            "path": r["path"],
+            "affects_prefix": r["affects"],
+        }
+        for r in rows
+    ]
+    return {
+        "router": os.path.relpath(router_path(root), root) if router_path(root) else None,
+        "projects": projects,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -721,20 +725,13 @@ def tool_board_create_entry(params):
     sub = TYPE_SUBDIR[entry_type]
     path = os.path.join(bd, sub, filename)
 
-    fields = [("id", eid), ("type", entry_type), ("title", title),
-              ("discovered", discovered)]
+    fields = [("id", eid), ("type", entry_type), ("title", title), ("discovered", discovered)]
     body = ""
     pattern = params.get("pattern")
     pattern_ids = params.get("pattern_ids")
-    pattern_values = (
-        pattern if isinstance(pattern, list) else [pattern]
-        if pattern
-        else []
-    )
+    pattern_values = pattern if isinstance(pattern, list) else [pattern] if pattern else []
     pattern_id_values = (
-        pattern_ids if isinstance(pattern_ids, list) else [pattern_ids]
-        if pattern_ids
-        else []
+        pattern_ids if isinstance(pattern_ids, list) else [pattern_ids] if pattern_ids else []
     )
     pattern_registry = load_pattern_registry(Path(bd))
     resolved_patterns, unresolved_patterns = resolve_entry_patterns(
@@ -746,11 +743,7 @@ def tool_board_create_entry(params):
         pattern_registry,
     )
     canonical_pattern_ids = sorted(
-        {
-            item["id"]
-            for item in resolved_patterns
-            if not item["id"].startswith("legacy:")
-        }
+        {item["id"] for item in resolved_patterns if not item["id"].startswith("legacy:")}
     )
 
     if entry_type in ("bug", "feature"):
@@ -759,7 +752,9 @@ def tool_board_create_entry(params):
             raise ToolError("invalid status %r" % status)
         priority = require(params, "priority")
         if priority not in VALID_PRIORITY:
-            raise ToolError("invalid priority %r (allowed: %s)" % (priority, ", ".join(VALID_PRIORITY)))
+            raise ToolError(
+                "invalid priority %r (allowed: %s)" % (priority, ", ".join(VALID_PRIORITY))
+            )
         affects = require(params, "affects")
         needs = params.get("needs", "tdd")
         if needs is not None and needs not in VALID_NEEDS:
@@ -769,7 +764,9 @@ def tool_board_create_entry(params):
         if needs:
             fields.append(("needs", needs))
         if blocked_by:
-            fields.append(("blocked_by", blocked_by if isinstance(blocked_by, list) else [blocked_by]))
+            fields.append(
+                ("blocked_by", blocked_by if isinstance(blocked_by, list) else [blocked_by])
+            )
         if pattern_values:
             fields.append(("pattern", pattern_values))
         body = _body_from_done_when(params.get("done_when"), params.get("body"))
@@ -808,10 +805,16 @@ def tool_board_create_entry(params):
         derived_from = require(params, "derived_from")
         if not isinstance(derived_from, list):
             derived_from = [derived_from]
-        fields = [("id", eid), ("type", "learning"), ("subtype", subtype),
-                  ("title", title), ("discovered", discovered),
-                  ("confidence", confidence), ("recurrence", recurrence),
-                  ("derived_from", derived_from)]
+        fields = [
+            ("id", eid),
+            ("type", "learning"),
+            ("subtype", subtype),
+            ("title", title),
+            ("discovered", discovered),
+            ("confidence", confidence),
+            ("recurrence", recurrence),
+            ("derived_from", derived_from),
+        ]
         if params.get("applies_to"):
             a = params.get("applies_to")
             fields.append(("applies_to", a if isinstance(a, list) else [a]))
@@ -838,16 +841,17 @@ def tool_board_create_entry(params):
     warnings = []
     for unresolved in unresolved_patterns:
         warnings.append(
-            "pattern label %s is unresolved; preserved as observed evidence"
-            % unresolved["label"]
+            "pattern label %s is unresolved; preserved as observed evidence" % unresolved["label"]
         )
     parent = params.get("parent")
     if parent:
         parent = _oneline(str(parent))
         fields.append(("parent", parent))
         if not find_entry(bd, parent):
-            warnings.append("parent %s not found on this board (dangling — "
-                            "accepted, entry is not blocked by it)" % parent)
+            warnings.append(
+                "parent %s not found on this board (dangling — "
+                "accepted, entry is not blocked by it)" % parent
+            )
 
     content = serialize_frontmatter(fields) + "\n\n" + body.rstrip() + "\n"
 
@@ -1022,15 +1026,9 @@ def tool_board_update_entry(params):
     warnings = []
     if "pattern" in params or "pattern_ids" in params:
         new_pattern = params.get("pattern", fm.get("pattern", []))
-        new_pattern_ids = params.get(
-            "pattern_ids", fm.get("pattern_ids", [])
-        )
+        new_pattern_ids = params.get("pattern_ids", fm.get("pattern_ids", []))
         pattern_values = (
-            new_pattern
-            if isinstance(new_pattern, list)
-            else [new_pattern]
-            if new_pattern
-            else []
+            new_pattern if isinstance(new_pattern, list) else [new_pattern] if new_pattern else []
         )
         pattern_id_values = (
             new_pattern_ids
@@ -1048,17 +1046,11 @@ def tool_board_update_entry(params):
             load_pattern_registry(Path(bd)),
         )
         canonical_pattern_ids = sorted(
-            {
-                item["id"]
-                for item in resolved_patterns
-                if not item["id"].startswith("legacy:")
-            }
+            {item["id"] for item in resolved_patterns if not item["id"].startswith("legacy:")}
         )
         fm["pattern"] = pattern_values
         fm["pattern_ids"] = canonical_pattern_ids
-        changes.append(
-            "pattern_ids=%s" % fmt_list(canonical_pattern_ids)
-        )
+        changes.append("pattern_ids=%s" % fmt_list(canonical_pattern_ids))
         for unresolved in unresolved_patterns:
             warnings.append(
                 "pattern label %s is unresolved; preserved as observed evidence"
@@ -1070,8 +1062,10 @@ def tool_board_update_entry(params):
         fm["parent"] = new_parent
         changes.append("parent=%s" % new_parent)
         if not find_entry(bd, new_parent):
-            warnings.append("parent %s not found on this board (dangling — "
-                            "accepted, entry is not blocked by it)" % new_parent)
+            warnings.append(
+                "parent %s not found on this board (dangling — "
+                "accepted, entry is not blocked by it)" % new_parent
+            )
 
     # Rebuild frontmatter preserving order then appending any new keys.
     field_pairs = []
@@ -1101,7 +1095,11 @@ def tool_board_update_entry(params):
     append_section = params.get("append_section")
     if append_section:
         heading = append_section.get("heading") if isinstance(append_section, dict) else None
-        section_body = append_section.get("body", "") if isinstance(append_section, dict) else str(append_section)
+        section_body = (
+            append_section.get("body", "")
+            if isinstance(append_section, dict)
+            else str(append_section)
+        )
         if not heading:
             raise ToolError("append_section requires a 'heading'")
         # A heading is a single markdown line; flatten embedded newlines so it
@@ -1122,17 +1120,13 @@ def tool_board_update_entry(params):
             archive = Path(archive_path).read_text(encoding="utf-8")
         except OSError as exc:
             raise ToolError("cannot read ARCHIVE.md: %s" % exc) from exc
-        archive_id_pattern = re.compile(
-            r"(?m)^-\s+%s\s+\|" % re.escape(entry_id)
-        )
+        archive_id_pattern = re.compile(r"(?m)^-\s+%s\s+\|" % re.escape(entry_id))
         if not archive_id_pattern.search(archive):
             patterns = fm.get("pattern", [])
             if not isinstance(patterns, list):
                 patterns = [patterns] if patterns else []
             pattern_text = (
-                " | pattern: %s" % ", ".join(str(item) for item in patterns)
-                if patterns
-                else ""
+                " | pattern: %s" % ", ".join(str(item) for item in patterns) if patterns else ""
             )
             archive_line = "- %s | %s%s | resolved: %s\n" % (
                 entry_id,
@@ -1217,9 +1211,7 @@ def tool_board_patterns(params):
     }
     plan_id = params.get("apply")
     if plan_id:
-        return apply_pattern_operation(
-            Path(bd), project, action, operation_params, plan_id
-        )
+        return apply_pattern_operation(Path(bd), project, action, operation_params, plan_id)
     return plan_pattern_operation(Path(bd), action, operation_params)
 
 
@@ -1300,9 +1292,7 @@ def tool_board_hypotheses(params):
         for key, value in params.items()
         if key not in {"root", "project", "action", "apply"}
     }
-    return plan_hypothesis_operation(
-        Path(bd), project, action, operation_params
-    )
+    return plan_hypothesis_operation(Path(bd), project, action, operation_params)
 
 
 def tool_board_promote_findings(params):
@@ -1506,8 +1496,13 @@ def tool_board_rebuild(params):
         if not os.path.isdir(bd):
             continue
         n = rebuild_board(bd, project)
-        results.append({"project": project, "open_lines": n,
-                        "board_md": os.path.relpath(os.path.join(bd, "BOARD.md"), root)})
+        results.append(
+            {
+                "project": project,
+                "open_lines": n,
+                "board_md": os.path.relpath(os.path.join(bd, "BOARD.md"), root),
+            }
+        )
     return {"rebuilt": results}
 
 
@@ -1551,8 +1546,9 @@ def tool_board_capture_finding(params):
         # forges a scratch header a reader / count_scratch_findings would honor
         # (eb-self B054, re-opening the B040 harm). Downstream readers use
         # universal-newline semantics, so the split must too.
-        quoted = "\n".join(("> " + ln) if ln.strip() else ">"
-                           for ln in str(evidence).rstrip().splitlines())
+        quoted = "\n".join(
+            ("> " + ln) if ln.strip() else ">" for ln in str(evidence).rstrip().splitlines()
+        )
         block += ["", quoted]
     block.append("")
     text = "\n".join(block) + "\n"
@@ -1560,8 +1556,10 @@ def tool_board_capture_finding(params):
     with open(sp, "a", encoding="utf-8") as f:
         if is_new:
             f.write("# MCP scratch inbox — %s\n\n" % today_utc())
-            f.write("Un-promoted findings captured via the MCP server. "
-                    "Promote to entries with board_create_entry.\n\n")
+            f.write(
+                "Un-promoted findings captured via the MCP server. "
+                "Promote to entries with board_create_entry.\n\n"
+            )
         f.write(text)
 
     return {
@@ -1585,9 +1583,14 @@ def render_remember_learning(lid, title, insight, context, discovered):
     MUST stay byte-identical with the twin renderer embedded in
     hooks/scripts/board-remember.sh — tests/orchestration/board-remember.sh
     asserts script-vs-MCP output equivalence (modulo id/timestamp)."""
-    applies = context.rstrip() if context.strip() else (
-        "Scope not yet established — recorded from an explicit user remember; "
-        "cross-reference when the topic recurs.")
+    applies = (
+        context.rstrip()
+        if context.strip()
+        else (
+            "Scope not yet established — recorded from an explicit user remember; "
+            "cross-reference when the topic recurs."
+        )
+    )
     return (
         "---\n"
         "id: %s\n"
@@ -1707,9 +1710,9 @@ def _utc_timestamp():
 
 def _claim_age_seconds(raw_timestamp):
     try:
-        heartbeat = datetime.strptime(
-            raw_timestamp.strip(), "%Y-%m-%dT%H:%M:%SZ"
-        ).replace(tzinfo=timezone.utc)
+        heartbeat = datetime.strptime(raw_timestamp.strip(), "%Y-%m-%dT%H:%M:%SZ").replace(
+            tzinfo=timezone.utc
+        )
     except (TypeError, ValueError):
         return None
     return int((datetime.now(timezone.utc) - heartbeat).total_seconds())
@@ -1782,8 +1785,7 @@ def tool_board_claim(params):
     timestamp = _utc_timestamp()
     try:
         owner_file.write_text(
-            "session_id: %s\ntimestamp: %s\ncwd: %s\n"
-            % (session_id, timestamp, os.getcwd()),
+            "session_id: %s\ntimestamp: %s\ncwd: %s\n" % (session_id, timestamp, os.getcwd()),
             encoding="utf-8",
         )
         heartbeat_file.write_text(timestamp + "\n", encoding="utf-8")
@@ -1806,19 +1808,13 @@ def tool_board_release(params):
     claim_dir = board_dir / "_claims" / entry_id
     owner_file = claim_dir / "owner.txt"
     if not claim_dir.is_dir() or not owner_file.is_file():
-        return _release_result(
-            entry_id, 3, stderr="claim or owner record not found"
-        )
+        return _release_result(entry_id, 3, stderr="claim or owner record not found")
     try:
         owner_lines = owner_file.read_text(encoding="utf-8").splitlines()
     except OSError as exc:
         return _release_result(entry_id, 3, stderr=str(exc))
     owner = next(
-        (
-            line.split(":", 1)[1].strip()
-            for line in owner_lines
-            if line.startswith("session_id:")
-        ),
+        (line.split(":", 1)[1].strip() for line in owner_lines if line.startswith("session_id:")),
         "",
     )
     if owner != session_id:
@@ -1828,9 +1824,7 @@ def tool_board_release(params):
     for attempt in range(3):
         try:
             shutil.rmtree(claim_dir)
-            return _release_result(
-                entry_id, 0, stdout="released: %s" % entry_id
-            )
+            return _release_result(entry_id, 0, stdout="released: %s" % entry_id)
         except FileNotFoundError:
             return _release_result(entry_id, 0, stdout="released: %s" % entry_id)
         except OSError as exc:
@@ -1894,8 +1888,10 @@ def tool_board_status(params):
 # ---------------------------------------------------------------------------
 # Tool registry + JSON schemas
 # ---------------------------------------------------------------------------
-_ROOT_PROP = {"type": "string",
-              "description": "Repo root that contains the board. Defaults to $CLAUDE_PROJECT_DIR or the current working directory."}
+_ROOT_PROP = {
+    "type": "string",
+    "description": "Repo root that contains the board. Defaults to $CLAUDE_PROJECT_DIR or the current working directory.",
+}
 
 
 def _tool_annotations(read_only, destructive, idempotent):
@@ -1913,6 +1909,7 @@ def _tool_annotations(read_only, destructive, idempotent):
         "openWorldHint": False,
     }
 
+
 TOOLS = [
     {
         "name": "board_init",
@@ -1921,9 +1918,18 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Project name (kebab-case), e.g. 'navigator'."},
-                "affects_prefix": {"type": "string", "description": "affects: prefix routed to this board. Defaults to '<project>/'."},
-                "agents_md": {"type": "boolean", "description": "Write/refresh the <!-- engineering-board:start/end --> block in <root>/AGENTS.md (idempotent; preserves everything outside the markers). Default true."},
+                "project": {
+                    "type": "string",
+                    "description": "Project name (kebab-case), e.g. 'navigator'.",
+                },
+                "affects_prefix": {
+                    "type": "string",
+                    "description": "affects: prefix routed to this board. Defaults to '<project>/'.",
+                },
+                "agents_md": {
+                    "type": "boolean",
+                    "description": "Write/refresh the <!-- engineering-board:start/end --> block in <root>/AGENTS.md (idempotent; preserves everything outside the markers). Default true.",
+                },
                 "root": _ROOT_PROP,
             },
             "required": ["project"],
@@ -1947,30 +1953,111 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Target project (must already be board_init'd)."},
-                "type": {"type": "string", "enum": ["bug", "feature", "question", "observation", "learning"],
-                         "description": "Entry type. Determines the id prefix (B/F/Q/O/L) and required fields."},
-                "title": {"type": "string", "description": "Short title. Present-tense for bug/feature; interrogative for question; one-line takeaway for learning."},
-                "priority": {"type": "string", "enum": VALID_PRIORITY, "description": "Required for bug/feature. P0=production down/data loss … P3=cosmetic."},
-                "affects": {"type": "string", "description": "Relative file path the fix/answer lands in. Required for bug/feature; optional for question."},
-                "needs": {"type": "string", "enum": VALID_NEEDS, "description": "Workflow state for bug/feature. Defaults to 'tdd' on intake."},
-                "status": {"type": "string", "enum": VALID_STATUS, "description": "Initial status. Defaults to 'open' for bug/feature/question."},
-                "blocked_by": {"type": "array", "items": {"type": "string"}, "description": "Question ids (e.g. ['Q001']) blocking a bug/feature."},
-                "pattern": {"type": "array", "items": {"type": "string"}, "description": "Root-cause pattern tags (kebab-case)."},
-                "pattern_ids": {"type": "array", "items": {"type": "string", "pattern": "^P[0-9]{3}$"}, "description": "Canonical pattern record ids. Existing aliases and merged ids resolve to the active P### identity."},
-                "done_when": {"type": "array", "items": {"type": "string"}, "description": "Verification criteria — become the required '## Done when' checklist for bug/feature/question."},
-                "source": {"type": "string", "description": "Question only: what surfaced this question."},
-                "subtype": {"type": "string", "enum": ["pattern", "finding", "principle"], "description": "Learning only. Required."},
-                "confidence": {"type": "string", "enum": ["low", "medium", "high"], "description": "Learning only. Required."},
-                "recurrence": {"type": "integer", "description": "Learning only. Number of resolved entries this is derived from. Required."},
-                "derived_from": {"type": "array", "items": {"type": "string"}, "description": "Learning only. Resolved entry ids that surfaced this pattern. Required."},
-                "takeaway": {"type": "string", "description": "Learning only: the durable lesson (becomes '## Takeaway')."},
-                "sources": {"type": "array", "items": {"type": "string"}, "description": "Learning only: source lines for '## Sources' (defaults to derived_from)."},
-                "applies_to": {"type": "array", "items": {"type": "string"}, "description": "Learning only: paths/components where this applies."},
-                "pattern_tag": {"type": "string", "description": "Learning only: original pattern: tag retained for cross-reference."},
-                "parent": {"type": "string", "description": "Optional parent entry id (e.g. 'F012') for subtask grouping. A dangling id is accepted with a warning in the response (it never blocks the entry)."},
-                "body": {"type": "string", "description": "Free-form body (used as the section content when done_when/takeaway are not given)."},
-                "discovered": {"type": "string", "description": "Discovery date YYYY-MM-DD. Defaults to today (UTC)."},
+                "project": {
+                    "type": "string",
+                    "description": "Target project (must already be board_init'd).",
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["bug", "feature", "question", "observation", "learning"],
+                    "description": "Entry type. Determines the id prefix (B/F/Q/O/L) and required fields.",
+                },
+                "title": {
+                    "type": "string",
+                    "description": "Short title. Present-tense for bug/feature; interrogative for question; one-line takeaway for learning.",
+                },
+                "priority": {
+                    "type": "string",
+                    "enum": VALID_PRIORITY,
+                    "description": "Required for bug/feature. P0=production down/data loss … P3=cosmetic.",
+                },
+                "affects": {
+                    "type": "string",
+                    "description": "Relative file path the fix/answer lands in. Required for bug/feature; optional for question.",
+                },
+                "needs": {
+                    "type": "string",
+                    "enum": VALID_NEEDS,
+                    "description": "Workflow state for bug/feature. Defaults to 'tdd' on intake.",
+                },
+                "status": {
+                    "type": "string",
+                    "enum": VALID_STATUS,
+                    "description": "Initial status. Defaults to 'open' for bug/feature/question.",
+                },
+                "blocked_by": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Question ids (e.g. ['Q001']) blocking a bug/feature.",
+                },
+                "pattern": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Root-cause pattern tags (kebab-case).",
+                },
+                "pattern_ids": {
+                    "type": "array",
+                    "items": {"type": "string", "pattern": "^P[0-9]{3}$"},
+                    "description": "Canonical pattern record ids. Existing aliases and merged ids resolve to the active P### identity.",
+                },
+                "done_when": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Verification criteria — become the required '## Done when' checklist for bug/feature/question.",
+                },
+                "source": {
+                    "type": "string",
+                    "description": "Question only: what surfaced this question.",
+                },
+                "subtype": {
+                    "type": "string",
+                    "enum": ["pattern", "finding", "principle"],
+                    "description": "Learning only. Required.",
+                },
+                "confidence": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"],
+                    "description": "Learning only. Required.",
+                },
+                "recurrence": {
+                    "type": "integer",
+                    "description": "Learning only. Number of resolved entries this is derived from. Required.",
+                },
+                "derived_from": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Learning only. Resolved entry ids that surfaced this pattern. Required.",
+                },
+                "takeaway": {
+                    "type": "string",
+                    "description": "Learning only: the durable lesson (becomes '## Takeaway').",
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Learning only: source lines for '## Sources' (defaults to derived_from).",
+                },
+                "applies_to": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Learning only: paths/components where this applies.",
+                },
+                "pattern_tag": {
+                    "type": "string",
+                    "description": "Learning only: original pattern: tag retained for cross-reference.",
+                },
+                "parent": {
+                    "type": "string",
+                    "description": "Optional parent entry id (e.g. 'F012') for subtask grouping. A dangling id is accepted with a warning in the response (it never blocks the entry).",
+                },
+                "body": {
+                    "type": "string",
+                    "description": "Free-form body (used as the section content when done_when/takeaway are not given).",
+                },
+                "discovered": {
+                    "type": "string",
+                    "description": "Discovery date YYYY-MM-DD. Defaults to today (UTC).",
+                },
                 "root": _ROOT_PROP,
             },
             "required": ["project", "type", "title"],
@@ -1984,11 +2071,20 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Restrict to one project (default: all projects in the router)."},
-                "type": {"type": "string", "enum": ["bug", "feature", "question", "observation", "learning"]},
+                "project": {
+                    "type": "string",
+                    "description": "Restrict to one project (default: all projects in the router).",
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["bug", "feature", "question", "observation", "learning"],
+                },
                 "status": {"type": "string", "enum": VALID_STATUS},
                 "needs": {"type": "string", "enum": VALID_NEEDS},
-                "ready": {"type": "boolean", "description": "true: only ready entries — status open AND every blocked_by id that resolves to an existing entry is resolved. Adds a dangling_blockers warning list to the result."},
+                "ready": {
+                    "type": "boolean",
+                    "description": "true: only ready entries — status open AND every blocked_by id that resolves to an existing entry is resolved. Adds a dangling_blockers warning list to the result.",
+                },
                 "root": _ROOT_PROP,
             },
         },
@@ -2022,15 +2118,32 @@ TOOLS = [
                 "needs": {"type": "string", "enum": VALID_NEEDS},
                 "priority": {"type": "string", "enum": VALID_PRIORITY},
                 "blocked_by": {"type": "array", "items": {"type": "string"}},
-                "pattern": {"type": "array", "items": {"type": "string"}, "description": "Observed root-cause labels. Unresolved values remain evidence and produce warnings."},
-                "pattern_ids": {"type": "array", "items": {"type": "string", "pattern": "^P[0-9]{3}$"}, "description": "Canonical pattern record ids."},
-                "parent": {"type": "string", "description": "Parent entry id for subtask grouping. A dangling id is accepted with a warning in the response."},
+                "pattern": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Observed root-cause labels. Unresolved values remain evidence and produce warnings.",
+                },
+                "pattern_ids": {
+                    "type": "array",
+                    "items": {"type": "string", "pattern": "^P[0-9]{3}$"},
+                    "description": "Canonical pattern record ids.",
+                },
+                "parent": {
+                    "type": "string",
+                    "description": "Parent entry id for subtask grouping. A dangling id is accepted with a warning in the response.",
+                },
                 "comment": {
                     "type": "object",
                     "description": "Append '- **<author>** <UTC ISO8601>: <text>' to the entry's '## Comments' section (section created on first comment; text flattened to one line; timestamp computed server-side).",
                     "properties": {
-                        "author": {"type": "string", "description": "Comment author (e.g. session or agent name)."},
-                        "text": {"type": "string", "description": "Comment text (single line; newlines are flattened)."},
+                        "author": {
+                            "type": "string",
+                            "description": "Comment author (e.g. session or agent name).",
+                        },
+                        "text": {
+                            "type": "string",
+                            "description": "Comment text (single line; newlines are flattened).",
+                        },
                     },
                     "required": ["author", "text"],
                 },
@@ -2038,7 +2151,10 @@ TOOLS = [
                     "type": "object",
                     "description": "Append a markdown section to the body.",
                     "properties": {
-                        "heading": {"type": "string", "description": "Section heading (## added if absent)."},
+                        "heading": {
+                            "type": "string",
+                            "description": "Section heading (## added if absent).",
+                        },
                         "body": {"type": "string", "description": "Section body markdown."},
                     },
                     "required": ["heading"],
@@ -2300,7 +2416,10 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "project": {"type": "string"},
-                "action": {"type": "string", "enum": ["list", "create", "alias", "assign", "correct"]},
+                "action": {
+                    "type": "string",
+                    "enum": ["list", "create", "alias", "assign", "correct"],
+                },
                 "label": {"type": "string"},
                 "aliases": {"type": "array", "items": {"type": "string"}},
                 "alias": {"type": "string"},
@@ -2355,7 +2474,10 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Project to rebuild (default: all projects in the router)."},
+                "project": {
+                    "type": "string",
+                    "description": "Project to rebuild (default: all projects in the router).",
+                },
                 "root": _ROOT_PROP,
             },
         },
@@ -2369,10 +2491,19 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "project": {"type": "string"},
-                "kind": {"type": "string", "description": "Finding kind, e.g. bug, feature, question, observation."},
+                "kind": {
+                    "type": "string",
+                    "description": "Finding kind, e.g. bug, feature, question, observation.",
+                },
                 "title": {"type": "string", "description": "One-line finding summary."},
-                "evidence": {"type": "string", "description": "Optional supporting evidence / quote."},
-                "affects": {"type": "string", "description": "Optional relative path the finding concerns."},
+                "evidence": {
+                    "type": "string",
+                    "description": "Optional supporting evidence / quote.",
+                },
+                "affects": {
+                    "type": "string",
+                    "description": "Optional relative path the finding concerns.",
+                },
                 "root": _ROOT_PROP,
             },
             "required": ["project", "kind", "title"],
@@ -2388,7 +2519,10 @@ TOOLS = [
             "properties": {
                 "project": {"type": "string"},
                 "entry_id": {"type": "string"},
-                "session_id": {"type": "string", "description": "Caller's session id (claim owner)."},
+                "session_id": {
+                    "type": "string",
+                    "description": "Caller's session id (claim owner).",
+                },
                 "root": _ROOT_PROP,
             },
             "required": ["project", "entry_id", "session_id"],
@@ -2418,9 +2552,18 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Target project (must already be board_init'd)."},
-                "insight": {"type": "string", "description": "The durable lesson to remember (becomes the title and '## Takeaway')."},
-                "context": {"type": "string", "description": "Optional: when/where the insight applies (becomes '## When this applies')."},
+                "project": {
+                    "type": "string",
+                    "description": "Target project (must already be board_init'd).",
+                },
+                "insight": {
+                    "type": "string",
+                    "description": "The durable lesson to remember (becomes the title and '## Takeaway').",
+                },
+                "context": {
+                    "type": "string",
+                    "description": "Optional: when/where the insight applies (becomes '## When this applies').",
+                },
                 "root": _ROOT_PROP,
             },
             "required": ["project", "insight"],
@@ -2434,7 +2577,10 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Restrict to one project (default: all)."},
+                "project": {
+                    "type": "string",
+                    "description": "Restrict to one project (default: all).",
+                },
                 "root": _ROOT_PROP,
             },
         },
@@ -2484,8 +2630,10 @@ def call_tool(name, arguments):
     except (ToolError, CoreError) as e:
         return {"content": [{"type": "text", "text": "Error: %s" % e}], "isError": True}
     except Exception as e:  # pragma: no cover - defensive
-        return {"content": [{"type": "text", "text": "Internal error: %s: %s" % (type(e).__name__, e)}],
-                "isError": True}
+        return {
+            "content": [{"type": "text", "text": "Internal error: %s: %s" % (type(e).__name__, e)}],
+            "isError": True,
+        }
 
 
 def dispatch(method, params):
@@ -2499,9 +2647,9 @@ def dispatch(method, params):
             "capabilities": {"tools": {"listChanged": False}},
             "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
             "instructions": "Maintains the engineering-board markdown board: init projects, "
-                            "create/list/update/get entries, rebuild the index, capture scratch "
-                            "findings, canonical patterns, graph analysis, foreground "
-                            "promotion, and claim/release entry locks.",
+            "create/list/update/get entries, rebuild the index, capture scratch "
+            "findings, canonical patterns, graph analysis, foreground "
+            "promotion, and claim/release entry locks.",
         }
     if method == "ping":
         return {}
@@ -2519,8 +2667,11 @@ def handle_message(obj):
     """Handle one parsed JSON-RPC message object. Returns a response dict, or
     None for notifications (no reply)."""
     if not isinstance(obj, dict):
-        return {"jsonrpc": "2.0", "id": None,
-                "error": {"code": -32600, "message": "invalid request: not an object"}}
+        return {
+            "jsonrpc": "2.0",
+            "id": None,
+            "error": {"code": -32600, "message": "invalid request: not an object"},
+        }
 
     method = obj.get("method")
     msg_id = obj.get("id")
@@ -2532,8 +2683,11 @@ def handle_message(obj):
         return None
 
     if not method:
-        return {"jsonrpc": "2.0", "id": msg_id,
-                "error": {"code": -32600, "message": "invalid request: missing method"}}
+        return {
+            "jsonrpc": "2.0",
+            "id": msg_id,
+            "error": {"code": -32600, "message": "invalid request: missing method"},
+        }
 
     try:
         result = dispatch(method, obj.get("params"))
@@ -2541,8 +2695,11 @@ def handle_message(obj):
     except RpcError as e:
         return {"jsonrpc": "2.0", "id": msg_id, "error": {"code": e.code, "message": e.message}}
     except Exception as e:  # pragma: no cover - defensive
-        return {"jsonrpc": "2.0", "id": msg_id,
-                "error": {"code": -32603, "message": "internal error: %s: %s" % (type(e).__name__, e)}}
+        return {
+            "jsonrpc": "2.0",
+            "id": msg_id,
+            "error": {"code": -32603, "message": "internal error: %s: %s" % (type(e).__name__, e)},
+        }
 
 
 def serve_stdio(stdin=None, stdout=None):
@@ -2556,8 +2713,11 @@ def serve_stdio(stdin=None, stdout=None):
         try:
             obj = json.loads(line)
         except json.JSONDecodeError:
-            resp = {"jsonrpc": "2.0", "id": None,
-                    "error": {"code": -32700, "message": "parse error"}}
+            resp = {
+                "jsonrpc": "2.0",
+                "id": None,
+                "error": {"code": -32700, "message": "parse error"},
+            }
             stdout.write(json.dumps(resp) + "\n")
             stdout.flush()
             continue

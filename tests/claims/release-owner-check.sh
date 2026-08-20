@@ -17,8 +17,14 @@ SESSION_B="session-nonowner-$(python3 -c 'import uuid; print(uuid.uuid4().hex[:8
 PASS=0
 FAIL=0
 
-pass() { echo "  PASS: $1"; PASS=$((PASS+1)); }
-fail() { echo "  FAIL: $1"; FAIL=$((FAIL+1)); }
+pass() {
+  echo "  PASS: $1"
+  PASS=$((PASS + 1))
+}
+fail() {
+  echo "  FAIL: $1"
+  FAIL=$((FAIL + 1))
+}
 
 echo "=== release-owner-check ==="
 
@@ -26,8 +32,8 @@ echo "=== release-owner-check ==="
 CLAIM_DIR="${BOARD_DIR}/_claims/${ENTRY_ID}"
 mkdir -p "${CLAIM_DIR}"
 NOW_ISO="$(python3 -c 'import datetime; print(datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))')"
-printf 'session_id: %s\ntimestamp: %s\ncwd: %s\n' "${SESSION_A}" "${NOW_ISO}" "$(pwd)" > "${CLAIM_DIR}/owner.txt"
-printf '%s\n' "${NOW_ISO}" > "${CLAIM_DIR}/heartbeat.txt"
+printf 'session_id: %s\ntimestamp: %s\ncwd: %s\n' "${SESSION_A}" "${NOW_ISO}" "$(pwd)" >"${CLAIM_DIR}/owner.txt"
+printf '%s\n' "${NOW_ISO}" >"${CLAIM_DIR}/heartbeat.txt"
 
 # Attempt release with SESSION_B (non-owner) — must exit 3
 exit_code=0

@@ -11,13 +11,23 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="${1:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 CMD="$ROOT/commands/board-run.md"
 
-PASS=0; FAIL=0
+PASS=0
+FAIL=0
 report() {
-  if [ "$1" = "0" ]; then printf "  [PASS] %s\n" "$2"; PASS=$((PASS+1));
-  else printf "  [FAIL] %s\n" "$2"; FAIL=$((FAIL+1)); fi
+  if [ "$1" = "0" ]; then
+    printf "  [PASS] %s\n" "$2"
+    PASS=$((PASS + 1))
+  else
+    printf "  [FAIL] %s\n" "$2"
+    FAIL=$((FAIL + 1))
+  fi
 }
 
-[ -f "$CMD" ] && report 0 "board-run.md exists" || { report 1 "board-run.md exists"; echo "board-run-command: $PASS pass, $FAIL fail"; exit 1; }
+[ -f "$CMD" ] && report 0 "board-run.md exists" || {
+  report 1 "board-run.md exists"
+  echo "board-run-command: $PASS pass, $FAIL fail"
+  exit 1
+}
 
 for token in "currently in PM mode" "currently in worker mode" "currently paused"; do
   grep -qF "$token" "$CMD" && report 0 "guard refuses: $token" || report 1 "guard refuses: $token"
@@ -32,8 +42,8 @@ grep -qF 'board-claim-release.sh' "$CMD" && report 0 "claim released (always)" |
 for agent in tdd-builder code-reviewer validator; do
   grep -qF "$agent" "$CMD" && report 0 "dispatches $agent" || report 1 "dispatches $agent"
 done
-grep -qF -- '---ENTRY-ID---' "$CMD" && grep -qF -- '---ENTRY-CONTENT---' "$CMD" \
-  && report 0 "worker dispatch format (ENTRY delimiters)" || report 1 "worker dispatch format"
+grep -qF -- '---ENTRY-ID---' "$CMD" && grep -qF -- '---ENTRY-CONTENT---' "$CMD" &&
+  report 0 "worker dispatch format (ENTRY delimiters)" || report 1 "worker dispatch format"
 grep -qF 'suggested_next_needs' "$CMD" && report 0 "applies suggested_next_needs" || report 1 "applies suggested_next_needs"
 grep -qF 'No-op pass-through rule' "$CMD" && report 0 "documents no-op pass-through rationale" || report 1 "documents no-op pass-through rationale"
 grep -qF 'max 5 rounds' "$CMD" && report 0 "bounded (max 5 rounds)" || report 1 "bounded (max 5 rounds)"

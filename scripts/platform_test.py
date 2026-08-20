@@ -13,7 +13,6 @@ import sys
 import tempfile
 import time
 
-from platform_contract import validate_repository_contract
 from validator_resources import ResourceError, run_locked
 
 
@@ -31,13 +30,7 @@ def _source_commit() -> str:
 
 
 def _write_result(shell_name: str, workers: int, stages: list[dict[str, object]]) -> None:
-    result_path = (
-        ROOT
-        / ".engineering-board"
-        / "validation"
-        / "platform"
-        / f"{shell_name}.json"
-    )
+    result_path = ROOT / ".engineering-board" / "validation" / "platform" / f"{shell_name}.json"
     result_path.parent.mkdir(parents=True, exist_ok=True)
     family = platform.system().lower()
     machine = platform.machine().lower()
@@ -95,6 +88,13 @@ def _run_tests(shell_name: str, workers: int) -> int:
             ],
         ),
         (
+            "quality-command-contract",
+            [
+                sys.executable,
+                str(ROOT / "tests" / "quality" / "test_quality_gate.py"),
+            ],
+        ),
+        (
             "evaluation-harness",
             [sys.executable, str(ROOT / "tests" / "evaluation" / "test_harness.py")],
         ),
@@ -121,9 +121,7 @@ def main() -> int:
     if os.name == "nt" and args.shell == "bash":
         parser.error("native Windows evidence must use cmd or powershell")
 
-    state_root = args.state_root or (
-        ROOT / ".engineering-board" / "validator-locks"
-    )
+    state_root = args.state_root or (ROOT / ".engineering-board" / "validator-locks")
     if os.environ.get("ENGINEERING_BOARD_VALIDATOR_SESSION"):
         return _run_tests(args.shell, args.workers)
     try:

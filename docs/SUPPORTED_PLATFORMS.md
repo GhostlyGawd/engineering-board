@@ -10,10 +10,30 @@ and GitHub Actions together.
 
 | Row | Native shell | Required validation |
 |---|---|---|
-| `macos-arm64-bash` | Bash | `bash scripts/bootstrap-dev.sh --check`, `bash tests/run-all.sh`, and `python3 scripts/platform_test.py --workers 2 --shell bash` |
-| `linux-x86_64-bash` | Bash | `bash scripts/bootstrap-dev.sh --check` and `bash tests/run-all.sh` on `ubuntu-24.04` |
-| `windows-x86_64-powershell` | PowerShell | `python scripts/bootstrap_dev.py --check` and `python scripts/platform_test.py --workers 2 --shell powershell` on `windows-2025` |
-| `windows-x86_64-cmd` | `cmd.exe` | `python scripts\bootstrap_dev.py --check` and `python scripts\platform_test.py --workers 2 --shell cmd` on `windows-2025` |
+| `macos-arm64-bash` | Bash | Bootstrap check, the Bash quality command set below, `bash tests/run-all.sh`, and `python3 scripts/platform_test.py --workers 2 --shell bash` |
+| `linux-x86_64-bash` | Bash | Bootstrap check, the Bash quality command set below, and `bash tests/run-all.sh` on `ubuntu-24.04` |
+| `windows-x86_64-powershell` | PowerShell | Python bootstrap and quality command sets plus `python scripts/platform_test.py --workers 2 --shell powershell` on `windows-2025` |
+| `windows-x86_64-cmd` | `cmd.exe` | Python bootstrap and quality command sets plus `python scripts\platform_test.py --workers 2 --shell cmd` on `windows-2025` |
+
+## Stable quality command parity
+
+The macOS/Linux Bash interface is:
+
+```sh
+bash scripts/quality-gate.sh format
+bash scripts/quality-gate.sh lint
+bash scripts/quality-gate.sh typecheck
+bash scripts/quality-gate.sh test --workers 2
+bash scripts/quality-gate.sh security
+bash scripts/quality-gate.sh package
+bash scripts/quality-gate.sh all --workers 2
+```
+
+PowerShell calls `python scripts/quality_gate.py` with the same selectors.
+`cmd.exe` calls `python scripts\quality_gate.py` with the same selectors.
+Help, stage names, diagnostics, artifacts, and exit decisions come from the
+same Python implementation. The `test` selector is the quality test and
+coverage invocation. `all --workers 2` is the split-gate aggregate.
 
 The matrix declares minimum and current versions for Python, Node.js, Git,
 Claude Code, Codex CLI, supported operating systems, and the devcontainer

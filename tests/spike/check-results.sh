@@ -50,7 +50,7 @@ else
     elif [ ! -s "$transcript_path" ]; then
       print_result "d" "FAIL" "transcript file exists but is empty: $transcript_path"
     else
-      print_result "d" "PASS" "transcript_path resolves to non-empty file ($(wc -c < "$transcript_path" | tr -d ' ') bytes)."
+      print_result "d" "PASS" "transcript_path resolves to non-empty file ($(wc -c <"$transcript_path" | tr -d ' ') bytes)."
     fi
   fi
 fi
@@ -94,8 +94,8 @@ if [ -z "$transcript_path" ] || [ ! -f "$transcript_path" ]; then
   print_result "b" "FAIL" "cannot resolve transcript_path to validate JSON capture (see (d))."
 else
   # Look for the extractor's fixed signature in the transcript.
-  if grep -q '"spike_version": *"0.0.1"' "$transcript_path" 2>/dev/null \
-     || grep -q '"spike_version":"0.0.1"' "$transcript_path" 2>/dev/null; then
+  if grep -q '"spike_version": *"0.0.1"' "$transcript_path" 2>/dev/null ||
+    grep -q '"spike_version":"0.0.1"' "$transcript_path" 2>/dev/null; then
     print_result "b" "PASS" "extractor JSON signature found in transcript."
   else
     print_result "b" "FAIL" "extractor JSON signature not found in transcript — subagent output not captured."

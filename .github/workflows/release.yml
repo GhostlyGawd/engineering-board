@@ -70,9 +70,11 @@ jobs:
           case "$TAG" in v[0-9]*) ;; *) echo "tag '$TAG' must look like v1.2.3" >&2; exit 1;; esac
           git merge-base --is-ancestor "$SHA" origin/main \
             || { echo "sha $SHA is not on main" >&2; exit 1; }
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+          {
+            echo "tag=$TAG"
+            echo "sha=$SHA"
+            echo "version=${TAG#v}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create tag if missing (dispatch)
         if: github.event_name == 'workflow_dispatch'

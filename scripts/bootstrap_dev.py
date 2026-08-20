@@ -90,8 +90,7 @@ def load_manifest(path: Path) -> Dict[str, Any]:
             f"{identifier}: version must be exact",
         )
         _require(
-            tool.get("provider")
-            in {"artifact", "node", "node-package", "python", "uv"},
+            tool.get("provider") in {"artifact", "node", "node-package", "python", "uv"},
             f"{identifier}: unsupported provider",
         )
         _require(
@@ -164,13 +163,7 @@ def _provider_command(
         return install_root / "node" / "bin" / executable
     if provider == "node-package":
         suffix = ".cmd" if windows else ""
-        return (
-            install_root
-            / "node-tools"
-            / "node_modules"
-            / ".bin"
-            / f"{executable}{suffix}"
-        )
+        return install_root / "node-tools" / "node_modules" / ".bin" / f"{executable}{suffix}"
     suffix = ".exe" if windows else ""
     return install_root / "bin" / f"{executable}{suffix}"
 
@@ -205,10 +198,7 @@ def _run_tool_version(
         version_command = [
             str(_python_bin(install_root, selected_platform)),
             "-c",
-            (
-                "import importlib.metadata,sys;"
-                "print(importlib.metadata.version(sys.argv[1]))"
-            ),
+            ("import importlib.metadata,sys;print(importlib.metadata.version(sys.argv[1]))"),
             tool["package"],
         ]
     result = subprocess.run(
@@ -245,8 +235,7 @@ def check_installation(
     marker = install_root / ".complete.json"
     if not marker.is_file():
         raise BootstrapError(
-            f"development toolchain is not installed at {install_root}; "
-            f"run: {recovery_command()}"
+            f"development toolchain is not installed at {install_root}; run: {recovery_command()}"
         )
     try:
         completed = json.loads(marker.read_text(encoding="utf-8"))
@@ -279,8 +268,7 @@ def check_installation(
             actual_file = file_sha256(command)
             if expected_file != actual_file:
                 raise BootstrapError(
-                    f"{tool['id']} executable checksum mismatch; "
-                    f"run: {recovery_command()}"
+                    f"{tool['id']} executable checksum mismatch; run: {recovery_command()}"
                 )
             version = tool["version"]
         elif command_runner is None:
@@ -373,9 +361,7 @@ def _extract_archive(
                     target.symlink_to(member.linkname)
                     continue
                 if member.islnk():
-                    raise BootstrapError(
-                        f"archive contains unsupported hard link: {member.name}"
-                    )
+                    raise BootstrapError(f"archive contains unsupported hard link: {member.name}")
                 if member.isdir():
                     target.mkdir(parents=True, exist_ok=True)
                     continue
@@ -561,9 +547,7 @@ def install_toolchain(
     syft_stage = install_root / ".syft-stage"
     shutil.rmtree(syft_stage, ignore_errors=True)
     _extract_archive(syft_archive, syft_stage, syft_artifact["strip_components"])
-    syft_source = syft_stage / (
-        "syft.exe" if _is_windows(selected_platform) else "syft"
-    )
+    syft_source = syft_stage / ("syft.exe" if _is_windows(selected_platform) else "syft")
     _require(syft_source.is_file(), "Syft archive did not contain syft")
     syft_target = bin_root / syft_source.name
     shutil.copy2(syft_source, syft_target)
@@ -587,9 +571,7 @@ def install_toolchain(
             )
     inventory = dict(sorted(inventory.items()))
     executable_hashes = {
-        tool["id"]: file_sha256(
-            _provider_command(tool, install_root, selected_platform)
-        )
+        tool["id"]: file_sha256(_provider_command(tool, install_root, selected_platform))
         for tool in manifest["tools"]
         if tool.get("verify") == "file-sha256"
     }

@@ -8,7 +8,7 @@ import json
 import ntpath
 from pathlib import Path, PureWindowsPath
 import re
-from typing import Any
+from typing import Any, cast
 
 
 REQUIRED_TOOLS = {"python", "node", "git", "claude-code", "codex-cli"}
@@ -17,6 +17,15 @@ REQUIRED_ROWS = {
     "macos-arm64-bash",
     "windows-x86_64-cmd",
     "windows-x86_64-powershell",
+}
+QUALITY_SURFACES = {
+    "format",
+    "lint",
+    "package",
+    "quality-all",
+    "quality-test",
+    "security",
+    "typecheck",
 }
 WINDOWS_RESERVED_NAMES = {
     "AUX",
@@ -54,7 +63,9 @@ def validate_windows_relative_path(value: str) -> str:
     _require(bool(value), "Windows path is empty")
     _require("\x00" not in value, "Windows path contains NUL")
     path = PureWindowsPath(value)
-    _require(not path.is_absolute() and not path.drive and not path.root, "Windows path is absolute")
+    _require(
+        not path.is_absolute() and not path.drive and not path.root, "Windows path is absolute"
+    )
     normalized_parts: list[str] = []
     for part in path.parts:
         _require(part not in {".", ".."}, "Windows path traverses its root")
@@ -80,7 +91,7 @@ def windows_path_is_within(path: str, root: str) -> bool:
 def _load_object(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     _require(isinstance(value, dict), f"{path} root must be an object")
-    return value
+    return cast(dict[str, Any], value)
 
 
 def validate_schema_instance(
@@ -100,7 +111,10 @@ def validate_schema_instance(
         )
         target: Any = root_schema
         for part in reference[2:].split("/"):
-            _require(isinstance(target, dict) and part in target, f"{location}: missing schema reference {reference}")
+            _require(
+                isinstance(target, dict) and part in target,
+                f"{location}: missing schema reference {reference}",
+            )
             target = target[part]
         _require(isinstance(target, dict), f"{location}: invalid schema reference {reference}")
         validate_schema_instance(
@@ -177,7 +191,51 @@ def validate_schema_instance(
             _require(len(instance) >= minimum_length, f"{location}: string is too short")
         pattern = schema.get("pattern")
         if pattern is not None:
-            _require(re.search(pattern, instance) is not None, f"{location}: string does not match pattern")
+            _require(
+                re.search(pattern, instance) is not None,
+                f"{location}: string does not match pattern",
+            )
+
+
+def _validate_platform_surfaces(
+    row: dict[str, Any],
+    surfaces: list[dict[str, Any]],
+) -> None:
+    surface_ids = {surface.get("id") for surface in surfaces}
+    _require(
+        "bootstrap-check" in surface_ids,
+        f"{row.get('id')} has no bootstrap-check surface",
+    )
+    _require(
+        QUALITY_SURFACES <= surface_ids,
+        f"{row.get('id')} has an incomplete quality command surface",
+    )
+    command_text = "\n".join(str(surface["command"]) for surface in surfaces)
+    if row["os"]["family"] == "windows":
+        _require(
+            "platform_test.py" in command_text,
+            f"{row['id']} must use the Python launcher",
+        )
+        _require(
+            "bootstrap_dev.py --check" in command_text,
+            f"{row['id']} must use the Python bootstrap check",
+        )
+        _require(
+            "bash" not in command_text.lower(),
+            f"{row['id']} cannot use Bash as native evidence",
+        )
+        _require(
+            "quality_gate.py" in command_text,
+            f"{row['id']} must use the Python quality launcher",
+        )
+        return
+    quality_commands = "\n".join(
+        str(surface["command"]) for surface in surfaces if surface.get("id") in QUALITY_SURFACES
+    )
+    _require(
+        "bash scripts/quality-gate.sh" in quality_commands,
+        f"{row['id']} must use the Bash quality launcher",
+    )
 
 
 def validate_repository_contract(root: Path) -> dict[str, Any]:
@@ -186,23 +244,28 @@ def validate_repository_contract(root: Path) -> dict[str, Any]:
     schema_path = root / "support" / "platform-matrix.schema.json"
     matrix = _load_object(matrix_path)
     schema = _load_object(schema_path)
-    _require(schema.get("$schema") == "https://json-schema.org/draft/2020-12/schema", "schema draft is not pinned")
+    _require(
+        schema.get("$schema") == "https://json-schema.org/draft/2020-12/schema",
+        "schema draft is not pinned",
+    )
     validate_schema_instance(matrix, schema)
-    _require(matrix.get("$schema") == "./platform-matrix.schema.json", "matrix does not reference its schema")
+    _require(
+        matrix.get("$schema") == "./platform-matrix.schema.json",
+        "matrix does not reference its schema",
+    )
     _require(matrix.get("schema_version") == "1", "unsupported platform matrix schema")
 
-    tools = matrix.get("tools")
+    tools = cast(dict[str, Any], matrix.get("tools"))
     _require(isinstance(tools, dict), "matrix tools must be an object")
     _require(set(tools) == REQUIRED_TOOLS, "matrix tool inventory is incomplete")
     for name, versions in tools.items():
         _require(isinstance(versions, dict), f"{name} versions must be an object")
         _require(
-            isinstance(versions.get("minimum"), str)
-            and isinstance(versions.get("current"), str),
+            isinstance(versions.get("minimum"), str) and isinstance(versions.get("current"), str),
             f"{name} requires minimum and current versions",
         )
 
-    platforms = matrix.get("platforms")
+    platforms = cast(list[dict[str, Any]], matrix.get("platforms"))
     _require(isinstance(platforms, list), "matrix platforms must be an array")
     row_ids = [row.get("id") for row in platforms if isinstance(row, dict)]
     _require(len(row_ids) == len(set(row_ids)), "platform row ids must be unique")
@@ -211,39 +274,46 @@ def validate_repository_contract(root: Path) -> dict[str, Any]:
     }
     _require(required_rows == REQUIRED_ROWS, "required platform rows are incomplete")
 
-    allowed_skips = set(matrix.get("permitted_skip_reasons", []))
+    allowed_skips = set(cast(list[str], matrix.get("permitted_skip_reasons", [])))
     for row in platforms:
         _require(isinstance(row, dict), "platform row must be an object")
-        _require(row.get("native_shell") in {"bash", "cmd", "powershell"}, f"invalid native shell for {row.get('id')}")
-        _require(row.get("architecture") in {"arm64", "x86_64"}, f"invalid architecture for {row.get('id')}")
-        row_tools = row.get("tools")
-        _require(isinstance(row_tools, list) and set(row_tools) <= set(tools), f"unknown tool in {row.get('id')}")
-        surfaces = row.get("surfaces")
-        _require(isinstance(surfaces, list) and surfaces, f"{row.get('id')} has no surfaces")
-        surface_ids = {
-            surface.get("id") for surface in surfaces if isinstance(surface, dict)
-        }
         _require(
-            "bootstrap-check" in surface_ids,
-            f"{row.get('id')} has no bootstrap-check surface",
+            row.get("native_shell") in {"bash", "cmd", "powershell"},
+            f"invalid native shell for {row.get('id')}",
+        )
+        _require(
+            row.get("architecture") in {"arm64", "x86_64"},
+            f"invalid architecture for {row.get('id')}",
+        )
+        row_tools = row.get("tools")
+        _require(
+            isinstance(row_tools, list) and set(row_tools) <= set(tools),
+            f"unknown tool in {row.get('id')}",
+        )
+        surfaces = cast(list[dict[str, Any]], row.get("surfaces"))
+        _require(
+            isinstance(surfaces, list) and bool(surfaces),
+            f"{row.get('id')} has no surfaces",
         )
         for surface in surfaces:
             skips = surface.get("permitted_skip_reasons")
-            _require(isinstance(skips, list) and set(skips) <= allowed_skips, f"invalid skip reason in {row.get('id')}")
-            _require(isinstance(surface.get("command"), str) and surface["command"], f"missing command in {row.get('id')}")
-        if row["os"]["family"] == "windows":
-            command_text = "\n".join(surface["command"] for surface in surfaces)
-            _require("platform_test.py" in command_text, f"{row['id']} must use the Python launcher")
             _require(
-                "bootstrap_dev.py --check" in command_text,
-                f"{row['id']} must use the Python bootstrap check",
+                isinstance(skips, list) and set(skips) <= allowed_skips,
+                f"invalid skip reason in {row.get('id')}",
             )
-            _require("bash" not in command_text.lower(), f"{row['id']} cannot use Bash as native evidence")
+            _require(
+                isinstance(surface.get("command"), str) and surface["command"],
+                f"missing command in {row.get('id')}",
+            )
+        _validate_platform_surfaces(row, surfaces)
 
-    limits = matrix.get("limits")
+    limits = cast(dict[str, Any], matrix.get("limits"))
     _require(isinstance(limits, dict), "matrix limits must be an object")
     _require(limits.get("validator_sessions") == 2, "validator session limit must be two")
-    _require(limits.get("exclusive_resources") == ["aggregate", "browser", "otlp"], "exclusive resources are incomplete")
+    _require(
+        limits.get("exclusive_resources") == ["aggregate", "browser", "otlp"],
+        "exclusive resources are incomplete",
+    )
     _require(limits.get("ports") == [4173, 4318], "exclusive ports are incomplete")
     _require(limits.get("mcp_fanout") == 5, "MCP fan-out must be five")
     _require(limits.get("claude_fanout") == 3, "Claude fan-out must be three")
@@ -261,8 +331,7 @@ def validate_repository_contract(root: Path) -> dict[str, Any]:
             _require(row["runner"] in workflows, f"CI omits runner {row['runner']}")
     _require("Git Bash" in docs and "WSL" in docs, "compatibility environments are not documented")
     _require(
-        re.search(r"Git Bash.+not native Windows", docs, re.IGNORECASE | re.DOTALL)
-        is not None,
+        re.search(r"Git Bash.+not native Windows", docs, re.IGNORECASE | re.DOTALL) is not None,
         "Git Bash is not classified separately",
     )
 
@@ -271,14 +340,12 @@ def validate_repository_contract(root: Path) -> dict[str, Any]:
         toolchain.get("schema_version") == "1",
         "unsupported development toolchain schema",
     )
+    artifacts = cast(list[dict[str, Any]], toolchain.get("artifacts", []))
     artifact_platforms = {
-        artifact.get("platform")
-        for artifact in toolchain.get("artifacts", [])
-        if isinstance(artifact, dict)
+        artifact.get("platform") for artifact in artifacts if isinstance(artifact, dict)
     }
     _require(
-        artifact_platforms
-        == {"darwin-arm64", "linux-x86_64", "windows-x86_64"},
+        artifact_platforms == {"darwin-arm64", "linux-x86_64", "windows-x86_64"},
         "development tool artifacts do not cover every supported host",
     )
     devcontainer = _load_object(root / ".devcontainer" / "devcontainer.json")

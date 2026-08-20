@@ -1,0 +1,40 @@
+{
+  "schema_version": "1",
+  "tool": "mypy",
+  "strict": true,
+  "applications": [
+    {
+      "id": "root-plugin",
+      "typed_paths": [
+        "hooks/scripts/board_demo.py",
+        "scripts/platform_contract.py",
+        "scripts/quality_checks.py",
+        "scripts/quality_gate.py",
+        "scripts/validator_resources.py"
+      ],
+      "staged_exclusions": [
+        "evaluation/harness.py",
+        "hooks/scripts/board-context.py",
+        "hooks/scripts/board-graph-build.py",
+        "hooks/scripts/board-insights.py",
+        "hooks/scripts/board-intake.py",
+        "hooks/scripts/board-outcome.py",
+        "hooks/scripts/board_reject_check.py",
+        "scripts/aggregate_ci_evidence.py",
+        "scripts/bootstrap_ci_evidence.py",
+        "scripts/bootstrap_dev.py",
+        "scripts/platform_test.py",
+        "scripts/prepare-release.py"
+      ]
+    },
+    {
+      "id": "mcp-server",
+      "typed_paths": [
+        "mcp-server/engineering_board_core.py"
+      ],
+      "staged_exclusions": [
+        "mcp-server/engineering_board_mcp.py"
+      ]
+    }
+  ]
+}

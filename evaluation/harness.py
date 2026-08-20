@@ -85,7 +85,10 @@ def _require(condition: bool, message: str) -> None:
 
 def _safe_relative(value: str) -> Path:
     path = Path(value)
-    _require(bool(value) and not path.is_absolute() and ".." not in path.parts, f"unsafe relative path: {value}")
+    _require(
+        bool(value) and not path.is_absolute() and ".." not in path.parts,
+        f"unsafe relative path: {value}",
+    )
     return path
 
 
@@ -174,7 +177,10 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
     corpus_id = corpus.get("corpus_id")
     corpus_role = corpus.get("corpus_role")
     corpus_version = corpus.get("corpus_version")
-    _require(isinstance(corpus_id, str) and SAFE_NAME.fullmatch(corpus_id) is not None, "invalid corpus id")
+    _require(
+        isinstance(corpus_id, str) and SAFE_NAME.fullmatch(corpus_id) is not None,
+        "invalid corpus id",
+    )
     _require(corpus_role in {"calibration", "proposal", "evidence"}, "invalid corpus role")
     _require(isinstance(corpus_version, int) and corpus_version >= 1, "invalid corpus version")
     _require(corpus.get("locked") is (corpus_role == "evidence"), "invalid corpus lock state")
@@ -207,8 +213,7 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
     _require(fixture_board.is_dir(), f"missing context fixture: {fixture_board}")
     fixture_project = fixture.get("project")
     _require(
-        isinstance(fixture_project, str)
-        and SAFE_NAME.fullmatch(fixture_project) is not None,
+        isinstance(fixture_project, str) and SAFE_NAME.fullmatch(fixture_project) is not None,
         "invalid context fixture project",
     )
     memory_sources: dict[str, str] = {}
@@ -228,21 +233,32 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
         _require(isinstance(case, dict), "each corpus case must be an object")
         case_id = case.get("id")
         category = case.get("category")
-        _require(isinstance(case_id, str) and SAFE_NAME.fullmatch(case_id) is not None, "invalid case id")
+        _require(
+            isinstance(case_id, str) and SAFE_NAME.fullmatch(case_id) is not None, "invalid case id"
+        )
         _require(case_id not in ids, f"duplicate case id: {case_id}")
         ids.add(case_id)
         _require(category in CATEGORIES, f"invalid category for {case_id}")
         counts[category] += 1
         for field in ("title", "task"):
-            _require(isinstance(case.get(field), str) and bool(case[field].strip()), f"{case_id} requires {field}")
+            _require(
+                isinstance(case.get(field), str) and bool(case[field].strip()),
+                f"{case_id} requires {field}",
+            )
         files = case.get("files")
-        _require(isinstance(files, list) and files and all(isinstance(item, str) for item in files), f"{case_id} requires files")
+        _require(
+            isinstance(files, list) and files and all(isinstance(item, str) for item in files),
+            f"{case_id} requires files",
+        )
         evidence = case.get("canonical_evidence")
         _require(isinstance(evidence, list) and evidence, f"{case_id} requires canonical evidence")
         evidence_ids: set[str] = set()
         evidence_texts: list[str] = []
         for item in evidence:
-            _require(isinstance(item, dict) and isinstance(item.get("id"), str), f"invalid evidence for {case_id}")
+            _require(
+                isinstance(item, dict) and isinstance(item.get("id"), str),
+                f"invalid evidence for {case_id}",
+            )
             _require(item["id"] not in evidence_ids, f"duplicate evidence id for {case_id}")
             evidence_ids.add(item["id"])
             relative = _safe_relative(item.get("path", ""))
@@ -263,35 +279,64 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
         cause = case.get("expected_systemic_cause")
         rejected = case.get("rejected_memories")
         scoring = case.get("scoring")
-        _require(isinstance(rejected, list) and all(isinstance(item, str) for item in rejected), f"invalid rejected memories for {case_id}")
-        _require(isinstance(scoring, dict) and isinstance(scoring.get("expected_outcome_effect"), str), f"invalid scoring contract for {case_id}")
+        _require(
+            isinstance(rejected, list) and all(isinstance(item, str) for item in rejected),
+            f"invalid rejected memories for {case_id}",
+        )
+        _require(
+            isinstance(scoring, dict) and isinstance(scoring.get("expected_outcome_effect"), str),
+            f"invalid scoring contract for {case_id}",
+        )
         outcome = scoring.get("outcome_evaluation")
-        _require(isinstance(outcome, dict) and isinstance(outcome.get("applicable"), bool), f"invalid outcome evaluation for {case_id}")
+        _require(
+            isinstance(outcome, dict) and isinstance(outcome.get("applicable"), bool),
+            f"invalid outcome evaluation for {case_id}",
+        )
         if category in POSITIVE_CATEGORIES:
-            _require(isinstance(memory, str) and isinstance(cause, str), f"positive case {case_id} requires memory and cause")
+            _require(
+                isinstance(memory, str) and isinstance(cause, str),
+                f"positive case {case_id} requires memory and cause",
+            )
             _require(memory in memory_ids, f"missing expected memory for {case_id}: {memory}")
-            _require(scoring.get("durable_systemic_conclusion_allowed") is True, f"positive case {case_id} must allow a conclusion")
+            _require(
+                scoring.get("durable_systemic_conclusion_allowed") is True,
+                f"positive case {case_id} must allow a conclusion",
+            )
             for field in ("entry_id", "hypothesis_id", "expected_status"):
-                _require(isinstance(outcome.get(field), str) and bool(outcome[field]), f"{case_id} outcome requires {field}")
-            _require(outcome.get("applicable") is True, f"positive case {case_id} requires an outcome evaluation")
-            _require(outcome["hypothesis_id"] == memory, f"{case_id} outcome must target the expected memory")
-            _require(isinstance(outcome.get("expected_score_delta"), int), f"{case_id} outcome requires expected_score_delta")
-            _require(isinstance(outcome.get("expected_rank_max"), int) and outcome["expected_rank_max"] >= 1, f"{case_id} outcome requires expected_rank_max")
+                _require(
+                    isinstance(outcome.get(field), str) and bool(outcome[field]),
+                    f"{case_id} outcome requires {field}",
+                )
+            _require(
+                outcome.get("applicable") is True,
+                f"positive case {case_id} requires an outcome evaluation",
+            )
+            _require(
+                outcome["hypothesis_id"] == memory,
+                f"{case_id} outcome must target the expected memory",
+            )
+            _require(
+                isinstance(outcome.get("expected_score_delta"), int),
+                f"{case_id} outcome requires expected_score_delta",
+            )
+            _require(
+                isinstance(outcome.get("expected_rank_max"), int)
+                and outcome["expected_rank_max"] >= 1,
+                f"{case_id} outcome requires expected_rank_max",
+            )
             if corpus_role in {"proposal", "evidence"}:
                 oracle_terms = scoring.get("oracle_terms")
                 _require(
                     isinstance(oracle_terms, list)
                     and len(oracle_terms) >= 2
                     and all(
-                        isinstance(item, str) and len(item.strip()) >= 4
-                        for item in oracle_terms
+                        isinstance(item, str) and len(item.strip()) >= 4 for item in oracle_terms
                     ),
                     f"{case_id} requires at least two oracle terms",
                 )
                 for field in ("information_gap", "plausible_local_correction"):
                     _require(
-                        isinstance(scoring.get(field), str)
-                        and bool(scoring[field].strip()),
+                        isinstance(scoring.get(field), str) and bool(scoring[field].strip()),
                         f"{case_id} scoring requires {field}",
                     )
                 visible = "\n".join(
@@ -305,9 +350,7 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
                     memory.casefold() not in visible,
                     f"{case_id} visible input discloses the expected memory id",
                 )
-                leaked_terms = [
-                    item for item in oracle_terms if item.casefold() in visible
-                ]
+                leaked_terms = [item for item in oracle_terms if item.casefold() in visible]
                 _require(
                     not leaked_terms,
                     f"{case_id} visible input discloses oracle terms: {leaked_terms}",
@@ -322,21 +365,15 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
                     prior_entry_ids = boundary.get("prior_entry_ids")
                     current_domains = boundary.get("current_domains")
                     prior_domains = boundary.get("prior_domains")
-                    prior_oracle_terms = boundary.get(
-                        "prior_incident_oracle_terms"
-                    )
+                    prior_oracle_terms = boundary.get("prior_incident_oracle_terms")
                     _require(
-                        isinstance(current_entry_id, str)
-                        and bool(current_entry_id),
+                        isinstance(current_entry_id, str) and bool(current_entry_id),
                         f"{case_id} requires one current incident entry",
                     )
                     _require(
                         isinstance(prior_entry_ids, list)
                         and bool(prior_entry_ids)
-                        and all(
-                            isinstance(item, str) and bool(item)
-                            for item in prior_entry_ids
-                        ),
+                        and all(isinstance(item, str) and bool(item) for item in prior_entry_ids),
                         f"{case_id} requires prior incident entries",
                     )
                     _require(
@@ -346,19 +383,13 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
                     _require(
                         isinstance(current_domains, list)
                         and len(current_domains) == 1
-                        and all(
-                            isinstance(item, str) and bool(item)
-                            for item in current_domains
-                        ),
+                        and all(isinstance(item, str) and bool(item) for item in current_domains),
                         f"{case_id} requires exactly one current domain",
                     )
                     _require(
                         isinstance(prior_domains, list)
                         and bool(prior_domains)
-                        and all(
-                            isinstance(item, str) and bool(item)
-                            for item in prior_domains
-                        ),
+                        and all(isinstance(item, str) and bool(item) for item in prior_domains),
                         f"{case_id} requires prior incident domains",
                     )
                     visible_domains = {Path(item).parts[0] for item in files}
@@ -377,8 +408,7 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
                     memory_text = memory_sources[memory]
                     for entry_id in [current_entry_id, *prior_entry_ids]:
                         _require(
-                            re.search(rf"\b{re.escape(entry_id)}\b", memory_text)
-                            is not None,
+                            re.search(rf"\b{re.escape(entry_id)}\b", memory_text) is not None,
                             f"{case_id} memory does not cite incident {entry_id}",
                         )
                     _require(
@@ -391,9 +421,7 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
                         f"{case_id} requires prior incident oracle terms",
                     )
                     prior_leaks = [
-                        item
-                        for item in prior_oracle_terms
-                        if item.casefold() in visible
+                        item for item in prior_oracle_terms if item.casefold() in visible
                     ]
                     _require(
                         not prior_leaks,
@@ -417,9 +445,18 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
                         f"{case_id} must classify a current-only rule as local",
                     )
         else:
-            _require(memory is None and cause is None, f"negative case {case_id} cannot define a systemic cause")
-            _require(scoring.get("durable_systemic_conclusion_allowed") is False, f"negative case {case_id} cannot allow a conclusion")
-            _require(outcome.get("applicable") is False, f"negative case {case_id} cannot apply an outcome")
+            _require(
+                memory is None and cause is None,
+                f"negative case {case_id} cannot define a systemic cause",
+            )
+            _require(
+                scoring.get("durable_systemic_conclusion_allowed") is False,
+                f"negative case {case_id} cannot allow a conclusion",
+            )
+            _require(
+                outcome.get("applicable") is False,
+                f"negative case {case_id} cannot apply an outcome",
+            )
         if category == "lexical-decoy":
             _require(bool(rejected), f"lexical decoy {case_id} requires a rejected memory")
         for memory_id in rejected:
@@ -427,9 +464,7 @@ def validate_corpus(root: Path, corpus_path: Path) -> dict[str, Any]:
         if category == "cross-domain-shared-cause":
             if corpus_version >= 4 and corpus_role in {"proposal", "evidence"}:
                 boundary = scoring["information_boundary"]
-                domains = set(boundary["current_domains"]) | set(
-                    boundary["prior_domains"]
-                )
+                domains = set(boundary["current_domains"]) | set(boundary["prior_domains"])
                 _require(
                     len(domains) >= 2,
                     f"cross-domain case {case_id} requires two domains across current and prior incidents",
@@ -484,7 +519,10 @@ def _load_frozen_core(root: Path, source_commit: str, directory: Path) -> tuple[
     _atomic_text(source_path, source.stdout.decode("utf-8"))
     module_name = f"_engineering_board_core_{source_commit}"
     specification = importlib.util.spec_from_file_location(module_name, source_path)
-    _require(specification is not None and specification.loader is not None, "cannot create the frozen product module")
+    _require(
+        specification is not None and specification.loader is not None,
+        "cannot create the frozen product module",
+    )
     module = importlib.util.module_from_spec(specification)
     specification.loader.exec_module(module)
     return module, source_sha256
@@ -521,7 +559,10 @@ def build_context_evidence(root: Path, corpus_path: Path, source_commit: str) ->
     root = root.resolve()
     corpus_path = corpus_path.resolve()
     validate_corpus(root, corpus_path)
-    _require(HEX40.fullmatch(source_commit) is not None, "source commit must be a lowercase 40-character SHA")
+    _require(
+        HEX40.fullmatch(source_commit) is not None,
+        "source commit must be a lowercase 40-character SHA",
+    )
     corpus = _read_json(corpus_path)
     fixture = corpus["context_fixture"]
     fixture_board = (corpus_path.parent / _safe_relative(fixture["board"])).resolve()
@@ -530,9 +571,7 @@ def build_context_evidence(root: Path, corpus_path: Path, source_commit: str) ->
     briefs: dict[str, dict[str, Any]] = {}
     outcomes: dict[str, dict[str, Any]] = {}
     with tempfile.TemporaryDirectory(prefix="eb-d1-frozen-core-") as frozen_temp:
-        module, frozen_core_sha256 = _load_frozen_core(
-            root, source_commit, Path(frozen_temp)
-        )
+        module, frozen_core_sha256 = _load_frozen_core(root, source_commit, Path(frozen_temp))
         for case in corpus["cases"]:
             case_id = case["id"]
             try:
@@ -547,12 +586,17 @@ def build_context_evidence(root: Path, corpus_path: Path, source_commit: str) ->
                 raise EvaluationError(f"frozen context build failed for {case_id}: {exc}") from exc
             _require(isinstance(brief, dict), f"invalid context brief for {case_id}")
             _require(
-                CONTEXT_FINGERPRINT.fullmatch(str(brief.get("context_fingerprint") or "")) is not None,
+                CONTEXT_FINGERPRINT.fullmatch(str(brief.get("context_fingerprint") or ""))
+                is not None,
                 f"invalid product context fingerprint for {case_id}",
             )
-            _require(isinstance(brief.get("results"), list), f"invalid product context results for {case_id}")
             _require(
-                not {"expected_relevant_memory", "rejected_memories", "expected_systemic_cause"} & set(brief),
+                isinstance(brief.get("results"), list),
+                f"invalid product context results for {case_id}",
+            )
+            _require(
+                not {"expected_relevant_memory", "rejected_memories", "expected_systemic_cause"}
+                & set(brief),
                 f"context brief contains scoring oracle fields for {case_id}",
             )
             expected_memory = case["expected_relevant_memory"]
@@ -603,9 +647,7 @@ def build_context_evidence(root: Path, corpus_path: Path, source_commit: str) ->
                             "context_used": True,
                         },
                     )
-                    module.apply_outcome_plan(
-                        outcome_board, project, plan["plan_token"]
-                    )
+                    module.apply_outcome_plan(outcome_board, project, plan["plan_token"])
                     after = module.build_context(
                         outcome_board,
                         project,
@@ -614,7 +656,9 @@ def build_context_evidence(root: Path, corpus_path: Path, source_commit: str) ->
                         limit=3,
                     )
                 except Exception as exc:
-                    raise EvaluationError(f"frozen outcome evaluation failed for {case_id}: {exc}") from exc
+                    raise EvaluationError(
+                        f"frozen outcome evaluation failed for {case_id}: {exc}"
+                    ) from exc
                 before_observation = _memory_observation(brief, hypothesis_id)
                 after_observation = _memory_observation(after, hypothesis_id)
                 expected_delta = outcome_contract["expected_score_delta"]
@@ -632,8 +676,7 @@ def build_context_evidence(root: Path, corpus_path: Path, source_commit: str) ->
                     "hypothesis_id": hypothesis_id,
                     "expected_effect": case["scoring"]["expected_outcome_effect"],
                     "observed_effect": (
-                        f"{hypothesis_id} changed from {before_observation} "
-                        f"to {after_observation}."
+                        f"{hypothesis_id} changed from {before_observation} to {after_observation}."
                     ),
                     "before": before_observation,
                     "after": after_observation,
@@ -655,50 +698,90 @@ def _validate_contracts(value: dict[str, Any]) -> dict[str, Any]:
     _require(isinstance(profiles, dict) and bool(profiles), "client contracts require profiles")
     reference_profiles: list[str] = []
     for name, contract in profiles.items():
-        _require(isinstance(name, str) and SAFE_NAME.fullmatch(name) is not None, f"invalid profile name: {name}")
+        _require(
+            isinstance(name, str) and SAFE_NAME.fullmatch(name) is not None,
+            f"invalid profile name: {name}",
+        )
         _require(isinstance(contract, dict), f"invalid {name} client contract")
         role = contract.get("role")
         _require(role in {"reference", "replication"}, f"invalid {name} profile role")
         if role == "reference":
             reference_profiles.append(name)
-        _require(contract.get("affects_product_gate") is (role == "reference"), f"invalid {name} product-gate authority")
-        _require(isinstance(contract.get("client_id"), str) and bool(contract["client_id"].strip()), f"invalid {name} client id")
-        _require(isinstance(contract.get("transport"), str) and bool(contract["transport"].strip()), f"invalid {name} transport")
-        _require(isinstance(contract.get("repetitions"), int) and contract["repetitions"] >= 1, f"invalid {name} repetitions")
-        _require(contract.get("required_pins") == ["client_version", "model_identifier", "instructions_sha256", "tools_sha256"], f"invalid {name} required pins")
+        _require(
+            contract.get("affects_product_gate") is (role == "reference"),
+            f"invalid {name} product-gate authority",
+        )
+        _require(
+            isinstance(contract.get("client_id"), str) and bool(contract["client_id"].strip()),
+            f"invalid {name} client id",
+        )
+        _require(
+            isinstance(contract.get("transport"), str) and bool(contract["transport"].strip()),
+            f"invalid {name} transport",
+        )
+        _require(
+            isinstance(contract.get("repetitions"), int) and contract["repetitions"] >= 1,
+            f"invalid {name} repetitions",
+        )
+        _require(
+            contract.get("required_pins")
+            == ["client_version", "model_identifier", "instructions_sha256", "tools_sha256"],
+            f"invalid {name} required pins",
+        )
     _require(len(reference_profiles) == 1, "client contracts require exactly one reference profile")
     return profiles
 
 
-def _validate_config(value: dict[str, Any], cases: list[dict[str, Any]], profiles: dict[str, Any]) -> None:
+def _validate_config(
+    value: dict[str, Any], cases: list[dict[str, Any]], profiles: dict[str, Any]
+) -> None:
     _require(value.get("schema_version") == "3", "unsupported run configuration schema")
-    _require(isinstance(value.get("run_id"), str) and SAFE_NAME.fullmatch(value["run_id"]) is not None, "invalid run id")
-    _require(isinstance(value.get("source_commit"), str) and HEX40.fullmatch(value["source_commit"]) is not None, "source commit must be a lowercase 40-character SHA")
+    _require(
+        isinstance(value.get("run_id"), str) and SAFE_NAME.fullmatch(value["run_id"]) is not None,
+        "invalid run id",
+    )
+    _require(
+        isinstance(value.get("source_commit"), str)
+        and HEX40.fullmatch(value["source_commit"]) is not None,
+        "source commit must be a lowercase 40-character SHA",
+    )
     _require(value.get("trial_policy") == "d1-client-neutral-v2", "invalid trial policy")
     configured = value.get("profiles")
-    _require(isinstance(configured, dict) and set(configured) == set(profiles), "run profiles do not match client contracts")
+    _require(
+        isinstance(configured, dict) and set(configured) == set(profiles),
+        "run profiles do not match client contracts",
+    )
     for name, contract in profiles.items():
         pins = configured[name]
         _require(isinstance(pins, dict), f"missing {name} profile pins")
         for pin in contract["required_pins"]:
             candidate = pins.get(pin)
             if pin.endswith("sha256"):
-                _require(isinstance(candidate, str) and HEX64.fullmatch(candidate) is not None, f"invalid {name} {pin}")
+                _require(
+                    isinstance(candidate, str) and HEX64.fullmatch(candidate) is not None,
+                    f"invalid {name} {pin}",
+                )
             else:
-                _require(isinstance(candidate, str) and bool(candidate.strip()), f"invalid {name} {pin}")
+                _require(
+                    isinstance(candidate, str) and bool(candidate.strip()), f"invalid {name} {pin}"
+                )
     fingerprints = value.get("context_fingerprints")
-    _require(isinstance(fingerprints, dict) and set(fingerprints) == {case["id"] for case in cases}, "context fingerprints must cover every case")
+    _require(
+        isinstance(fingerprints, dict) and set(fingerprints) == {case["id"] for case in cases},
+        "context fingerprints must cover every case",
+    )
     _require(
         all(
-            isinstance(item, str)
-            and CONTEXT_FINGERPRINT.fullmatch(item) is not None
+            isinstance(item, str) and CONTEXT_FINGERPRINT.fullmatch(item) is not None
             for item in fingerprints.values()
         ),
         "invalid context fingerprint",
     )
 
 
-def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path: Path, output: Path) -> dict[str, Any]:
+def prepare_run(
+    root: Path, corpus_path: Path, contracts_path: Path, config_path: Path, output: Path
+) -> dict[str, Any]:
     """Create isolated baseline and context workspaces without running a client."""
     root = root.resolve()
     output = output.absolute()
@@ -715,9 +798,7 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
     profiles = _validate_contracts(contracts)
     config = _read_json(config_path)
     _validate_config(config, corpus["cases"], profiles)
-    context_evidence = build_context_evidence(
-        root, corpus_path, config["source_commit"]
-    )
+    context_evidence = build_context_evidence(root, corpus_path, config["source_commit"])
     generated_fingerprints = {
         case_id: brief["context_fingerprint"]
         for case_id, brief in context_evidence["briefs"].items()
@@ -730,9 +811,8 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
     try:
         trials: list[dict[str, Any]] = []
         evidence_base = corpus_path.resolve().parent / corpus["evidence_root"]
-        fixture_source = (
-            corpus_path.resolve().parent
-            / _safe_relative(corpus["context_fixture"]["board"])
+        fixture_source = corpus_path.resolve().parent / _safe_relative(
+            corpus["context_fixture"]["board"]
         )
         fixture_project = corpus["context_fixture"]["project"]
         for profile_name in sorted(profiles):
@@ -740,7 +820,12 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
             for case in corpus["cases"]:
                 for repetition in range(1, contract["repetitions"] + 1):
                     pair_key = f"{profile_name}-{case['id']}-r{repetition}"
-                    controlled = {"task": case["task"], "files": case["files"], "evidence_ids": [item["id"] for item in case["canonical_evidence"]], "repository_fixture_sha256": context_evidence["fixture_digest"]}
+                    controlled = {
+                        "task": case["task"],
+                        "files": case["files"],
+                        "evidence_ids": [item["id"] for item in case["canonical_evidence"]],
+                        "repository_fixture_sha256": context_evidence["fixture_digest"],
+                    }
                     for arm in ("baseline", "context"):
                         trial_key = f"{pair_key}-{arm}"
                         workspace = Path("workspaces") / trial_key
@@ -751,13 +836,15 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
                             source = evidence_base / item["path"]
                             target = destination / "evidence" / Path(item["path"]).name
                             shutil.copyfile(source, target)
-                            evidence_artifacts.append({"id": item["id"], "path": str(target.relative_to(destination)), "sha256": _file_digest(target)})
+                            evidence_artifacts.append(
+                                {
+                                    "id": item["id"],
+                                    "path": str(target.relative_to(destination)),
+                                    "sha256": _file_digest(target),
+                                }
+                            )
                         repository = destination / "repository"
-                        repository_board = (
-                            repository
-                            / "engineering-board"
-                            / fixture_project
-                        )
+                        repository_board = repository / "engineering-board" / fixture_project
                         shutil.copytree(fixture_source, repository_board)
                         repository_artifact = {
                             "path": str(repository.relative_to(destination)),
@@ -766,17 +853,62 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
                         context_brief = None
                         if arm == "context":
                             context_brief = context_evidence["briefs"][case["id"]]
-                        trial_input = {"schema_version": "3", "trial_key": trial_key, "pair_key": pair_key, "profile": profile_name, "profile_role": contract["role"], "client": {"client_id": contract["client_id"], "transport": contract["transport"], **config["profiles"][profile_name]}, "case_id": case["id"], "category": case["category"], "repetition": repetition, "arm": arm, "controlled_inputs": controlled, "context_brief": context_brief, "evidence": evidence_artifacts, "repository": repository_artifact}
+                        trial_input = {
+                            "schema_version": "3",
+                            "trial_key": trial_key,
+                            "pair_key": pair_key,
+                            "profile": profile_name,
+                            "profile_role": contract["role"],
+                            "client": {
+                                "client_id": contract["client_id"],
+                                "transport": contract["transport"],
+                                **config["profiles"][profile_name],
+                            },
+                            "case_id": case["id"],
+                            "category": case["category"],
+                            "repetition": repetition,
+                            "arm": arm,
+                            "controlled_inputs": controlled,
+                            "context_brief": context_brief,
+                            "evidence": evidence_artifacts,
+                            "repository": repository_artifact,
+                        }
                         _atomic_json(destination / "input.json", trial_input)
-                        trials.append({**trial_input, "workspace": str(workspace), "input_sha256": _file_digest(destination / "input.json")})
-        manifest = {"schema_version": "3", "run_id": config["run_id"], "source_commit": config["source_commit"], "trial_policy": config["trial_policy"], "corpus_id": corpus_summary["corpus_id"], "corpus_version": corpus_summary["corpus_version"], "corpus_digest": corpus_summary["digest"], "client_contracts_digest": _digest(contracts), "configuration_digest": _digest(config), "context_fixture_digest": context_evidence["fixture_digest"], "frozen_core_sha256": context_evidence["frozen_core_sha256"], "outcome_evaluations": context_evidence["outcomes"], "corpus": corpus, "trials": trials}
+                        trials.append(
+                            {
+                                **trial_input,
+                                "workspace": str(workspace),
+                                "input_sha256": _file_digest(destination / "input.json"),
+                            }
+                        )
+        manifest = {
+            "schema_version": "3",
+            "run_id": config["run_id"],
+            "source_commit": config["source_commit"],
+            "trial_policy": config["trial_policy"],
+            "corpus_id": corpus_summary["corpus_id"],
+            "corpus_version": corpus_summary["corpus_version"],
+            "corpus_digest": corpus_summary["digest"],
+            "client_contracts_digest": _digest(contracts),
+            "configuration_digest": _digest(config),
+            "context_fixture_digest": context_evidence["fixture_digest"],
+            "frozen_core_sha256": context_evidence["frozen_core_sha256"],
+            "outcome_evaluations": context_evidence["outcomes"],
+            "corpus": corpus,
+            "trials": trials,
+        }
         manifest["manifest_fingerprint"] = _digest(manifest)
         _atomic_json(stage / "run-manifest.json", manifest)
         os.replace(stage, output)
     except Exception:
         shutil.rmtree(stage, ignore_errors=True)
         raise
-    return {"run_id": config["run_id"], "trial_arms": len(trials), "pairs": len(trials) // 2, "manifest": str(output / "run-manifest.json")}
+    return {
+        "run_id": config["run_id"],
+        "trial_arms": len(trials),
+        "pairs": len(trials) // 2,
+        "manifest": str(output / "run-manifest.json"),
+    }
 
 
 def load_run(run_dir: Path, trial_key: str | None = None) -> dict[str, Any]:
@@ -795,7 +927,10 @@ def load_run(run_dir: Path, trial_key: str | None = None) -> dict[str, Any]:
     keys: set[str] = set()
     for trial in trials:
         key = trial.get("trial_key")
-        _require(isinstance(key, str) and SAFE_NAME.fullmatch(key) is not None and key not in keys, "invalid or duplicate trial key")
+        _require(
+            isinstance(key, str) and SAFE_NAME.fullmatch(key) is not None and key not in keys,
+            "invalid or duplicate trial key",
+        )
         keys.add(key)
     if trial_key is not None:
         _require(trial_key in keys, f"unknown trial key: {trial_key}")
@@ -806,7 +941,10 @@ def load_run(run_dir: Path, trial_key: str | None = None) -> dict[str, Any]:
         workspace = run_dir / _safe_relative(trial.get("workspace", ""))
         _reject_linked_path(workspace)
         input_path = workspace / "input.json"
-        _require(input_path.is_file() and _file_digest(input_path) == trial.get("input_sha256"), f"trial input fingerprint does not match: {key}")
+        _require(
+            input_path.is_file() and _file_digest(input_path) == trial.get("input_sha256"),
+            f"trial input fingerprint does not match: {key}",
+        )
         trial_input = _read_json(input_path)
         for artifact in trial_input.get("evidence", []):
             artifact_path = workspace / _safe_relative(artifact.get("path", ""))
@@ -839,31 +977,61 @@ def _attempt_files(run_dir: Path, trial_key: str) -> list[Path]:
 
 def _validate_attempt(trial: dict[str, Any], case: dict[str, Any], attempt: dict[str, Any]) -> None:
     _require(attempt.get("schema_version") == "1", "unsupported attempt schema")
-    _require(isinstance(attempt.get("attempt_id"), str) and SAFE_NAME.fullmatch(attempt["attempt_id"]) is not None, "invalid attempt id")
+    _require(
+        isinstance(attempt.get("attempt_id"), str)
+        and SAFE_NAME.fullmatch(attempt["attempt_id"]) is not None,
+        "invalid attempt id",
+    )
     _require(attempt.get("state") in {"scored", "infrastructure_failure"}, "invalid attempt state")
     if attempt["state"] == "infrastructure_failure":
-        _require(isinstance(attempt.get("failure_reason"), str) and bool(attempt["failure_reason"].strip()), "infrastructure failure requires a reason")
+        _require(
+            isinstance(attempt.get("failure_reason"), str)
+            and bool(attempt["failure_reason"].strip()),
+            "infrastructure failure requires a reason",
+        )
         return
-    for field in ("first_proposed_correction", "first_stated_cause", "final_diagnosis", "classification_evidence", "reviewer"):
-        _require(isinstance(attempt.get(field), str) and bool(attempt[field].strip()), f"scored attempt requires {field}")
+    for field in (
+        "first_proposed_correction",
+        "first_stated_cause",
+        "final_diagnosis",
+        "classification_evidence",
+        "reviewer",
+    ):
+        _require(
+            isinstance(attempt.get(field), str) and bool(attempt[field].strip()),
+            f"scored attempt requires {field}",
+        )
     for field in ("systemic_before_local", "durable_systemic_conclusion"):
         _require(isinstance(attempt.get(field), bool), f"scored attempt requires boolean {field}")
     citations = attempt.get("canonical_citations")
     memories = attempt.get("surfaced_memories")
-    _require(isinstance(citations, list) and all(isinstance(item, str) for item in citations), "invalid canonical citations")
+    _require(
+        isinstance(citations, list) and all(isinstance(item, str) for item in citations),
+        "invalid canonical citations",
+    )
     _require(isinstance(memories, list), "invalid surfaced memories")
     for memory in memories:
-        _require(isinstance(memory, dict) and isinstance(memory.get("id"), str) and isinstance(memory.get("rank"), int) and memory["rank"] >= 1, "invalid surfaced memory")
+        _require(
+            isinstance(memory, dict)
+            and isinstance(memory.get("id"), str)
+            and isinstance(memory.get("rank"), int)
+            and memory["rank"] >= 1,
+            "invalid surfaced memory",
+        )
     if trial["arm"] == "baseline":
         _require(memories == [], "baseline arm cannot receive surfaced memories")
         return
     brief = trial["context_brief"]
-    _require(attempt.get("context_fingerprint") == brief["context_fingerprint"], "context fingerprint does not match the trial")
+    _require(
+        attempt.get("context_fingerprint") == brief["context_fingerprint"],
+        "context fingerprint does not match the trial",
+    )
     expected_surfaced = [
-        {"id": result["id"], "rank": rank}
-        for rank, result in enumerate(brief["results"], start=1)
+        {"id": result["id"], "rank": rank} for rank, result in enumerate(brief["results"], start=1)
     ]
-    _require(memories == expected_surfaced, "surfaced memories do not match the frozen context brief")
+    _require(
+        memories == expected_surfaced, "surfaced memories do not match the frozen context brief"
+    )
     expected_memory = case["expected_relevant_memory"]
     expected_observation = (
         next(
@@ -874,10 +1042,23 @@ def _validate_attempt(trial: dict[str, Any], case: dict[str, Any], attempt: dict
         else None
     )
     expected_rank = expected_observation["rank"] if expected_observation else None
-    _require(attempt.get("expected_memory_rank") == expected_rank, "expected memory rank does not match the frozen context brief")
-    _require(isinstance(attempt.get("irrelevant_memory_count"), int) and attempt["irrelevant_memory_count"] >= 0, "invalid irrelevant memory count")
-    _require(attempt.get("rejected_memory_treatment") in {"not_surfaced", "rejected", "used"}, "invalid rejected memory treatment")
-    _require(attempt.get("lexical_decoy_treatment") in {"ignored", "not_applicable", "used"}, "invalid lexical decoy treatment")
+    _require(
+        attempt.get("expected_memory_rank") == expected_rank,
+        "expected memory rank does not match the frozen context brief",
+    )
+    _require(
+        isinstance(attempt.get("irrelevant_memory_count"), int)
+        and attempt["irrelevant_memory_count"] >= 0,
+        "invalid irrelevant memory count",
+    )
+    _require(
+        attempt.get("rejected_memory_treatment") in {"not_surfaced", "rejected", "used"},
+        "invalid rejected memory treatment",
+    )
+    _require(
+        attempt.get("lexical_decoy_treatment") in {"ignored", "not_applicable", "used"},
+        "invalid lexical decoy treatment",
+    )
 
 
 def record_attempt(run_dir: Path, trial_key: str, attempt: dict[str, Any]) -> str:
@@ -893,18 +1074,31 @@ def record_attempt(run_dir: Path, trial_key: str, attempt: dict[str, Any]) -> st
     if len(existing) >= 2:
         raise EvaluationError("infrastructure replacement limit is one attempt")
     if not existing:
-        _require(attempt.get("replacement_for") is None, "initial attempt cannot replace another attempt")
+        _require(
+            attempt.get("replacement_for") is None, "initial attempt cannot replace another attempt"
+        )
     else:
-        _require(existing[0]["state"] == "infrastructure_failure", "only an infrastructure failure can be replaced")
-        _require(attempt.get("replacement_for") == existing[0]["attempt_id"], "replacement relation does not match the failed attempt")
-    _require(all(item.get("attempt_id") != attempt.get("attempt_id") for item in existing), "duplicate attempt id")
+        _require(
+            existing[0]["state"] == "infrastructure_failure",
+            "only an infrastructure failure can be replaced",
+        )
+        _require(
+            attempt.get("replacement_for") == existing[0]["attempt_id"],
+            "replacement relation does not match the failed attempt",
+        )
+    _require(
+        all(item.get("attempt_id") != attempt.get("attempt_id") for item in existing),
+        "duplicate attempt id",
+    )
     _validate_attempt(trial, cases[trial["case_id"]], attempt)
     path = run_dir / "records" / trial_key / f"{len(existing) + 1:02d}-{attempt['attempt_id']}.json"
     _atomic_json(path, attempt, exclusive=True)
     return str(path)
 
 
-def _collect_results(run_dir: Path, manifest: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
+def _collect_results(
+    run_dir: Path, manifest: dict[str, Any]
+) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
     scored: dict[str, dict[str, Any]] = {}
     invalid: list[dict[str, Any]] = []
     for trial in manifest["trials"]:
@@ -913,7 +1107,14 @@ def _collect_results(run_dir: Path, manifest: dict[str, Any]) -> tuple[dict[str,
             if attempt.get("state") == "scored":
                 scored[trial["trial_key"]] = attempt
             else:
-                invalid.append({"trial_key": trial["trial_key"], "attempt_id": attempt.get("attempt_id"), "failure_reason": attempt.get("failure_reason"), "replacement_for": attempt.get("replacement_for")})
+                invalid.append(
+                    {
+                        "trial_key": trial["trial_key"],
+                        "attempt_id": attempt.get("attempt_id"),
+                        "failure_reason": attempt.get("failure_reason"),
+                        "replacement_for": attempt.get("replacement_for"),
+                    }
+                )
     return scored, invalid
 
 
@@ -933,17 +1134,9 @@ def score_run(run_dir: Path) -> dict[str, Any]:
     context_trials = [trial for trial in reference_positive if trial["arm"] == "context"]
     baseline_trials = [trial for trial in reference_positive if trial["arm"] == "baseline"]
     replication_profiles = sorted(
-        {
-            trial["profile"]
-            for trial in manifest["trials"]
-            if trial["profile_role"] == "replication"
-        }
+        {trial["profile"] for trial in manifest["trials"] if trial["profile_role"] == "replication"}
     )
-    missing = [
-        trial["trial_key"]
-        for trial in reference_trials
-        if trial["trial_key"] not in scored
-    ]
+    missing = [trial["trial_key"] for trial in reference_trials if trial["trial_key"] not in scored]
     missing_replications = {
         profile: [
             trial["trial_key"]
@@ -956,25 +1149,21 @@ def score_run(run_dir: Path) -> dict[str, Any]:
     def rate(trials: list[dict[str, Any]]) -> float:
         if not trials or any(trial["trial_key"] not in scored for trial in trials):
             return 0.0
-        successes = sum(bool(scored[trial["trial_key"]]["systemic_before_local"]) for trial in trials)
+        successes = sum(
+            bool(scored[trial["trial_key"]]["systemic_before_local"]) for trial in trials
+        )
         return round(100.0 * successes / len(trials), 2)
 
     context_rate = rate(context_trials)
     baseline_rate = rate(baseline_trials)
     replications: dict[str, dict[str, Any]] = {}
     for profile in replication_profiles:
-        profile_trials = [
-            trial for trial in manifest["trials"] if trial["profile"] == profile
-        ]
+        profile_trials = [trial for trial in manifest["trials"] if trial["profile"] == profile]
         profile_positive = [
             trial for trial in profile_trials if trial["category"] in POSITIVE_CATEGORIES
         ]
-        profile_context = [
-            trial for trial in profile_positive if trial["arm"] == "context"
-        ]
-        profile_baseline = [
-            trial for trial in profile_positive if trial["arm"] == "baseline"
-        ]
+        profile_context = [trial for trial in profile_positive if trial["arm"] == "context"]
+        profile_baseline = [trial for trial in profile_positive if trial["arm"] == "baseline"]
         profile_context_rate = rate(profile_context)
         profile_baseline_rate = rate(profile_baseline)
         replications[profile] = {
@@ -983,9 +1172,7 @@ def score_run(run_dir: Path) -> dict[str, Any]:
             "positive_baseline_denominator": len(profile_baseline),
             "context_rate_percent": profile_context_rate,
             "baseline_rate_percent": profile_baseline_rate,
-            "improvement_percentage_points": round(
-                profile_context_rate - profile_baseline_rate, 2
-            ),
+            "improvement_percentage_points": round(profile_context_rate - profile_baseline_rate, 2),
         }
     citation_total = 0
     citation_valid = 0
@@ -995,7 +1182,13 @@ def score_run(run_dir: Path) -> dict[str, Any]:
     failed_cases: set[str] = set()
     false_positive_count = 0
     per_case: dict[str, dict[str, Any]] = {
-        case_id: {"category": case["category"], "scored_arms": 0, "systemic_before_local": 0, "durable_systemic_conclusions": 0, "failures": []}
+        case_id: {
+            "category": case["category"],
+            "scored_arms": 0,
+            "systemic_before_local": 0,
+            "durable_systemic_conclusions": 0,
+            "failures": [],
+        }
         for case_id, case in cases.items()
     }
     for trial in reference_trials:
@@ -1012,7 +1205,9 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         if attempt["systemic_before_local"]:
             citation_total += 1
             allowed = {item["id"] for item in case["canonical_evidence"]}
-            if attempt["canonical_citations"] and set(attempt["canonical_citations"]).issubset(allowed):
+            if attempt["canonical_citations"] and set(attempt["canonical_citations"]).issubset(
+                allowed
+            ):
                 citation_valid += 1
             else:
                 failed_cases.add(trial["case_id"])
@@ -1020,8 +1215,14 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         if trial["arm"] == "context":
             if case["category"] in POSITIVE_CATEGORIES:
                 expected = case["expected_relevant_memory"]
-                surfaced = next((item for item in attempt["surfaced_memories"] if item["id"] == expected), None)
-                if surfaced is None or surfaced["rank"] > 3 or attempt.get("expected_memory_rank") != surfaced["rank"]:
+                surfaced = next(
+                    (item for item in attempt["surfaced_memories"] if item["id"] == expected), None
+                )
+                if (
+                    surfaced is None
+                    or surfaced["rank"] > 3
+                    or attempt.get("expected_memory_rank") != surfaced["rank"]
+                ):
                     rank_failures.add(trial["case_id"])
                     failed_cases.add(trial["case_id"])
                     summary["failures"].append("expected-memory-rank")
@@ -1046,8 +1247,12 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         "zero_negative_conclusions": reference_complete and not negative_failures,
         "outcome_loop_matches": not outcome_failures,
     }
-    if reference_complete and (not gates["reference_absolute_rate"] or not gates["reference_improvement"]):
-        failed_cases.update(case["id"] for case in cases.values() if case["category"] in POSITIVE_CATEGORIES)
+    if reference_complete and (
+        not gates["reference_absolute_rate"] or not gates["reference_improvement"]
+    ):
+        failed_cases.update(
+            case["id"] for case in cases.values() if case["category"] in POSITIVE_CATEGORIES
+        )
     return {
         "schema_version": "2",
         "run_id": manifest["run_id"],
@@ -1063,7 +1268,11 @@ def score_run(run_dir: Path) -> dict[str, Any]:
             "improvement_percentage_points": round(context_rate - baseline_rate, 2),
         },
         "replications": replications,
-        "canonical_citation_coverage": {"valid": citation_valid, "total": citation_total, "percent": round(100.0 * citation_valid / citation_total, 2) if citation_total else 0.0},
+        "canonical_citation_coverage": {
+            "valid": citation_valid,
+            "total": citation_total,
+            "percent": round(100.0 * citation_valid / citation_total, 2) if citation_total else 0.0,
+        },
         "false_positive_count": false_positive_count,
         "missing_trial_arms": missing,
         "missing_replication_arms": missing_replications,
@@ -1124,16 +1333,18 @@ def write_report(run_dir: Path) -> dict[str, str]:
     lines.extend(["", "## Per-case evidence", ""])
     for case_id, item in score["per_case"].items():
         failures = ", ".join(item["failures"]) if item["failures"] else "none"
-        lines.extend([
-            f"### {case_id}",
-            "",
-            f"- Category: `{item['category']}`",
-            f"- Scored arms: {item['scored_arms']}",
-            f"- Systemic-before-local classifications: {item['systemic_before_local']}",
-            f"- Durable systemic conclusions: {item['durable_systemic_conclusions']}",
-            f"- Failures: {failures}",
-            "",
-        ])
+        lines.extend(
+            [
+                f"### {case_id}",
+                "",
+                f"- Category: `{item['category']}`",
+                f"- Scored arms: {item['scored_arms']}",
+                f"- Systemic-before-local classifications: {item['systemic_before_local']}",
+                f"- Durable systemic conclusions: {item['durable_systemic_conclusions']}",
+                f"- Failures: {failures}",
+                "",
+            ]
+        )
     lines.extend(["## Outcome-loop evidence", ""])
     for case_id, outcome in score["outcome_evaluations"].items():
         lines.extend(
@@ -1161,9 +1372,7 @@ def _parser() -> argparse.ArgumentParser:
     validate = commands.add_parser("validate", help="validate the fixed corpus")
     validate.add_argument("--root", required=True, type=Path)
     validate.add_argument("--corpus", required=True, type=Path)
-    contexts = commands.add_parser(
-        "contexts", help="build frozen product context evidence"
-    )
+    contexts = commands.add_parser("contexts", help="build frozen product context evidence")
     contexts.add_argument("--root", required=True, type=Path)
     contexts.add_argument("--corpus", required=True, type=Path)
     contexts.add_argument("--source-commit", required=True)
@@ -1189,9 +1398,7 @@ def main() -> int:
         if args.command == "validate":
             result: Any = validate_corpus(args.root, args.corpus)
         elif args.command == "contexts":
-            evidence = build_context_evidence(
-                args.root, args.corpus, args.source_commit
-            )
+            evidence = build_context_evidence(args.root, args.corpus, args.source_commit)
             result = {
                 "fixture_digest": evidence["fixture_digest"],
                 "frozen_core_sha256": evidence["frozen_core_sha256"],

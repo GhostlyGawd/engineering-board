@@ -17,8 +17,14 @@ SESSION_START="$ROOT/hooks/scripts/board-session-start.sh"
 
 PASS=0
 FAIL=0
-pass() { printf "  [PASS] %s\n" "$1"; PASS=$((PASS + 1)); }
-fail() { printf "  [FAIL] %s\n" "$1"; FAIL=$((FAIL + 1)); }
+pass() {
+  printf "  [PASS] %s\n" "$1"
+  PASS=$((PASS + 1))
+}
+fail() {
+  printf "  [FAIL] %s\n" "$1"
+  FAIL=$((FAIL + 1))
+}
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -27,14 +33,14 @@ make_board() {
   # make_board <project-dir> — scaffold the standard router + empty board.
   local proj="$1"
   mkdir -p "$proj/engineering-board/demo"/{bugs,features,questions,observations,learnings}
-  cat > "$proj/engineering-board/BOARD-ROUTER.md" <<'EOF'
+  cat >"$proj/engineering-board/BOARD-ROUTER.md" <<'EOF'
 # Board Router
 
 | project | path | affects prefix |
 |---------|------|----------------|
 | demo | engineering-board/demo | demo/ |
 EOF
-  cat > "$proj/engineering-board/demo/BOARD.md" <<'EOF'
+  cat >"$proj/engineering-board/demo/BOARD.md" <<'EOF'
 # demo — Board
 
 Live index of open items. Resolved items move to ARCHIVE.md.
@@ -93,8 +99,8 @@ board.write_text(
 PY
 OUT2C="$(CLAUDE_PROJECT_DIR="$P2C" bash "$SESSION_START" 2>/dev/null || true)"
 if printf '%s\n' "$OUT2C" | grep -qE '^\[ demo \] — 1 open item\(s\):$' &&
-   printf '%s\n' "$OUT2C" | grep -qF -- '- B001 P1 | [real open entry](bugs/B001.md)' &&
-   ! printf '%s\n' "$OUT2C" | grep -qE 'Bug/Feature lines|Question lines|Observation lines|Learning lines|Order within'; then
+  printf '%s\n' "$OUT2C" | grep -qF -- '- B001 P1 | [real open entry](bugs/B001.md)' &&
+  ! printf '%s\n' "$OUT2C" | grep -qE 'Bug/Feature lines|Question lines|Observation lines|Learning lines|Order within'; then
   pass "T2c: one canonical Open row is the only rendered entry"
 else
   fail "T2c: one-row board count or rendering included non-Open content"
@@ -104,7 +110,7 @@ fi
 P3="$TMP/blocking"
 make_board "$P3"
 BUGS="$P3/engineering-board/demo/bugs"
-cat > "$BUGS/B012.md" <<'EOF'
+cat >"$BUGS/B012.md" <<'EOF'
 ---
 id: B012
 type: bug
@@ -118,7 +124,7 @@ blocked_by: [Q003]
 ## Done when
 - x
 EOF
-cat > "$P3/engineering-board/demo/questions/Q003.md" <<'EOF'
+cat >"$P3/engineering-board/demo/questions/Q003.md" <<'EOF'
 ---
 id: Q003
 type: question
@@ -183,7 +189,7 @@ fi
 P6="$TMP/mode-pm"
 make_board "$P6"
 mkdir -p "$P6/.engineering-board"
-printf '{"mode":"pm","session_id":"s1"}\n' > "$P6/.engineering-board/session-mode.json"
+printf '{"mode":"pm","session_id":"s1"}\n' >"$P6/.engineering-board/session-mode.json"
 OUT6="$(CLAUDE_PROJECT_DIR="$P6" bash "$SESSION_START" 2>/dev/null || true)"
 if printf '%s\n' "$OUT6" | grep -qF "Mode: PM" && printf '%s\n' "$OUT6" | grep -qiF "fresh session"; then
   pass "T6: PM mode surfaced with restart-to-switch guidance"
@@ -195,7 +201,7 @@ fi
 P7="$TMP/mode-worker"
 make_board "$P7"
 mkdir -p "$P7/.engineering-board"
-printf '{"mode":"worker","discipline":"tdd","session_id":"s1"}\n' > "$P7/.engineering-board/session-mode.json"
+printf '{"mode":"worker","discipline":"tdd","session_id":"s1"}\n' >"$P7/.engineering-board/session-mode.json"
 OUT7="$(CLAUDE_PROJECT_DIR="$P7" bash "$SESSION_START" 2>/dev/null || true)"
 if printf '%s\n' "$OUT7" | grep -qF "Mode: Worker (discipline=tdd)"; then
   pass "T7: worker mode surfaced with discipline"
@@ -208,7 +214,7 @@ fi
 P8="$TMP/mode-corrupt"
 make_board "$P8"
 mkdir -p "$P8/.engineering-board"
-printf 'not json{' > "$P8/.engineering-board/session-mode.json"
+printf 'not json{' >"$P8/.engineering-board/session-mode.json"
 OUT8="$(CLAUDE_PROJECT_DIR="$P8" bash "$SESSION_START" 2>/dev/null || true)"
 if printf '%s\n' "$OUT8" | grep -qF "Mode: passive"; then
   pass "T8: corrupt session-mode.json falls back to passive line"
@@ -285,10 +291,10 @@ MEMORY_COUNT="$(
   printf '%s\n' "$OUT9" | grep -cE '^    - .*score [0-9]+:' || true
 )"
 if printf '%s\n' "$OUT9" | grep -qF "SYSTEMIC MEMORY" &&
-   printf '%s\n' "$OUT9" | grep -qF "H001" &&
-   printf '%s\n' "$OUT9" | grep -qF "The shared boundary has no owner" &&
-   printf '%s\n' "$OUT9" | grep -qF "Two domains use an implicit boundary." &&
-   [ "$MEMORY_COUNT" -le 3 ]; then
+  printf '%s\n' "$OUT9" | grep -qF "H001" &&
+  printf '%s\n' "$OUT9" | grep -qF "The shared boundary has no owner" &&
+  printf '%s\n' "$OUT9" | grep -qF "Two domains use an implicit boundary." &&
+  [ "$MEMORY_COUNT" -le 3 ]; then
   pass "T9: active entry surfaces no more than three systemic memories"
 else
   fail "T9: bounded systemic memory was not surfaced"

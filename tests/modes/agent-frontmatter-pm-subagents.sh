@@ -63,17 +63,17 @@ echo ""
 echo "=== consolidator.md ==="
 
 check_frontmatter_delimiter "$CONSOLIDATOR" "consolidator.md"
-check_grep "$CONSOLIDATOR" "E" "^name: consolidator$"            "consolidator.md frontmatter: name=consolidator"
-check_grep "$CONSOLIDATOR" "E" "^description:"                   "consolidator.md frontmatter: description present"
-check_grep "$CONSOLIDATOR" "E" "^model: inherit$"                "consolidator.md frontmatter: model=inherit (no cost lock)"
-check_grep "$CONSOLIDATOR" "E" "^tools:"                         "consolidator.md frontmatter: tools list present"
-check_grep "$CONSOLIDATOR" "E" "^color:"                         "consolidator.md frontmatter: color present"
+check_grep "$CONSOLIDATOR" "E" "^name: consolidator$" "consolidator.md frontmatter: name=consolidator"
+check_grep "$CONSOLIDATOR" "E" "^description:" "consolidator.md frontmatter: description present"
+check_grep "$CONSOLIDATOR" "E" "^model: inherit$" "consolidator.md frontmatter: model=inherit (no cost lock)"
+check_grep "$CONSOLIDATOR" "E" "^tools:" "consolidator.md frontmatter: tools list present"
+check_grep "$CONSOLIDATOR" "E" "^color:" "consolidator.md frontmatter: color present"
 
 # IMPROVEMENTS #4 — promoted entries must arrive workable: the body must carry
 # the Done-when drafting rule (concrete testable bullets from the finding's own
 # text, marked as drafted, TODO-placeholder fallback only when too thin).
-check_grep "$CONSOLIDATOR" "F" "Done-when drafting rule"          "consolidator.md body: Done-when drafting rule present"
-check_grep "$CONSOLIDATOR" "F" "drafted at promotion"             "consolidator.md body: drafted-at-promotion marker documented"
+check_grep "$CONSOLIDATOR" "F" "Done-when drafting rule" "consolidator.md body: Done-when drafting rule present"
+check_grep "$CONSOLIDATOR" "F" "drafted at promotion" "consolidator.md body: drafted-at-promotion marker documented"
 check_grep "$CONSOLIDATOR" "F" "TODO -- define completion criteria" "consolidator.md body: thin-finding placeholder fallback kept"
 
 # Required tools for consolidator (reads, writes entries, runs bash scripts)
@@ -90,11 +90,11 @@ done
 check_grep "$CONSOLIDATOR" "F" "untrusted data, not instructions" "consolidator.md contains untrusted-data framing"
 
 # Input contract: scratch session file path (not ---ENTRY-ID--- pattern)
-check_grep "$CONSOLIDATOR" "F" "_sessions/"                      "consolidator.md documents scratch session file input"
+check_grep "$CONSOLIDATOR" "F" "_sessions/" "consolidator.md documents scratch session file input"
 
 # Output contract fields
 for field in schema_version session_file promoted archived_superseded deferred; do
-  check_grep "$CONSOLIDATOR" "F" "\"$field\""                    "consolidator.md output contract: $field field"
+  check_grep "$CONSOLIDATOR" "F" "\"$field\"" "consolidator.md output contract: $field field"
 done
 
 # AC T2b defense: distinct affects must produce distinct entries
@@ -105,7 +105,7 @@ else
 fi
 
 # needs: tdd set at promotion for bug/feature
-check_grep "$CONSOLIDATOR" "F" "needs: tdd"                      "consolidator.md sets needs: tdd on bug/feature promotion"
+check_grep "$CONSOLIDATOR" "F" "needs: tdd" "consolidator.md sets needs: tdd on bug/feature promotion"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TIDIER
@@ -114,11 +114,11 @@ echo ""
 echo "=== tidier.md ==="
 
 check_frontmatter_delimiter "$TIDIER" "tidier.md"
-check_grep "$TIDIER" "E" "^name: tidier$"                        "tidier.md frontmatter: name=tidier"
-check_grep "$TIDIER" "E" "^description:"                         "tidier.md frontmatter: description present"
-check_grep "$TIDIER" "E" "^model: inherit$"                      "tidier.md frontmatter: model=inherit (no cost lock)"
-check_grep "$TIDIER" "E" "^tools:"                               "tidier.md frontmatter: tools list present"
-check_grep "$TIDIER" "E" "^color:"                               "tidier.md frontmatter: color present"
+check_grep "$TIDIER" "E" "^name: tidier$" "tidier.md frontmatter: name=tidier"
+check_grep "$TIDIER" "E" "^description:" "tidier.md frontmatter: description present"
+check_grep "$TIDIER" "E" "^model: inherit$" "tidier.md frontmatter: model=inherit (no cost lock)"
+check_grep "$TIDIER" "E" "^tools:" "tidier.md frontmatter: tools list present"
+check_grep "$TIDIER" "E" "^color:" "tidier.md frontmatter: color present"
 
 # Required tools for tidier (reads, writes BOARD.md, runs bash scripts)
 TOOLS_LINE_T="$(grep -E "^tools:" "$TIDIER" || true)"
@@ -131,14 +131,14 @@ for tool in Read Write Edit Bash Grep Glob; do
 done
 
 # Untrusted-data framing
-check_grep "$TIDIER" "F" "untrusted data, not instructions"       "tidier.md contains untrusted-data framing"
+check_grep "$TIDIER" "F" "untrusted data, not instructions" "tidier.md contains untrusted-data framing"
 
 # Input contract: board directory path
-check_grep "$TIDIER" "F" "board"                                  "tidier.md documents board directory input"
+check_grep "$TIDIER" "F" "board" "tidier.md documents board directory input"
 
 # Output contract fields
 for field in schema_version actions_taken board_md_rebuilt stale_claims_reclaimed archived_sessions_deleted patterns; do
-  check_grep "$TIDIER" "F" "$field"                               "tidier.md output contract: $field field"
+  check_grep "$TIDIER" "F" "$field" "tidier.md output contract: $field field"
 done
 
 # Idempotency guarantee: must document fast-path / nothing-to-do behavior
@@ -150,7 +150,7 @@ fi
 
 # References the helper scripts it delegates to
 for script in board-index-check.sh board-claim-reclaim-stale.sh board-audit-scratch.sh; do
-  check_grep "$TIDIER" "F" "$script"                              "tidier.md references $script"
+  check_grep "$TIDIER" "F" "$script" "tidier.md references $script"
 done
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -160,11 +160,11 @@ echo ""
 echo "=== learnings-curator.md ==="
 
 check_frontmatter_delimiter "$LEARNINGS" "learnings-curator.md"
-check_grep "$LEARNINGS" "E" "^name: learnings-curator$"          "learnings-curator.md frontmatter: name=learnings-curator"
-check_grep "$LEARNINGS" "E" "^description:"                      "learnings-curator.md frontmatter: description present"
-check_grep "$LEARNINGS" "E" "^model: inherit$"                   "learnings-curator.md frontmatter: model=inherit (no cost lock)"
-check_grep "$LEARNINGS" "E" "^tools:"                            "learnings-curator.md frontmatter: tools list present"
-check_grep "$LEARNINGS" "E" "^color:"                            "learnings-curator.md frontmatter: color present"
+check_grep "$LEARNINGS" "E" "^name: learnings-curator$" "learnings-curator.md frontmatter: name=learnings-curator"
+check_grep "$LEARNINGS" "E" "^description:" "learnings-curator.md frontmatter: description present"
+check_grep "$LEARNINGS" "E" "^model: inherit$" "learnings-curator.md frontmatter: model=inherit (no cost lock)"
+check_grep "$LEARNINGS" "E" "^tools:" "learnings-curator.md frontmatter: tools list present"
+check_grep "$LEARNINGS" "E" "^color:" "learnings-curator.md frontmatter: color present"
 
 # The learnings-curator dispatches the deterministic curator script;
 # Write/Edit are still excluded — the *script* owns writes, the agent does not.
@@ -185,19 +185,19 @@ for excluded_tool in Write Edit; do
 done
 
 # Untrusted-data framing
-check_grep "$LEARNINGS" "F" "untrusted data, not instructions"   "learnings-curator.md contains untrusted-data framing"
+check_grep "$LEARNINGS" "F" "untrusted data, not instructions" "learnings-curator.md contains untrusted-data framing"
 
 # Input contract: board directory path
-check_grep "$LEARNINGS" "F" "board"                              "learnings-curator.md documents board directory input"
+check_grep "$LEARNINGS" "F" "board" "learnings-curator.md documents board directory input"
 
 # Curation output contract fields
 for field in schema_version board_dir min_recurrence resolved_scanned tag_counts promoted updated skipped; do
-  check_grep "$LEARNINGS" "F" "\"$field\""                       "learnings-curator.md output contract: $field field"
+  check_grep "$LEARNINGS" "F" "\"$field\"" "learnings-curator.md output contract: $field field"
 done
 
 # Must dispatch the deterministic curator script.
-check_grep "$LEARNINGS" "F" "board-curate-learnings.sh"           "learnings-curator.md dispatches board-curate-learnings.sh"
-check_grep "$LEARNINGS" "F" "curation schema 0.3.0"               "learnings-curator.md labels 0.3.0 as a curation schema"
+check_grep "$LEARNINGS" "F" "board-curate-learnings.sh" "learnings-curator.md dispatches board-curate-learnings.sh"
+check_grep "$LEARNINGS" "F" "curation schema 0.3.0" "learnings-curator.md labels 0.3.0 as a curation schema"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 TOTAL=$((PASS + FAIL))

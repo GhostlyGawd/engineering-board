@@ -49,9 +49,11 @@ PASS=0
 FAIL=0
 report() {
   if [ "$1" = "0" ]; then
-    printf "  [PASS] %s\n" "$2"; PASS=$((PASS + 1))
+    printf "  [PASS] %s\n" "$2"
+    PASS=$((PASS + 1))
   else
-    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"; FAIL=$((FAIL + 1))
+    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"
+    FAIL=$((FAIL + 1))
   fi
 }
 
@@ -83,7 +85,7 @@ except Exception:
 PY
 }
 
-count_objects() {  # number of top-level JSON objects in a scratch file
+count_objects() { # number of top-level JSON objects in a scratch file
   python3 - "$1" <<'PY'
 import sys, json
 text = open(sys.argv[1], encoding="utf-8", errors="replace").read()
@@ -110,13 +112,15 @@ if [ -x "$APPEND" ]; then
   report 0 "board-scratch-append.sh exists and is executable"
 else
   report 1 "board-scratch-append.sh exists and is executable" "not found/executable: $APPEND"
-  echo ""; echo "scratch-append: $PASS pass, $FAIL fail"; exit 1
+  echo ""
+  echo "scratch-append: $PASS pass, $FAIL fail"
+  exit 1
 fi
 
 # ── 2-4. Happy path: exit 0, file created, timestamp pinned, quote round-trips ─
 UNIT="$TMP/unit"
 mkdir -p "$UNIT"
-SCRATCH1="$UNIT/nested/dir/session-a.md"   # nested dir must be auto-created
+SCRATCH1="$UNIT/nested/dir/session-a.md" # nested dir must be auto-created
 FINDING1="$UNIT/finding1.json"
 python3 - "$FINDING1" "$HOSTILE_QUOTE" <<'PY'
 import sys, json
@@ -130,10 +134,10 @@ obj = {"schema_version": "0.2.1", "findings": [{
 open(path, "w", encoding="utf-8").write(json.dumps(obj, ensure_ascii=False))
 PY
 
-if EB_SCRATCH_APPEND_NOW="2026-06-01T12:34:56Z" bash "$APPEND" "$SCRATCH1" < "$FINDING1" > "$UNIT/out1" 2> "$UNIT/err1"; then
+if EB_SCRATCH_APPEND_NOW="2026-06-01T12:34:56Z" bash "$APPEND" "$SCRATCH1" <"$FINDING1" >"$UNIT/out1" 2>"$UNIT/err1"; then
   report 0 "happy path exits 0"
 else
-  report 1 "happy path exits 0" "stderr=$(tr '\n' ' ' < "$UNIT/err1")"
+  report 1 "happy path exits 0" "stderr=$(tr '\n' ' ' <"$UNIT/err1")"
 fi
 
 if [ -f "$SCRATCH1" ]; then
@@ -156,18 +160,18 @@ else
 fi
 
 # ── B005: a human capture summary is printed on stdout (visible on the turn) ──
-if grep -qF 'EB-CAPTURE-SUMMARY: captured 1 finding(s):' "$UNIT/out1" \
-   && grep -qF 'render helper mishandles format and env expansion' "$UNIT/out1" \
-   && grep -qF '/board-promote' "$UNIT/out1"; then
+if grep -qF 'EB-CAPTURE-SUMMARY: captured 1 finding(s):' "$UNIT/out1" &&
+  grep -qF 'render helper mishandles format and env expansion' "$UNIT/out1" &&
+  grep -qF '/board-promote' "$UNIT/out1"; then
   report 0 "B005: capture summary line names the finding + /board-promote"
 else
-  report 1 "B005: capture summary line present" "out1=$(tr '\n' '|' < "$UNIT/out1")"
+  report 1 "B005: capture summary line present" "out1=$(tr '\n' '|' <"$UNIT/out1")"
 fi
 
 # ── 5. Append accumulates, never clobbers ───────────────────────────────────
 FINDING2="$UNIT/finding2.json"
-printf '%s' '{"schema_version":"0.2.1","findings":[{"scratch_id":"S-unit-2","type":"observation","confidence":"tentative","title":"second finding","affects":null,"evidence_quote":"a second one","discovered":"2026-06-01","tags":[]}]}' > "$FINDING2"
-EB_SCRATCH_APPEND_NOW="2026-06-01T12:35:00Z" bash "$APPEND" "$SCRATCH1" < "$FINDING2" > /dev/null 2> "$UNIT/err2" || true
+printf '%s' '{"schema_version":"0.2.1","findings":[{"scratch_id":"S-unit-2","type":"observation","confidence":"tentative","title":"second finding","affects":null,"evidence_quote":"a second one","discovered":"2026-06-01","tags":[]}]}' >"$FINDING2"
+EB_SCRATCH_APPEND_NOW="2026-06-01T12:35:00Z" bash "$APPEND" "$SCRATCH1" <"$FINDING2" >/dev/null 2>"$UNIT/err2" || true
 OBJ_COUNT="$(count_objects "$SCRATCH1")"
 FIRST_STILL="$(scratch_field "$SCRATCH1" 0 scratch_id)"
 SECOND_NEW="$(scratch_field "$SCRATCH1" 1 scratch_id)"
@@ -179,16 +183,16 @@ fi
 
 # ── 6. Zero-findings object is valid and accepted ───────────────────────────
 SCRATCH_EMPTY="$UNIT/session-empty.md"
-if printf '%s' '{"schema_version":"0.2.1","findings":[]}' | bash "$APPEND" "$SCRATCH_EMPTY" > /dev/null 2> "$UNIT/err_empty"; then
+if printf '%s' '{"schema_version":"0.2.1","findings":[]}' | bash "$APPEND" "$SCRATCH_EMPTY" >/dev/null 2>"$UNIT/err_empty"; then
   report 0 "zero-findings object accepted (exit 0)"
 else
-  report 1 "zero-findings object accepted" "stderr=$(tr '\n' ' ' < "$UNIT/err_empty")"
+  report 1 "zero-findings object accepted" "stderr=$(tr '\n' ' ' <"$UNIT/err_empty")"
 fi
 
 # ── 7. Empty stdin fails loudly (exit 3), writes nothing ────────────────────
 SCRATCH_NONE="$UNIT/never-created-empty.md"
 set +e
-printf '' | bash "$APPEND" "$SCRATCH_NONE" > /dev/null 2> "$UNIT/err_e"
+printf '' | bash "$APPEND" "$SCRATCH_NONE" >/dev/null 2>"$UNIT/err_e"
 RC=$?
 set -e
 if [ "$RC" -eq 3 ] && [ ! -f "$SCRATCH_NONE" ]; then
@@ -200,7 +204,7 @@ fi
 # ── 8. Truncated / invalid JSON fails loudly (exit 3), writes nothing ───────
 SCRATCH_BAD="$UNIT/never-created-bad.md"
 set +e
-printf '%s' '{"schema_version":"0.2.1","findings":[ {"scratch_id":"S-x","title":"oops"' | bash "$APPEND" "$SCRATCH_BAD" > /dev/null 2> "$UNIT/err_bad"
+printf '%s' '{"schema_version":"0.2.1","findings":[ {"scratch_id":"S-x","title":"oops"' | bash "$APPEND" "$SCRATCH_BAD" >/dev/null 2>"$UNIT/err_bad"
 RC=$?
 set -e
 if [ "$RC" -eq 3 ] && [ ! -f "$SCRATCH_BAD" ]; then
@@ -211,7 +215,7 @@ fi
 
 # ── 8b. Object present but missing 'findings' array -> exit 3 ────────────────
 set +e
-printf '%s' '{"schema_version":"0.2.1","oops":[]}' | bash "$APPEND" "$UNIT/never-created-noarr.md" > /dev/null 2> "$UNIT/err_noarr"
+printf '%s' '{"schema_version":"0.2.1","oops":[]}' | bash "$APPEND" "$UNIT/never-created-noarr.md" >/dev/null 2>"$UNIT/err_noarr"
 RC=$?
 set -e
 if [ "$RC" -eq 3 ]; then
@@ -223,19 +227,19 @@ fi
 # ── 9. Salvage: valid object wrapped in stray prose/fence -> exit 0 ──────────
 SCRATCH_SALV="$UNIT/session-salvage.md"
 set +e
-printf '%s\n' 'Here is the result:' '```json' '{"schema_version":"0.2.1","findings":[{"scratch_id":"S-salv","type":"bug","confidence":"confirmed","title":"t","affects":null,"evidence_quote":"q","discovered":"2026-06-01","tags":[]}]}' '```' | bash "$APPEND" "$SCRATCH_SALV" > "$UNIT/out_salv" 2> "$UNIT/err_salv"
+printf '%s\n' 'Here is the result:' '```json' '{"schema_version":"0.2.1","findings":[{"scratch_id":"S-salv","type":"bug","confidence":"confirmed","title":"t","affects":null,"evidence_quote":"q","discovered":"2026-06-01","tags":[]}]}' '```' | bash "$APPEND" "$SCRATCH_SALV" >"$UNIT/out_salv" 2>"$UNIT/err_salv"
 RC=$?
 set -e
 SALV_ID="$(scratch_field "$SCRATCH_SALV" 0 scratch_id)"
 if [ "$RC" -eq 0 ] && [ "$SALV_ID" = "S-salv" ] && grep -q "salvaged_via_rawdecode" "$UNIT/out_salv"; then
   report 0 "prose-wrapped object salvaged exactly as the consolidator would (exit 0)"
 else
-  report 1 "prose-wrapped object salvaged" "rc=$RC id=$SALV_ID out=$(tr '\n' ' ' < "$UNIT/out_salv")"
+  report 1 "prose-wrapped object salvaged" "rc=$RC id=$SALV_ID out=$(tr '\n' ' ' <"$UNIT/out_salv")"
 fi
 
 # ── 10. Usage error: missing scratch-path arg -> exit 1 ─────────────────────
 set +e
-printf '%s' '{"schema_version":"0.2.1","findings":[]}' | bash "$APPEND" > /dev/null 2> "$UNIT/err_usage"
+printf '%s' '{"schema_version":"0.2.1","findings":[]}' | bash "$APPEND" >/dev/null 2>"$UNIT/err_usage"
 RC=$?
 set -e
 if [ "$RC" -eq 1 ]; then
@@ -252,16 +256,16 @@ fi
 PROJECT="$TMP/project"
 BOARD_DIR="$PROJECT/engineering-board/scratch"
 mkdir -p "$BOARD_DIR/bugs" "$BOARD_DIR/features" "$BOARD_DIR/questions" \
-         "$BOARD_DIR/observations" "$BOARD_DIR/_sessions" "$PROJECT/.engineering-board"
+  "$BOARD_DIR/observations" "$BOARD_DIR/_sessions" "$PROJECT/.engineering-board"
 
-cat > "$PROJECT/engineering-board/BOARD-ROUTER.md" <<'EOF'
+cat >"$PROJECT/engineering-board/BOARD-ROUTER.md" <<'EOF'
 # Board Router
 
 | project | path | affects prefix |
 |---------|------|----------------|
 | scratch | engineering-board/scratch/ | scratch/ |
 EOF
-printf '# scratch - Board\n\n## Open\n\n' > "$BOARD_DIR/BOARD.md"
+printf '# scratch - Board\n\n## Open\n\n' >"$BOARD_DIR/BOARD.md"
 
 TRANSCRIPT="$PROJECT/transcript.jsonl"
 E2E_FINDING="$TMP/e2e-finding.json"
@@ -288,15 +292,16 @@ obj = {"schema_version": "0.2.1", "findings": [{
 open(finding_path, "w", encoding="utf-8").write(json.dumps(obj, ensure_ascii=False))
 PY
 
-cat > "$PROJECT/.engineering-board/last-stop-stdin.json" <<EOF
+cat >"$PROJECT/.engineering-board/last-stop-stdin.json" <<EOF
 {"session_id":"e2e-session","transcript_path":"$TRANSCRIPT","hook_event_name":"Stop","stop_hook_active":false}
 EOF
 
 # Write scratch via the helper (the production path), then consolidate.
-if bash "$APPEND" "$BOARD_DIR/_sessions/e2e-session.md" < "$E2E_FINDING" > /dev/null 2> "$UNIT/err_e2e"; then
+if bash "$APPEND" "$BOARD_DIR/_sessions/e2e-session.md" <"$E2E_FINDING" >/dev/null 2>"$UNIT/err_e2e"; then
   export CLAUDE_PROJECT_DIR="$PROJECT"
-  bash "$CONSOLIDATE" < "$PROJECT/.engineering-board/last-stop-stdin.json" > "$UNIT/cons.out" 2> "$UNIT/cons.err" || true
-  DISP="$(python3 - "$BOARD_DIR/consolidation.log" <<'PY'
+  bash "$CONSOLIDATE" <"$PROJECT/.engineering-board/last-stop-stdin.json" >"$UNIT/cons.out" 2>"$UNIT/cons.err" || true
+  DISP="$(
+    python3 - "$BOARD_DIR/consolidation.log" <<'PY'
 import sys, json
 hit = ""
 try:
@@ -314,13 +319,13 @@ except Exception:
     pass
 print(hit)
 PY
-)"
+  )"
   case "$DISP" in
     promoted_*) report 0 "end-to-end: hostile-quote finding PROMOTES via consolidate ($DISP)" ;;
-    *)          report 1 "end-to-end: hostile-quote finding PROMOTES via consolidate" "disposition='${DISP:-<none>}' (expected promoted_*)" ;;
+    *) report 1 "end-to-end: hostile-quote finding PROMOTES via consolidate" "disposition='${DISP:-<none>}' (expected promoted_*)" ;;
   esac
 else
-  report 1 "end-to-end: scratch-append wrote the e2e finding" "stderr=$(tr '\n' ' ' < "$UNIT/err_e2e")"
+  report 1 "end-to-end: scratch-append wrote the e2e finding" "stderr=$(tr '\n' ' ' <"$UNIT/err_e2e")"
 fi
 
 echo ""

@@ -49,7 +49,10 @@ BOARD_DIR_LOWER="$(echo "$BOARD_DIR" | tr '[:upper:]' '[:lower:]')"
 STALE_CLAIM_SEC=180
 for marker in "onedrive" "dropbox" "icloud" "google drive" "googledrive" "box sync" "boxsync"; do
   case "$BOARD_DIR_LOWER" in
-    *"$marker"*) STALE_CLAIM_SEC=300; break ;;
+    *"$marker"*)
+      STALE_CLAIM_SEC=300
+      break
+      ;;
   esac
 done
 LIVENESS_THRESHOLD=$((STALE_CLAIM_SEC * 2))

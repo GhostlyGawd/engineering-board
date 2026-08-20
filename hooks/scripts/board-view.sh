@@ -36,17 +36,24 @@ DEMO_DIR=""
 EXPECT_DEMO_DIR=0
 for arg in "$@"; do
   if [ "${EXPECT_LINK_BASE}" -eq 1 ]; then
-    LINK_BASE="${arg}"; EXPECT_LINK_BASE=0; continue
+    LINK_BASE="${arg}"
+    EXPECT_LINK_BASE=0
+    continue
   fi
   if [ "${EXPECT_DEMO_DIR}" -eq 1 ]; then
-    DEMO_DIR="${arg}"; EXPECT_DEMO_DIR=0; continue
+    DEMO_DIR="${arg}"
+    EXPECT_DEMO_DIR=0
+    continue
   fi
   case "${arg}" in
     --stdout) TO_STDOUT=1 ;;
-    --stamp) STAMP=1 ;;                    # opt-in freshness footer (breaks byte-determinism deliberately)
-    --link-base) EXPECT_LINK_BASE=1 ;;     # href prefix for entry cards (e.g. a GitHub blob URL)
+    --stamp) STAMP=1 ;;                # opt-in freshness footer (breaks byte-determinism deliberately)
+    --link-base) EXPECT_LINK_BASE=1 ;; # href prefix for entry cards (e.g. a GitHub blob URL)
     --demo-dir) EXPECT_DEMO_DIR=1 ;;
-    --*) echo "board-view: unknown flag ${arg}" >&2; exit 1 ;;
+    --*)
+      echo "board-view: unknown flag ${arg}" >&2
+      exit 1
+      ;;
     *) PROJECT_FILTER="${arg}" ;;
   esac
 done
@@ -230,7 +237,7 @@ if [ -n "${DEMO_DIR}" ]; then
   if [ "${TO_STDOUT}" -eq 1 ]; then
     printf '%s\n' "${DEMO_DOC}"
   else
-    printf '%s\n' "${DEMO_DOC}" > "${DEMO_DIR}/pattern-intelligence.html"
+    printf '%s\n' "${DEMO_DOC}" >"${DEMO_DIR}/pattern-intelligence.html"
     echo "board-view: wrote ${DEMO_DIR}/pattern-intelligence.html"
   fi
   exit 0
@@ -994,6 +1001,6 @@ else
       [ "${row%%$'\t'*}" = "${PROJECT_FILTER}" ] && OUT_DIR="${row#*$'\t'}"
     done
   fi
-  printf '%s\n' "${DOC}" > "${OUT_DIR}/board.html"
+  printf '%s\n' "${DOC}" >"${OUT_DIR}/board.html"
   echo "board-view: wrote ${OUT_DIR}/board.html"
 fi

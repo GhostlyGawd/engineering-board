@@ -104,6 +104,14 @@ _Last updated: 2026-07-10_
   `scripts/bootstrap_dev.py` is the native-Windows interface. Check mode is
   offline/read-only. `.devcontainer/` uses the same inventory at
   `/workspaces/engineering-board` as user `vscode`.
+- **Stable quality contract:** `scripts/quality_gate.py` owns the
+  `format`/`lint`/`typecheck`/`test`/`security`/`package`/`all` selectors;
+  `scripts/quality-gate.sh` is the delegating macOS/Linux adapter. Native
+  PowerShell and `cmd.exe` call the Python entry directly.
+  `support/quality/typing-policy.json` declares strict root-plugin and MCP
+  scopes plus visible staged exclusions. The format and lint gates are
+  non-rewriting and cover Python, shell, Markdown, YAML, JSON/schema,
+  workflows, naming, complexity, dead code, duplication, and large files.
 - **Board location resolves in ONE place now:** source `hooks/scripts/board-paths.sh` and call `eb_board_dirs` / `eb_board_rows` / `eb_router_path`. Do **not** re-hardcode `docs/boards/` in scripts.
 - **Version bumps** must touch *both* `.claude-plugin/plugin.json` and `marketplace.json` (coherence-checked), and a fix only reaches installs when the version *increases*.
 - New `hooks/scripts/*.sh` must pass `tests/crosscompat-lint.sh`: shebang exactly `#!/usr/bin/env bash`, no `date -d`/`date -j -f`, no `jq`, no drive letters (use python3 for JSON + timestamps).

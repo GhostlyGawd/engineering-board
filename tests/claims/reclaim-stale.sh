@@ -42,8 +42,8 @@ make_claim() {
   local name="$1" age_sec="$2"
   local dir="$CLAIMS_DIR/$name"
   mkdir -p "$dir"
-  printf 'session-%s 2026-05-11T00:00:00Z %s\n' "$name" "$TMP" > "$dir/owner.txt"
-  printf '2026-05-11T00:00:00Z\n' > "$dir/heartbeat.txt"
+  printf 'session-%s 2026-05-11T00:00:00Z %s\n' "$name" "$TMP" >"$dir/owner.txt"
+  printf '2026-05-11T00:00:00Z\n' >"$dir/heartbeat.txt"
   # Back-date the heartbeat mtime via python3 (touch -d is not portable).
   python3 - "$dir/heartbeat.txt" "$age_sec" <<'PY'
 import sys, os, time
@@ -53,24 +53,26 @@ os.utime(path, (t, t))
 PY
 }
 
-make_claim "FRESH-001"   0      # (i)   fresh
-make_claim "STALE-002"   200    # (ii)  stale  (> 180s default)
-make_claim "VSTALE-003"  600    # (iii) very stale
+make_claim "FRESH-001" 0    # (i)   fresh
+make_claim "STALE-002" 200  # (ii)  stale  (> 180s default)
+make_claim "VSTALE-003" 600 # (iii) very stale
 
 # ── Run reclaim with default 180s threshold ───────────────────────────────────
 STDOUT="$TMP/reclaim.stdout"
 STDERR="$TMP/reclaim.stderr"
 # Force non-cloud path (no OneDrive substring) so 180s threshold applies.
-EB_STALE_SEC=180 bash "$RECLAIM" "$BOARD_DIR" > "$STDOUT" 2> "$STDERR"
+EB_STALE_SEC=180 bash "$RECLAIM" "$BOARD_DIR" >"$STDOUT" 2>"$STDERR"
 
 # ── Assertion harness ─────────────────────────────────────────────────────────
 PASS=0
 FAIL=0
 report() {
   if [ "$1" = "0" ]; then
-    printf "  [PASS] %s\n" "$2"; PASS=$((PASS + 1))
+    printf "  [PASS] %s\n" "$2"
+    PASS=$((PASS + 1))
   else
-    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"; FAIL=$((FAIL + 1))
+    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"
+    FAIL=$((FAIL + 1))
   fi
 }
 

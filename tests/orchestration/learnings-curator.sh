@@ -31,7 +31,7 @@ mkdir -p "$BOARD_DIR/bugs" "$BOARD_DIR/features" "$BOARD_DIR/observations"
 
 plant_resolved_bug() {
   local id="$1" tag="$2" disc="$3"
-  cat > "$BOARD_DIR/bugs/$id-x.md" <<EOF
+  cat >"$BOARD_DIR/bugs/$id-x.md" <<EOF
 ---
 id: $id
 type: bug
@@ -52,7 +52,7 @@ plant_resolved_bug "B001" "shared" "2026-05-01"
 plant_resolved_bug "B002" "shared" "2026-05-02"
 plant_resolved_bug "B003" "shared" "2026-05-03"
 plant_resolved_bug "B004" "lonely" "2026-05-04"
-cat > "$BOARD_DIR/bugs/B005-x.md" <<EOF
+cat >"$BOARD_DIR/bugs/B005-x.md" <<EOF
 ---
 id: B005
 type: bug
@@ -73,9 +73,11 @@ PASS=0
 FAIL=0
 report() {
   if [ "$1" = "0" ]; then
-    printf "  [PASS] %s\n" "$2"; PASS=$((PASS + 1))
+    printf "  [PASS] %s\n" "$2"
+    PASS=$((PASS + 1))
   else
-    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"; FAIL=$((FAIL + 1))
+    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"
+    FAIL=$((FAIL + 1))
   fi
 }
 

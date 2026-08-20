@@ -50,7 +50,7 @@ TARGET="${1:-}"
 DISCIPLINE=""
 
 case "$TARGET" in
-  pm|paused|resumed)
+  pm | paused | resumed)
     shift
     ;;
   worker)
@@ -67,11 +67,14 @@ case "$TARGET" in
       exit 1
     fi
     case "$DISCIPLINE" in
-      tdd|review|validate) ;;
-      *) echo "guard: invalid discipline '$DISCIPLINE' (expected tdd|review|validate)" >&2; exit 1 ;;
+      tdd | review | validate) ;;
+      *)
+        echo "guard: invalid discipline '$DISCIPLINE' (expected tdd|review|validate)" >&2
+        exit 1
+        ;;
     esac
     ;;
-  ""|-h|--help)
+  "" | -h | --help)
     usage
     ;;
   *)
@@ -125,7 +128,7 @@ PERSISTED_PREV_DISCIPLINE="$(printf '%s\n' "$STATE_OUT" | sed -n '4p')"
 # Normalize unrecognized modes to "null" — the §11.5 matrix treats unset/null/
 # unrecognized identically.
 case "$CURRENT_MODE" in
-  pm|worker|paused) ;;
+  pm | worker | paused) ;;
   *) CURRENT_MODE="null" ;;
 esac
 
@@ -135,8 +138,8 @@ emit_allow() {
   if [ "$TARGET" = "paused" ]; then
     # previous_mode = the mode we are leaving; null becomes JSON null.
     case "$CURRENT_MODE" in
-      pm|worker) printf 'PREVIOUS_MODE=%s\n' "$CURRENT_MODE" ;;
-      *)         printf 'PREVIOUS_MODE=null\n' ;;
+      pm | worker) printf 'PREVIOUS_MODE=%s\n' "$CURRENT_MODE" ;;
+      *) printf 'PREVIOUS_MODE=null\n' ;;
     esac
     if [ "$CURRENT_MODE" = "worker" ]; then
       printf 'PREVIOUS_DISCIPLINE=%s\n' "$CURRENT_DISCIPLINE"
@@ -155,16 +158,20 @@ emit_allow() {
 if [ "$TARGET" = "pm" ]; then
   case "$CURRENT_MODE" in
     null)
-      emit_allow ;;
+      emit_allow
+      ;;
     pm)
       echo "Engineering board: already in PM mode. No action taken."
-      exit 2 ;;
+      exit 2
+      ;;
     worker)
       echo "Engineering board: currently in worker mode (discipline=${CURRENT_DISCIPLINE}). Restart the session to switch to PM mode. No action taken."
-      exit 3 ;;
+      exit 3
+      ;;
     paused)
       echo "Engineering board: currently paused. Run /board-resume first, then /pm-start. No action taken."
-      exit 3 ;;
+      exit 3
+      ;;
   esac
 fi
 
@@ -172,10 +179,12 @@ fi
 if [ "$TARGET" = "worker" ]; then
   case "$CURRENT_MODE" in
     null)
-      emit_allow ;;
+      emit_allow
+      ;;
     pm)
       echo "Engineering board: currently in PM mode. Restart the session to switch to worker mode. No action taken."
-      exit 3 ;;
+      exit 3
+      ;;
     worker)
       if [ "$CURRENT_DISCIPLINE" = "$DISCIPLINE" ]; then
         echo "Engineering board: already in worker mode (discipline=${CURRENT_DISCIPLINE}). No action taken."
@@ -183,10 +192,12 @@ if [ "$TARGET" = "worker" ]; then
       else
         echo "Engineering board: currently in worker mode (discipline=${CURRENT_DISCIPLINE}). Restart the session to switch to discipline=${DISCIPLINE}. No action taken."
         exit 3
-      fi ;;
+      fi
+      ;;
     paused)
       echo "Engineering board: currently paused. Run /board-resume first, then /worker-start --discipline ${DISCIPLINE}. No action taken."
-      exit 3 ;;
+      exit 3
+      ;;
   esac
 fi
 
@@ -195,9 +206,11 @@ if [ "$TARGET" = "paused" ]; then
   case "$CURRENT_MODE" in
     paused)
       echo "Engineering board: already paused. No action taken."
-      exit 2 ;;
-    null|pm|worker)
-      emit_allow ;;
+      exit 2
+      ;;
+    null | pm | worker)
+      emit_allow
+      ;;
   esac
 fi
 
@@ -205,10 +218,12 @@ fi
 if [ "$TARGET" = "resumed" ]; then
   case "$CURRENT_MODE" in
     paused)
-      emit_allow ;;
-    null|pm|worker)
+      emit_allow
+      ;;
+    null | pm | worker)
       echo "Engineering board: not currently paused. No action taken."
-      exit 2 ;;
+      exit 2
+      ;;
   esac
 fi
 

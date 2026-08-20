@@ -51,6 +51,48 @@
           "permitted_skip_reasons": []
         },
         {
+          "id": "format",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh format",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "lint",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh lint",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "typecheck",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh typecheck",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "quality-test",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh test --workers 2",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "security",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh security",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "package",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh package",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "quality-all",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh all --workers 2",
+          "permitted_skip_reasons": []
+        },
+        {
           "id": "compatibility",
           "required": true,
           "command": "bash tests/run-all.sh",
@@ -89,6 +131,48 @@
           "permitted_skip_reasons": []
         },
         {
+          "id": "format",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh format",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "lint",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh lint",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "typecheck",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh typecheck",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "quality-test",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh test --workers 2",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "security",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh security",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "package",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh package",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "quality-all",
+          "required": true,
+          "command": "bash scripts/quality-gate.sh all --workers 2",
+          "permitted_skip_reasons": []
+        },
+        {
           "id": "compatibility",
           "required": true,
           "command": "bash tests/run-all.sh",
@@ -118,6 +202,48 @@
           "id": "bootstrap-check",
           "required": true,
           "command": "python scripts/bootstrap_dev.py --check",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "format",
+          "required": true,
+          "command": "python scripts/quality_gate.py format",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "lint",
+          "required": true,
+          "command": "python scripts/quality_gate.py lint",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "typecheck",
+          "required": true,
+          "command": "python scripts/quality_gate.py typecheck",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "quality-test",
+          "required": true,
+          "command": "python scripts/quality_gate.py test --workers 2",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "security",
+          "required": true,
+          "command": "python scripts/quality_gate.py security",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "package",
+          "required": true,
+          "command": "python scripts/quality_gate.py package",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "quality-all",
+          "required": true,
+          "command": "python scripts/quality_gate.py all --workers 2",
           "permitted_skip_reasons": []
         },
         {
@@ -152,6 +278,48 @@
           "id": "bootstrap-check",
           "required": true,
           "command": "python scripts\\bootstrap_dev.py --check",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "format",
+          "required": true,
+          "command": "python scripts\\quality_gate.py format",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "lint",
+          "required": true,
+          "command": "python scripts\\quality_gate.py lint",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "typecheck",
+          "required": true,
+          "command": "python scripts\\quality_gate.py typecheck",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "quality-test",
+          "required": true,
+          "command": "python scripts\\quality_gate.py test --workers 2",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "security",
+          "required": true,
+          "command": "python scripts\\quality_gate.py security",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "package",
+          "required": true,
+          "command": "python scripts\\quality_gate.py package",
+          "permitted_skip_reasons": []
+        },
+        {
+          "id": "quality-all",
+          "required": true,
+          "command": "python scripts\\quality_gate.py all --workers 2",
           "permitted_skip_reasons": []
         },
         {

@@ -261,6 +261,24 @@ session id).
 
 ## Tests
 
+From the repository root, the MCP application participates in the stable
+quality gates:
+
+```sh
+bash scripts/quality-gate.sh format
+bash scripts/quality-gate.sh lint
+bash scripts/quality-gate.sh typecheck
+bash scripts/quality-gate.sh package
+```
+
+Native Windows uses `python scripts/quality_gate.py` with the same selectors.
+The strict typed MCP scope is `engineering_board_core.py`.
+`engineering_board_mcp.py` is a tracked staged exclusion in
+`support/quality/typing-policy.json`. Development checks do not add a runtime
+dependency to the wheel, source archive, or MCP bundle.
+
+The MCP compatibility suite remains:
+
 ```sh
 bash mcp-server/run-tests.sh
 ```

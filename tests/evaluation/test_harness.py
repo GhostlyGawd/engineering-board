@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import copy
 import json
-import os
 from pathlib import Path
 import re
 import shutil
@@ -53,12 +52,9 @@ class EvaluationHarnessTests(unittest.TestCase):
         evidence = self.__class__.context_evidence
         assert evidence is not None
         fingerprints = {
-            case_id: brief["context_fingerprint"]
-            for case_id, brief in evidence["briefs"].items()
+            case_id: brief["context_fingerprint"] for case_id, brief in evidence["briefs"].items()
         }
-        contracts = json.loads(
-            (contracts_path or self.contracts_path).read_text(encoding="utf-8")
-        )
+        contracts = json.loads((contracts_path or self.contracts_path).read_text(encoding="utf-8"))
         profiles = {
             name: {
                 "client_version": f"{name}-test-1",
@@ -106,11 +102,7 @@ class EvaluationHarnessTests(unittest.TestCase):
             else []
         )
         expected_memory_rank = next(
-            (
-                item["rank"]
-                for item in surfaced_memories
-                if item["id"] == expected_memory
-            ),
+            (item["rank"] for item in surfaced_memories if item["id"] == expected_memory),
             None,
         )
         attempt: dict[str, object] = {
@@ -119,16 +111,10 @@ class EvaluationHarnessTests(unittest.TestCase):
             "state": "scored",
             "replacement_for": None,
             "first_proposed_correction": "Inspect the declared case evidence.",
-            "first_stated_cause": (
-                case["expected_systemic_cause"] or "No shared systemic cause."
-            ),
-            "canonical_citations": (
-                [case["canonical_evidence"][0]["id"]] if systemic else []
-            ),
+            "first_stated_cause": (case["expected_systemic_cause"] or "No shared systemic cause."),
+            "canonical_citations": ([case["canonical_evidence"][0]["id"]] if systemic else []),
             "surfaced_memories": surfaced_memories,
-            "final_diagnosis": (
-                case["expected_systemic_cause"] or "The issue is independent."
-            ),
+            "final_diagnosis": (case["expected_systemic_cause"] or "The issue is independent."),
             "systemic_before_local": systemic,
             "classification_evidence": "The classification follows the case contract.",
             "reviewer": "test-reviewer",
@@ -137,16 +123,12 @@ class EvaluationHarnessTests(unittest.TestCase):
         if context:
             attempt.update(
                 {
-                    "context_fingerprint": trial["context_brief"][
-                        "context_fingerprint"
-                    ],
+                    "context_fingerprint": trial["context_brief"]["context_fingerprint"],
                     "expected_memory_rank": expected_memory_rank,
                     "irrelevant_memory_count": 0,
                     "rejected_memory_treatment": "not_surfaced",
                     "lexical_decoy_treatment": (
-                        "ignored"
-                        if case["category"] == "lexical-decoy"
-                        else "not_applicable"
+                        "ignored" if case["category"] == "lexical-decoy" else "not_applicable"
                     ),
                 }
             )
@@ -193,9 +175,7 @@ class EvaluationHarnessTests(unittest.TestCase):
         self.assertEqual(summary["corpus_role"], "calibration")
         with tempfile.TemporaryDirectory(prefix="eb-eval-calibration-") as temp:
             base = Path(temp)
-            with self.assertRaisesRegex(
-                EvaluationError, "locked evidence corpus"
-            ):
+            with self.assertRaisesRegex(EvaluationError, "locked evidence corpus"):
                 prepare_run(
                     ROOT,
                     self.calibration_corpus_path,
@@ -211,9 +191,7 @@ class EvaluationHarnessTests(unittest.TestCase):
         self.assertEqual(summary["case_count"], 8)
         with tempfile.TemporaryDirectory(prefix="eb-eval-proposal-") as temp:
             base = Path(temp)
-            with self.assertRaisesRegex(
-                EvaluationError, "locked evidence corpus"
-            ):
+            with self.assertRaisesRegex(EvaluationError, "locked evidence corpus"):
                 prepare_run(
                     ROOT,
                     self.proposal_corpus_path,
@@ -238,9 +216,7 @@ class EvaluationHarnessTests(unittest.TestCase):
                 evidence_path.read_text(encoding="utf-8") + "\nObserved again.\n",
                 encoding="utf-8",
             )
-            evidence_digest = validate_corpus(
-                copied.parent, corpus_path
-            )["digest"]
+            evidence_digest = validate_corpus(copied.parent, corpus_path)["digest"]
             self.assertNotEqual(original, evidence_digest)
 
             context_path = (
@@ -265,27 +241,19 @@ class EvaluationHarnessTests(unittest.TestCase):
             value = copy.deepcopy(original)
             value["cases"][0]["files"].append("admin/order_editor.ts")
             corpus_path.write_text(json.dumps(value), encoding="utf-8")
-            with self.assertRaisesRegex(
-                EvaluationError, "declared current domain"
-            ):
+            with self.assertRaisesRegex(EvaluationError, "declared current domain"):
                 validate_corpus(copied.parent, corpus_path)
 
             value = copy.deepcopy(original)
             case = value["cases"][0]
-            evidence_path = (
-                copied
-                / value["evidence_root"]
-                / case["canonical_evidence"][0]["path"]
-            )
+            evidence_path = copied / value["evidence_root"] / case["canonical_evidence"][0]["path"]
             evidence_path.write_text(
                 evidence_path.read_text(encoding="utf-8")
                 + "\nThe administrator order editor also failed.\n",
                 encoding="utf-8",
             )
             corpus_path.write_text(json.dumps(value), encoding="utf-8")
-            with self.assertRaisesRegex(
-                EvaluationError, "prior incident terms"
-            ):
+            with self.assertRaisesRegex(EvaluationError, "prior incident terms"):
                 validate_corpus(copied.parent, corpus_path)
 
             shutil.copyfile(
@@ -296,53 +264,34 @@ class EvaluationHarnessTests(unittest.TestCase):
                 evidence_path,
             )
             value = copy.deepcopy(original)
-            value["cases"][0]["scoring"]["information_boundary"][
-                "prior_entry_ids"
-            ] = ["B999"]
+            value["cases"][0]["scoring"]["information_boundary"]["prior_entry_ids"] = ["B999"]
             corpus_path.write_text(json.dumps(value), encoding="utf-8")
-            with self.assertRaisesRegex(
-                EvaluationError, "memory does not cite incident B999"
-            ):
+            with self.assertRaisesRegex(EvaluationError, "memory does not cite incident B999"):
                 validate_corpus(copied.parent, corpus_path)
 
             value = copy.deepcopy(original)
-            value["cases"][0]["scoring"]["systemic_classification"][
-                "scope"
-            ] = "current-component"
+            value["cases"][0]["scoring"]["systemic_classification"]["scope"] = "current-component"
             corpus_path.write_text(json.dumps(value), encoding="utf-8")
-            with self.assertRaisesRegex(
-                EvaluationError, "scope must be cross-incident"
-            ):
+            with self.assertRaisesRegex(EvaluationError, "scope must be cross-incident"):
                 validate_corpus(copied.parent, corpus_path)
 
     def test_v4_proposal_builds_expected_context_and_outcomes(self) -> None:
-        evidence = build_context_evidence(
-            ROOT, self.proposal_corpus_path, self.source_commit
-        )
-        corpus = json.loads(
-            self.proposal_corpus_path.read_text(encoding="utf-8")
-        )
+        evidence = build_context_evidence(ROOT, self.proposal_corpus_path, self.source_commit)
+        corpus = json.loads(self.proposal_corpus_path.read_text(encoding="utf-8"))
         for case in corpus["cases"]:
             case_id = case["id"]
             self.assertTrue(evidence["outcomes"][case_id]["matches_expected"])
             expected_memory = case["expected_relevant_memory"]
             if expected_memory is None:
                 continue
-            result_ids = [
-                item["id"]
-                for item in evidence["briefs"][case_id]["results"]
-            ]
+            result_ids = [item["id"] for item in evidence["briefs"][case_id]["results"]]
             self.assertIn(expected_memory, result_ids)
 
     def test_trial_response_schema_accepts_versioned_evidence_ids(self) -> None:
         schema = json.loads(
-            (ROOT / "evaluation" / "trial-response.schema.json").read_text(
-                encoding="utf-8"
-            )
+            (ROOT / "evaluation" / "trial-response.schema.json").read_text(encoding="utf-8")
         )
-        pattern = schema["properties"]["canonical_citations"]["items"][
-            "pattern"
-        ]
+        pattern = schema["properties"]["canonical_citations"]["items"]["pattern"]
         self.assertIsNotNone(re.fullmatch(pattern, "E-D1-C01"))
         self.assertIsNotNone(re.fullmatch(pattern, "E-D1-V4-C01"))
         self.assertIsNone(re.fullmatch(pattern, "E-D1-V4-01"))
@@ -377,11 +326,7 @@ class EvaluationHarnessTests(unittest.TestCase):
             corpus_path = copied / "evidence-corpus.json"
             value = json.loads(corpus_path.read_text(encoding="utf-8"))
             case = value["cases"][0]
-            evidence_path = (
-                copied
-                / value["evidence_root"]
-                / case["canonical_evidence"][0]["path"]
-            )
+            evidence_path = copied / value["evidence_root"] / case["canonical_evidence"][0]["path"]
             evidence_path.write_text(
                 evidence_path.read_text(encoding="utf-8")
                 + "\nThe paths use one shared canonical region-code boundary.\n",
@@ -401,9 +346,7 @@ class EvaluationHarnessTests(unittest.TestCase):
             )
             case["task"] = case["expected_systemic_cause"]
             corpus_path.write_text(json.dumps(value), encoding="utf-8")
-            with self.assertRaisesRegex(
-                EvaluationError, "expected systemic cause"
-            ):
+            with self.assertRaisesRegex(EvaluationError, "expected systemic cause"):
                 validate_corpus(copied.parent, corpus_path)
 
             case["task"] = "Inspect the reported behavior."
@@ -419,14 +362,10 @@ class EvaluationHarnessTests(unittest.TestCase):
                 validate_corpus(copied.parent, corpus_path)
 
     def test_evidence_context_surfaces_expected_negative_memory(self) -> None:
-        evidence = build_context_evidence(
-            ROOT, self.corpus_path, self.source_commit
-        )
+        evidence = build_context_evidence(ROOT, self.corpus_path, self.source_commit)
         expected = {"D1-C05": "H105", "D1-C06": "H106"}
         for case_id, memory_id in expected.items():
-            result_ids = [
-                item["id"] for item in evidence["briefs"][case_id]["results"]
-            ]
+            result_ids = [item["id"] for item in evidence["briefs"][case_id]["results"]]
             self.assertIn(memory_id, result_ids)
 
     def test_prepare_builds_48_isolated_arms_with_equal_pair_controls(self) -> None:
@@ -440,13 +379,9 @@ class EvaluationHarnessTests(unittest.TestCase):
                 validate_corpus(ROOT, self.corpus_path)["digest"],
             )
             self.assertEqual(len(manifest["trials"]), 48)
-            reference = [
-                t for t in manifest["trials"] if t["profile_role"] == "reference"
-            ]
+            reference = [t for t in manifest["trials"] if t["profile_role"] == "reference"]
             self.assertEqual(len(reference), 48)
-            self.assertEqual(
-                len({trial["workspace"] for trial in manifest["trials"]}), 48
-            )
+            self.assertEqual(len({trial["workspace"] for trial in manifest["trials"]}), 48)
             pairs: dict[str, list[dict]] = {}
             for trial in manifest["trials"]:
                 pairs.setdefault(trial["pair_key"], []).append(trial)
@@ -456,9 +391,7 @@ class EvaluationHarnessTests(unittest.TestCase):
                 self.assertEqual({item["arm"] for item in pair}, {"baseline", "context"})
                 baseline = next(item for item in pair if item["arm"] == "baseline")
                 context = next(item for item in pair if item["arm"] == "context")
-                self.assertEqual(
-                    baseline["controlled_inputs"], context["controlled_inputs"]
-                )
+                self.assertEqual(baseline["controlled_inputs"], context["controlled_inputs"])
                 self.assertEqual(baseline["repository"], context["repository"])
                 for item in pair:
                     repository = (
@@ -468,16 +401,12 @@ class EvaluationHarnessTests(unittest.TestCase):
                         / "engineering-board"
                         / "d1-evaluation"
                     )
-                    self.assertTrue(
-                        (repository / "hypotheses").is_dir()
-                    )
+                    self.assertTrue((repository / "hypotheses").is_dir())
                 self.assertIsNone(baseline["context_brief"])
                 self.assertIsNotNone(context["context_brief"])
                 self.assertIn("context_fingerprint", context["context_brief"])
                 self.assertIn("results", context["context_brief"])
-                self.assertNotIn(
-                    "expected_relevant_memory", context["context_brief"]
-                )
+                self.assertNotIn("expected_relevant_memory", context["context_brief"])
                 self.assertNotIn("rejected_memories", context["context_brief"])
 
     def test_prepare_refuses_existing_or_linked_output(self) -> None:
@@ -503,7 +432,6 @@ class EvaluationHarnessTests(unittest.TestCase):
                     linked / "run",
                 )
 
-
     def test_load_rejects_linked_run_and_tampered_evidence(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-integrity-") as temp:
             base = Path(temp)
@@ -516,13 +444,12 @@ class EvaluationHarnessTests(unittest.TestCase):
             manifest = load_run(run_dir)
             trial = manifest["trials"][0]
             workspace = run_dir / trial["workspace"]
-            trial_input = json.loads(
-                (workspace / "input.json").read_text(encoding="utf-8")
-            )
+            trial_input = json.loads((workspace / "input.json").read_text(encoding="utf-8"))
             evidence_path = workspace / trial_input["evidence"][0]["path"]
             evidence_path.write_text("tampered\n", encoding="utf-8")
             with self.assertRaisesRegex(EvaluationError, "evidence fingerprint"):
                 load_run(run_dir)
+
     def test_record_enforces_scored_retry_and_one_replacement(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-retry-") as temp:
             run_dir = self.prepare(Path(temp))
@@ -570,9 +497,7 @@ class EvaluationHarnessTests(unittest.TestCase):
             manifest = load_run(run_dir)
             trial = next(t for t in manifest["trials"] if t["arm"] == "context")
             case = next(c for c in manifest["corpus"]["cases"] if c["id"] == trial["case_id"])
-            result = self.scored_attempt(
-                trial, case, context_fingerprint="ctx-wrong-fingerprint"
-            )
+            result = self.scored_attempt(trial, case, context_fingerprint="ctx-wrong-fingerprint")
             with self.assertRaisesRegex(EvaluationError, "context fingerprint"):
                 record_attempt(run_dir, trial["trial_key"], result)
 
@@ -607,9 +532,7 @@ class EvaluationHarnessTests(unittest.TestCase):
                     "tools_sha256",
                 ],
             }
-            contracts_path.write_text(
-                json.dumps(contracts, indent=2) + "\n", encoding="utf-8"
-            )
+            contracts_path.write_text(json.dumps(contracts, indent=2) + "\n", encoding="utf-8")
             run_dir = base / "run"
             prepare_run(
                 ROOT,
@@ -630,9 +553,7 @@ class EvaluationHarnessTests(unittest.TestCase):
                 )
             score = score_run(run_dir)
             self.assertFalse(score["replications"]["other-client"]["complete"])
-            self.assertEqual(
-                len(score["missing_replication_arms"]["other-client"]), 16
-            )
+            self.assertEqual(len(score["missing_replication_arms"]["other-client"]), 16)
             self.assertTrue(score["gates"]["outcome_loop_matches"])
             self.assertTrue(score["gates"]["reference_complete"])
             self.assertTrue(score["overall_pass"])
@@ -651,8 +572,7 @@ class EvaluationHarnessTests(unittest.TestCase):
             negative_context = next(
                 trial
                 for trial in manifest["trials"]
-                if trial["arm"] == "context"
-                and trial["category"] == "lexical-decoy"
+                if trial["arm"] == "context" and trial["category"] == "lexical-decoy"
             )
             overrides = {
                 trial["trial_key"]: {
@@ -662,9 +582,7 @@ class EvaluationHarnessTests(unittest.TestCase):
                 }
                 for trial in positive_context[:4]
             }
-            overrides[negative_context["trial_key"]] = {
-                "durable_systemic_conclusion": True
-            }
+            overrides[negative_context["trial_key"]] = {"durable_systemic_conclusion": True}
             self.record_complete_run(run_dir, overrides)
             score = score_run(run_dir)
             self.assertFalse(score["overall_pass"])
@@ -692,7 +610,6 @@ class EvaluationHarnessTests(unittest.TestCase):
             self.assertNotIn("raw_prompt", report)
             self.assertTrue(Path(paths["json"]).is_file())
 
-
     def test_report_refuses_linked_output_without_partial_write(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-report-link-") as temp:
             base = Path(temp)
@@ -704,6 +621,7 @@ class EvaluationHarnessTests(unittest.TestCase):
                 write_report(run_dir)
             self.assertEqual(protected.read_text(encoding="utf-8"), "protected\n")
             self.assertFalse((run_dir / "report.json").exists())
+
     def test_cli_validate_reports_the_corpus_digest(self) -> None:
         result = subprocess.run(
             [

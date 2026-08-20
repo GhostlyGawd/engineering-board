@@ -45,18 +45,57 @@ docker build --no-cache --platform linux/amd64 \
 
 The container uses user `vscode` and workspace
 `/workspaces/engineering-board`. Its post-create command checks the pinned
-inventory. The later quality-gate feature owns the additional stable selector
-commands, so this image does not claim those gates yet.
+inventory.
 
-## Run the test suite
+## Run the stable quality commands
 
-Run the full test suite:
+On macOS or Linux, use these exact repository entry points:
 
 ```sh
+bash scripts/quality-gate.sh format
+bash scripts/quality-gate.sh lint
+bash scripts/quality-gate.sh typecheck
+bash scripts/quality-gate.sh test --workers 2
+bash scripts/quality-gate.sh security
+bash scripts/quality-gate.sh package
+bash scripts/quality-gate.sh all --workers 2
 bash tests/run-all.sh
 ```
 
-The continuous integration (CI) workflow runs this command for each push.
+The `test` selector is the quality test and coverage invocation. There is no
+standalone `coverage` selector. `all --workers 2` is the split-gate aggregate.
+`tests/run-all.sh` remains the supported compatibility aggregate.
+
+On native Windows PowerShell, use:
+
+```powershell
+python scripts/quality_gate.py format
+python scripts/quality_gate.py lint
+python scripts/quality_gate.py typecheck
+python scripts/quality_gate.py test --workers 2
+python scripts/quality_gate.py security
+python scripts/quality_gate.py package
+python scripts/quality_gate.py all --workers 2
+```
+
+From native `cmd.exe`, use the same selectors with the Windows path:
+
+```bat
+python scripts\quality_gate.py format
+python scripts\quality_gate.py lint
+python scripts\quality_gate.py typecheck
+python scripts\quality_gate.py test --workers 2
+python scripts\quality_gate.py security
+python scripts\quality_gate.py package
+python scripts\quality_gate.py all --workers 2
+```
+
+Run `bash scripts/quality-gate.sh --help` or
+`python scripts/quality_gate.py --help` for selector help. Invalid selectors,
+unknown options, missing values, and worker counts outside 1 to 2 fail before
+any stage starts. Git Bash and WSL are compatibility environments. They are
+not native Windows evidence.
+
 Supported host, shell, runtime, and container versions are declared in
 [`support/platform-matrix.json`](support/platform-matrix.json) and documented
 in [`docs/SUPPORTED_PLATFORMS.md`](docs/SUPPORTED_PLATFORMS.md). Native

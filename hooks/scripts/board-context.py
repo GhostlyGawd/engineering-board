@@ -35,11 +35,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.report and args.learning_summary:
         parser.error("--report and --learning-summary are mutually exclusive")
-    limit = (
-        args.limit
-        if args.limit is not None
-        else (10 if args.learning_summary else 3)
-    )
+    limit = args.limit if args.limit is not None else (10 if args.learning_summary else 3)
     board_dir = Path(args.board_dir).resolve()
     if not board_dir.is_dir():
         print(
@@ -48,9 +44,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
     alarm_enabled = bool(
-        args.deadline_seconds
-        and args.deadline_seconds > 0
-        and hasattr(signal, "SIGALRM")
+        args.deadline_seconds and args.deadline_seconds > 0 and hasattr(signal, "SIGALRM")
     )
     if alarm_enabled:
         signal.signal(
@@ -106,8 +100,7 @@ def main(argv: list[str] | None = None) -> int:
         ]
         if matches:
             rendered = "; ".join(
-                f"{item['id']} [{item['confidence']}] - "
-                f"{str(item['title']).replace(';', ',')}"
+                f"{item['id']} [{item['confidence']}] - {str(item['title']).replace(';', ',')}"
                 for item in matches
             )
             print(f"Matched Learnings: {rendered}")

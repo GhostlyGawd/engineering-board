@@ -10,13 +10,18 @@ FAIL=0
 check() {
   local label="$1" needle="$2"
   if grep -qF -- "$needle" "$CMD"; then
-    printf "  [PASS] %s\n" "$label"; PASS=$((PASS + 1))
+    printf "  [PASS] %s\n" "$label"
+    PASS=$((PASS + 1))
   else
-    printf "  [FAIL] %s\n" "$label"; FAIL=$((FAIL + 1))
+    printf "  [FAIL] %s\n" "$label"
+    FAIL=$((FAIL + 1))
   fi
 }
 
-[ -f "$CMD" ] || { echo "MISSING FILE: $CMD" >&2; exit 1; }
+[ -f "$CMD" ] || {
+  echo "MISSING FILE: $CMD" >&2
+  exit 1
+}
 check "frontmatter description" "description:"
 check "frontmatter argument hint" "argument-hint: [--clean <run-id>]"
 check "creates through deterministic script" 'board-demo.sh" create'

@@ -123,11 +123,7 @@ def _parse_scalar(value: str) -> Any:
         inner = value[1:-1].strip()
         if not inner:
             return []
-        return [
-            item.strip().strip("'\"")
-            for item in inner.split(",")
-            if item.strip()
-        ]
+        return [item.strip().strip("'\"") for item in inner.split(",") if item.strip()]
     if value in {"null", "~"}:
         return None
     return value.strip("'\"")
@@ -148,9 +144,7 @@ def parse_frontmatter(text: str, source: str) -> tuple[dict[str, Any], str]:
         if not line.strip() or line.lstrip().startswith("#"):
             continue
         if ":" not in line:
-            raise GraphError(
-                f"{source}:{line_number}: malformed frontmatter line"
-            )
+            raise GraphError(f"{source}:{line_number}: malformed frontmatter line")
         key, value = line.split(":", 1)
         key = key.strip()
         if not key:
@@ -202,15 +196,10 @@ def load_pattern_registry(board_dir: Path) -> dict[str, Any]:
             raise GraphError(f"{relative}: unable to read: {exc}") from exc
         frontmatter, body = parse_frontmatter(text, relative)
         missing = [
-            key
-            for key in ("id", "type", "status", "label", "created")
-            if not frontmatter.get(key)
+            key for key in ("id", "type", "status", "label", "created") if not frontmatter.get(key)
         ]
         if missing:
-            raise GraphError(
-                f"{relative}: missing required pattern field(s): "
-                f"{', '.join(missing)}"
-            )
+            raise GraphError(f"{relative}: missing required pattern field(s): {', '.join(missing)}")
         pattern_id = str(frontmatter["id"])
         if not SAFE_PATTERN_ID.fullmatch(pattern_id):
             raise GraphError(f"{relative}: unsafe pattern id {pattern_id!r}")
@@ -223,9 +212,7 @@ def load_pattern_registry(board_dir: Path) -> dict[str, Any]:
             raise GraphError(f"{relative}: type must be 'pattern'")
         status = str(frontmatter["status"])
         if status not in PATTERN_STATUSES:
-            raise GraphError(
-                f"{relative}: invalid pattern status {status!r}"
-            )
+            raise GraphError(f"{relative}: invalid pattern status {status!r}")
         label = normalize_pattern_label(str(frontmatter["label"]))
         if not label:
             raise GraphError(f"{relative}: label normalizes to an empty value")
@@ -265,35 +252,26 @@ def load_pattern_registry(board_dir: Path) -> dict[str, Any]:
         if record["status"] == "merged":
             if not SAFE_PATTERN_ID.fullmatch(target) or target not in by_id:
                 raise GraphError(
-                    f"{record['source']}: merged pattern requires an existing "
-                    "merged_into P###"
+                    f"{record['source']}: merged pattern requires an existing merged_into P###"
                 )
             if target == pattern_id:
-                raise GraphError(
-                    f"{record['source']}: pattern cannot merge into itself"
-                )
+                raise GraphError(f"{record['source']}: pattern cannot merge into itself")
         elif target:
-            raise GraphError(
-                f"{record['source']}: merged_into requires status: merged"
-            )
+            raise GraphError(f"{record['source']}: merged_into requires status: merged")
 
     for start in sorted(by_id):
         seen: set[str] = set()
         current = start
         while by_id[current]["status"] == "merged":
             if current in seen:
-                raise GraphError(
-                    f"{by_id[start]['source']}: pattern merge cycle detected"
-                )
+                raise GraphError(f"{by_id[start]['source']}: pattern merge cycle detected")
             seen.add(current)
             current = str(by_id[current]["merged_into"])
 
     return {"by_id": by_id, "by_token": by_token, "sources": sources}
 
 
-def _resolved_pattern_id(
-    pattern_id: str, registry: dict[str, Any]
-) -> tuple[str, str]:
+def _resolved_pattern_id(pattern_id: str, registry: dict[str, Any]) -> tuple[str, str]:
     """Resolve a canonical or merged pattern id to its durable active target."""
     by_id = registry["by_id"]
     if pattern_id not in by_id:
@@ -342,16 +320,10 @@ def resolve_entry_patterns(
             continue
         matched_id = registry["by_token"].get(label)
         if matched_id:
-            pattern_id, merged_resolution = _resolved_pattern_id(
-                matched_id, registry
-            )
+            pattern_id, merged_resolution = _resolved_pattern_id(matched_id, registry)
             record = registry["by_id"][pattern_id]
             direct_record = registry["by_id"][matched_id]
-            resolution = (
-                "exact-label"
-                if label == direct_record["label"]
-                else "alias"
-            )
+            resolution = "exact-label" if label == direct_record["label"] else "alias"
             if merged_resolution == "merged-id":
                 resolution = "merged-alias"
             item = resolved.setdefault(
@@ -364,9 +336,7 @@ def resolve_entry_patterns(
                     "source_field": "pattern",
                 },
             )
-            item["observed_labels"] = sorted(
-                set(item["observed_labels"]) | {label}
-            )
+            item["observed_labels"] = sorted(set(item["observed_labels"]) | {label})
             continue
         legacy_id = f"legacy:{label}"
         resolved[legacy_id] = {
@@ -451,9 +421,7 @@ def _find_entry_path(board_dir: Path, entry_id: str) -> Path:
         if path.is_file()
     ]
     if len(matches) != 1:
-        raise GraphError(
-            f"entry {entry_id} not found uniquely on the selected board"
-        )
+        raise GraphError(f"entry {entry_id} not found uniquely on the selected board")
     path = matches[0]
     if path.is_symlink():
         raise GraphError(f"{path.name}: linked entry is not mutable")
@@ -471,9 +439,7 @@ def _plan_id(payload: dict[str, Any]) -> str:
     ).hexdigest()
 
 
-def plan_pattern_operation(
-    board_dir: Path, action: str, params: dict[str, Any]
-) -> dict[str, Any]:
+def plan_pattern_operation(board_dir: Path, action: str, params: dict[str, Any]) -> dict[str, Any]:
     """Validate a pattern mutation and bind it to current canonical state."""
     board_dir = board_dir.resolve()
     action = str(action or "").strip()
@@ -488,9 +454,7 @@ def plan_pattern_operation(
             {
                 normalized_alias
                 for raw in _as_list(params.get("aliases"))
-                if (
-                    normalized_alias := normalize_pattern_label(raw)
-                )
+                if (normalized_alias := normalize_pattern_label(raw))
             }
         )
         for token in [label] + aliases:
@@ -499,25 +463,18 @@ def plan_pattern_operation(
                     f"pattern label or alias {token!r} already belongs to "
                     f"{registry['by_token'][token]}"
                 )
-        highest = max(
-            [int(pattern_id[1:]) for pattern_id in registry["by_id"]] or [0]
-        )
+        highest = max([int(pattern_id[1:]) for pattern_id in registry["by_id"]] or [0])
         normalized = {
             "id": f"P{highest + 1:03d}",
             "label": label,
             "aliases": aliases,
-            "definition": _oneline(
-                params.get("definition")
-                or f"Recurring failure mode: {label}."
-            ),
+            "definition": _oneline(params.get("definition") or f"Recurring failure mode: {label}."),
             "inclusion_evidence": _oneline(
                 params.get("inclusion_evidence")
-                or "Assign only when repository evidence identifies this "
-                "failure mode."
+                or "Assign only when repository evidence identifies this failure mode."
             ),
             "exclusions": _oneline(
-                params.get("exclusions")
-                or "Do not assign from surface-language similarity alone."
+                params.get("exclusions") or "Do not assign from surface-language similarity alone."
             ),
         }
     elif action == "alias":
@@ -528,23 +485,16 @@ def plan_pattern_operation(
             raise GraphError("alias requires a non-empty label")
         previous = registry["by_token"].get(alias)
         if previous and previous != pattern_id:
-            raise GraphError(
-                f"pattern alias {alias!r} already belongs to {previous}"
-            )
+            raise GraphError(f"pattern alias {alias!r} already belongs to {previous}")
         normalized = {"pattern_id": target_id, "alias": alias}
     elif action == "assign":
         entry_id = str(params.get("entry_id") or "")
         _find_entry_path(board_dir, entry_id)
-        pattern_id, _ = _resolved_pattern_id(
-            str(params.get("pattern_id") or ""), registry
-        )
+        pattern_id, _ = _resolved_pattern_id(str(params.get("pattern_id") or ""), registry)
         normalized = {
             "entry_id": entry_id,
             "pattern_id": pattern_id,
-            "reason": _oneline(
-                params.get("reason")
-                or "Explicit canonical pattern assignment."
-            ),
+            "reason": _oneline(params.get("reason") or "Explicit canonical pattern assignment."),
         }
     elif action == "correct":
         entry_id = str(params.get("entry_id") or "")
@@ -556,9 +506,7 @@ def plan_pattern_operation(
         )
         reason = _oneline(params.get("reason") or "")
         if not replacement or not reason:
-            raise GraphError(
-                "correct requires replace, with, and a non-empty reason"
-            )
+            raise GraphError("correct requires replace, with, and a non-empty reason")
         normalized = {
             "entry_id": entry_id,
             "replace": replacement,
@@ -566,9 +514,7 @@ def plan_pattern_operation(
             "reason": reason,
         }
     else:
-        raise GraphError(
-            "invalid pattern action; use create, alias, assign, or correct"
-        )
+        raise GraphError("invalid pattern action; use create, alias, assign, or correct")
 
     payload = {
         "action": action,
@@ -595,18 +541,14 @@ def apply_pattern_operation(
     board_dir = board_dir.resolve()
     plan = plan_pattern_operation(board_dir, action, params)
     if plan["plan_id"] != plan_id:
-        raise GraphError(
-            "plan_stale: canonical inputs changed; request a fresh preview"
-        )
+        raise GraphError("plan_stale: canonical inputs changed; request a fresh preview")
     operation = plan["operation"]
     now = _utc_now()
 
     if action == "create":
         patterns_dir = board_dir / "patterns"
         patterns_dir.mkdir(parents=True, exist_ok=True)
-        path = patterns_dir / (
-            f"{operation['id']}-{operation['label']}.md"
-        )
+        path = patterns_dir / (f"{operation['id']}-{operation['label']}.md")
         if path.exists():
             raise GraphError(f"pattern record already exists: {path.name}")
         content = (
@@ -639,22 +581,15 @@ def apply_pattern_operation(
             path = board_dir / record["source"]
             text = path.read_text(encoding="utf-8")
             frontmatter, body = parse_frontmatter(text, record["source"])
-            aliases = sorted(
-                set(_as_list(frontmatter.get("aliases")))
-                | {operation["alias"]}
-            )
+            aliases = sorted(set(_as_list(frontmatter.get("aliases"))) | {operation["alias"]})
             frontmatter["aliases"] = aliases
             history = (
-                body.rstrip()
-                + "\n\n"
-                + f"- {now}: Added alias `{operation['alias']}` through "
+                body.rstrip() + "\n\n" + f"- {now}: Added alias `{operation['alias']}` through "
                 "an explicit apply action.\n"
             )
             _atomic_write(
                 path,
-                serialize_frontmatter(list(frontmatter.items()))
-                + "\n\n"
-                + history.lstrip(),
+                serialize_frontmatter(list(frontmatter.items())) + "\n\n" + history.lstrip(),
             )
             changed.append(record["source"])
         else:
@@ -664,19 +599,14 @@ def apply_pattern_operation(
             frontmatter, body = parse_frontmatter(text, relative)
             pattern_ids = _as_list(frontmatter.get("pattern_ids"))
             if action == "assign":
-                pattern_ids = sorted(
-                    set(pattern_ids) | {operation["pattern_id"]}
-                )
+                pattern_ids = sorted(set(pattern_ids) | {operation["pattern_id"]})
                 history_line = (
-                    f"- {now}: Assigned `{operation['pattern_id']}` — "
-                    f"{operation['reason']}"
+                    f"- {now}: Assigned `{operation['pattern_id']}` — {operation['reason']}"
                 )
             else:
                 replacement = operation["replace"]
                 if SAFE_PATTERN_ID.fullmatch(replacement):
-                    pattern_ids = [
-                        item for item in pattern_ids if item != replacement
-                    ]
+                    pattern_ids = [item for item in pattern_ids if item != replacement]
                 else:
                     replacement_label = normalize_pattern_label(replacement)
                     frontmatter["pattern"] = [
@@ -684,9 +614,7 @@ def apply_pattern_operation(
                         for item in _as_list(frontmatter.get("pattern"))
                         if normalize_pattern_label(item) != replacement_label
                     ]
-                pattern_ids = sorted(
-                    set(pattern_ids) | {operation["with"]}
-                )
+                pattern_ids = sorted(set(pattern_ids) | {operation["with"]})
                 history_line = (
                     f"- {now}: Replaced `{replacement}` with "
                     f"`{operation['with']}` — {operation['reason']}"
@@ -695,23 +623,14 @@ def apply_pattern_operation(
             if "## Pattern history" in body:
                 body = body.rstrip() + "\n" + history_line + "\n"
             else:
-                body = (
-                    body.rstrip()
-                    + "\n\n## Pattern history\n\n"
-                    + history_line
-                    + "\n"
-                )
+                body = body.rstrip() + "\n\n## Pattern history\n\n" + history_line + "\n"
             _atomic_write(
                 path,
-                serialize_frontmatter(list(frontmatter.items()))
-                + "\n\n"
-                + body.lstrip(),
+                serialize_frontmatter(list(frontmatter.items())) + "\n\n" + body.lstrip(),
             )
             changed.append(relative)
 
-    graph, cache_path = build_graph_cached(
-        board_dir, project, _utc_now(), full=True
-    )
+    graph, cache_path = build_graph_cached(board_dir, project, _utc_now(), full=True)
     _atomic_write(
         board_dir / "GRAPH.yml",
         json.dumps(graph, ensure_ascii=False, indent=2) + "\n",
@@ -727,9 +646,7 @@ def apply_pattern_operation(
     }
 
 
-def load_scratch_findings(
-    board_dir: Path, session: str | None = None
-) -> list[dict[str, Any]]:
+def load_scratch_findings(board_dir: Path, session: str | None = None) -> list[dict[str, Any]]:
     """Read extractor JSON and MCP Markdown scratch as untrusted evidence."""
     sessions_dir = board_dir / "_sessions"
     findings: list[dict[str, Any]] = []
@@ -780,8 +697,7 @@ def load_scratch_findings(
                     ).encode("utf-8")
                 ).hexdigest()[:16]
                 item["scratch_id"] = str(
-                    item.get("scratch_id")
-                    or f"scratch:{relative}:{fallback_fingerprint}"
+                    item.get("scratch_id") or f"scratch:{relative}:{fallback_fingerprint}"
                 )
                 findings.append(item)
                 index += 1
@@ -851,9 +767,7 @@ def load_scratch_findings(
     )
 
 
-def plan_promotion(
-    board_dir: Path, project: str, session: str | None = None
-) -> dict[str, Any]:
+def plan_promotion(board_dir: Path, project: str, session: str | None = None) -> dict[str, Any]:
     """Create a no-write, content-bound foreground promotion plan."""
     board_dir = board_dir.resolve()
     findings = load_scratch_findings(board_dir, session)
@@ -879,8 +793,7 @@ def plan_promotion(
         values = [
             int(entry["id"][1:])
             for entry in entries
-            if str(entry.get("type")) == entry_type
-            and str(entry.get("id", "")).startswith(prefix)
+            if str(entry.get("type")) == entry_type and str(entry.get("id", "")).startswith(prefix)
         ]
         counters[prefix] = max(values or [0])
 
@@ -916,9 +829,7 @@ def plan_promotion(
             )
             planned.append(base)
             continue
-        duplicate_id = existing_by_key.get(
-            (entry_type, title.casefold(), affects)
-        )
+        duplicate_id = existing_by_key.get((entry_type, title.casefold(), affects))
         if duplicate_id:
             base.update(
                 {
@@ -932,35 +843,25 @@ def plan_promotion(
         prefix = PROMOTION_TYPES[entry_type][1]
         counters[prefix] += 1
         entry_id = f"{prefix}{counters[prefix]:03d}"
-        pattern_labels = _as_list(
-            finding.get("pattern") or finding.get("patterns")
-        )
+        pattern_labels = _as_list(finding.get("pattern") or finding.get("patterns"))
         proposed_entry = {
             "id": entry_id,
             "type": entry_type,
             "pattern": pattern_labels,
             "_source": finding["_source_file"],
         }
-        resolved, unresolved = resolve_entry_patterns(
-            proposed_entry, registry
-        )
+        resolved, unresolved = resolve_entry_patterns(proposed_entry, registry)
         base.update(
             {
                 "disposition": "create",
                 "entry_id": entry_id,
-                "priority": "P2"
-                if entry_type in {"bug", "feature"}
-                else None,
+                "priority": "P2" if entry_type in {"bug", "feature"} else None,
                 "pattern": pattern_labels,
                 "pattern_ids": [
-                    item["id"]
-                    for item in resolved
-                    if not item["id"].startswith("legacy:")
+                    item["id"] for item in resolved if not item["id"].startswith("legacy:")
                 ],
                 "unresolved_patterns": unresolved,
-                "discovered": _oneline(
-                    finding.get("discovered") or _utc_now()[:10]
-                ),
+                "discovered": _oneline(finding.get("discovered") or _utc_now()[:10]),
                 "evidence": str(finding.get("evidence_quote") or ""),
             }
         )
@@ -977,27 +878,19 @@ def plan_promotion(
         **payload,
         "plan_id": _plan_id(payload),
         "writes_canonical": False,
-        "summary": dict(
-            Counter(item["disposition"] for item in planned)
-        ),
+        "summary": dict(Counter(item["disposition"] for item in planned)),
     }
 
 
-def _write_promoted_entry(
-    board_dir: Path, item: dict[str, Any], now: str
-) -> str:
+def _write_promoted_entry(board_dir: Path, item: dict[str, Any], now: str) -> str:
     """Atomically write one planned canonical entry and return its path."""
     subdir = PROMOTION_TYPES[item["type"]][0]
     directory = board_dir / subdir
     directory.mkdir(parents=True, exist_ok=True)
-    slug = re.sub(
-        r"[^a-z0-9]+", "-", item["title"].casefold()
-    ).strip("-")[:60] or "finding"
+    slug = re.sub(r"[^a-z0-9]+", "-", item["title"].casefold()).strip("-")[:60] or "finding"
     path = directory / f"{item['entry_id']}-{slug}.md"
     if path.exists():
-        raise GraphError(
-            f"plan_stale: target already exists: {path.name}"
-        )
+        raise GraphError(f"plan_stale: target already exists: {path.name}")
     fields: list[tuple[str, Any]] = [
         ("id", item["entry_id"]),
         ("type", item["type"]),
@@ -1037,10 +930,7 @@ def _write_promoted_entry(
             [
                 "## Evidence",
                 "",
-                *[
-                    "> " + line if line else ">"
-                    for line in item["evidence"].splitlines()
-                ],
+                *["> " + line if line else ">" for line in item["evidence"].splitlines()],
                 "",
             ]
         )
@@ -1050,20 +940,14 @@ def _write_promoted_entry(
                 "## Pattern history",
                 "",
                 f"- {now}: Assigned "
-                + ", ".join(
-                    f"`{pattern_id}`"
-                    for pattern_id in item["pattern_ids"]
-                )
+                + ", ".join(f"`{pattern_id}`" for pattern_id in item["pattern_ids"])
                 + " during explicit foreground promotion.",
                 "",
             ]
         )
     _atomic_write(
         path,
-        serialize_frontmatter(fields)
-        + "\n\n"
-        + "\n".join(body_parts).rstrip()
-        + "\n",
+        serialize_frontmatter(fields) + "\n\n" + "\n".join(body_parts).rstrip() + "\n",
     )
     return path.relative_to(board_dir).as_posix()
 
@@ -1081,9 +965,7 @@ def _promotion_plan_for_apply(
         if sessions_dir.is_dir():
             selectors.extend(
                 selector
-                for path in sorted(
-                    sessions_dir.glob("*.md"), key=lambda item: item.name
-                )
+                for path in sorted(sessions_dir.glob("*.md"), key=lambda item: item.name)
                 for selector in (path.name, path.stem)
             )
 
@@ -1098,9 +980,7 @@ def _promotion_plan_for_apply(
             continue
         if candidate["plan_id"] == plan_id:
             return candidate
-    raise GraphError(
-        "plan_stale: scratch or canonical inputs changed; preview again"
-    )
+    raise GraphError("plan_stale: scratch or canonical inputs changed; preview again")
 
 
 def apply_promotion(
@@ -1114,9 +994,7 @@ def apply_promotion(
     board_dir = board_dir.resolve()
     # A plan id binds the exact selector string used during preview. Codex can
     # therefore apply that plan without repeating the optional session input.
-    plan = _promotion_plan_for_apply(
-        board_dir, project, session, plan_id
-    )
+    plan = _promotion_plan_for_apply(board_dir, project, session, plan_id)
     now = _utc_now()
     results: list[dict[str, Any]] = []
     final_by_file: dict[str, list[str]] = {}
@@ -1127,31 +1005,21 @@ def apply_promotion(
         disposition = item["disposition"]
         if disposition == "create":
             try:
-                result["file"] = _write_promoted_entry(
-                    board_dir, item, now
-                )
+                result["file"] = _write_promoted_entry(board_dir, item, now)
                 disposition = "created"
             except OSError as exc:
                 disposition = "deferred"
-                result["reason"] = (
-                    "write_error:"
-                    + _oneline(str(exc))[:160]
-                )
+                result["reason"] = "write_error:" + _oneline(str(exc))[:160]
         receipt = {
             "scratch_id": item["scratch_id"],
             "disposition": (
-                f"promoted_{item['entry_id']}"
-                if disposition == "created"
-                else disposition
+                f"promoted_{item['entry_id']}" if disposition == "created" else disposition
             ),
             "consolidated_at": now,
             "source": item["source_file"],
         }
         with log_path.open("a", encoding="utf-8", newline="\n") as handle:
-            handle.write(
-                json.dumps(receipt, ensure_ascii=False, sort_keys=True)
-                + "\n"
-            )
+            handle.write(json.dumps(receipt, ensure_ascii=False, sort_keys=True) + "\n")
         result["disposition"] = disposition
         results.append(result)
         final_by_file.setdefault(item["source_file"], []).append(disposition)
@@ -1161,8 +1029,7 @@ def apply_promotion(
         archive_dir = board_dir / "_sessions" / "_archive"
         for relative, dispositions in sorted(final_by_file.items()):
             if not dispositions or not all(
-                value in {"created", "deduplicated", "already_applied"}
-                for value in dispositions
+                value in {"created", "deduplicated", "already_applied"} for value in dispositions
             ):
                 continue
             source = board_dir / relative
@@ -1174,9 +1041,7 @@ def apply_promotion(
             os.replace(source, target)
             archived.append(target.relative_to(board_dir).as_posix())
 
-    graph, cache_path = build_graph_cached(
-        board_dir, project, _utc_now(), full=True
-    )
+    graph, cache_path = build_graph_cached(board_dir, project, _utc_now(), full=True)
     _atomic_write(
         board_dir / "GRAPH.yml",
         json.dumps(graph, ensure_ascii=False, indent=2) + "\n",
@@ -1210,21 +1075,16 @@ def load_entries(board_dir: Path) -> list[dict[str, Any]]:
                 raise GraphError(f"{relative}: unable to read: {exc}") from exc
             frontmatter, body = parse_frontmatter(text, relative)
             missing = [
-                key
-                for key in ("id", "type", "title", "discovered")
-                if not frontmatter.get(key)
+                key for key in ("id", "type", "title", "discovered") if not frontmatter.get(key)
             ]
             if missing:
-                raise GraphError(
-                    f"{relative}: missing required field(s): {', '.join(missing)}"
-                )
+                raise GraphError(f"{relative}: missing required field(s): {', '.join(missing)}")
             entry_id = str(frontmatter["id"])
             if not SAFE_ID.fullmatch(entry_id):
                 raise GraphError(f"{relative}: unsafe or unsupported id {entry_id!r}")
             if entry_id in seen_ids:
                 raise GraphError(
-                    f"{relative}: duplicate id {entry_id} also used by "
-                    f"{seen_ids[entry_id]}"
+                    f"{relative}: duplicate id {entry_id} also used by {seen_ids[entry_id]}"
                 )
             seen_ids[entry_id] = relative
             if str(frontmatter.get("status", "open")) == "resolved":
@@ -1242,13 +1102,9 @@ def _affects_domain(value: Any) -> str | None:
 
 
 def _shared_affects_prefix(left: Any, right: Any) -> str | None:
-    left_parts = [
-        part for part in str(left or "").replace("\\", "/").strip("/").split("/")
-        if part
-    ]
+    left_parts = [part for part in str(left or "").replace("\\", "/").strip("/").split("/") if part]
     right_parts = [
-        part for part in str(right or "").replace("\\", "/").strip("/").split("/")
-        if part
+        part for part in str(right or "").replace("\\", "/").strip("/").split("/") if part
     ]
     shared: list[str] = []
     for left_part, right_part in zip(left_parts, right_parts):
@@ -1292,12 +1148,8 @@ def build_edges(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Build stable explicit and shared-signal edges."""
     ids = {str(entry["id"]) for entry in entries}
     edges: list[dict[str, Any]] = []
-    tag_counts = Counter(
-        tag for entry in entries for tag in _as_list(entry.get("tags"))
-    )
-    universal_tags = {
-        tag for tag, count in tag_counts.items() if count > len(entries) / 2
-    }
+    tag_counts = Counter(tag for entry in entries for tag in _as_list(entry.get("tags")))
+    universal_tags = {tag for tag, count in tag_counts.items() if count > len(entries) / 2}
 
     for entry in entries:
         source = str(entry["id"])
@@ -1324,21 +1176,12 @@ def build_edges(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
     for index, left in enumerate(entries):
         for right in entries[index + 1 :]:
             left_id, right_id = str(left["id"]), str(right["id"])
-            left_patterns = {
-                item["id"]: item for item in left.get("_resolved_patterns", [])
-            }
-            right_patterns = {
-                item["id"]: item for item in right.get("_resolved_patterns", [])
-            }
-            shared_pattern_ids = sorted(
-                set(left_patterns) & set(right_patterns)
-            )
+            left_patterns = {item["id"]: item for item in left.get("_resolved_patterns", [])}
+            right_patterns = {item["id"]: item for item in right.get("_resolved_patterns", [])}
+            shared_pattern_ids = sorted(set(left_patterns) & set(right_patterns))
             if shared_pattern_ids:
                 shared_labels = sorted(
-                    {
-                        left_patterns[pattern_id]["label"]
-                        for pattern_id in shared_pattern_ids
-                    }
+                    {left_patterns[pattern_id]["label"] for pattern_id in shared_pattern_ids}
                 )
                 edges.append(
                     _edge(
@@ -1351,9 +1194,7 @@ def build_edges(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
                         evidence=[
                             {
                                 "entry": left_id,
-                                "field": left_patterns[pattern_id][
-                                    "source_field"
-                                ],
+                                "field": left_patterns[pattern_id]["source_field"],
                                 "source": str(left["_source"]),
                             }
                             for pattern_id in shared_pattern_ids
@@ -1361,18 +1202,14 @@ def build_edges(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
                         + [
                             {
                                 "entry": right_id,
-                                "field": right_patterns[pattern_id][
-                                    "source_field"
-                                ],
+                                "field": right_patterns[pattern_id]["source_field"],
                                 "source": str(right["_source"]),
                             }
                             for pattern_id in shared_pattern_ids
                         ],
                     )
                 )
-            affects_prefix = _shared_affects_prefix(
-                left.get("affects"), right.get("affects")
-            )
+            affects_prefix = _shared_affects_prefix(left.get("affects"), right.get("affects"))
             if affects_prefix:
                 edges.append(
                     _edge(
@@ -1396,10 +1233,7 @@ def build_edges(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     )
                 )
             shared_tags = sorted(
-                (
-                    set(_as_list(left.get("tags")))
-                    & set(_as_list(right.get("tags")))
-                )
+                (set(_as_list(left.get("tags"))) & set(_as_list(right.get("tags"))))
                 - universal_tags
             )
             if shared_tags:
@@ -1434,14 +1268,11 @@ def build_edges(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if previous is None or edge["weight"] > previous["weight"]:
             unique[key] = edge
         elif edge["weight"] == previous["weight"]:
-            values = sorted(
-                set(previous["value"].split(", ")) | set(edge["value"].split(", "))
-            )
+            values = sorted(set(previous["value"].split(", ")) | set(edge["value"].split(", ")))
             previous["value"] = ", ".join(values)
             if edge.get("pattern_ids"):
                 previous["pattern_ids"] = sorted(
-                    set(previous.get("pattern_ids", []))
-                    | set(edge["pattern_ids"])
+                    set(previous.get("pattern_ids", [])) | set(edge["pattern_ids"])
                 )
             if edge.get("evidence"):
                 combined = {
@@ -1452,9 +1283,7 @@ def build_edges(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     ): item
                     for item in previous.get("evidence", []) + edge["evidence"]
                 }
-                previous["evidence"] = [
-                    combined[key] for key in sorted(combined)
-                ]
+                previous["evidence"] = [combined[key] for key in sorted(combined)]
     return sorted(
         unique.values(),
         key=lambda edge: (
@@ -1468,7 +1297,7 @@ def build_edges(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def _components(node_ids: list[str], edges: list[dict[str, Any]]) -> list[list[str]]:
-    adjacency = {node_id: set() for node_id in node_ids}
+    adjacency: dict[str, set[str]] = {node_id: set() for node_id in node_ids}
     for edge in edges:
         adjacency[edge["from"]].add(edge["to"])
         adjacency[edge["to"]].add(edge["from"])
@@ -1503,9 +1332,7 @@ def build_clusters(
             continue
         member_set = set(members)
         internal = [
-            edge
-            for edge in edges
-            if edge["from"] in member_set and edge["to"] in member_set
+            edge for edge in edges if edge["from"] in member_set and edge["to"] in member_set
         ]
         pair_count = len({(edge["from"], edge["to"]) for edge in internal})
         possible = len(members) * (len(members) - 1) / 2
@@ -1513,18 +1340,14 @@ def build_clusters(
             {
                 pattern["id"]
                 for member in members
-                for pattern in entry_by_id[member].get(
-                    "_resolved_patterns", []
-                )
+                for pattern in entry_by_id[member].get("_resolved_patterns", [])
             }
         )
         patterns = sorted(
             {
                 pattern["label"]
                 for member in members
-                for pattern in entry_by_id[member].get(
-                    "_resolved_patterns", []
-                )
+                for pattern in entry_by_id[member].get("_resolved_patterns", [])
             }
         )
         domains = sorted(
@@ -1552,8 +1375,7 @@ def build_clusters(
                     {
                         pattern_id
                         for edge in internal
-                        if edge["kind"] == kind
-                        and value in edge["value"].split(", ")
+                        if edge["kind"] == kind and value in edge["value"].split(", ")
                         for pattern_id in edge.get("pattern_ids", [])
                     }
                 )
@@ -1625,9 +1447,7 @@ def build_graph(
                 node[key] = values
         resolved_patterns = entry.get("_resolved_patterns", [])
         if resolved_patterns:
-            node["pattern_ids"] = [
-                item["id"] for item in resolved_patterns
-            ]
+            node["pattern_ids"] = [item["id"] for item in resolved_patterns]
             node["resolved_patterns"] = resolved_patterns
         nodes[str(entry["id"])] = node
 
@@ -1653,8 +1473,7 @@ def build_graph(
                     {
                         (edge["from"], edge["to"])
                         for edge in edges
-                        if edge["from"] in cluster["members"]
-                        and edge["to"] in cluster["members"]
+                        if edge["from"] in cluster["members"] and edge["to"] in cluster["members"]
                     }
                 ),
             }
@@ -1698,9 +1517,7 @@ def build_graph(
         ),
         "findings": findings,
         "read_order": [cluster["id"] for cluster in clusters] + isolated,
-        "drill_in": {
-            cluster["id"]: cluster["members"] for cluster in clusters
-        },
+        "drill_in": {cluster["id"]: cluster["members"] for cluster in clusters},
     }
 
 
@@ -1712,14 +1529,12 @@ def _atomic_write(path: Path, content: str) -> None:
 
 
 def _utc_now() -> str:
-    return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace(
-        "+00:00", "Z"
+    return (
+        dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     )
 
 
-def _bounded_text(
-    value: Any, field: str, maximum: int, *, required: bool = True
-) -> str:
+def _bounded_text(value: Any, field: str, maximum: int, *, required: bool = True) -> str:
     text = "" if value is None else _oneline(value)
     if required and not text:
         raise GraphError(f"{field} is required")
@@ -1743,18 +1558,11 @@ def _parse_sections(body: str, source: str) -> dict[str, str]:
             raise GraphError(f"{source}: content appears before the first section")
     missing = [name for name in HYPOTHESIS_SECTIONS if name not in sections]
     if missing:
-        raise GraphError(
-            f"{source}: missing required section(s): {', '.join(missing)}"
-        )
-    return {
-        name: "\n".join(lines).strip()
-        for name, lines in sections.items()
-    }
+        raise GraphError(f"{source}: missing required section(s): {', '.join(missing)}")
+    return {name: "\n".join(lines).strip() for name, lines in sections.items()}
 
 
-def _hypothesis_inventory_fingerprint(
-    board_dir: Path, paths: list[Path] | None = None
-) -> str:
+def _hypothesis_inventory_fingerprint(board_dir: Path, paths: list[Path] | None = None) -> str:
     digest = hashlib.sha256()
     hypotheses_dir = board_dir / "hypotheses"
     if paths is None:
@@ -1819,8 +1627,7 @@ def load_hypothesis_registry(board_dir: Path) -> dict[str, Any]:
         missing = [key for key in required if not frontmatter.get(key)]
         if missing:
             raise GraphError(
-                f"{relative}: missing required hypothesis field(s): "
-                + ", ".join(missing)
+                f"{relative}: missing required hypothesis field(s): " + ", ".join(missing)
             )
         hypothesis_id = str(frontmatter["id"])
         if not SAFE_HYPOTHESIS_ID.fullmatch(hypothesis_id):
@@ -1837,20 +1644,13 @@ def load_hypothesis_registry(board_dir: Path) -> dict[str, Any]:
             raise GraphError(f"{relative}: invalid claim_key {claim_key!r}")
         claim_fingerprint = str(frontmatter["claim_fingerprint"])
         if not SAFE_CLAIM_FINGERPRINT.fullmatch(claim_fingerprint):
-            raise GraphError(
-                f"{relative}: invalid claim_fingerprint {claim_fingerprint!r}"
-            )
+            raise GraphError(f"{relative}: invalid claim_fingerprint {claim_fingerprint!r}")
         cluster_fingerprint = str(frontmatter["cluster_fingerprint"])
         if not SAFE_CLUSTER_FINGERPRINT.fullmatch(cluster_fingerprint):
-            raise GraphError(
-                f"{relative}: invalid cluster_fingerprint "
-                f"{cluster_fingerprint!r}"
-            )
+            raise GraphError(f"{relative}: invalid cluster_fingerprint {cluster_fingerprint!r}")
         graph_fingerprint = str(frontmatter["graph_source_fingerprint"])
         if not SAFE_SOURCE_FINGERPRINT.fullmatch(graph_fingerprint):
-            raise GraphError(
-                f"{relative}: invalid graph_source_fingerprint"
-            )
+            raise GraphError(f"{relative}: invalid graph_source_fingerprint")
         confidence = str(frontmatter["confidence"])
         if confidence not in {"low", "medium", "high"}:
             raise GraphError(f"{relative}: invalid confidence {confidence!r}")
@@ -1859,13 +1659,10 @@ def load_hypothesis_registry(board_dir: Path) -> dict[str, Any]:
             raise GraphError(f"{relative}: invalid pattern_ids")
         if claim_fingerprint != _claim_fingerprint(claim_key, pattern_ids):
             raise GraphError(
-                f"{relative}: claim_fingerprint does not match claim_key "
-                "and pattern_ids"
+                f"{relative}: claim_fingerprint does not match claim_key and pattern_ids"
             )
         derived_from = _as_list(frontmatter["derived_from"])
-        if not derived_from or any(
-            not SAFE_EVIDENCE_ID.fullmatch(item) for item in derived_from
-        ):
+        if not derived_from or any(not SAFE_EVIDENCE_ID.fullmatch(item) for item in derived_from):
             raise GraphError(f"{relative}: invalid derived_from evidence ids")
         try:
             revision = int(str(frontmatter["revision"]))
@@ -1892,23 +1689,15 @@ def load_hypothesis_registry(board_dir: Path) -> dict[str, Any]:
         }
         by_id[hypothesis_id] = record
         by_claim.setdefault(claim_fingerprint, []).append(hypothesis_id)
-    duplicate_claims = {
-        fingerprint: ids
-        for fingerprint, ids in by_claim.items()
-        if len(ids) > 1
-    }
+    duplicate_claims = {fingerprint: ids for fingerprint, ids in by_claim.items() if len(ids) > 1}
     if duplicate_claims:
         fingerprint, ids = sorted(duplicate_claims.items())[0]
         raise GraphError(
-            "duplicate hypothesis claim fingerprint "
-            f"{fingerprint}: {', '.join(sorted(ids))}"
+            f"duplicate hypothesis claim fingerprint {fingerprint}: {', '.join(sorted(ids))}"
         )
     return {
         "by_id": by_id,
-        "by_claim": {
-            fingerprint: sorted(ids)
-            for fingerprint, ids in sorted(by_claim.items())
-        },
+        "by_claim": {fingerprint: sorted(ids) for fingerprint, ids in sorted(by_claim.items())},
         "fingerprint": _hypothesis_inventory_fingerprint(board_dir, paths),
     }
 
@@ -1925,8 +1714,7 @@ def list_hypotheses(board_dir: Path, project: str) -> dict[str, Any]:
             merged_from.setdefault(target, []).append(hypothesis_id)
     hypotheses: list[dict[str, Any]] = []
     cluster_fingerprints = {
-        str(cluster.get("fingerprint"))
-        for cluster in graph.get("topology", {}).get("clusters", [])
+        str(cluster.get("fingerprint")) for cluster in graph.get("topology", {}).get("clusters", [])
     }
     for hypothesis_id, record in sorted(registry["by_id"].items()):
         frontmatter = record["frontmatter"]
@@ -1938,29 +1726,21 @@ def list_hypotheses(board_dir: Path, project: str) -> dict[str, Any]:
                 "claim_key": record["claim_key"],
                 "claim_fingerprint": record["claim_fingerprint"],
                 "cluster_fingerprint": record["cluster_fingerprint"],
-                "graph_source_fingerprint": record[
-                    "graph_source_fingerprint"
-                ],
+                "graph_source_fingerprint": record["graph_source_fingerprint"],
                 "pattern_ids": sorted(_as_list(frontmatter.get("pattern_ids"))),
                 "confidence": str(frontmatter["confidence"]),
                 "derived_from": record["derived_from"],
-                "affected_domains": sorted(
-                    _as_list(frontmatter.get("affected_domains"))
-                ),
+                "affected_domains": sorted(_as_list(frontmatter.get("affected_domains"))),
                 "supersedes": sorted(_as_list(frontmatter.get("supersedes"))),
-                "split_claim_keys": sorted(
-                    _as_list(frontmatter.get("split_claim_keys"))
-                ),
+                "split_claim_keys": sorted(_as_list(frontmatter.get("split_claim_keys"))),
                 "merged_into": frontmatter.get("merged_into"),
                 "merged_from": sorted(merged_from.get(hypothesis_id, [])),
                 "created": str(frontmatter["created"]),
                 "last_evaluated": str(frontmatter["last_evaluated"]),
                 "revision": int(str(frontmatter["revision"])),
                 "stale": (
-                    record["graph_source_fingerprint"]
-                    != graph["source_fingerprint"]
-                    or record["cluster_fingerprint"]
-                    not in cluster_fingerprints
+                    record["graph_source_fingerprint"] != graph["source_fingerprint"]
+                    or record["cluster_fingerprint"] not in cluster_fingerprints
                 ),
                 "source": record["source"],
             }
@@ -2005,8 +1785,7 @@ def rank_clusters(graph: dict[str, Any]) -> dict[str, Any]:
         )
         diversity = min(len(domains), 5) * 5
         severity = max(
-            [severity_points.get(str(node.get("priority", "")), 0) for node in member_nodes]
-            or [0]
+            [severity_points.get(str(node.get("priority", "")), 0) for node in member_nodes] or [0]
         )
         member_dates = [
             parsed
@@ -2019,21 +1798,11 @@ def rank_clusters(graph: dict[str, Any]) -> dict[str, Any]:
             age = (reference_date - newest).days
             recency = 15 if age <= 7 else 10 if age <= 30 else 5 if age <= 90 else 0
         elif members:
-            warnings.append(
-                f"{cluster.get('fingerprint')}: missing valid discovered dates"
-            )
-        canonical_count = sum(
-            1 for node in member_nodes if _as_list(node.get("pattern_ids"))
-        )
-        canonical_points = (
-            (10 * canonical_count) // len(members) if members else 0
-        )
+            warnings.append(f"{cluster.get('fingerprint')}: missing valid discovered dates")
+        canonical_count = sum(1 for node in member_nodes if _as_list(node.get("pattern_ids")))
+        canonical_points = (10 * canonical_count) // len(members) if members else 0
         signal_kinds = sorted(
-            {
-                str(signal.get("kind"))
-                for signal in cluster.get("signals", [])
-                if signal.get("kind")
-            }
+            {str(signal.get("kind")) for signal in cluster.get("signals", []) if signal.get("kind")}
         )
         evidence_quality = canonical_points + (5 if len(signal_kinds) >= 2 else 0)
         components = {
@@ -2049,8 +1818,7 @@ def rank_clusters(graph: dict[str, Any]) -> dict[str, Any]:
                 "cluster_fingerprint": cluster.get("fingerprint"),
                 "members": members,
                 "member_sources": {
-                    member: str(nodes.get(member, {}).get("source", ""))
-                    for member in members
+                    member: str(nodes.get(member, {}).get("source", "")) for member in members
                 },
                 "pattern_ids": sorted(cluster.get("pattern_ids", [])),
                 "patterns": sorted(cluster.get("patterns", [])),
@@ -2066,8 +1834,7 @@ def rank_clusters(graph: dict[str, Any]) -> dict[str, Any]:
                             priority
                             for priority in ("P0", "P1", "P2", "P3")
                             if any(
-                                str(node.get("priority", "")) == priority
-                                for node in member_nodes
+                                str(node.get("priority", "")) == priority for node in member_nodes
                             )
                         ),
                         None,
@@ -2081,9 +1848,7 @@ def rank_clusters(graph: dict[str, Any]) -> dict[str, Any]:
     ranked.sort(key=lambda item: (-item["score"], item["cluster_fingerprint"]))
     return {
         "ranking_rule_version": RANKING_RULE_VERSION,
-        "reference_discovered": (
-            reference_date.isoformat() if reference_date else None
-        ),
+        "reference_discovered": (reference_date.isoformat() if reference_date else None),
         "ranked_clusters": ranked,
         "warnings": sorted(set(warnings)),
     }
@@ -2105,9 +1870,7 @@ def build_insights(
         if not SAFE_CLUSTER_FINGERPRINT.fullmatch(cluster_fingerprint):
             raise GraphError("invalid cluster fingerprint")
         clusters = [
-            cluster
-            for cluster in clusters
-            if cluster["cluster_fingerprint"] == cluster_fingerprint
+            cluster for cluster in clusters if cluster["cluster_fingerprint"] == cluster_fingerprint
         ]
         if not clusters:
             raise GraphError(f"cluster not found: {cluster_fingerprint}")
@@ -2125,11 +1888,9 @@ def build_insights(
             "claim_fingerprint": record["claim_fingerprint"],
             "cluster_fingerprint": record["cluster_fingerprint"],
             "stale": (
-                record["graph_source_fingerprint"]
-                != graph["source_fingerprint"]
+                record["graph_source_fingerprint"] != graph["source_fingerprint"]
                 or not any(
-                    cluster.get("fingerprint")
-                    == record["cluster_fingerprint"]
+                    cluster.get("fingerprint") == record["cluster_fingerprint"]
                     for cluster in graph.get("topology", {}).get("clusters", [])
                 )
             ),
@@ -2139,9 +1900,7 @@ def build_insights(
         if record["status"] == "rejected":
             negative_memory.append(summary)
     for cluster in clusters:
-        cluster["hypothesis_refs"] = references.get(
-            cluster["cluster_fingerprint"], []
-        )
+        cluster["hypothesis_refs"] = references.get(cluster["cluster_fingerprint"], [])
     return {
         "project": project,
         "graph_source_fingerprint": graph["source_fingerprint"],
@@ -2173,14 +1932,10 @@ def _load_all_entries(board_dir: Path) -> list[dict[str, Any]]:
                 raise GraphError(f"{relative}: unsafe or unreadable entry") from exc
             frontmatter, body = parse_frontmatter(text, relative)
             missing = [
-                key
-                for key in ("id", "type", "title", "discovered")
-                if not frontmatter.get(key)
+                key for key in ("id", "type", "title", "discovered") if not frontmatter.get(key)
             ]
             if missing:
-                raise GraphError(
-                    f"{relative}: missing required field(s): {', '.join(missing)}"
-                )
+                raise GraphError(f"{relative}: missing required field(s): {', '.join(missing)}")
             entry_id = str(frontmatter["id"])
             if not SAFE_ID.fullmatch(entry_id):
                 raise GraphError(f"{relative}: unsafe or unsupported id {entry_id!r}")
@@ -2287,9 +2042,7 @@ def _memory_source_fingerprint(
     learning_fingerprint: str,
 ) -> str:
     return hashlib.sha256(
-        "\0".join(
-            (graph_fingerprint, hypothesis_fingerprint, learning_fingerprint)
-        ).encode("utf-8")
+        "\0".join((graph_fingerprint, hypothesis_fingerprint, learning_fingerprint)).encode("utf-8")
     ).hexdigest()
 
 
@@ -2332,12 +2085,8 @@ def _path_has_segment_overlap(left: str, right: str) -> bool:
 
 def _path_is_in_scope(path: str, scope: str) -> bool:
     """Return true when a repository path is inside the declared scope."""
-    path_parts = [
-        part.casefold() for part in path.replace("\\", "/").split("/") if part
-    ]
-    scope_parts = [
-        part.casefold() for part in scope.replace("\\", "/").split("/") if part
-    ]
+    path_parts = [part.casefold() for part in path.replace("\\", "/").split("/") if part]
+    scope_parts = [part.casefold() for part in scope.replace("\\", "/").split("/") if part]
     if not path_parts or not scope_parts or len(scope_parts) > len(path_parts):
         return False
     return path_parts[: len(scope_parts)] == scope_parts
@@ -2356,9 +2105,7 @@ def _bounded_context_text(value: Any, maximum: int) -> str:
     return _oneline(value)[:maximum]
 
 
-def _graph_distance(
-    graph: dict[str, Any], starts: set[str], targets: set[str]
-) -> int | None:
+def _graph_distance(graph: dict[str, Any], starts: set[str], targets: set[str]) -> int | None:
     if starts & targets:
         return 0
     adjacency: dict[str, set[str]] = {}
@@ -2384,16 +2131,14 @@ def _graph_distance(
 
 
 def _encode_context_token(payload: dict[str, Any]) -> str:
-    raw_payload = json.dumps(
-        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    )
+    raw_payload = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     envelope = {
         "payload": payload,
         "checksum": hashlib.sha256(raw_payload.encode("utf-8")).hexdigest(),
     }
-    raw = json.dumps(
-        envelope, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode("utf-8")
+    raw = json.dumps(envelope, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
     return base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
 
 
@@ -2408,12 +2153,11 @@ def _decode_context_token(token: str) -> dict[str, Any]:
         checksum = envelope["checksum"]
     except (ValueError, KeyError, TypeError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise GraphError("invalid context token") from exc
-    canonical = json.dumps(
-        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    )
-    if not isinstance(payload, dict) or checksum != hashlib.sha256(
-        canonical.encode("utf-8")
-    ).hexdigest():
+    canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    if (
+        not isinstance(payload, dict)
+        or checksum != hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    ):
         raise GraphError("invalid context token checksum")
     return payload
 
@@ -2457,9 +2201,7 @@ def build_context(
         files = []
     if not isinstance(files, list) or len(files) > 100:
         raise GraphError("files must be a list with at most 100 paths")
-    normalized_files = sorted(
-        {_normalize_context_path(value, "files") for value in files}
-    )
+    normalized_files = sorted({_normalize_context_path(value, "files") for value in files})
     if entry_ids is None:
         entry_ids = []
     if not isinstance(entry_ids, list) or len(entry_ids) > 50:
@@ -2475,9 +2217,7 @@ def build_context(
             if cwd_path.is_absolute():
                 cwd_relative = cwd_path.resolve().relative_to(repository_root.resolve()).as_posix()
             else:
-                cwd_relative = _normalize_context_path(
-                    str(cwd), "cwd", allow_root=True
-                )
+                cwd_relative = _normalize_context_path(str(cwd), "cwd", allow_root=True)
         except (OSError, ValueError) as exc:
             raise GraphError("cwd must be inside the repository") from exc
     if not task.strip() and not normalized_files and not normalized_entry_ids and not cwd_relative:
@@ -2523,9 +2263,7 @@ def build_context(
     if cwd_relative:
         context_paths.append(cwd_relative)
     context_paths.extend(
-        _normalize_context_path(
-            entries_by_id[entry_id].get("affects"), "entry affects"
-        )
+        _normalize_context_path(entries_by_id[entry_id].get("affects"), "entry affects")
         for entry_id in normalized_entry_ids
         if str(entries_by_id[entry_id].get("affects") or "").strip()
     )
@@ -2539,35 +2277,22 @@ def build_context(
     }
 
     candidates: list[dict[str, Any]] = []
-    ranked_by_fp = {
-        str(item["cluster_fingerprint"]): item
-        for item in ranking["ranked_clusters"]
-    }
+    ranked_by_fp = {str(item["cluster_fingerprint"]): item for item in ranking["ranked_clusters"]}
     for cluster_fp, cluster in sorted(ranked_by_fp.items()):
         pattern_ids = set(cluster.get("pattern_ids", []))
-        pattern_labels = sorted(
-            {str(value) for value in cluster.get("patterns", []) if str(value)}
-        )
+        pattern_labels = sorted({str(value) for value in cluster.get("patterns", []) if str(value)})
         members = set(cluster.get("members", []))
         affected_domains = sorted(
-            {
-                str(value)
-                for value in cluster.get("affected_domains", [])
-                if str(value)
-            }
+            {str(value) for value in cluster.get("affected_domains", []) if str(value)}
         )
         summary_parts = []
         if pattern_ids:
             summary_parts.append("Pattern IDs: " + ", ".join(sorted(pattern_ids)))
         if pattern_labels:
-            summary_parts.append(
-                "Normalized patterns: " + ", ".join(pattern_labels)
-            )
+            summary_parts.append("Normalized patterns: " + ", ".join(pattern_labels))
         summary_parts.append("Members: " + ", ".join(sorted(members)))
         if affected_domains:
-            summary_parts.append(
-                "Affected domains: " + ", ".join(affected_domains)
-            )
+            summary_parts.append("Affected domains: " + ", ".join(affected_domains))
         candidates.append(
             {
                 "kind": "cluster",
@@ -2589,9 +2314,7 @@ def build_context(
                     CONTEXT_SUMMARY_LIMIT,
                 ),
                 "texts": pattern_labels,
-                "source_refs": sorted(
-                    set(cluster.get("member_sources", {}).values())
-                ),
+                "source_refs": sorted(set(cluster.get("member_sources", {}).values())),
             }
         )
     cluster_fps = set(ranked_by_fp)
@@ -2626,7 +2349,8 @@ def build_context(
                     record["claim_key"],
                     record["sections"].get("Proposed root cause", ""),
                 ],
-                "source_refs": [record["source"]] + [
+                "source_refs": [record["source"]]
+                + [
                     str(entries_by_id.get(item, {}).get("_source") or "")
                     for item in record["derived_from"]
                 ],
@@ -2645,9 +2369,7 @@ def build_context(
                 "status": record["outcome_status"],
                 "stale": False,
                 "pattern_ids": learning_patterns,
-                "pattern_tags": (
-                    {record["pattern_tag"]} if record["pattern_tag"] else set()
-                ),
+                "pattern_tags": ({record["pattern_tag"]} if record["pattern_tag"] else set()),
                 "members": set(record["derived_from"]),
                 "applies_to": set(record["applies_to"]),
                 "confidence": record["confidence"],
@@ -2661,7 +2383,8 @@ def build_context(
                     CONTEXT_SUMMARY_LIMIT,
                 ),
                 "texts": [record["title"], record["takeaway"], record["pattern_tag"]],
-                "source_refs": [record["source"]] + [
+                "source_refs": [record["source"]]
+                + [
                     str(entries_by_id.get(item, {}).get("_source") or "")
                     for item in record["derived_from"]
                 ],
@@ -2688,22 +2411,17 @@ def build_context(
                 "explicit-pattern:" + ",".join(sorted(pattern_ids & explicit_pattern_ids))
             )
         elif pattern_ids & entry_pattern_ids:
-            components["canonical_pattern"] = (
-                30 if candidate["kind"] == "learning" else 25
-            )
+            components["canonical_pattern"] = 30 if candidate["kind"] == "learning" else 25
             matched_signals.append(
                 "entry-pattern:" + ",".join(sorted(pattern_ids & entry_pattern_ids))
             )
         elif candidate["kind"] == "learning" and pattern_tags & entry_pattern_tags:
             components["canonical_pattern"] = 30
             matched_signals.append(
-                "entry-pattern-tag:"
-                + ",".join(sorted(pattern_tags & entry_pattern_tags))
+                "entry-pattern-tag:" + ",".join(sorted(pattern_tags & entry_pattern_tags))
             )
         member_entries = [
-            entries_by_id[item]
-            for item in sorted(candidate["members"])
-            if item in entries_by_id
+            entries_by_id[item] for item in sorted(candidate["members"]) if item in entries_by_id
         ]
         affected = sorted(
             {
@@ -2731,16 +2449,14 @@ def build_context(
         if evidence_path_matches or learning_scope_matches:
             components["affected_path"] = 30
         if learning_scope_matches:
-            matched_signals.append(
-                "learning-applies-to:" + ",".join(learning_scope_matches[:5])
-            )
+            matched_signals.append("learning-applies-to:" + ",".join(learning_scope_matches[:5]))
         if evidence_path_matches:
-            matched_signals.append(
-                "affected-path:" + ",".join(evidence_path_matches[:5])
-            )
-        distance = _graph_distance(
-            graph, set(normalized_entry_ids), set(candidate["members"])
-        ) if normalized_entry_ids else None
+            matched_signals.append("affected-path:" + ",".join(evidence_path_matches[:5]))
+        distance = (
+            _graph_distance(graph, set(normalized_entry_ids), set(candidate["members"]))
+            if normalized_entry_ids
+            else None
+        )
         if distance is not None:
             components["graph_proximity"] = {0: 20, 1: 12, 2: 6}[distance]
             matched_signals.append(f"graph-distance:{distance}")
@@ -2749,10 +2465,10 @@ def build_context(
         if overlap:
             components["intent_overlap"] = min(len(overlap) * 2, 10)
             matched_signals.append("intent:" + ",".join(overlap[:5]))
-        if (
-            candidate["kind"] == "negative_memory"
-            or candidate["status"] in {"confirmed", "supported"}
-        ):
+        if candidate["kind"] == "negative_memory" or candidate["status"] in {
+            "confirmed",
+            "supported",
+        }:
             components["outcome_relevance"] = 5
             matched_signals.append("outcome:" + str(candidate["status"]))
         elif candidate["status"] in {"weakened", "contested"}:
@@ -2802,9 +2518,7 @@ def build_context(
                 "components": components,
                 "matched_signals": matched_signals,
                 "why": " ".join(why_parts),
-                "source_refs": sorted(
-                    {value for value in candidate["source_refs"] if value}
-                ),
+                "source_refs": sorted({value for value in candidate["source_refs"] if value}),
                 "_tie": (
                     0
                     if direct_negative
@@ -2856,11 +2570,12 @@ def build_context(
         "ranking_rule_version": CONTEXT_RANKING_RULE_VERSION,
         "result_ids": [item["id"] for item in results],
     }
-    context_fingerprint = "ctx-" + hashlib.sha256(
-        json.dumps(
-            context_material, sort_keys=True, separators=(",", ":")
-        ).encode("utf-8")
-    ).hexdigest()[:16]
+    context_fingerprint = (
+        "ctx-"
+        + hashlib.sha256(
+            json.dumps(context_material, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()[:16]
+    )
     return {
         "project": project,
         "context_fingerprint": context_fingerprint,
@@ -2913,9 +2628,7 @@ def _normalize_evidence_ids(
     if required and not ids:
         raise GraphError(f"{field} requires at least one evidence id")
     invalid = [
-        item
-        for item in ids
-        if not SAFE_EVIDENCE_ID.fullmatch(item) or item not in valid_ids
+        item for item in ids if not SAFE_EVIDENCE_ID.fullmatch(item) or item not in valid_ids
     ]
     if invalid:
         raise GraphError(f"{field} contains unknown evidence id(s): {', '.join(invalid)}")
@@ -2944,15 +2657,10 @@ def _serialize_hypothesis(record: dict[str, Any]) -> str:
         "last_evaluated",
         "revision",
     )
-    fields = [
-        (key, frontmatter.get(key))
-        for key in field_order
-        if key in frontmatter
-    ]
+    fields = [(key, frontmatter.get(key)) for key in field_order if key in frontmatter]
     sections = record["sections"]
     body = "\n\n".join(
-        f"## {name}\n\n{sections.get(name, '')}".rstrip()
-        for name in HYPOTHESIS_SECTIONS
+        f"## {name}\n\n{sections.get(name, '')}".rstrip() for name in HYPOTHESIS_SECTIONS
     )
     return serialize_frontmatter(fields) + "\n\n" + body + "\n"
 
@@ -2960,9 +2668,9 @@ def _serialize_hypothesis(record: dict[str, Any]) -> str:
 def _encode_plan(payload: dict[str, Any]) -> tuple[str, str]:
     plan_id = _plan_id(payload)
     envelope = {"payload": payload, "plan_id": plan_id}
-    raw = json.dumps(
-        envelope, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode("utf-8")
+    raw = json.dumps(envelope, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
     token = base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
     return token, plan_id
 
@@ -2978,19 +2686,21 @@ def _decode_plan(token: str) -> dict[str, Any]:
         plan_id = envelope["plan_id"]
     except (ValueError, KeyError, TypeError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise GraphError("invalid hypothesis plan token") from exc
-    if not isinstance(payload, dict) or plan_id != _plan_id(payload):
+    if (
+        not isinstance(envelope, dict)
+        or not isinstance(payload, dict)
+        or plan_id != _plan_id(payload)
+    ):
         raise GraphError("invalid hypothesis plan checksum")
-    return envelope
+    return dict(envelope)
 
 
-def _cluster_by_fingerprint(
-    graph: dict[str, Any], cluster_fingerprint: str
-) -> dict[str, Any]:
+def _cluster_by_fingerprint(graph: dict[str, Any], cluster_fingerprint: str) -> dict[str, Any]:
     if not SAFE_CLUSTER_FINGERPRINT.fullmatch(cluster_fingerprint):
         raise GraphError("invalid cluster fingerprint")
     for cluster in graph.get("topology", {}).get("clusters", []):
-        if cluster.get("fingerprint") == cluster_fingerprint:
-            return cluster
+        if isinstance(cluster, dict) and cluster.get("fingerprint") == cluster_fingerprint:
+            return dict(cluster)
     raise GraphError(f"cluster not found: {cluster_fingerprint}")
 
 
@@ -3070,34 +2780,22 @@ def plan_hypothesis_operation(
         if not SAFE_CLAIM_KEY.fullmatch(claim_key):
             raise GraphError("claim_key must be lowercase kebab-case")
         title = _bounded_text(params.get("title"), "title", 160)
-        root_cause = _bounded_text(
-            params.get("root_cause"), "root_cause", 2000
-        )
-        confidence = _bounded_text(
-            params.get("confidence"), "confidence", 6
-        )
+        root_cause = _bounded_text(params.get("root_cause"), "root_cause", 2000)
+        confidence = _bounded_text(params.get("confidence"), "confidence", 6)
         if confidence not in {"low", "medium", "high"}:
             raise GraphError("confidence must be low, medium, or high")
-        confidence_basis = _bounded_text(
-            params.get("confidence_basis"), "confidence_basis", 800
-        )
+        confidence_basis = _bounded_text(params.get("confidence_basis"), "confidence_basis", 800)
         falsifier = _bounded_text(params.get("falsifier"), "falsifier", 800)
         alternatives_raw = params.get("alternatives")
         if not isinstance(alternatives_raw, list) or not alternatives_raw:
             raise GraphError("alternatives requires at least one explanation")
         if len(alternatives_raw) > 5:
             raise GraphError("alternatives permits at most five explanations")
-        alternatives = [
-            _bounded_text(value, "alternative", 400)
-            for value in alternatives_raw
-        ]
+        alternatives = [_bounded_text(value, "alternative", 400) for value in alternatives_raw]
         counter_raw = params.get("counter_evidence", [])
         if not isinstance(counter_raw, list):
             raise GraphError("counter_evidence must be a list")
-        counter_evidence = [
-            _bounded_text(value, "counter_evidence", 400)
-            for value in counter_raw
-        ]
+        counter_evidence = [_bounded_text(value, "counter_evidence", 400) for value in counter_raw]
         evidence_raw = params.get("supporting_evidence")
         if not isinstance(evidence_raw, list):
             raise GraphError("supporting_evidence must be a list")
@@ -3111,9 +2809,7 @@ def plan_hypothesis_operation(
             supporting.append(
                 {
                     "id": evidence_id,
-                    "reason": _bounded_text(
-                        item.get("reason"), "evidence reason", 400
-                    ),
+                    "reason": _bounded_text(item.get("reason"), "evidence reason", 400),
                 }
             )
         required_members = sorted(cluster.get("members", []))
@@ -3121,9 +2817,7 @@ def plan_hypothesis_operation(
         if supplied_members != required_members or len(set(supplied_members)) != len(
             supplied_members
         ):
-            raise GraphError(
-                "supporting_evidence must cite every cluster member exactly once"
-            )
+            raise GraphError("supporting_evidence must cite every cluster member exactly once")
         pattern_ids = sorted(cluster.get("pattern_ids", []))
         claim_fingerprint = _claim_fingerprint(claim_key, pattern_ids)
         existing = [
@@ -3141,34 +2835,24 @@ def plan_hypothesis_operation(
                 "claim_fingerprint": claim_fingerprint,
                 "rejecting_outcome": record["status"],
                 "evaluated_evidence": record["derived_from"],
-                "message": (
-                    f"{record['id']} rejected this claim; "
-                    "use reopen with new evidence"
-                ),
+                "message": (f"{record['id']} rejected this claim; use reopen with new evidence"),
                 "writes_canonical": False,
                 "plan_token": None,
             }
         if existing:
-            raise GraphError(
-                "duplicate_claim: "
-                + ", ".join(record["id"] for record in existing)
-            )
+            raise GraphError("duplicate_claim: " + ", ".join(record["id"] for record in existing))
         supersedes = sorted(set(_as_list(params.get("supersedes"))))
         for parent_id in supersedes:
             parent = registry["by_id"].get(parent_id)
             if (
                 not parent
                 or parent["status"] != "split"
-                or claim_key
-                not in _as_list(parent["frontmatter"].get("split_claim_keys"))
+                or claim_key not in _as_list(parent["frontmatter"].get("split_claim_keys"))
             ):
-                raise GraphError(
-                    f"supersedes requires split parent authorizing {claim_key}"
-                )
-        next_number = max(
-            [int(hypothesis_id[1:]) for hypothesis_id in registry["by_id"]]
-            or [0]
-        ) + 1
+                raise GraphError(f"supersedes requires split parent authorizing {claim_key}")
+        next_number = (
+            max([int(hypothesis_id[1:]) for hypothesis_id in registry["by_id"]] or [0]) + 1
+        )
         hypothesis_id = f"H{next_number:03d}"
         frontmatter = {
             "id": hypothesis_id,
@@ -3194,9 +2878,7 @@ def plan_hypothesis_operation(
                 f"- {item['id']}: {item['reason']}"
                 for item in sorted(supporting, key=lambda item: item["id"])
             ),
-            "Alternative explanations": "\n".join(
-                f"- {value}" for value in alternatives
-            ),
+            "Alternative explanations": "\n".join(f"- {value}" for value in alternatives),
             "Counter-evidence": (
                 "\n".join(f"- {value}" for value in counter_evidence)
                 if counter_evidence
@@ -3235,18 +2917,14 @@ def plan_hypothesis_operation(
             "record": record,
         }
     else:
-        hypothesis_id = _bounded_text(
-            params.get("hypothesis_id"), "hypothesis_id", 16
-        )
+        hypothesis_id = _bounded_text(params.get("hypothesis_id"), "hypothesis_id", 16)
         record_current = registry["by_id"].get(hypothesis_id)
         if not record_current:
             raise GraphError(f"hypothesis not found: {hypothesis_id}")
         frontmatter = dict(record_current["frontmatter"])
         sections = dict(record_current["sections"])
         actor = _bounded_text(params.get("actor"), "actor", 120)
-        reason_field = (
-            "new_evidence_reason" if action == "reopen" else "reason"
-        )
+        reason_field = "new_evidence_reason" if action == "reopen" else "reason"
         reason = _bounded_text(params.get(reason_field), reason_field, 800)
         evidence_ids = _normalize_evidence_ids(
             params.get("evidence_ids"), valid_ids, "evidence_ids"
@@ -3271,13 +2949,13 @@ def plan_hypothesis_operation(
                     f"unsupported hypothesis transition {current_status} -> {new_status}"
                 )
             request["status"] = new_status
-            confidence = params.get("confidence")
-            if confidence is not None:
-                confidence = _bounded_text(confidence, "confidence", 6)
-                if confidence not in {"low", "medium", "high"}:
+            requested_confidence = params.get("confidence")
+            if requested_confidence is not None:
+                confidence_value = _bounded_text(requested_confidence, "confidence", 6)
+                if confidence_value not in {"low", "medium", "high"}:
                     raise GraphError("confidence must be low, medium, or high")
-                frontmatter["confidence"] = confidence
-                request["confidence"] = confidence
+                frontmatter["confidence"] = confidence_value
+                request["confidence"] = confidence_value
         elif action == "reopen":
             if current_status != "rejected":
                 raise GraphError("reopen requires a rejected hypothesis")
@@ -3295,15 +2973,11 @@ def plan_hypothesis_operation(
             if not old_members.issubset(current_members) or not new_members.issubset(
                 current_members
             ):
-                raise GraphError(
-                    "reopen cluster must contain retained and new evidence"
-                )
+                raise GraphError("reopen cluster must contain retained and new evidence")
             frontmatter["cluster_fingerprint"] = cluster_fingerprint
             frontmatter["graph_source_fingerprint"] = graph["source_fingerprint"]
             frontmatter["pattern_ids"] = sorted(cluster.get("pattern_ids", []))
-            frontmatter["affected_domains"] = sorted(
-                cluster.get("affected_domains", [])
-            )
+            frontmatter["affected_domains"] = sorted(cluster.get("affected_domains", []))
             frontmatter["derived_from"] = sorted(current_members)
             new_status = "proposed"
             request["cluster_fingerprint"] = cluster_fingerprint
@@ -3314,9 +2988,7 @@ def plan_hypothesis_operation(
             if len(claim_keys) < 2 or any(
                 not SAFE_CLAIM_KEY.fullmatch(item) for item in claim_keys
             ):
-                raise GraphError(
-                    "split requires at least two unique kebab-case claim keys"
-                )
+                raise GraphError("split requires at least two unique kebab-case claim keys")
             frontmatter["split_claim_keys"] = claim_keys
             request["claim_keys"] = claim_keys
             new_status = "split"
@@ -3335,31 +3007,23 @@ def plan_hypothesis_operation(
             request["into"] = target_id
             new_status = "merged"
         if action in {"evaluate", "reopen"}:
-            cluster_fingerprint = params.get("cluster_fingerprint")
-            stale = (
-                record_current["graph_source_fingerprint"]
-                != graph["source_fingerprint"]
-            )
-            if stale and action == "evaluate" and not cluster_fingerprint:
-                raise GraphError(
-                    "stale hypothesis evaluation requires current cluster_fingerprint"
-                )
-            if cluster_fingerprint and action == "evaluate":
+            requested_cluster_fingerprint = params.get("cluster_fingerprint")
+            stale = record_current["graph_source_fingerprint"] != graph["source_fingerprint"]
+            if stale and action == "evaluate" and not requested_cluster_fingerprint:
+                raise GraphError("stale hypothesis evaluation requires current cluster_fingerprint")
+            if requested_cluster_fingerprint and action == "evaluate":
                 cluster_value = _bounded_text(
-                    cluster_fingerprint, "cluster_fingerprint", 18
+                    requested_cluster_fingerprint,
+                    "cluster_fingerprint",
+                    18,
                 )
                 cluster = _cluster_by_fingerprint(graph, cluster_value)
                 frontmatter["cluster_fingerprint"] = cluster_value
-                frontmatter["graph_source_fingerprint"] = graph[
-                    "source_fingerprint"
-                ]
+                frontmatter["graph_source_fingerprint"] = graph["source_fingerprint"]
                 frontmatter["pattern_ids"] = sorted(cluster.get("pattern_ids", []))
-                frontmatter["affected_domains"] = sorted(
-                    cluster.get("affected_domains", [])
-                )
+                frontmatter["affected_domains"] = sorted(cluster.get("affected_domains", []))
                 frontmatter["derived_from"] = sorted(
-                    set(_as_list(frontmatter.get("derived_from")))
-                    | set(cluster.get("members", []))
+                    set(_as_list(frontmatter.get("derived_from"))) | set(cluster.get("members", []))
                 )
                 request["cluster_fingerprint"] = cluster_value
         frontmatter["status"] = new_status
@@ -3416,17 +3080,10 @@ def plan_hypothesis_operation(
 def _hypothesis_lock_path(board_dir: Path, project: str) -> Path:
     cache_path = cache_path_for_board(board_dir, project)
     safe_project = re.sub(r"[^A-Za-z0-9._-]+", "-", project).strip("-")
-    return (
-        cache_path.parents[3]
-        / "locks"
-        / "hypotheses"
-        / f"{safe_project}.lock"
-    )
+    return cache_path.parents[3] / "locks" / "hypotheses" / f"{safe_project}.lock"
 
 
-def apply_hypothesis_plan(
-    board_dir: Path, project: str, plan_token: str
-) -> dict[str, Any]:
+def apply_hypothesis_plan(board_dir: Path, project: str, plan_token: str) -> dict[str, Any]:
     """Revalidate and apply one content-bound hypothesis plan."""
     board_dir = board_dir.resolve()
     envelope = _decode_plan(plan_token)
@@ -3441,13 +3098,9 @@ def apply_hypothesis_plan(
             dict(payload.get("request") or {}),
         )
     except GraphError as exc:
-        raise GraphError(
-            "plan_stale: canonical inputs changed; request a fresh preview"
-        ) from exc
+        raise GraphError("plan_stale: canonical inputs changed; request a fresh preview") from exc
     if fresh.get("plan_id") != envelope["plan_id"]:
-        raise GraphError(
-            "plan_stale: canonical inputs changed; request a fresh preview"
-        )
+        raise GraphError("plan_stale: canonical inputs changed; request a fresh preview")
     lock_path = _hypothesis_lock_path(board_dir, project)
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     acquired = False
@@ -3469,13 +3122,9 @@ def apply_hypothesis_plan(
                 dict(payload.get("request") or {}),
             )
         except GraphError as exc:
-            raise GraphError(
-                "plan_stale: canonical inputs changed after lock acquisition"
-            ) from exc
+            raise GraphError("plan_stale: canonical inputs changed after lock acquisition") from exc
         if fresh.get("plan_id") != envelope["plan_id"]:
-            raise GraphError(
-                "plan_stale: canonical inputs changed after lock acquisition"
-            )
+            raise GraphError("plan_stale: canonical inputs changed after lock acquisition")
         operation = fresh["operation"]
         target = (board_dir / operation["target"]).resolve()
         hypotheses_dir = (board_dir / "hypotheses").resolve()
@@ -3497,9 +3146,7 @@ def apply_hypothesis_plan(
             "changed": operation["target"],
             "plan_id": fresh["plan_id"],
             "graph_source_fingerprint": fresh["graph_source_fingerprint"],
-            "hypothesis_inventory_fingerprint": load_hypothesis_registry(
-                board_dir
-            )["fingerprint"],
+            "hypothesis_inventory_fingerprint": load_hypothesis_registry(board_dir)["fingerprint"],
         }
     finally:
         try:
@@ -3508,9 +3155,7 @@ def apply_hypothesis_plan(
             pass
 
 
-def _learning_state(
-    recurrence: int, events: list[dict[str, Any]]
-) -> tuple[str, str, str]:
+def _learning_state(recurrence: int, events: list[dict[str, Any]]) -> tuple[str, str, str]:
     results = {str(event.get("fix_result") or "") for event in events}
     if "partial" in results or ("held" in results and "failed" in results):
         outcome_status = "contested"
@@ -3554,16 +3199,12 @@ def _serialize_learning(record: dict[str, Any]) -> str:
         "outcome_refs",
     )
     fields = [
-        (key, frontmatter.get(key))
-        for key in field_order
-        if frontmatter.get(key) is not None
+        (key, frontmatter.get(key)) for key in field_order if frontmatter.get(key) is not None
     ]
-    return serialize_frontmatter(fields) + "\n\n" + record["body"].strip() + "\n"
+    return serialize_frontmatter(fields) + "\n\n" + str(record["body"]).strip() + "\n"
 
 
-def plan_learning_feedback(
-    board_dir: Path, project: str, pattern_id: str
-) -> dict[str, Any]:
+def plan_learning_feedback(board_dir: Path, project: str, pattern_id: str) -> dict[str, Any]:
     """Preview one outcome-aware pattern Learning update."""
     board_dir = board_dir.resolve()
     pattern_id = _bounded_text(pattern_id, "pattern_id", 128)
@@ -3586,43 +3227,32 @@ def plan_learning_feedback(
         if resolved_id in {item["id"] for item in entry_patterns}:
             resolved_sources.append(entry)
     if not resolved_sources:
-        raise GraphError(
-            f"pattern {resolved_id} has no resolved canonical source entries"
-        )
+        raise GraphError(f"pattern {resolved_id} has no resolved canonical source entries")
     hypotheses = load_hypothesis_registry(board_dir)
     events: list[dict[str, Any]] = []
     outcome_refs: set[str] = set()
     for hypothesis_id, hypothesis in hypotheses["by_id"].items():
-        if resolved_id not in _as_list(
-            hypothesis["frontmatter"].get("pattern_ids")
-        ):
+        if resolved_id not in _as_list(hypothesis["frontmatter"].get("pattern_ids")):
             continue
         hypothesis_events = _structured_outcomes(hypothesis["sections"])
         if hypothesis_events:
             outcome_refs.add(hypothesis_id)
             events.extend(hypothesis_events)
-    outcome_status, confidence, confidence_basis = _learning_state(
-        len(resolved_sources), events
-    )
+    outcome_status, confidence, confidence_basis = _learning_state(len(resolved_sources), events)
     learnings = _load_learnings(board_dir)
-    existing_id = learnings["by_pattern"].get(resolved_id) or learnings[
-        "by_pattern"
-    ].get(pattern["label"])
+    existing_id = learnings["by_pattern"].get(resolved_id) or learnings["by_pattern"].get(
+        pattern["label"]
+    )
     existing = learnings["by_id"].get(existing_id) if existing_id else None
     derived_from = sorted(str(entry["id"]) for entry in resolved_sources)
-    earliest = min(
-        str(entry.get("discovered") or "1970-01-01")
-        for entry in resolved_sources
-    )
+    earliest = min(str(entry.get("discovered") or "1970-01-01") for entry in resolved_sources)
     if existing:
         frontmatter = dict(existing["frontmatter"])
         learning_id = existing["id"]
         target = existing["source"]
         body = existing["body"]
     else:
-        next_number = max(
-            [int(item[1:]) for item in learnings["by_id"]] or [0]
-        ) + 1
+        next_number = max([int(item[1:]) for item in learnings["by_id"]] or [0]) + 1
         learning_id = f"L{next_number:03d}"
         target = f"learnings/{learning_id}-{pattern['label']}.md"
         frontmatter = {
@@ -3652,9 +3282,7 @@ def plan_learning_feedback(
             "confidence_basis": confidence_basis,
             "recurrence": len(resolved_sources),
             "derived_from": derived_from,
-            "pattern_ids": (
-                [resolved_id] if SAFE_PATTERN_ID.fullmatch(resolved_id) else []
-            ),
+            "pattern_ids": ([resolved_id] if SAFE_PATTERN_ID.fullmatch(resolved_id) else []),
             "pattern_tag": pattern["label"],
             "outcome_status": outcome_status,
             "outcome_refs": sorted(outcome_refs),
@@ -3702,9 +3330,7 @@ def plan_learning_feedback(
         "hypothesis_inventory_fingerprint": hypotheses["fingerprint"],
         "learning_inventory_fingerprint": learnings["fingerprint"],
         "operation": operation,
-        "result_content_fingerprint": hashlib.sha256(
-            content.encode("utf-8")
-        ).hexdigest(),
+        "result_content_fingerprint": hashlib.sha256(content.encode("utf-8")).hexdigest(),
     }
     token, plan_id = _encode_plan(payload)
     return {
@@ -3716,9 +3342,7 @@ def plan_learning_feedback(
             {
                 "outcome_status": existing["outcome_status"],
                 "confidence": str(existing["frontmatter"].get("confidence") or "low"),
-                "recurrence": int(
-                    str(existing["frontmatter"].get("recurrence") or 0)
-                ),
+                "recurrence": int(str(existing["frontmatter"].get("recurrence") or 0)),
             }
             if existing
             else None
@@ -3742,9 +3366,7 @@ def _learning_lock_path(board_dir: Path, project: str) -> Path:
     return cache_path.parents[3] / "locks" / "learnings" / f"{safe_project}.lock"
 
 
-def apply_learning_plan(
-    board_dir: Path, project: str, plan_token: str
-) -> dict[str, Any]:
+def apply_learning_plan(board_dir: Path, project: str, plan_token: str) -> dict[str, Any]:
     """Revalidate and atomically apply one pattern Learning plan."""
     board_dir = board_dir.resolve()
     envelope = _decode_plan(plan_token)
@@ -3775,9 +3397,7 @@ def apply_learning_plan(
             board_dir, project, str(payload.get("request", {}).get("pattern_id") or "")
         )
     except GraphError as exc:
-        raise GraphError(
-            "plan_stale: canonical Learning inputs changed"
-        ) from exc
+        raise GraphError("plan_stale: canonical Learning inputs changed") from exc
     if fresh.get("plan_id") != envelope["plan_id"]:
         raise GraphError("plan_stale: canonical Learning inputs changed")
     lock_path = _learning_lock_path(board_dir, project)
@@ -3787,13 +3407,9 @@ def apply_learning_plan(
     except FileExistsError as exc:
         raise GraphError("lock_contended: retry the Learning apply") from exc
     try:
-        fresh = plan_learning_feedback(
-            board_dir, project, str(payload["request"]["pattern_id"])
-        )
+        fresh = plan_learning_feedback(board_dir, project, str(payload["request"]["pattern_id"]))
         if fresh.get("plan_id") != envelope["plan_id"]:
-            raise GraphError(
-                "plan_stale: canonical Learning inputs changed after lock acquisition"
-            )
+            raise GraphError("plan_stale: canonical Learning inputs changed after lock acquisition")
         operation = fresh["operation"]
         target = (board_dir / operation["target"]).resolve()
         if target.is_symlink():
@@ -3807,9 +3423,7 @@ def apply_learning_plan(
             "id": operation["id"],
             "changed": operation["target"],
             "plan_id": fresh["plan_id"],
-            "learning_inventory_fingerprint": _load_learnings(board_dir)[
-                "fingerprint"
-            ],
+            "learning_inventory_fingerprint": _load_learnings(board_dir)["fingerprint"],
         }
     finally:
         try:
@@ -3818,15 +3432,11 @@ def apply_learning_plan(
             pass
 
 
-def plan_outcome(
-    board_dir: Path, project: str, params: dict[str, Any]
-) -> dict[str, Any]:
+def plan_outcome(board_dir: Path, project: str, params: dict[str, Any]) -> dict[str, Any]:
     """Preview one explicit fix outcome without changing canonical state."""
     board_dir = board_dir.resolve()
     entry_id = _bounded_text(params.get("entry_id"), "entry_id", 16)
-    hypothesis_id = _bounded_text(
-        params.get("hypothesis_id"), "hypothesis_id", 16
-    )
+    hypothesis_id = _bounded_text(params.get("hypothesis_id"), "hypothesis_id", 16)
     fix_result = _bounded_text(params.get("fix_result"), "fix_result", 16)
     disposition = _bounded_text(
         params.get("hypothesis_disposition"),
@@ -3836,23 +3446,15 @@ def plan_outcome(
     if fix_result not in FIX_RESULTS:
         raise GraphError("invalid fix_result")
     if disposition not in OUTCOME_DISPOSITIONS[fix_result]:
-        raise GraphError(
-            f"fix_result {fix_result} is incompatible with disposition {disposition}"
-        )
-    fix_summary = _bounded_text(
-        params.get("fix_summary"), "fix_summary", 1000
-    )
+        raise GraphError(f"fix_result {fix_result} is incompatible with disposition {disposition}")
+    fix_summary = _bounded_text(params.get("fix_summary"), "fix_summary", 1000)
     actor = _bounded_text(params.get("actor"), "actor", 120)
-    observed_until = _bounded_text(
-        params.get("observed_until"), "observed_until", 10
-    )
+    observed_until = _bounded_text(params.get("observed_until"), "observed_until", 10)
     observed_date = _valid_date(observed_until)
     if observed_date is None:
         raise GraphError("observed_until must use ISO YYYY-MM-DD")
     valid_ids = _all_canonical_entry_ids(board_dir)
-    evidence_ids = _normalize_evidence_ids(
-        params.get("evidence_ids"), valid_ids, "evidence_ids"
-    )
+    evidence_ids = _normalize_evidence_ids(params.get("evidence_ids"), valid_ids, "evidence_ids")
     entries = {str(item["id"]): item for item in _load_all_entries(board_dir)}
     entry = entries.get(entry_id)
     if not entry:
@@ -3861,12 +3463,9 @@ def plan_outcome(
     if discovered and observed_date < discovered:
         raise GraphError("observed_until cannot precede entry discovery")
     if fix_result == "held" and (
-        str(entry.get("status") or "open") != "resolved"
-        or entry_id not in evidence_ids
+        str(entry.get("status") or "open") != "resolved" or entry_id not in evidence_ids
     ):
-        raise GraphError(
-            "held requires a resolved entry cited as completion evidence"
-        )
+        raise GraphError("held requires a resolved entry cited as completion evidence")
     graph = build_graph(board_dir, project, _utc_now(), build_mode="full")
     registry = load_hypothesis_registry(board_dir)
     hypothesis = registry["by_id"].get(hypothesis_id)
@@ -3877,9 +3476,7 @@ def plan_outcome(
     patterns = load_pattern_registry(board_dir)
     entry_patterns, _ = resolve_entry_patterns(entry, patterns)
     entry_pattern_ids = {item["id"] for item in entry_patterns}
-    hypothesis_pattern_ids = set(
-        _as_list(hypothesis["frontmatter"].get("pattern_ids"))
-    )
+    hypothesis_pattern_ids = set(_as_list(hypothesis["frontmatter"].get("pattern_ids")))
     cluster_members: set[str] = set()
     for cluster in graph.get("topology", {}).get("clusters", []):
         if cluster.get("fingerprint") == hypothesis["cluster_fingerprint"]:
@@ -3890,9 +3487,7 @@ def plan_outcome(
         or bool(entry_pattern_ids & hypothesis_pattern_ids)
     )
     if not allowed_entry:
-        raise GraphError(
-            "entry is not a cited source, cluster member, or same-pattern neighbor"
-        )
+        raise GraphError("entry is not a cited source, cluster member, or same-pattern neighbor")
     context_used = params.get("context_used", False)
     if not isinstance(context_used, bool):
         raise GraphError("context_used must be a boolean")
@@ -3912,16 +3507,13 @@ def plan_outcome(
             learnings["fingerprint"],
         )
         context_reference = {
-            "context_fingerprint": "ctx-" + hashlib.sha256(
-                json.dumps(
-                    token_payload, sort_keys=True, separators=(",", ":")
-                ).encode("utf-8")
+            "context_fingerprint": "ctx-"
+            + hashlib.sha256(
+                json.dumps(token_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
             ).hexdigest()[:16],
             "source_fingerprint": str(token_payload.get("source_fingerprint") or ""),
             "source_state": (
-                "current"
-                if token_payload.get("source_fingerprint") == current_source
-                else "stale"
+                "current" if token_payload.get("source_fingerprint") == current_source else "stale"
             ),
             "verified": True,
         }
@@ -3937,11 +3529,14 @@ def plan_outcome(
         "context_used": context_used,
         "context_reference": context_reference,
     }
-    event_id = "out-" + hashlib.sha256(
-        json.dumps(
-            event_base, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        ).encode("utf-8")
-    ).hexdigest()[:16]
+    event_id = (
+        "out-"
+        + hashlib.sha256(
+            json.dumps(
+                event_base, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+            ).encode("utf-8")
+        ).hexdigest()[:16]
+    )
     event = {"event_id": event_id, **event_base}
     existing_events = _structured_outcomes(hypothesis["sections"])
     if any(item.get("event_id") == event_id for item in existing_events):
@@ -3995,17 +3590,11 @@ def plan_outcome(
         pattern_events = [
             outcome
             for other_id, other in registry["by_id"].items()
-            if pattern_id
-            in _as_list(other["frontmatter"].get("pattern_ids"))
+            if pattern_id in _as_list(other["frontmatter"].get("pattern_ids"))
             for outcome in _structured_outcomes(other["sections"])
-            if not (
-                other_id == hypothesis_id
-                and outcome.get("event_id") == event_id
-            )
+            if not (other_id == hypothesis_id and outcome.get("event_id") == event_id)
         ]
-        status, confidence, basis = _learning_state(
-            resolved_count, pattern_events + [event]
-        )
+        status, confidence, basis = _learning_state(resolved_count, pattern_events + [event])
         predicted_feedback.append(
             {
                 "pattern_id": pattern_id,
@@ -4036,9 +3625,7 @@ def plan_outcome(
     }
 
 
-def apply_outcome_plan(
-    board_dir: Path, project: str, plan_token: str
-) -> dict[str, Any]:
+def apply_outcome_plan(board_dir: Path, project: str, plan_token: str) -> dict[str, Any]:
     """Revalidate and atomically apply one explicit H### fix outcome."""
     board_dir = board_dir.resolve()
     envelope = _decode_plan(plan_token)
@@ -4074,9 +3661,7 @@ def apply_outcome_plan(
     try:
         fresh = plan_outcome(board_dir, project, dict(payload["request"]))
         if fresh.get("plan_id") != envelope["plan_id"]:
-            raise GraphError(
-                "plan_stale: canonical outcome inputs changed after lock acquisition"
-            )
+            raise GraphError("plan_stale: canonical outcome inputs changed after lock acquisition")
         operation = fresh["operation"]
         target = (board_dir / operation["target"]).resolve()
         hypotheses_dir = (board_dir / "hypotheses").resolve()
@@ -4093,14 +3678,10 @@ def apply_outcome_plan(
         except OSError:
             pass
     learning_feedback = []
-    pattern_ids = _as_list(
-        operation["record"]["frontmatter"].get("pattern_ids")
-    )
+    pattern_ids = _as_list(operation["record"]["frontmatter"].get("pattern_ids"))
     for pattern_id in pattern_ids:
         try:
-            learning_feedback.append(
-                plan_learning_feedback(board_dir, project, pattern_id)
-            )
+            learning_feedback.append(plan_learning_feedback(board_dir, project, pattern_id))
         except GraphError as exc:
             learning_feedback.append(
                 {
@@ -4117,9 +3698,7 @@ def apply_outcome_plan(
         "event_id": operation["event_id"],
         "changed": operation["target"],
         "plan_id": fresh["plan_id"],
-        "hypothesis_inventory_fingerprint": load_hypothesis_registry(board_dir)[
-            "fingerprint"
-        ],
+        "hypothesis_inventory_fingerprint": load_hypothesis_registry(board_dir)["fingerprint"],
         "learning_feedback": learning_feedback,
     }
 
@@ -4181,12 +3760,12 @@ def curate_learning_feedback(
             continue
         resolved, _ = resolve_entry_patterns(entry, patterns)
         counts.update(item["id"] for item in resolved)
-    applied = []
-    promoted = []
-    updated = []
-    pending = []
-    failed = []
-    skipped = []
+    applied: list[dict[str, Any]] = []
+    promoted: list[dict[str, Any]] = []
+    updated: list[dict[str, Any]] = []
+    pending: list[str] = []
+    failed: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
     for pattern_id in sorted(counts):
         tag = (
             pattern_id.split(":", 1)[1]
@@ -4199,8 +3778,7 @@ def curate_learning_feedback(
                     "pattern_id": pattern_id,
                     "tag": tag,
                     "reason": (
-                        f"recurrence_below_threshold "
-                        f"({counts[pattern_id]} < {min_recurrence})"
+                        f"recurrence_below_threshold ({counts[pattern_id]} < {min_recurrence})"
                     ),
                 }
             )
@@ -4217,9 +3795,7 @@ def curate_learning_feedback(
                     }
                 )
                 continue
-            receipt = apply_learning_plan(
-                board_dir, project, str(preview["plan_token"])
-            )
+            receipt = apply_learning_plan(board_dir, project, str(preview["plan_token"]))
             applied.append(receipt)
             compatibility = {
                 "id": receipt["id"],
@@ -4235,9 +3811,7 @@ def curate_learning_feedback(
                 updated.append(compatibility)
         except GraphError as exc:
             failed.append({"pattern_id": pattern_id, "detail": str(exc)})
-            pending.extend(
-                item for item in sorted(counts) if item > pattern_id
-            )
+            pending.extend(item for item in sorted(counts) if item > pattern_id)
             break
     return {
         "project": project,
@@ -4269,14 +3843,7 @@ def cache_path_for_board(board_dir: Path, project: str) -> Path:
             break
     if repository_root is None:
         repository_root = resolved.parent
-    return (
-        repository_root
-        / ".engineering-board"
-        / "cache"
-        / "graph"
-        / safe_project
-        / "state.json"
-    )
+    return repository_root / ".engineering-board" / "cache" / "graph" / safe_project / "state.json"
 
 
 def build_graph_cached(
@@ -4289,9 +3856,7 @@ def build_graph_cached(
     """Build graph facts and use only a source-equivalent disposable cache."""
     board_dir = board_dir.resolve()
     cache_path = (
-        cache_path.resolve()
-        if cache_path is not None
-        else cache_path_for_board(board_dir, project)
+        cache_path.resolve() if cache_path is not None else cache_path_for_board(board_dir, project)
     )
     before = source_fingerprint(board_dir)
 
@@ -4319,9 +3884,7 @@ def build_graph_cached(
     )
     after = source_fingerprint(board_dir)
     if before != after or graph["source_fingerprint"] != after:
-        raise GraphError(
-            "source_changed: canonical Markdown changed during graph build"
-        )
+        raise GraphError("source_changed: canonical Markdown changed during graph build")
     cache_payload = {
         "schema_version": GRAPH_SCHEMA_VERSION,
         "source_fingerprint": after,
@@ -4364,9 +3927,7 @@ def main(argv: list[str] | None = None) -> int:
             args.project,
             args.generated_at or _utc_now(),
             full=args.full,
-            cache_path=(
-                Path(args.cache_path) if args.cache_path else None
-            ),
+            cache_path=(Path(args.cache_path) if args.cache_path else None),
         )
     except GraphError as exc:
         print(json.dumps({"error": "invalid_graph_input", "detail": str(exc)}), file=sys.stderr)

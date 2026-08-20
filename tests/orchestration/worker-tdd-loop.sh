@@ -45,13 +45,13 @@ BOARD_DIR="$PROJECT/engineering-board/demo"
 SESSION_ID="worker-tdd-test-session"
 mkdir -p "$BOARD_DIR/bugs" "$BOARD_DIR/features" "$BOARD_DIR/_claims" "$PROJECT/.engineering-board"
 
-cat > "$PROJECT/.engineering-board/session-mode.json" <<EOF
+cat >"$PROJECT/.engineering-board/session-mode.json" <<EOF
 {"mode":"worker","discipline":"tdd","session_id":"$SESSION_ID","started_at":"2026-05-11T12:00:00Z"}
 EOF
 
 # Plant two needs:tdd entries (status: open) and one needs:review entry to
 # verify discipline filtering doesn't sweep wrong-discipline entries.
-cat > "$BOARD_DIR/bugs/B100-first.md" <<'EOF'
+cat >"$BOARD_DIR/bugs/B100-first.md" <<'EOF'
 ---
 id: B100
 type: bug
@@ -69,7 +69,7 @@ needs: tdd
 - Tests pass.
 EOF
 
-cat > "$BOARD_DIR/bugs/B101-second.md" <<'EOF'
+cat >"$BOARD_DIR/bugs/B101-second.md" <<'EOF'
 ---
 id: B101
 type: bug
@@ -87,7 +87,7 @@ needs: tdd
 - Tests pass.
 EOF
 
-cat > "$BOARD_DIR/features/F100-other-discipline.md" <<'EOF'
+cat >"$BOARD_DIR/features/F100-other-discipline.md" <<'EOF'
 ---
 id: F100
 type: feature
@@ -155,7 +155,7 @@ while :; do
 
   # step (f) acquire claim.
   ACQ_RC=0
-  bash "$ACQUIRE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" > "$TMP/acq.$ITER.stdout" 2> "$TMP/acq.$ITER.stderr" || ACQ_RC=$?
+  bash "$ACQUIRE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" >"$TMP/acq.$ITER.stdout" 2>"$TMP/acq.$ITER.stderr" || ACQ_RC=$?
   if [ "$ACQ_RC" -ne 0 ]; then
     report 1 "iter $ITER: claim acquire for $ENTRY_ID" "exit=$ACQ_RC"
     break
@@ -189,7 +189,7 @@ PY
 
   # step (i) release claim.
   REL_RC=0
-  bash "$RELEASE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" > "$TMP/rel.$ITER.stdout" 2> "$TMP/rel.$ITER.stderr" || REL_RC=$?
+  bash "$RELEASE" "$BOARD_DIR" "$ENTRY_ID" "$SESSION_ID-iter$ITER" >"$TMP/rel.$ITER.stdout" 2>"$TMP/rel.$ITER.stderr" || REL_RC=$?
   if [ "$REL_RC" -eq 0 ]; then
     report 0 "iter $ITER: claim released for $ENTRY_ID"
   else

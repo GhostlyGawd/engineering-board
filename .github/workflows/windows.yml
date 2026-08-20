@@ -54,6 +54,11 @@ jobs:
           --shell powershell
           --output .engineering-board/validation/bootstrap/powershell.json
 
+      - name: Provision pinned development tools from PowerShell
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: python scripts/bootstrap_dev.py
+
       - name: Validate from PowerShell
         if: matrix.native_shell == 'powershell'
         shell: pwsh
@@ -76,6 +81,11 @@ jobs:
           python scripts\bootstrap_ci_evidence.py
           --shell cmd
           --output .engineering-board\validation\bootstrap\cmd.json
+
+      - name: Provision pinned development tools from cmd.exe
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: python scripts\bootstrap_dev.py
 
       - name: Validate from cmd.exe
         if: matrix.native_shell == 'cmd'

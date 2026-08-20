@@ -17,6 +17,11 @@ increases.
 - Added checksum-verified pinned development bootstrap tooling for macOS,
   Linux, native Windows, and a digest-pinned reproducible devcontainer with a
   stable workspace, user, and normalized tool inventory.
+- Added stable Bash and native-Windows Python quality entry points with
+  equivalent selectors and early invocation validation; repository-wide
+  non-rewriting format/lint policy; strict root-plugin and MCP type scopes with
+  tracked staged exclusions; and exact contributor, agent, platform, and MCP
+  application guidance.
 
 ### Fixed
 

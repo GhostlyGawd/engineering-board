@@ -50,6 +50,7 @@ SUITES=(
   "crosscompat-lint|bash tests/crosscompat-lint.sh"
   "platform-portability|bash tests/platform/automated.sh"
   "bootstrap-devcontainer|bash tests/bootstrap/automated.sh"
+  "quality-command-contract|bash tests/quality/automated.sh"
   "evaluation-harness|bash tests/evaluation/automated.sh"
   "reject-filter|bash tests/security/reject-filter.sh"
   "session-start|bash tests/session-start/automated.sh"
@@ -71,7 +72,7 @@ run_suite() {
   printf "RUN: %s\n" "$label"
   printf "================================================================\n"
   # shellcheck disable=SC2086
-  if $cmd "$ROOT" > /tmp/eb-run-all-$$-$label.log 2>&1; then
+  if $cmd "$ROOT" >/tmp/eb-run-all-$$-$label.log 2>&1; then
     tail -3 /tmp/eb-run-all-$$-$label.log
     printf "[PASS] %s\n" "$label"
     PASS=$((PASS + 1))

@@ -9,15 +9,21 @@ trap 'rm -rf "$PROJECT"' EXIT
 PASS=0
 FAIL=0
 
-pass() { printf "  [PASS] %s\n" "$1"; PASS=$((PASS + 1)); }
-fail() { printf "  [FAIL] %s\n" "$1"; FAIL=$((FAIL + 1)); }
+pass() {
+  printf "  [PASS] %s\n" "$1"
+  PASS=$((PASS + 1))
+}
+fail() {
+  printf "  [FAIL] %s\n" "$1"
+  FAIL=$((FAIL + 1))
+}
 digest() { sha256sum "$1" | awk '{print $1}'; }
 
 mkdir -p "$PROJECT/engineering-board/real" "$PROJECT/src" "$PROJECT/.claude"
-printf '# real router\n' > "$PROJECT/engineering-board/BOARD-ROUTER.md"
-printf '# real board\n' > "$PROJECT/engineering-board/real/BOARD.md"
-printf 'real source\n' > "$PROJECT/src/app.txt"
-printf '{"permissions":{"allow":[]}}\n' > "$PROJECT/.claude/settings.json"
+printf '# real router\n' >"$PROJECT/engineering-board/BOARD-ROUTER.md"
+printf '# real board\n' >"$PROJECT/engineering-board/real/BOARD.md"
+printf 'real source\n' >"$PROJECT/src/app.txt"
+printf '{"permissions":{"allow":[]}}\n' >"$PROJECT/.claude/settings.json"
 git -C "$PROJECT" init -q
 git -C "$PROJECT" config user.name "Demo Test"
 git -C "$PROJECT" config user.email "demo@example.invalid"
@@ -30,14 +36,14 @@ GIT_BEFORE="$(digest "$PROJECT/.git/config")"
 
 CREATE="$(CLAUDE_PROJECT_DIR="$PROJECT" EB_DEMO_RUN_ID=full-run bash "$DEMO" create)"
 RUN="$PROJECT/.engineering-board/demo/pattern-intelligence/full-run"
-echo "$CREATE" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["status"] == "awaiting_hypothesis" and not d["reused"]' \
-  && pass "first create is contained and awaiting interpretation" || fail "first create"
+echo "$CREATE" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["status"] == "awaiting_hypothesis" and not d["reused"]' &&
+  pass "first create is contained and awaiting interpretation" || fail "first create"
 
 REUSE="$(CLAUDE_PROJECT_DIR="$PROJECT" EB_DEMO_RUN_ID=full-run bash "$DEMO" create)"
-echo "$REUSE" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["reused"]' \
-  && pass "unchanged repeat reuses the run without overwrite" || fail "repeat behavior"
+echo "$REUSE" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["reused"]' &&
+  pass "unchanged repeat reuses the run without overwrite" || fail "repeat behavior"
 
-cat > "$PROJECT/hypothesis.json" <<'JSON'
+cat >"$PROJECT/hypothesis.json" <<'JSON'
 {
   "title": "Lifecycle semantics are duplicated across adapters",
   "root_cause": "The worker, renderer, and MCP adapter appear to interpret the same lifecycle state independently.",
@@ -51,21 +57,20 @@ cat > "$PROJECT/hypothesis.json" <<'JSON'
 }
 JSON
 CLAUDE_PROJECT_DIR="$PROJECT" bash "$DEMO" hypothesis full-run \
-  < "$PROJECT/hypothesis.json" >/dev/null 2>/dev/null
+  <"$PROJECT/hypothesis.json" >/dev/null 2>/dev/null
 
-if [ "$(digest "$PROJECT/engineering-board/BOARD-ROUTER.md")" = "$ROUTER_BEFORE" ] \
-  && [ "$(digest "$PROJECT/engineering-board/real/BOARD.md")" = "$BOARD_BEFORE" ] \
-  && [ "$(digest "$PROJECT/src/app.txt")" = "$SOURCE_BEFORE" ] \
-  && [ "$(digest "$PROJECT/.claude/settings.json")" = "$SETTINGS_BEFORE" ] \
-  && [ "$(digest "$PROJECT/.git/config")" = "$GIT_BEFORE" ]; then
+if [ "$(digest "$PROJECT/engineering-board/BOARD-ROUTER.md")" = "$ROUTER_BEFORE" ] &&
+  [ "$(digest "$PROJECT/engineering-board/real/BOARD.md")" = "$BOARD_BEFORE" ] &&
+  [ "$(digest "$PROJECT/src/app.txt")" = "$SOURCE_BEFORE" ] &&
+  [ "$(digest "$PROJECT/.claude/settings.json")" = "$SETTINGS_BEFORE" ] &&
+  [ "$(digest "$PROJECT/.git/config")" = "$GIT_BEFORE" ]; then
   pass "real board, source, settings, and Git configuration remain unchanged"
 else
   fail "real-state mutation boundary"
 fi
 
-python3 - "$RUN/graph.json" "$RUN/manifest.json" <<'PY' \
-  && pass "actual run records one 3-domain cluster and complete manifest" \
-  || fail "complete artifact semantics"
+python3 - "$RUN/graph.json" "$RUN/manifest.json" <<'PY' &&
+\
 import json, sys
 graph = json.load(open(sys.argv[1], encoding="utf-8"))
 manifest = json.load(open(sys.argv[2], encoding="utf-8"))
@@ -75,13 +80,14 @@ assert cluster["affected_domains"] == ["board-view", "hooks", "mcp-server"]
 assert manifest["status"] == "complete"
 assert "pattern-intelligence.html" in manifest["files"]
 PY
+  pass "actual run records one 3-domain cluster and complete manifest" || fail "complete artifact semantics"
 
-printf 'user note\n' > "$RUN/notes.txt"
+printf 'user note\n' >"$RUN/notes.txt"
 RC=0
 CLAUDE_PROJECT_DIR="$PROJECT" bash "$DEMO" --clean full-run \
   >/dev/null 2>"$PROJECT/cleanup-error.json" || RC=$?
-if [ "$RC" -eq 3 ] && grep -q "unexpected: notes.txt" "$PROJECT/cleanup-error.json" \
-  && [ -d "$RUN" ]; then
+if [ "$RC" -eq 3 ] && grep -q "unexpected: notes.txt" "$PROJECT/cleanup-error.json" &&
+  [ -d "$RUN" ]; then
   pass "tampered scope refuses cleanup and preserves the run"
 else
   fail "tamper cleanup boundary"

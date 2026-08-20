@@ -16,8 +16,14 @@ SESSION_B="session-wrong-$(python3 -c 'import uuid; print(uuid.uuid4().hex[:8])'
 PASS=0
 FAIL=0
 
-pass() { echo "  PASS: $1"; PASS=$((PASS+1)); }
-fail() { echo "  FAIL: $1"; FAIL=$((FAIL+1)); }
+pass() {
+  echo "  PASS: $1"
+  PASS=$((PASS + 1))
+}
+fail() {
+  echo "  FAIL: $1"
+  FAIL=$((FAIL + 1))
+}
 
 echo "=== heartbeat-refresh ==="
 
@@ -25,8 +31,8 @@ echo "=== heartbeat-refresh ==="
 CLAIM_DIR="${BOARD_DIR}/_claims/${ENTRY_ID}"
 mkdir -p "${CLAIM_DIR}"
 NOW_ISO="$(python3 -c 'import datetime; print(datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))')"
-printf 'session_id: %s\ntimestamp: %s\ncwd: %s\n' "${SESSION_A}" "${NOW_ISO}" "$(pwd)" > "${CLAIM_DIR}/owner.txt"
-printf '%s\n' "${NOW_ISO}" > "${CLAIM_DIR}/heartbeat.txt"
+printf 'session_id: %s\ntimestamp: %s\ncwd: %s\n' "${SESSION_A}" "${NOW_ISO}" "$(pwd)" >"${CLAIM_DIR}/owner.txt"
+printf '%s\n' "${NOW_ISO}" >"${CLAIM_DIR}/heartbeat.txt"
 
 # Get initial mtime using python3 with path as argv (avoids Windows backslash escaping)
 MTIME_BEFORE="$(python3 -c 'import os,sys; print(int(os.path.getmtime(sys.argv[1])))' "${CLAIM_DIR}/heartbeat.txt")"

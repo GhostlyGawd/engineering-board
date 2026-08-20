@@ -56,7 +56,9 @@ def _windows_pid_is_alive(pid: int) -> bool:
 
     process_query_limited_information = 0x1000
     still_active = 259
-    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    win_dll = getattr(ctypes, "WinDLL")
+    get_last_error = getattr(ctypes, "get_last_error")
+    kernel32 = win_dll("kernel32", use_last_error=True)
     kernel32.OpenProcess.argtypes = [
         wintypes.DWORD,
         wintypes.BOOL,
@@ -73,12 +75,12 @@ def _windows_pid_is_alive(pid: int) -> bool:
 
     handle = kernel32.OpenProcess(process_query_limited_information, False, pid)
     if not handle:
-        return ctypes.get_last_error() != 87
+        return int(get_last_error()) != 87
     try:
         exit_code = wintypes.DWORD()
         if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
             return True
-        return exit_code.value == still_active
+        return bool(exit_code.value == still_active)
     finally:
         kernel32.CloseHandle(handle)
 
@@ -180,9 +182,7 @@ def run_locked(
             session_lock = candidate
             break
     if session_lock is None:
-        raise ResourceError(
-            f"global validator capacity is occupied ({MAX_SESSIONS} sessions)"
-        )
+        raise ResourceError(f"global validator capacity is occupied ({MAX_SESSIONS} sessions)")
 
     try:
         if exclusive is not None:
@@ -191,14 +191,11 @@ def run_locked(
                 occupant = _read_owner(exclusive_lock) or {}
                 occupied_label = occupant.get("label", "unknown")
                 raise ResourceError(
-                    f"exclusive resource is occupied: {exclusive} "
-                    f"(owner label: {occupied_label})"
+                    f"exclusive resource is occupied: {exclusive} (owner label: {occupied_label})"
                 )
             port = PORT_RESOURCES.get(exclusive)
             if port is not None and not _port_is_available(port):
-                raise ResourceError(
-                    f"127.0.0.1:{port} is occupied; no fallback port is allowed"
-                )
+                raise ResourceError(f"127.0.0.1:{port} is occupied; no fallback port is allowed")
 
         environment = os.environ.copy()
         environment["ENGINEERING_BOARD_VALIDATOR_SESSION"] = token
@@ -217,9 +214,7 @@ def main() -> int:
         default=Path(
             os.environ.get(
                 "ENGINEERING_BOARD_VALIDATOR_STATE",
-                Path(__file__).resolve().parents[1]
-                / ".engineering-board"
-                / "validator-locks",
+                Path(__file__).resolve().parents[1] / ".engineering-board" / "validator-locks",
             )
         ),
     )

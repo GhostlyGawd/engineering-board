@@ -32,8 +32,8 @@ class DemoError(Exception):
 
 
 def _utc_now() -> str:
-    return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace(
-        "+00:00", "Z"
+    return (
+        dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     )
 
 
@@ -118,12 +118,7 @@ class DemoStore:
     def __init__(self, project_dir: Path, plugin_root: Path):
         self.project_dir = project_dir.resolve()
         self.plugin_root = plugin_root.resolve()
-        self.base = (
-            self.project_dir
-            / ".engineering-board"
-            / "demo"
-            / "pattern-intelligence"
-        )
+        self.base = self.project_dir / ".engineering-board" / "demo" / "pattern-intelligence"
         _assert_contained(self.project_dir, self.base)
         _assert_no_links(self.project_dir, self.base)
 
@@ -172,9 +167,7 @@ class DemoStore:
             for directory in list(directories):
                 path = root_path / directory
                 if _is_link(path):
-                    mismatches.append(
-                        f"linked path: {path.relative_to(run_dir).as_posix()}"
-                    )
+                    mismatches.append(f"linked path: {path.relative_to(run_dir).as_posix()}")
                     directories.remove(directory)
             for filename in files:
                 path = root_path / filename
@@ -250,9 +243,7 @@ def create_demo(
         run_dir = store.run_dir(run_id)
 
     run_dir.mkdir(parents=True, exist_ok=False)
-    fixture_root = (
-        store.plugin_root / "references" / "demo" / "pattern-intelligence"
-    )
+    fixture_root = store.plugin_root / "references" / "demo" / "pattern-intelligence"
     copied = _copy_fixtures(fixture_root, run_dir)
     manifest: dict[str, Any] = {
         "schema_version": "1",
@@ -409,9 +400,7 @@ def write_hypothesis(
             "invalid_state",
             f"cannot write hypothesis while status is {manifest.get('status')!r}",
         )
-    request = json.loads(
-        (run_dir / "hypothesis-request.json").read_text(encoding="utf-8")
-    )
+    request = json.loads((run_dir / "hypothesis-request.json").read_text(encoding="utf-8"))
     hypothesis = _validated_hypothesis(payload, request)
     cluster = request["cluster"]
     created = manifest["created_at"][:10]
@@ -438,10 +427,7 @@ def write_hypothesis(
         "## Supporting evidence",
         "",
     ]
-    lines.extend(
-        f"- {item['id']}: {item['reason']}"
-        for item in hypothesis["supporting_evidence"]
-    )
+    lines.extend(f"- {item['id']}: {item['reason']}" for item in hypothesis["supporting_evidence"])
     lines.extend(["", "## Alternative explanations", ""])
     lines.extend(f"- {value}" for value in hypothesis["alternatives"])
     lines.extend(
@@ -453,10 +439,7 @@ def write_hypothesis(
             "",
             "## Outcome history",
             "",
-            (
-                f"- {created}: Proposed from synthetic cluster {cluster['id']}; "
-                "not confirmed."
-            ),
+            (f"- {created}: Proposed from synthetic cluster {cluster['id']}; not confirmed."),
             "",
         ]
     )

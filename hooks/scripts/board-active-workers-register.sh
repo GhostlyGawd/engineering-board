@@ -36,13 +36,19 @@ if [ -z "$MODE" ]; then
   exit 1
 fi
 case "$MODE" in
-  pm|worker) ;;
-  *) echo "register: bad mode '$MODE'" >&2; exit 1 ;;
+  pm | worker) ;;
+  *)
+    echo "register: bad mode '$MODE'" >&2
+    exit 1
+    ;;
 esac
 if [ "$MODE" = "worker" ]; then
   case "$DISCIPLINE" in
-    tdd|review|validate) ;;
-    *) echo "register: worker mode requires discipline in {tdd,review,validate}, got '$DISCIPLINE'" >&2; exit 1 ;;
+    tdd | review | validate) ;;
+    *)
+      echo "register: worker mode requires discipline in {tdd,review,validate}, got '$DISCIPLINE'" >&2
+      exit 1
+      ;;
   esac
 fi
 
@@ -69,7 +75,10 @@ BOARD_DIR_LOWER="$(echo "$CLAUDE_PROJECT_DIR" | tr '[:upper:]' '[:lower:]')"
 STALE_CLAIM_SEC=180
 for marker in "onedrive" "dropbox" "icloud" "google drive" "googledrive" "box sync" "boxsync"; do
   case "$BOARD_DIR_LOWER" in
-    *"$marker"*) STALE_CLAIM_SEC=300; break ;;
+    *"$marker"*)
+      STALE_CLAIM_SEC=300
+      break
+      ;;
   esac
 done
 GC_THRESHOLD=$((STALE_CLAIM_SEC * 2))
@@ -85,7 +94,10 @@ while ! mkdir "$LOCK_DIR" 2>/dev/null; do
   sleep 0.1
 done
 
-cleanup_lock() { rmdir "$LOCK_DIR" 2>/dev/null || true; rm -f "$TMP" 2>/dev/null || true; }
+cleanup_lock() {
+  rmdir "$LOCK_DIR" 2>/dev/null || true
+  rm -f "$TMP" 2>/dev/null || true
+}
 trap cleanup_lock EXIT
 
 # --- Mutate registry via python3 -------------------------------------------

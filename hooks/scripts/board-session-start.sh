@@ -29,7 +29,8 @@ echo ""
 # which mode they're in and how to change it — a session holds one mode at a
 # time, so switching means starting a new session.
 MODE_FILE="${CLAUDE_PROJECT_DIR:-$PWD}/.engineering-board/session-mode.json"
-mode_line="$(python3 - "$MODE_FILE" <<'PY' 2>/dev/null || true
+mode_line="$(
+  python3 - "$MODE_FILE" <<'PY' 2>/dev/null || true
 import json, os, sys
 corrupt = False
 try:
@@ -111,7 +112,7 @@ for i in "${!BOARD_PATHS[@]}"; do
       item_id=$(grep "^id:" "${f}" 2>/dev/null | awk '{print $2}' || true)
       item_title=$(grep "^title:" "${f}" 2>/dev/null | sed 's/^title: //' || true)
       echo "    - ${item_id}: ${item_title}"
-    done <<< "${in_progress_files}"
+    done <<<"${in_progress_files}"
     echo "  Resolve or reset before starting new work."
     echo ""
   fi
@@ -145,7 +146,7 @@ sys.stdout.buffer.write(b"\0".join(paths[:100]) + (b"\0" if paths else b""))
     if [ -n "${in_progress_files}" ]; then
       while IFS= read -r active_file; do
         grep "^id:" "${active_file}" 2>/dev/null | awk '{print $2}' || true
-      done <<< "${in_progress_files}"
+      done <<<"${in_progress_files}"
     fi
   )
   context_json=""
@@ -189,7 +190,8 @@ for item in results:
   # timeout (measured 1200 entries = 15s). This reads each file once and maps
   # each entry's own blockers to its id (also fixing the prior head -1 quirk
   # that mis-attributed identical blocked_by lines).
-  blocking_map=$(python3 - "${BOARD_DIR}" <<'PY' 2>/dev/null || true
+  blocking_map=$(
+    python3 - "${BOARD_DIR}" <<'PY' 2>/dev/null || true
 import os, re, sys
 
 board_dir = sys.argv[1]
@@ -225,7 +227,7 @@ for root, dirs, files in os.walk(board_dir):
 for blocker, entry_id in sorted(set(rels)):
     print(f"    {blocker} blocks {entry_id}")
 PY
-)
+  )
   if [ -n "${blocking_map}" ]; then
     echo "  Blocking relationships:"
     printf '%s\n' "${blocking_map}"
@@ -245,7 +247,7 @@ PY
         session_id=$(basename "${scratch_file}" .md)
         case "${session_id}" in
           mcp-*) echo "    ${session_id}  (MCP inbox — promote with the MCP \`board_create_entry\` tool; the consolidator leaves it untouched)" ;;
-          *)     echo "    ${session_id}" ;;
+          *) echo "    ${session_id}" ;;
         esac
       done < <(find "${SCRATCH_DIR}" -maxdepth 1 -type f -name "*.md" 2>/dev/null | sort)
       echo ""

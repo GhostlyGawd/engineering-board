@@ -28,8 +28,14 @@ cd "$ROOT"
 PASS=0
 FAIL=0
 
-pass() { printf "  [PASS] %s\n" "$1"; PASS=$((PASS + 1)); }
-fail() { printf "  [FAIL] %s\n" "$1"; FAIL=$((FAIL + 1)); }
+pass() {
+  printf "  [PASS] %s\n" "$1"
+  PASS=$((PASS + 1))
+}
+fail() {
+  printf "  [FAIL] %s\n" "$1"
+  FAIL=$((FAIL + 1))
+}
 
 # Convert one fixture .md into a finding JSON and run it through the canonical
 # CLI. Prints the classifier verdict ("accept" or "reject:<reason>").

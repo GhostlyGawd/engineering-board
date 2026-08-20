@@ -108,7 +108,8 @@ PY
 fi
 
 # Step 2 — read router rows ("<project>\t<path>") and move each compat board dir.
-ROWS="$(python3 - "$ROUTER" <<'PY'
+ROWS="$(
+  python3 - "$ROUTER" <<'PY'
 import sys
 router = sys.argv[1]
 with open(router, encoding="utf-8") as f:
@@ -146,7 +147,7 @@ while IFS=$'\t' read -r project pathrel; do
       ALREADY_COUNT=$((ALREADY_COUNT + 1))
       continue
       ;;
-    "$EB_COMPAT_ROOT"/*) : ;;  # candidate to move
+    "$EB_COMPAT_ROOT"/*) : ;; # candidate to move
     *)
       echo "  skipped: $project (custom path not under $EB_COMPAT_ROOT/: $pathrel)"
       SKIPPED_COUNT=$((SKIPPED_COUNT + 1))

@@ -33,13 +33,19 @@ fi
 # id cannot mkdir outside the board (eb-self B034, defense-in-depth for direct
 # invocation — the MCP layer validates too).
 case "$ENTRY_ID" in
-  */*|*'\'*|*..*) echo "invalid entry-id (no path separators or '..'): $ENTRY_ID" >&2; exit 1 ;;
+  */* | *'\'* | *..*)
+    echo "invalid entry-id (no path separators or '..'): $ENTRY_ID" >&2
+    exit 1
+    ;;
 esac
 # SESSION_ID is written to owner.txt and read back via grep|awk '{print $2}';
 # whitespace/newline breaks that round-trip (self-DoS) and injects owner lines
 # (eb-self B029). Session tokens never contain whitespace — reject it.
 case "$SESSION_ID" in
-  *[[:space:]]*) echo "invalid session-id (no whitespace): $SESSION_ID" >&2; exit 1 ;;
+  *[[:space:]]*)
+    echo "invalid session-id (no whitespace): $SESSION_ID" >&2
+    exit 1
+    ;;
 esac
 
 # --- Cloud-sync detection ------------------------------------------------
@@ -110,7 +116,8 @@ if ! mkdir "$CLAIM_DIR" 2>/dev/null; then
   fi
 
   # Check heartbeat age via python3 (portable; no date -d / date -j -f)
-  HEARTBEAT_AGE_SEC="$(python3 - "$EXISTING_HEARTBEAT" "$STALE_CLAIM_SEC" <<'PY'
+  HEARTBEAT_AGE_SEC="$(
+    python3 - "$EXISTING_HEARTBEAT" "$STALE_CLAIM_SEC" <<'PY'
 import sys, datetime
 
 raw_ts = sys.argv[1].strip()
@@ -125,7 +132,7 @@ except Exception:
     # Unparseable timestamp — treat as stale
     print(stale_sec + 1)
 PY
-)"
+  )"
 
   if [ "$HEARTBEAT_AGE_SEC" -ge "$STALE_CLAIM_SEC" ]; then
     # Claim is stale — signal caller to run reclaim-stale
@@ -139,11 +146,11 @@ fi
 # mkdir succeeded — we own the directory.  Write owner.txt then heartbeat.txt.
 {
   printf 'session_id: %s\n' "$SESSION_ID"
-  printf 'timestamp: %s\n'  "$NOW_ISO"
-  printf 'cwd: %s\n'        "$CWD"
-} > "$OWNER_FILE"
+  printf 'timestamp: %s\n' "$NOW_ISO"
+  printf 'cwd: %s\n' "$CWD"
+} >"$OWNER_FILE"
 
-printf '%s\n' "$NOW_ISO" > "$HEARTBEAT_FILE"
+printf '%s\n' "$NOW_ISO" >"$HEARTBEAT_FILE"
 
 # --- Read-verify own write -----------------------------------------------
 # Guard against cloud-sync or AV that might rename/delay the file.

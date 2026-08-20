@@ -69,14 +69,8 @@ class FoundationPortabilityTests(unittest.TestCase):
             self.assertFalse((outside / "result.json").exists())
 
     def test_windows_path_variants_remain_contained(self) -> None:
-        self.assertTrue(
-            windows_path_is_within(
-                r"C:\REPO\engineering-board\entry.md", r"c:\repo"
-            )
-        )
-        self.assertFalse(
-            windows_path_is_within(r"C:\repository\entry.md", r"C:\repo")
-        )
+        self.assertTrue(windows_path_is_within(r"C:\REPO\engineering-board\entry.md", r"c:\repo"))
+        self.assertFalse(windows_path_is_within(r"C:\repository\entry.md", r"C:\repo"))
         for value in (
             r"C:\outside\entry.md",
             r"\\server\share\entry.md",
@@ -110,9 +104,7 @@ class FoundationPortabilityTests(unittest.TestCase):
         self.assertEqual(matrix["limits"]["validator_sessions"], 2)
         self.assertEqual(matrix["limits"]["ports"], [4173, 4318])
         schema = json.loads(
-            (ROOT / "support" / "platform-matrix.schema.json").read_text(
-                encoding="utf-8"
-            )
+            (ROOT / "support" / "platform-matrix.schema.json").read_text(encoding="utf-8")
         )
         invalid = dict(matrix)
         invalid["unexpected"] = True

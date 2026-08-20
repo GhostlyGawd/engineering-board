@@ -61,7 +61,7 @@ fi
 PAYLOAD_FILE="$(mktemp 2>/dev/null || mktemp -t ebscratch.XXXXXX)"
 cleanup() { rm -f "$PAYLOAD_FILE" 2>/dev/null || true; }
 trap cleanup EXIT
-cat > "$PAYLOAD_FILE"
+cat >"$PAYLOAD_FILE"
 
 NOW_OVERRIDE="${EB_SCRATCH_APPEND_NOW:-}"
 

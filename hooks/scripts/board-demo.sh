@@ -38,7 +38,7 @@ case "${1:-create}" in
     bash "${VIEW}" --demo-dir "${RUN_DIR}" >&2
     core finalize "$2" "${RUN_DIR}/pattern-intelligence.html"
     ;;
-  --clean|clean)
+  --clean | clean)
     if [ "$#" -ne 2 ]; then
       echo '{"error":"usage","detail":"board-demo.sh --clean <run-id>"}' >&2
       exit 2

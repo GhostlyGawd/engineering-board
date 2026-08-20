@@ -116,9 +116,7 @@ class BootstrapCliTests(unittest.TestCase):
             self.assertFalse((install_root / ".complete.json").exists())
 
     def test_native_windows_recovery_uses_python_entry_point(self) -> None:
-        with mock.patch.object(
-            bootstrap_dev.platform, "system", return_value="Windows"
-        ):
+        with mock.patch.object(bootstrap_dev.platform, "system", return_value="Windows"):
             self.assertEqual(
                 bootstrap_dev.recovery_command(),
                 "python scripts/bootstrap_dev.py",
@@ -130,9 +128,7 @@ class BootstrapCliTests(unittest.TestCase):
             )
 
         manifest = bootstrap_dev.load_manifest(MANIFEST)
-        with tempfile.TemporaryDirectory(
-            prefix="eb bootstrap windows recovery "
-        ) as temp:
+        with tempfile.TemporaryDirectory(prefix="eb bootstrap windows recovery ") as temp:
             install_root = Path(temp)
             with (
                 mock.patch.object(
@@ -191,9 +187,7 @@ class DevcontainerContractTests(unittest.TestCase):
         config = json.loads(DEVCONTAINER.read_text(encoding="utf-8"))
         self.assertEqual(config["workspaceFolder"], "/workspaces/engineering-board")
         self.assertEqual(config["remoteUser"], "vscode")
-        self.assertEqual(
-            config["postCreateCommand"], "bash scripts/bootstrap-dev.sh --check"
-        )
+        self.assertEqual(config["postCreateCommand"], "bash scripts/bootstrap-dev.sh --check")
         self.assertEqual(config["build"]["dockerfile"], "Dockerfile")
         self.assertEqual(config["build"]["context"], "..")
 
@@ -238,8 +232,7 @@ class WorkflowEvidenceContractTests(unittest.TestCase):
                 [],
                 2,
                 "",
-                "usage: bootstrap_dev.py\nunrecognized arguments: "
-                "--not-a-bootstrap-option",
+                "usage: bootstrap_dev.py\nunrecognized arguments: --not-a-bootstrap-option",
             ),
         ]
         with tempfile.TemporaryDirectory(prefix="eb windows evidence ") as temp:

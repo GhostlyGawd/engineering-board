@@ -28,9 +28,7 @@ def parse_version(value: str) -> tuple[int, int, int]:
     """Return a stable Semantic Versioning tuple."""
     match = SEMVER_RE.fullmatch(value)
     if not match:
-        raise ReleaseError(
-            f"version {value!r} must use the stable MAJOR.MINOR.PATCH format"
-        )
+        raise ReleaseError(f"version {value!r} must use the stable MAJOR.MINOR.PATCH format")
     return tuple(int(part) for part in match.groups())
 
 
@@ -70,11 +68,7 @@ def update_changelog(text: str, version: str, release_date: str) -> str:
     body = match.group("body").strip()
     if not body:
         raise ReleaseError("CHANGELOG.md [Unreleased] has no release note")
-    replacement = (
-        "## [Unreleased]\n\n"
-        f"## [{version}] — {release_date}\n\n"
-        f"{body}\n\n"
-    )
+    replacement = f"## [Unreleased]\n\n## [{version}] — {release_date}\n\n{body}\n\n"
     return text[: match.start()] + replacement + text[match.end() :]
 
 
@@ -110,9 +104,7 @@ def plan_text_changes(
     target_version = parse_version(target)
     current_version = parse_version(current)
     if refresh and target_version != current_version:
-        raise ReleaseError(
-            f"refresh target {target} must equal current version {current}"
-        )
+        raise ReleaseError(f"refresh target {target} must equal current version {current}")
     if not refresh and target_version <= current_version:
         raise ReleaseError(
             f"target version {target} must be greater than current version {current}"
@@ -163,9 +155,7 @@ def plan_text_changes(
         if isinstance(entry, dict) and entry.get("name") == plugin.get("name")
     ]
     if len(codex_matching) != 1:
-        raise ReleaseError(
-            "Codex marketplace.json must have one matching plugin entry"
-        )
+        raise ReleaseError("Codex marketplace.json must have one matching plugin entry")
     codex_entry = codex_matching[0]
     if str(codex_entry.get("version", "")) != current:
         raise ReleaseError("Codex marketplace version must match the current version")
@@ -270,9 +260,7 @@ def build_prospective_bundle(
     root: Path, target: str, release_date: str, *, refresh: bool = False
 ) -> tuple[str, dict[Path, str]]:
     """Build the bundle from a temporary tree with prospective versions."""
-    current, initial = plan_text_changes(
-        root, target, release_date, None, refresh=refresh
-    )
+    current, initial = plan_text_changes(root, target, release_date, None, refresh=refresh)
     with tempfile.TemporaryDirectory(prefix="engineering-board-release-") as temp:
         staged_root = Path(temp) / "repository"
         shutil.copytree(
@@ -281,8 +269,7 @@ def build_prospective_bundle(
             ignore=shutil.ignore_patterns(".git", ".codeweb", "dist", "__pycache__"),
         )
         staged_changes = {
-            staged_root / path.relative_to(root): text
-            for path, text in initial.items()
+            staged_root / path.relative_to(root): text for path, text in initial.items()
         }
         write_changes(staged_changes)
         result = subprocess.run(
@@ -299,9 +286,7 @@ def build_prospective_bundle(
         if not match:
             raise ReleaseError("prospective MCP bundle build returned no SHA-256")
         bundle_sha = match.group(1)
-    _, final = plan_text_changes(
-        root, target, release_date, bundle_sha, refresh=refresh
-    )
+    _, final = plan_text_changes(root, target, release_date, bundle_sha, refresh=refresh)
     return current, final
 
 
@@ -337,9 +322,7 @@ def verify_applied_bundle(root: Path, expected_sha: str) -> None:
     match = re.search(r"^sha256: ([0-9a-f]{64})$", result.stdout, re.MULTILINE)
     if not match or match.group(1) != expected_sha:
         actual = match.group(1) if match else "missing"
-        raise ReleaseError(
-            f"applied MCP bundle checksum {actual} does not match {expected_sha}"
-        )
+        raise ReleaseError(f"applied MCP bundle checksum {actual} does not match {expected_sha}")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -348,9 +331,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="Prepare all versioned Engineering Board release surfaces."
     )
     parser.add_argument("version", help="Target stable version, without a v prefix.")
-    parser.add_argument(
-        "--apply", action="store_true", help="Write the previewed release changes."
-    )
+    parser.add_argument("--apply", action="store_true", help="Write the previewed release changes.")
     parser.add_argument(
         "--refresh",
         action="store_true",
@@ -370,9 +351,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path(__file__).resolve().parents[1],
         help=argparse.SUPPRESS,
     )
-    parser.add_argument(
-        "--json", action="store_true", help="Print the result as JSON."
-    )
+    parser.add_argument("--json", action="store_true", help="Print the result as JSON.")
     return parser
 
 
@@ -403,9 +382,7 @@ def main() -> int:
             "release_date": args.date,
             "refresh": args.refresh,
             "bundle_sha256": bundle_sha,
-            "changed_files": [
-                path.relative_to(root).as_posix() for path in sorted(changes)
-            ],
+            "changed_files": [path.relative_to(root).as_posix() for path in sorted(changes)],
         }
     except (OSError, ReleaseError) as exc:
         print(f"prepare-release: FAIL: {exc}", file=sys.stderr)

@@ -33,7 +33,7 @@ for BOARD_DIR in "${BOARD_DIRS[@]}"; do
     continue
   fi
 
-  declare -A PREFIX_FOR=( [bugs]=B [features]=F [questions]=Q [observations]=O [learnings]=L )
+  declare -A PREFIX_FOR=([bugs]=B [features]=F [questions]=Q [observations]=O [learnings]=L)
   PROJECT_NAME="$(basename "${BOARD_DIR}")"
 
   for sub in bugs features questions observations learnings; do
@@ -46,7 +46,8 @@ for BOARD_DIR in "${BOARD_DIRS[@]}"; do
       # entries stay in the subdir (status: resolved, provenance in ARCHIVE.md)
       # per the resolve-in-place convention. Counting them here defeated the
       # invariant on every board that had ever resolved anything (eb-self B023).
-      file_count=$(python3 - "${sub_dir}" <<'PY'
+      file_count=$(
+        python3 - "${sub_dir}" <<'PY'
 import os, re, sys, glob
 sub_dir = sys.argv[1]
 n = 0
@@ -66,7 +67,7 @@ for p in glob.glob(os.path.join(sub_dir, "*.md")):
     n += 1
 print(n)
 PY
-)
+      )
     fi
 
     # Open rows come in two shapes: top-level entries ("- B001 ...") and C7
