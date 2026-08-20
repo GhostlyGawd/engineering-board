@@ -77,11 +77,17 @@ class Failure(Exception):
 
 
 PASSED = []
+SKIPPED = []
 
 
 def ok(label):
     PASSED.append(label)
     print("  [PASS] %s" % label)
+
+
+def skip(label, reason):
+    SKIPPED.append(label)
+    print("  [SKIP] %s: %s" % (label, reason))
 
 
 def check(cond, label, detail=""):
@@ -327,6 +333,22 @@ def run_validate(file_path, project_dir):
     return proc.returncode, proc.stderr
 
 
+def check_entry_validation(file_path, project_dir, label, warning_label=None):
+    if os.name == "nt":
+        skip(label, "posix-bash-only")
+        if warning_label:
+            skip(warning_label, "posix-bash-only")
+        return
+    rc, err = run_validate(file_path, project_dir)
+    check(rc == 0, label, err)
+    if warning_label:
+        check(
+            "parent" in err.lower() and "F999" in err,
+            warning_label,
+            err,
+        )
+
+
 def suite_lifecycle(mod, tmp_repo):
     print("\n== Suite 2: in-process board lifecycle + real validation ==")
     root = tmp_repo
@@ -379,8 +401,7 @@ def suite_lifecycle(mod, tmp_repo):
     )
     check(bug["id"] == "B001", "first bug is B001", bug["id"])
     bug_path = os.path.join(root, bug["file"])
-    rc, err = run_validate(bug_path, root)
-    check(rc == 0, "created bug passes board-validate-entry.sh", err)
+    check_entry_validation(bug_path, root, "created bug passes board-validate-entry.sh")
 
     # board_create_entry — question
     q = mod.tool_board_create_entry(
@@ -394,8 +415,11 @@ def suite_lifecycle(mod, tmp_repo):
         }
     )
     check(q["id"] == "Q001", "first question is Q001", q["id"])
-    rc, err = run_validate(os.path.join(root, q["file"]), root)
-    check(rc == 0, "created question passes board-validate-entry.sh", err)
+    check_entry_validation(
+        os.path.join(root, q["file"]),
+        root,
+        "created question passes board-validate-entry.sh",
+    )
 
     # board_create_entry — feature (blocked by the question)
     feat = mod.tool_board_create_entry(
@@ -412,8 +436,11 @@ def suite_lifecycle(mod, tmp_repo):
         }
     )
     check(feat["id"] == "F001", "first feature is F001", feat["id"])
-    rc, err = run_validate(os.path.join(root, feat["file"]), root)
-    check(rc == 0, "created feature passes board-validate-entry.sh", err)
+    check_entry_validation(
+        os.path.join(root, feat["file"]),
+        root,
+        "created feature passes board-validate-entry.sh",
+    )
 
     # negative: missing priority for a bug is rejected
     try:
@@ -460,8 +487,11 @@ def suite_lifecycle(mod, tmp_repo):
     got2 = mod.tool_board_get_entry({"project": "atlas", "root": root, "entry_id": "B001"})
     check("## Investigation" in got2["markdown"], "appended section present")
     check(got2["frontmatter"]["status"] == "in_progress", "status persisted")
-    rc, err = run_validate(os.path.join(root, got2["file"]), root)
-    check(rc == 0, "updated bug still passes validation", err)
+    check_entry_validation(
+        os.path.join(root, got2["file"]),
+        root,
+        "updated bug still passes validation",
+    )
 
     # illegal transition rejected
     try:
@@ -978,8 +1008,11 @@ def suite_lifecycle(mod, tmp_repo):
             "takeaway": "Always flush-and-verify tail on buffered writers.",
         }
     )
-    rc, err = run_validate(os.path.join(root, learn["file"]), root)
-    check(rc == 0, "created learning passes board-validate-entry.sh", err)
+    check_entry_validation(
+        os.path.join(root, learn["file"]),
+        root,
+        "created learning passes board-validate-entry.sh",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1284,8 +1317,11 @@ def suite_remember(mod):
             "## Takeaway" in body and "## Sources" in body and "## When this applies" in body,
             "body carries the curator-shaped sections",
         )
-        rc, err = run_validate(lpath, root)
-        check(rc == 0, "remember-produced learning passes board-validate-entry.sh", err)
+        check_entry_validation(
+            lpath,
+            root,
+            "remember-produced learning passes board-validate-entry.sh",
+        )
 
         # BOARD.md treatment matches the curator/rebuild convention (L row).
         with open(os.path.join(root, "engineering-board", "mem", "BOARD.md")) as f:
@@ -1293,17 +1329,20 @@ def suite_remember(mod):
         check("- L001 | [" in bmd, "BOARD.md gained the L001 open row", bmd)
 
         # index-check stays green after a remember.
-        proc = subprocess.run(
-            ["bash", index_check],
-            capture_output=True,
-            text=True,
-            env=dict(os.environ, CLAUDE_PROJECT_DIR=root),
-        )
-        check(
-            proc.returncode == 0,
-            "board-index-check.sh green post-remember",
-            proc.stderr + proc.stdout,
-        )
+        if os.name == "nt":
+            skip("board-index-check.sh green post-remember", "posix-bash-only")
+        else:
+            proc = subprocess.run(
+                ["bash", index_check],
+                capture_output=True,
+                text=True,
+                env=dict(os.environ, CLAUDE_PROJECT_DIR=root),
+            )
+            check(
+                proc.returncode == 0,
+                "board-index-check.sh green post-remember",
+                proc.stderr + proc.stdout,
+            )
 
         # second remember allocates the next id.
         r2 = mod.tool_board_remember(
@@ -1372,8 +1411,11 @@ def suite_comments_parent(mod):
         check(
             got["frontmatter"].get("parent") == "B001", "parent round-trips through create -> get"
         )
-        rc, err = run_validate(os.path.join(root, got["file"]), root)
-        check(rc == 0, "entry with parent passes board-validate-entry.sh", err)
+        check_entry_validation(
+            os.path.join(root, got["file"]),
+            root,
+            "entry with parent passes board-validate-entry.sh",
+        )
 
         # dangling parent -> warning in response, NOT an error; validator warns
         # on stderr but still exits 0.
@@ -1394,12 +1436,11 @@ def suite_comments_parent(mod):
             "dangling parent create returns a warning",
             json.dumps(rd),
         )
-        rc, err = run_validate(os.path.join(root, rd["file"]), root)
-        check(rc == 0, "dangling parent is accepted by the validator (warn, not fail)", err)
-        check(
-            "parent" in err.lower() and "F999" in err,
+        check_entry_validation(
+            os.path.join(root, rd["file"]),
+            root,
+            "dangling parent is accepted by the validator (warn, not fail)",
             "validator warns about the dangling parent on stderr",
-            err,
         )
 
         # parent settable via update, dangling -> warning.
@@ -1521,7 +1562,7 @@ def suite_comments_parent(mod):
         a_pos = md2.find("- **alice**")
         b_pos = md2.find("- **bob**")
         check(0 < a_pos < b_pos, "comments append in order")
-        rc, err = run_validate(
+        check_entry_validation(
             os.path.join(
                 root,
                 mod.tool_board_get_entry({"project": "fam", "root": root, "entry_id": "B001"})[
@@ -1529,8 +1570,8 @@ def suite_comments_parent(mod):
                 ],
             ),
             root,
+            "entry with comments still passes validation",
         )
-        check(rc == 0, "entry with comments still passes validation", err)
 
         # malformed comment -> ToolError.
         try:
@@ -1838,7 +1879,10 @@ def main():
         shutil.rmtree(tmp1, ignore_errors=True)
         shutil.rmtree(tmp2, ignore_errors=True)
 
-    print("\nRESULT: PASS (%d checks)" % len(PASSED))
+    if SKIPPED:
+        print("\nRESULT: PASS (%d checks, %d skips)" % (len(PASSED), len(SKIPPED)))
+    else:
+        print("\nRESULT: PASS (%d checks)" % len(PASSED))
     return 0
 
 
