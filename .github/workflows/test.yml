@@ -28,6 +28,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           # The Milestone D.1 harness loads the product core from the pinned
           # v1.11.0 commit. A one-commit checkout cannot verify that source.
           fetch-depth: 0

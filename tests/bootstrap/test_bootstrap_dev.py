@@ -312,6 +312,10 @@ class WorkflowEvidenceContractTests(unittest.TestCase):
     def test_windows_workflow_retains_complete_bootstrap_evidence(self) -> None:
         workflow = WINDOWS_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("push:\n    branches: [main]", workflow)
+        self.assertIn(
+            "ref: ${{ github.event.pull_request.head.sha || github.sha }}",
+            workflow,
+        )
         self.assertIn("scripts/bootstrap_ci_evidence.py", workflow)
         self.assertIn("--shell powershell", workflow)
         self.assertIn("--shell cmd", workflow)
@@ -329,6 +333,10 @@ class WorkflowEvidenceContractTests(unittest.TestCase):
     def test_aggregate_workflow_retains_exact_head_result(self) -> None:
         workflow = TEST_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("push:\n    branches: [main]", workflow)
+        self.assertIn(
+            "ref: ${{ github.event.pull_request.head.sha || github.sha }}",
+            workflow,
+        )
         self.assertIn("scripts/aggregate_ci_evidence.py", workflow)
         self.assertIn(
             ".engineering-board/validation/aggregate/run-all.json",
