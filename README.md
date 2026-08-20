@@ -434,7 +434,8 @@ bash tests/run-all.sh
 
 Native Windows uses `python scripts/quality_gate.py` with the same selectors
 from PowerShell or `cmd.exe`. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the
-exact native command paths, coverage invocation, and application scopes.
+exact native command paths, enforced total/application/branch/changed-line
+coverage thresholds, named security families, and application scopes.
 
 ## Support
 

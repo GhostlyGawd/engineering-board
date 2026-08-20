@@ -23,6 +23,7 @@ from quality_checks import QualityRunner  # noqa: E402
 
 PYTHON_ENTRY = ROOT / "scripts" / "quality_gate.py"
 BASH_ENTRY = ROOT / "scripts" / "quality-gate.sh"
+INTERNAL_COVERAGE_ENTRY = ROOT / "scripts" / "coverage_gate.py"
 STABLE_SELECTORS = ("format", "lint", "typecheck", "test", "security", "package", "all")
 PINNED_TOOLS = ROOT / ".engineering-board" / "dev-tools"
 
@@ -59,14 +60,18 @@ class QualityCommandContractTests(unittest.TestCase):
         self,
         fixture: Path,
         selector: str,
+        *,
+        environment: dict[str, str] | None = None,
     ) -> subprocess.CompletedProcess[str]:
-        environment = os.environ.copy()
-        environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)
+        fixture_environment = os.environ.copy()
+        if environment:
+            fixture_environment.update(environment)
+        fixture_environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)
         return self.run_python(
             "--root",
             str(fixture),
             selector,
-            environment=environment,
+            environment=fixture_environment,
         )
 
     def test_help_is_discoverable_and_equivalent(self) -> None:
@@ -220,6 +225,48 @@ class QualityCommandContractTests(unittest.TestCase):
                     result.stdout,
                 )
 
+    def test_internal_coverage_reports_all_thresholds_and_identity(self) -> None:
+        environment = os.environ.copy()
+        environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)
+        result = subprocess.run(
+            [sys.executable, str(INTERNAL_COVERAGE_ENTRY), "--root", str(ROOT)],
+            cwd=ROOT,
+            env=environment,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        diagnostic = result.stdout + result.stderr
+        for token in (
+            "coverage total lines:",
+            "coverage total branches:",
+            "coverage application root-plugin lines:",
+            "coverage application mcp-server lines:",
+            "coverage changed-lines:",
+            "base=",
+            "head=",
+        ):
+            self.assertIn(token, diagnostic)
+
+    def test_security_selector_reports_every_named_family(self) -> None:
+        environment = os.environ.copy()
+        environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)
+        result = self.run_python("security", environment=environment)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        for family in (
+            "dependency-audit",
+            "secret-scan",
+            "workflow-risks",
+            "immutable-pins",
+            "supply-chain-policy",
+            "checksum-integrity",
+            "reject-filter",
+        ):
+            self.assertIn(f"security family {family}", result.stdout)
+
     def test_invalid_invocations_start_no_stage_or_artifact(self) -> None:
         invalid = (
             (),
@@ -278,6 +325,26 @@ class QualityCommandContractTests(unittest.TestCase):
         shutil.copytree(
             ROOT,
             fixture,
+            ignore=shutil.ignore_patterns(
+                ".engineering-board",
+                ".git",
+                "__pycache__",
+                "dist",
+            ),
+        )
+        return fixture
+
+    @staticmethod
+    def copy_repository_with_history(destination: Path) -> Path:
+        fixture = destination / "quality fixture"
+        subprocess.run(
+            ["git", "clone", "-q", "--no-hardlinks", str(ROOT), str(fixture)],
+            check=True,
+        )
+        shutil.copytree(
+            ROOT,
+            fixture,
+            dirs_exist_ok=True,
             ignore=shutil.ignore_patterns(
                 ".engineering-board",
                 ".git",
@@ -511,6 +578,125 @@ class QualityCommandContractTests(unittest.TestCase):
                 "typing-policy failed",
                 "changed outside the approved policy",
             )
+
+    def test_changed_line_coverage_fails_a_real_untested_regression(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb coverage regression ") as temp:
+            fixture = self.copy_repository_with_history(Path(temp))
+            subprocess.run(
+                ["git", "config", "user.name", "Coverage Fixture"], cwd=fixture, check=True
+            )
+            subprocess.run(
+                ["git", "config", "user.email", "coverage-fixture@example.invalid"],
+                cwd=fixture,
+                check=True,
+            )
+            subprocess.run(["git", "add", "."], cwd=fixture, check=True)
+            subprocess.run(
+                ["git", "commit", "--allow-empty", "-qm", "fixture baseline"],
+                cwd=fixture,
+                check=True,
+            )
+
+            target = fixture / "hooks" / "scripts" / "board_demo.py"
+            target.write_text(
+                target.read_text(encoding="utf-8")
+                + "\n\ndef reachable_but_untested_regression(value: bool) -> str:\n"
+                + '    """Return one of two reachable values."""\n'
+                + '    return "covered" if value else "missed"\n',
+                encoding="utf-8",
+            )
+            subprocess.run(["git", "add", target.name], cwd=target.parent, check=True)
+            subprocess.run(
+                ["git", "commit", "-qm", "add uncovered regression"], cwd=fixture, check=True
+            )
+
+            environment = os.environ.copy()
+            environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)
+            result = subprocess.run(
+                [sys.executable, str(INTERNAL_COVERAGE_ENTRY), "--root", str(fixture)],
+                cwd=fixture,
+                env=environment,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            diagnostic = result.stdout + result.stderr
+            self.assertIn("coverage total lines: pass", diagnostic)
+            self.assertIn("coverage changed-lines: fail", diagnostic)
+            self.assertIn("hooks/scripts/board_demo.py", diagnostic)
+            self.assertIn("reachable_but_untested_regression", target.read_text(encoding="utf-8"))
+
+    def test_security_families_fail_closed_and_redact_secret_values(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb security regression ") as temp:
+            fixture = self.copy_repository(Path(temp))
+            dependency_fixture = fixture / "support" / "quality" / "dependency-audit.txt"
+            dependency_fixture.write_text("urllib3==1.26.5\n", encoding="utf-8")
+
+            secret_value = "github_" + "pat_" + ("A" * 40)
+            secret_fixture = fixture / "docs" / "security-secret-fixture.md"
+            secret_fixture.write_text(f"credential: {secret_value}\n", encoding="utf-8")
+
+            workflow_fixture = fixture / ".github" / "workflows" / "security-fixture.yml"
+            workflow_fixture.write_text(
+                "name: security fixture\n"
+                "on: pull_request\n"
+                "permissions:\n"
+                "  contents: write\n"
+                "jobs:\n"
+                "  unsafe:\n"
+                "    runs-on: ubuntu-latest\n"
+                "    steps:\n"
+                "      - uses: actions/checkout@v7\n"
+                '      - run: echo "${{ github.event.pull_request.title }}"\n',
+                encoding="utf-8",
+            )
+
+            manifest_path = fixture / "support" / "dev-tools" / "toolchain.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["artifacts"][0]["url"] = (
+                "https://github.com/astral-sh/uv/releases/latest/download/uv.tar.gz"
+            )
+            manifest["artifacts"][0]["sha256"] = "0" * 64
+            manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+            protected_paths = (
+                dependency_fixture,
+                secret_fixture,
+                workflow_fixture,
+                manifest_path,
+            )
+            before = {path: self.digest(path) for path in protected_paths}
+            result = self.run_fixture(
+                fixture,
+                "security",
+                environment={
+                    "ENGINEERING_BOARD_SECURITY_DEPENDENCY_INPUT": (
+                        "support/quality/dependency-audit.txt"
+                    )
+                },
+            )
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            diagnostic = result.stdout + result.stderr
+            for token in (
+                "dependency-audit",
+                "PYSEC-",
+                "secret-scan",
+                "SECRET-GITHUB-PAT",
+                "workflow-risks",
+                "template-injection",
+                "immutable-pins",
+                "unpinned-uses",
+                "mutable download URL",
+                "checksum-integrity",
+                "manifest checksum",
+                "<redacted>",
+            ):
+                self.assertIn(token, diagnostic)
+            self.assertNotIn(secret_value, diagnostic)
+            self.assertEqual(before, {path: self.digest(path) for path in protected_paths})
 
 
 if __name__ == "__main__":

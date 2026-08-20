@@ -7,9 +7,11 @@
       "id": "root-plugin",
       "typed_paths": [
         "hooks/scripts/board_demo.py",
+        "scripts/coverage_gate.py",
         "scripts/platform_contract.py",
         "scripts/quality_checks.py",
         "scripts/quality_gate.py",
+        "scripts/security_gate.py",
         "scripts/validator_resources.py"
       ],
       "staged_exclusions": [

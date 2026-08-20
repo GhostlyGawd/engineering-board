@@ -56,3 +56,11 @@ Markdown, YAML, JSON and schemas, workflows, naming, complexity, dead code,
 duplicate code, and large-file policy. Strict typing covers the root plugin
 and MCP server scopes listed in `support/quality/typing-policy.json`; the gate
 prints each tracked staged exclusion.
+
+The `test` selector enforces the versioned total, branch, per-application, and
+changed-line thresholds in `support/quality/coverage-policy.json`. The
+`security` selector reports dependency audit, secret scan, workflow risk,
+immutable pin, supply-chain policy, checksum integrity, and reject-filter
+families separately.
+Security diagnostics name rules and advisories but redact detected secret
+values.

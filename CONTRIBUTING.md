@@ -96,6 +96,20 @@ unknown options, missing values, and worker counts outside 1 to 2 fail before
 any stage starts. Git Bash and WSL are compatibility environments. They are
 not native Windows evidence.
 
+The `test` selector writes ignored coverage evidence below
+`.engineering-board/validation/coverage/`. It enforces the versioned total,
+branch, root-plugin, MCP-server, and changed-line thresholds in
+`support/quality/coverage-policy.json`. Pull-request runs compare with the
+base branch. Local runs compare with the previous commit unless
+`ENGINEERING_BOARD_COVERAGE_BASE` names an explicit base.
+
+The `security` selector audits the complete pinned Python lock, scans for
+secret signatures, runs the pinned workflow analyzer, requires full action
+SHAs and immutable download URLs, verifies checksums and the installed tool
+inventory, enforces the tracked supply-chain policy, and exercises the
+canonical reject filter. It reports each family separately. Secret
+diagnostics show `<redacted>` instead of the detected value.
+
 Supported host, shell, runtime, and container versions are declared in
 [`support/platform-matrix.json`](support/platform-matrix.json) and documented
 in [`docs/SUPPORTED_PLATFORMS.md`](docs/SUPPORTED_PLATFORMS.md). Native

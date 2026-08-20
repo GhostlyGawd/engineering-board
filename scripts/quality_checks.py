@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import importlib.util
 import json
 import os
 from pathlib import Path
@@ -11,6 +10,9 @@ import re
 import subprocess
 import sys
 from typing import Any, Iterable, Sequence
+
+from coverage_gate import CoverageGateError, run_coverage
+from security_gate import SecurityGateError, run_security
 
 
 IGNORED_DIRECTORIES = {
@@ -24,9 +26,11 @@ PYTHON_DIRECTORIES = ("scripts", "hooks/scripts", "mcp-server", "evaluation", "t
 ANALYSIS_DIRECTORIES = ("scripts", "hooks/scripts", "mcp-server", "evaluation")
 ANALYSIS_EXCLUSIONS = {"mcp-server/test_mcp_server.py"}
 TYPED_PATHS = (
+    "scripts/coverage_gate.py",
     "scripts/platform_contract.py",
     "scripts/quality_checks.py",
     "scripts/quality_gate.py",
+    "scripts/security_gate.py",
     "scripts/validator_resources.py",
     "hooks/scripts/board_demo.py",
     "mcp-server/engineering_board_core.py",
@@ -40,9 +44,11 @@ EXPECTED_TYPING_POLICY = {
             "id": "root-plugin",
             "typed_paths": [
                 "hooks/scripts/board_demo.py",
+                "scripts/coverage_gate.py",
                 "scripts/platform_contract.py",
                 "scripts/quality_checks.py",
                 "scripts/quality_gate.py",
+                "scripts/security_gate.py",
                 "scripts/validator_resources.py",
             ],
             "staged_exclusions": [
@@ -587,63 +593,20 @@ class QualityRunner:
                 native_shell,
             ],
         )
-
-    @staticmethod
-    def _fixture_field(text: str, field: str) -> str:
-        match = re.search(
-            rf"^\s*(?:-\s*)?{re.escape(field)}:\s*(.+)$",
-            text,
-            re.MULTILINE,
-        )
-        return match.group(1).strip() if match else ""
+        self._stage("coverage")
+        try:
+            run_coverage(self.root)
+        except CoverageGateError as exc:
+            raise QualityError(f"coverage failed: {exc}") from exc
+        print("quality-gate: pass coverage", flush=True)
 
     def security(self) -> None:
-        self._stage("reject-filter")
-        module_path = self.root / "hooks" / "scripts" / "board_reject_check.py"
-        spec = importlib.util.spec_from_file_location("quality_reject_filter", module_path)
-        if spec is None or spec.loader is None:
-            raise QualityError("reject-filter failed: cannot load canonical filter")
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        reject_finding = getattr(module, "reject_finding")
-        adversarial = sorted((self.root / "tests/fixtures/adversarial-paste").glob("adv-*.md"))
-        benign = sorted((self.root / "tests/fixtures/benign-findings").glob("benign-*.md"))
-        if len(adversarial) < 30 or len(benign) < 20:
-            raise QualityError(
-                f"reject-filter corpus shrank: adversarial={len(adversarial)}, benign={len(benign)}"
-            )
-        failures: list[str] = []
-        for path, should_reject in [
-            *((path, True) for path in adversarial),
-            *((path, False) for path in benign),
-        ]:
-            text = path.read_text(encoding="utf-8")
-            title_match = re.search(r"^#\s*(.+)$", text, re.MULTILINE)
-            tags = [
-                value.strip().strip("\"'")
-                for value in self._fixture_field(text, "tags").strip("[]").split(",")
-                if value.strip()
-            ]
-            finding = {
-                "title": title_match.group(1).strip() if title_match else "",
-                "evidence_quote": self._fixture_field(text, "evidence_quote").strip('"'),
-                "affects": self._fixture_field(text, "affects"),
-                "tags": tags,
-            }
-            verdict = reject_finding(finding)
-            rejected = verdict is not None
-            if rejected != should_reject:
-                failures.append(
-                    f"{path.relative_to(self.root).as_posix()}: "
-                    f"expected {'reject' if should_reject else 'accept'}, got {verdict}"
-                )
-        if failures:
-            raise QualityError("reject-filter failed:\n" + "\n".join(failures))
-        print(
-            "quality-gate: pass reject-filter "
-            f"(adversarial={len(adversarial)}, benign={len(benign)})",
-            flush=True,
-        )
+        self._stage("security")
+        try:
+            run_security(self.root, self.toolchain.root, self.environment)
+        except SecurityGateError as exc:
+            raise QualityError(f"security failed: {exc}") from exc
+        print("quality-gate: pass security", flush=True)
 
     def package(self) -> None:
         command = (

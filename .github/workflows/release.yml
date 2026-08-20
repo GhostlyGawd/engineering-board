@@ -42,27 +42,33 @@ on:
         default: false
 
 permissions:
-  contents: write   # create tag ref + release
-  id-token: write   # OIDC for mcp-publisher (registry publish)
+  contents: read
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # create tag ref + release
+      id-token: write   # OIDC for mcp-publisher (registry publish)
     outputs:
       sha: ${{ steps.resolve.outputs.sha }}
       version: ${{ steps.resolve.outputs.version }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
 
       - name: Resolve tag + sha
         id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_SHA: ${{ inputs.sha }}
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG="${{ inputs.tag }}"
-            SHA="${{ inputs.sha }}"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            TAG="$INPUT_TAG"
+            SHA="$INPUT_SHA"
           else
             TAG="${GITHUB_REF#refs/tags/}"
             SHA="$(git rev-list -n 1 "$TAG")"
@@ -78,10 +84,11 @@ jobs:
 
       - name: Create tag if missing (dispatch)
         if: github.event_name == 'workflow_dispatch'
+        env:
+          SHA: ${{ steps.resolve.outputs.sha }}
+          TAG: ${{ steps.resolve.outputs.tag }}
         run: |
           set -euo pipefail
-          TAG="${{ steps.resolve.outputs.tag }}"
-          SHA="${{ steps.resolve.outputs.sha }}"
           if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
             echo "tag $TAG already exists on origin — reusing (tags are never moved)"
           else
@@ -92,19 +99,25 @@ jobs:
           fi
 
       - name: Check out the tagged tree
-        run: git checkout --detach "${{ steps.resolve.outputs.sha }}"
+        env:
+          SHA: ${{ steps.resolve.outputs.sha }}
+        run: git checkout --detach "$SHA"
 
       - name: Verify tag matches the manifest version
+        env:
+          EXPECTED_VERSION: ${{ steps.resolve.outputs.version }}
         run: |
           set -euo pipefail
           MANIFEST_VER="$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")"
-          [ "$MANIFEST_VER" = "${{ steps.resolve.outputs.version }}" ] \
-            || { echo "plugin.json at this sha is $MANIFEST_VER, not ${{ steps.resolve.outputs.version }}" >&2; exit 1; }
+          [ "$MANIFEST_VER" = "$EXPECTED_VERSION" ] \
+            || { echo "plugin.json at this sha is $MANIFEST_VER, not $EXPECTED_VERSION" >&2; exit 1; }
 
       - name: Extract release notes from CHANGELOG
+        env:
+          VERSION: ${{ steps.resolve.outputs.version }}
         run: |
           set -euo pipefail
-          python3 - "${{ steps.resolve.outputs.version }}" > /tmp/notes.md <<'PY'
+          python3 - "$VERSION" > /tmp/notes.md <<'PY'
           import re, sys
           version = sys.argv[1]
           text = open("CHANGELOG.md", encoding="utf-8").read()
@@ -138,16 +151,17 @@ jobs:
 
       - name: Publish the GitHub Release
         env:
+          ATTACH_BUNDLE: ${{ steps.bundle.outputs.attach }}
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.resolve.outputs.tag }}
         run: |
           set -euo pipefail
-          TAG="${{ steps.resolve.outputs.tag }}"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "release $TAG already exists — leaving it untouched"
             exit 0
           fi
           ASSET=""
-          [ "${{ steps.bundle.outputs.attach }}" = "true" ] && ASSET="dist/engineering-board-mcp.mcpb"
+          [ "$ATTACH_BUNDLE" = "true" ] && ASSET="dist/engineering-board-mcp.mcpb"
           gh release create "$TAG" $ASSET \
             --repo "$GITHUB_REPOSITORY" \
             --verify-tag \
@@ -160,13 +174,25 @@ jobs:
         working-directory: mcp-server
         run: |
           set -euo pipefail
-          OS="$(uname -s | tr '[:upper:]' '[:lower:]')"; ARCH="$(uname -m)"
-          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_${OS}_${ARCH}.tar.gz" | tar xz mcp-publisher \
-          || { # asset naming fallback: look the download URL up via the API
-            URL="$(curl -fsSL https://api.github.com/repos/modelcontextprotocol/registry/releases/latest \
-              | python3 -c "import json,sys; a=json.load(sys.stdin)['assets']; print(next(x['browser_download_url'] for x in a if 'publisher' in x['name'] and '$OS' in x['name'] and ('$ARCH' in x['name'] or 'amd64' in x['name'])))")"
-            curl -fsSL "$URL" | tar xz mcp-publisher
-          }
+          URL="https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_amd64.tar.gz"
+          EXPECTED="a06c9096dcb9727c13555b6be26c7effa707b01f06a4c561ba7a3635443cf2cc"
+          ARCHIVE="$(mktemp)"
+          trap 'rm -f "$ARCHIVE"' EXIT
+          curl -fsSL "$URL" -o "$ARCHIVE"
+          python3 - "$ARCHIVE" "$EXPECTED" <<'PY'
+          import hashlib
+          import pathlib
+          import sys
+
+          path = pathlib.Path(sys.argv[1])
+          expected = sys.argv[2]
+          actual = hashlib.sha256(path.read_bytes()).hexdigest()
+          if actual != expected:
+              raise SystemExit(
+                  f"mcp-publisher checksum mismatch: expected {expected}, got {actual}"
+              )
+          PY
+          tar xzf "$ARCHIVE" mcp-publisher
           ./mcp-publisher login github-oidc
           ./mcp-publisher publish
           echo "published to registry.modelcontextprotocol.io — syndication to PulseMCP/Glama/mcp.so follows automatically"
@@ -188,11 +214,14 @@ jobs:
       contents: read
       id-token: write   # OIDC for PyPI trusted publishing
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ needs.release.outputs.sha }}
+          persist-credentials: false
 
       - name: Verify pyproject version matches the tag
+        env:
+          EXPECTED_VERSION: ${{ needs.release.outputs.version }}
         run: |
           set -euo pipefail
           PKG_VER="$(python3 -c "
@@ -201,15 +230,15 @@ jobs:
           m = re.search(r'^version\s*=\s*\"([^\"]+)\"', text, re.M)
           print(m.group(1) if m else '')
           ")"
-          [ "$PKG_VER" = "${{ needs.release.outputs.version }}" ] \
-            || { echo "pyproject.toml is $PKG_VER, not ${{ needs.release.outputs.version }} — refusing to publish" >&2; exit 1; }
+          [ "$PKG_VER" = "$EXPECTED_VERSION" ] \
+            || { echo "pyproject.toml is $PKG_VER, not $EXPECTED_VERSION — refusing to publish" >&2; exit 1; }
 
       - name: Build sdist + wheel
         working-directory: mcp-server
         run: pipx run build
 
       - name: Publish to PyPI (trusted publishing)
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
         with:
           packages-dir: mcp-server/dist/
           skip-existing: true

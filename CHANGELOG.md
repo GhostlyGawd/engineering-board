@@ -22,6 +22,10 @@ increases.
   non-rewriting format/lint policy; strict root-plugin and MCP type scopes with
   tracked staged exclusions; and exact contributor, agent, platform, and MCP
   application guidance.
+- Added enforceable total, branch, root-plugin, MCP-server, and changed-line
+  coverage thresholds plus named fail-closed dependency, secret, workflow,
+  immutable-pin, checksum-integrity, and reject-filter security families with
+  advisory diagnostics and secret-value redaction.
 
 ### Fixed
 

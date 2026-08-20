@@ -112,6 +112,11 @@ _Last updated: 2026-07-10_
   scopes plus visible staged exclusions. The format and lint gates are
   non-rewriting and cover Python, shell, Markdown, YAML, JSON/schema,
   workflows, naming, complexity, dead code, duplication, and large files.
+  The test gate also enforces the versioned overall, branch, application, and
+  changed-line policy in `support/quality/coverage-policy.json`. The security
+  gate reports fail-closed dependency, secret, workflow, immutable-pin,
+  supply-chain-policy, checksum-integrity, and reject-filter families and
+  redacts secret values.
 - **Board location resolves in ONE place now:** source `hooks/scripts/board-paths.sh` and call `eb_board_dirs` / `eb_board_rows` / `eb_router_path`. Do **not** re-hardcode `docs/boards/` in scripts.
 - **Version bumps** must touch *both* `.claude-plugin/plugin.json` and `marketplace.json` (coherence-checked), and a fix only reaches installs when the version *increases*.
 - New `hooks/scripts/*.sh` must pass `tests/crosscompat-lint.sh`: shebang exactly `#!/usr/bin/env bash`, no `date -d`/`date -j -f`, no `jq`, no drive letters (use python3 for JSON + timestamps).

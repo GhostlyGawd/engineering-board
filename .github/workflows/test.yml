@@ -30,9 +30,10 @@ jobs:
       ENGINEERING_BOARD_SUPPORT_ROW: linux-x86_64-bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
           # The Milestone D.1 harness loads the product core from the pinned
           # v1.11.0 commit. A one-commit checkout cannot verify that source.
           fetch-depth: 0
@@ -58,7 +59,7 @@ jobs:
 
       - name: Retain exact-head aggregate result
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: aggregate-result-linux-x86_64-bash
           path: .engineering-board/validation/aggregate/run-all.json

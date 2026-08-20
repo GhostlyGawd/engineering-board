@@ -1,0 +1,40 @@
+{
+  "schema_version": "1",
+  "measurement": {
+    "omitted_paths": [
+      "mcp-server/test_mcp_server.py",
+      "scripts/coverage_gate.py",
+      "scripts/quality_checks.py",
+      "scripts/quality_gate.py",
+      "scripts/security_gate.py",
+      "tests/"
+    ]
+  },
+  "total": {
+    "line_percent": 40.0,
+    "branch_percent": 40.0
+  },
+  "changed_lines": {
+    "line_percent": 70.0
+  },
+  "applications": [
+    {
+      "id": "root-plugin",
+      "paths": [
+        "evaluation/",
+        "hooks/scripts/",
+        "scripts/"
+      ],
+      "line_percent": 15.0,
+      "branch_percent": 10.0
+    },
+    {
+      "id": "mcp-server",
+      "paths": [
+        "mcp-server/"
+      ],
+      "line_percent": 60.0,
+      "branch_percent": 60.0
+    }
+  ]
+}
