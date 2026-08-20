@@ -38,6 +38,13 @@ class BootstrapError(RuntimeError):
     """Actionable bootstrap failure."""
 
 
+def recovery_command() -> str:
+    """Return the documented bootstrap command for the current host."""
+    if platform.system() == "Windows":
+        return "python scripts/bootstrap_dev.py"
+    return "bash scripts/bootstrap-dev.sh"
+
+
 def file_sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -177,7 +184,7 @@ def _run_tool_version(
     if not command.is_file():
         raise BootstrapError(
             f"missing pinned tool {tool['id']} {tool['version']} at {command}; "
-            "run: bash scripts/bootstrap-dev.sh"
+            f"run: {recovery_command()}"
         )
     environment = os.environ.copy()
     path_entries = [
@@ -216,13 +223,13 @@ def _run_tool_version(
     if result.returncode != 0:
         raise BootstrapError(
             f"{tool['id']} version check exited {result.returncode}: {output}; "
-            "run: bash scripts/bootstrap-dev.sh"
+            f"run: {recovery_command()}"
         )
     expected = expected_output_version
     if re.search(rf"(?<![0-9.]){re.escape(expected)}(?![0-9.])", output) is None:
         raise BootstrapError(
             f"{tool['id']} version mismatch: expected {expected}, got "
-            f"{output or '<empty output>'}; run: bash scripts/bootstrap-dev.sh"
+            f"{output or '<empty output>'}; run: {recovery_command()}"
         )
     return tool["version"]
 
@@ -239,27 +246,25 @@ def check_installation(
     if not marker.is_file():
         raise BootstrapError(
             f"development toolchain is not installed at {install_root}; "
-            "run: bash scripts/bootstrap-dev.sh"
+            f"run: {recovery_command()}"
         )
     try:
         completed = json.loads(marker.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise BootstrapError(
-            f"toolchain completion marker is invalid: {exc}; "
-            "run: bash scripts/bootstrap-dev.sh"
+            f"toolchain completion marker is invalid: {exc}; run: {recovery_command()}"
         ) from exc
     manifest_path = manifest["_manifest_path"]
     expected_digest = file_sha256(manifest_path)
     if completed.get("manifest_sha256") != expected_digest:
         raise BootstrapError(
-            "toolchain manifest changed after installation; "
-            "run: bash scripts/bootstrap-dev.sh"
+            f"toolchain manifest changed after installation; run: {recovery_command()}"
         )
     selected_platform = platform_key()
     if completed.get("platform") != selected_platform:
         raise BootstrapError(
             f"toolchain was installed for {completed.get('platform')}, "
-            f"not {selected_platform}; run: bash scripts/bootstrap-dev.sh"
+            f"not {selected_platform}; run: {recovery_command()}"
         )
     inventory: Dict[str, str] = {}
     for tool in manifest["tools"]:
@@ -268,14 +273,14 @@ def check_installation(
             if not command.is_file():
                 raise BootstrapError(
                     f"missing pinned tool {tool['id']} {tool['version']} at "
-                    f"{command}; run: bash scripts/bootstrap-dev.sh"
+                    f"{command}; run: {recovery_command()}"
                 )
             expected_file = completed.get("file_sha256", {}).get(tool["id"])
             actual_file = file_sha256(command)
             if expected_file != actual_file:
                 raise BootstrapError(
                     f"{tool['id']} executable checksum mismatch; "
-                    "run: bash scripts/bootstrap-dev.sh"
+                    f"run: {recovery_command()}"
                 )
             version = tool["version"]
         elif command_runner is None:
@@ -306,7 +311,7 @@ def download_artifact(
         temporary.unlink(missing_ok=True)
         raise BootstrapError(
             f"download failed for {artifact['id']} {artifact['version']}: {exc}; "
-            "check network access and rerun: bash scripts/bootstrap-dev.sh"
+            f"check network access and rerun: {recovery_command()}"
         ) from exc
     actual = file_sha256(temporary)
     if actual != artifact["sha256"]:
@@ -314,7 +319,7 @@ def download_artifact(
         raise BootstrapError(
             f"checksum mismatch for {artifact['id']} {artifact['version']}: "
             f"expected {artifact['sha256']}, got {actual}; remove {archive} "
-            "and rerun: bash scripts/bootstrap-dev.sh"
+            f"and rerun: {recovery_command()}"
         )
     os.replace(temporary, archive)
     return archive
@@ -424,7 +429,7 @@ def _run_install(
     raise BootstrapError(
         f"installation command failed with exit {result.returncode}: "
         f"{' '.join(command)}: {diagnostic}; correct the reported prerequisite or "
-        "network error and rerun: bash scripts/bootstrap-dev.sh"
+        f"network error and rerun: {recovery_command()}"
     )
 
 

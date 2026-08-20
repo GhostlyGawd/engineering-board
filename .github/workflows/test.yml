@@ -1,7 +1,7 @@
 name: tests
 
-# v0.3.2 CI gate — runs the full engineering-board test suite on every push
-# and pull-request. Mirrors what `bash tests/run-all.sh` runs locally.
+# v0.3.2 CI gate — runs the full engineering-board test suite on main pushes
+# and pull requests. Mirrors what `bash tests/run-all.sh` runs locally.
 #
 # The runner owns the current suite manifest. This workflow does not duplicate
 # the suite count because the count changes as product gates are added.
@@ -15,6 +15,7 @@ name: tests
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 jobs:
@@ -46,4 +47,15 @@ jobs:
         run: bash scripts/bootstrap-dev.sh --check
 
       - name: Run full test suite
-        run: bash tests/run-all.sh
+        run: >-
+          python3 scripts/aggregate_ci_evidence.py
+          --output .engineering-board/validation/aggregate/run-all.json
+
+      - name: Retain exact-head aggregate result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aggregate-result-linux-x86_64-bash
+          path: .engineering-board/validation/aggregate/run-all.json
+          if-no-files-found: error
+          retention-days: 30

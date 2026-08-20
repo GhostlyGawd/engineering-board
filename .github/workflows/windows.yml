@@ -2,6 +2,7 @@ name: native-windows
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 jobs:
@@ -44,18 +45,13 @@ jobs:
           git --version
           python -c "import os, platform; print(os.name, platform.platform())"
 
-      - name: Provision pinned development tools from PowerShell
+      - name: Exercise bootstrap contract from PowerShell
         if: matrix.native_shell == 'powershell'
         shell: pwsh
-        run: python scripts/bootstrap_dev.py
-
-      - name: Verify pinned development tools from PowerShell
-        if: matrix.native_shell == 'powershell'
-        shell: pwsh
-        env:
-          UV_OFFLINE: "1"
-          npm_config_offline: "true"
-        run: python scripts/bootstrap_dev.py --check
+        run: >-
+          python scripts/bootstrap_ci_evidence.py
+          --shell powershell
+          --output .engineering-board/validation/bootstrap/powershell.json
 
       - name: Validate from PowerShell
         if: matrix.native_shell == 'powershell'
@@ -72,28 +68,26 @@ jobs:
           git --version
           python -c "import os, platform; print(os.name, platform.platform())"
 
-      - name: Provision pinned development tools from cmd.exe
+      - name: Exercise bootstrap contract from cmd.exe
         if: matrix.native_shell == 'cmd'
         shell: cmd
-        run: python scripts\bootstrap_dev.py
-
-      - name: Verify pinned development tools from cmd.exe
-        if: matrix.native_shell == 'cmd'
-        shell: cmd
-        env:
-          UV_OFFLINE: "1"
-          npm_config_offline: "true"
-        run: python scripts\bootstrap_dev.py --check
+        run: >-
+          python scripts\bootstrap_ci_evidence.py
+          --shell cmd
+          --output .engineering-board\validation\bootstrap\cmd.json
 
       - name: Validate from cmd.exe
         if: matrix.native_shell == 'cmd'
         shell: cmd
         run: python scripts\platform_test.py --workers 2 --shell cmd
 
-      - name: Retain platform result
+      - name: Retain exact-head Windows evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: platform-result-${{ matrix.support_row }}
-          path: .engineering-board/validation/platform/${{ matrix.native_shell }}.json
+          name: foundation-windows-evidence-${{ matrix.support_row }}
+          path: |
+            .engineering-board/validation/bootstrap/*.json
+            .engineering-board/validation/platform/*.json
           if-no-files-found: error
+          retention-days: 30

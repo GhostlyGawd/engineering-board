@@ -20,6 +20,9 @@ increases.
 
 ### Fixed
 
+- Native Windows bootstrap failures now print the supported Python recovery
+  command, and Windows plus aggregate CI retain exact-head result manifests
+  for the temporary foundation evidence flow.
 - The evaluation harness now accepts fixed macOS system aliases such as
   `/var` to `/private/var` without accepting user-created symbolic-link,
   junction, or reparse-point escapes.

@@ -15,11 +15,13 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from scripts import bootstrap_dev
+from scripts import bootstrap_ci_evidence, bootstrap_dev
 
 MANIFEST = ROOT / "support" / "dev-tools" / "toolchain.json"
 DEVCONTAINER = ROOT / ".devcontainer" / "devcontainer.json"
 DOCKERFILE = ROOT / ".devcontainer" / "Dockerfile"
+WINDOWS_WORKFLOW = ROOT / ".github" / "workflows" / "windows.yml"
+TEST_WORKFLOW = ROOT / ".github" / "workflows" / "test.yml"
 EXPECTED_TOOLS = {
     "actionlint",
     "check-jsonschema",
@@ -113,6 +115,38 @@ class BootstrapCliTests(unittest.TestCase):
             self.assertEqual(before, after)
             self.assertFalse((install_root / ".complete.json").exists())
 
+    def test_native_windows_recovery_uses_python_entry_point(self) -> None:
+        with mock.patch.object(
+            bootstrap_dev.platform, "system", return_value="Windows"
+        ):
+            self.assertEqual(
+                bootstrap_dev.recovery_command(),
+                "python scripts/bootstrap_dev.py",
+            )
+        with mock.patch.object(bootstrap_dev.platform, "system", return_value="Darwin"):
+            self.assertEqual(
+                bootstrap_dev.recovery_command(),
+                "bash scripts/bootstrap-dev.sh",
+            )
+
+        manifest = bootstrap_dev.load_manifest(MANIFEST)
+        with tempfile.TemporaryDirectory(
+            prefix="eb bootstrap windows recovery "
+        ) as temp:
+            install_root = Path(temp)
+            with (
+                mock.patch.object(
+                    bootstrap_dev.platform,
+                    "system",
+                    return_value="Windows",
+                ),
+                self.assertRaisesRegex(
+                    bootstrap_dev.BootstrapError,
+                    r"run: python scripts/bootstrap_dev\.py",
+                ),
+            ):
+                bootstrap_dev.check_installation(ROOT, install_root, manifest)
+
     def test_check_is_network_free_and_read_only(self) -> None:
         manifest = bootstrap_dev.load_manifest(MANIFEST)
         expected = {tool["id"]: tool["version"] for tool in manifest["tools"]}
@@ -181,6 +215,127 @@ class DevcontainerContractTests(unittest.TestCase):
             ".DS_Store",
         ):
             self.assertIn(pattern, dockerignore)
+
+
+class WorkflowEvidenceContractTests(unittest.TestCase):
+    def test_windows_evidence_manifest_records_required_decisions(self) -> None:
+        inventory = json.dumps({"python": "3.14.0", "ruff": "0.12.12"}) + "\n"
+        results = [
+            subprocess.CompletedProcess([], 0, inventory, ""),
+            subprocess.CompletedProcess([], 0, inventory, ""),
+            subprocess.CompletedProcess([], 0, inventory, ""),
+            subprocess.CompletedProcess([], 0, inventory, ""),
+            subprocess.CompletedProcess(
+                [],
+                2,
+                "",
+                (
+                    "bootstrap-dev: development toolchain is not installed; "
+                    "run: python scripts/bootstrap_dev.py"
+                ),
+            ),
+            subprocess.CompletedProcess(
+                [],
+                2,
+                "",
+                "usage: bootstrap_dev.py\nunrecognized arguments: "
+                "--not-a-bootstrap-option",
+            ),
+        ]
+        with tempfile.TemporaryDirectory(prefix="eb windows evidence ") as temp:
+            output = Path(temp) / "powershell.json"
+            with (
+                mock.patch.object(
+                    sys,
+                    "argv",
+                    [
+                        "bootstrap_ci_evidence.py",
+                        "--shell",
+                        "powershell",
+                        "--output",
+                        str(output),
+                    ],
+                ),
+                mock.patch.object(
+                    bootstrap_ci_evidence,
+                    "_run",
+                    side_effect=results,
+                ),
+                mock.patch.object(
+                    bootstrap_ci_evidence,
+                    "_git",
+                    side_effect=["", "a" * 40, ""],
+                ),
+                mock.patch.object(
+                    bootstrap_ci_evidence,
+                    "_clone_checkout",
+                    return_value=subprocess.CompletedProcess([], 0, "", ""),
+                ),
+                mock.patch.object(
+                    bootstrap_ci_evidence,
+                    "_git_at",
+                    side_effect=["", ""],
+                ),
+                mock.patch.object(
+                    bootstrap_ci_evidence.platform,
+                    "system",
+                    return_value="Windows",
+                ),
+            ):
+                exit_code = bootstrap_ci_evidence.main()
+
+            evidence = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual(exit_code, 0)
+            self.assertTrue(evidence["overall_pass"])
+            self.assertEqual(evidence["source_commit"], "a" * 40)
+            self.assertEqual(evidence["native_shell"], "powershell")
+            self.assertEqual(
+                [stage["exit_code"] for stage in evidence["stages"]],
+                [0, 0, 0, 0, 2, 2],
+            )
+            self.assertEqual(
+                [stage["name"] for stage in evidence["stages"]],
+                [
+                    "clean-install",
+                    "offline-read-only-check",
+                    "spaced-checkout-offline-check",
+                    "second-bootstrap",
+                    "missing-installation",
+                    "unknown-option",
+                ],
+            )
+            self.assertEqual(
+                len({stage["inventory_sha256"] for stage in evidence["stages"][:4]}),
+                1,
+            )
+
+    def test_windows_workflow_retains_complete_bootstrap_evidence(self) -> None:
+        workflow = WINDOWS_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("push:\n    branches: [main]", workflow)
+        self.assertIn("scripts/bootstrap_ci_evidence.py", workflow)
+        self.assertIn("--shell powershell", workflow)
+        self.assertIn("--shell cmd", workflow)
+        self.assertIn(
+            ".engineering-board/validation/bootstrap/*.json",
+            workflow,
+        )
+        self.assertIn(
+            ".engineering-board/validation/platform/*.json",
+            workflow,
+        )
+        self.assertIn("foundation-windows-evidence-${{ matrix.support_row }}", workflow)
+        self.assertIn("retention-days:", workflow)
+
+    def test_aggregate_workflow_retains_exact_head_result(self) -> None:
+        workflow = TEST_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("push:\n    branches: [main]", workflow)
+        self.assertIn("scripts/aggregate_ci_evidence.py", workflow)
+        self.assertIn(
+            ".engineering-board/validation/aggregate/run-all.json",
+            workflow,
+        )
+        self.assertIn("aggregate-result-linux-x86_64-bash", workflow)
+        self.assertIn("if: always()", workflow)
 
 
 if __name__ == "__main__":
