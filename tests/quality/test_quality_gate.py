@@ -323,6 +323,12 @@ class QualityCommandContractTests(unittest.TestCase):
         )
         self.assertEqual(dist_before, self.tree_digest(ROOT / "dist"))
 
+    def test_all_selector_acquires_the_exclusive_aggregate_resource(self) -> None:
+        source = PYTHON_ENTRY.read_text(encoding="utf-8")
+        self.assertIn('"quality-all"', source)
+        self.assertIn('"aggregate"', source)
+        self.assertIn("ENGINEERING_BOARD_VALIDATOR_SESSION", source)
+
     @staticmethod
     def digest(path: Path) -> str:
         return hashlib.sha256(path.read_bytes()).hexdigest()

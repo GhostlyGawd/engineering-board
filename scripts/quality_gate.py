@@ -10,6 +10,7 @@ import sys
 from typing import NoReturn
 
 from quality_checks import QualityError, QualityRunner
+from validator_resources import ResourceError, run_locked
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -88,8 +89,30 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("a selector is required: " + ", ".join(SELECTORS))
 
     root = arguments.root.expanduser().resolve()
-    runner = QualityRunner(root)
     workers = int(getattr(arguments, "workers", 2))
+    if (
+        arguments.selector == "all"
+        and os.environ.get("ENGINEERING_BOARD_VALIDATOR_SESSION") is None
+    ):
+        try:
+            return run_locked(
+                root / ".engineering-board" / "validator-locks",
+                "quality-all",
+                [
+                    sys.executable,
+                    str(Path(__file__).resolve()),
+                    "--root",
+                    str(root),
+                    "all",
+                    "--workers",
+                    str(workers),
+                ],
+                "aggregate",
+            )
+        except ResourceError as exc:
+            print(f"quality-gate: {exc}", file=sys.stderr)
+            return 75
+    runner = QualityRunner(root)
     try:
         return runner.run(str(arguments.selector), workers)
     except QualityError as exc:
