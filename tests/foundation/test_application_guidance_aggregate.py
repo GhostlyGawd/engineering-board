@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -136,7 +137,7 @@ class ApplicationContractTests(unittest.TestCase):
             self.assertTrue(report["documented_commands_pass"])
             self.assertEqual(
                 {item["platform"] for item in report["documented_commands"]},
-                {"posix"},
+                {"windows" if os.name == "nt" else "posix"},
             )
             self.assertEqual(
                 [item["id"] for item in report["applications"]],
