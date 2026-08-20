@@ -131,6 +131,15 @@ _Last updated: 2026-07-10_
   committed, staged, unstaged, and untracked Python changes into one
   deterministic identity. Eligible measured source missing from the coverage
   report fails closed instead of disappearing from the denominator.
+- **Application and aggregate contract:** `support/applications.json` declares
+  the exact root plugin, MCP server, and optional future Conductor markers plus
+  required guidance. `scripts/application_contract.py` audits discovery,
+  guidance links/sections, documented command smokes, versions, counts,
+  workflow names, and package names. `support/legacy-suites.json` is the
+  canonical compatibility inventory; `tests/run-all.sh` delegates to
+  `scripts/legacy_run_all.py`, which preserves later diagnostics and writes
+  normalized decision/artifact fingerprints. The split `all` gate records
+  every stage duration and narrow rerun command.
 - **Board location resolves in ONE place now:** source `hooks/scripts/board-paths.sh` and call `eb_board_dirs` / `eb_board_rows` / `eb_router_path`. Do **not** re-hardcode `docs/boards/` in scripts.
 - **Version bumps** must touch *both* `.claude-plugin/plugin.json` and `marketplace.json` (coherence-checked), and a fix only reaches installs when the version *increases*.
 - New `hooks/scripts/*.sh` must pass `tests/crosscompat-lint.sh`: shebang exactly `#!/usr/bin/env bash`, no `date -d`/`date -j -f`, no `jq`, no drive letters (use python3 for JSON + timestamps).

@@ -436,6 +436,10 @@ Native Windows uses `python scripts/quality_gate.py` with the same selectors
 from PowerShell or `cmd.exe`. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the
 exact native command paths, enforced total/application/branch/changed-line
 coverage thresholds, named security families, and application scopes.
+The native compatibility journey is
+`python scripts/legacy_run_all.py --root . --portable-only` from PowerShell or
+`python scripts\legacy_run_all.py --root . --portable-only` from `cmd.exe`;
+it reports Bash-only plugin suites with the explicit `posix-bash-only` reason.
 
 ## Support
 

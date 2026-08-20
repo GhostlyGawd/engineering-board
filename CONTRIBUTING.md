@@ -67,6 +67,21 @@ The `test` selector is the quality test and coverage invocation. There is no
 standalone `coverage` selector. `all --workers 2` is the split-gate aggregate.
 `tests/run-all.sh` remains the supported compatibility aggregate.
 
+The platform-neutral compatibility runner is:
+
+```sh
+python3 scripts/legacy_run_all.py --root . --portable-only
+```
+
+On native Windows PowerShell use
+`python scripts/legacy_run_all.py --root . --portable-only`. From native
+`cmd.exe` use
+`python scripts\legacy_run_all.py --root . --portable-only`. The
+`--portable-only` journey runs the shared Python suites and records each
+Bash-only plugin suite as `posix-bash-only`; it is not a claim that Bash hooks
+run natively on Windows. Every form accepts an explicit repository root from
+an unrelated directory, including a path with spaces.
+
 On native Windows PowerShell, use:
 
 ```powershell

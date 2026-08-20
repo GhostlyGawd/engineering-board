@@ -247,6 +247,14 @@
           "permitted_skip_reasons": []
         },
         {
+          "id": "compatibility",
+          "required": true,
+          "command": "python scripts/legacy_run_all.py --root . --portable-only",
+          "permitted_skip_reasons": [
+            "posix-bash-only"
+          ]
+        },
+        {
           "id": "platform-neutral-runtime",
           "required": true,
           "command": "python scripts/platform_test.py --workers 2 --shell powershell",
@@ -321,6 +329,14 @@
           "required": true,
           "command": "python scripts\\quality_gate.py all --workers 2",
           "permitted_skip_reasons": []
+        },
+        {
+          "id": "compatibility",
+          "required": true,
+          "command": "python scripts\\legacy_run_all.py --root . --portable-only",
+          "permitted_skip_reasons": [
+            "posix-bash-only"
+          ]
         },
         {
           "id": "platform-neutral-runtime",

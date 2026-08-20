@@ -11,6 +11,8 @@ import subprocess
 import sys
 from typing import Any, Iterable, Sequence
 
+from aggregate_runner import AggregateReport, AggregateRunner, Stage, print_report, write_report
+from application_contract import discover_applications, shared_contract_fingerprint
 from coverage_gate import CoverageGateError, run_coverage
 from security_gate import SecurityGateError, run_security
 
@@ -22,11 +24,27 @@ IGNORED_DIRECTORIES = {
     "dist",
     "node_modules",
 }
-PYTHON_DIRECTORIES = ("scripts", "hooks/scripts", "mcp-server", "evaluation", "tests")
-ANALYSIS_DIRECTORIES = ("scripts", "hooks/scripts", "mcp-server", "evaluation")
+PYTHON_DIRECTORIES = (
+    "scripts",
+    "hooks/scripts",
+    "mcp-server",
+    "conductor",
+    "evaluation",
+    "tests",
+)
+ANALYSIS_DIRECTORIES = (
+    "scripts",
+    "hooks/scripts",
+    "mcp-server",
+    "conductor",
+    "evaluation",
+)
 ANALYSIS_EXCLUSIONS = {"mcp-server/test_mcp_server.py"}
 TYPED_PATHS = (
+    "scripts/aggregate_runner.py",
+    "scripts/application_contract.py",
     "scripts/coverage_gate.py",
+    "scripts/legacy_run_all.py",
     "scripts/package_contract.py",
     "scripts/package_gate.py",
     "scripts/package_runtime.py",
@@ -48,7 +66,10 @@ EXPECTED_TYPING_POLICY = {
             "id": "root-plugin",
             "typed_paths": [
                 "hooks/scripts/board_demo.py",
+                "scripts/aggregate_runner.py",
+                "scripts/application_contract.py",
                 "scripts/coverage_gate.py",
+                "scripts/legacy_run_all.py",
                 "scripts/package_contract.py",
                 "scripts/package_gate.py",
                 "scripts/package_runtime.py",
@@ -552,6 +573,15 @@ class QualityRunner:
             ],
         )
         self._validate_large_files()
+        self._run(
+            "application-guidance-freshness",
+            [
+                sys.executable,
+                "scripts/application_contract.py",
+                "--check",
+                "--smoke-commands",
+            ],
+        )
 
     def typecheck(self) -> None:
         policy_path = self.root / "support" / "quality" / "typing-policy.json"
@@ -582,7 +612,7 @@ class QualityRunner:
             ],
         )
 
-    def test(self, workers: int) -> None:
+    def _platform_test(self, workers: int) -> None:
         support_row = os.environ.get("ENGINEERING_BOARD_SUPPORT_ROW", "")
         native_shell = os.environ.get("ENGINEERING_BOARD_NATIVE_SHELL")
         if native_shell is None:
@@ -603,12 +633,18 @@ class QualityRunner:
                 native_shell,
             ],
         )
+
+    def _coverage(self) -> None:
         self._stage("coverage")
         try:
             run_coverage(self.root)
         except CoverageGateError as exc:
             raise QualityError(f"coverage failed: {exc}") from exc
         print("quality-gate: pass coverage", flush=True)
+
+    def test(self, workers: int) -> None:
+        self._platform_test(workers)
+        self._coverage()
 
     def security(self) -> None:
         self._stage("security")
@@ -645,12 +681,78 @@ class QualityRunner:
         elif selector == "package":
             self.package()
         elif selector == "all":
-            self.format()
-            self.lint()
-            self.typecheck()
-            self.test(workers)
-            self.security()
-            self.package()
+            applications = tuple(application.id for application in discover_applications(self.root))
+            stage_actions = {
+                "format": self.format,
+                "lint": self.lint,
+                "typecheck": self.typecheck,
+                "test": lambda: self._platform_test(workers),
+                "coverage": self._coverage,
+                "security": self.security,
+                "package": self.package,
+            }
+            stages = (
+                Stage(
+                    "format",
+                    ("quality-gate", "format"),
+                    "bash scripts/quality-gate.sh format",
+                    applications,
+                ),
+                Stage(
+                    "lint",
+                    ("quality-gate", "lint"),
+                    "bash scripts/quality-gate.sh lint",
+                    applications,
+                ),
+                Stage(
+                    "typecheck",
+                    ("quality-gate", "typecheck"),
+                    "bash scripts/quality-gate.sh typecheck",
+                    applications,
+                ),
+                Stage(
+                    "test",
+                    ("quality-gate", "test"),
+                    f"bash scripts/quality-gate.sh test --workers {workers}",
+                    applications,
+                ),
+                Stage(
+                    "coverage",
+                    ("quality-gate", "test"),
+                    f"bash scripts/quality-gate.sh test --workers {workers}",
+                    applications,
+                    dependencies=("test",),
+                ),
+                Stage(
+                    "security",
+                    ("quality-gate", "security"),
+                    "bash scripts/quality-gate.sh security",
+                    applications,
+                ),
+                Stage(
+                    "package",
+                    ("quality-gate", "package"),
+                    "bash scripts/quality-gate.sh package",
+                    applications,
+                ),
+            )
+
+            def execute(stage: Stage) -> int:
+                stage_actions[stage.name]()
+                return 0
+
+            aggregate = AggregateRunner(stages, execute=execute).run()
+            report = AggregateReport(
+                aggregate.results,
+                shared_contract_fingerprint(self.root),
+            )
+            print_report(report)
+            write_report(
+                self.root / ".engineering-board" / "validation" / "aggregate" / "quality-all.json",
+                report,
+            )
+            if report.exit_code:
+                return report.exit_code
         else:
             raise QualityError(f"unknown selector {selector!r}", 2)
         print(f"quality-gate: selector {selector} passed", flush=True)

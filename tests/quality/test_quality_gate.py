@@ -118,6 +118,7 @@ class QualityCommandContractTests(unittest.TestCase):
 
         matrix = json.loads((ROOT / "support" / "platform-matrix.json").read_text(encoding="utf-8"))
         expected_surfaces = {
+            "compatibility",
             "format",
             "lint",
             "package",
@@ -135,15 +136,21 @@ class QualityCommandContractTests(unittest.TestCase):
                         "quality_gate.py" in surfaces[surface]
                         and "bash" not in surfaces[surface].lower()
                         for surface in expected_surfaces
+                        if surface != "compatibility"
                     )
                 )
+                self.assertIn("legacy_run_all.py", surfaces["compatibility"])
+                self.assertIn("--portable-only", surfaces["compatibility"])
+                self.assertNotIn("bash", surfaces["compatibility"].lower())
             else:
                 self.assertTrue(
                     all(
                         "bash scripts/quality-gate.sh" in surfaces[surface]
                         for surface in expected_surfaces
+                        if surface != "compatibility"
                     )
                 )
+                self.assertEqual(surfaces["compatibility"], "bash tests/run-all.sh")
 
         policy = json.loads(
             (ROOT / "support" / "quality" / "typing-policy.json").read_text(encoding="utf-8")
@@ -186,6 +193,11 @@ class QualityCommandContractTests(unittest.TestCase):
                 f"python {command_path} invalid-quality-selector",
                 windows,
             )
+        self.assertIn("Run compatibility journey from PowerShell", windows)
+        self.assertIn("python scripts/legacy_run_all.py", windows)
+        self.assertIn("Run compatibility journey from cmd.exe", windows)
+        self.assertIn(r"python scripts\legacy_run_all.py", windows)
+        self.assertIn(".engineering-board/validation/aggregate/*.json", windows)
 
     def test_long_tool_inputs_are_batched_with_utf8_output(self) -> None:
         runner = QualityRunner.__new__(QualityRunner)

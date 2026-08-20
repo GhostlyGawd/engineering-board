@@ -1,0 +1,31 @@
+{
+  "schema_version": "1",
+  "suites": [
+    {"id": "orchestration", "command": ["bash", "tests/orchestration/automated.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "claims", "command": ["bash", "tests/claims/automated.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "smoke", "command": ["bash", "tests/smoke/automated.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "scratch-append", "command": ["bash", "tests/scratch/append.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "paths", "command": ["bash", "tests/paths/resolution-order.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "modes", "command": ["bash", "tests/modes/automated.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "permissions", "command": ["bash", "tests/permissions/automated.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "workflow-actions", "command": ["bash", "tests/workflow-actions.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "lint-orchestrator-prompts", "command": ["bash", "tests/lint-orchestrator-prompts.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "version-coherence", "command": ["bash", "tests/version-coherence.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "codex-plugin", "command": ["bash", "tests/codex-plugin.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "release-preparation", "command": ["bash", "tests/release-preparation.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "docs-coherence", "command": ["bash", "tests/docs-coherence.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "token-coherence", "command": ["bash", "tests/token-coherence.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "crosscompat-lint", "command": ["bash", "tests/crosscompat-lint.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "platform-portability", "command": ["{python}", "tests/platform/test_foundation_portability.py"], "portable": true},
+    {"id": "bootstrap-devcontainer", "command": ["{python}", "tests/bootstrap/test_bootstrap_dev.py"], "portable": true},
+    {"id": "quality-command-contract", "command": ["{python}", "tests/quality/test_quality_gate.py"], "portable": true},
+    {"id": "application-guidance-aggregate", "command": ["{python}", "tests/foundation/test_application_guidance_aggregate.py"], "portable": true},
+    {"id": "package-runtime-matrix", "command": ["{python}", "tests/packaging/test_package_gate.py"], "portable": true},
+    {"id": "evaluation-harness", "command": ["{python}", "tests/evaluation/test_harness.py"], "portable": true},
+    {"id": "reject-filter", "command": ["bash", "tests/security/reject-filter.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "session-start", "command": ["bash", "tests/session-start/automated.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "prompt-guard", "command": ["bash", "tests/prompt-guard/automated.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "view", "command": ["bash", "tests/view/automated.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "mcp-server", "command": ["{python}", "mcp-server/test_mcp_server.py"], "portable": true}
+  ]
+}

@@ -85,6 +85,15 @@ jobs:
         shell: pwsh
         run: python scripts/platform_test.py --workers 2 --shell powershell
 
+      - name: Run compatibility journey from PowerShell
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: >-
+          python scripts/legacy_run_all.py
+          --root .
+          --portable-only
+          --report .engineering-board/validation/aggregate/powershell.json
+
       - name: Show native process identity
         if: matrix.native_shell == 'cmd'
         shell: cmd
@@ -130,6 +139,15 @@ jobs:
         shell: cmd
         run: python scripts\platform_test.py --workers 2 --shell cmd
 
+      - name: Run compatibility journey from cmd.exe
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: >-
+          python scripts\legacy_run_all.py
+          --root .
+          --portable-only
+          --report .engineering-board\validation\aggregate\cmd.json
+
       - name: Retain exact-head Windows evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -138,5 +156,6 @@ jobs:
           path: |
             .engineering-board/validation/bootstrap/*.json
             .engineering-board/validation/platform/*.json
+            .engineering-board/validation/aggregate/*.json
           if-no-files-found: error
           retention-days: 30

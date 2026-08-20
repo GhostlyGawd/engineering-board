@@ -7,7 +7,10 @@
       "id": "root-plugin",
       "typed_paths": [
         "hooks/scripts/board_demo.py",
+        "scripts/aggregate_runner.py",
+        "scripts/application_contract.py",
         "scripts/coverage_gate.py",
+        "scripts/legacy_run_all.py",
         "scripts/package_contract.py",
         "scripts/package_gate.py",
         "scripts/package_runtime.py",

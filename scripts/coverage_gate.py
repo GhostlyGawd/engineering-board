@@ -31,6 +31,7 @@ POSIX_COVERAGE_COMMANDS: tuple[tuple[str, ...], ...] = (
 PORTABLE_COVERAGE_COMMANDS: tuple[tuple[str, ...], ...] = (
     (sys.executable, "tests/platform/test_foundation_portability.py"),
     (sys.executable, "tests/bootstrap/test_bootstrap_dev.py"),
+    (sys.executable, "tests/foundation/test_application_guidance_aggregate.py"),
     (sys.executable, "tests/evaluation/test_harness.py"),
     (sys.executable, "tests/packaging/test_package_gate.py"),
     (sys.executable, "mcp-server/test_mcp_server.py"),

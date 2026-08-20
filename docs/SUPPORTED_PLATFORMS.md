@@ -12,8 +12,8 @@ and GitHub Actions together.
 |---|---|---|
 | `macos-arm64-bash` | Bash | Bootstrap check, the Bash quality command set below, `bash tests/run-all.sh`, and `python3 scripts/platform_test.py --workers 2 --shell bash` |
 | `linux-x86_64-bash` | Bash | Bootstrap check, the Bash quality command set below, and `bash tests/run-all.sh` on `ubuntu-24.04` |
-| `windows-x86_64-powershell` | PowerShell | Python bootstrap and quality command sets plus `python scripts/platform_test.py --workers 2 --shell powershell` on `windows-2025` |
-| `windows-x86_64-cmd` | `cmd.exe` | Python bootstrap and quality command sets plus `python scripts\platform_test.py --workers 2 --shell cmd` on `windows-2025` |
+| `windows-x86_64-powershell` | PowerShell | Python bootstrap and quality command sets, `python scripts/legacy_run_all.py --root . --portable-only`, plus `python scripts/platform_test.py --workers 2 --shell powershell` on `windows-2025` |
+| `windows-x86_64-cmd` | `cmd.exe` | Python bootstrap and quality command sets, `python scripts\legacy_run_all.py --root . --portable-only`, plus `python scripts\platform_test.py --workers 2 --shell cmd` on `windows-2025` |
 
 ## Stable quality command parity
 
@@ -56,6 +56,12 @@ locks, evaluation harness, and a real zero-dependency MCP stdio lifecycle. It
 writes a commit-bound result manifest below
 `.engineering-board/validation/platform/`; native Windows CI retains that
 manifest as a workflow artifact.
+
+The compatibility aggregate remains `bash tests/run-all.sh` on Unix/macOS.
+Native Windows runs the platform-neutral shared-suite journey with
+`python scripts/legacy_run_all.py --root . --portable-only` from PowerShell or
+`python scripts\legacy_run_all.py --root . --portable-only` from `cmd.exe`.
+Bash-only plugin suites are visible skips with reason `posix-bash-only`.
 
 ## Devcontainer
 

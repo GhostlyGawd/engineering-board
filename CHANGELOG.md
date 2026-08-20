@@ -30,6 +30,10 @@ increases.
   runtime matrix that reproduces wheel, sdist, and MCPB artifacts, installs
   wheel and sdist on Python 3.8 and current Python, runs MCP stdio from every
   distribution, and emits schema-valid digest-bound CycloneDX SBOMs.
+- Added exact canonical application discovery and per-application guidance,
+  documented-command and freshness auditing, diagnosable multi-failure split
+  aggregation, and a platform-neutral compatibility runner with normalized
+  repeatability evidence and explicit native-Windows portable-suite skips.
 
 ### Fixed
 

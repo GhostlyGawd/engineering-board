@@ -1,0 +1,86 @@
+{
+  "schema_version": "1",
+  "applications": [
+    {
+      "id": "root-plugin",
+      "root": ".",
+      "optional": false,
+      "markers": [
+        ".claude-plugin/plugin.json",
+        ".codex-plugin/plugin.json",
+        "hooks/hooks.json"
+      ],
+      "guidance": "AGENTS.md",
+      "required_sections": [
+        "## Setup",
+        "## Architecture",
+        "## Validation",
+        "## Security boundaries",
+        "## Packaging and release",
+        "## Aggregate gates"
+      ]
+    },
+    {
+      "id": "mcp-server",
+      "root": "mcp-server",
+      "optional": false,
+      "markers": [
+        "pyproject.toml",
+        "engineering_board_mcp.py",
+        "engineering_board_core.py"
+      ],
+      "guidance": "mcp-server/AGENTS.md",
+      "required_sections": [
+        "## Setup",
+        "## Architecture",
+        "## Validation",
+        "## Security boundaries",
+        "## Packaging and release",
+        "## Aggregate gates"
+      ]
+    },
+    {
+      "id": "conductor",
+      "root": "conductor",
+      "optional": true,
+      "markers": [
+        "pyproject.toml",
+        "engineering_board_conductor.py"
+      ],
+      "guidance": "conductor/AGENTS.md",
+      "required_sections": [
+        "## Setup",
+        "## Architecture",
+        "## Validation",
+        "## Security boundaries",
+        "## Packaging and release",
+        "## Aggregate gates"
+      ]
+    }
+  ],
+  "documented_command_smokes": [
+    [
+      "bash",
+      "scripts/bootstrap-dev.sh",
+      "--check"
+    ],
+    [
+      "bash",
+      "scripts/quality-gate.sh",
+      "--help"
+    ],
+    [
+      "{python}",
+      "scripts/quality_gate.py",
+      "--help"
+    ]
+  ],
+  "workflow_names": {
+    ".github/workflows/test.yml": "tests",
+    ".github/workflows/windows.yml": "native-windows"
+  },
+  "package_names": {
+    "mcp-server/pyproject.toml": "engineering-board-mcp",
+    "mcp-server/server.json": "io.github.GhostlyGawd/engineering-board"
+  }
+}
