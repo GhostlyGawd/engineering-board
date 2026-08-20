@@ -143,6 +143,21 @@ class QualityCommandContractTests(unittest.TestCase):
         wrapper = BASH_ENTRY.read_text(encoding="utf-8")
         self.assertIn('exec python3 "$SCRIPT_DIR/quality_gate.py" "$@"', wrapper)
 
+    def test_standing_ci_workflows_are_bounded_to_validation_events(self) -> None:
+        for workflow_name in ("test.yml", "windows.yml"):
+            with self.subTest(workflow=workflow_name):
+                workflow = (ROOT / ".github" / "workflows" / workflow_name).read_text(
+                    encoding="utf-8"
+                )
+                self.assertIn(
+                    "  pull_request:\n    types: [opened, synchronize]\n",
+                    workflow,
+                )
+                self.assertIn("\npermissions:\n  contents: read\n", workflow)
+                self.assertNotIn("pull_request_target", workflow)
+                self.assertNotIn("\n    secrets:", workflow)
+                self.assertNotIn("\n    environment:", workflow)
+
     def test_clean_format_lint_type_security_and_package_selectors_pass(self) -> None:
         environment = os.environ.copy()
         environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)

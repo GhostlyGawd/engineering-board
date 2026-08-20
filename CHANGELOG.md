@@ -32,6 +32,8 @@ increases.
   command, and Windows plus aggregate CI explicitly check out the pull-request
   head and retain exact-head result manifests for the temporary foundation
   evidence flow.
+- Temporary foundation evidence workflows now accept only pull-request open
+  and synchronization events with read-only repository contents permission.
 - The evaluation harness now accepts fixed macOS system aliases such as
   `/var` to `/private/var` without accepting user-created symbolic-link,
   junction, or reparse-point escapes.
