@@ -69,26 +69,36 @@ def _validation_fingerprint(root: Path) -> str:
     digest = hashlib.sha256()
     if not validation.exists():
         return digest.hexdigest()
-    for path in sorted(validation.rglob("*")):
-        if not path.is_file() or "aggregate" in path.parts:
-            continue
-        relative = path.relative_to(validation).as_posix()
-        digest.update(relative.encode("utf-8"))
-        if path.suffix == ".json":
-            try:
-                value = json.loads(path.read_text(encoding="utf-8"))
-            except (OSError, json.JSONDecodeError):
-                digest.update(path.read_bytes())
-            else:
-                digest.update(
-                    json.dumps(
-                        _normalized(value),
-                        sort_keys=True,
-                        separators=(",", ":"),
-                    ).encode("utf-8")
-                )
-        else:
+    package_root = validation / "package"
+    for path in sorted(package_root.glob("*")):
+        if path.is_file() and path.name != "report.json":
+            digest.update(path.name.encode("utf-8"))
             digest.update(path.read_bytes())
+    for relative in ("coverage/summary.json", "package/report.json", "platform/bash.json"):
+        path = validation / relative
+        if not path.is_file():
+            continue
+        value = json.loads(path.read_text(encoding="utf-8"))
+        if relative == "coverage/summary.json":
+            value = {
+                "applications": [
+                    {"id": item["id"], "passed": item["passed"]} for item in value["applications"]
+                ],
+                "base": value["base"],
+                "changed_lines": value["changed_lines"],
+                "head": value["head"],
+                "identity": value["identity"],
+                "passed": value["passed"],
+                "schema_version": value["schema_version"],
+            }
+        digest.update(relative.encode("utf-8"))
+        digest.update(
+            json.dumps(
+                _normalized(value),
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        )
     return digest.hexdigest()
 
 
