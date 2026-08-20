@@ -20,6 +20,9 @@ increases.
 
 ### Fixed
 
+- Native Windows validator lock probes now inspect process state without
+  signaling the lock owner, so occupied-resource checks fail promptly instead
+  of interrupting the workflow process tree.
 - Native Windows bootstrap failures now print the supported Python recovery
   command, and Windows plus aggregate CI retain exact-head result manifests
   for the temporary foundation evidence flow.

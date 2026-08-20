@@ -50,9 +50,44 @@ def _read_owner(directory: Path) -> dict[str, Any] | None:
     return value if isinstance(value, dict) else None
 
 
+def _windows_pid_is_alive(pid: int) -> bool:
+    import ctypes
+    from ctypes import wintypes
+
+    process_query_limited_information = 0x1000
+    still_active = 259
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel32.OpenProcess.argtypes = [
+        wintypes.DWORD,
+        wintypes.BOOL,
+        wintypes.DWORD,
+    ]
+    kernel32.OpenProcess.restype = wintypes.HANDLE
+    kernel32.GetExitCodeProcess.argtypes = [
+        wintypes.HANDLE,
+        ctypes.POINTER(wintypes.DWORD),
+    ]
+    kernel32.GetExitCodeProcess.restype = wintypes.BOOL
+    kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel32.CloseHandle.restype = wintypes.BOOL
+
+    handle = kernel32.OpenProcess(process_query_limited_information, False, pid)
+    if not handle:
+        return ctypes.get_last_error() != 87
+    try:
+        exit_code = wintypes.DWORD()
+        if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+            return True
+        return exit_code.value == still_active
+    finally:
+        kernel32.CloseHandle(handle)
+
+
 def _pid_is_alive(pid: object) -> bool:
     if not isinstance(pid, int) or pid <= 0:
         return False
+    if os.name == "nt":
+        return _windows_pid_is_alive(pid)
     try:
         os.kill(pid, 0)
     except ProcessLookupError:

@@ -12,11 +12,13 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from evaluation.harness import EvaluationError, _atomic_text  # noqa: E402
+from scripts import validator_resources  # noqa: E402
 from scripts.platform_contract import (  # noqa: E402
     validate_repository_contract,
     validate_schema_instance,
@@ -164,6 +166,23 @@ class FoundationPortabilityTests(unittest.TestCase):
 
 
 class ValidatorResourceTests(unittest.TestCase):
+    def test_windows_pid_liveness_never_sends_signal(self) -> None:
+        with (
+            mock.patch.object(validator_resources.os, "name", "nt"),
+            mock.patch.object(
+                validator_resources,
+                "_windows_pid_is_alive",
+                return_value=True,
+            ) as windows_probe,
+            mock.patch.object(
+                validator_resources.os,
+                "kill",
+                side_effect=AssertionError("Windows liveness sent a signal"),
+            ),
+        ):
+            self.assertTrue(validator_resources._pid_is_alive(1234))
+        windows_probe.assert_called_once_with(1234)
+
     def run_resource(
         self,
         state_root: Path,
