@@ -31,6 +31,9 @@ import subprocess
 import importlib.util
 from pathlib import Path
 
+sys.stdout.reconfigure(encoding="utf-8")
+sys.stderr.reconfigure(encoding="utf-8")
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 SERVER_PATH = os.path.join(HERE, "engineering_board_mcp.py")
 PLUGIN_ROOT = os.path.dirname(HERE)
