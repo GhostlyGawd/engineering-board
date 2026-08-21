@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -289,6 +290,26 @@ def _summary(values: Sequence[dict[str, Any]]) -> tuple[int, int, int, int]:
     return covered_lines, measured_lines, covered_branches, measured_branches
 
 
+def _coverage_commands(
+    platform_name: str,
+    bash_executable: str | None,
+) -> tuple[tuple[str, ...], ...]:
+    """Return the complete measured test inventory for the current host."""
+
+    if platform_name == "nt" and bash_executable is None:
+        raise CoverageGateError(
+            "Git for Windows Bash compatibility runner is required for complete "
+            "plugin coverage; install the matrix-declared Git for Windows tool"
+        )
+    if platform_name == "nt":
+        assert bash_executable is not None
+        bash_commands = tuple(
+            (bash_executable, *command[1:]) for command in POSIX_COVERAGE_COMMANDS
+        )
+        return bash_commands + PORTABLE_COVERAGE_COMMANDS
+    return POSIX_COVERAGE_COMMANDS + PORTABLE_COVERAGE_COMMANDS
+
+
 def _decision(label: str, measured: float, threshold: float) -> bool:
     passed = measured >= threshold
     print(
@@ -343,9 +364,10 @@ def _collect_report(
         )
         config.write_text(config_text, encoding="utf-8")
         driver = temp / "driver.py"
-        commands = PORTABLE_COVERAGE_COMMANDS
-        if os.name != "nt":
-            commands = POSIX_COVERAGE_COMMANDS + commands
+        commands = _coverage_commands(
+            os.name,
+            shutil.which("bash", path=environment.get("PATH")),
+        )
         instrumented_commands = tuple(
             (
                 str(executable),

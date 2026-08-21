@@ -34,6 +34,10 @@ PowerShell calls `python scripts/quality_gate.py` with the same selectors.
 Help, stage names, diagnostics, artifacts, and exit decisions come from the
 same Python implementation. The `test` selector is the quality test and
 coverage invocation. `all --workers 2` is the split-gate aggregate.
+The native Windows test selector uses the Bash bundled with the required Git
+for Windows installation only to collect Bash-plugin compatibility coverage.
+The owning selector, process identity, decisions, and artifacts remain the
+native Python path from PowerShell or `cmd.exe`.
 
 The matrix declares minimum and current versions for Python, Node.js, Git,
 Claude Code, Codex CLI, supported operating systems, and the devcontainer

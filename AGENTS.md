@@ -121,7 +121,10 @@ The `test` selector enforces the versioned total, branch, per-application, and
 changed-line thresholds in `support/quality/coverage-policy.json`. The
 changed-line identity includes committed changes since the selected base plus
 staged, unstaged, and untracked Python changes. Eligible source missing from
-the coverage report fails closed.
+the coverage report fails closed. On native Windows, the Python selector uses
+the Bash bundled with the matrix-declared Git for Windows installation only
+for Bash-plugin compatibility coverage. PowerShell or `cmd.exe` remains the
+native entry point and process identity.
 `security` selector reports dependency audit, secret scan, workflow risk,
 immutable pin, supply-chain policy, checksum integrity, and reject-filter
 families separately.

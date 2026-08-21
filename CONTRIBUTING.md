@@ -120,7 +120,10 @@ base branch. Local runs compare with the previous commit unless
 `ENGINEERING_BOARD_COVERAGE_BASE` names an explicit base. Both modes include
 staged, unstaged, and untracked Python changes in the reported identity and
 uncovered-line decision. Eligible changed source missing from the coverage
-report fails instead of being skipped.
+report fails instead of being skipped. Native Windows starts the selector from
+PowerShell or `cmd.exe`. The selector uses the Bash bundled with the required
+Git for Windows installation only to measure Bash-plugin compatibility cases;
+this child coverage does not reclassify Git Bash as native Windows evidence.
 
 The `security` selector audits the complete pinned Python lock, scans for
 secret signatures, runs the pinned workflow analyzer, requires full action

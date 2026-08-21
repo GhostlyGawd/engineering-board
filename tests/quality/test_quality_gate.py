@@ -271,6 +271,20 @@ class QualityCommandContractTests(unittest.TestCase):
             coverage_gate.PORTABLE_COVERAGE_COMMANDS,
         )
 
+    def test_native_windows_coverage_runs_bash_compatibility_cases_explicitly(self) -> None:
+        bash = "C:/Program Files/Git/bin/bash.exe"
+        commands = coverage_gate._coverage_commands("nt", bash)
+        self.assertEqual(
+            commands,
+            tuple((bash, *command[1:]) for command in coverage_gate.POSIX_COVERAGE_COMMANDS)
+            + coverage_gate.PORTABLE_COVERAGE_COMMANDS,
+        )
+        with self.assertRaisesRegex(
+            coverage_gate.CoverageGateError,
+            "Git for Windows Bash compatibility runner is required",
+        ):
+            coverage_gate._coverage_commands("nt", None)
+
     def test_security_selector_reports_every_named_family(self) -> None:
         environment = os.environ.copy()
         environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)

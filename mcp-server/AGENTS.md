@@ -38,6 +38,9 @@ bash mcp-server/run-tests.sh
 On native Windows, replace the Bash quality wrapper with
 `python scripts/quality_gate.py <selector>` from PowerShell or
 `python scripts\quality_gate.py <selector>` from `cmd.exe`.
+The native Python test selector uses the Bash bundled with Git for Windows
+only for Bash-plugin compatibility coverage; it does not run the MCP server
+through a Bash launcher.
 
 The strict typed MCP scope includes `mcp-server/engineering_board_core.py` and
 `mcp-server/engineering_board_build_backend.py`.

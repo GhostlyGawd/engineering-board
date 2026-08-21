@@ -53,6 +53,9 @@ increases.
   and exercise explicit native-shell quality help, selectors, and rejection.
 - Native Windows quality checks now batch long repository file lists and
   decode validator output as UTF-8 instead of the active console code page.
+- Native Windows coverage now measures the Bash-plugin compatibility cases
+  through the Bash bundled with Git for Windows while preserving PowerShell
+  and `cmd.exe` as the native quality entry points.
 - The evaluation harness now accepts fixed macOS system aliases such as
   `/var` to `/private/var` without accepting user-created symbolic-link,
   junction, or reparse-point escapes.
