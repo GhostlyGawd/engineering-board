@@ -315,6 +315,12 @@ def _coverage_commands(
     return POSIX_COVERAGE_COMMANDS + PORTABLE_COVERAGE_COMMANDS
 
 
+def _coverage_python_executable(tool_root: Path, platform_name: str) -> str:
+    executable = "python.exe" if platform_name == "nt" else "python"
+    scripts = "Scripts" if platform_name == "nt" else "bin"
+    return (tool_root / "python-tools" / scripts / executable).as_posix()
+
+
 def _decision(label: str, measured: float, threshold: float) -> bool:
     passed = measured >= threshold
     print(
@@ -466,6 +472,7 @@ def run_coverage(root: Path) -> None:
     tool_root = _tool_root(root)
     python_bin = tool_root / "python-tools" / ("Scripts" if os.name == "nt" else "bin")
     environment["PATH"] = os.pathsep.join((str(python_bin), environment.get("PATH", "")))
+    environment["PYTHON"] = _coverage_python_executable(tool_root, os.name)
     environment["PYTHONUTF8"] = "1"
     report = _collect_report(root, policy, executable, environment)
     omitted_paths = [str(path) for path in policy.get("measurement", {}).get("omitted_paths", [])]

@@ -284,7 +284,16 @@ class QualityCommandContractTests(unittest.TestCase):
         )
         for command in coverage_gate.WINDOWS_COMPATIBILITY_COVERAGE_COMMANDS:
             self.assertEqual(command[0], "bash")
-            self.assertTrue((ROOT / command[1]).is_file())
+            fixture = ROOT / command[1]
+            self.assertTrue(fixture.is_file())
+            self.assertIn('"${PYTHON:-python3}"', fixture.read_text())
+        self.assertEqual(
+            coverage_gate._coverage_python_executable(
+                Path("C:/engineering-board/dev-tools"),
+                "nt",
+            ),
+            "C:/engineering-board/dev-tools/python-tools/Scripts/python.exe",
+        )
         with self.assertRaisesRegex(
             coverage_gate.CoverageGateError,
             "Git for Windows Bash compatibility runner is required",
