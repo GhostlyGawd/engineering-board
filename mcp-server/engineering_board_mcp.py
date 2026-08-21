@@ -167,7 +167,7 @@ def atomic_write(path, content):
     for this run). os.replace also replaces a symlink at `path` rather than
     writing through it."""
     tmp = "%s.tmp.%d" % (path, os.getpid())
-    with open(tmp, "w", encoding="utf-8") as f:
+    with open(tmp, "w", encoding="utf-8", newline="\n") as f:
         f.write(content)
     os.replace(tmp, path)
 

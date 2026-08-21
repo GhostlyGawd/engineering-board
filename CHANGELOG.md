@@ -37,6 +37,9 @@ increases.
 
 ### Fixed
 
+- Packaged MCP graph writes now preserve exact UTF-8 and literal LF bytes on
+  native Windows, and package failures name `GRAPH.yml` or cache `state.json`
+  with the failing byte or temporary-file condition.
 - Changed-line coverage now executes the package backend, contract, gate, and
   runtime tests under the pinned collector; includes committed, staged,
   unstaged, and untracked Python changes in one deterministic identity; and

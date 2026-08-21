@@ -19,6 +19,7 @@ from package_contract import (
 
 MCP_PROTOCOL_VERSION = "2025-06-18"
 MCP_TOOL_COUNT = 19
+GRAPH_PACKAGE_MARKER = "Graph café ↳ package smoke".encode("utf-8")
 
 
 def run_command(
@@ -54,6 +55,45 @@ def _venv_console(venv: Path) -> Path:
     suffix = ".exe" if os.name == "nt" else ""
     directory = "Scripts" if os.name == "nt" else "bin"
     return venv / directory / f"engineering-board-mcp{suffix}"
+
+
+def _graph_output_issues(path: Path, name: str) -> list[str]:
+    issues: list[str] = []
+    if not path.is_file():
+        issues.append(f"{name} ({path}): missing output")
+    else:
+        content = path.read_bytes()
+        try:
+            content.decode("utf-8")
+        except UnicodeDecodeError:
+            issues.append(f"{name} ({path}): invalid UTF-8")
+        if GRAPH_PACKAGE_MARKER not in content:
+            issues.append(f"{name} ({path}): marker missing")
+        carriage_returns = content.count(b"\r")
+        if carriage_returns:
+            issues.append(f"{name} ({path}): CR count {carriage_returns}, expected 0")
+        terminal_lfs = len(content) - len(content.rstrip(b"\n"))
+        if terminal_lfs != 1:
+            issues.append(f"{name} ({path}): terminal LF count {terminal_lfs}, expected 1")
+
+    temporary_siblings = sorted(path.parent.glob(path.name + ".tmp*"))
+    if temporary_siblings:
+        issues.append(
+            f"{name} ({path}): temporary sibling residue: "
+            + ", ".join(str(sibling) for sibling in temporary_siblings)
+        )
+    return issues
+
+
+def _validate_graph_outputs(repository: Path, project: str, label: str) -> None:
+    graph_path = repository / "engineering-board" / project / "GRAPH.yml"
+    cache_path = repository / ".engineering-board" / "cache" / "graph" / project / "state.json"
+    issues = [
+        *_graph_output_issues(graph_path, "GRAPH.yml"),
+        *_graph_output_issues(cache_path, "cache state.json"),
+    ]
+    if issues:
+        raise PackageGateError(f"{label}: graph output contract failed:\n- " + "\n- ".join(issues))
 
 
 def _rpc_smoke(command: Sequence[str | Path], repository: Path, label: str) -> None:
@@ -164,18 +204,7 @@ def _rpc_smoke(command: Sequence[str | Path], repository: Path, label: str) -> N
             "board_graph",
             {"root": str(repository), "project": project, "full": True},
         )
-        graph_path = repository / "engineering-board" / project / "GRAPH.yml"
-        cache_path = repository / ".engineering-board" / "cache" / "graph" / project / "state.json"
-        marker = "Graph café ↳ package smoke".encode("utf-8")
-        for written_path in (graph_path, cache_path):
-            if not written_path.is_file():
-                raise PackageGateError(f"{label}: graph write missing {written_path}")
-            content = written_path.read_bytes()
-            if marker not in content or b"\r" in content or not content.endswith(b"\n"):
-                raise PackageGateError(f"{label}: graph write is not exact UTF-8 with LF")
-            temporary = written_path.with_name(written_path.name + ".tmp")
-            if temporary.exists():
-                raise PackageGateError(f"{label}: temporary graph sibling remained")
+        _validate_graph_outputs(repository, project, label)
         stdin.close()
         exit_code = process.wait(timeout=10)
         stdout_tail = stdout.read()

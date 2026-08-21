@@ -413,6 +413,72 @@ class PackageGateTests(unittest.TestCase):
                 ["board_init", "board_create_entry", "board_graph"],
             )
 
+    def test_graph_output_diagnostics_name_each_path_and_byte_condition(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb graph diagnostics ") as temp:
+            repository = Path(temp)
+            project = "package-smoke"
+            graph_path = repository / "engineering-board" / project / "GRAPH.yml"
+            cache_path = (
+                repository / ".engineering-board" / "cache" / "graph" / project / "state.json"
+            )
+            graph_path.parent.mkdir(parents=True)
+            cache_path.parent.mkdir(parents=True)
+            graph_path.write_bytes(b"\xff\r")
+            graph_path.with_name(graph_path.name + ".tmp.123").write_bytes(b"residue")
+            cache_path.with_name(cache_path.name + ".tmp").write_bytes(b"residue")
+
+            with self.assertRaises(PackageGateError) as raised:
+                package_runtime._validate_graph_outputs(
+                    repository,
+                    project,
+                    "Python 3.8 wheel",
+                )
+
+            diagnostic = str(raised.exception)
+            for expected in (
+                "GRAPH.yml",
+                str(graph_path),
+                "invalid UTF-8",
+                "marker missing",
+                "CR count 1, expected 0",
+                "terminal LF count 0, expected 1",
+                "temporary sibling residue",
+                "cache state.json",
+                str(cache_path),
+                "missing output",
+            ):
+                with self.subTest(expected=expected):
+                    self.assertIn(expected, diagnostic)
+
+    def test_graph_output_diagnostics_require_exactly_one_terminal_lf(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb graph exact lf ") as temp:
+            repository = Path(temp)
+            project = "package-smoke"
+            marker = "Graph café ↳ package smoke"
+            graph_path = repository / "engineering-board" / project / "GRAPH.yml"
+            cache_path = (
+                repository / ".engineering-board" / "cache" / "graph" / project / "state.json"
+            )
+            for path in (graph_path, cache_path):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes((marker + "\n").encode("utf-8"))
+
+            package_runtime._validate_graph_outputs(
+                repository,
+                project,
+                "Python 3.8 wheel",
+            )
+            cache_path.write_bytes((marker + "\n\n").encode("utf-8"))
+            with self.assertRaisesRegex(
+                PackageGateError,
+                r"cache state\.json .*terminal LF count 2, expected 1",
+            ):
+                package_runtime._validate_graph_outputs(
+                    repository,
+                    project,
+                    "Python 3.8 wheel",
+                )
+
     def test_runtime_install_and_tool_helpers_are_portable(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb runtime helpers ") as temp:
             temporary = Path(temp)
