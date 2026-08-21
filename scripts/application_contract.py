@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
-from typing import Any, cast
+from typing import Any, Dict, cast
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,7 +41,7 @@ def _load_policy(root: Path) -> dict[str, Any]:
     applications = value.get("applications")
     if not isinstance(applications, list) or not applications:
         raise ApplicationContractError("support/applications.json: applications are required")
-    return cast(dict[str, Any], value)
+    return cast(Dict[str, Any], value)
 
 
 def discover_applications(root: Path) -> tuple[Application, ...]:

@@ -85,6 +85,13 @@ class ApplicationContractTests(unittest.TestCase):
                 ["root-plugin", "mcp-server", "conductor"],
             )
 
+    def test_casts_do_not_evaluate_builtin_generic_aliases(self) -> None:
+        source = APPLICATION_ENTRY.read_text(encoding="utf-8")
+        self.assertNotRegex(
+            source,
+            r"\bcast\((?:dict|list|tuple|set|frozenset|type)\[",
+        )
+
     def test_guidance_and_freshness_audit_passes_then_names_stale_surface(self) -> None:
         report = audit_repository(ROOT)
         self.assertEqual(report["applications"], ["root-plugin", "mcp-server"])

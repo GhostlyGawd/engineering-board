@@ -37,6 +37,9 @@ increases.
 
 ### Fixed
 
+- The application discovery and guidance contract now uses Python-3.8-safe
+  runtime typing forms while preserving its reports, diagnostics, and command
+  behavior.
 - The platform-neutral legacy aggregate runner now configures strict UTF-8
   stdout and stderr before CLI output, forwards Unicode suite diagnostics
   without changing decisions, and infers native PowerShell or `cmd.exe`
