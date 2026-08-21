@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import textwrap
 import unittest
 
 
@@ -191,6 +192,123 @@ class AggregateRunnerTests(unittest.TestCase):
 
 
 class LegacyCompatibilityTests(unittest.TestCase):
+    def test_windows_text_translation_preserves_literal_lf_boundaries(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb legacy windows lf ") as temp:
+            temporary = Path(temp)
+            fixture = temporary / "checkout with spaces"
+            fixture.mkdir()
+            stdout_marker = "suite stdout: ⊘ 雪 Ω"
+            stderr_marker = "suite stderr: ↳ 火 λ"
+            manifest = fixture / "suites.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "1",
+                        "suites": [
+                            {
+                                "id": "unicode-failure",
+                                "command": [
+                                    "{python}",
+                                    "-c",
+                                    (
+                                        "import os; "
+                                        f"os.write(1, {stdout_marker!r}.encode('utf-8') + b'\\n'); "
+                                        f"os.write(2, {stderr_marker!r}.encode('utf-8') + b'\\n'); "
+                                        "raise SystemExit(7)"
+                                    ),
+                                ],
+                                "portable": True,
+                            }
+                        ],
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            report_path = temporary / "windows.json"
+            report_path.write_bytes(b"stale report\r\n")
+            wrapper = textwrap.dedent(
+                """
+                import runpy
+                import sys
+                from pathlib import Path
+
+                class WindowsTextStream:
+                    def __init__(self, raw):
+                        self.raw = raw
+                        self.encoding = "cp1252"
+                        self.errors = "strict"
+                        self.newline = None
+
+                    def reconfigure(self, *, encoding=None, errors=None, newline=None):
+                        if encoding is not None:
+                            self.encoding = encoding
+                        if errors is not None:
+                            self.errors = errors
+                        self.newline = newline
+
+                    def write(self, value):
+                        translated = value.replace(
+                            "\\n",
+                            "\\r\\n" if self.newline is None else self.newline,
+                        )
+                        self.raw.write(translated.encode(self.encoding, self.errors))
+                        return len(value)
+
+                    def flush(self):
+                        self.raw.flush()
+
+                target = sys.argv.pop(1)
+                sys.path.insert(0, str(Path(target).resolve().parent))
+                sys.stdout = WindowsTextStream(sys.stdout.buffer)
+                sys.stderr = WindowsTextStream(sys.stderr.buffer)
+                runpy.run_path(target, run_name="__main__")
+                """
+            )
+            environment = os.environ.copy()
+            environment["ENGINEERING_BOARD_VALIDATOR_SESSION"] = "1"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-c",
+                    wrapper,
+                    str(LEGACY_ENTRY),
+                    "--root",
+                    str(fixture),
+                    "--manifest",
+                    str(manifest),
+                    "--portable-only",
+                    "--report",
+                    str(report_path),
+                ],
+                cwd=temporary,
+                env=environment,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 1, result.stderr.decode("utf-8"))
+            self.assertEqual(
+                result.stdout.count((stdout_marker + "\n").encode()),
+                1,
+                result.stdout + result.stderr,
+            )
+            self.assertEqual(
+                result.stderr.count((stderr_marker + "\n").encode()),
+                1,
+                result.stderr,
+            )
+            self.assertNotIn(b"\r", result.stdout)
+            self.assertNotIn(b"\r", result.stderr)
+            report_bytes = report_path.read_bytes()
+            self.assertTrue(report_bytes.endswith(b"\n"))
+            self.assertNotIn(b"\r", report_bytes)
+            report = json.loads(report_bytes.decode("utf-8"))
+            self.assertEqual(report["results"][0]["exit_code"], 7)
+            self.assertFalse(report["overall_pass"])
+            self.assertEqual(list(temporary.glob(f".{report_path.name}.*")), [])
+
     def test_forced_cp1252_forwards_unicode_and_writes_complete_reports(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb legacy utf8 ") as temp:
             temporary = Path(temp)

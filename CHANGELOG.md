@@ -37,6 +37,9 @@ increases.
 
 ### Fixed
 
+- The platform-neutral legacy aggregate runner now preserves literal LF bytes
+  for stdout, stderr, and atomically replaced normalized JSON reports on
+  native Windows.
 - The application discovery and guidance contract now uses Python-3.8-safe
   runtime typing forms while preserving its reports, diagnostics, and command
   behavior.

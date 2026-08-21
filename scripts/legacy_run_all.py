@@ -30,7 +30,11 @@ VOLATILE_KEYS = {
 
 def _configure_console_utf8() -> None:
     for stream in (sys.stdout, sys.stderr):
-        getattr(stream, "reconfigure")(encoding="utf-8", errors="strict")
+        getattr(stream, "reconfigure")(
+            encoding="utf-8",
+            errors="strict",
+            newline="\n",
+        )
 
 
 def _native_shell() -> str:
@@ -126,7 +130,7 @@ def _atomic_json(path: Path, value: dict[str, object]) -> None:
         dir=path.parent,
     )
     try:
-        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as stream:
             json.dump(value, stream, indent=2, sort_keys=True)
             stream.write("\n")
         os.replace(temporary_name, path)
