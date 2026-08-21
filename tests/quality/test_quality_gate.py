@@ -291,6 +291,20 @@ class QualityCommandContractTests(unittest.TestCase):
         ):
             coverage_gate._coverage_commands("nt", None)
 
+    def test_windows_compatibility_coverage_uses_git_bash_readable_paths(
+        self,
+    ) -> None:
+        fixture = (
+            ROOT / "tests" / "orchestration" / "milestone-c-root-cause-intelligence.sh"
+        ).read_text()
+
+        self.assertIn(
+            '["bash", "hooks/scripts/board-view.sh", project, "--stdout"]',
+            fixture,
+        )
+        self.assertIn("CLAUDE_PROJECT_DIR=repo.as_posix()", fixture)
+        self.assertIn("cwd=root", fixture)
+
     def test_security_selector_reports_every_named_family(self) -> None:
         environment = os.environ.copy()
         environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)

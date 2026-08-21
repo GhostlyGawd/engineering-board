@@ -455,11 +455,12 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-c-") as tmp:
         }
     )
     rendered = subprocess.run(
-        ["bash", str(root / "hooks" / "scripts" / "board-view.sh"), project, "--stdout"],
+        ["bash", "hooks/scripts/board-view.sh", project, "--stdout"],
         check=True,
         text=True,
         capture_output=True,
-        env=dict(os.environ, CLAUDE_PROJECT_DIR=str(repo)),
+        cwd=root,
+        env=dict(os.environ, CLAUDE_PROJECT_DIR=repo.as_posix()),
     ).stdout
     assert "Ranked systemic investigations" in rendered
     assert "score is not confidence" in rendered
