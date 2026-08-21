@@ -559,7 +559,7 @@ def suite_lifecycle(mod, tmp_repo):
         f.write("| evil | ../outside | evil/ |\n")
     outside = os.path.join(os.path.dirname(root), "outside")
     os.makedirs(outside, exist_ok=True)
-    with open(os.path.join(outside, "BOARD.md"), "w") as f:
+    with open(os.path.join(outside, "BOARD.md"), "w", encoding="utf-8") as f:
         f.write("PRECIOUS\n")
     for tool, nm in (
         (mod.tool_board_rebuild, "rebuild"),
@@ -572,7 +572,7 @@ def suite_lifecycle(mod, tmp_repo):
         except mod.ToolError:
             pass
     check(
-        open(os.path.join(outside, "BOARD.md")).read().strip() == "PRECIOUS",
+        open(os.path.join(outside, "BOARD.md"), encoding="utf-8").read().strip() == "PRECIOUS",
         "bulk tools did not overwrite a file outside root via router escape (B035)",
     )
     # Remove the poisoned row so later assertions see a clean router.
@@ -650,7 +650,7 @@ def suite_lifecycle(mod, tmp_repo):
     sp = os.path.join(
         cap_root, "engineering-board", "cap", "_sessions", "mcp-%s.md" % mod.today_utc()
     )
-    hdrs = sum(1 for ln in open(sp) if ln.startswith("## "))
+    hdrs = sum(1 for ln in open(sp, encoding="utf-8") if ln.startswith("## "))
     check(
         hdrs == 1,
         "board_capture_finding title cannot inject a second header (B040)",
@@ -673,7 +673,7 @@ def suite_lifecycle(mod, tmp_repo):
     ev_sp = os.path.join(
         ev_root, "engineering-board", "ev", "_sessions", "mcp-%s.md" % mod.today_utc()
     )
-    ev_hdrs = sum(1 for ln in open(ev_sp) if ln.startswith("## "))
+    ev_hdrs = sum(1 for ln in open(ev_sp, encoding="utf-8") if ln.startswith("## "))
     check(
         ev_hdrs == 1,
         "board_capture_finding evidence cannot inject a second header (B040 follow-up)",
@@ -701,7 +701,7 @@ def suite_lifecycle(mod, tmp_repo):
         )
         b54_bd = mod.board_dir_for(b54_root, "b54")
         b54_sp = os.path.join(b54_bd, "_sessions", "mcp-%s.md" % mod.today_utc())
-        b54_hdrs = sum(1 for ln in open(b54_sp) if ln.startswith("## "))
+        b54_hdrs = sum(1 for ln in open(b54_sp, encoding="utf-8") if ln.startswith("## "))
         check(
             b54_hdrs == 1,
             "board_capture_finding evidence %s cannot forge a scratch header (B054)" % sep_name,
@@ -755,10 +755,10 @@ def suite_lifecycle(mod, tmp_repo):
     # board_rebuild — deterministic + idempotent
     rb1 = mod.tool_board_rebuild({"project": "atlas", "root": root})
     board_md = os.path.join(board_dir, "BOARD.md")
-    with open(board_md) as f:
+    with open(board_md, encoding="utf-8") as f:
         content1 = f.read()
     rb2 = mod.tool_board_rebuild({"project": "atlas", "root": root})
-    with open(board_md) as f:
+    with open(board_md, encoding="utf-8") as f:
         content2 = f.read()
     check(content1 == content2, "board_rebuild is idempotent (byte-identical)")
     # B001 (in_progress) present with suffix; F001 blocked with ⊘ Q001; B001 before F001
@@ -793,7 +793,7 @@ def suite_lifecycle(mod, tmp_repo):
     )
     sp = os.path.join(root, cf["scratch_file"])
     check(os.path.isfile(sp), "capture_finding created scratch file")
-    with open(sp) as f:
+    with open(sp, encoding="utf-8") as f:
         scratch = f.read()
     check("Flush latency spikes under load" in scratch, "finding written to scratch")
     st2 = mod.tool_board_status({"project": "atlas", "root": root})
@@ -900,7 +900,7 @@ def suite_lifecycle(mod, tmp_repo):
         }
     )
     archive_path = Path(root, "engineering-board", "atlas", "ARCHIVE.md")
-    archive_preamble = archive_path.read_text()
+    archive_preamble = archive_path.read_text(encoding="utf-8")
     first_archive_row = "- O999 | First resolved entry | resolved: 2026-01-02"
     check(
         mod.archive_with_newest_row(archive_preamble, first_archive_row)
@@ -911,7 +911,7 @@ def suite_lifecycle(mod, tmp_repo):
         "- B900 P2 | [Older resolved entry](bugs/B900.md) — resolved 2026-01-01\n\n"
         "- B901 P3 | [Oldest resolved entry](bugs/B901.md) — resolved 2025-12-31\n"
     )
-    archive_path.write_text(archive_preamble + older_archive_rows)
+    archive_path.write_text(archive_preamble + older_archive_rows, encoding="utf-8")
     resolved = mod.tool_board_update_entry(
         {
             "project": "atlas",
@@ -920,7 +920,7 @@ def suite_lifecycle(mod, tmp_repo):
             "status": "resolved",
         }
     )
-    archive_text = archive_path.read_text()
+    archive_text = archive_path.read_text(encoding="utf-8")
     first_marker = "- O001 | Resolution archive contract | resolved:"
     check(
         "inserted ARCHIVE.md" in resolved["changes"],
@@ -960,7 +960,7 @@ def suite_lifecycle(mod, tmp_repo):
             "status": "resolved",
         }
     )
-    archive_after_second = archive_path.read_text()
+    archive_after_second = archive_path.read_text(encoding="utf-8")
     second_marker = "- O002 | Newer resolution archive contract | resolved:"
     check(
         archive_after_second.startswith(archive_preamble + second_marker),
@@ -988,7 +988,7 @@ def suite_lifecycle(mod, tmp_repo):
             "status": "resolved",
         }
     )
-    archive_after_repeat = archive_path.read_text()
+    archive_after_repeat = archive_path.read_text(encoding="utf-8")
     check(
         archive_after_repeat.count(first_marker) == 1,
         "repeated resolved update does not duplicate ARCHIVE.md",
@@ -1324,7 +1324,10 @@ def suite_remember(mod):
         )
 
         # BOARD.md treatment matches the curator/rebuild convention (L row).
-        with open(os.path.join(root, "engineering-board", "mem", "BOARD.md")) as f:
+        with open(
+            os.path.join(root, "engineering-board", "mem", "BOARD.md"),
+            encoding="utf-8",
+        ) as f:
             bmd = f.read()
         check("- L001 | [" in bmd, "BOARD.md gained the L001 open row", bmd)
 
@@ -1465,10 +1468,10 @@ def suite_comments_parent(mod):
         # deterministic across rebuilds.
         mod.tool_board_rebuild({"project": "fam", "root": root})
         bmd_path = os.path.join(root, "engineering-board", "fam", "BOARD.md")
-        with open(bmd_path) as f:
+        with open(bmd_path, encoding="utf-8") as f:
             bmd1 = f.read()
         mod.tool_board_rebuild({"project": "fam", "root": root})
-        with open(bmd_path) as f:
+        with open(bmd_path, encoding="utf-8") as f:
             bmd2 = f.read()
         check(bmd1 == bmd2, "rebuild with parents is byte-deterministic")
         lines = [ln for ln in bmd1.split("\n")]
@@ -1502,7 +1505,7 @@ def suite_comments_parent(mod):
                 "done_when": ["x"],
             }
         )
-        with open(bmd_path) as f:
+        with open(bmd_path, encoding="utf-8") as f:
             bmd3 = f.read()
         check(
             "\n- %s " % rx["id"] in bmd3,
@@ -1660,11 +1663,14 @@ def suite_distribution():
     must stay well-formed and version-coherent with plugin.json — the same
     lockstep discipline the plugin/marketplace manifests already enforce.
     """
-    plugin_ver = json.load(open(os.path.join(PLUGIN_ROOT, ".claude-plugin", "plugin.json")))[
-        "version"
-    ]
+    plugin_ver = json.load(
+        open(
+            os.path.join(PLUGIN_ROOT, ".claude-plugin", "plugin.json"),
+            encoding="utf-8",
+        )
+    )["version"]
 
-    server = json.load(open(os.path.join(HERE, "server.json")))
+    server = json.load(open(os.path.join(HERE, "server.json"), encoding="utf-8"))
     check(
         server.get("version") == plugin_ver,
         "server.json version matches plugin.json",
@@ -1684,7 +1690,7 @@ def suite_distribution():
         "server.json declares the stdio transport",
     )
 
-    manifest = json.load(open(os.path.join(HERE, "manifest.json")))
+    manifest = json.load(open(os.path.join(HERE, "manifest.json"), encoding="utf-8"))
     check(
         manifest.get("version") == plugin_ver,
         "manifest.json (.mcpb) version matches plugin.json",
@@ -1697,7 +1703,7 @@ def suite_distribution():
         "manifest.json points at the real server entry point",
     )
 
-    smithery = open(os.path.join(HERE, "smithery.yaml")).read()
+    smithery = open(os.path.join(HERE, "smithery.yaml"), encoding="utf-8").read()
     for token in ("startCommand:", "type: stdio", "engineering_board_mcp.py", "commandFunction:"):
         check(token in smithery, "smithery.yaml contains %r" % token)
 
