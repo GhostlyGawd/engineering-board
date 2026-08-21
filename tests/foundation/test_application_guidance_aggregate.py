@@ -184,6 +184,123 @@ class AggregateRunnerTests(unittest.TestCase):
 
 
 class LegacyCompatibilityTests(unittest.TestCase):
+    def test_forced_cp1252_forwards_unicode_and_writes_complete_reports(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb legacy utf8 ") as temp:
+            temporary = Path(temp)
+            fixture = temporary / "checkout with spaces"
+            fixture.mkdir()
+            stdout_marker = "suite stdout: ⊘ 雪 Ω"
+            stderr_marker = "suite stderr: ↳ 火 λ"
+            later_marker = "later suite: ✓"
+            failure_source = (
+                "import os; "
+                'os.write(1, "suite stdout: \\u2298 \\u96ea \\u03a9\\n".encode("utf-8")); '
+                'os.write(2, "suite stderr: \\u21b3 \\u706b \\u03bb\\n".encode("utf-8")); '
+                "raise SystemExit(7)"
+            )
+            later_source = 'import os; os.write(1, "later suite: \\u2713\\n".encode("utf-8"))'
+            manifest = fixture / "suites.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "1",
+                        "suites": [
+                            {
+                                "id": "unicode-failure",
+                                "command": ["{python}", "-c", failure_source],
+                                "portable": True,
+                            },
+                            {
+                                "id": "later-pass",
+                                "command": ["{python}", "-c", later_source],
+                                "portable": True,
+                            },
+                            {
+                                "id": "posix-only",
+                                "command": ["bash", "-c", "exit 0"],
+                                "portable": False,
+                                "skip_reason": "posix-bash-only",
+                            },
+                        ],
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            environment = os.environ.copy()
+            environment["PYTHONIOENCODING"] = "cp1252:strict"
+            environment["PYTHONUTF8"] = "0"
+            environment.pop("ENGINEERING_BOARD_NATIVE_SHELL", None)
+            fingerprints: list[tuple[str, str]] = []
+
+            for shell_name in ("powershell", "cmd"):
+                environment["ENGINEERING_BOARD_SUPPORT_ROW"] = f"windows-x86_64-{shell_name}"
+                report_path = temporary / f"{shell_name}.json"
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        str(LEGACY_ENTRY),
+                        "--root",
+                        str(fixture),
+                        "--manifest",
+                        str(manifest),
+                        "--portable-only",
+                        "--report",
+                        str(report_path),
+                        "--state-root",
+                        str(temporary / f"{shell_name}-locks"),
+                    ],
+                    cwd=temporary,
+                    env=environment,
+                    capture_output=True,
+                    check=False,
+                )
+
+                self.assertEqual(result.returncode, 1, result.stderr.decode("utf-8"))
+                stdout = result.stdout.decode("utf-8")
+                stderr = result.stderr.decode("utf-8")
+                self.assertEqual(result.stdout.count((stdout_marker + "\n").encode()), 1)
+                self.assertEqual(result.stderr.count((stderr_marker + "\n").encode()), 1)
+                self.assertIn(later_marker, stdout)
+                self.assertNotIn("\ufffd", stdout + stderr)
+                self.assertTrue(report_path.is_file())
+                self.assertEqual(
+                    list(temporary.glob(f".{report_path.name}.*")),
+                    [],
+                )
+
+                report = json.loads(report_path.read_text(encoding="utf-8"))
+                self.assertEqual(report["native_shell"], shell_name)
+                self.assertEqual(report["passed"], 1)
+                self.assertEqual(report["failed"], 1)
+                self.assertEqual(report["skipped"], 1)
+                self.assertEqual(report["suite_count"], 3)
+                self.assertEqual(
+                    [(item["id"], item["status"], item["exit_code"]) for item in report["results"]],
+                    [
+                        ("unicode-failure", "failed", 7),
+                        ("later-pass", "passed", 0),
+                        ("posix-only", "skipped", None),
+                    ],
+                )
+                self.assertEqual(
+                    report["results"][0]["rerun_command"],
+                    " ".join([sys.executable, "-c", failure_source]),
+                )
+                self.assertEqual(report["repository_status_before"], "")
+                self.assertEqual(report["repository_status_after"], "")
+                self.assertTrue(report["repository_clean"])
+                self.assertFalse(report["overall_pass"])
+                fingerprints.append(
+                    (
+                        report["normalized_decision_fingerprint"],
+                        report["artifact_fingerprint"],
+                    )
+                )
+
+            self.assertEqual(fingerprints[0], fingerprints[1])
+
     def test_portable_runner_accepts_spaced_root_continues_and_is_repeatable(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb legacy portable ") as temp:
             temporary = Path(temp)

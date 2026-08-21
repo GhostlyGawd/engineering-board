@@ -37,6 +37,11 @@ increases.
 
 ### Fixed
 
+- The platform-neutral legacy aggregate runner now configures strict UTF-8
+  stdout and stderr before CLI output, forwards Unicode suite diagnostics
+  without changing decisions, and infers native PowerShell or `cmd.exe`
+  report identity from the Windows support row when the shell variable is
+  absent.
 - Packaged MCP graph writes now preserve exact UTF-8 and literal LF bytes on
   native Windows, and package failures name `GRAPH.yml` or cache `state.json`
   with the failing byte or temporary-file condition.

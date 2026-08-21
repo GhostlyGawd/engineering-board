@@ -28,6 +28,23 @@ VOLATILE_KEYS = {
 }
 
 
+def _configure_console_utf8() -> None:
+    for stream in (sys.stdout, sys.stderr):
+        getattr(stream, "reconfigure")(encoding="utf-8", errors="strict")
+
+
+def _native_shell() -> str:
+    native_shell = os.environ.get("ENGINEERING_BOARD_NATIVE_SHELL")
+    if native_shell is not None:
+        return native_shell
+    support_row = os.environ.get("ENGINEERING_BOARD_SUPPORT_ROW", "")
+    if support_row.endswith("-powershell"):
+        return "powershell"
+    if support_row.endswith("-cmd"):
+        return "cmd"
+    return "cmd" if os.name == "nt" else "bash"
+
+
 def _git_status(root: Path) -> str:
     result = subprocess.run(
         ["git", "-C", str(root), "status", "--porcelain=v1", "--untracked-files=all"],
@@ -224,10 +241,7 @@ def _run(root: Path, manifest_path: Path, portable_only: bool, report_path: Path
         "support_row": os.environ.get("ENGINEERING_BOARD_SUPPORT_ROW", "local"),
         "os_family": platform.system().lower(),
         "architecture": platform.machine().lower(),
-        "native_shell": os.environ.get(
-            "ENGINEERING_BOARD_NATIVE_SHELL",
-            "cmd" if os.name == "nt" else "bash",
-        ),
+        "native_shell": _native_shell(),
         "command": (
             f"{sys.executable} scripts/legacy_run_all.py --root {root}"
             + (" --portable-only" if portable_only else "")
@@ -263,6 +277,7 @@ def _run(root: Path, manifest_path: Path, portable_only: bool, report_path: Path
 
 
 def main(argv: list[str] | None = None) -> int:
+    _configure_console_utf8()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--manifest", type=Path)
