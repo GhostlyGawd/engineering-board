@@ -29,6 +29,11 @@ POSIX_COVERAGE_COMMANDS: tuple[tuple[str, ...], ...] = (
     ("bash", "tests/view/automated.sh"),
     ("bash", "tests/security/reject-filter.sh"),
 )
+WINDOWS_COMPATIBILITY_COVERAGE_COMMANDS: tuple[tuple[str, ...], ...] = (
+    ("bash", "tests/orchestration/milestone-b-pattern-pipeline.sh"),
+    ("bash", "tests/orchestration/milestone-c-root-cause-intelligence.sh"),
+    ("bash", "tests/orchestration/milestone-d-context-outcome-intelligence.sh"),
+)
 PORTABLE_COVERAGE_COMMANDS: tuple[tuple[str, ...], ...] = (
     (sys.executable, "tests/platform/test_foundation_portability.py"),
     (sys.executable, "tests/bootstrap/test_bootstrap_dev.py"),
@@ -304,7 +309,7 @@ def _coverage_commands(
     if platform_name == "nt":
         assert bash_executable is not None
         bash_commands = tuple(
-            (bash_executable, *command[1:]) for command in POSIX_COVERAGE_COMMANDS
+            (bash_executable, *command[1:]) for command in WINDOWS_COMPATIBILITY_COVERAGE_COMMANDS
         )
         return bash_commands + PORTABLE_COVERAGE_COMMANDS
     return POSIX_COVERAGE_COMMANDS + PORTABLE_COVERAGE_COMMANDS

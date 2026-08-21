@@ -276,9 +276,15 @@ class QualityCommandContractTests(unittest.TestCase):
         commands = coverage_gate._coverage_commands("nt", bash)
         self.assertEqual(
             commands,
-            tuple((bash, *command[1:]) for command in coverage_gate.POSIX_COVERAGE_COMMANDS)
+            tuple(
+                (bash, *command[1:])
+                for command in coverage_gate.WINDOWS_COMPATIBILITY_COVERAGE_COMMANDS
+            )
             + coverage_gate.PORTABLE_COVERAGE_COMMANDS,
         )
+        for command in coverage_gate.WINDOWS_COMPATIBILITY_COVERAGE_COMMANDS:
+            self.assertEqual(command[0], "bash")
+            self.assertTrue((ROOT / command[1]).is_file())
         with self.assertRaisesRegex(
             coverage_gate.CoverageGateError,
             "Git for Windows Bash compatibility runner is required",
