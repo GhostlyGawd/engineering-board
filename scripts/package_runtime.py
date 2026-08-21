@@ -130,16 +130,52 @@ def _rpc_smoke(command: Sequence[str | Path], repository: Path, label: str) -> N
         tools = receive(3).get("result", {}).get("tools")
         if not isinstance(tools, list) or len(tools) != MCP_TOOL_COUNT:
             raise PackageGateError(f"{label}: expected {MCP_TOOL_COUNT} tools")
-        send(
-            "tools/call",
+
+        def call_tool(name: str, arguments: dict[str, Any]) -> None:
+            send(
+                "tools/call",
+                {
+                    "name": name,
+                    "arguments": arguments,
+                },
+            )
+            tool_result = receive(request_id).get("result")
+            if not isinstance(tool_result, dict) or tool_result.get("isError") is True:
+                raise PackageGateError(f"{label}: {name} failed")
+
+        project = "package-smoke"
+        call_tool(
+            "board_init",
+            {"root": str(repository), "project": project, "agents_md": False},
+        )
+        call_tool(
+            "board_create_entry",
             {
-                "name": "board_list_projects",
-                "arguments": {"root": str(repository)},
+                "root": str(repository),
+                "project": project,
+                "type": "bug",
+                "title": "Graph café ↳ package smoke",
+                "priority": "P2",
+                "affects": "src/package_graph.py",
+                "done_when": ["The packaged graph writer emits literal LF bytes."],
             },
         )
-        tool_result = receive(4).get("result")
-        if not isinstance(tool_result, dict) or tool_result.get("isError") is True:
-            raise PackageGateError(f"{label}: representative tool call failed")
+        call_tool(
+            "board_graph",
+            {"root": str(repository), "project": project, "full": True},
+        )
+        graph_path = repository / "engineering-board" / project / "GRAPH.yml"
+        cache_path = repository / ".engineering-board" / "cache" / "graph" / project / "state.json"
+        marker = "Graph café ↳ package smoke".encode("utf-8")
+        for written_path in (graph_path, cache_path):
+            if not written_path.is_file():
+                raise PackageGateError(f"{label}: graph write missing {written_path}")
+            content = written_path.read_bytes()
+            if marker not in content or b"\r" in content or not content.endswith(b"\n"):
+                raise PackageGateError(f"{label}: graph write is not exact UTF-8 with LF")
+            temporary = written_path.with_name(written_path.name + ".tmp")
+            if temporary.exists():
+                raise PackageGateError(f"{label}: temporary graph sibling remained")
         stdin.close()
         exit_code = process.wait(timeout=10)
         stdout_tail = stdout.read()

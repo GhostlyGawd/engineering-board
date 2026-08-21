@@ -372,8 +372,10 @@ class PackageGateTests(unittest.TestCase):
                 )
 
             server = temporary / "fake_mcp.py"
+            calls = temporary / "calls.jsonl"
             server.write_text(
                 "import json, sys\n"
+                "from pathlib import Path\n"
                 "for line in sys.stdin:\n"
                 "    value=json.loads(line)\n"
                 "    if 'id' not in value:\n"
@@ -386,14 +388,29 @@ class PackageGateTests(unittest.TestCase):
                 "    elif method=='tools/list':\n"
                 "        result={'tools':[{} for _ in range(19)]}\n"
                 "    else:\n"
+                "        with open(sys.argv[1], 'a', encoding='utf-8', newline='\\n') as stream:\n"
+                "            stream.write(value['params']['name']+'\\n')\n"
+                "        if value['params']['name']=='board_graph':\n"
+                "            arguments=value['params']['arguments']\n"
+                "            root=Path(arguments['root'])\n"
+                "            project=arguments['project']\n"
+                "            graph=root/'engineering-board'/project/'GRAPH.yml'\n"
+                "            cache=root/'.engineering-board'/'cache'/'graph'/project/'state.json'\n"
+                "            for path in (graph, cache):\n"
+                "                path.parent.mkdir(parents=True, exist_ok=True)\n"
+                "                path.write_bytes('Graph café ↳ package smoke\\n'.encode('utf-8'))\n"
                 "        result={'content':[],'isError':False}\n"
                 "    print(json.dumps({'jsonrpc':'2.0','id':value['id'],'result':result}),flush=True)\n",
                 encoding="utf-8",
             )
             package_runtime._rpc_smoke(
-                [sys.executable, server],
+                [sys.executable, server, calls],
                 temporary,
                 "fake MCP",
+            )
+            self.assertEqual(
+                calls.read_text(encoding="utf-8").splitlines(),
+                ["board_init", "board_create_entry", "board_graph"],
             )
 
     def test_runtime_install_and_tool_helpers_are_portable(self) -> None:
