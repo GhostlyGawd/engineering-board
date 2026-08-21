@@ -113,7 +113,7 @@ def load_server():
 def suite_stdio(tmp_repo):
     print("\n== Suite 1: real stdio subprocess session ==")
     proc = subprocess.Popen(
-        ["python3", SERVER_PATH],
+        [sys.executable, SERVER_PATH],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -1763,7 +1763,7 @@ def suite_multiclient():
 
     def spawn():
         pr = subprocess.Popen(
-            ["python3", SERVER_PATH],
+            [sys.executable, SERVER_PATH],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
