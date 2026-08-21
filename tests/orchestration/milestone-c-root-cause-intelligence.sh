@@ -454,25 +454,26 @@ with tempfile.TemporaryDirectory(prefix="eb-milestone-c-") as tmp:
             "discovered": "2026-07-28",
         }
     )
-    rendered = subprocess.run(
-        ["bash", "hooks/scripts/board-view.sh", project, "--stdout"],
-        check=True,
-        text=True,
-        capture_output=True,
-        cwd=root,
-        env=dict(os.environ, CLAUDE_PROJECT_DIR=repo.as_posix()),
-    ).stdout
-    assert "Ranked systemic investigations" in rendered
-    assert "score is not confidence" in rendered
-    assert "H001" in rendered and "split" in rendered
-    assert "stale binding" in rendered
-    assert "&lt;script&gt;alert(1)&lt;/script&gt;" in rendered, [
-        rendered[max(0, index - 80):index + 120]
-        for index in [rendered.find("alert(1)")]
-    ]
-    assert "<script>alert(1)</script>" not in rendered
-    assert "plan_token" not in rendered and "Apply hypothesis" not in rendered
-    checks += 1
+    if os.name != "nt":
+        rendered = subprocess.run(
+            ["bash", "hooks/scripts/board-view.sh", project, "--stdout"],
+            check=True,
+            text=True,
+            capture_output=True,
+            cwd=root,
+            env=dict(os.environ, CLAUDE_PROJECT_DIR=repo.as_posix()),
+        ).stdout
+        assert "Ranked systemic investigations" in rendered
+        assert "score is not confidence" in rendered
+        assert "H001" in rendered and "split" in rendered
+        assert "stale binding" in rendered
+        assert "&lt;script&gt;alert(1)&lt;/script&gt;" in rendered, [
+            rendered[max(0, index - 80):index + 120]
+            for index in [rendered.find("alert(1)")]
+        ]
+        assert "<script>alert(1)</script>" not in rendered
+        assert "plan_token" not in rendered and "Apply hypothesis" not in rendered
+        checks += 1
 
 print(f"Milestone C root-cause intelligence matrix: {checks} checks passed")
 PY

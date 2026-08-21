@@ -304,6 +304,7 @@ class QualityCommandContractTests(unittest.TestCase):
         )
         self.assertIn("CLAUDE_PROJECT_DIR=repo.as_posix()", fixture)
         self.assertIn("cwd=root", fixture)
+        self.assertIn('if os.name != "nt":', fixture)
 
     def test_security_selector_reports_every_named_family(self) -> None:
         environment = os.environ.copy()
