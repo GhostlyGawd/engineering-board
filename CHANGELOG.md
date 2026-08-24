@@ -37,6 +37,11 @@ increases.
 
 ### Fixed
 
+- The devcontainer now treats only its canonical workspace as a safe Git
+  directory, keeps nested quality tests on the image-pinned tool root, and
+  uses a checksum-pinned native arm64 validator and POSIX command layer when
+  its amd64 image runs through an arm64 emulation host. Its documented cold
+  build no longer requires a BuildKit-only platform option.
 - The platform-neutral legacy aggregate runner now preserves literal LF bytes
   for stdout, stderr, and atomically replaced normalized JSON reports on
   native Windows.

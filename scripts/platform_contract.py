@@ -6,10 +6,9 @@ from __future__ import annotations
 import argparse
 import json
 import ntpath
-from pathlib import Path, PureWindowsPath
 import re
+from pathlib import Path, PureWindowsPath
 from typing import Any, cast
-
 
 REQUIRED_TOOLS = {"python", "node", "git", "claude-code", "codex-cli"}
 REQUIRED_ROWS = {
@@ -64,7 +63,8 @@ def validate_windows_relative_path(value: str) -> str:
     _require("\x00" not in value, "Windows path contains NUL")
     path = PureWindowsPath(value)
     _require(
-        not path.is_absolute() and not path.drive and not path.root, "Windows path is absolute"
+        not path.is_absolute() and not path.drive and not path.root,
+        "Windows path is absolute",
     )
     normalized_parts: list[str] = []
     for part in path.parts:
@@ -116,7 +116,10 @@ def validate_schema_instance(
                 f"{location}: missing schema reference {reference}",
             )
             target = target[part]
-        _require(isinstance(target, dict), f"{location}: invalid schema reference {reference}")
+        _require(
+            isinstance(target, dict),
+            f"{location}: invalid schema reference {reference}",
+        )
         validate_schema_instance(
             instance,
             target,
@@ -174,7 +177,10 @@ def validate_schema_instance(
             _require(len(instance) >= minimum, f"{location}: too few items")
         if schema.get("uniqueItems"):
             serialized = [json.dumps(item, sort_keys=True) for item in instance]
-            _require(len(serialized) == len(set(serialized)), f"{location}: items are not unique")
+            _require(
+                len(serialized) == len(set(serialized)),
+                f"{location}: items are not unique",
+            )
         item_schema = schema.get("items")
         if isinstance(item_schema, dict):
             for index, value in enumerate(instance):
@@ -329,7 +335,10 @@ def validate_repository_contract(root: Path) -> dict[str, Any]:
         if row.get("ci_required"):
             _require(row["id"] in workflows, f"CI omits required platform row {row['id']}")
             _require(row["runner"] in workflows, f"CI omits runner {row['runner']}")
-    _require("Git Bash" in docs and "WSL" in docs, "compatibility environments are not documented")
+    _require(
+        "Git Bash" in docs and "WSL" in docs,
+        "compatibility environments are not documented",
+    )
     _require(
         re.search(r"Git Bash.+not native Windows", docs, re.IGNORECASE | re.DOTALL) is not None,
         "Git Bash is not classified separately",
@@ -345,8 +354,15 @@ def validate_repository_contract(root: Path) -> dict[str, Any]:
         artifact.get("platform") for artifact in artifacts if isinstance(artifact, dict)
     }
     _require(
-        artifact_platforms == {"darwin-arm64", "linux-x86_64", "windows-x86_64"},
-        "development tool artifacts do not cover every supported host",
+        artifact_platforms
+        == {
+            "darwin-arm64",
+            "linux-arm64",
+            "linux-x86_64",
+            "windows-x86_64",
+        },
+        "development tool artifacts do not cover every supported host "
+        "and the internal devcontainer arm64 runtime",
     )
     devcontainer = _load_object(root / ".devcontainer" / "devcontainer.json")
     _require(

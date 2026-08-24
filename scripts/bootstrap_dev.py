@@ -32,6 +32,9 @@ SUPPORTED_PLATFORMS = {
     ("Windows", "AMD64"): "windows-x86_64",
     ("Windows", "x86_64"): "windows-x86_64",
 }
+DEVCONTAINER_LINUX_ARM64_ROOT = Path("/opt/engineering-board-runtime/linux-arm64")
+DEVCONTAINER_LINUX_X86_64_ROOT = Path("/opt/engineering-board-runtime/linux-x86_64")
+ARTIFACT_PLATFORMS = set(SUPPORTED_PLATFORMS.values()) | {"linux-arm64"}
 
 
 class BootstrapError(RuntimeError):
@@ -119,7 +122,7 @@ def load_manifest(path: Path) -> Dict[str, Any]:
     for artifact in artifacts:
         _require(isinstance(artifact, dict), "artifact entry must be an object")
         _require(
-            artifact.get("platform") in SUPPORTED_PLATFORMS.values(),
+            artifact.get("platform") in ARTIFACT_PLATFORMS,
             f"unsupported artifact platform: {artifact.get('platform')!r}",
         )
         _require(
@@ -140,6 +143,18 @@ def load_manifest(path: Path) -> Dict[str, Any]:
 def platform_key() -> str:
     key = (platform.system(), platform.machine())
     selected = SUPPORTED_PLATFORMS.get(key)
+    if selected is None and key in {
+        ("Linux", "aarch64"),
+        ("Linux", "arm64"),
+    }:
+        configured = os.environ.get("ENGINEERING_BOARD_DEV_TOOLS")
+        if configured:
+            configured_root = Path(configured).expanduser()
+            if (
+                configured_root == DEVCONTAINER_LINUX_ARM64_ROOT
+                or configured_root.resolve() == DEVCONTAINER_LINUX_ARM64_ROOT
+            ):
+                selected = "linux-arm64"
     if selected is None:
         raise BootstrapError(
             "unsupported bootstrap host "
@@ -510,6 +525,8 @@ def install_toolchain(
     root: Path,
     install_root: Path,
     manifest: Dict[str, Any],
+    *,
+    defer_executable_checks: bool = False,
 ) -> Dict[str, str]:
     selected_platform = platform_key()
     install_root.mkdir(parents=True, exist_ok=True)
@@ -628,7 +645,7 @@ def install_toolchain(
 
     inventory: Dict[str, str] = {}
     for tool in manifest["tools"]:
-        if tool.get("verify") == "file-sha256":
+        if defer_executable_checks or tool.get("verify") == "file-sha256":
             command = _provider_command(tool, install_root, selected_platform)
             _require(
                 command.is_file(),
@@ -645,7 +662,7 @@ def install_toolchain(
     executable_hashes = {
         tool["id"]: file_sha256(_provider_command(tool, install_root, selected_platform))
         for tool in manifest["tools"]
-        if tool.get("verify") == "file-sha256"
+        if defer_executable_checks or tool.get("verify") == "file-sha256"
     }
     _atomic_json(
         marker,
@@ -655,6 +672,7 @@ def install_toolchain(
             "platform": selected_platform,
             "inventory": inventory,
             "file_sha256": executable_hashes,
+            "deferred_executable_checks": defer_executable_checks,
         },
     )
     return inventory
@@ -684,6 +702,11 @@ def main() -> int:
         help="override the ignored development-tool installation directory",
     )
     parser.add_argument(
+        "--defer-executable-checks",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
         "--root",
         type=Path,
         default=Path(__file__).resolve().parents[1],
@@ -699,13 +722,30 @@ def main() -> int:
             if args.install_root is not None
             else _default_install_root(root)
         )
+        if args.defer_executable_checks:
+            if (
+                args.check
+                or install_root != DEVCONTAINER_LINUX_X86_64_ROOT
+                or platform_key() != "linux-x86_64"
+                or os.environ.get("ENGINEERING_BOARD_DEVCONTAINER_EMULATED_BUILD") != "1"
+            ):
+                raise BootstrapError(
+                    "--defer-executable-checks is limited to the emulated "
+                    "devcontainer build at "
+                    f"{DEVCONTAINER_LINUX_X86_64_ROOT}"
+                )
         if args.check:
             inventory = check_installation(root, install_root, manifest)
         else:
             try:
                 inventory = check_installation(root, install_root, manifest)
             except BootstrapError:
-                inventory = install_toolchain(root, install_root, manifest)
+                inventory = install_toolchain(
+                    root,
+                    install_root,
+                    manifest,
+                    defer_executable_checks=args.defer_executable_checks,
+                )
         _print_inventory(inventory)
         return 0
     except BootstrapError as exc:

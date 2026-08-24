@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -20,6 +21,7 @@ from scripts import bootstrap_ci_evidence, bootstrap_dev
 MANIFEST = ROOT / "support" / "dev-tools" / "toolchain.json"
 DEVCONTAINER = ROOT / ".devcontainer" / "devcontainer.json"
 DOCKERFILE = ROOT / ".devcontainer" / "Dockerfile"
+TOOLCHAIN_SELECTOR = ROOT / ".devcontainer" / "select-toolchain.sh"
 WINDOWS_WORKFLOW = ROOT / ".github" / "workflows" / "windows.yml"
 TEST_WORKFLOW = ROOT / ".github" / "workflows" / "test.yml"
 EXPECTED_TOOLS = {
@@ -77,6 +79,14 @@ class BootstrapManifestTests(unittest.TestCase):
             self.assertRegex(artifact["sha256"], r"^[0-9a-f]{64}$")
             self.assertTrue(artifact["url"].startswith("https://"))
             self.assertNotIn("/latest/", artifact["url"])
+        self.assertEqual(
+            {
+                artifact["id"]
+                for artifact in value["artifacts"]
+                if artifact["platform"] == "linux-arm64"
+            },
+            {"node", "syft", "uv"},
+        )
 
     def test_mcp_runtime_metadata_remains_dependency_free(self) -> None:
         pyproject = (ROOT / "mcp-server" / "pyproject.toml").read_text(encoding="utf-8")
@@ -145,6 +155,57 @@ class BootstrapCliTests(unittest.TestCase):
             ):
                 bootstrap_dev.check_installation(ROOT, install_root, manifest)
 
+    def test_linux_arm64_is_bounded_to_the_canonical_devcontainer_tool_root(
+        self,
+    ) -> None:
+        environment = {
+            "ENGINEERING_BOARD_DEV_TOOLS": ("/opt/engineering-board-runtime/linux-arm64")
+        }
+        with (
+            mock.patch.dict(os.environ, environment, clear=False),
+            mock.patch.object(bootstrap_dev.platform, "system", return_value="Linux"),
+            mock.patch.object(
+                bootstrap_dev.platform,
+                "machine",
+                return_value="aarch64",
+            ),
+        ):
+            self.assertEqual(bootstrap_dev.platform_key(), "linux-arm64")
+
+        with (
+            mock.patch.dict(
+                os.environ,
+                {"ENGINEERING_BOARD_DEV_TOOLS": "/tmp/linux-arm64"},
+                clear=False,
+            ),
+            mock.patch.object(bootstrap_dev.platform, "system", return_value="Linux"),
+            mock.patch.object(
+                bootstrap_dev.platform,
+                "machine",
+                return_value="aarch64",
+            ),
+            self.assertRaisesRegex(
+                bootstrap_dev.BootstrapError,
+                "unsupported bootstrap host Linux/aarch64",
+            ),
+        ):
+            bootstrap_dev.platform_key()
+
+    def test_deferred_checks_are_bounded_to_the_emulated_devcontainer_build(
+        self,
+    ) -> None:
+        rejected = self.run_cli(
+            "--defer-executable-checks",
+            "--install-root",
+            "/tmp/linux-x86_64",
+        )
+        self.assertEqual(rejected.returncode, 2)
+        self.assertIn("--defer-executable-checks", rejected.stderr)
+        self.assertIn(
+            "/opt/engineering-board-runtime/linux-x86_64",
+            rejected.stderr,
+        )
+
     def test_check_is_network_free_and_read_only(self) -> None:
         manifest = bootstrap_dev.load_manifest(MANIFEST)
         expected = {tool["id"]: tool["version"] for tool in manifest["tools"]}
@@ -192,13 +253,58 @@ class DevcontainerContractTests(unittest.TestCase):
         self.assertEqual(config["postCreateCommand"], "bash scripts/bootstrap-dev.sh --check")
         self.assertEqual(config["build"]["dockerfile"], "Dockerfile")
         self.assertEqual(config["build"]["context"], "..")
+        self.assertNotIn("options", config["build"])
+        self.assertEqual(
+            config["containerEnv"]["ENGINEERING_BOARD_DEV_TOOLS"],
+            "/opt/engineering-board-runtime/current",
+        )
 
         dockerfile = DOCKERFILE.read_text(encoding="utf-8")
         self.assertNotIn(":latest", dockerfile)
         self.assertGreaterEqual(dockerfile.count("@sha256:"), 3)
         self.assertIn("USER vscode", dockerfile)
+        self.assertIn("GIT_CONFIG_KEY_0=safe.directory", dockerfile)
+        self.assertIn("GIT_CONFIG_VALUE_0=/workspaces/engineering-board", dockerfile)
+        self.assertIn("PYTHONDONTWRITEBYTECODE=1", dockerfile)
+        self.assertIn('ENTRYPOINT ["/usr/local/bin/select-toolchain.sh"]', dockerfile)
         self.assertNotIn(".config/engineering-board", dockerfile)
         self.assertNotIn("github-app.pem", dockerfile)
+
+    def test_devcontainer_arm64_toolchain_is_pinned_and_architecture_bounded(
+        self,
+    ) -> None:
+        dockerfile = DOCKERFILE.read_text(encoding="utf-8")
+        selector = TOOLCHAIN_SELECTOR.read_text(encoding="utf-8")
+        for digest in (
+            "a110e01da17f27ebb99b4ae5d8fab540071fcf7bc906b2c8df29c925bb5d9e36",
+            "9e7720738fbcb12e8122beb5194cfa58ab0029c78c3ed39f8986aa68713e31bc",
+            "4290d77f2efb22105839727af2a816a0aaba3ace690a10afd806e654bd78b1d3",
+        ):
+            self.assertIn(digest, dockerfile)
+        self.assertGreaterEqual(dockerfile.count("FROM --platform=linux/arm64"), 3)
+        self.assertGreaterEqual(dockerfile.count("FROM --platform=linux/amd64"), 3)
+        self.assertIn("/opt/engineering-board-runtime/linux-arm64", dockerfile)
+        self.assertIn("/opt/engineering-board-runtime/linux-x86_64", dockerfile)
+        self.assertIn("/opt/engineering-board-native/usr/bin", dockerfile)
+        self.assertIn("/proc/cpuinfo", selector)
+        self.assertIn("asimd", selector)
+        self.assertIn("linux-arm64", selector)
+        self.assertIn("linux-x86_64", selector)
+        self.assertIn("/opt/engineering-board-native/usr/bin", selector)
+        self.assertIn(
+            "GIT_EXEC_PATH=/opt/engineering-board-native/usr/lib/git-core",
+            selector,
+        )
+        self.assertIn(
+            'PATH="${runtime_root}/current/bin:'
+            "${runtime_root}/current/python-tools/bin:"
+            "${runtime_root}/current/node/bin:"
+            "${runtime_root}/current/node-tools/node_modules/.bin"
+            '${native_path:+:${native_path}}:${PATH}"',
+            selector,
+        )
+        self.assertIn("--defer-executable-checks", dockerfile)
+        self.assertIn("ln -sfn", selector)
 
     def test_docker_context_excludes_private_and_host_runtime_files(self) -> None:
         dockerignore = (ROOT / ".dockerignore").read_text(encoding="utf-8")

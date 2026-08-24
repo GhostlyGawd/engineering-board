@@ -39,15 +39,21 @@ To use the containerized workspace, open the repository in a Dev Container or
 build it with:
 
 ```sh
-docker build --no-cache --platform linux/amd64 \
+docker build --no-cache \
   -f .devcontainer/Dockerfile \
   -t engineering-board-devcontainer .
 ```
 
 The container uses user `vscode` and workspace
 `/workspaces/engineering-board`. Its post-create command checks the pinned
-inventory.
-
+inventory. The image marks only that workspace as a safe Git directory.
+When an amd64 container runs through an arm64 emulation host, it selects the
+checksum-pinned native arm64 Python, Node, and standalone validator toolchain
+that was installed during the image build. The container keeps its required
+and POSIX command layer that were installed during the image build. The final
+image stage keeps the required amd64 image identity without requiring a
+BuildKit-only command-line option, and validation does not install another
+tool.
 ## Run the stable quality commands
 
 On macOS or Linux, use these exact repository entry points:

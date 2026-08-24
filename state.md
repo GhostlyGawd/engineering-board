@@ -105,7 +105,9 @@ _Last updated: 2026-07-10_
   `scripts/bootstrap-dev.sh` is the macOS/Linux interface;
   `scripts/bootstrap_dev.py` is the native-Windows interface. Check mode is
   offline/read-only. `.devcontainer/` uses the same inventory at
-  `/workspaces/engineering-board` as user `vscode`.
+  `/workspaces/engineering-board` as user `vscode`. Its final image stays
+  `linux/amd64`; on an arm64 emulation host it selects the separately pinned
+  native arm64 validator and POSIX command layers built into the image.
 - **Stable quality contract:** `scripts/quality_gate.py` owns the
   `format`/`lint`/`typecheck`/`test`/`security`/`package`/`all` selectors;
   `scripts/quality-gate.sh` is the delegating macOS/Linux adapter. Native

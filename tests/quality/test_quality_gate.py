@@ -6,14 +6,13 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from pathlib import Path
 from unittest import mock
-
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -21,15 +20,30 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import coverage_gate  # noqa: E402
 from quality_checks import QualityRunner  # noqa: E402
 
-
 PYTHON_ENTRY = ROOT / "scripts" / "quality_gate.py"
 BASH_ENTRY = ROOT / "scripts" / "quality-gate.sh"
 INTERNAL_COVERAGE_ENTRY = ROOT / "scripts" / "coverage_gate.py"
 STABLE_SELECTORS = ("format", "lint", "typecheck", "test", "security", "package", "all")
-PINNED_TOOLS = ROOT / ".engineering-board" / "dev-tools"
+
+
+def pinned_tools() -> Path:
+    configured = os.environ.get("ENGINEERING_BOARD_DEV_TOOLS")
+    if configured:
+        return Path(configured).expanduser().resolve()
+    return ROOT / ".engineering-board" / "dev-tools"
 
 
 class QualityCommandContractTests(unittest.TestCase):
+    def test_pinned_tool_root_honors_the_container_environment(self) -> None:
+        with mock.patch.dict(
+            os.environ,
+            {"ENGINEERING_BOARD_DEV_TOOLS": "/opt/engineering-board-tools"},
+        ):
+            self.assertEqual(
+                pinned_tools(),
+                Path("/opt/engineering-board-tools"),
+            )
+
     def run_python(
         self,
         *arguments: str,
@@ -67,7 +81,7 @@ class QualityCommandContractTests(unittest.TestCase):
         fixture_environment = os.environ.copy()
         if environment:
             fixture_environment.update(environment)
-        fixture_environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)
+        fixture_environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(pinned_tools())
         return self.run_python(
             "--root",
             str(fixture),
@@ -228,7 +242,7 @@ class QualityCommandContractTests(unittest.TestCase):
 
     def test_clean_format_lint_type_security_and_package_selectors_pass(self) -> None:
         environment = os.environ.copy()
-        environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)
+        environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(pinned_tools())
         for selector in ("format", "lint", "typecheck", "security", "package"):
             with self.subTest(selector=selector):
                 result = self.run_python(selector, environment=environment)
@@ -240,7 +254,7 @@ class QualityCommandContractTests(unittest.TestCase):
 
     def test_internal_coverage_reports_all_thresholds_and_identity(self) -> None:
         environment = os.environ.copy()
-        environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)
+        environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(pinned_tools())
         result = subprocess.run(
             [sys.executable, str(INTERNAL_COVERAGE_ENTRY), "--root", str(ROOT)],
             cwd=ROOT,
@@ -271,7 +285,9 @@ class QualityCommandContractTests(unittest.TestCase):
             coverage_gate.PORTABLE_COVERAGE_COMMANDS,
         )
 
-    def test_native_windows_coverage_runs_bash_compatibility_cases_explicitly(self) -> None:
+    def test_native_windows_coverage_runs_bash_compatibility_cases_explicitly(
+        self,
+    ) -> None:
         bash = "C:/Program Files/Git/bin/bash.exe"
         commands = coverage_gate._coverage_commands("nt", bash)
         self.assertEqual(
@@ -317,7 +333,7 @@ class QualityCommandContractTests(unittest.TestCase):
 
     def test_security_selector_reports_every_named_family(self) -> None:
         environment = os.environ.copy()
-        environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)
+        environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(pinned_tools())
         result = self.run_python("security", environment=environment)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         for family in (
@@ -653,7 +669,9 @@ class QualityCommandContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="eb coverage regression ") as temp:
             fixture = self.copy_repository_with_history(Path(temp))
             subprocess.run(
-                ["git", "config", "user.name", "Coverage Fixture"], cwd=fixture, check=True
+                ["git", "config", "user.name", "Coverage Fixture"],
+                cwd=fixture,
+                check=True,
             )
             subprocess.run(
                 ["git", "config", "user.email", "coverage-fixture@example.invalid"],
@@ -682,11 +700,13 @@ class QualityCommandContractTests(unittest.TestCase):
             )
             subprocess.run(["git", "add", target.name], cwd=target.parent, check=True)
             subprocess.run(
-                ["git", "commit", "-qm", "add uncovered regression"], cwd=fixture, check=True
+                ["git", "commit", "-qm", "add uncovered regression"],
+                cwd=fixture,
+                check=True,
             )
 
             environment = os.environ.copy()
-            environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(PINNED_TOOLS)
+            environment["ENGINEERING_BOARD_DEV_TOOLS"] = str(pinned_tools())
             environment["ENGINEERING_BOARD_COVERAGE_BASE"] = baseline
             result = subprocess.run(
                 [sys.executable, str(INTERNAL_COVERAGE_ENTRY), "--root", str(fixture)],
@@ -709,7 +729,9 @@ class QualityCommandContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="eb coverage identity ") as temp:
             fixture = self.copy_repository_with_history(Path(temp))
             subprocess.run(
-                ["git", "config", "user.name", "Coverage Fixture"], cwd=fixture, check=True
+                ["git", "config", "user.name", "Coverage Fixture"],
+                cwd=fixture,
+                check=True,
             )
             subprocess.run(
                 ["git", "config", "user.email", "coverage-fixture@example.invalid"],

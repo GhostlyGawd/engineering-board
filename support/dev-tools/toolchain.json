@@ -40,6 +40,14 @@
     {
       "id": "uv",
       "version": "0.12.3",
+      "platform": "linux-arm64",
+      "url": "https://github.com/astral-sh/uv/releases/download/0.12.3/uv-aarch64-unknown-linux-gnu.tar.gz",
+      "sha256": "bb66cb52e7b1823aed1183630d8d8e5c958840d584a4c55ec10a4cfc168dcca2",
+      "strip_components": 1
+    },
+    {
+      "id": "uv",
+      "version": "0.12.3",
       "platform": "linux-x86_64",
       "url": "https://github.com/astral-sh/uv/releases/download/0.12.3/uv-x86_64-unknown-linux-gnu.tar.gz",
       "sha256": "600cf9a742aca00d292673b16b5acffaa7b8c269a364ad0c2e79498dcb1fe101",
@@ -64,6 +72,14 @@
     {
       "id": "node",
       "version": "26.7.0",
+      "platform": "linux-arm64",
+      "url": "https://nodejs.org/dist/v26.7.0/node-v26.7.0-linux-arm64.tar.xz",
+      "sha256": "afc7a004018485092ac8985b817b0d5684472bd9472e0b57d2ab88737e50090d",
+      "strip_components": 1
+    },
+    {
+      "id": "node",
+      "version": "26.7.0",
       "platform": "linux-x86_64",
       "url": "https://nodejs.org/dist/v26.7.0/node-v26.7.0-linux-x64.tar.xz",
       "sha256": "982aa24dd8be4c889c6a8ab337ddff3b0896645b20f4239356e80552c16277ee",
@@ -83,6 +99,14 @@
       "platform": "darwin-arm64",
       "url": "https://github.com/anchore/syft/releases/download/v1.51.0/syft_1.51.0_darwin_arm64.tar.gz",
       "sha256": "4f37f4c7fefce0a68e4cf71ba3f5f9829a99e65d89b29f7ee41b8c2c10ea8c59",
+      "strip_components": 0
+    },
+    {
+      "id": "syft",
+      "version": "1.51.0",
+      "platform": "linux-arm64",
+      "url": "https://github.com/anchore/syft/releases/download/v1.51.0/syft_1.51.0_linux_arm64.tar.gz",
+      "sha256": "6c0466811541ea03add5213a60a1562f0851e4c0b0ecfdee1a694a9455285900",
       "strip_components": 0
     },
     {
