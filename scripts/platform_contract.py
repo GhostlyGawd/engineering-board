@@ -314,6 +314,19 @@ def validate_repository_contract(root: Path) -> dict[str, Any]:
         _validate_platform_surfaces(row, surfaces)
 
     limits = cast(dict[str, Any], matrix.get("limits"))
+    local_qa = cast(dict[str, Any], matrix.get("local_qa"))
+    _require(
+        local_qa
+        == {
+            "posix_command": "bash scripts/serve-qa.sh",
+            "windows_command": r"python scripts\serve_qa.py",
+            "address": "127.0.0.1",
+            "port": 4173,
+            "exclusive_resources": ["browser", "port-4173"],
+            "stop": "recorded-pid",
+        },
+        "local QA command and lifecycle contract are incomplete",
+    )
     _require(isinstance(limits, dict), "matrix limits must be an object")
     _require(limits.get("validator_sessions") == 2, "validator session limit must be two")
     _require(

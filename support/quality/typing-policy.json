@@ -18,6 +18,7 @@
         "scripts/quality_checks.py",
         "scripts/quality_gate.py",
         "scripts/security_gate.py",
+        "scripts/serve_qa.py",
         "scripts/validator_resources.py"
       ],
       "staged_exclusions": [

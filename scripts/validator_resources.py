@@ -153,6 +153,7 @@ def _acquire_directory(directory: Path, owner: dict[str, Any]) -> bool:
 def _port_is_available(port: int) -> bool:
     probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
+        probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         probe.bind(("127.0.0.1", port))
     except OSError:
         return False

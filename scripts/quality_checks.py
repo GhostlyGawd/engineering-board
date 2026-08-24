@@ -52,6 +52,7 @@ TYPED_PATHS = (
     "scripts/quality_checks.py",
     "scripts/quality_gate.py",
     "scripts/security_gate.py",
+    "scripts/serve_qa.py",
     "scripts/validator_resources.py",
     "hooks/scripts/board_demo.py",
     "mcp-server/engineering_board_build_backend.py",
@@ -77,6 +78,7 @@ EXPECTED_TYPING_POLICY = {
                 "scripts/quality_checks.py",
                 "scripts/quality_gate.py",
                 "scripts/security_gate.py",
+                "scripts/serve_qa.py",
                 "scripts/validator_resources.py",
             ],
             "staged_exclusions": [

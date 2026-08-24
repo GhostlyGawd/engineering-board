@@ -188,9 +188,10 @@ done
 BIG="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
 echo "$BIG" | grep -q 'more resolved</summary>' && pass "Done column collapses beyond 10 (details/summary)" || fail "Done collapse missing"
 
-# IMPROVEMENTS #8: --stamp adds a freshness line; default stays deterministic.
-ST="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout --stamp 2>/dev/null)"
-echo "$ST" | grep -q 'Generated from <code>' && pass "--stamp adds a freshness footer" || fail "--stamp missing"
+# IMPROVEMENTS #8: --stamp adds one explicit full revision; default stays deterministic.
+STAMP_SHA="0123456789abcdef0123456789abcdef01234567"
+ST="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout --stamp --revision "$STAMP_SHA" 2>/dev/null)"
+echo "$ST" | grep -q "Generated from <code>${STAMP_SHA}</code>" && pass "--stamp adds the exact full revision" || fail "--stamp revision missing"
 echo "$OUT" | grep -q 'Generated from <code>' && fail "default output leaks a stamp (breaks determinism)" || pass "default output has no stamp"
 
 # Print styles exist.
@@ -325,6 +326,12 @@ if python3 "$SCRIPT_DIR/landing_contract.py" "$ROOT"; then
   pass "landing first-visit source matches tracked policy"
 else
   fail "landing first-visit source does not match tracked policy"
+fi
+
+if python3 "$SCRIPT_DIR/security_local_qa.py" "$ROOT"; then
+  pass "generator security and local QA lifecycle contract"
+else
+  fail "generator security or local QA lifecycle contract"
 fi
 
 echo ""

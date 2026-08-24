@@ -86,6 +86,12 @@ lock. Ports `127.0.0.1:4173` and `127.0.0.1:4318` require exclusive port
 locks. An occupied lock or port fails visibly, and validation does not replace
 the listener, share it, or select another port.
 
+The sole local browser QA lifecycle is `bash scripts/serve-qa.sh` on
+Unix/macOS and the matrix-declared platform-neutral
+`python scripts\serve_qa.py` on native Windows. It stages the current landing
+and a fresh generated board, binds only `127.0.0.1:4173`, and stops only the
+PID recorded in repository-scoped runtime state.
+
 Use `scripts/validator_resources.py` for repository-owned validator sessions.
 MCP fan-out is at most five child cases within one session. Claude plugin
 fan-out is at most three child cases within one session.

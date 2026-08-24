@@ -9,6 +9,7 @@
     "tools",
     "platforms",
     "containers",
+    "local_qa",
     "limits",
     "permitted_skip_reasons"
   ],
@@ -38,6 +39,9 @@
         "$ref": "#/$defs/container"
       }
     },
+    "local_qa": {
+      "$ref": "#/$defs/localQa"
+    },
     "limits": {
       "$ref": "#/$defs/limits"
     },
@@ -51,6 +55,41 @@
     }
   },
   "$defs": {
+    "localQa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "posix_command",
+        "windows_command",
+        "address",
+        "port",
+        "exclusive_resources",
+        "stop"
+      ],
+      "properties": {
+        "posix_command": {
+          "const": "bash scripts/serve-qa.sh"
+        },
+        "windows_command": {
+          "const": "python scripts\\serve_qa.py"
+        },
+        "address": {
+          "const": "127.0.0.1"
+        },
+        "port": {
+          "const": 4173
+        },
+        "exclusive_resources": {
+          "const": [
+            "browser",
+            "port-4173"
+          ]
+        },
+        "stop": {
+          "const": "recorded-pid"
+        }
+      }
+    },
     "versionRange": {
       "type": "object",
       "additionalProperties": false,

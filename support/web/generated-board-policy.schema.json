@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ghostlygawd.github.io/engineering-board/schemas/generated-board-policy.schema.json",
+  "title": "Engineering Board generated board and local QA policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "generator",
+    "markers",
+    "local_qa"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./generated-board-policy.schema.json"
+    },
+    "schema_version": {
+      "const": "1"
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "document",
+        "external_runtime_resources",
+        "default_revision",
+        "stamp_revision_format"
+      ],
+      "properties": {
+        "command": {
+          "const": "bash hooks/scripts/board-view.sh"
+        },
+        "document": {
+          "const": "one-self-contained-html-document"
+        },
+        "external_runtime_resources": {
+          "const": false
+        },
+        "default_revision": {
+          "type": "null"
+        },
+        "stamp_revision_format": {
+          "const": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "markers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "empty_board",
+        "analysis_unavailable",
+        "claims_empty",
+        "reclaims_empty",
+        "workers_empty"
+      ],
+      "properties": {
+        "empty_board": {
+          "const": "No canonical entries are available."
+        },
+        "analysis_unavailable": {
+          "const": "Pattern analysis is unavailable."
+        },
+        "claims_empty": {
+          "const": "no active claims"
+        },
+        "reclaims_empty": {
+          "const": "no recent reclaims"
+        },
+        "workers_empty": {
+          "const": "no active workers"
+        }
+      }
+    },
+    "local_qa": {
+      "$ref": "#/$defs/localQa"
+    }
+  },
+  "$defs": {
+    "localQa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "posix_command",
+        "windows_command",
+        "address",
+        "port",
+        "exclusive_resources",
+        "stop"
+      ],
+      "properties": {
+        "posix_command": {
+          "const": "bash scripts/serve-qa.sh"
+        },
+        "windows_command": {
+          "const": "python scripts\\serve_qa.py"
+        },
+        "address": {
+          "const": "127.0.0.1"
+        },
+        "port": {
+          "const": 4173
+        },
+        "exclusive_resources": {
+          "const": [
+            "browser",
+            "port-4173"
+          ]
+        },
+        "stop": {
+          "const": "recorded-pid"
+        }
+      }
+    }
+  }
+}

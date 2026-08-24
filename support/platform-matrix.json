@@ -367,6 +367,17 @@
       "permitted_skip_reasons": []
     }
   ],
+  "local_qa": {
+    "posix_command": "bash scripts/serve-qa.sh",
+    "windows_command": "python scripts\\serve_qa.py",
+    "address": "127.0.0.1",
+    "port": 4173,
+    "exclusive_resources": [
+      "browser",
+      "port-4173"
+    ],
+    "stop": "recorded-pid"
+  },
   "limits": {
     "validator_sessions": 2,
     "exclusive_resources": [

@@ -1,0 +1,29 @@
+{
+  "$schema": "./generated-board-policy.schema.json",
+  "schema_version": "1",
+  "generator": {
+    "command": "bash hooks/scripts/board-view.sh",
+    "document": "one-self-contained-html-document",
+    "external_runtime_resources": false,
+    "default_revision": null,
+    "stamp_revision_format": "^[0-9a-f]{40}$"
+  },
+  "markers": {
+    "empty_board": "No canonical entries are available.",
+    "analysis_unavailable": "Pattern analysis is unavailable.",
+    "claims_empty": "no active claims",
+    "reclaims_empty": "no recent reclaims",
+    "workers_empty": "no active workers"
+  },
+  "local_qa": {
+    "posix_command": "bash scripts/serve-qa.sh",
+    "windows_command": "python scripts\\serve_qa.py",
+    "address": "127.0.0.1",
+    "port": 4173,
+    "exclusive_resources": [
+      "browser",
+      "port-4173"
+    ],
+    "stop": "recorded-pid"
+  }
+}

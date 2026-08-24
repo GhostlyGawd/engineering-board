@@ -37,9 +37,17 @@ increases.
 - Added a schema-validated public landing surface policy with exact first-
   viewport markers, focusable controls, product-owned theme values, and
   script-free landmark, heading, link, and install-command inventories.
+- Added the canonical loopback browser QA lifecycle at
+  `bash scripts/serve-qa.sh`, with exclusive browser and port ownership,
+  current-checkout staging, recorded-PID cleanup, native-Windows parity, and
+  visible lock, listener, generation, and receipt failures.
 
 ### Fixed
 
+- Generated boards now require explicit full-SHA stamping, validate source
+  links, atomically replace only the selected output, use stable empty and
+  unavailable markers, bound optional coordination data, and keep adversarial
+  values visible but inert across every rendered field.
 - The landing page now survives denied theme storage, missing enhancement
   APIs, clipboard rejection, reduced motion, and disabled JavaScript while
   preserving selectable install commands and closed `eb-theme` values.
