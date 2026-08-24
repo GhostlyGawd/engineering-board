@@ -34,9 +34,15 @@ increases.
   documented-command and freshness auditing, diagnosable multi-failure split
   aggregation, and a platform-neutral compatibility runner with normalized
   repeatability evidence and explicit native-Windows portable-suite skips.
+- Added a schema-validated public landing surface policy with exact first-
+  viewport markers, focusable controls, product-owned theme values, and
+  script-free landmark, heading, link, and install-command inventories.
 
 ### Fixed
 
+- The landing page now survives denied theme storage, missing enhancement
+  APIs, clipboard rejection, reduced motion, and disabled JavaScript while
+  preserving selectable install commands and closed `eb-theme` values.
 - The devcontainer now treats only its canonical workspace as a safe Git
   directory, keeps nested quality tests on the image-pinned tool root, and
   uses a checksum-pinned native arm64 validator and POSIX command layer when

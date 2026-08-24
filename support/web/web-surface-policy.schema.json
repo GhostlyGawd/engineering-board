@@ -1,0 +1,243 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ghostlygawd.github.io/engineering-board/schemas/web-surface-policy.schema.json",
+  "title": "Engineering Board public web surface policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "surface",
+    "storage",
+    "theme",
+    "first_viewport",
+    "controls",
+    "no_javascript"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./web-surface-policy.schema.json"
+    },
+    "schema_version": {
+      "const": "1"
+    },
+    "surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "canonical_url"
+      ],
+      "properties": {
+        "id": {
+          "const": "landing"
+        },
+        "source": {
+          "const": "docs/index.html"
+        },
+        "canonical_url": {
+          "const": "https://ghostlygawd.github.io/engineering-board/"
+        }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "product_owned_key",
+        "permitted_values",
+        "preserve_unrelated_state"
+      ],
+      "properties": {
+        "product_owned_key": {
+          "const": "eb-theme"
+        },
+        "permitted_values": {
+          "const": [
+            "light",
+            "dark"
+          ]
+        },
+        "preserve_unrelated_state": {
+          "const": true
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "absent_value",
+        "storage_denial"
+      ],
+      "properties": {
+        "absent_value": {
+          "const": "computed-browser-preference"
+        },
+        "storage_denial": {
+          "const": "continue-with-in-memory-selection"
+        }
+      }
+    },
+    "first_viewport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height",
+        "initial_focus",
+        "markers",
+        "focus_order"
+      ],
+      "properties": {
+        "width": {
+          "const": 1280
+        },
+        "height": {
+          "const": 720
+        },
+        "initial_focus": {
+          "const": "document"
+        },
+        "markers": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "$ref": "#/$defs/namedSelector"
+          }
+        },
+        "focus_order": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/namedSelector"
+          }
+        }
+      }
+    },
+    "controls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "selector",
+          "role",
+          "accessible_name",
+          "enhancement_only"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]+$"
+          },
+          "selector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "enum": [
+              "button",
+              "link"
+            ]
+          },
+          "accessible_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "enhancement_only": {
+            "type": "boolean"
+          },
+          "copies_selector": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "no_javascript": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "landmarks",
+        "headings",
+        "links",
+        "install_code"
+      ],
+      "properties": {
+        "landmarks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "headings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/namedSelector"
+          }
+        },
+        "install_code": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "selector",
+              "text"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]+$"
+              },
+              "selector": {
+                "type": "string",
+                "minLength": 1
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "namedSelector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selector",
+        "accessible_name"
+      ],
+      "properties": {
+        "selector": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accessible_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

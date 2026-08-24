@@ -528,6 +528,7 @@ class QualityRunner:
                 self.toolchain.executable("check-jsonschema"),
                 "--check-metaschema",
                 "support/platform-matrix.schema.json",
+                "support/web/web-surface-policy.schema.json",
                 "evaluation/trial-response.schema.json",
             ],
         )
@@ -538,6 +539,15 @@ class QualityRunner:
                 "--schemafile",
                 "support/platform-matrix.schema.json",
                 "support/platform-matrix.json",
+            ],
+        )
+        self._run(
+            "web-surface-policy",
+            [
+                self.toolchain.executable("check-jsonschema"),
+                "--schemafile",
+                "support/web/web-surface-policy.schema.json",
+                "support/web/web-surface-policy.json",
             ],
         )
         self._run(

@@ -321,6 +321,12 @@ C1="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
 C2="$(CLAUDE_PROJECT_DIR="$P" bash "$VIEW" demo --stdout 2>/dev/null)"
 [ "$C1" = "$C2" ] && pass "C12: byte-deterministic with claims/reclaims/workers present" || fail "C12: non-deterministic with coordination data"
 
+if python3 "$SCRIPT_DIR/landing_contract.py" "$ROOT"; then
+  pass "landing first-visit source matches tracked policy"
+else
+  fail "landing first-visit source does not match tracked policy"
+fi
+
 echo ""
 echo "================================================================"
 echo "board-view: $PASS pass, $FAIL fail"

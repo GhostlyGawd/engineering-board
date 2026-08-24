@@ -1,0 +1,192 @@
+{
+  "$schema": "./web-surface-policy.schema.json",
+  "schema_version": "1",
+  "surface": {
+    "id": "landing",
+    "source": "docs/index.html",
+    "canonical_url": "https://ghostlygawd.github.io/engineering-board/"
+  },
+  "storage": {
+    "product_owned_key": "eb-theme",
+    "permitted_values": [
+      "light",
+      "dark"
+    ],
+    "preserve_unrelated_state": true
+  },
+  "theme": {
+    "absent_value": "computed-browser-preference",
+    "storage_denial": "continue-with-in-memory-selection"
+  },
+  "first_viewport": {
+    "width": 1280,
+    "height": 720,
+    "initial_focus": "document",
+    "markers": [
+      {
+        "selector": "#product-marker",
+        "accessible_name": "engineering·board"
+      },
+      {
+        "selector": "#h1",
+        "accessible_name": "Find a shared root cause across different findings."
+      },
+      {
+        "selector": "#hero-install",
+        "accessible_name": "Install — free & MIT"
+      },
+      {
+        "selector": "#hero-board",
+        "accessible_name": "See a live board it runs"
+      }
+    ],
+    "focus_order": [
+      {
+        "selector": "#nav-why",
+        "accessible_name": "Why"
+      },
+      {
+        "selector": "#nav-compare",
+        "accessible_name": "Compare"
+      },
+      {
+        "selector": "#nav-install",
+        "accessible_name": "Install"
+      },
+      {
+        "selector": "#nav-docs",
+        "accessible_name": "Docs"
+      },
+      {
+        "selector": "#nav-board",
+        "accessible_name": "Live board"
+      },
+      {
+        "selector": "#nav-github",
+        "accessible_name": "GitHub"
+      },
+      {
+        "selector": "#theme",
+        "accessible_name": "Color theme"
+      },
+      {
+        "selector": "#hero-install",
+        "accessible_name": "Install — free & MIT"
+      },
+      {
+        "selector": "#hero-board",
+        "accessible_name": "See a live board it runs"
+      }
+    ]
+  },
+  "controls": [
+    {
+      "id": "theme",
+      "selector": "#theme",
+      "role": "button",
+      "accessible_name": "Color theme",
+      "enhancement_only": false
+    },
+    {
+      "id": "install",
+      "selector": "#hero-install",
+      "role": "link",
+      "accessible_name": "Install — free & MIT",
+      "enhancement_only": false
+    },
+    {
+      "id": "live-board",
+      "selector": "#hero-board",
+      "role": "link",
+      "accessible_name": "See a live board it runs",
+      "enhancement_only": false
+    },
+    {
+      "id": "copy-codex",
+      "selector": "[data-copy-for=\"install-codex\"]",
+      "role": "button",
+      "accessible_name": "Copy Codex plugin install command",
+      "enhancement_only": true,
+      "copies_selector": "#install-codex"
+    },
+    {
+      "id": "copy-claude",
+      "selector": "[data-copy-for=\"install-claude\"]",
+      "role": "button",
+      "accessible_name": "Copy Claude Code plugin install command",
+      "enhancement_only": true,
+      "copies_selector": "#install-claude"
+    },
+    {
+      "id": "copy-mcp",
+      "selector": "[data-copy-for=\"install-mcp\"]",
+      "role": "button",
+      "accessible_name": "Copy MCP server install command",
+      "enhancement_only": true,
+      "copies_selector": "#install-mcp"
+    }
+  ],
+  "no_javascript": {
+    "landmarks": [
+      "header",
+      "nav",
+      "main",
+      "footer"
+    ],
+    "headings": [
+      "Find a shared root cause across different findings.",
+      "Product differences",
+      "Systemic context before and after a fix",
+      "Memory that learns from outcomes",
+      "Claims for parallel agents",
+      "Falsifiable verification",
+      "Stable pattern memory",
+      "Use Claude Code Tasks and Engineering Board",
+      "Product comparison",
+      "Install Engineering Board"
+    ],
+    "links": [
+      {
+        "selector": "#hero-install",
+        "accessible_name": "Install — free & MIT"
+      },
+      {
+        "selector": "#hero-board",
+        "accessible_name": "See a live board it runs"
+      },
+      {
+        "selector": "#nav-docs",
+        "accessible_name": "Docs"
+      },
+      {
+        "selector": "#nav-board",
+        "accessible_name": "Live board"
+      },
+      {
+        "selector": "#mcp-client-setup",
+        "accessible_name": "client setup procedures"
+      },
+      {
+        "selector": "#security-policy",
+        "accessible_name": "security policy"
+      }
+    ],
+    "install_code": [
+      {
+        "id": "install-codex",
+        "selector": "#install-codex",
+        "text": "codex plugin marketplace add GhostlyGawd/engineering-board\ncodex plugin add engineering-board@engineering-board\n\n# then start a new Codex session"
+      },
+      {
+        "id": "install-claude",
+        "selector": "#install-claude",
+        "text": "/plugin marketplace add GhostlyGawd/engineering-board\n/plugin install engineering-board\n\n# then, in a project:\n/board-setup\n\n# optional contained first win:\n/board-demo"
+      },
+      {
+        "id": "install-mcp",
+        "selector": "#install-mcp",
+        "text": "# one line from PyPI\nclaude mcp add engineering-board -- uvx engineering-board-mcp\n\n# fallback — run from a clone:\ngit clone https://github.com/GhostlyGawd/engineering-board\nclaude mcp add engineering-board -- \\\n  python3 \"$(pwd)/engineering-board/mcp-server/engineering_board_mcp.py\"\n\n# Claude Desktop: claude_desktop_config.json\n\"mcpServers\": {\n  \"engineering-board\": {\n    \"command\": \"uvx\",\n    \"args\": [\"engineering-board-mcp\"]\n  }\n}"
+      }
+    ]
+  }
+}
