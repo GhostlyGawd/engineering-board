@@ -334,6 +334,12 @@ else
   fail "public link or deployment provenance contract"
 fi
 
+if python3 "$SCRIPT_DIR/public_audit_unit.py"; then
+  pass "public audit deterministic branch coverage"
+else
+  fail "public audit deterministic branch coverage"
+fi
+
 if python3 "$SCRIPT_DIR/security_local_qa.py" "$ROOT"; then
   pass "generator security and local QA lifecycle contract"
 else
