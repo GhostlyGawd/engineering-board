@@ -44,6 +44,11 @@ increases.
 
 ### Fixed
 
+- The Claude plugin now resolves its bundled MCP launcher from
+  `${CLAUDE_PLUGIN_ROOT}` instead of the active target repository, so an
+  isolated installed session connects the plugin-owned 19-tool server without
+  copying plugin files into the project. Codex keeps its separate
+  release-pinned relative launcher and writes-only approval policy.
 - Generated boards now require explicit full-SHA stamping, validate source
   links, atomically replace only the selected output, use stable empty and
   unavailable markers, bound optional coordination data, and keep adversarial

@@ -196,21 +196,26 @@ Add to `claude_desktop_config.json` (macOS:
 The Claude Code plugin auto-registers this server through the repository-root
 [`.mcp.json`](../.mcp.json). The Codex plugin selects
 [`codex-mcp.json`](../codex-mcp.json), which adds
-`default_tools_approval_mode: writes`. Both files use this transport:
+`default_tools_approval_mode: writes`. Claude resolves the launcher from its
+installed plugin root, rather than the active target repository:
 
 ```json
 {
   "mcpServers": {
     "engineering-board": {
       "command": "node",
-      "args": ["scripts/engineering-board-mcp-launcher.mjs"],
-      "cwd": "."
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/scripts/engineering-board-mcp-launcher.mjs"
+      ],
+      "cwd": "${CLAUDE_PLUGIN_ROOT}"
     }
   }
 }
 ```
 
-The plugins use `scripts/engineering-board-mcp-launcher.mjs`. The launcher selects `python3`,
+Codex resolves the relative launcher and `cwd: "."` from its separately
+installed plugin cache. Both hosts use
+`scripts/engineering-board-mcp-launcher.mjs`. The launcher selects `python3`,
 `python`, or the Windows `py -3` launcher without using a shell. Set `PYTHON`
 to an executable path when Python is not on `PATH`.
 
