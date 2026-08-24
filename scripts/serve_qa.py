@@ -195,6 +195,8 @@ def _stage_site() -> Tuple[Path, Dict[str, str]]:
         environment = os.environ.copy()
         environment["CLAUDE_PROJECT_DIR"] = str(ROOT)
         board_source = ROOT / "engineering-board" / "eb-self"
+        canonical_root = temporary / "engineering-board"
+        canonical_root.mkdir(parents=True, exist_ok=True)
         for relative in (
             "bugs",
             "features",
@@ -208,6 +210,10 @@ def _stage_site() -> Tuple[Path, Dict[str, str]]:
                 shutil.copytree(
                     str(source_directory),
                     str(temporary / relative),
+                )
+                shutil.copytree(
+                    str(source_directory),
+                    str(canonical_root / relative),
                 )
         generated = subprocess.run(
             [
@@ -230,6 +236,8 @@ def _stage_site() -> Tuple[Path, Dict[str, str]]:
                 3,
             )
         (temporary / "board.html").write_bytes(generated.stdout)
+        canonical_board = canonical_root / "board.html"
+        canonical_board.write_bytes(generated.stdout)
         hashes = {
             "landing_sha256": _sha256(temporary / "index.html"),
             "board_sha256": _sha256(temporary / "board.html"),

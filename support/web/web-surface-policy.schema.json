@@ -10,6 +10,7 @@
     "surface",
     "storage",
     "theme",
+    "navigation",
     "first_viewport",
     "controls",
     "no_javascript"
@@ -77,6 +78,30 @@
         },
         "storage_denial": {
           "const": "continue-with-in-memory-selection"
+        }
+      }
+    },
+    "navigation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fragment_ids",
+        "scroll_margin_top_px",
+        "board_path"
+      ],
+      "properties": {
+        "fragment_ids": {
+          "const": [
+            "why",
+            "compare",
+            "install"
+          ]
+        },
+        "scroll_margin_top_px": {
+          "const": 72
+        },
+        "board_path": {
+          "const": "/engineering-board/board.html"
         }
       }
     },

@@ -328,6 +328,12 @@ else
   fail "landing first-visit source does not match tracked policy"
 fi
 
+if python3 "$SCRIPT_DIR/public_deployment.py"; then
+  pass "public link and deployment provenance contract"
+else
+  fail "public link or deployment provenance contract"
+fi
+
 if python3 "$SCRIPT_DIR/security_local_qa.py" "$ROOT"; then
   pass "generator security and local QA lifecycle contract"
 else

@@ -182,6 +182,7 @@
 
     /* ===== Sections ===== */
     section{padding:4rem 0}
+    section[id]{scroll-margin-top:72px}
     section h2{font-size:clamp(1.6rem,4vw,var(--eb-fs-2xl));text-align:center;margin-bottom:.4rem}
     section .sub{text-align:center;color:var(--eb-text-muted);max-width:46ch;margin:0 auto 2.5rem}
     .grid{display:grid;gap:1rem}
@@ -260,7 +261,7 @@
         <a id="nav-compare" href="#compare">Compare</a>
         <a id="nav-install" href="#install">Install</a>
         <a id="nav-docs" href="https://github.com/GhostlyGawd/engineering-board#readme">Docs</a>
-        <a id="nav-board" href="board.html">Live board</a>
+        <a id="nav-board" href="/engineering-board/board.html">Live board</a>
         <a class="ghlink" id="nav-github" href="https://github.com/GhostlyGawd/engineering-board">GitHub</a>
         <button class="theme-btn" id="theme" type="button" aria-label="Color theme">Theme: System</button>
       </nav>
@@ -275,7 +276,7 @@
 <p class="whofor">Use Engineering Board when an engineering agent must learn across sessions and domains. The product does not require a database, service, or daemon.</p>
       <div class="cta-row">
         <a class="btn btn-primary" id="hero-install" href="#install">Install — free &amp; MIT</a>
-        <a class="btn btn-ghost" id="hero-board" href="board.html">See a live board it runs</a>
+        <a class="btn btn-ghost" id="hero-board" href="/engineering-board/board.html">See a live board it runs</a>
       </div>
 
       <figure class="demo" aria-label="Pattern-intelligence demo result">
@@ -293,7 +294,7 @@
         <figcaption class="demo-cap">Real deterministic fixture output · context before a fix · evidence after a fix · 2026-07-28</figcaption>
       </figure>
 
-<p class="trustband">The project uses its <a href="board.html">public board</a>. The project has <a href="https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml">CI tests</a>, no runtime package dependency, and an MIT license. The server is on the <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">MCP Registry</a>.</p>
+<p class="trustband">The project uses its <a href="/engineering-board/board.html">public board</a>. The project has <a href="https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml">CI tests</a>, no runtime package dependency, and an MIT license. The server is on the <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">MCP Registry</a>.</p>
     </section>
 
     <section id="why" aria-labelledby="why-h">
@@ -336,7 +337,7 @@
 <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem"><a href="https://github.com/gastownhall/beads">beads</a> has mature memory and claim features. <a href="https://github.com/MrLesk/Backlog.md">Backlog.md</a> has a detailed task model. <a href="https://github.com/eyaltoledano/claude-task-master">Task Master</a> converts a product requirements document into tasks. Engineering Board has a different primary function. It uses reviewable engineering evidence to show cross-domain patterns.</p>
         <figure class="reveal" style="margin:2rem auto 0;max-width:60rem;background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:var(--eb-radius-lg);padding:1.25rem;box-shadow:var(--eb-shadow-card)">
           <img src="assets/board-screenshot.png" alt="Screenshot of this repo's real rendered board: a search input, type/priority/status filter chips, and kanban columns — to do, review, validate, done — populated with entry cards." loading="lazy" width="1280" height="800" style="display:block;max-width:100%;height:auto;border-radius:var(--eb-radius-card);border:1px solid var(--eb-border)">
-          <figcaption style="margin:.7rem 0 0;text-align:center;font-size:.72rem;color:var(--eb-text-faint);font-family:var(--eb-font-mono)">the real thing — this repo's own board, as <code>/board-view</code> renders it · <a href="board.html">open it live</a></figcaption>
+          <figcaption style="margin:.7rem 0 0;text-align:center;font-size:.72rem;color:var(--eb-text-faint);font-family:var(--eb-font-mono)">the real thing — this repo's own board, as <code>/board-view</code> renders it · <a href="/engineering-board/board.html">open it live</a></figcaption>
         </figure>
       </div>
     </section>
@@ -396,7 +397,7 @@ claude mcp add engineering-board -- \
       <span>Built in the open by <a href="https://github.com/GhostlyGawd">@GhostlyGawd</a> · a solo, MIT-licensed project · <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/LICENSE">LICENSE</a></span>
       <span>
         <a href="https://github.com/GhostlyGawd/engineering-board">Repository</a> ·
-        <a href="board.html">Live board</a> ·
+        <a href="/engineering-board/board.html">Live board</a> ·
         <a href="https://github.com/GhostlyGawd/engineering-board/releases">Releases</a> ·
         <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">MCP Registry</a> ·
         <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/ARCHITECTURE.md">Architecture</a> ·
@@ -437,6 +438,23 @@ claude mcp add engineering-board -- \
       if(reduce||!("IntersectionObserver" in window)){els.forEach(function(e){e.classList.add("in")});return;}
       var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);}})},{threshold:.15});
       els.forEach(function(e){io.observe(e)});
+    })();
+
+    // Reapply direct and in-page fragments after final layout. This keeps each
+    // destination below the sticky header even when images settle later.
+    (function(){
+      function placeHashTarget(){
+        if(!window.location.hash)return;
+        var id;
+        try{id=decodeURIComponent(window.location.hash.slice(1));}
+        catch(error){return;}
+        var target=document.getElementById(id);
+        if(!target)return;
+        target.scrollIntoView({behavior:"instant",block:"start"});
+      }
+      window.addEventListener("hashchange",placeHashTarget);
+      window.addEventListener("load",placeHashTarget);
+      placeHashTarget();
     })();
 
     // Interactive board demo — a card promoted through the state machine.

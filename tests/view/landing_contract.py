@@ -115,6 +115,13 @@ def main() -> int:
         assert element["tag"] == "code"
         assert element["text"] == install["text"]
 
+    navigation = policy["navigation"]
+    assert navigation["fragment_ids"] == ["why", "compare", "install"]
+    for fragment in navigation["fragment_ids"]:
+        assert fragment in parser.elements
+    assert f"section[id]{{scroll-margin-top:{navigation['scroll_margin_top_px']}px}}" in source
+    assert navigation["board_path"] == "/engineering-board/board.html"
+
     required_source_contract = [
         'key="eb-theme", allowed={light:true,dark:true};',
         "try{return window.localStorage.getItem(key);}",

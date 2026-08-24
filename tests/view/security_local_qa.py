@@ -358,11 +358,14 @@ class GeneratorSecurityLocalQATest(unittest.TestCase):
             with urllib.request.urlopen("http://127.0.0.1:4173/", timeout=5) as response:
                 landing = response.read()
                 self.assertEqual(response.status, 200)
-            with urllib.request.urlopen("http://127.0.0.1:4173/board.html", timeout=5) as response:
+            with urllib.request.urlopen(
+                "http://127.0.0.1:4173/engineering-board/board.html",
+                timeout=5,
+            ) as response:
                 board = response.read()
                 self.assertEqual(response.status, 200)
             with urllib.request.urlopen(
-                "http://127.0.0.1:4173/bugs/"
+                "http://127.0.0.1:4173/engineering-board/bugs/"
                 "B001-sessionstart-on2-blockedby-loop-exceeds-10s-time.md",
                 timeout=5,
             ) as response:

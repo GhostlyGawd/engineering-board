@@ -9,6 +9,7 @@
         "hooks/scripts/board_demo.py",
         "scripts/aggregate_runner.py",
         "scripts/application_contract.py",
+        "scripts/audit_public_web.py",
         "scripts/coverage_gate.py",
         "scripts/legacy_run_all.py",
         "scripts/package_contract.py",

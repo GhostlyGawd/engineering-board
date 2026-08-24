@@ -18,6 +18,15 @@
     "absent_value": "computed-browser-preference",
     "storage_denial": "continue-with-in-memory-selection"
   },
+  "navigation": {
+    "fragment_ids": [
+      "why",
+      "compare",
+      "install"
+    ],
+    "scroll_margin_top_px": 72,
+    "board_path": "/engineering-board/board.html"
+  },
   "first_viewport": {
     "width": 1280,
     "height": 720,

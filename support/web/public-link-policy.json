@@ -1,0 +1,287 @@
+{
+  "$schema": "./public-link-policy.schema.json",
+  "schema_version": "1",
+  "landing": {
+    "source": "docs/index.html",
+    "canonical_url": "https://ghostlygawd.github.io/engineering-board/",
+    "board_path": "/engineering-board/board.html",
+    "anchor_count": 29,
+    "href_inventory": [
+      "#compare",
+      "#install",
+      "#why",
+      "/engineering-board/board.html",
+      "https://github.com/GhostlyGawd",
+      "https://github.com/GhostlyGawd/engineering-board",
+      "https://github.com/GhostlyGawd/engineering-board#readme",
+      "https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml",
+      "https://github.com/GhostlyGawd/engineering-board/blob/main/ARCHITECTURE.md",
+      "https://github.com/GhostlyGawd/engineering-board/blob/main/CHANGELOG.md",
+      "https://github.com/GhostlyGawd/engineering-board/blob/main/LICENSE",
+      "https://github.com/GhostlyGawd/engineering-board/blob/main/SECURITY.md",
+      "https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md",
+      "https://github.com/GhostlyGawd/engineering-board/releases",
+      "https://github.com/MrLesk/Backlog.md",
+      "https://github.com/eyaltoledano/claude-task-master",
+      "https://github.com/gastownhall/beads",
+      "https://github.com/thedotmack/claude-mem",
+      "https://registry.modelcontextprotocol.io/?search=engineering-board"
+    ]
+  },
+  "crawl": {
+    "user_agent": "engineering-board-link-audit/1",
+    "timeout_seconds": 20,
+    "max_response_bytes": 4000000,
+    "safe_schemes": [
+      "https"
+    ]
+  },
+  "resources": [
+    {
+      "id": "landing",
+      "origin": "https://ghostlygawd.github.io",
+      "path_pattern": "^/engineering-board/$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://ghostlygawd.github.io"
+      ],
+      "max_redirect_hops": 0,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "id=\"product-marker\"",
+      "fragment_targets": [
+        "compare",
+        "install",
+        "why"
+      ]
+    },
+    {
+      "id": "board",
+      "origin": "https://ghostlygawd.github.io",
+      "path_pattern": "^/engineering-board/board\\.html$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://ghostlygawd.github.io"
+      ],
+      "max_redirect_hops": 0,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "<h1>eb-self</h1>",
+      "fragment_targets": []
+    },
+    {
+      "id": "repository",
+      "origin": "https://github.com",
+      "path_pattern": "^/GhostlyGawd/engineering-board$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "GhostlyGawd/engineering-board",
+      "fragment_targets": [
+        "readme"
+      ]
+    },
+    {
+      "id": "continuous-integration",
+      "origin": "https://github.com",
+      "path_pattern": "^/GhostlyGawd/engineering-board/actions/workflows/test\\.yml$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "Workflow runs",
+      "fragment_targets": []
+    },
+    {
+      "id": "mcp-registry",
+      "origin": "https://registry.modelcontextprotocol.io",
+      "path_pattern": "^/$",
+      "query_pattern": "^search=engineering-board$",
+      "permitted_redirect_origins": [
+        "https://registry.modelcontextprotocol.io"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "Official MCP Registry",
+      "fragment_targets": []
+    },
+    {
+      "id": "beads",
+      "origin": "https://github.com",
+      "path_pattern": "^/gastownhall/beads$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "gastownhall/beads",
+      "fragment_targets": []
+    },
+    {
+      "id": "backlog",
+      "origin": "https://github.com",
+      "path_pattern": "^/MrLesk/Backlog\\.md$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "MrLesk/Backlog.md",
+      "fragment_targets": []
+    },
+    {
+      "id": "task-master",
+      "origin": "https://github.com",
+      "path_pattern": "^/eyaltoledano/claude-task-master$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "eyaltoledano/claude-task-master",
+      "fragment_targets": []
+    },
+    {
+      "id": "claude-memory",
+      "origin": "https://github.com",
+      "path_pattern": "^/thedotmack/claude-mem$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "thedotmack/claude-mem",
+      "fragment_targets": []
+    },
+    {
+      "id": "mcp-client-documentation",
+      "origin": "https://github.com",
+      "path_pattern": "^/GhostlyGawd/engineering-board/blob/main/mcp-server/README\\.md$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "MCP server",
+      "fragment_targets": []
+    },
+    {
+      "id": "security-policy",
+      "origin": "https://github.com",
+      "path_pattern": "^/GhostlyGawd/engineering-board/blob/main/SECURITY\\.md$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "Security policy",
+      "fragment_targets": []
+    },
+    {
+      "id": "maintainer",
+      "origin": "https://github.com",
+      "path_pattern": "^/GhostlyGawd$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "GhostlyGawd",
+      "fragment_targets": []
+    },
+    {
+      "id": "license",
+      "origin": "https://github.com",
+      "path_pattern": "^/GhostlyGawd/engineering-board/blob/main/LICENSE$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "MIT License",
+      "fragment_targets": []
+    },
+    {
+      "id": "releases",
+      "origin": "https://github.com",
+      "path_pattern": "^/GhostlyGawd/engineering-board/releases$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "Releases",
+      "fragment_targets": []
+    },
+    {
+      "id": "architecture",
+      "origin": "https://github.com",
+      "path_pattern": "^/GhostlyGawd/engineering-board/blob/main/ARCHITECTURE\\.md$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "architecture",
+      "fragment_targets": []
+    },
+    {
+      "id": "changelog",
+      "origin": "https://github.com",
+      "path_pattern": "^/GhostlyGawd/engineering-board/blob/main/CHANGELOG\\.md$",
+      "query_pattern": "^$",
+      "permitted_redirect_origins": [
+        "https://github.com"
+      ],
+      "max_redirect_hops": 1,
+      "accepted_terminal_statuses": [
+        200
+      ],
+      "content_marker": "Changelog",
+      "fragment_targets": []
+    }
+  ]
+}

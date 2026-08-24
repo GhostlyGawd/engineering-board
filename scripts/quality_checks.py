@@ -43,6 +43,7 @@ ANALYSIS_EXCLUSIONS = {"mcp-server/test_mcp_server.py"}
 TYPED_PATHS = (
     "scripts/aggregate_runner.py",
     "scripts/application_contract.py",
+    "scripts/audit_public_web.py",
     "scripts/coverage_gate.py",
     "scripts/legacy_run_all.py",
     "scripts/package_contract.py",
@@ -69,6 +70,7 @@ EXPECTED_TYPING_POLICY = {
                 "hooks/scripts/board_demo.py",
                 "scripts/aggregate_runner.py",
                 "scripts/application_contract.py",
+                "scripts/audit_public_web.py",
                 "scripts/coverage_gate.py",
                 "scripts/legacy_run_all.py",
                 "scripts/package_contract.py",
@@ -530,6 +532,7 @@ class QualityRunner:
                 self.toolchain.executable("check-jsonschema"),
                 "--check-metaschema",
                 "support/platform-matrix.schema.json",
+                "support/web/public-link-policy.schema.json",
                 "support/web/web-surface-policy.schema.json",
                 "evaluation/trial-response.schema.json",
             ],
@@ -541,6 +544,15 @@ class QualityRunner:
                 "--schemafile",
                 "support/platform-matrix.schema.json",
                 "support/platform-matrix.json",
+            ],
+        )
+        self._run(
+            "public-link-policy",
+            [
+                self.toolchain.executable("check-jsonschema"),
+                "--schemafile",
+                "support/web/public-link-policy.schema.json",
+                "support/web/public-link-policy.json",
             ],
         )
         self._run(
