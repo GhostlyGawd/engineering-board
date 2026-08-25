@@ -2,6 +2,7 @@
   "schema_version": "1",
   "measurement": {
     "omitted_paths": [
+      "mcp-server/test_mcp_protocol.py",
       "mcp-server/test_mcp_server.py",
       "scripts/coverage_gate.py",
       "scripts/quality_checks.py",

@@ -37,6 +37,7 @@ sys.stderr.reconfigure(encoding="utf-8")
 HERE = os.path.dirname(os.path.abspath(__file__))
 SERVER_PATH = os.path.join(HERE, "engineering_board_mcp.py")
 PLUGIN_ROOT = os.path.dirname(HERE)
+PUBLIC_TOOLS_FIXTURE = os.path.join(HERE, "fixtures", "public-tools-v1.13.4.json")
 VALIDATE_SCRIPT = os.path.join(PLUGIN_ROOT, "hooks", "scripts", "board-validate-entry.sh")
 
 EXPECTED_TOOL_ANNOTATIONS = {
@@ -201,6 +202,11 @@ def suite_stdio(tmp_repo):
         send({"jsonrpc": "2.0", "id": 30, "method": "tools/list"})
         repeated = recv().get("result", {}).get("tools", [])
         check(repeated == tools, "repeated tools/list is value-stable")
+        fixture = json.loads(Path(PUBLIC_TOOLS_FIXTURE).read_text(encoding="utf-8"))
+        check(
+            tools == fixture,
+            "tools/list matches the previous-release public contract fixture",
+        )
 
         # tools/call board_init via stdio
         send(
@@ -602,24 +608,22 @@ def suite_lifecycle(mod, tmp_repo):
 
     # security: affects_prefix router-row injection in board_init (eb-self B038).
     inj_root = tempfile.mkdtemp()
-    mod.tool_board_init(
-        {
-            "project": "beta",
-            "root": inj_root,
-            "affects_prefix": "alpha/ |\n| evil | /etc/cron.d | evil/",
-        }
-    )
-    projs = [p["id"] for p in mod.tool_board_list_projects({"root": inj_root})["projects"]]
-    check(
-        projs == ["beta"],
-        "affects_prefix cannot inject a spoofed router project (B038)",
-        str(projs),
-    )
+    before = _tree_snapshot(inj_root)
     try:
-        mod.tool_board_status({"root": inj_root})  # must not be DoS'd by an escaping row
-        ok("bulk tools still work after affects_prefix injection attempt (B038)")
-    except mod.ToolError as e:
-        raise Failure("affects_prefix injection DoS'd board_status: %s" % e)
+        mod.tool_board_init(
+            {
+                "project": "beta",
+                "root": inj_root,
+                "affects_prefix": "alpha/ |\n| evil | /etc/cron.d | evil/",
+            }
+        )
+        raise Failure("board_init accepted a malicious affects_prefix")
+    except mod.ToolError:
+        ok("board_init rejects a malicious affects_prefix before mutation (B038)")
+    check(
+        _tree_snapshot(inj_root) == before,
+        "malicious affects_prefix leaves the repository unchanged (B038)",
+    )
     shutil.rmtree(inj_root, ignore_errors=True)
 
     # security: board_init must not follow a symlink out of root (eb-self B039).
@@ -1704,6 +1708,10 @@ def suite_distribution():
         srv.get("type") == "python"
         and srv.get("entry_point") == "mcp-server/engineering_board_mcp.py",
         "manifest.json points at the real server entry point",
+    )
+    check(
+        srv.get("mcp_config", {}).get("env", {}).get("ENGINEERING_BOARD_REQUIRE_ROOT") == "1",
+        "manifest.json requires explicit roots for bundled calls",
     )
 
     smithery = open(os.path.join(HERE, "smithery.yaml"), encoding="utf-8").read()

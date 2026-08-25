@@ -374,39 +374,67 @@ class PackageGateTests(unittest.TestCase):
             server = temporary / "fake_mcp.py"
             calls = temporary / "calls.jsonl"
             server.write_text(
-                "import json, sys\n"
-                "from pathlib import Path\n"
-                "for line in sys.stdin:\n"
-                "    value=json.loads(line)\n"
-                "    if 'id' not in value:\n"
-                "        continue\n"
-                "    method=value['method']\n"
-                "    if method=='initialize':\n"
-                "        result={'protocolVersion':'2025-06-18'}\n"
-                "    elif method=='ping':\n"
-                "        result={}\n"
-                "    elif method=='tools/list':\n"
-                "        result={'tools':[{} for _ in range(19)]}\n"
-                "    else:\n"
-                "        with open(sys.argv[1], 'a', encoding='utf-8', newline='\\n') as stream:\n"
-                "            stream.write(value['params']['name']+'\\n')\n"
-                "        if value['params']['name']=='board_graph':\n"
-                "            arguments=value['params']['arguments']\n"
-                "            root=Path(arguments['root'])\n"
-                "            project=arguments['project']\n"
-                "            graph=root/'engineering-board'/project/'GRAPH.yml'\n"
-                "            cache=root/'.engineering-board'/'cache'/'graph'/project/'state.json'\n"
-                "            for path in (graph, cache):\n"
-                "                path.parent.mkdir(parents=True, exist_ok=True)\n"
-                "                path.write_bytes('Graph café ↳ package smoke\\n'.encode('utf-8'))\n"
-                "        result={'content':[],'isError':False}\n"
-                "    print(json.dumps({'jsonrpc':'2.0','id':value['id'],'result':result}),flush=True)\n",
+                """import json, sys
+from pathlib import Path
+initialized = False
+ready = False
+for line in sys.stdin:
+    if len(line) > 1024 * 1024:
+        print(json.dumps({'jsonrpc':'2.0','id':None,'error':{'code':-32001}}), flush=True)
+        continue
+    try:
+        value = json.loads(line)
+    except json.JSONDecodeError:
+        print(json.dumps({'jsonrpc':'2.0','id':None,'error':{'code':-32700}}), flush=True)
+        continue
+    method = value.get('method')
+    if 'id' not in value:
+        if method == 'notifications/initialized':
+            ready = True
+        continue
+    message_id = value['id']
+    if method == 'ping':
+        result = {}
+    elif method == 'initialize':
+        if value.get('params', {}).get('protocolVersion') != '2025-06-18':
+            print(json.dumps({'jsonrpc':'2.0','id':message_id,'error':{'code':-32602}}), flush=True)
+            continue
+        initialized = True
+        result = {'protocolVersion':'2025-06-18'}
+    elif not initialized or not ready:
+        print(json.dumps({'jsonrpc':'2.0','id':message_id,'error':{'code':-32002}}), flush=True)
+        continue
+    elif method == 'tools/list':
+        result = {'tools':[{} for _ in range(19)]}
+    elif method != 'tools/call':
+        print(json.dumps({'jsonrpc':'2.0','id':message_id,'error':{'code':-32601}}), flush=True)
+        continue
+    elif value['params']['name'] == 'nope':
+        print(json.dumps({'jsonrpc':'2.0','id':message_id,'error':{'code':-32602}}), flush=True)
+        continue
+    else:
+        with open(sys.argv[1], 'a', encoding='utf-8', newline='\\n') as stream:
+            stream.write(value['params']['name']+'\\n')
+        if value['params']['name']=='board_graph':
+            arguments=value['params']['arguments']
+            root=Path(arguments['root'])
+            project=arguments['project']
+            graph=root/'engineering-board'/project/'GRAPH.yml'
+            cache=root/'.engineering-board'/'cache'/'graph'/project/'state.json'
+            for path in (graph, cache):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes('Graph café ↳ package smoke\\n'.encode('utf-8'))
+        result={'content':[],'isError':False}
+    print(json.dumps({'jsonrpc':'2.0','id':message_id,'result':result}),flush=True)
+""",
                 encoding="utf-8",
             )
+            expected_tools = [{} for _ in range(19)]
             package_runtime._rpc_smoke(
                 [sys.executable, server, calls],
                 temporary,
                 "fake MCP",
+                expected_tools,
             )
             self.assertEqual(
                 calls.read_text(encoding="utf-8").splitlines(),
@@ -560,6 +588,9 @@ class PackageGateTests(unittest.TestCase):
                 mock.patch.object(package_runtime, "_installed_metadata"),
                 mock.patch.object(package_runtime, "_rpc_smoke") as rpc,
             ):
+                fixture = temporary / "mcp-server" / "fixtures" / "public-tools-v1.13.4.json"
+                fixture.parent.mkdir(parents=True)
+                fixture.write_text("[]\n", encoding="utf-8")
                 package_runtime.runtime_smoke(
                     root=temporary,
                     uv=Path("uv"),
@@ -577,6 +608,7 @@ class PackageGateTests(unittest.TestCase):
                 archive.writestr("mcp-server/engineering_board_mcp.py", "print('fixture')\n")
             with mock.patch.object(package_runtime, "_rpc_smoke") as rpc:
                 package_runtime.mcpb_smoke(
+                    root=temporary,
                     runtime="3.14.7",
                     interpreter=interpreter,
                     artifact=mcpb,

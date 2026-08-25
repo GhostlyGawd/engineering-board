@@ -61,6 +61,7 @@ from engineering_board_core import (
 
 PROTOCOL_VERSION = "2025-06-18"
 SERVER_NAME = "engineering-board"
+MAX_MESSAGE_BYTES = 1024 * 1024
 
 # Directory of this script and the repository or plugin root.
 SCRIPT_DIR = MODULE_DIR
@@ -128,17 +129,62 @@ def today_utc():
 def resolve_root(params):
     """Resolve the repo root: explicit arg > $CLAUDE_PROJECT_DIR > cwd."""
     root = params.get("root")
-    if root:
-        return os.path.abspath(os.path.expanduser(root))
-    env = os.environ.get("CLAUDE_PROJECT_DIR")
-    if env:
-        return os.path.abspath(env)
-    if os.environ.get("ENGINEERING_BOARD_REQUIRE_ROOT") == "1":
+    require_explicit = os.environ.get("ENGINEERING_BOARD_REQUIRE_ROOT") == "1"
+    if root is not None and not isinstance(root, str):
+        raise ToolError("root must be a string")
+    if root and require_explicit and not os.path.isabs(os.path.expanduser(root)):
+        raise ToolError("root must be an absolute path for bundled plugin calls")
+    if not root and require_explicit:
         raise ToolError(
             "missing required argument: root (the bundled plugin cannot infer "
             "the active repository)"
         )
-    return os.path.abspath(os.getcwd())
+    selected = root or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+    selected = os.path.realpath(os.path.abspath(os.path.expanduser(selected)))
+    if not os.path.exists(selected):
+        raise ToolError("repository root does not exist: %s" % selected)
+    if not os.path.isdir(selected):
+        raise ToolError("repository root is not a directory: %s" % selected)
+    return selected
+
+
+def _contained_path(root, target, label):
+    """Return target when its resolved identity stays below the selected root."""
+    root_real = os.path.realpath(root)
+    target_real = os.path.realpath(target)
+    try:
+        contained = os.path.commonpath([root_real, target_real]) == root_real
+    except ValueError:
+        contained = False
+    if not contained:
+        raise ToolError("%s escapes repository root: %r" % (label, target))
+    return target
+
+
+def _repository_relative_path(root, value, label, *, allow_root=False):
+    """Validate a repository-relative path signal and existing link identity."""
+    if not isinstance(value, str):
+        raise ToolError("%s must be a string" % label)
+    text = value.replace("\\", "/").strip()
+    if not text or any(character in text for character in "\r\n\x00|"):
+        raise ToolError("%s must be one repository-relative path" % label)
+    if text.startswith("/") or re.match(r"^[A-Za-z]:", text):
+        raise ToolError("%s must be repository-relative" % label)
+    parts = [part for part in text.split("/") if part not in {"", "."}]
+    if not parts:
+        if allow_root:
+            return "."
+        raise ToolError("%s contains an unsafe path" % label)
+    if any(part == ".." for part in parts):
+        raise ToolError("%s contains an unsafe path" % label)
+    normalized = "/".join(parts)
+    _contained_path(root, os.path.join(root, *parts), label)
+    return normalized + ("/" if text.endswith("/") else "")
+
+
+def _repository_relative_paths(root, values, label):
+    """Validate several repository-relative path signals."""
+    return [_repository_relative_path(root, value, label) for value in values]
 
 
 def slugify(title):
@@ -203,7 +249,7 @@ def router_path(root):
     for rel in ("engineering-board/BOARD-ROUTER.md", "docs/boards/BOARD-ROUTER.md"):
         p = os.path.join(root, rel)
         if os.path.isfile(p):
-            return p
+            return _contained_path(root, p, "router path")
     return None
 
 
@@ -223,11 +269,14 @@ def parse_router(root):
                 continue
             if cells[0].lower() == "project" or set(cells[0]) <= set("-: "):
                 continue
+            affects = cells[2] if len(cells) > 2 else ""
+            if affects:
+                affects = _repository_relative_path(root, affects, "router affects prefix")
             rows.append(
                 {
                     "project": cells[0],
                     "path": cells[1],
-                    "affects": cells[2] if len(cells) > 2 else "",
+                    "affects": affects,
                 }
             )
     return rows
@@ -296,12 +345,13 @@ def resolve_board_row(root, row):
     rows; a hand-edited `path` column could point outside the repo (eb-self B035).
     This mirrors the containment `board_dir_for` enforces so those tools can't be
     made to read or overwrite files outside root."""
-    bd = os.path.join(root, row["path"])
-    root_real = os.path.realpath(root)
-    bd_real = os.path.realpath(bd)
-    if bd_real != root_real and not bd_real.startswith(root_real + os.sep):
-        raise ToolError("router row for %r escapes root: %r" % (row.get("project"), row["path"]))
-    return bd
+    path = row.get("path")
+    if not isinstance(path, str) or not path.strip():
+        raise ToolError("router row for %r has no board path" % row.get("project"))
+    if os.path.isabs(path) or ".." in Path(path.replace("\\", "/")).parts:
+        raise ToolError("router row for %r has an unsafe path: %r" % (row.get("project"), path))
+    bd = os.path.join(root, path)
+    return _contained_path(root, bd, "router row for %r" % row.get("project"))
 
 
 def board_dir_for(root, project):
@@ -315,18 +365,29 @@ def board_dir_for(root, project):
             break
     if bd is None:
         bd = os.path.join(root, "engineering-board", project)
-    # Defense in depth: even a tampered router row must not escape the root.
-    root_real = os.path.realpath(root)
-    bd_real = os.path.realpath(bd)
-    if bd_real != root_real and not bd_real.startswith(root_real + os.sep):
-        raise ToolError("resolved board dir escapes root: %r" % bd)
-    return bd
+    return _contained_path(root, bd, "resolved board directory")
 
 
 def ensure_board_exists(root, project):
     bd = board_dir_for(root, project)
     if not os.path.isdir(bd):
         raise ToolError("no board for project %r under %s — run board_init first" % (project, root))
+    for relative in [
+        "BOARD.md",
+        "ARCHIVE.md",
+        "bugs",
+        "features",
+        "questions",
+        "observations",
+        "learnings",
+        "hypotheses",
+        "patterns",
+        "_sessions",
+        "_claims",
+    ]:
+        target = os.path.join(bd, relative)
+        if os.path.lexists(target):
+            _contained_path(root, target, "board path")
     return bd
 
 
@@ -419,7 +480,9 @@ def iter_entry_files(board_dir, subdirs=None):
         for fname in sorted(os.listdir(d)):
             if not fname.endswith(".md") or fname.startswith("."):
                 continue
-            yield sub, fname, os.path.join(d, fname)
+            path = os.path.join(d, fname)
+            _contained_path(board_dir, path, "entry path")
+            yield sub, fname, path
 
 
 def load_entries(board_dir, subdirs=None):
@@ -584,27 +647,30 @@ def upsert_agents_md(root):
 def tool_board_init(params):
     project = validate_project(require(params, "project"))
     root = resolve_root(params)
-    # affects_prefix is written into the BOARD-ROUTER.md table; flatten newlines
-    # and neutralize the `|` column separator so it can't inject a router row
-    # (eb-self B038) — the control file every bulk tool reads.
-    affects_prefix = _oneline(params.get("affects_prefix") or ("%s/" % project)).replace("|", "/")
+    affects_prefix = _repository_relative_path(
+        root,
+        params.get("affects_prefix") or ("%s/" % project),
+        "affects_prefix",
+    )
 
     created = []
     existed = []
 
     eb_dir = os.path.join(root, "engineering-board")
-    os.makedirs(eb_dir, exist_ok=True)
-
-    # board_init is the only path-writing tool; apply the same realpath
-    # containment the read/bulk tools use so a symlinked engineering-board/ or
-    # engineering-board/<project> can't relocate the scaffold outside root
-    # (eb-self B039).
     bd = os.path.join(eb_dir, project)
-    root_real = os.path.realpath(root)
-    for target in (eb_dir, bd):
-        tgt_real = os.path.realpath(target)
-        if tgt_real != root_real and not tgt_real.startswith(root_real + os.sep):
-            raise ToolError("board path escapes root (symlink?): %r" % target)
+    targets = [
+        eb_dir,
+        bd,
+        os.path.join(eb_dir, "BOARD-ROUTER.md"),
+        os.path.join(bd, "BOARD.md"),
+        os.path.join(bd, "ARCHIVE.md"),
+    ]
+    targets.extend(os.path.join(bd, sub, ".gitkeep") for sub in SCAFFOLD_SUBDIRS)
+    if params.get("agents_md", True):
+        targets.append(os.path.join(root, "AGENTS.md"))
+    for target in targets:
+        _contained_path(root, target, "board_init target")
+    os.makedirs(eb_dir, exist_ok=True)
 
     # Router
     rp = os.path.join(eb_dir, "BOARD-ROUTER.md")
@@ -724,6 +790,8 @@ def tool_board_create_entry(params):
     filename = "%s-%s.md" % (eid, slug)
     sub = TYPE_SUBDIR[entry_type]
     path = os.path.join(bd, sub, filename)
+    _contained_path(root, path, "entry target")
+    _contained_path(root, os.path.join(bd, "BOARD.md"), "board index target")
 
     fields = [("id", eid), ("type", entry_type), ("title", title), ("discovered", discovered)]
     body = ""
@@ -755,7 +823,7 @@ def tool_board_create_entry(params):
             raise ToolError(
                 "invalid priority %r (allowed: %s)" % (priority, ", ".join(VALID_PRIORITY))
             )
-        affects = require(params, "affects")
+        affects = _repository_relative_path(root, require(params, "affects"), "affects")
         needs = params.get("needs", "tdd")
         if needs is not None and needs not in VALID_NEEDS:
             raise ToolError("invalid needs %r (allowed: %s)" % (needs, ", ".join(VALID_NEEDS)))
@@ -779,7 +847,12 @@ def tool_board_create_entry(params):
         if params.get("source"):
             fields.append(("source", params.get("source")))
         if params.get("affects"):
-            fields.append(("affects", params.get("affects")))
+            fields.append(
+                (
+                    "affects",
+                    _repository_relative_path(root, params.get("affects"), "affects"),
+                )
+            )
         if pattern_values:
             fields.append(("pattern", pattern_values))
         body = _body_from_done_when(params.get("done_when"), params.get("body"))
@@ -816,8 +889,9 @@ def tool_board_create_entry(params):
             ("derived_from", derived_from),
         ]
         if params.get("applies_to"):
-            a = params.get("applies_to")
-            fields.append(("applies_to", a if isinstance(a, list) else [a]))
+            applies_to = params.get("applies_to")
+            values = applies_to if isinstance(applies_to, list) else [applies_to]
+            fields.append(("applies_to", _repository_relative_paths(root, values, "applies_to")))
         if params.get("pattern_tag"):
             fields.append(("pattern_tag", params.get("pattern_tag")))
         if params.get("status"):
@@ -1240,13 +1314,27 @@ def tool_board_context(params):
     limit = params.get("limit", 3)
     if isinstance(limit, bool) or not isinstance(limit, int):
         raise ToolError("limit must be an integer")
+    files = params.get("files")
+    if files is not None:
+        if not isinstance(files, list):
+            raise ToolError("files must be a list with at most 100 paths")
+        files = [_repository_relative_path(root, value, "files") for value in files]
+    cwd = params.get("cwd")
+    if cwd:
+        if not isinstance(cwd, str):
+            raise ToolError("cwd must be a string")
+        if os.path.isabs(os.path.expanduser(cwd)):
+            cwd = os.path.realpath(os.path.abspath(os.path.expanduser(cwd)))
+            _contained_path(root, cwd, "cwd")
+        else:
+            cwd = _repository_relative_path(root, cwd, "cwd", allow_root=True)
     return build_context(
         Path(bd),
         project,
         task=str(params.get("task") or ""),
-        files=params.get("files"),
+        files=files,
         entry_ids=params.get("entry_ids"),
-        cwd=str(params.get("cwd") or ""),
+        cwd=str(cwd or ""),
         limit=limit,
     )
 
@@ -1524,10 +1612,15 @@ def tool_board_capture_finding(params):
     bd = ensure_board_exists(root, project)
 
     evidence = params.get("evidence")
-    affects = _oneline(params.get("affects")) if params.get("affects") else None
+    affects = (
+        _repository_relative_path(root, params.get("affects"), "affects")
+        if params.get("affects")
+        else None
+    )
     ts = now_utc_iso()
 
     sp = scratch_file_path(bd)
+    _contained_path(root, sp, "scratch target")
     os.makedirs(os.path.dirname(sp), exist_ok=True)
     is_new = not os.path.isfile(sp)
 
@@ -1635,6 +1728,8 @@ def tool_board_remember(params):
     ldir = os.path.join(bd, "learnings")
     os.makedirs(ldir, exist_ok=True)
     path = os.path.join(ldir, fname)
+    _contained_path(root, path, "Learning target")
+    _contained_path(root, os.path.join(bd, "BOARD.md"), "board index target")
     if os.path.isfile(path):
         raise ToolError("learning file already exists: %s" % path)
 
@@ -1757,6 +1852,7 @@ def tool_board_claim(params):
     board_dir = Path(ensure_board_exists(root, project))
     claims_dir = board_dir / "_claims"
     claim_dir = claims_dir / entry_id
+    _contained_path(root, str(claim_dir), "claim target")
     owner_file = claim_dir / "owner.txt"
     heartbeat_file = claim_dir / "heartbeat.txt"
     stale_seconds = 300 if "onedrive" in board_dir.as_posix().casefold() else 180
@@ -1806,6 +1902,7 @@ def tool_board_release(params):
     root = resolve_root(params)
     board_dir = Path(ensure_board_exists(root, project))
     claim_dir = board_dir / "_claims" / entry_id
+    _contained_path(root, str(claim_dir), "claim target")
     owner_file = claim_dir / "owner.txt"
     if not claim_dir.is_dir() or not owner_file.is_file():
         return _release_result(entry_id, 3, stderr="claim or owner record not found")
@@ -2614,6 +2711,102 @@ class RpcError(Exception):
         self.message = message
 
 
+class ProtocolSession:
+    """One stdio connection's MCP lifecycle state."""
+
+    def __init__(self):
+        self.initialized = False
+        self.ready = False
+
+
+def _rpc_error(code, message, msg_id=None):
+    return {
+        "jsonrpc": "2.0",
+        "id": msg_id,
+        "error": {"code": code, "message": message},
+    }
+
+
+def _valid_request_id(value):
+    return (
+        value is None
+        or isinstance(value, str)
+        or (isinstance(value, int) and not isinstance(value, bool))
+    )
+
+
+def _diagnostic(error):
+    """Keep implementation diagnostics on stderr and bounded."""
+    sys.stderr.write("engineering-board MCP internal error: %s\n" % type(error).__name__)
+    sys.stderr.flush()
+
+
+def _schema_type_matches(value, expected):
+    matches = {
+        "object": isinstance(value, dict),
+        "array": isinstance(value, list),
+        "string": isinstance(value, str),
+        "integer": isinstance(value, int) and not isinstance(value, bool),
+        "boolean": isinstance(value, bool),
+    }
+    return expected not in matches or matches[expected]
+
+
+def _validate_schema_string(value, schema, field):
+    if "minLength" in schema and len(value) < schema["minLength"]:
+        raise RpcError(-32602, "%s is too short" % field)
+    if "maxLength" in schema and len(value) > schema["maxLength"]:
+        raise RpcError(-32602, "%s is too long" % field)
+    if "pattern" in schema and re.fullmatch(schema["pattern"], value) is None:
+        raise RpcError(-32602, "%s has an invalid format" % field)
+
+
+def _validate_schema_integer(value, schema, field):
+    if "minimum" in schema and value < schema["minimum"]:
+        raise RpcError(-32602, "%s is below the minimum" % field)
+    if "maximum" in schema and value > schema["maximum"]:
+        raise RpcError(-32602, "%s exceeds the maximum" % field)
+
+
+def _validate_schema_array(value, schema, field):
+    if "minItems" in schema and len(value) < schema["minItems"]:
+        raise RpcError(-32602, "%s has too few items" % field)
+    if "maxItems" in schema and len(value) > schema["maxItems"]:
+        raise RpcError(-32602, "%s has too many items" % field)
+    item_schema = schema.get("items")
+    if isinstance(item_schema, dict):
+        for index, item in enumerate(value):
+            _validate_schema_value(item, item_schema, "%s[%d]" % (field, index))
+
+
+def _validate_schema_object(value, schema, field):
+    for name in schema.get("required", []):
+        if name not in value:
+            raise RpcError(-32602, "%s requires %s" % (field, name))
+    properties = schema.get("properties", {})
+    for name, item in value.items():
+        child = properties.get(name)
+        if isinstance(child, dict):
+            _validate_schema_value(item, child, "%s.%s" % (field, name))
+
+
+def _validate_schema_value(value, schema, field):
+    """Validate the JSON Schema subset used by the public tool contracts."""
+    expected = schema.get("type")
+    if not _schema_type_matches(value, expected):
+        raise RpcError(-32602, "%s must be %s" % (field, expected))
+    if "enum" in schema and value not in schema["enum"]:
+        raise RpcError(-32602, "%s has an unsupported value" % field)
+    if isinstance(value, str):
+        _validate_schema_string(value, schema, field)
+    elif isinstance(value, int) and not isinstance(value, bool):
+        _validate_schema_integer(value, schema, field)
+    elif isinstance(value, list):
+        _validate_schema_array(value, schema, field)
+    elif isinstance(value, dict):
+        _validate_schema_object(value, schema, field)
+
+
 def call_tool(name, arguments):
     """Run a tool by name. Returns the tools/call result dict."""
     tool = TOOLS_BY_NAME.get(name)
@@ -2623,6 +2816,7 @@ def call_tool(name, arguments):
         arguments = {}
     if not isinstance(arguments, dict):
         raise RpcError(-32602, "tool arguments must be an object")
+    _validate_schema_value(arguments, tool["inputSchema"], "arguments")
     try:
         result = tool["handler"](arguments)
         text = json.dumps(result, ensure_ascii=False, indent=2)
@@ -2630,8 +2824,9 @@ def call_tool(name, arguments):
     except (ToolError, CoreError) as e:
         return {"content": [{"type": "text", "text": "Error: %s" % e}], "isError": True}
     except Exception as e:  # pragma: no cover - defensive
+        _diagnostic(e)
         return {
-            "content": [{"type": "text", "text": "Internal error: %s: %s" % (type(e).__name__, e)}],
+            "content": [{"type": "text", "text": "Internal error"}],
             "isError": True,
         }
 
@@ -2641,7 +2836,17 @@ def dispatch(method, params):
     protocol-level failures (unknown method, bad params)."""
     if params is None:
         params = {}
+    if not isinstance(params, dict):
+        raise RpcError(-32602, "params must be an object")
     if method == "initialize":
+        if params.get("protocolVersion") != PROTOCOL_VERSION:
+            raise RpcError(-32602, "unsupported protocol version")
+        capabilities = params.get("capabilities")
+        client_info = params.get("clientInfo")
+        if not isinstance(capabilities, dict):
+            raise RpcError(-32602, "initialize capabilities must be an object")
+        if client_info is not None and not isinstance(client_info, dict):
+            raise RpcError(-32602, "initialize clientInfo must be an object")
         return {
             "protocolVersion": PROTOCOL_VERSION,
             "capabilities": {"tools": {"listChanged": False}},
@@ -2663,50 +2868,89 @@ def dispatch(method, params):
     raise RpcError(-32601, "method not found: %s" % method)
 
 
-def handle_message(obj):
+def _request_fields(obj):
+    """Validate and return one JSON-RPC request's method, id, and params."""
+    if "id" in obj and not _valid_request_id(obj.get("id")):
+        raise RpcError(-32600, "invalid request: id must be a string, integer, or null")
+    method = obj.get("method")
+    if not isinstance(method, str) or not method:
+        raise RpcError(-32600, "invalid request: method must be a non-empty string")
+    params = obj.get("params")
+    if params is not None and not isinstance(params, dict):
+        raise RpcError(-32602, "params must be an object")
+    return method, obj.get("id"), params
+
+
+def handle_message(obj, session=None):
     """Handle one parsed JSON-RPC message object. Returns a response dict, or
     None for notifications (no reply)."""
+    session = session or ProtocolSession()
     if not isinstance(obj, dict):
-        return {
-            "jsonrpc": "2.0",
-            "id": None,
-            "error": {"code": -32600, "message": "invalid request: not an object"},
-        }
-
-    method = obj.get("method")
-    msg_id = obj.get("id")
+        return _rpc_error(-32600, "invalid request: not an object")
+    if obj.get("jsonrpc") != "2.0":
+        return _rpc_error(-32600, "invalid request: jsonrpc must be '2.0'")
     is_notification = "id" not in obj
+    raw_id = obj.get("id")
+    msg_id = raw_id if _valid_request_id(raw_id) else None
+    try:
+        method, msg_id, params = _request_fields(obj)
+    except RpcError as e:
+        return None if is_notification else _rpc_error(e.code, e.message, msg_id)
 
     # Notifications (no id) get no response.
     if is_notification:
-        # notifications/initialized and any other notification: no reply.
+        if method == "notifications/initialized" and session.initialized:
+            session.ready = True
         return None
 
-    if not method:
-        return {
-            "jsonrpc": "2.0",
-            "id": msg_id,
-            "error": {"code": -32600, "message": "invalid request: missing method"},
-        }
+    if method == "initialize":
+        if session.initialized:
+            return _rpc_error(-32600, "initialize has already completed", msg_id)
+    elif method != "ping":
+        if not session.initialized:
+            return _rpc_error(-32002, "server is not initialized", msg_id)
+        if not session.ready:
+            return _rpc_error(-32002, "client has not sent notifications/initialized", msg_id)
 
     try:
-        result = dispatch(method, obj.get("params"))
+        result = dispatch(method, params)
+        if method == "initialize":
+            session.initialized = True
         return {"jsonrpc": "2.0", "id": msg_id, "result": result}
     except RpcError as e:
-        return {"jsonrpc": "2.0", "id": msg_id, "error": {"code": e.code, "message": e.message}}
+        return _rpc_error(e.code, e.message, msg_id)
     except Exception as e:  # pragma: no cover - defensive
-        return {
-            "jsonrpc": "2.0",
-            "id": msg_id,
-            "error": {"code": -32603, "message": "internal error: %s: %s" % (type(e).__name__, e)},
-        }
+        _diagnostic(e)
+        return _rpc_error(-32603, "internal error", msg_id)
+
+
+def _read_stdio_line(stdin):
+    """Read one bounded newline-delimited message and drain oversized input."""
+    line = stdin.readline(MAX_MESSAGE_BYTES + 2)
+    if line == "":
+        return None, False
+    oversized = len(line.encode("utf-8")) > MAX_MESSAGE_BYTES
+    if not line.endswith("\n") and len(line) > MAX_MESSAGE_BYTES:
+        oversized = True
+        while line and not line.endswith("\n"):
+            line = stdin.readline(MAX_MESSAGE_BYTES + 2)
+    return line, oversized
 
 
 def serve_stdio(stdin=None, stdout=None):
     """Run the newline-delimited JSON-RPC stdio loop."""
     stdin = stdin or sys.stdin
     stdout = stdout or sys.stdout
-    for line in stdin:
+    session = ProtocolSession()
+    while True:
+        line, oversized = _read_stdio_line(stdin)
+        if line is None:
+            break
+        if oversized:
+            resp = _rpc_error(-32001, "message exceeds maximum size")
+            stdout.write(json.dumps(resp) + "\n")
+            stdout.flush()
+            continue
         line = line.strip()
         if not line:
             continue
@@ -2721,7 +2965,7 @@ def serve_stdio(stdin=None, stdout=None):
             stdout.write(json.dumps(resp) + "\n")
             stdout.flush()
             continue
-        resp = handle_message(obj)
+        resp = handle_message(obj, session)
         if resp is not None:
             # JSON-RPC must also work when Windows gives stdout a legacy code
             # page. Escaping non-ASCII keeps the wire representation portable.

@@ -12,7 +12,7 @@ TDD/review/validate loop remains supporting verification behavior. See
 `CHANGELOG.md` for release history and
 `docs/PRODUCT_EVOLUTION_SPEC.md` for the authoritative product direction.
 
-Current maintained compatibility inventory: **26 suites**. The canonical
+Current maintained compatibility inventory: **27 suites**. The canonical
 suite order and portable/native classification live in
 `support/legacy-suites.json`; `tests/run-all.sh` is the Unix/macOS adapter and
 `scripts/legacy_run_all.py` is the platform-neutral runner.

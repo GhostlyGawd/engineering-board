@@ -358,6 +358,7 @@ def run_package_gate(root: Path, tool_root: Path) -> dict[str, Any]:
                     environment=environment,
                 )
             mcpb_smoke(
+                root=root,
                 runtime=runtime,
                 interpreter=interpreter,
                 artifact=builds[0]["mcpb"],

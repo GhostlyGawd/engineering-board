@@ -44,6 +44,12 @@ increases.
 
 ### Fixed
 
+- MCP source, launcher, installed, and bundled stdio now enforce the
+  `2025-06-18` initialization lifecycle, reject malformed, invalid, and
+  oversized messages without stream desynchronization, preserve the exact
+  19-tool schema and annotation fixture across distributions, require an
+  explicit absolute repository root in bundled calls, and reject escaping
+  router, affects, symlink, and context paths before mutation.
 - The Claude plugin now resolves its bundled MCP launcher from
   `${CLAUDE_PLUGIN_ROOT}` instead of the active target repository, so an
   isolated installed session connects the plugin-owned 19-tool server without

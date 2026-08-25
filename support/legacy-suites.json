@@ -26,6 +26,7 @@
     {"id": "session-start", "command": ["bash", "tests/session-start/automated.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
     {"id": "prompt-guard", "command": ["bash", "tests/prompt-guard/automated.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
     {"id": "view", "command": ["bash", "tests/view/automated.sh", "{root}"], "portable": false, "skip_reason": "posix-bash-only"},
+    {"id": "mcp-protocol", "command": ["{python}", "mcp-server/test_mcp_protocol.py"], "portable": true},
     {"id": "mcp-server", "command": ["{python}", "mcp-server/test_mcp_server.py"], "portable": true}
   ]
 }

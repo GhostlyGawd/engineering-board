@@ -100,7 +100,7 @@ class ApplicationContractTests(unittest.TestCase):
         self.assertEqual(report["product_version"], "1.13.4")
         self.assertEqual(report["tool_count"], 19)
         self.assertEqual(report["command_count"], 21)
-        self.assertEqual(report["legacy_suite_count"], 26)
+        self.assertEqual(report["legacy_suite_count"], 27)
         self.assertRegex(shared_contract_fingerprint(ROOT), r"^[0-9a-f]{64}$")
 
         with tempfile.TemporaryDirectory(prefix="eb guidance stale ") as temp:

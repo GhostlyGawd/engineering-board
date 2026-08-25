@@ -302,16 +302,18 @@ The MCP compatibility suite remains:
 bash mcp-server/run-tests.sh
 ```
 
-`test_mcp_server.py` (pure python3, no deps) runs two suites:
+`run-tests.sh` runs two pure-Python, zero-dependency test modules:
 
-1. A **real end-to-end stdio session**: spawns the server as a subprocess and drives
-   `initialize` to `notifications/initialized` to `tools/list` to several `tools/call`,
-   asserting on the JSON-RPC responses (including `-32601`/`-32602` error paths).
-2. A **full board lifecycle** in a temp repo: `board_init` to `board_create_entry`
+1. `test_mcp_protocol.py` drives lifecycle ordering, protocol-version
+   negotiation, malformed and oversized message recovery, EOF/SIGINT,
+   launcher failure, root precedence, bundled explicit-root enforcement, and
+   traversal/symlink containment.
+2. `test_mcp_server.py` runs a real end-to-end stdio session and a **full board
+   lifecycle** in a temp repo: `board_init` to `board_create_entry`
    (bug + question + feature + learning) to `board_list_entries` to `board_update_entry`
    to `board_rebuild` to `board_status` to `board_capture_finding` to `board_claim` /
-   `board_release`, asserting every created file passes the real
-   `hooks/scripts/board-validate-entry.sh`.
+   `board_release`. It also pins the previous-release 19-tool public fixture
+   and asserts every created file passes the real `board-validate-entry.sh`.
 
 Exit 0 on all-pass. non-zero with detail on the first failure.
 

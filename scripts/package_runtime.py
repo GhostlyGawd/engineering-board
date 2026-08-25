@@ -19,6 +19,7 @@ from package_contract import (
 
 MCP_PROTOCOL_VERSION = "2025-06-18"
 MCP_TOOL_COUNT = 19
+MCP_MAX_MESSAGE_BYTES = 1024 * 1024
 GRAPH_PACKAGE_MARKER = "Graph café ↳ package smoke".encode("utf-8")
 
 
@@ -96,7 +97,12 @@ def _validate_graph_outputs(repository: Path, project: str, label: str) -> None:
         raise PackageGateError(f"{label}: graph output contract failed:\n- " + "\n- ".join(issues))
 
 
-def _rpc_smoke(command: Sequence[str | Path], repository: Path, label: str) -> None:
+def _rpc_smoke(
+    command: Sequence[str | Path],
+    repository: Path,
+    label: str,
+    expected_tools: list[dict[str, Any]],
+) -> None:
     process = subprocess.Popen(
         [str(value) for value in command],
         cwd=repository,
@@ -128,7 +134,7 @@ def _rpc_smoke(command: Sequence[str | Path], repository: Path, label: str) -> N
         stdin.write(json.dumps(message, separators=(",", ":")) + "\n")
         stdin.flush()
 
-    def receive(expected_id: int) -> dict[str, Any]:
+    def receive(expected_id: int | str | None) -> dict[str, Any]:
         line = stdout.readline()
         if not line:
             diagnostic = stderr_stream.read()
@@ -143,11 +149,35 @@ def _rpc_smoke(command: Sequence[str | Path], repository: Path, label: str) -> N
             raise PackageGateError(f"{label}: response is not an object: {value!r}")
         if value.get("id") != expected_id:
             raise PackageGateError(f"{label}: response id mismatch: {value!r}")
+        return value
+
+    def receive_success(expected_id: int | str) -> dict[str, Any]:
+        value = receive(expected_id)
         if "error" in value:
             raise PackageGateError(f"{label}: JSON-RPC error: {value['error']!r}")
         return value
 
+    def receive_error(expected_id: int | str | None, expected_code: int) -> dict[str, Any]:
+        value = receive(expected_id)
+        error = value.get("error")
+        if not isinstance(error, dict) or error.get("code") != expected_code:
+            raise PackageGateError(f"{label}: expected error {expected_code}, received {value!r}")
+        return value
+
     try:
+        send("tools/list", {})
+        receive_error(1, -32002)
+        send("ping", {})
+        require_equal(f"{label} pre-initialize ping", receive_success(2).get("result"), {})
+        send(
+            "initialize",
+            {
+                "protocolVersion": "1900-01-01",
+                "capabilities": {},
+                "clientInfo": {"name": "package-gate-negative", "version": "1"},
+            },
+        )
+        receive_error(3, -32602)
         send(
             "initialize",
             {
@@ -156,7 +186,7 @@ def _rpc_smoke(command: Sequence[str | Path], repository: Path, label: str) -> N
                 "clientInfo": {"name": "package-gate", "version": "1"},
             },
         )
-        initialized = receive(1).get("result", {})
+        initialized = receive_success(4).get("result", {})
         require_equal(
             f"{label} protocol",
             initialized.get("protocolVersion"),
@@ -165,11 +195,28 @@ def _rpc_smoke(command: Sequence[str | Path], repository: Path, label: str) -> N
         stdin.write('{"jsonrpc":"2.0","method":"notifications/initialized","params":{}}\n')
         stdin.flush()
         send("ping", {})
-        require_equal(f"{label} ping", receive(2).get("result"), {})
+        require_equal(f"{label} ping", receive_success(5).get("result"), {})
         send("tools/list", {})
-        tools = receive(3).get("result", {}).get("tools")
-        if not isinstance(tools, list) or len(tools) != MCP_TOOL_COUNT:
+        tools = receive_success(6).get("result", {}).get("tools")
+        if tools != expected_tools:
+            raise PackageGateError(f"{label}: public tools differ from the release fixture")
+        if len(tools) != MCP_TOOL_COUNT:
             raise PackageGateError(f"{label}: expected {MCP_TOOL_COUNT} tools")
+
+        stdin.write('{"jsonrpc":"2.0","id":7,"method":\n')
+        stdin.flush()
+        receive_error(None, -32700)
+        send("ping", {})
+        require_equal(f"{label} post-parse-error ping", receive_success(7).get("result"), {})
+        send("does/not/exist", {})
+        receive_error(8, -32601)
+        send("tools/call", {"name": "nope", "arguments": {}})
+        receive_error(9, -32602)
+        stdin.write("x" * (MCP_MAX_MESSAGE_BYTES + 1) + "\n")
+        stdin.flush()
+        receive_error(None, -32001)
+        send("ping", {})
+        require_equal(f"{label} post-oversize ping", receive_success(10).get("result"), {})
 
         def call_tool(name: str, arguments: dict[str, Any]) -> None:
             send(
@@ -179,7 +226,7 @@ def _rpc_smoke(command: Sequence[str | Path], repository: Path, label: str) -> N
                     "arguments": arguments,
                 },
             )
-            tool_result = receive(request_id).get("result")
+            tool_result = receive_success(request_id).get("result")
             if not isinstance(tool_result, dict) or tool_result.get("isError") is True:
                 raise PackageGateError(f"{label}: {name} failed")
 
@@ -322,11 +369,15 @@ def runtime_smoke(
     _installed_metadata(python, root, environment)
     repository = destination / f"repo-python-{runtime}-{kind}"
     repository.mkdir()
-    _rpc_smoke([console], repository, f"Python {runtime} {kind}")
+    expected_tools = json.loads(
+        (root / "mcp-server" / "fixtures" / "public-tools-v1.13.4.json").read_text(encoding="utf-8")
+    )
+    _rpc_smoke([console], repository, f"Python {runtime} {kind}", expected_tools)
 
 
 def mcpb_smoke(
     *,
+    root: Path,
     runtime: str,
     interpreter: Path,
     artifact: Path,
@@ -337,10 +388,14 @@ def mcpb_smoke(
         archive.extractall(extracted)
     repository = destination / f"repo-python-{runtime}-mcpb"
     repository.mkdir()
+    expected_tools = json.loads(
+        (root / "mcp-server" / "fixtures" / "public-tools-v1.13.4.json").read_text(encoding="utf-8")
+    )
     _rpc_smoke(
         [interpreter, extracted / "mcp-server" / "engineering_board_mcp.py"],
         repository,
         f"Python {runtime} mcpb",
+        expected_tools,
     )
 
 
