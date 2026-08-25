@@ -148,13 +148,8 @@ def platform_key() -> str:
         ("Linux", "arm64"),
     }:
         configured = os.environ.get("ENGINEERING_BOARD_DEV_TOOLS")
-        if configured:
-            configured_root = Path(configured).expanduser()
-            if (
-                configured_root == DEVCONTAINER_LINUX_ARM64_ROOT
-                or configured_root.resolve() == DEVCONTAINER_LINUX_ARM64_ROOT
-            ):
-                selected = "linux-arm64"
+        if configured == DEVCONTAINER_LINUX_ARM64_ROOT.as_posix():
+            selected = "linux-arm64"
     if selected is None:
         raise BootstrapError(
             "unsupported bootstrap host "

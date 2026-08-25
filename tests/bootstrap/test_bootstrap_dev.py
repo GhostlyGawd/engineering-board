@@ -156,41 +156,76 @@ class BootstrapCliTests(unittest.TestCase):
             ):
                 bootstrap_dev.check_installation(ROOT, install_root, manifest)
 
-    def test_linux_arm64_is_bounded_to_the_canonical_devcontainer_tool_root(
+    def test_linux_arm64_platform_key_requires_exact_declared_posix_root(
         self,
     ) -> None:
-        environment = {
-            "ENGINEERING_BOARD_DEV_TOOLS": ("/opt/engineering-board-runtime/linux-arm64")
-        }
-        with (
-            mock.patch.dict(os.environ, environment, clear=False),
-            mock.patch.object(bootstrap_dev.platform, "system", return_value="Linux"),
-            mock.patch.object(
-                bootstrap_dev.platform,
-                "machine",
-                return_value="aarch64",
-            ),
-        ):
-            self.assertEqual(bootstrap_dev.platform_key(), "linux-arm64")
+        canonical = "/opt/engineering-board-runtime/linux-arm64"
+        for machine in ("arm64", "aarch64"):
+            with (
+                self.subTest(machine=machine, configured=canonical),
+                mock.patch.dict(
+                    os.environ,
+                    {"ENGINEERING_BOARD_DEV_TOOLS": canonical},
+                    clear=False,
+                ),
+                mock.patch.object(
+                    bootstrap_dev.platform,
+                    "system",
+                    return_value="Linux",
+                ),
+                mock.patch.object(
+                    bootstrap_dev.platform,
+                    "machine",
+                    return_value=machine,
+                ),
+                mock.patch.object(
+                    bootstrap_dev,
+                    "Path",
+                    side_effect=AssertionError("platform declaration used host-native Path"),
+                ),
+            ):
+                self.assertEqual(bootstrap_dev.platform_key(), "linux-arm64")
 
-        with (
-            mock.patch.dict(
-                os.environ,
-                {"ENGINEERING_BOARD_DEV_TOOLS": "/tmp/linux-arm64"},
-                clear=False,
-            ),
-            mock.patch.object(bootstrap_dev.platform, "system", return_value="Linux"),
-            mock.patch.object(
-                bootstrap_dev.platform,
-                "machine",
-                return_value="aarch64",
-            ),
-            self.assertRaisesRegex(
-                bootstrap_dev.BootstrapError,
-                "unsupported bootstrap host Linux/aarch64",
-            ),
-        ):
-            bootstrap_dev.platform_key()
+        rejected_roots = (
+            "",
+            r"\opt\engineering-board-runtime\linux-arm64",
+            r"C:\opt\engineering-board-runtime\linux-arm64",
+            "opt/engineering-board-runtime/linux-arm64",
+            "/opt/engineering-board-runtime/./linux-arm64",
+            "/opt/engineering-board-runtime/linux-arm64/..",
+            "/opt/engineering-board-runtime/linux-arm64/",
+            "/tmp/linux-arm64",
+        )
+        for machine in ("arm64", "aarch64"):
+            for configured in rejected_roots:
+                with (
+                    self.subTest(machine=machine, configured=configured),
+                    mock.patch.dict(
+                        os.environ,
+                        {"ENGINEERING_BOARD_DEV_TOOLS": configured},
+                        clear=False,
+                    ),
+                    mock.patch.object(
+                        bootstrap_dev.platform,
+                        "system",
+                        return_value="Linux",
+                    ),
+                    mock.patch.object(
+                        bootstrap_dev.platform,
+                        "machine",
+                        return_value=machine,
+                    ),
+                    mock.patch.object(
+                        bootstrap_dev,
+                        "Path",
+                        side_effect=AssertionError("platform declaration used host-native Path"),
+                    ),
+                    self.assertRaisesRegex(
+                        bootstrap_dev.BootstrapError,
+                        f"unsupported bootstrap host Linux/{machine}",
+                    ),
+                ):
+                    bootstrap_dev.platform_key()
 
     def test_declared_devcontainer_roots_use_posix_semantics_on_every_host(
         self,

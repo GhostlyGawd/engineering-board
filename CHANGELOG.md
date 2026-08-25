@@ -94,6 +94,8 @@ increases.
 - Linux-container `/opt` declarations now retain POSIX separators on every
   host while configured executable tool roots keep host-native expansion and
   canonicalization.
+- Linux arm64 bootstrap artifact selection now requires the exact canonical
+  POSIX devcontainer tool-root declaration and rejects host-normalized aliases.
 - Native Windows bootstrap failures now print the supported Python recovery
   command, and Windows plus aggregate CI explicitly check out the pull-request
   head and retain exact-head result manifests for the temporary foundation
