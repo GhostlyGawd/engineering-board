@@ -158,6 +158,33 @@ class FoundationPortabilityTests(unittest.TestCase):
 
 
 class ValidatorResourceTests(unittest.TestCase):
+    def test_free_port_probe_uses_plain_bind_and_closes_socket(self) -> None:
+        probe = mock.Mock()
+        probe.setsockopt.side_effect = AssertionError("port probe enabled address reuse")
+        with mock.patch.object(
+            validator_resources.socket,
+            "socket",
+            return_value=probe,
+        ) as socket_factory:
+            self.assertTrue(validator_resources._port_is_available(4173))
+        socket_factory.assert_called_once_with(socket.AF_INET, socket.SOCK_STREAM)
+        probe.setsockopt.assert_not_called()
+        probe.bind.assert_called_once_with(("127.0.0.1", 4173))
+        probe.close.assert_called_once_with()
+
+    def test_port_probe_bind_error_returns_unavailable_and_closes_socket(self) -> None:
+        probe = mock.Mock()
+        probe.bind.side_effect = OSError("occupied")
+        with mock.patch.object(
+            validator_resources.socket,
+            "socket",
+            return_value=probe,
+        ):
+            self.assertFalse(validator_resources._port_is_available(4318))
+        probe.setsockopt.assert_not_called()
+        probe.bind.assert_called_once_with(("127.0.0.1", 4318))
+        probe.close.assert_called_once_with()
+
     def test_windows_pid_liveness_never_sends_signal(self) -> None:
         with (
             mock.patch.object(validator_resources.os, "name", "nt"),

@@ -153,13 +153,23 @@ def _acquire_directory(directory: Path, owner: dict[str, Any]) -> bool:
 def _port_is_available(port: int) -> bool:
     probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         probe.bind(("127.0.0.1", port))
     except OSError:
         return False
     finally:
         probe.close()
     return True
+
+
+def _port_has_listener(port: int) -> bool:
+    probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        probe.settimeout(0.2)
+        return probe.connect_ex(("127.0.0.1", port)) == 0
+    except OSError:
+        return True
+    finally:
+        probe.close()
 
 
 def run_locked(
@@ -195,7 +205,7 @@ def run_locked(
                     f"exclusive resource is occupied: {exclusive} (owner label: {occupied_label})"
                 )
             port = PORT_RESOURCES.get(exclusive)
-            if port is not None and not _port_is_available(port):
+            if port is not None and not _port_is_available(port) and _port_has_listener(port):
                 raise ResourceError(f"127.0.0.1:{port} is occupied; no fallback port is allowed")
 
         environment = os.environ.copy()

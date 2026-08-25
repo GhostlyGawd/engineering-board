@@ -88,6 +88,9 @@ increases.
 - Native Windows validator lock probes now inspect process state without
   signaling the lock owner, so occupied-resource checks fail promptly instead
   of interrupting the workflow process tree.
+- Validator occupied-port probes now use a plain loopback bind without address
+  reuse, so reusable foreign listeners on ports 4173 and 4318 fail visibly on
+  native Windows and remain owned by the original process.
 - Native Windows bootstrap failures now print the supported Python recovery
   command, and Windows plus aggregate CI explicitly check out the pull-request
   head and retain exact-head result manifests for the temporary foundation
