@@ -18,7 +18,7 @@ import tarfile
 import tempfile
 import urllib.request
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Callable, Dict, List, Optional
 
 # The stable bootstrap must parse on the supported Python 3.8 minimum.
@@ -32,8 +32,8 @@ SUPPORTED_PLATFORMS = {
     ("Windows", "AMD64"): "windows-x86_64",
     ("Windows", "x86_64"): "windows-x86_64",
 }
-DEVCONTAINER_LINUX_ARM64_ROOT = Path("/opt/engineering-board-runtime/linux-arm64")
-DEVCONTAINER_LINUX_X86_64_ROOT = Path("/opt/engineering-board-runtime/linux-x86_64")
+DEVCONTAINER_LINUX_ARM64_ROOT = PurePosixPath("/opt/engineering-board-runtime/linux-arm64")
+DEVCONTAINER_LINUX_X86_64_ROOT = PurePosixPath("/opt/engineering-board-runtime/linux-x86_64")
 ARTIFACT_PLATFORMS = set(SUPPORTED_PLATFORMS.values()) | {"linux-arm64"}
 
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import ntpath
 import os
 import shutil
 import subprocess
@@ -34,15 +35,52 @@ def pinned_tools() -> Path:
 
 
 class QualityCommandContractTests(unittest.TestCase):
-    def test_pinned_tool_root_honors_the_container_environment(self) -> None:
+    def test_pinned_tool_root_uses_host_native_resolution(self) -> None:
         with mock.patch.dict(
             os.environ,
             {"ENGINEERING_BOARD_DEV_TOOLS": "/opt/engineering-board-tools"},
         ):
             self.assertEqual(
                 pinned_tools(),
-                Path("/opt/engineering-board-tools"),
+                Path("/opt/engineering-board-tools").expanduser().resolve(),
             )
+
+        with tempfile.TemporaryDirectory(prefix="eb quality tool root ") as temp:
+            relative = Path(temp).name
+            previous_cwd = Path.cwd()
+            try:
+                os.chdir(Path(temp).parent)
+                with mock.patch.dict(
+                    os.environ,
+                    {"ENGINEERING_BOARD_DEV_TOOLS": relative},
+                    clear=False,
+                ):
+                    self.assertEqual(
+                        pinned_tools(),
+                        Path(relative).resolve(),
+                    )
+            finally:
+                os.chdir(previous_cwd)
+
+        windows_home = ntpath.join("D:\\", "Users", "builder")
+        with mock.patch.dict(
+            os.environ,
+            {"USERPROFILE": windows_home},
+            clear=True,
+        ):
+            self.assertEqual(
+                ntpath.normpath(ntpath.expanduser(r"~\engineering-board-tools")),
+                ntpath.join(windows_home, "engineering-board-tools"),
+            )
+        self.assertEqual(
+            ntpath.normpath(
+                ntpath.join(
+                    r"D:\repo\checkout",
+                    r"..\engineering-board-tools",
+                )
+            ),
+            r"D:\repo\engineering-board-tools",
+        )
 
     def run_python(
         self,

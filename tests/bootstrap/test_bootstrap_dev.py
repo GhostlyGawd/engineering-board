@@ -5,12 +5,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import ntpath
 import os
 import subprocess
 import sys
 import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -191,6 +192,69 @@ class BootstrapCliTests(unittest.TestCase):
         ):
             bootstrap_dev.platform_key()
 
+    def test_declared_devcontainer_roots_use_posix_semantics_on_every_host(
+        self,
+    ) -> None:
+        for root in (
+            bootstrap_dev.DEVCONTAINER_LINUX_ARM64_ROOT,
+            bootstrap_dev.DEVCONTAINER_LINUX_X86_64_ROOT,
+        ):
+            with self.subTest(root=root):
+                self.assertIs(type(root), PurePosixPath)
+                self.assertTrue(root.is_absolute())
+                self.assertEqual(str(root), root.as_posix())
+                self.assertEqual(ntpath.normpath(str(root)), str(root).replace("/", "\\"))
+
+    def test_python_38_parses_posix_devcontainer_declarations(self) -> None:
+        manifest = bootstrap_dev.load_manifest(MANIFEST)
+        configured = os.environ.get("ENGINEERING_BOARD_DEV_TOOLS")
+        install_root = (
+            Path(configured).expanduser().resolve()
+            if configured
+            else ROOT / ".engineering-board" / "dev-tools"
+        )
+        selected_platform = bootstrap_dev.platform_key()
+        uv = bootstrap_dev._provider_command(
+            next(tool for tool in manifest["tools"] if tool["id"] == "uv"),
+            install_root,
+            selected_platform,
+        )
+        environment = os.environ.copy()
+        environment.update(
+            {
+                "UV_PYTHON_DOWNLOADS": "never",
+                "UV_PYTHON_INSTALL_DIR": str(install_root / "python"),
+            }
+        )
+        located = subprocess.run(
+            [str(uv), "python", "find", "3.8.20"],
+            env=environment,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(located.returncode, 0, located.stdout + located.stderr)
+        probe = subprocess.run(
+            [
+                located.stdout.strip(),
+                "-c",
+                (
+                    "import runpy;"
+                    f"values=runpy.run_path({str(ROOT / 'scripts' / 'bootstrap_dev.py')!r});"
+                    "roots=(values['DEVCONTAINER_LINUX_ARM64_ROOT'],"
+                    "values['DEVCONTAINER_LINUX_X86_64_ROOT']);"
+                    "assert all(type(root).__name__ == 'PurePosixPath' for root in roots);"
+                    "assert [str(root) for root in roots] == "
+                    "['/opt/engineering-board-runtime/linux-arm64',"
+                    "'/opt/engineering-board-runtime/linux-x86_64']"
+                ),
+            ],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(probe.returncode, 0, probe.stdout + probe.stderr)
+
     def test_deferred_checks_are_bounded_to_the_emulated_devcontainer_build(
         self,
     ) -> None:
@@ -203,6 +267,10 @@ class BootstrapCliTests(unittest.TestCase):
         self.assertIn("--defer-executable-checks", rejected.stderr)
         self.assertIn(
             "/opt/engineering-board-runtime/linux-x86_64",
+            rejected.stderr,
+        )
+        self.assertNotIn(
+            r"\opt\engineering-board-runtime\linux-x86_64",
             rejected.stderr,
         )
 
