@@ -53,6 +53,16 @@ def tree_snapshot(root):
     return tuple(directories), files
 
 
+def terminate_host_process(process, native_windows=None):
+    if native_windows is None:
+        native_windows = os.name == "nt"
+    if native_windows:
+        process.terminate()
+        return 1, "native Windows host termination"
+    process.send_signal(signal.SIGINT)
+    return 0, "SIGINT"
+
+
 def suite_protocol_stream():
     print("\n== MCP protocol stream ==")
     repository = tempfile.mkdtemp(prefix="eb-mcp-protocol-")
@@ -246,6 +256,19 @@ def suite_protocol_stream():
 
 def suite_termination_and_launcher():
     print("\n== MCP termination and launcher ==")
+
+    class NativeWindowsProcess:
+        def send_signal(self, requested_signal):
+            raise ValueError("Unsupported signal: %s" % requested_signal)
+
+        def terminate(self):
+            self.terminated = True
+
+    native_windows_process = NativeWindowsProcess()
+    terminate_host_process(native_windows_process, native_windows=True)
+    if not getattr(native_windows_process, "terminated", False):
+        raise Failure("native Windows did not use supported host termination")
+
     truncated = subprocess.Popen(
         [sys.executable, SERVER_PATH],
         stdin=subprocess.PIPE,
@@ -279,10 +302,18 @@ def suite_termination_and_launcher():
     )
     interrupted.stdin.flush()
     json.loads(interrupted.stdout.readline())
-    interrupted.send_signal(signal.SIGINT)
+    expected_returncode, termination = terminate_host_process(interrupted)
     stdout, stderr = interrupted.communicate(timeout=5)
-    check(interrupted.returncode == 0, "source server exits cleanly on SIGINT", stderr)
-    check(stdout == "", "source SIGINT emits no stdout", repr(stdout))
+    check(
+        interrupted.returncode == expected_returncode,
+        "source server exits cleanly on %s" % termination,
+        stderr,
+    )
+    check(
+        stdout == "",
+        "source %s emits no stdout" % termination,
+        repr(stdout),
+    )
 
     invalid = subprocess.run(
         ["node", LAUNCHER_PATH],

@@ -44,6 +44,9 @@ increases.
 
 ### Fixed
 
+- The MCP protocol host-termination harness now preserves POSIX `SIGINT` while
+  using supported explicit process termination on native Windows, with the
+  same clean lifecycle and JSON-RPC-only stdout assertions on both platforms.
 - MCP source, launcher, installed, and bundled stdio now enforce the
   `2025-06-18` initialization lifecycle, reject malformed, invalid, and
   oversized messages without stream desynchronization, preserve the exact
