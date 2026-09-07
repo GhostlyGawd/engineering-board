@@ -1,0 +1,15 @@
+{
+  "name": "Engineering Board",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspaces/engineering-board",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/engineering-board,type=bind,consistency=cached",
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": false,
+  "containerEnv": {
+    "ENGINEERING_BOARD_DEV_TOOLS": "/opt/engineering-board-runtime/current"
+  },
+  "postCreateCommand": "bash scripts/bootstrap-dev.sh --check"
+}

@@ -103,35 +103,35 @@ if head -1 "$CMD" | grep -qF -- "---"; then
 else
   report 1 "board-init.md has frontmatter delimiter"
 fi
-check_re "frontmatter: description"                     "^description:"
-check_re "frontmatter: argument-hint"                   "^argument-hint:"
+check_re "frontmatter: description" "^description:"
+check_re "frontmatter: argument-hint" "^argument-hint:"
 check_re "frontmatter: argument-hint advertises --private" "argument-hint:.*--private"
 
 # ── New default: engineering-board/ (1.1.0), NOT docs/boards/ ────────────────
-check "scaffolds at engineering-board/ default"         "engineering-board/\$1"
-check "router at engineering-board/BOARD-ROUTER.md"     "engineering-board/BOARD-ROUTER.md"
-check "router path column uses engineering-board/\$1"   "| \$1 | engineering-board/\$1 |"
-check "framing: committed by default"                   "committed by default"
+check "scaffolds at engineering-board/ default" "engineering-board/\$1"
+check "router at engineering-board/BOARD-ROUTER.md" "engineering-board/BOARD-ROUTER.md"
+check "router path column uses engineering-board/\$1" "| \$1 | engineering-board/\$1 |"
+check "framing: committed by default" "committed by default"
 
 # ── Canonical record subdirs + .gitkeep ─────────────────────────────────────
 for sub in bugs features questions observations learnings hypotheses; do
   check "scaffolds subdir: $sub/" "engineering-board/\$1/$sub/"
 done
-check "entry-type dirs get .gitkeep"                    ".gitkeep"
+check "entry-type dirs get .gitkeep" ".gitkeep"
 
 # ── .gitignore stanza: §6.2 additive runtime patterns, print-only ───────────
-check "gitignore: runtime _sessions/ ignored"          "engineering-board/*/_sessions/"
-check "gitignore: runtime _claims/ ignored"            "engineering-board/*/_claims/"
-check "gitignore: runtime _migrate-snapshot/ ignored"  "engineering-board/*/_migrate-snapshot/"
-check "gitignore: hidden runtime folder ignored"       ".engineering-board/"
-check "gitignore: consolidation.log stays committed"   "consolidation.log"
-check "gitignore: print-only (does not auto-edit)"     "do not edit \`.gitignore\` automatically"
+check "gitignore: runtime _sessions/ ignored" "engineering-board/*/_sessions/"
+check "gitignore: runtime _claims/ ignored" "engineering-board/*/_claims/"
+check "gitignore: runtime _migrate-snapshot/ ignored" "engineering-board/*/_migrate-snapshot/"
+check "gitignore: hidden runtime folder ignored" ".engineering-board/"
+check "gitignore: consolidation.log stays committed" "consolidation.log"
+check "gitignore: print-only (does not auto-edit)" "do not edit \`.gitignore\` automatically"
 
 # The plugin repository dogfoods its own board. It must apply the same runtime
 # exclusions that the command prints for consuming repositories.
-check_file "self-host: hidden runtime ignored"          "$REPO_GITIGNORE" ".engineering-board/"
-check_file "self-host: runtime _sessions/ ignored"      "$REPO_GITIGNORE" "engineering-board/*/_sessions/"
-check_file "self-host: runtime _claims/ ignored"        "$REPO_GITIGNORE" "engineering-board/*/_claims/"
+check_file "self-host: hidden runtime ignored" "$REPO_GITIGNORE" ".engineering-board/"
+check_file "self-host: runtime _sessions/ ignored" "$REPO_GITIGNORE" "engineering-board/*/_sessions/"
+check_file "self-host: runtime _claims/ ignored" "$REPO_GITIGNORE" "engineering-board/*/_claims/"
 check_file "self-host: runtime migration state ignored" "$REPO_GITIGNORE" "engineering-board/*/_migrate-snapshot/"
 check_ignored "self-host: scratch path matches ignore policy" "engineering-board/eb-self/_sessions/check.md"
 check_ignored "self-host: claim path matches ignore policy" "engineering-board/eb-self/_claims/B999/owner.txt"
@@ -145,16 +145,16 @@ check_tracked "self-host: canonical graph is in the index" "engineering-board/eb
 check_tracked "self-host: consolidation receipt is in the index" "engineering-board/eb-self/consolidation.log"
 
 # ── --private full-tree opt-out ─────────────────────────────────────────────
-check "private: full-tree opt-out documented"          "# engineering-board (private"
+check "private: full-tree opt-out documented" "# engineering-board (private"
 
 # ── Backward compatibility + relocation pointer ─────────────────────────────
-check "compat: documents backward compatibility"       "Backward compatibility"
-check "compat: docs/boards/ still resolves"            "docs/boards/"
-check "compat: legacy docs/board/ still resolves"      "docs/board/"
+check "compat: documents backward compatibility" "Backward compatibility"
+check "compat: docs/boards/ still resolves" "docs/boards/"
+check "compat: legacy docs/board/ still resolves" "docs/board/"
 check "compat: points relocation at /board-migrate --relocate" "/board-migrate --relocate"
 
 # ── Idempotency ─────────────────────────────────────────────────────────────
-check "contract: idempotent"                            "idempotent"
+check "contract: idempotent" "idempotent"
 
 # ── Step ordering: validate -> router -> dir -> BOARD.md -> ARCHIVE.md ───────
 #    -> print .gitignore -> report.

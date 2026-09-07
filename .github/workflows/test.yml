@@ -1,7 +1,7 @@
 name: tests
 
-# v0.3.2 CI gate — runs the full engineering-board test suite on every push
-# and pull-request. Mirrors what `bash tests/run-all.sh` runs locally.
+# v0.3.2 CI gate — runs the full engineering-board test suite on main pushes
+# and pull requests. Mirrors what `bash tests/run-all.sh` runs locally.
 #
 # The runner owns the current suite manifest. This workflow does not duplicate
 # the suite count because the count changes as product gates are added.
@@ -15,16 +15,25 @@ name: tests
 
 on:
   push:
+    branches: [main]
   pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
 
 jobs:
   test:
     name: run-all
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    env:
+      ENGINEERING_BOARD_SUPPORT_ROW: linux-x86_64-bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
           # The Milestone D.1 harness loads the product core from the pinned
           # v1.11.0 commit. A one-commit checkout cannot verify that source.
           fetch-depth: 0
@@ -34,5 +43,25 @@ jobs:
           bash --version | head -1
           python3 --version
 
+      - name: Provision pinned development tools
+        run: bash scripts/bootstrap-dev.sh
+
+      - name: Verify pinned development tools offline
+        env:
+          UV_OFFLINE: "1"
+          npm_config_offline: "true"
+        run: bash scripts/bootstrap-dev.sh --check
+
       - name: Run full test suite
-        run: bash tests/run-all.sh
+        run: >-
+          python3 scripts/aggregate_ci_evidence.py
+          --output .engineering-board/validation/aggregate/run-all.json
+
+      - name: Retain exact-head aggregate result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: aggregate-result-linux-x86_64-bash
+          path: .engineering-board/validation/aggregate/run-all.json
+          if-no-files-found: error
+          retention-days: 30

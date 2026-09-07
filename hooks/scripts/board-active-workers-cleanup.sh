@@ -48,7 +48,10 @@ while ! mkdir "$LOCK_DIR" 2>/dev/null; do
   sleep 0.1
 done
 
-cleanup_lock() { rmdir "$LOCK_DIR" 2>/dev/null || true; rm -f "$TMP" 2>/dev/null || true; }
+cleanup_lock() {
+  rmdir "$LOCK_DIR" 2>/dev/null || true
+  rm -f "$TMP" 2>/dev/null || true
+}
 trap cleanup_lock EXIT
 
 python3 - "$REGISTRY" "$TMP" "$SESSION_ID" <<'PY'

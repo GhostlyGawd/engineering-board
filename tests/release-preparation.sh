@@ -63,7 +63,7 @@ PY
 BEFORE="$(sha256sum "$TMP/.claude-plugin/plugin.json" | awk '{print $1}')"
 CODEX_MARKET_BEFORE="$(sha256sum "$TMP/.agents/plugins/marketplace.json" | awk '{print $1}')"
 if python3 "$ROOT/scripts/prepare-release.py" "$TARGET_VERSION" \
-    --root "$TMP" --date 2026-07-28 --json > "$TMP/preview.json"; then
+  --root "$TMP" --date 2026-07-28 --json >"$TMP/preview.json"; then
   pass "preview succeeds"
 else
   fail "preview succeeds"
@@ -83,7 +83,7 @@ else
   fail "preview does not write the Codex marketplace"
 fi
 
-if python3 - "$TMP/preview.json" <<'PY'
+if python3 - "$TMP/preview.json" <<'PY'; then
 import json, pathlib, sys
 preview = json.loads(pathlib.Path(sys.argv[1]).read_text())
 assert preview["status"] == "preview"
@@ -92,20 +92,19 @@ assert "ARCHITECTURE.md" in preview["changed_files"]
 assert "docs/PRODUCT_EVOLUTION_SPEC.md" in preview["changed_files"]
 assert "SECURITY.md" not in preview["changed_files"]
 PY
-then
   pass "preview plans the Codex marketplace version and ref update"
 else
   fail "preview plans the Codex marketplace version and ref update"
 fi
 
 if python3 "$ROOT/scripts/prepare-release.py" "$TARGET_VERSION" \
-    --root "$TMP" --date 2026-07-28 --apply --json > "$TMP/applied.json"; then
+  --root "$TMP" --date 2026-07-28 --apply --json >"$TMP/applied.json"; then
   pass "apply succeeds"
 else
   fail "apply succeeds"
 fi
 
-if python3 - "$TMP" "$TARGET_VERSION" <<'PY'
+if python3 - "$TMP" "$TARGET_VERSION" <<'PY'; then
 import json, pathlib, re, sys
 root = pathlib.Path(sys.argv[1])
 target = sys.argv[2]
@@ -149,7 +148,6 @@ major, minor, _patch = target.split(".")
 assert f"Current minor release, {major}.{minor}.x" in security
 assert f"_Current release boundary: `v{target}`_" in product
 PY
-then
   pass "all versioned surfaces align"
 else
   fail "all versioned surfaces align"
@@ -188,13 +186,13 @@ note = "\n### Changed\n\n- Added an independent minor-release fixture.\n"
 path.write_text(path.read_text().replace(marker, marker + note, 1))
 PY
 if python3 "$ROOT/scripts/prepare-release.py" "$MINOR_TARGET" \
-    --root "$MINOR_TMP" --date 2026-07-29 --apply --json \
-    > "$MINOR_TMP/minor-applied.json"; then
+  --root "$MINOR_TMP" --date 2026-07-29 --apply --json \
+  >"$MINOR_TMP/minor-applied.json"; then
   pass "independent minor release apply succeeds"
 else
   fail "independent minor release apply succeeds"
 fi
-if python3 - "$MINOR_TMP" "$MINOR_TARGET" <<'PY'
+if python3 - "$MINOR_TMP" "$MINOR_TARGET" <<'PY'; then
 import json
 import pathlib
 import sys
@@ -210,16 +208,15 @@ assert f"_Current release boundary: `v{target}`_" in (
     root / "docs/PRODUCT_EVOLUTION_SPEC.md"
 ).read_text()
 PY
-then
   pass "minor release advances the supported minor and current release markers"
 else
   fail "minor release advances the supported minor and current release markers"
 fi
 
-printf "\nApproved review change.\n" >> "$TMP/mcp-server/README.md"
+printf "\nApproved review change.\n" >>"$TMP/mcp-server/README.md"
 if python3 "$ROOT/scripts/prepare-release.py" "$TARGET_VERSION" \
-    --root "$TMP" --date 2026-07-28 --refresh --apply --json \
-    > "$TMP/refreshed.json"; then
+  --root "$TMP" --date 2026-07-28 --refresh --apply --json \
+  >"$TMP/refreshed.json"; then
   pass "prepared version refresh succeeds"
 else
   fail "prepared version refresh succeeds"
@@ -242,21 +239,21 @@ else
 fi
 
 if python3 "$ROOT/scripts/prepare-release.py" "$TARGET_VERSION" \
-    --root "$TMP" --date 2026-07-28 >/dev/null 2>&1; then
+  --root "$TMP" --date 2026-07-28 >/dev/null 2>&1; then
   fail "same version is refused"
 else
   pass "same version is refused"
 fi
 
 if python3 "$ROOT/scripts/prepare-release.py" "v$TARGET_VERSION" \
-    --root "$TMP" --date 2026-07-28 >/dev/null 2>&1; then
+  --root "$TMP" --date 2026-07-28 >/dev/null 2>&1; then
   fail "invalid version is refused"
 else
   pass "invalid version is refused"
 fi
 
 if python3 "$ROOT/scripts/prepare-release.py" "${TARGET_VERSION%.*}.999" \
-    --root "$TMP" --date 2026-07-28 --refresh >/dev/null 2>&1; then
+  --root "$TMP" --date 2026-07-28 --refresh >/dev/null 2>&1; then
   fail "refresh with another version is refused"
 else
   pass "refresh with another version is refused"
@@ -270,7 +267,7 @@ market["plugins"][0]["source"]["ref"] = "main"
 path.write_text(json.dumps(market, indent=2) + "\n")
 PY
 if python3 "$ROOT/scripts/prepare-release.py" "$TARGET_VERSION" \
-    --root "$TMP" --date 2026-07-28 --refresh >/dev/null 2>&1; then
+  --root "$TMP" --date 2026-07-28 --refresh >/dev/null 2>&1; then
   fail "drifted Codex marketplace ref is refused"
 else
   pass "drifted Codex marketplace ref is refused"

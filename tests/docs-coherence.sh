@@ -44,9 +44,9 @@ HISTORICAL_AUDITS=(
 )
 
 for f in "$SERVER" "$ROOT/README.md" "$ROOT/docs/index.html" \
-         "$ROOT/mcp-server/README.md" "$ROOT/docs/llms.txt" \
-         "$ROOT/.claude-plugin/plugin.json" \
-         "${CURRENT_DOC_FILES[@]}" "${HISTORICAL_AUDITS[@]}"; do
+  "$ROOT/mcp-server/README.md" "$ROOT/docs/llms.txt" \
+  "$ROOT/.claude-plugin/plugin.json" \
+  "${CURRENT_DOC_FILES[@]}" "${HISTORICAL_AUDITS[@]}"; do
   if [ ! -f "$f" ]; then
     echo "docs-coherence: MISSING $f" >&2
     exit 1
@@ -76,7 +76,8 @@ if [ "$TOOL_COUNT" -lt 1 ] || [ "$COMMAND_COUNT" -lt 1 ] || [ "$SKILL_COUNT" -lt
 fi
 
 EXIT=0
-RESULT="$(python3 - "$TOOL_COUNT" "$COMMAND_COUNT" "$SKILL_COUNT" "$ROOT" "$ROOT/README.md" "${DOC_FILES[@]}" <<'PY'
+RESULT="$(
+  python3 - "$TOOL_COUNT" "$COMMAND_COUNT" "$SKILL_COUNT" "$ROOT" "$ROOT/README.md" "${DOC_FILES[@]}" <<'PY'
 import json, pathlib, re, sys
 
 tool_count = int(sys.argv[1])

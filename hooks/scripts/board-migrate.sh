@@ -112,7 +112,7 @@ PY
     LEARNINGS_DIR="$BOARD_DIR/learnings"
     mkdir -p "$LEARNINGS_DIR"
     if [ ! -f "$LEARNINGS_DIR/.gitkeep" ]; then
-      : > "$LEARNINGS_DIR/.gitkeep"
+      : >"$LEARNINGS_DIR/.gitkeep"
     fi
 
     # Step 3: back-fill needs: on open/in_progress bug/feature entries.

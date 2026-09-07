@@ -92,6 +92,56 @@ _Last updated: 2026-07-10_
 ## Repo working notes (any session)
 
 - **Always** finish with `bash tests/run-all.sh` green before pushing; CI enforces it.
+- **Platform contract:** `support/platform-matrix.json` is the machine-readable
+  OS/shell/runtime source of truth. Native Windows uses
+  `scripts/platform_test.py` from PowerShell and `cmd.exe`; Git Bash and WSL
+  are compatibility rows only. Repository validators use
+  `scripts/validator_resources.py` for the global two-session cap and
+  exclusive aggregate/browser/OTLP/port locks.
+- **Pinned development environment:** `support/dev-tools/` owns the exact
+  inventory, dependency locks, immutable download URLs, and checksums.
+  The bootstrap also provisions the declared Python 3.8 and current package
+  test runtimes below the same ignored tool root.
+  `scripts/bootstrap-dev.sh` is the macOS/Linux interface;
+  `scripts/bootstrap_dev.py` is the native-Windows interface. Check mode is
+  offline/read-only. `.devcontainer/` uses the same inventory at
+  `/workspaces/engineering-board` as user `vscode`. Its final image stays
+  `linux/amd64`; on an arm64 emulation host it selects the separately pinned
+  native arm64 validator and POSIX command layers built into the image.
+- **Stable quality contract:** `scripts/quality_gate.py` owns the
+  `format`/`lint`/`typecheck`/`test`/`security`/`package`/`all` selectors;
+  `scripts/quality-gate.sh` is the delegating macOS/Linux adapter. Native
+  PowerShell and `cmd.exe` call the Python entry directly.
+  `support/quality/typing-policy.json` declares strict root-plugin and MCP
+  scopes plus visible staged exclusions. The format and lint gates are
+  non-rewriting and cover Python, shell, Markdown, YAML, JSON/schema,
+  workflows, naming, complexity, dead code, duplication, and large files.
+  The test gate also enforces the versioned overall, branch, application, and
+  changed-line policy in `support/quality/coverage-policy.json`. The security
+  gate reports fail-closed dependency, secret, workflow, immutable-pin,
+  supply-chain-policy, checksum-integrity, and reject-filter families and
+  redacts secret values.
+- **Package runtime contract:** `scripts/package_gate.py` orchestrates the
+  focused `package_contract.py` and `package_runtime.py` modules with the
+  zero-dependency `mcp-server/engineering_board_build_backend.py`. Together
+  they reproduce wheel, sdist, and MCPB bytes, enforce exact archive contents
+  and coherent manifests, install wheel and sdist on Python 3.8/current, smoke
+  every MCP distribution over stdio, and write digest-bound CycloneDX evidence
+  below `.engineering-board/validation/package/`.
+- **Changed-line coverage identity:** the test selector instruments portable
+  Python test subprocesses, including package backend/runtime tests, and binds
+  committed, staged, unstaged, and untracked Python changes into one
+  deterministic identity. Eligible measured source missing from the coverage
+  report fails closed instead of disappearing from the denominator.
+- **Application and aggregate contract:** `support/applications.json` declares
+  the exact root plugin, MCP server, and optional future Conductor markers plus
+  required guidance. `scripts/application_contract.py` audits discovery,
+  guidance links/sections, documented command smokes, versions, counts,
+  workflow names, and package names. `support/legacy-suites.json` is the
+  canonical compatibility inventory; `tests/run-all.sh` delegates to
+  `scripts/legacy_run_all.py`, which preserves later diagnostics and writes
+  normalized decision/artifact fingerprints. The split `all` gate records
+  every stage duration and narrow rerun command.
 - **Board location resolves in ONE place now:** source `hooks/scripts/board-paths.sh` and call `eb_board_dirs` / `eb_board_rows` / `eb_router_path`. Do **not** re-hardcode `docs/boards/` in scripts.
 - **Version bumps** must touch *both* `.claude-plugin/plugin.json` and `marketplace.json` (coherence-checked), and a fix only reaches installs when the version *increases*.
 - New `hooks/scripts/*.sh` must pass `tests/crosscompat-lint.sh`: shebang exactly `#!/usr/bin/env bash`, no `date -d`/`date -j -f`, no `jq`, no drive letters (use python3 for JSON + timestamps).

@@ -10,6 +10,27 @@
   <meta name="theme-color" content="#FAF9F5" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#17191E" media="(prefers-color-scheme: dark)">
 
+  <script>
+    // Apply the sole product-owned preference before paint. Storage access is
+    // optional: denied reads/writes must not prevent the landing page rendering.
+    (function(){
+      var root=document.documentElement, key="eb-theme", allowed={light:true,dark:true};
+      function read(){
+        try{return window.localStorage.getItem(key);}
+        catch(error){return null;}
+      }
+      function write(value){
+        try{window.localStorage.setItem(key,value);}
+        catch(error){return false;}
+        return true;
+      }
+      var saved=read();
+      if(allowed[saved]){root.setAttribute("data-theme",saved);}
+      root.classList.add("js");
+      window.__ebTheme={allowed:allowed,read:read,write:write};
+    })();
+  </script>
+
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="engineering-board — pattern intelligence for engineering agents">
@@ -124,7 +145,11 @@
     .btn:hover{transform:translateY(-1px)}
     .btn:active{transform:translateY(0)}
     .btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-    @media(prefers-reduced-motion:reduce){.btn:hover{transform:none}}
+    @media(prefers-reduced-motion:reduce){
+      body{transition:none}
+      .btn{transition:none}
+      .btn:hover{transform:none}
+    }
 
     /* ===== Board demo ===== */
     .demo{margin:3rem auto 0;max-width:60rem;background:var(--eb-surface);border:1px solid var(--eb-border);
@@ -153,9 +178,11 @@
       border:1px solid var(--eb-border);border-radius:var(--eb-radius-sm);padding:.2rem .5rem;cursor:pointer;opacity:.85}
     .copy-btn:hover{color:var(--eb-text);opacity:1}
     .copy-btn:focus-visible{opacity:1}
+    .code-wrap code{user-select:text}
 
     /* ===== Sections ===== */
     section{padding:4rem 0}
+    section[id]{scroll-margin-top:72px}
     section h2{font-size:clamp(1.6rem,4vw,var(--eb-fs-2xl));text-align:center;margin-bottom:.4rem}
     section .sub{text-align:center;color:var(--eb-text-muted);max-width:46ch;margin:0 auto 2.5rem}
     .grid{display:grid;gap:1rem}
@@ -214,27 +241,29 @@
     footer .wrap{display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center}
     footer a{color:var(--eb-text-muted)}
 
-    /* staged reveal on scroll */
-    .reveal{opacity:0;transform:translateY(12px);transition:opacity var(--eb-dur-slow) var(--eb-ease-out),transform var(--eb-dur-slow) var(--eb-ease-out)}
+    /* Staged reveal is progressive enhancement. Without JavaScript, core
+       content remains visible. The early script adds .js before first paint. */
+    .reveal{opacity:1;transform:none}
+    .js .reveal{opacity:0;transform:translateY(12px);transition:opacity var(--eb-dur-slow) var(--eb-ease-out),transform var(--eb-dur-slow) var(--eb-ease-out)}
     .reveal.in{opacity:1;transform:none}
-    @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+    @media(prefers-reduced-motion:reduce){.js .reveal{opacity:1;transform:none;transition:none}}
   </style>
 </head>
 <body>
   <header class="nav">
     <div class="wrap">
-      <span class="brand">
+      <span class="brand" id="product-marker">
         <img src="assets/favicon.svg" alt="" width="26" height="26" aria-hidden="true">
         engineering<span style="color:var(--eb-accent)">·</span>board
       </span>
       <nav class="nav-links" aria-label="Primary">
-        <a href="#why">Why</a>
-        <a href="#compare">Compare</a>
-        <a href="#install">Install</a>
-        <a href="https://github.com/GhostlyGawd/engineering-board#readme">Docs</a>
-        <a href="board.html">Live board</a>
-        <a class="ghlink" href="https://github.com/GhostlyGawd/engineering-board">GitHub</a>
-        <button class="theme-btn" id="theme" type="button" aria-label="Toggle color theme">Theme</button>
+        <a id="nav-why" href="#why">Why</a>
+        <a id="nav-compare" href="#compare">Compare</a>
+        <a id="nav-install" href="#install">Install</a>
+        <a id="nav-docs" href="https://github.com/GhostlyGawd/engineering-board#readme">Docs</a>
+        <a id="nav-board" href="/engineering-board/board.html">Live board</a>
+        <a class="ghlink" id="nav-github" href="https://github.com/GhostlyGawd/engineering-board">GitHub</a>
+        <button class="theme-btn" id="theme" type="button" aria-label="Color theme">Theme: System</button>
       </nav>
     </div>
   </header>
@@ -246,8 +275,8 @@
 <p class="tagline"><strong>The board is the memory.</strong> The agent receives relevant systemic evidence before a fix and returns the verified outcome after the fix.</p>
 <p class="whofor">Use Engineering Board when an engineering agent must learn across sessions and domains. The product does not require a database, service, or daemon.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="#install">Install — free &amp; MIT</a>
-        <a class="btn btn-ghost" href="board.html">See a live board it runs</a>
+        <a class="btn btn-primary" id="hero-install" href="#install">Install — free &amp; MIT</a>
+        <a class="btn btn-ghost" id="hero-board" href="/engineering-board/board.html">See a live board it runs</a>
       </div>
 
       <figure class="demo" aria-label="Pattern-intelligence demo result">
@@ -265,7 +294,7 @@
         <figcaption class="demo-cap">Real deterministic fixture output · context before a fix · evidence after a fix · 2026-07-28</figcaption>
       </figure>
 
-<p class="trustband">The project uses its <a href="board.html">public board</a>. The project has <a href="https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml">CI tests</a>, no runtime package dependency, and an MIT license. The server is on the <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">MCP Registry</a>.</p>
+<p class="trustband">The project uses its <a href="/engineering-board/board.html">public board</a>. The project has <a href="https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml">CI tests</a>, no runtime package dependency, and an MIT license. The server is on the <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">MCP Registry</a>.</p>
     </section>
 
     <section id="why" aria-labelledby="why-h">
@@ -308,7 +337,7 @@
 <p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem"><a href="https://github.com/gastownhall/beads">beads</a> has mature memory and claim features. <a href="https://github.com/MrLesk/Backlog.md">Backlog.md</a> has a detailed task model. <a href="https://github.com/eyaltoledano/claude-task-master">Task Master</a> converts a product requirements document into tasks. Engineering Board has a different primary function. It uses reviewable engineering evidence to show cross-domain patterns.</p>
         <figure class="reveal" style="margin:2rem auto 0;max-width:60rem;background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:var(--eb-radius-lg);padding:1.25rem;box-shadow:var(--eb-shadow-card)">
           <img src="assets/board-screenshot.png" alt="Screenshot of this repo's real rendered board: a search input, type/priority/status filter chips, and kanban columns — to do, review, validate, done — populated with entry cards." loading="lazy" width="1280" height="800" style="display:block;max-width:100%;height:auto;border-radius:var(--eb-radius-card);border:1px solid var(--eb-border)">
-          <figcaption style="margin:.7rem 0 0;text-align:center;font-size:.72rem;color:var(--eb-text-faint);font-family:var(--eb-font-mono)">the real thing — this repo's own board, as <code>/board-view</code> renders it · <a href="board.html">open it live</a></figcaption>
+          <figcaption style="margin:.7rem 0 0;text-align:center;font-size:.72rem;color:var(--eb-text-faint);font-family:var(--eb-font-mono)">the real thing — this repo's own board, as <code>/board-view</code> renders it · <a href="/engineering-board/board.html">open it live</a></figcaption>
         </figure>
       </div>
     </section>
@@ -320,7 +349,7 @@
         <div class="install">
           <div class="card2 reveal recommended">
 <p class="eyebrow">Codex plugin</p>
-            <pre><code>codex plugin marketplace add GhostlyGawd/engineering-board
+            <pre><code id="install-codex">codex plugin marketplace add GhostlyGawd/engineering-board
 codex plugin add engineering-board@engineering-board
 
 # then start a new Codex session</code></pre>
@@ -328,7 +357,7 @@ codex plugin add engineering-board@engineering-board
           </div>
           <div class="card2 reveal">
 <p class="eyebrow">Claude Code plugin</p>
-            <pre><code>/plugin marketplace add GhostlyGawd/engineering-board
+            <pre><code id="install-claude">/plugin marketplace add GhostlyGawd/engineering-board
 /plugin install engineering-board
 
 # then, in a project:
@@ -340,7 +369,7 @@ codex plugin add engineering-board@engineering-board
           </div>
           <div class="card2 reveal">
 <p class="eyebrow">MCP server for an MCP client</p>
-            <pre><code># one line from PyPI
+            <pre><code id="install-mcp"># one line from PyPI
 claude mcp add engineering-board -- uvx engineering-board-mcp
 
 # fallback — run from a clone:
@@ -355,10 +384,10 @@ claude mcp add engineering-board -- \
     "args": ["engineering-board-mcp"]
   }
 }</code></pre>
-<p class="muted" style="font-size:.8rem">The Python server has no package dependency. It provides 19 tools through standard input and output. Read the <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md">client setup procedures</a>.</p>
+<p class="muted" style="font-size:.8rem">The Python server has no package dependency. It provides 19 tools through standard input and output. Read the <a id="mcp-client-setup" href="https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md">client setup procedures</a>.</p>
           </div>
         </div>
-<p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">An uninstall operation does not remove the Markdown board. The system treats scratch content as untrusted data. Read the <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/SECURITY.md">security policy</a>.</p>
+<p class="sub reveal" style="margin-top:1.5rem;font-size:.8rem">An uninstall operation does not remove the Markdown board. The system treats scratch content as untrusted data. Read the <a id="security-policy" href="https://github.com/GhostlyGawd/engineering-board/blob/main/SECURITY.md">security policy</a>.</p>
       </div>
     </section>
   </main>
@@ -368,7 +397,7 @@ claude mcp add engineering-board -- \
       <span>Built in the open by <a href="https://github.com/GhostlyGawd">@GhostlyGawd</a> · a solo, MIT-licensed project · <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/LICENSE">LICENSE</a></span>
       <span>
         <a href="https://github.com/GhostlyGawd/engineering-board">Repository</a> ·
-        <a href="board.html">Live board</a> ·
+        <a href="/engineering-board/board.html">Live board</a> ·
         <a href="https://github.com/GhostlyGawd/engineering-board/releases">Releases</a> ·
         <a href="https://registry.modelcontextprotocol.io/?search=engineering-board">MCP Registry</a> ·
         <a href="https://github.com/GhostlyGawd/engineering-board/blob/main/ARCHITECTURE.md">Architecture</a> ·
@@ -378,16 +407,27 @@ claude mcp add engineering-board -- \
   </footer>
 
   <script>
-    // Theme toggle — persists choice; defaults to OS preference.
+    // Theme toggle — persists a closed value set and otherwise follows the
+    // computed browser preference. Storage denial stays in-memory and usable.
     (function(){
-      var root=document.documentElement, key="eb-theme";
-      var saved=localStorage.getItem(key);
-      if(saved){root.setAttribute("data-theme",saved);}
-      document.getElementById("theme").addEventListener("click",function(){
+      var root=document.documentElement, state=window.__ebTheme;
+      var button=document.getElementById("theme");
+      function explicit(){
+        var value=root.getAttribute("data-theme");
+        return state.allowed[value] ? value : "";
+      }
+      function label(){
+        var value=explicit();
+        button.textContent="Theme: "+(value ? value.charAt(0).toUpperCase()+value.slice(1) : "System");
+      }
+      label();
+      button.addEventListener("click",function(){
         var cur=root.getAttribute("data-theme");
         var next = cur==="dark" ? "light" : cur==="light" ? "dark"
           : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "light":"dark");
-        root.setAttribute("data-theme",next);localStorage.setItem(key,next);
+        root.setAttribute("data-theme",next);
+        state.write(next);
+        label();
       });
     })();
 
@@ -398,6 +438,23 @@ claude mcp add engineering-board -- \
       if(reduce||!("IntersectionObserver" in window)){els.forEach(function(e){e.classList.add("in")});return;}
       var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);}})},{threshold:.15});
       els.forEach(function(e){io.observe(e)});
+    })();
+
+    // Reapply direct and in-page fragments after final layout. This keeps each
+    // destination below the sticky header even when images settle later.
+    (function(){
+      function placeHashTarget(){
+        if(!window.location.hash)return;
+        var id;
+        try{id=decodeURIComponent(window.location.hash.slice(1));}
+        catch(error){return;}
+        var target=document.getElementById(id);
+        if(!target)return;
+        target.scrollIntoView({behavior:"instant",block:"start"});
+      }
+      window.addEventListener("hashchange",placeHashTarget);
+      window.addEventListener("load",placeHashTarget);
+      placeHashTarget();
     })();
 
     // Interactive board demo — a card promoted through the state machine.
@@ -439,19 +496,39 @@ claude mcp add engineering-board -- \
       });
     })();
 
-    // Copy-to-clipboard buttons on the install code blocks.
+    // Copy-to-clipboard buttons on the install code blocks. The buttons remain
+    // safe when the API is missing or rejects, and the exact code stays text-
+    // selectable for manual copying.
     (function(){
-      if(!navigator.clipboard) return;
-      document.querySelectorAll("pre").forEach(function(pre){
+      var names={
+        "install-codex":"Codex plugin",
+        "install-claude":"Claude Code plugin",
+        "install-mcp":"MCP server"
+      };
+      function reset(btn){
+        window.setTimeout(function(){btn.textContent="Copy";},1500);
+      }
+      function reportCopyFailure(btn){
+        btn.textContent="Select & copy";
+        reset(btn);
+      }
+      document.querySelectorAll("pre > code[id]").forEach(function(code){
+        var pre=code.parentNode;
         var wrap=document.createElement("div");wrap.className="code-wrap";
         pre.parentNode.insertBefore(wrap,pre);wrap.appendChild(pre);
         var btn=document.createElement("button");btn.className="copy-btn";btn.type="button";
-        btn.textContent="Copy";btn.setAttribute("aria-label","Copy code to clipboard");
+        btn.textContent="Copy";btn.setAttribute("aria-label","Copy "+names[code.id]+" install command");
+        btn.setAttribute("aria-live","polite");btn.setAttribute("data-copy-for",code.id);
         wrap.appendChild(btn);
         btn.addEventListener("click",function(){
-          navigator.clipboard.writeText(pre.innerText).then(function(){
-            btn.textContent="Copied";setTimeout(function(){btn.textContent="Copy";},1500);
-          });
+          if(!navigator.clipboard||typeof navigator.clipboard.writeText!=="function"){
+            reportCopyFailure(btn);return;
+          }
+          Promise.resolve().then(function(){
+            return navigator.clipboard.writeText(code.textContent);
+          }).then(function(){
+            btn.textContent="Copied";reset(btn);
+          }).catch(function(){reportCopyFailure(btn);});
         });
       });
     })();

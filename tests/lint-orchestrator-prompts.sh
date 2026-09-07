@@ -40,8 +40,8 @@ for f in "${FILES[@]}"; do
 done
 
 total="${#FILES[@]}"
-fails=$(( ${#missing[@]} + ${#not_found[@]} ))
-present=$(( total - fails ))
+fails=$((${#missing[@]} + ${#not_found[@]}))
+present=$((total - fails))
 
 if [ "$fails" -eq 0 ]; then
   echo "lint-orchestrator-prompts: PASS (framing string present in ${present}/${total} files)"

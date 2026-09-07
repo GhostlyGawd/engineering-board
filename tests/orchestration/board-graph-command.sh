@@ -56,52 +56,52 @@ check_re() {
 }
 
 # ── Trigger surface ─────────────────────────────────────────────────────────
-check "trigger: /board-graph documented"                      "/board-graph"
-check "trigger: per-project variant"                          "/board-graph <project-name>"
-check "trigger: --full cache-bypass flag"                     "--full"
+check "trigger: /board-graph documented" "/board-graph"
+check "trigger: per-project variant" "/board-graph <project-name>"
+check "trigger: --full cache-bypass flag" "--full"
 
 # ── Determinism is the central contract ─────────────────────────────────────
-check "contract: purely deterministic"                        "purely deterministic"
+check "contract: purely deterministic" "purely deterministic"
 check "contract: byte-identical output (modulo generated_at)" "byte-identical"
-check "contract: no LLM in construction"                      "No LLM in graph construction"
+check "contract: no LLM in construction" "No LLM in graph construction"
 
 # ── Output: GRAPH.yml with the documented top-level keys, in order ──────────
-check "output path: GRAPH.yml"                                "GRAPH.yml"
+check "output path: GRAPH.yml" "GRAPH.yml"
 for key in generated_at project entries_analyzed nodes edges topology findings; do
-  check "schema: top-level key '$key'"                        "$key"
+  check "schema: top-level key '$key'" "$key"
 done
 
 # ── Edge kinds — all 7 documented kinds must remain in the table ────────────
 for kind in blocked-by superseded-by merged-into contradicts shared-pattern shared-affects-prefix shared-tag; do
-  check "edge kind: $kind"                                    "$kind"
+  check "edge kind: $kind" "$kind"
 done
 
 # ── Edge-kind weights (the deterministic-rule keys) ─────────────────────────
-check "edge weights: 3 for hard relationships"                "| 3 |"
-check "edge weights: 2 for shared-pattern / shared-affects"   "| 2 |"
-check "edge weights: 1 for shared-tag"                        "| 1 |"
+check "edge weights: 3 for hard relationships" "| 3 |"
+check "edge weights: 2 for shared-pattern / shared-affects" "| 2 |"
+check "edge weights: 1 for shared-tag" "| 1 |"
 
 # ── Deduplication rule for same {from,to,kind} pairs ────────────────────────
-check "edge dedup: same kind concatenates values"             "concatenate values"
+check "edge dedup: same kind concatenates values" "concatenate values"
 
 # ── Topology vocabulary: clusters, density, bridge nodes, isolated ──────────
-check "topology: clusters (connected components)"             "Clusters"
-check "topology: density formula"                             "internal_edges"
-check "topology: bridge nodes (cut vertices / articulation)"  "articulation points"
-check "topology: cross-cluster bridges"                       "Cross-cluster bridges"
-check "topology: isolated nodes"                              "Isolated"
+check "topology: clusters (connected components)" "Clusters"
+check "topology: density formula" "internal_edges"
+check "topology: bridge nodes (cut vertices / articulation)" "articulation points"
+check "topology: cross-cluster bridges" "Cross-cluster bridges"
+check "topology: isolated nodes" "Isolated"
 
 # ── Universal-tag suppression: tags on >50% of entries are skipped ──────────
 check "tag handling: universal tags excluded (>50% threshold)" ">50%"
 
 # ── Findings vocabulary — all 6 typed records ───────────────────────────────
 for ftype in dense-cluster cross-cluster-bridge isolated-node pattern-recurrence contradiction blocked-chain; do
-  check "finding type: $ftype"                                "$ftype"
+  check "finding type: $ftype" "$ftype"
 done
 
 # ── Findings discipline: structured-only, no prose ──────────────────────────
-check "findings: no prose, no claims, no implications"        "No prose"
-check "findings: structured facts only"                       "structured facts"
+check "findings: no prose, no claims, no implications" "No prose"
+check "findings: structured facts only" "structured facts"
 
 # ── Step ordering: resolve boards -> parse -> tag freq -> edges -> topology
 #    -> findings -> write -> report.
@@ -120,12 +120,12 @@ else
 fi
 
 # ── Notes section: caches well + pairs with /board-rebuild ──────────────────
-check "notes: cheap to regenerate"                            "Cheap to regenerate"
-check "notes: pairs with /board-rebuild"                      "/board-rebuild"
-check "notes: staleness impossible by construction"           "Staleness is impossible by construction"
+check "notes: cheap to regenerate" "Cheap to regenerate"
+check "notes: pairs with /board-rebuild" "/board-rebuild"
+check "notes: staleness impossible by construction" "Staleness is impossible by construction"
 
 # ── Interpretation belongs downstream, not in this command ──────────────────
-check "scope: interpretation downstream"                      "Interpretation belongs downstream"
+check "scope: interpretation downstream" "Interpretation belongs downstream"
 
 echo ""
 echo "================================================================"

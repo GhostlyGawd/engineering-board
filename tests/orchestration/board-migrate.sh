@@ -30,12 +30,12 @@ trap cleanup_tmp EXIT
 BOARD_DIR="$TMP/docs/board"
 mkdir -p "$BOARD_DIR/bugs" "$BOARD_DIR/features" "$BOARD_DIR/questions" "$BOARD_DIR/observations"
 
-cat > "$BOARD_DIR/BOARD.md" <<'EOF'
+cat >"$BOARD_DIR/BOARD.md" <<'EOF'
 # board
 ## Open
 - B001 P2 | [t](bugs/B001-x.md)
 EOF
-cat > "$BOARD_DIR/bugs/B001-x.md" <<'EOF'
+cat >"$BOARD_DIR/bugs/B001-x.md" <<'EOF'
 ---
 id: B001
 type: bug
@@ -48,7 +48,7 @@ affects: foo/
 ## Done when
 - [ ] fix
 EOF
-cat > "$BOARD_DIR/features/F001-x.md" <<'EOF'
+cat >"$BOARD_DIR/features/F001-x.md" <<'EOF'
 ---
 id: F001
 type: feature
@@ -62,7 +62,7 @@ affects: bar/
 ## Done when
 - [ ] do
 EOF
-cat > "$BOARD_DIR/bugs/B002-x.md" <<'EOF'
+cat >"$BOARD_DIR/bugs/B002-x.md" <<'EOF'
 ---
 id: B002
 type: bug
@@ -99,21 +99,23 @@ PASS=0
 FAIL=0
 report() {
   if [ "$1" = "0" ]; then
-    printf "  [PASS] %s\n" "$2"; PASS=$((PASS + 1))
+    printf "  [PASS] %s\n" "$2"
+    PASS=$((PASS + 1))
   else
-    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"; FAIL=$((FAIL + 1))
+    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"
+    FAIL=$((FAIL + 1))
   fi
 }
 
-grep -Fq "## Choose a migration mode" "$COMMAND" \
-  && report 0 "command names the mode-selection boundary" \
-  || report 1 "command names the mode-selection boundary"
-grep -Fq "### Data migration mode" "$COMMAND" \
-  && report 0 "command names the data migration workflow" \
-  || report 1 "command names the data migration workflow"
-grep -Fq "### Folder relocation mode" "$COMMAND" \
-  && report 0 "command names the folder relocation workflow" \
-  || report 1 "command names the folder relocation workflow"
+grep -Fq "## Choose a migration mode" "$COMMAND" &&
+  report 0 "command names the mode-selection boundary" ||
+  report 1 "command names the mode-selection boundary"
+grep -Fq "### Data migration mode" "$COMMAND" &&
+  report 0 "command names the data migration workflow" ||
+  report 1 "command names the data migration workflow"
+grep -Fq "### Folder relocation mode" "$COMMAND" &&
+  report 0 "command names the folder relocation workflow" ||
+  report 1 "command names the folder relocation workflow"
 if grep -Fq "skip Steps" "$COMMAND"; then
   report 1 "command has no cross-workflow skip instruction"
 else

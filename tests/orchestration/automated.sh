@@ -34,6 +34,7 @@
 #   23. milestone-b-pattern-pipeline.sh — canonical identity, cache, MCP, CLI, promotion
 #   24. milestone-c-root-cause-intelligence.sh — ranking, hypotheses, negative memory, view
 #   25. milestone-d-context-outcome-intelligence.sh — retrieval, outcomes, Learnings, rebuild
+#   26. python-newline-compatibility.sh — Python 3.8 atomic UTF-8/LF writers
 #
 # Usage:
 #   bash tests/orchestration/automated.sh                # auto-detect plugin root
@@ -75,6 +76,7 @@ SUBTESTS=(
   "milestone-b-pattern-pipeline.sh"
   "milestone-c-root-cause-intelligence.sh"
   "milestone-d-context-outcome-intelligence.sh"
+  "python-newline-compatibility.sh"
 )
 
 for st in "${SUBTESTS[@]}"; do

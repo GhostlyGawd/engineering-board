@@ -87,8 +87,14 @@ PY
 
 PASS=0
 FAIL=0
-pass() { printf '  [PASS] %s\n' "$1"; PASS=$((PASS + 1)); }
-fail() { printf '  [FAIL] %s\n' "$1"; FAIL=$((FAIL + 1)); }
+pass() {
+  printf '  [PASS] %s\n' "$1"
+  PASS=$((PASS + 1))
+}
+fail() {
+  printf '  [FAIL] %s\n' "$1"
+  FAIL=$((FAIL + 1))
+}
 
 BEFORE="$(digest)"
 PROMPT_START="$(python3 -c 'import time; print(time.time())')"

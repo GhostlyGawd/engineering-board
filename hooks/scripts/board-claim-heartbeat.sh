@@ -30,7 +30,7 @@ fi
 
 NOW_ISO="$(python3 -c 'import datetime; print(datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))')"
 
-printf '%s\n' "${NOW_ISO}" > "${HEARTBEAT_TMP}"
+printf '%s\n' "${NOW_ISO}" >"${HEARTBEAT_TMP}"
 mv "${HEARTBEAT_TMP}" "${HEARTBEAT_FILE}"
 
 echo "heartbeat refreshed: ${ENTRY_ID} at ${NOW_ISO}"

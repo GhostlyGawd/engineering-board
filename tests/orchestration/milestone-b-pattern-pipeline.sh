@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="${1:-$(cd "$(dirname "$0")/../.." && pwd)}"
 
-python3 - "$ROOT" <<'PY'
+"${PYTHON:-python3}" - "$ROOT" <<'PY'
 import copy
 import json
 import os

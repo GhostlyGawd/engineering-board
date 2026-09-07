@@ -28,7 +28,8 @@
         "${__dirname}/mcp-server/engineering_board_mcp.py"
       ],
       "env": {
-        "CLAUDE_PROJECT_DIR": "${__dirname}"
+        "CLAUDE_PROJECT_DIR": "${__dirname}",
+        "ENGINEERING_BOARD_REQUIRE_ROOT": "1"
       }
     }
   },

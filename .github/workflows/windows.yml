@@ -1,0 +1,161 @@
+name: native-windows
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  platform:
+    name: ${{ matrix.support_row }}
+    runs-on: windows-2025
+    env:
+      ENGINEERING_BOARD_SUPPORT_ROW: ${{ matrix.support_row }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - support_row: windows-x86_64-powershell
+            native_shell: powershell
+          - support_row: windows-x86_64-cmd
+            native_shell: cmd
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Select supported Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+
+      - name: Select supported Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "26"
+
+      - name: Show native process identity
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: |
+          $PSVersionTable
+          python --version
+          node --version
+          git --version
+          python -c "import os, platform; print(os.name, platform.platform())"
+
+      - name: Exercise bootstrap contract from PowerShell
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: >-
+          python scripts/bootstrap_ci_evidence.py
+          --shell powershell
+          --output .engineering-board/validation/bootstrap/powershell.json
+
+      - name: Provision pinned development tools from PowerShell
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: python scripts/bootstrap_dev.py
+
+      - name: Exercise quality command contract from PowerShell
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: |
+          python scripts/quality_gate.py --help
+          python scripts/quality_gate.py format
+          python scripts/quality_gate.py lint
+          python scripts/quality_gate.py typecheck
+          python scripts/quality_gate.py invalid-quality-selector
+          $invalidExit = $LASTEXITCODE
+          if ($invalidExit -eq 0) {
+            throw "invalid quality selector unexpectedly passed"
+          }
+          Write-Host "invalid-selector-exit=$invalidExit"
+          $global:LASTEXITCODE = 0
+
+      - name: Validate from PowerShell
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: python scripts/platform_test.py --workers 2 --shell powershell
+
+      - name: Run compatibility journey from PowerShell
+        if: matrix.native_shell == 'powershell'
+        shell: pwsh
+        run: >-
+          python scripts/legacy_run_all.py
+          --root .
+          --portable-only
+          --report .engineering-board/validation/aggregate/powershell.json
+
+      - name: Show native process identity
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: |
+          ver
+          python --version
+          node --version
+          git --version
+          python -c "import os, platform; print(os.name, platform.platform())"
+
+      - name: Exercise bootstrap contract from cmd.exe
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: >-
+          python scripts\bootstrap_ci_evidence.py
+          --shell cmd
+          --output .engineering-board\validation\bootstrap\cmd.json
+
+      - name: Provision pinned development tools from cmd.exe
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: python scripts\bootstrap_dev.py
+
+      - name: Exercise quality command contract from cmd.exe
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: |
+          python scripts\quality_gate.py --help
+          if errorlevel 1 exit /b 1
+          python scripts\quality_gate.py format
+          if errorlevel 1 exit /b 1
+          python scripts\quality_gate.py lint
+          if errorlevel 1 exit /b 1
+          python scripts\quality_gate.py typecheck
+          if errorlevel 1 exit /b 1
+          python scripts\quality_gate.py invalid-quality-selector
+          if not errorlevel 1 exit /b 1
+          echo invalid-selector-exit=%errorlevel%
+          exit /b 0
+
+      - name: Validate from cmd.exe
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: python scripts\platform_test.py --workers 2 --shell cmd
+
+      - name: Run compatibility journey from cmd.exe
+        if: matrix.native_shell == 'cmd'
+        shell: cmd
+        run: >-
+          python scripts\legacy_run_all.py
+          --root .
+          --portable-only
+          --report .engineering-board\validation\aggregate\cmd.json
+
+      - name: Retain exact-head Windows evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: foundation-windows-evidence-${{ matrix.support_row }}
+          path: |
+            .engineering-board/validation/bootstrap/*.json
+            .engineering-board/validation/platform/*.json
+            .engineering-board/validation/aggregate/*.json
+          if-no-files-found: error
+          retention-days: 30

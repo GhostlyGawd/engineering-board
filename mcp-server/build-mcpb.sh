@@ -30,7 +30,8 @@ cp "$ROOT/LICENSE" "$STAGE/LICENSE"
 # interpreter present everywhere): sorted entry names + a fixed timestamp +
 # fixed permissions, so the same input tree always yields a byte-identical
 # bundle and therefore a stable sha256 that can be pinned in server.json.
-SHA="$(python3 - "$STAGE" "$BUNDLE" <<'PY'
+SHA="$(
+  python3 - "$STAGE" "$BUNDLE" <<'PY'
 import os, sys, zipfile, hashlib
 stage, bundle = sys.argv[1], sys.argv[2]
 paths = []

@@ -14,11 +14,17 @@ SESSION_ID="${3:?session-id required}"
 # ENTRY_ID becomes a path segment; reject traversal so a crafted id cannot
 # rm -rf outside the board (eb-self B034, defense-in-depth for direct invocation).
 case "$ENTRY_ID" in
-  */*|*'\'*|*..*) echo "invalid entry-id (no path separators or '..'): $ENTRY_ID" >&2; exit 1 ;;
+  */* | *'\'* | *..*)
+    echo "invalid entry-id (no path separators or '..'): $ENTRY_ID" >&2
+    exit 1
+    ;;
 esac
 # Reject whitespace in SESSION_ID (owner.txt round-trip self-DoS + injection; B029).
 case "$SESSION_ID" in
-  *[[:space:]]*) echo "invalid session-id (no whitespace): $SESSION_ID" >&2; exit 1 ;;
+  *[[:space:]]*)
+    echo "invalid session-id (no whitespace): $SESSION_ID" >&2
+    exit 1
+    ;;
 esac
 
 CLAIM_DIR="${BOARD_DIR}/_claims/${ENTRY_ID}"

@@ -1,0 +1,12 @@
+target-version = "py39"
+line-length = 100
+
+[lint]
+select = ["E4", "E7", "E9", "F"]
+
+[lint.per-file-ignores]
+"hooks/scripts/board-graph-build.py" = ["E402"]
+"hooks/scripts/board-intake.py" = ["E402"]
+"mcp-server/engineering_board_mcp.py" = ["E402"]
+"mcp-server/test_mcp_server.py" = ["E741", "F841"]
+"tests/bootstrap/test_bootstrap_dev.py" = ["E402"]

@@ -59,6 +59,23 @@ the entry content for the applicable HTML context.
 The controls that follow add defense in depth. They do not replace the
 untrusted-data rule.
 
+## Validate repository dependencies and automation
+
+Run `bash scripts/quality-gate.sh security` on macOS or Linux. On native
+Windows, run `python scripts/quality_gate.py security` from PowerShell or
+`python scripts\quality_gate.py security` from `cmd.exe`.
+
+The gate fails closed and reports these families separately:
+
+- the complete pinned Python dependency lock through `pip-audit`;
+- secret signatures, with detected values replaced by `<redacted>`;
+- high-confidence workflow risks through `zizmor`;
+- full-SHA action references and immutable download URLs;
+- pinned manifest, installed executable, and download checksum integrity;
+- the canonical untrusted-finding reject filter.
+
+Security checks do not rewrite dependency, workflow, or checksum manifests.
+
 ## Protect evaluation evidence
 
 The `evaluation/` harness uses sanitized repository fixtures. It does not
@@ -79,6 +96,11 @@ The harness applies these controls:
 These controls protect evaluation integrity. They do not make an unsafe live
 
 client or unsafe case data acceptable.
+
+On macOS, the harness accepts only the operating system's fixed `/var`,
+`/tmp`, and `/etc` aliases when they resolve to their matching `/private`
+locations. It still rejects a user-created symbolic-link ancestor. On Windows,
+it also rejects junction and reparse-point ancestors before creating output.
 ## Filter and sanitize a promoted finding
 
 The promotion process sends each scratch finding to the deterministic reject

@@ -63,8 +63,10 @@ assert claude_mcp == {
     "mcpServers": {
         "engineering-board": {
             "command": "node",
-            "args": ["scripts/engineering-board-mcp-launcher.mjs"],
-            "cwd": ".",
+            "args": [
+                "${CLAUDE_PLUGIN_ROOT}/scripts/engineering-board-mcp-launcher.mjs"
+            ],
+            "cwd": "${CLAUDE_PLUGIN_ROOT}",
         }
     }
 }

@@ -37,17 +37,32 @@ PAUSED_SET=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --claim-acquire) CLAIM_ACQUIRE="${2:-}"; shift 2 ;;
-    --claim-release) CLAIM_RELEASE="${2:-}"; shift 2 ;;
-    --paused)        PAUSED_SET="${2:-}";    shift 2 ;;
-    *) echo "bump: unknown flag '$1'" >&2; exit 1 ;;
+    --claim-acquire)
+      CLAIM_ACQUIRE="${2:-}"
+      shift 2
+      ;;
+    --claim-release)
+      CLAIM_RELEASE="${2:-}"
+      shift 2
+      ;;
+    --paused)
+      PAUSED_SET="${2:-}"
+      shift 2
+      ;;
+    *)
+      echo "bump: unknown flag '$1'" >&2
+      exit 1
+      ;;
   esac
 done
 
 if [ -n "$PAUSED_SET" ]; then
   case "$PAUSED_SET" in
-    true|false) ;;
-    *) echo "bump: --paused must be 'true' or 'false', got '$PAUSED_SET'" >&2; exit 1 ;;
+    true | false) ;;
+    *)
+      echo "bump: --paused must be 'true' or 'false', got '$PAUSED_SET'" >&2
+      exit 1
+      ;;
   esac
 fi
 
@@ -77,7 +92,10 @@ while ! mkdir "$LOCK_DIR" 2>/dev/null; do
   sleep 0.1
 done
 
-cleanup_lock() { rmdir "$LOCK_DIR" 2>/dev/null || true; rm -f "$TMP" 2>/dev/null || true; }
+cleanup_lock() {
+  rmdir "$LOCK_DIR" 2>/dev/null || true
+  rm -f "$TMP" 2>/dev/null || true
+}
 trap cleanup_lock EXIT
 
 python3 - "$REGISTRY" "$TMP" "$SESSION_ID" "$NOW_ISO" "$CLAIM_ACQUIRE" "$CLAIM_RELEASE" "$PAUSED_SET" <<'PY'

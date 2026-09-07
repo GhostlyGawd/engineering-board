@@ -11,15 +11,17 @@
 #   bash board-view.sh [project] [--stdout]
 #     project   optional; when omitted, renders every board the router resolves.
 #     --stdout  print HTML to stdout instead of writing board.html.
+#     --link-base <https-url/>  prefix canonical relative source paths.
+#     --stamp --revision <sha>  add one explicit full 40-character revision.
 #   bash board-view.sh --demo-dir <run-dir> [--stdout]
 #     render the contained pattern-intelligence demo to pattern-intelligence.html.
 #
-# Exit codes: 0 ok; 1 no board layout / bad args.
+# Exit codes: 0 ok; 2 usage or unsafe option; 3 required input unavailable.
 set -euo pipefail
 
 if [ -z "${CLAUDE_PROJECT_DIR:-}" ]; then
-  echo "board-view: CLAUDE_PROJECT_DIR not set" >&2
-  exit 1
+  echo "board-view: E_REQUIRED_INPUT CLAUDE_PROJECT_DIR is not set; run from a repository root" >&2
+  exit 3
 fi
 
 EB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -31,30 +33,78 @@ PROJECT_FILTER=""
 TO_STDOUT=0
 STAMP=0
 LINK_BASE="${EB_VIEW_LINK_BASE:-}"
-EXPECT_LINK_BASE=0
 DEMO_DIR=""
-EXPECT_DEMO_DIR=0
-for arg in "$@"; do
-  if [ "${EXPECT_LINK_BASE}" -eq 1 ]; then
-    LINK_BASE="${arg}"; EXPECT_LINK_BASE=0; continue
-  fi
-  if [ "${EXPECT_DEMO_DIR}" -eq 1 ]; then
-    DEMO_DIR="${arg}"; EXPECT_DEMO_DIR=0; continue
-  fi
-  case "${arg}" in
+REVISION=""
+
+usage_error() {
+  printf 'board-view: E_USAGE %s; see /board-view help\n' "$1" >&2
+  exit 2
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
     --stdout) TO_STDOUT=1 ;;
-    --stamp) STAMP=1 ;;                    # opt-in freshness footer (breaks byte-determinism deliberately)
-    --link-base) EXPECT_LINK_BASE=1 ;;     # href prefix for entry cards (e.g. a GitHub blob URL)
-    --demo-dir) EXPECT_DEMO_DIR=1 ;;
-    --*) echo "board-view: unknown flag ${arg}" >&2; exit 1 ;;
-    *) PROJECT_FILTER="${arg}" ;;
+    --stamp) STAMP=1 ;;
+    --link-base)
+      shift
+      [ "$#" -gt 0 ] || usage_error "--link-base requires an HTTPS or loopback HTTP URL ending in /"
+      LINK_BASE="$1"
+      ;;
+    --revision)
+      shift
+      [ "$#" -gt 0 ] || usage_error "--revision requires a full 40-character lowercase Git SHA"
+      REVISION="$1"
+      ;;
+    --demo-dir)
+      shift
+      [ "$#" -gt 0 ] || usage_error "--demo-dir requires a path"
+      DEMO_DIR="$1"
+      ;;
+    --*) usage_error "unknown flag $1" ;;
+    *)
+      [ -z "${PROJECT_FILTER}" ] || usage_error "only one project may be selected"
+      PROJECT_FILTER="$1"
+      ;;
   esac
+  shift
 done
 export EB_VIEW_LINK_BASE="${LINK_BASE}"
 
-if [ "${EXPECT_DEMO_DIR}" -eq 1 ]; then
-  echo "board-view: --demo-dir requires a path" >&2
-  exit 1
+if [ -n "${LINK_BASE}" ]; then
+  if ! python3 - "${LINK_BASE}" <<'PY'; then
+import sys
+from urllib.parse import urlsplit
+
+value = sys.argv[1]
+parsed = urlsplit(value)
+safe_loopback = parsed.scheme == "http" and parsed.hostname == "127.0.0.1"
+safe_https = parsed.scheme == "https" and bool(parsed.hostname)
+valid = (
+    (safe_loopback or safe_https)
+    and parsed.username is None
+    and parsed.password is None
+    and not parsed.query
+    and not parsed.fragment
+    and value.endswith("/")
+    and not any(ord(char) < 32 for char in value)
+)
+raise SystemExit(0 if valid else 1)
+PY
+    echo "board-view: E_LINK_BASE use an HTTPS or 127.0.0.1 HTTP URL ending in /; unsafe link base refused" >&2
+    exit 2
+  fi
+fi
+
+if [ "${STAMP}" -eq 1 ]; then
+  case "${REVISION}" in
+    [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;;
+    *)
+      echo "board-view: E_REVISION --stamp requires --revision with a full 40-character lowercase Git SHA" >&2
+      exit 2
+      ;;
+  esac
+elif [ -n "${REVISION}" ]; then
+  usage_error "--revision is valid only with --stamp"
 fi
 
 render_demo() {
@@ -223,14 +273,14 @@ PY
 
 if [ -n "${DEMO_DIR}" ]; then
   if [ ! -d "${DEMO_DIR}" ]; then
-    echo "board-view: demo directory not found: ${DEMO_DIR}" >&2
-    exit 1
+    echo "board-view: E_REQUIRED_INPUT demo directory is unavailable; recreate the contained demo run" >&2
+    exit 3
   fi
   DEMO_DOC="$(render_demo "${DEMO_DIR}")"
   if [ "${TO_STDOUT}" -eq 1 ]; then
     printf '%s\n' "${DEMO_DOC}"
   else
-    printf '%s\n' "${DEMO_DOC}" > "${DEMO_DIR}/pattern-intelligence.html"
+    printf '%s\n' "${DEMO_DOC}" >"${DEMO_DIR}/pattern-intelligence.html"
     echo "board-view: wrote ${DEMO_DIR}/pattern-intelligence.html"
   fi
   exit 0
@@ -243,9 +293,26 @@ while IFS= read -r line; do
   ROWS+=("${line}")
 done < <(eb_board_rows)
 if [ ${#ROWS[@]} -eq 0 ]; then
-  echo "board-view: no board layout found; run /board-init first" >&2
-  exit 1
+  echo "board-view: E_REQUIRED_INPUT no board layout found; run /board-init first" >&2
+  exit 3
 fi
+
+validate_board_dir() {
+  python3 - "${CLAUDE_PROJECT_DIR}" "$1" <<'PY'
+import os
+import sys
+
+root = os.path.realpath(sys.argv[1])
+board = os.path.realpath(sys.argv[2])
+try:
+    contained = os.path.commonpath([root, board]) == root
+except ValueError:
+    contained = False
+required = os.path.join(board, "BOARD.md")
+valid = contained and os.path.isdir(board) and os.path.isfile(required) and os.access(required, os.R_OK)
+raise SystemExit(0 if valid else 1)
+PY
+}
 
 render_one() {
   # render_one <label> <board-dir>  -> HTML on stdout
@@ -327,8 +394,35 @@ LEARNINGS.sort(key=lambda e: (
     e.get("id", ""),
 ))
 
+def clean_text(value):
+    text = str(value or "")
+    return "".join(
+        char if char in "\t\n\r" or ord(char) >= 32 else "\ufffd"
+        for char in text
+    )
+
 def esc(s):
-    return html.escape(str(s or ""))
+    return html.escape(clean_text(s), quote=True)
+
+def safe_source(source):
+    value = clean_text(source).strip().replace("\\", "/")
+    parts = value.split("/")
+    if (
+        not value
+        or value.startswith("/")
+        or any(part in {"", ".", ".."} for part in parts)
+        or any(ord(char) < 32 for char in value)
+        or parts[0] not in {
+            "bugs", "features", "questions", "observations", "learnings", "hypotheses"
+        }
+        or not parts[-1].endswith(".md")
+    ):
+        return ""
+    return LINK_BASE + value
+
+def bounded(value, maximum=200):
+    text = clean_text(value)
+    return text if len(text) <= maximum else text[:maximum] + "…"
 
 def intelligence_panel_html():
     try:
@@ -338,12 +432,12 @@ def intelligence_panel_html():
         insights = build_insights(Path(board_dir), label, limit=5)
         value_report = build_value_report(Path(board_dir), label)
         registry = load_hypothesis_registry(Path(board_dir))
-    except Exception as exc:
+    except Exception:
         return (
             '<section class="intel"><div class="intel-head">'
             '<div><span class="eyebrow">Pattern intelligence</span>'
             '<h2>Analysis unavailable</h2></div></div>'
-            f'<p class="intel-error">{esc(exc)}</p></section>'
+            '<p class="intel-error">Pattern analysis is unavailable.</p></section>'
         )
     clusters = insights.get("ranked_clusters", [])
     records = registry.get("by_id", {})
@@ -353,15 +447,19 @@ def intelligence_panel_html():
         component_html = "".join(
             f'<li><span>{esc(name.replace("_", " "))}</span>'
             f'<strong>{esc(value)}</strong></li>'
-            for name, value in components.items()
+            for name, value in sorted(components.items())
         )
         member_html = "".join(
-            f'<a class="intel-member" href="{esc(LINK_BASE + cluster.get("member_sources", {}).get(member, ""))}">'
-            f'{esc(member)}</a>'
-            for member in cluster.get("members", [])
+            (
+                f'<a class="intel-member" href="{esc(safe_source(cluster.get("member_sources", {}).get(member, "")))}">'
+                f'{esc(member)}</a>'
+                if safe_source(cluster.get("member_sources", {}).get(member, ""))
+                else f'<span class="intel-member">{esc(member)}</span>'
+            )
+            for member in sorted(cluster.get("members", []))
         )
         hypothesis_html = []
-        for ref in cluster.get("hypothesis_refs", []):
+        for ref in sorted(cluster.get("hypothesis_refs", []), key=lambda item: str(item.get("id", ""))):
             record = records.get(ref.get("id"), {})
             frontmatter = record.get("frontmatter", {})
             sections = record.get("sections", {})
@@ -388,8 +486,13 @@ def intelligence_panel_html():
             )
             hypothesis_html.append(
                 f'<article class="hypothesis-card state-{esc(state)}">'
-                f'<div class="hypothesis-top"><a class="cid" href="{esc(LINK_BASE + source)}">'
-                f'{esc(ref.get("id"))}</a><span class="hstate">{esc(state)}</span>'
+                f'<div class="hypothesis-top">'
+                + (
+                    f'<a class="cid" href="{esc(safe_source(source))}">{esc(ref.get("id"))}</a>'
+                    if safe_source(source)
+                    else f'<span class="cid">{esc(ref.get("id"))}</span>'
+                )
+                + f'<span class="hstate">{esc(state)}</span>'
                 f'{stale_badge}{outcome_badge}</div>'
                 f'<h4>{esc(frontmatter.get("title"))}</h4>'
                 f'<p>{esc(sections.get("Proposed root cause"))}</p>'
@@ -412,8 +515,8 @@ def intelligence_panel_html():
             f'<div class="cluster-score"><strong>{esc(cluster.get("score"))}</strong>'
             '<span>investigation priority</span></div></div>'
             f'<div class="intel-members">{member_html}</div>'
-            f'<p class="cluster-meta">patterns: {esc(", ".join(cluster.get("patterns", [])))}'
-            f' · domains: {esc(", ".join(cluster.get("affected_domains", [])))}</p>'
+            f'<p class="cluster-meta">patterns: {esc(", ".join(sorted(cluster.get("patterns", []))))}'
+            f' · domains: {esc(", ".join(sorted(cluster.get("affected_domains", []))))}</p>'
             f'<ul class="score-components">{component_html}</ul>'
             f'<div class="hypotheses">{hypotheses}</div>'
             '</article>'
@@ -421,7 +524,7 @@ def intelligence_panel_html():
     body = (
         "".join(cluster_cards)
         if cluster_cards
-        else '<p class="intel-empty">No multi-entry clusters are present.</p>'
+        else '<p class="intel-empty">Pattern analysis is unavailable.</p>'
     )
     return (
         '<section class="intel"><div class="intel-head"><div>'
@@ -621,8 +724,11 @@ def coordination_panel_html():
                         break
         except Exception:
             pass
-        owner_html = f' — <code>{esc(owner)}</code>' if owner else ""
-        claim_rows.append(f'<li><span class="cid">{esc(name)}</span>{owner_html}</li>')
+        if owner:
+            owner_html = f' — <code>{esc(bounded(owner))}</code>'
+            claim_rows.append(
+                f'<li><span class="cid">{esc(bounded(name))}</span>{owner_html}</li>'
+            )
 
     reclaim_rows = []
     try:
@@ -640,11 +746,11 @@ def coordination_panel_html():
             rec = json.loads(ln)
         except Exception:
             continue  # malformed lines are skipped, never fatal
-        if isinstance(rec, dict):
+        if isinstance(rec, dict) and rec.get("entry_id") and rec.get("reclaimed_at"):
             parsed.append(rec)
     for rec in parsed[-5:]:
-        eid = str(rec.get("entry_id", "") or "?")
-        at = str(rec.get("reclaimed_at", "") or "")
+        eid = bounded(rec.get("entry_id", "") or "?")
+        at = bounded(rec.get("reclaimed_at", ""))
         reclaim_rows.append(f'<li class="reclaim">{esc(eid)} · {esc(at)}</li>')
 
     worker_rows = []
@@ -657,12 +763,18 @@ def coordination_panel_html():
             data = []
     except Exception:
         data = []
-    for w in data:
-        if not isinstance(w, dict):
-            continue
-        mode = str(w.get("mode", "") or "?")
-        disc = str(w.get("discipline") or "").strip()
-        sid = str(w.get("session_id", "") or "")[:12]
+    workers = sorted(
+        (w for w in data if isinstance(w, dict)),
+        key=lambda item: (
+            str(item.get("mode", "")),
+            str(item.get("discipline", "")),
+            str(item.get("session_id", "")),
+        ),
+    )[:20]
+    for w in workers:
+        mode = bounded(w.get("mode", "") or "?", 40)
+        disc = bounded(w.get("discipline") or "", 40).strip()
+        sid = bounded(w.get("session_id", "") or "", 12)
         label_w = mode + (f" · {disc}" if disc else "")
         worker_rows.append(f'<li><span class="kind">{esc(label_w)}</span> <code>{esc(sid)}</code></li>')
 
@@ -682,11 +794,17 @@ panels_html = f'<div class="panels">{stats_panel_html()}{coordination_panel_html
 intelligence_html = intelligence_panel_html()
 
 open_ct = sum(1 for e in entries if e["_sub"] in ("bugs", "features") and e.get("status") != "resolved")
+empty_html = (
+    '<p class="board-empty">No canonical entries are available.</p>'
+    if not entries
+    else ""
+)
 sys.stdout.write(
     f'<section class="board">'
     f'<div class="board-head"><h1>{esc(label)}</h1>'
     f'<span class="summary">{open_ct} open · {len(entries)} total</span></div>'
     f'{intelligence_html}'
+    f'{empty_html}'
     f'<div class="cols">{"".join(cols_html)}</div>'
     f'<div class="no-match" hidden>No entries match the current search and filters.</div>'
     f'{learn_html}'
@@ -704,13 +822,16 @@ for row in "${ROWS[@]}"; do
   if [ -n "${PROJECT_FILTER}" ] && [ "${label}" != "${PROJECT_FILTER}" ]; then
     continue
   fi
-  [ -d "${path}" ] || continue
+  if ! validate_board_dir "${path}"; then
+    echo "board-view: E_REQUIRED_INPUT selected board is missing, unreadable, or outside the repository; run /board-rebuild after repairing BOARD-ROUTER.md" >&2
+    exit 3
+  fi
   BODY="${BODY}$(render_one "${label}" "${path}")"
 done
 
 if [ -z "${BODY}" ]; then
-  echo "board-view: no matching board for '${PROJECT_FILTER}'" >&2
-  exit 1
+  echo "board-view: E_REQUIRED_INPUT no matching board for '${PROJECT_FILTER}'; choose a project listed in BOARD-ROUTER.md" >&2
+  exit 3
 fi
 
 # Assemble the full self-contained document (brand tokens inlined; light + dark).
@@ -968,10 +1089,7 @@ HTML
 
 STAMP_LINE=""
 if [ "${STAMP}" -eq 1 ]; then
-  # Opt-in freshness stamp (deliberately not default: default output stays
-  # byte-deterministic and safe to commit without churn).
-  GIT_SHA="$(git -C "${CLAUDE_PROJECT_DIR}" rev-parse --short HEAD 2>/dev/null || echo "unknown")"
-  STAMP_LINE=" Generated from <code>${GIT_SHA}</code>."
+  STAMP_LINE=" Generated from <code>${REVISION}</code>."
 fi
 FOOT="<footer>Generated by <code>/board-view</code> — a committed, offline projection of the board.${STAMP_LINE} The board is the database.</footer>
 ${SCRIPT}
@@ -994,6 +1112,14 @@ else
       [ "${row%%$'\t'*}" = "${PROJECT_FILTER}" ] && OUT_DIR="${row#*$'\t'}"
     done
   fi
-  printf '%s\n' "${DOC}" > "${OUT_DIR}/board.html"
+  TMP_OUTPUT="$(mktemp "${OUT_DIR}/.board.html.tmp.XXXXXX")"
+  cleanup_output() {
+    rm -f "${TMP_OUTPUT}"
+  }
+  trap cleanup_output EXIT
+  printf '%s\n' "${DOC}" >"${TMP_OUTPUT}"
+  chmod 0644 "${TMP_OUTPUT}"
+  mv "${TMP_OUTPUT}" "${OUT_DIR}/board.html"
+  trap - EXIT
   echo "board-view: wrote ${OUT_DIR}/board.html"
 fi

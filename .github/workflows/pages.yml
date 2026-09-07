@@ -1,31 +1,15 @@
 name: pages
 
-# Publishes the landing page by syncing docs/{index.html,assets,.nojekyll,llms.txt}
-# to the gh-pages branch, which GitHub Pages serves (branch-deploy mode —
-# the site auto-enabled when gh-pages was first pushed). Also publishes the
-# committed eb-self board view as /board.html — the live public roadmap
-# (IMPROVEMENTS.md #3): every /board-view refresh merged to main updates it.
-#
-# Why not actions/deploy-pages? The workflow GITHUB_TOKEN on this repo cannot
-# create or manage the Pages site via the API ("Resource not accessible by
-# integration", run 28713202716), but it CAN push branches (contents: write).
-# Branch-deploy needs no special Pages permissions and keeps docs/ on main as
-# the single source of truth.
+# Pages publication is an explicit protected-main operation. The job renders
+# eb-self from canonical Markdown at the checked-out source SHA, then advances
+# the existing gh-pages history without force-pushing it. The generated board
+# is never trusted from a different revision.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "docs/index.html"
-      - "docs/assets/**"
-      - "docs/.nojekyll"
-      - "docs/llms.txt"
-      - "engineering-board/eb-self/board.html"
-      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: pages
@@ -33,24 +17,39 @@ concurrency:
 
 jobs:
   publish:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: https://ghostlygawd.github.io/engineering-board/
+    permissions:
+      contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Publish docs/ to gh-pages
+      - name: Generate canonical Pages site
         run: |
           set -euo pipefail
-          SHA=$(git rev-parse --short HEAD)
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          test "${SOURCE_SHA}" = "${GITHUB_SHA}"
           SITE=$(mktemp -d)
           cp -r docs/index.html docs/assets docs/.nojekyll docs/llms.txt "$SITE"/
-          cp engineering-board/eb-self/board.html "$SITE"/board.html
+          CLAUDE_PROJECT_DIR="${GITHUB_WORKSPACE}" \
+            bash hooks/scripts/board-view.sh eb-self --stdout \
+              --stamp --revision "${SOURCE_SHA}" \
+              --link-base "https://github.com/GhostlyGawd/engineering-board/blob/${SOURCE_SHA}/engineering-board/eb-self/" \
+              >"${SITE}/board.html"
+          BOARD_SHA256="$(sha256sum "${SITE}/board.html" | cut -d' ' -f1)"
+          printf 'pages-provenance source_sha=%s board_sha256=%s\n' \
+            "${SOURCE_SHA}" "${BOARD_SHA256}"
+
+          git fetch --no-tags origin gh-pages
+          git checkout -B gh-pages origin/gh-pages
+          git rm -rfq --ignore-unmatch .
+          cp -r "${SITE}"/. .
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan gh-pages
-          git rm -rfq .
-          git clean -fdq
-          cp -r "$SITE"/. .
           git add -A
-          git commit -m "pages: publish docs/ from main@${SHA}"
-          git push origin +gh-pages
+          git commit -m "pages: publish protected main@${SOURCE_SHA}"
+          git push origin HEAD:gh-pages

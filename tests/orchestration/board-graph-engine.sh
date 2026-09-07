@@ -10,8 +10,14 @@ trap 'rm -rf "$TMP"' EXIT
 PASS=0
 FAIL=0
 
-pass() { printf "  [PASS] %s\n" "$1"; PASS=$((PASS + 1)); }
-fail() { printf "  [FAIL] %s\n" "$1"; FAIL=$((FAIL + 1)); }
+pass() {
+  printf "  [PASS] %s\n" "$1"
+  PASS=$((PASS + 1))
+}
+fail() {
+  printf "  [FAIL] %s\n" "$1"
+  FAIL=$((FAIL + 1))
+}
 
 python3 "$ENGINE" \
   --board-dir "$FIXTURE" \
@@ -34,9 +40,9 @@ assert c[0]["patterns"] == ["duplicated-state-contract"]
 assert c[0]["density"] == 1.0
 PY
 
-cmp -s "$TMP/GRAPH.yml" "$TMP/graph.json" \
-  && pass "GRAPH.yml is dependency-free JSON-compatible YAML" \
-  || fail "GRAPH.yml/json logical source diverged"
+cmp -s "$TMP/GRAPH.yml" "$TMP/graph.json" &&
+  pass "GRAPH.yml is dependency-free JSON-compatible YAML" ||
+  fail "GRAPH.yml/json logical source diverged"
 
 FIRST="$(sha256sum "$TMP/GRAPH.yml" | awk '{print $1}')"
 python3 "$ENGINE" \
@@ -51,7 +57,7 @@ SECOND="$(sha256sum "$TMP/GRAPH.yml" | awk '{print $1}')"
 make_entry() {
   local dir="$1" id="$2" pattern="$3" affects="$4"
   mkdir -p "$dir/bugs"
-  cat > "$dir/bugs/$id.md" <<EOF
+  cat >"$dir/bugs/$id.md" <<EOF
 ---
 id: $id
 type: bug
@@ -98,7 +104,7 @@ PY
 
 BAD="$TMP/malformed"
 mkdir -p "$BAD/bugs"
-cat > "$BAD/bugs/missing-id.md" <<'EOF'
+cat >"$BAD/bugs/missing-id.md" <<'EOF'
 ---
 type: bug
 title: Missing id
@@ -108,8 +114,8 @@ EOF
 RC=0
 python3 "$ENGINE" --board-dir "$BAD" --project malformed \
   --output "$TMP/should-not-exist.yml" 2>"$TMP/error.json" || RC=$?
-if [ "$RC" -eq 2 ] && grep -q "missing required field(s): id" "$TMP/error.json" \
-  && [ ! -e "$TMP/should-not-exist.yml" ]; then
+if [ "$RC" -eq 2 ] && grep -q "missing required field(s): id" "$TMP/error.json" &&
+  [ ! -e "$TMP/should-not-exist.yml" ]; then
   pass "malformed input fails explicitly with no partial graph"
 else
   fail "malformed input boundary"

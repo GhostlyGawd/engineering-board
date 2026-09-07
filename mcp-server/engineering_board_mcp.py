@@ -61,6 +61,7 @@ from engineering_board_core import (
 
 PROTOCOL_VERSION = "2025-06-18"
 SERVER_NAME = "engineering-board"
+MAX_MESSAGE_BYTES = 1024 * 1024
 
 # Directory of this script and the repository or plugin root.
 SCRIPT_DIR = MODULE_DIR
@@ -128,17 +129,62 @@ def today_utc():
 def resolve_root(params):
     """Resolve the repo root: explicit arg > $CLAUDE_PROJECT_DIR > cwd."""
     root = params.get("root")
-    if root:
-        return os.path.abspath(os.path.expanduser(root))
-    env = os.environ.get("CLAUDE_PROJECT_DIR")
-    if env:
-        return os.path.abspath(env)
-    if os.environ.get("ENGINEERING_BOARD_REQUIRE_ROOT") == "1":
+    require_explicit = os.environ.get("ENGINEERING_BOARD_REQUIRE_ROOT") == "1"
+    if root is not None and not isinstance(root, str):
+        raise ToolError("root must be a string")
+    if root and require_explicit and not os.path.isabs(os.path.expanduser(root)):
+        raise ToolError("root must be an absolute path for bundled plugin calls")
+    if not root and require_explicit:
         raise ToolError(
             "missing required argument: root (the bundled plugin cannot infer "
             "the active repository)"
         )
-    return os.path.abspath(os.getcwd())
+    selected = root or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+    selected = os.path.realpath(os.path.abspath(os.path.expanduser(selected)))
+    if not os.path.exists(selected):
+        raise ToolError("repository root does not exist: %s" % selected)
+    if not os.path.isdir(selected):
+        raise ToolError("repository root is not a directory: %s" % selected)
+    return selected
+
+
+def _contained_path(root, target, label):
+    """Return target when its resolved identity stays below the selected root."""
+    root_real = os.path.realpath(root)
+    target_real = os.path.realpath(target)
+    try:
+        contained = os.path.commonpath([root_real, target_real]) == root_real
+    except ValueError:
+        contained = False
+    if not contained:
+        raise ToolError("%s escapes repository root: %r" % (label, target))
+    return target
+
+
+def _repository_relative_path(root, value, label, *, allow_root=False):
+    """Validate a repository-relative path signal and existing link identity."""
+    if not isinstance(value, str):
+        raise ToolError("%s must be a string" % label)
+    text = value.replace("\\", "/").strip()
+    if not text or any(character in text for character in "\r\n\x00|"):
+        raise ToolError("%s must be one repository-relative path" % label)
+    if text.startswith("/") or re.match(r"^[A-Za-z]:", text):
+        raise ToolError("%s must be repository-relative" % label)
+    parts = [part for part in text.split("/") if part not in {"", "."}]
+    if not parts:
+        if allow_root:
+            return "."
+        raise ToolError("%s contains an unsafe path" % label)
+    if any(part == ".." for part in parts):
+        raise ToolError("%s contains an unsafe path" % label)
+    normalized = "/".join(parts)
+    _contained_path(root, os.path.join(root, *parts), label)
+    return normalized + ("/" if text.endswith("/") else "")
+
+
+def _repository_relative_paths(root, values, label):
+    """Validate several repository-relative path signals."""
+    return [_repository_relative_path(root, value, label) for value in values]
 
 
 def slugify(title):
@@ -167,7 +213,7 @@ def atomic_write(path, content):
     for this run). os.replace also replaces a symlink at `path` rather than
     writing through it."""
     tmp = "%s.tmp.%d" % (path, os.getpid())
-    with open(tmp, "w", encoding="utf-8") as f:
+    with open(tmp, "w", encoding="utf-8", newline="\n") as f:
         f.write(content)
     os.replace(tmp, path)
 
@@ -203,7 +249,7 @@ def router_path(root):
     for rel in ("engineering-board/BOARD-ROUTER.md", "docs/boards/BOARD-ROUTER.md"):
         p = os.path.join(root, rel)
         if os.path.isfile(p):
-            return p
+            return _contained_path(root, p, "router path")
     return None
 
 
@@ -223,11 +269,16 @@ def parse_router(root):
                 continue
             if cells[0].lower() == "project" or set(cells[0]) <= set("-: "):
                 continue
-            rows.append({
-                "project": cells[0],
-                "path": cells[1],
-                "affects": cells[2] if len(cells) > 2 else "",
-            })
+            affects = cells[2] if len(cells) > 2 else ""
+            if affects:
+                affects = _repository_relative_path(root, affects, "router affects prefix")
+            rows.append(
+                {
+                    "project": cells[0],
+                    "path": cells[1],
+                    "affects": affects,
+                }
+            )
     return rows
 
 
@@ -248,7 +299,8 @@ def validate_project(project):
     if not _SAFE_PROJECT_RE.match(project) or ".." in project:
         raise ToolError(
             "invalid project name %r: use letters, digits, '.', '_', '-' only "
-            "(no path separators, no '..', no leading '~' or '.')" % project)
+            "(no path separators, no '..', no leading '~' or '.')" % project
+        )
     return project
 
 
@@ -267,7 +319,8 @@ def validate_entry_id(entry_id):
     if not _SAFE_ENTRY_RE.match(entry_id) or ".." in entry_id:
         raise ToolError(
             "invalid entry_id %r: use letters, digits, '.', '_', '-' only "
-            "(no path separators, no '..')" % entry_id)
+            "(no path separators, no '..')" % entry_id
+        )
     return entry_id
 
 
@@ -292,12 +345,13 @@ def resolve_board_row(root, row):
     rows; a hand-edited `path` column could point outside the repo (eb-self B035).
     This mirrors the containment `board_dir_for` enforces so those tools can't be
     made to read or overwrite files outside root."""
-    bd = os.path.join(root, row["path"])
-    root_real = os.path.realpath(root)
-    bd_real = os.path.realpath(bd)
-    if bd_real != root_real and not bd_real.startswith(root_real + os.sep):
-        raise ToolError("router row for %r escapes root: %r" % (row.get("project"), row["path"]))
-    return bd
+    path = row.get("path")
+    if not isinstance(path, str) or not path.strip():
+        raise ToolError("router row for %r has no board path" % row.get("project"))
+    if os.path.isabs(path) or ".." in Path(path.replace("\\", "/")).parts:
+        raise ToolError("router row for %r has an unsafe path: %r" % (row.get("project"), path))
+    bd = os.path.join(root, path)
+    return _contained_path(root, bd, "router row for %r" % row.get("project"))
 
 
 def board_dir_for(root, project):
@@ -311,19 +365,29 @@ def board_dir_for(root, project):
             break
     if bd is None:
         bd = os.path.join(root, "engineering-board", project)
-    # Defense in depth: even a tampered router row must not escape the root.
-    root_real = os.path.realpath(root)
-    bd_real = os.path.realpath(bd)
-    if bd_real != root_real and not bd_real.startswith(root_real + os.sep):
-        raise ToolError("resolved board dir escapes root: %r" % bd)
-    return bd
+    return _contained_path(root, bd, "resolved board directory")
 
 
 def ensure_board_exists(root, project):
     bd = board_dir_for(root, project)
     if not os.path.isdir(bd):
-        raise ToolError(
-            "no board for project %r under %s — run board_init first" % (project, root))
+        raise ToolError("no board for project %r under %s — run board_init first" % (project, root))
+    for relative in [
+        "BOARD.md",
+        "ARCHIVE.md",
+        "bugs",
+        "features",
+        "questions",
+        "observations",
+        "learnings",
+        "hypotheses",
+        "patterns",
+        "_sessions",
+        "_claims",
+    ]:
+        target = os.path.join(bd, relative)
+        if os.path.lexists(target):
+            _contained_path(root, target, "board path")
     return bd
 
 
@@ -355,7 +419,7 @@ def parse_frontmatter(text):
         key = key.strip()
         val = val.strip()
         fm[key] = _parse_scalar(val)
-    body = "\n".join(lines[end + 1:])
+    body = "\n".join(lines[end + 1 :])
     return fm, body
 
 
@@ -409,14 +473,16 @@ def serialize_frontmatter(fields):
 # ---------------------------------------------------------------------------
 def iter_entry_files(board_dir, subdirs=None):
     """Yield (subdir, filename, fullpath) for entry .md files, sorted."""
-    for sub in (subdirs or SUBDIRS):
+    for sub in subdirs or SUBDIRS:
         d = os.path.join(board_dir, sub)
         if not os.path.isdir(d):
             continue
         for fname in sorted(os.listdir(d)):
             if not fname.endswith(".md") or fname.startswith("."):
                 continue
-            yield sub, fname, os.path.join(d, fname)
+            path = os.path.join(d, fname)
+            _contained_path(board_dir, path, "entry path")
+            yield sub, fname, path
 
 
 def load_entries(board_dir, subdirs=None):
@@ -474,8 +540,7 @@ def compute_ready(entries):
             dangling.append({"entry": e.get("id", ""), "missing": missing})
         if status != "open":
             continue  # in_progress / blocked / no-status entries are never ready
-        if all(by_id[b].get("status") == "resolved"
-               for b in blockers if b in by_id):
+        if all(by_id[b].get("status") == "resolved" for b in blockers if b in by_id):
             ready.append(e.get("id", ""))
     return sorted(ready), sorted(dangling, key=lambda w: w["entry"])
 
@@ -524,10 +589,7 @@ BOARD_SKELETON = (
     "- Order within each section: P0 → P1 → P2 → P3 → unranked\n"
 )
 
-ARCHIVE_SKELETON = (
-    "# {project} — Archive\n\n"
-    "Resolved entries. Newest at the top.\n"
-)
+ARCHIVE_SKELETON = "# {project} — Archive\n\nResolved entries. Newest at the top.\n"
 
 # C8: marker-fenced AGENTS.md block. board_init writes/updates ONLY what sits
 # between the markers; content outside them is never touched. The block tells
@@ -555,7 +617,8 @@ AGENTS_MD_BLOCK = (
     "- When done: `board_update_entry` to the new status, then `board_release`.\n"
     "\n"
     "Read one entry with `board_get_entry`; get an overview with `board_status`.\n"
-    + AGENTS_MD_END + "\n"
+    + AGENTS_MD_END
+    + "\n"
 )
 
 
@@ -572,8 +635,7 @@ def upsert_agents_md(root):
     start = text.find(AGENTS_MD_START)
     end = text.find(AGENTS_MD_END)
     if start != -1 and end != -1 and end >= start:
-        new = (text[:start] + AGENTS_MD_BLOCK.rstrip("\n")
-               + text[end + len(AGENTS_MD_END):])
+        new = text[:start] + AGENTS_MD_BLOCK.rstrip("\n") + text[end + len(AGENTS_MD_END) :]
     else:
         new = text.rstrip("\n") + "\n\n" + AGENTS_MD_BLOCK
     if new == text:
@@ -585,27 +647,30 @@ def upsert_agents_md(root):
 def tool_board_init(params):
     project = validate_project(require(params, "project"))
     root = resolve_root(params)
-    # affects_prefix is written into the BOARD-ROUTER.md table; flatten newlines
-    # and neutralize the `|` column separator so it can't inject a router row
-    # (eb-self B038) — the control file every bulk tool reads.
-    affects_prefix = _oneline(params.get("affects_prefix") or ("%s/" % project)).replace("|", "/")
+    affects_prefix = _repository_relative_path(
+        root,
+        params.get("affects_prefix") or ("%s/" % project),
+        "affects_prefix",
+    )
 
     created = []
     existed = []
 
     eb_dir = os.path.join(root, "engineering-board")
-    os.makedirs(eb_dir, exist_ok=True)
-
-    # board_init is the only path-writing tool; apply the same realpath
-    # containment the read/bulk tools use so a symlinked engineering-board/ or
-    # engineering-board/<project> can't relocate the scaffold outside root
-    # (eb-self B039).
     bd = os.path.join(eb_dir, project)
-    root_real = os.path.realpath(root)
-    for target in (eb_dir, bd):
-        tgt_real = os.path.realpath(target)
-        if tgt_real != root_real and not tgt_real.startswith(root_real + os.sep):
-            raise ToolError("board path escapes root (symlink?): %r" % target)
+    targets = [
+        eb_dir,
+        bd,
+        os.path.join(eb_dir, "BOARD-ROUTER.md"),
+        os.path.join(bd, "BOARD.md"),
+        os.path.join(bd, "ARCHIVE.md"),
+    ]
+    targets.extend(os.path.join(bd, sub, ".gitkeep") for sub in SCAFFOLD_SUBDIRS)
+    if params.get("agents_md", True):
+        targets.append(os.path.join(root, "AGENTS.md"))
+    for target in targets:
+        _contained_path(root, target, "board_init target")
+    os.makedirs(eb_dir, exist_ok=True)
 
     # Router
     rp = os.path.join(eb_dir, "BOARD-ROUTER.md")
@@ -678,13 +743,18 @@ def tool_board_init(params):
 def tool_board_list_projects(params):
     root = resolve_root(params)
     rows = parse_router(root)
-    projects = [{
-        "id": r["project"],
-        "path": r["path"],
-        "affects_prefix": r["affects"],
-    } for r in rows]
-    return {"router": os.path.relpath(router_path(root), root) if router_path(root) else None,
-            "projects": projects}
+    projects = [
+        {
+            "id": r["project"],
+            "path": r["path"],
+            "affects_prefix": r["affects"],
+        }
+        for r in rows
+    ]
+    return {
+        "router": os.path.relpath(router_path(root), root) if router_path(root) else None,
+        "projects": projects,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -720,21 +790,16 @@ def tool_board_create_entry(params):
     filename = "%s-%s.md" % (eid, slug)
     sub = TYPE_SUBDIR[entry_type]
     path = os.path.join(bd, sub, filename)
+    _contained_path(root, path, "entry target")
+    _contained_path(root, os.path.join(bd, "BOARD.md"), "board index target")
 
-    fields = [("id", eid), ("type", entry_type), ("title", title),
-              ("discovered", discovered)]
+    fields = [("id", eid), ("type", entry_type), ("title", title), ("discovered", discovered)]
     body = ""
     pattern = params.get("pattern")
     pattern_ids = params.get("pattern_ids")
-    pattern_values = (
-        pattern if isinstance(pattern, list) else [pattern]
-        if pattern
-        else []
-    )
+    pattern_values = pattern if isinstance(pattern, list) else [pattern] if pattern else []
     pattern_id_values = (
-        pattern_ids if isinstance(pattern_ids, list) else [pattern_ids]
-        if pattern_ids
-        else []
+        pattern_ids if isinstance(pattern_ids, list) else [pattern_ids] if pattern_ids else []
     )
     pattern_registry = load_pattern_registry(Path(bd))
     resolved_patterns, unresolved_patterns = resolve_entry_patterns(
@@ -746,11 +811,7 @@ def tool_board_create_entry(params):
         pattern_registry,
     )
     canonical_pattern_ids = sorted(
-        {
-            item["id"]
-            for item in resolved_patterns
-            if not item["id"].startswith("legacy:")
-        }
+        {item["id"] for item in resolved_patterns if not item["id"].startswith("legacy:")}
     )
 
     if entry_type in ("bug", "feature"):
@@ -759,8 +820,10 @@ def tool_board_create_entry(params):
             raise ToolError("invalid status %r" % status)
         priority = require(params, "priority")
         if priority not in VALID_PRIORITY:
-            raise ToolError("invalid priority %r (allowed: %s)" % (priority, ", ".join(VALID_PRIORITY)))
-        affects = require(params, "affects")
+            raise ToolError(
+                "invalid priority %r (allowed: %s)" % (priority, ", ".join(VALID_PRIORITY))
+            )
+        affects = _repository_relative_path(root, require(params, "affects"), "affects")
         needs = params.get("needs", "tdd")
         if needs is not None and needs not in VALID_NEEDS:
             raise ToolError("invalid needs %r (allowed: %s)" % (needs, ", ".join(VALID_NEEDS)))
@@ -769,7 +832,9 @@ def tool_board_create_entry(params):
         if needs:
             fields.append(("needs", needs))
         if blocked_by:
-            fields.append(("blocked_by", blocked_by if isinstance(blocked_by, list) else [blocked_by]))
+            fields.append(
+                ("blocked_by", blocked_by if isinstance(blocked_by, list) else [blocked_by])
+            )
         if pattern_values:
             fields.append(("pattern", pattern_values))
         body = _body_from_done_when(params.get("done_when"), params.get("body"))
@@ -782,7 +847,12 @@ def tool_board_create_entry(params):
         if params.get("source"):
             fields.append(("source", params.get("source")))
         if params.get("affects"):
-            fields.append(("affects", params.get("affects")))
+            fields.append(
+                (
+                    "affects",
+                    _repository_relative_path(root, params.get("affects"), "affects"),
+                )
+            )
         if pattern_values:
             fields.append(("pattern", pattern_values))
         body = _body_from_done_when(params.get("done_when"), params.get("body"))
@@ -808,13 +878,20 @@ def tool_board_create_entry(params):
         derived_from = require(params, "derived_from")
         if not isinstance(derived_from, list):
             derived_from = [derived_from]
-        fields = [("id", eid), ("type", "learning"), ("subtype", subtype),
-                  ("title", title), ("discovered", discovered),
-                  ("confidence", confidence), ("recurrence", recurrence),
-                  ("derived_from", derived_from)]
+        fields = [
+            ("id", eid),
+            ("type", "learning"),
+            ("subtype", subtype),
+            ("title", title),
+            ("discovered", discovered),
+            ("confidence", confidence),
+            ("recurrence", recurrence),
+            ("derived_from", derived_from),
+        ]
         if params.get("applies_to"):
-            a = params.get("applies_to")
-            fields.append(("applies_to", a if isinstance(a, list) else [a]))
+            applies_to = params.get("applies_to")
+            values = applies_to if isinstance(applies_to, list) else [applies_to]
+            fields.append(("applies_to", _repository_relative_paths(root, values, "applies_to")))
         if params.get("pattern_tag"):
             fields.append(("pattern_tag", params.get("pattern_tag")))
         if params.get("status"):
@@ -838,16 +915,17 @@ def tool_board_create_entry(params):
     warnings = []
     for unresolved in unresolved_patterns:
         warnings.append(
-            "pattern label %s is unresolved; preserved as observed evidence"
-            % unresolved["label"]
+            "pattern label %s is unresolved; preserved as observed evidence" % unresolved["label"]
         )
     parent = params.get("parent")
     if parent:
         parent = _oneline(str(parent))
         fields.append(("parent", parent))
         if not find_entry(bd, parent):
-            warnings.append("parent %s not found on this board (dangling — "
-                            "accepted, entry is not blocked by it)" % parent)
+            warnings.append(
+                "parent %s not found on this board (dangling — "
+                "accepted, entry is not blocked by it)" % parent
+            )
 
     content = serialize_frontmatter(fields) + "\n\n" + body.rstrip() + "\n"
 
@@ -1022,15 +1100,9 @@ def tool_board_update_entry(params):
     warnings = []
     if "pattern" in params or "pattern_ids" in params:
         new_pattern = params.get("pattern", fm.get("pattern", []))
-        new_pattern_ids = params.get(
-            "pattern_ids", fm.get("pattern_ids", [])
-        )
+        new_pattern_ids = params.get("pattern_ids", fm.get("pattern_ids", []))
         pattern_values = (
-            new_pattern
-            if isinstance(new_pattern, list)
-            else [new_pattern]
-            if new_pattern
-            else []
+            new_pattern if isinstance(new_pattern, list) else [new_pattern] if new_pattern else []
         )
         pattern_id_values = (
             new_pattern_ids
@@ -1048,17 +1120,11 @@ def tool_board_update_entry(params):
             load_pattern_registry(Path(bd)),
         )
         canonical_pattern_ids = sorted(
-            {
-                item["id"]
-                for item in resolved_patterns
-                if not item["id"].startswith("legacy:")
-            }
+            {item["id"] for item in resolved_patterns if not item["id"].startswith("legacy:")}
         )
         fm["pattern"] = pattern_values
         fm["pattern_ids"] = canonical_pattern_ids
-        changes.append(
-            "pattern_ids=%s" % fmt_list(canonical_pattern_ids)
-        )
+        changes.append("pattern_ids=%s" % fmt_list(canonical_pattern_ids))
         for unresolved in unresolved_patterns:
             warnings.append(
                 "pattern label %s is unresolved; preserved as observed evidence"
@@ -1070,8 +1136,10 @@ def tool_board_update_entry(params):
         fm["parent"] = new_parent
         changes.append("parent=%s" % new_parent)
         if not find_entry(bd, new_parent):
-            warnings.append("parent %s not found on this board (dangling — "
-                            "accepted, entry is not blocked by it)" % new_parent)
+            warnings.append(
+                "parent %s not found on this board (dangling — "
+                "accepted, entry is not blocked by it)" % new_parent
+            )
 
     # Rebuild frontmatter preserving order then appending any new keys.
     field_pairs = []
@@ -1101,7 +1169,11 @@ def tool_board_update_entry(params):
     append_section = params.get("append_section")
     if append_section:
         heading = append_section.get("heading") if isinstance(append_section, dict) else None
-        section_body = append_section.get("body", "") if isinstance(append_section, dict) else str(append_section)
+        section_body = (
+            append_section.get("body", "")
+            if isinstance(append_section, dict)
+            else str(append_section)
+        )
         if not heading:
             raise ToolError("append_section requires a 'heading'")
         # A heading is a single markdown line; flatten embedded newlines so it
@@ -1122,17 +1194,13 @@ def tool_board_update_entry(params):
             archive = Path(archive_path).read_text(encoding="utf-8")
         except OSError as exc:
             raise ToolError("cannot read ARCHIVE.md: %s" % exc) from exc
-        archive_id_pattern = re.compile(
-            r"(?m)^-\s+%s\s+\|" % re.escape(entry_id)
-        )
+        archive_id_pattern = re.compile(r"(?m)^-\s+%s\s+\|" % re.escape(entry_id))
         if not archive_id_pattern.search(archive):
             patterns = fm.get("pattern", [])
             if not isinstance(patterns, list):
                 patterns = [patterns] if patterns else []
             pattern_text = (
-                " | pattern: %s" % ", ".join(str(item) for item in patterns)
-                if patterns
-                else ""
+                " | pattern: %s" % ", ".join(str(item) for item in patterns) if patterns else ""
             )
             archive_line = "- %s | %s%s | resolved: %s\n" % (
                 entry_id,
@@ -1217,9 +1285,7 @@ def tool_board_patterns(params):
     }
     plan_id = params.get("apply")
     if plan_id:
-        return apply_pattern_operation(
-            Path(bd), project, action, operation_params, plan_id
-        )
+        return apply_pattern_operation(Path(bd), project, action, operation_params, plan_id)
     return plan_pattern_operation(Path(bd), action, operation_params)
 
 
@@ -1248,13 +1314,27 @@ def tool_board_context(params):
     limit = params.get("limit", 3)
     if isinstance(limit, bool) or not isinstance(limit, int):
         raise ToolError("limit must be an integer")
+    files = params.get("files")
+    if files is not None:
+        if not isinstance(files, list):
+            raise ToolError("files must be a list with at most 100 paths")
+        files = [_repository_relative_path(root, value, "files") for value in files]
+    cwd = params.get("cwd")
+    if cwd:
+        if not isinstance(cwd, str):
+            raise ToolError("cwd must be a string")
+        if os.path.isabs(os.path.expanduser(cwd)):
+            cwd = os.path.realpath(os.path.abspath(os.path.expanduser(cwd)))
+            _contained_path(root, cwd, "cwd")
+        else:
+            cwd = _repository_relative_path(root, cwd, "cwd", allow_root=True)
     return build_context(
         Path(bd),
         project,
         task=str(params.get("task") or ""),
-        files=params.get("files"),
+        files=files,
         entry_ids=params.get("entry_ids"),
-        cwd=str(params.get("cwd") or ""),
+        cwd=str(cwd or ""),
         limit=limit,
     )
 
@@ -1300,9 +1380,7 @@ def tool_board_hypotheses(params):
         for key, value in params.items()
         if key not in {"root", "project", "action", "apply"}
     }
-    return plan_hypothesis_operation(
-        Path(bd), project, action, operation_params
-    )
+    return plan_hypothesis_operation(Path(bd), project, action, operation_params)
 
 
 def tool_board_promote_findings(params):
@@ -1506,8 +1584,13 @@ def tool_board_rebuild(params):
         if not os.path.isdir(bd):
             continue
         n = rebuild_board(bd, project)
-        results.append({"project": project, "open_lines": n,
-                        "board_md": os.path.relpath(os.path.join(bd, "BOARD.md"), root)})
+        results.append(
+            {
+                "project": project,
+                "open_lines": n,
+                "board_md": os.path.relpath(os.path.join(bd, "BOARD.md"), root),
+            }
+        )
     return {"rebuilt": results}
 
 
@@ -1529,10 +1612,15 @@ def tool_board_capture_finding(params):
     bd = ensure_board_exists(root, project)
 
     evidence = params.get("evidence")
-    affects = _oneline(params.get("affects")) if params.get("affects") else None
+    affects = (
+        _repository_relative_path(root, params.get("affects"), "affects")
+        if params.get("affects")
+        else None
+    )
     ts = now_utc_iso()
 
     sp = scratch_file_path(bd)
+    _contained_path(root, sp, "scratch target")
     os.makedirs(os.path.dirname(sp), exist_ok=True)
     is_new = not os.path.isfile(sp)
 
@@ -1551,8 +1639,9 @@ def tool_board_capture_finding(params):
         # forges a scratch header a reader / count_scratch_findings would honor
         # (eb-self B054, re-opening the B040 harm). Downstream readers use
         # universal-newline semantics, so the split must too.
-        quoted = "\n".join(("> " + ln) if ln.strip() else ">"
-                           for ln in str(evidence).rstrip().splitlines())
+        quoted = "\n".join(
+            ("> " + ln) if ln.strip() else ">" for ln in str(evidence).rstrip().splitlines()
+        )
         block += ["", quoted]
     block.append("")
     text = "\n".join(block) + "\n"
@@ -1560,8 +1649,10 @@ def tool_board_capture_finding(params):
     with open(sp, "a", encoding="utf-8") as f:
         if is_new:
             f.write("# MCP scratch inbox — %s\n\n" % today_utc())
-            f.write("Un-promoted findings captured via the MCP server. "
-                    "Promote to entries with board_create_entry.\n\n")
+            f.write(
+                "Un-promoted findings captured via the MCP server. "
+                "Promote to entries with board_create_entry.\n\n"
+            )
         f.write(text)
 
     return {
@@ -1585,9 +1676,14 @@ def render_remember_learning(lid, title, insight, context, discovered):
     MUST stay byte-identical with the twin renderer embedded in
     hooks/scripts/board-remember.sh — tests/orchestration/board-remember.sh
     asserts script-vs-MCP output equivalence (modulo id/timestamp)."""
-    applies = context.rstrip() if context.strip() else (
-        "Scope not yet established — recorded from an explicit user remember; "
-        "cross-reference when the topic recurs.")
+    applies = (
+        context.rstrip()
+        if context.strip()
+        else (
+            "Scope not yet established — recorded from an explicit user remember; "
+            "cross-reference when the topic recurs."
+        )
+    )
     return (
         "---\n"
         "id: %s\n"
@@ -1632,6 +1728,8 @@ def tool_board_remember(params):
     ldir = os.path.join(bd, "learnings")
     os.makedirs(ldir, exist_ok=True)
     path = os.path.join(ldir, fname)
+    _contained_path(root, path, "Learning target")
+    _contained_path(root, os.path.join(bd, "BOARD.md"), "board index target")
     if os.path.isfile(path):
         raise ToolError("learning file already exists: %s" % path)
 
@@ -1707,9 +1805,9 @@ def _utc_timestamp():
 
 def _claim_age_seconds(raw_timestamp):
     try:
-        heartbeat = datetime.strptime(
-            raw_timestamp.strip(), "%Y-%m-%dT%H:%M:%SZ"
-        ).replace(tzinfo=timezone.utc)
+        heartbeat = datetime.strptime(raw_timestamp.strip(), "%Y-%m-%dT%H:%M:%SZ").replace(
+            tzinfo=timezone.utc
+        )
     except (TypeError, ValueError):
         return None
     return int((datetime.now(timezone.utc) - heartbeat).total_seconds())
@@ -1754,6 +1852,7 @@ def tool_board_claim(params):
     board_dir = Path(ensure_board_exists(root, project))
     claims_dir = board_dir / "_claims"
     claim_dir = claims_dir / entry_id
+    _contained_path(root, str(claim_dir), "claim target")
     owner_file = claim_dir / "owner.txt"
     heartbeat_file = claim_dir / "heartbeat.txt"
     stale_seconds = 300 if "onedrive" in board_dir.as_posix().casefold() else 180
@@ -1782,8 +1881,7 @@ def tool_board_claim(params):
     timestamp = _utc_timestamp()
     try:
         owner_file.write_text(
-            "session_id: %s\ntimestamp: %s\ncwd: %s\n"
-            % (session_id, timestamp, os.getcwd()),
+            "session_id: %s\ntimestamp: %s\ncwd: %s\n" % (session_id, timestamp, os.getcwd()),
             encoding="utf-8",
         )
         heartbeat_file.write_text(timestamp + "\n", encoding="utf-8")
@@ -1804,21 +1902,16 @@ def tool_board_release(params):
     root = resolve_root(params)
     board_dir = Path(ensure_board_exists(root, project))
     claim_dir = board_dir / "_claims" / entry_id
+    _contained_path(root, str(claim_dir), "claim target")
     owner_file = claim_dir / "owner.txt"
     if not claim_dir.is_dir() or not owner_file.is_file():
-        return _release_result(
-            entry_id, 3, stderr="claim or owner record not found"
-        )
+        return _release_result(entry_id, 3, stderr="claim or owner record not found")
     try:
         owner_lines = owner_file.read_text(encoding="utf-8").splitlines()
     except OSError as exc:
         return _release_result(entry_id, 3, stderr=str(exc))
     owner = next(
-        (
-            line.split(":", 1)[1].strip()
-            for line in owner_lines
-            if line.startswith("session_id:")
-        ),
+        (line.split(":", 1)[1].strip() for line in owner_lines if line.startswith("session_id:")),
         "",
     )
     if owner != session_id:
@@ -1828,9 +1921,7 @@ def tool_board_release(params):
     for attempt in range(3):
         try:
             shutil.rmtree(claim_dir)
-            return _release_result(
-                entry_id, 0, stdout="released: %s" % entry_id
-            )
+            return _release_result(entry_id, 0, stdout="released: %s" % entry_id)
         except FileNotFoundError:
             return _release_result(entry_id, 0, stdout="released: %s" % entry_id)
         except OSError as exc:
@@ -1894,8 +1985,10 @@ def tool_board_status(params):
 # ---------------------------------------------------------------------------
 # Tool registry + JSON schemas
 # ---------------------------------------------------------------------------
-_ROOT_PROP = {"type": "string",
-              "description": "Repo root that contains the board. Defaults to $CLAUDE_PROJECT_DIR or the current working directory."}
+_ROOT_PROP = {
+    "type": "string",
+    "description": "Repo root that contains the board. Defaults to $CLAUDE_PROJECT_DIR or the current working directory.",
+}
 
 
 def _tool_annotations(read_only, destructive, idempotent):
@@ -1913,6 +2006,7 @@ def _tool_annotations(read_only, destructive, idempotent):
         "openWorldHint": False,
     }
 
+
 TOOLS = [
     {
         "name": "board_init",
@@ -1921,9 +2015,18 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Project name (kebab-case), e.g. 'navigator'."},
-                "affects_prefix": {"type": "string", "description": "affects: prefix routed to this board. Defaults to '<project>/'."},
-                "agents_md": {"type": "boolean", "description": "Write/refresh the <!-- engineering-board:start/end --> block in <root>/AGENTS.md (idempotent; preserves everything outside the markers). Default true."},
+                "project": {
+                    "type": "string",
+                    "description": "Project name (kebab-case), e.g. 'navigator'.",
+                },
+                "affects_prefix": {
+                    "type": "string",
+                    "description": "affects: prefix routed to this board. Defaults to '<project>/'.",
+                },
+                "agents_md": {
+                    "type": "boolean",
+                    "description": "Write/refresh the <!-- engineering-board:start/end --> block in <root>/AGENTS.md (idempotent; preserves everything outside the markers). Default true.",
+                },
                 "root": _ROOT_PROP,
             },
             "required": ["project"],
@@ -1947,30 +2050,111 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Target project (must already be board_init'd)."},
-                "type": {"type": "string", "enum": ["bug", "feature", "question", "observation", "learning"],
-                         "description": "Entry type. Determines the id prefix (B/F/Q/O/L) and required fields."},
-                "title": {"type": "string", "description": "Short title. Present-tense for bug/feature; interrogative for question; one-line takeaway for learning."},
-                "priority": {"type": "string", "enum": VALID_PRIORITY, "description": "Required for bug/feature. P0=production down/data loss … P3=cosmetic."},
-                "affects": {"type": "string", "description": "Relative file path the fix/answer lands in. Required for bug/feature; optional for question."},
-                "needs": {"type": "string", "enum": VALID_NEEDS, "description": "Workflow state for bug/feature. Defaults to 'tdd' on intake."},
-                "status": {"type": "string", "enum": VALID_STATUS, "description": "Initial status. Defaults to 'open' for bug/feature/question."},
-                "blocked_by": {"type": "array", "items": {"type": "string"}, "description": "Question ids (e.g. ['Q001']) blocking a bug/feature."},
-                "pattern": {"type": "array", "items": {"type": "string"}, "description": "Root-cause pattern tags (kebab-case)."},
-                "pattern_ids": {"type": "array", "items": {"type": "string", "pattern": "^P[0-9]{3}$"}, "description": "Canonical pattern record ids. Existing aliases and merged ids resolve to the active P### identity."},
-                "done_when": {"type": "array", "items": {"type": "string"}, "description": "Verification criteria — become the required '## Done when' checklist for bug/feature/question."},
-                "source": {"type": "string", "description": "Question only: what surfaced this question."},
-                "subtype": {"type": "string", "enum": ["pattern", "finding", "principle"], "description": "Learning only. Required."},
-                "confidence": {"type": "string", "enum": ["low", "medium", "high"], "description": "Learning only. Required."},
-                "recurrence": {"type": "integer", "description": "Learning only. Number of resolved entries this is derived from. Required."},
-                "derived_from": {"type": "array", "items": {"type": "string"}, "description": "Learning only. Resolved entry ids that surfaced this pattern. Required."},
-                "takeaway": {"type": "string", "description": "Learning only: the durable lesson (becomes '## Takeaway')."},
-                "sources": {"type": "array", "items": {"type": "string"}, "description": "Learning only: source lines for '## Sources' (defaults to derived_from)."},
-                "applies_to": {"type": "array", "items": {"type": "string"}, "description": "Learning only: paths/components where this applies."},
-                "pattern_tag": {"type": "string", "description": "Learning only: original pattern: tag retained for cross-reference."},
-                "parent": {"type": "string", "description": "Optional parent entry id (e.g. 'F012') for subtask grouping. A dangling id is accepted with a warning in the response (it never blocks the entry)."},
-                "body": {"type": "string", "description": "Free-form body (used as the section content when done_when/takeaway are not given)."},
-                "discovered": {"type": "string", "description": "Discovery date YYYY-MM-DD. Defaults to today (UTC)."},
+                "project": {
+                    "type": "string",
+                    "description": "Target project (must already be board_init'd).",
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["bug", "feature", "question", "observation", "learning"],
+                    "description": "Entry type. Determines the id prefix (B/F/Q/O/L) and required fields.",
+                },
+                "title": {
+                    "type": "string",
+                    "description": "Short title. Present-tense for bug/feature; interrogative for question; one-line takeaway for learning.",
+                },
+                "priority": {
+                    "type": "string",
+                    "enum": VALID_PRIORITY,
+                    "description": "Required for bug/feature. P0=production down/data loss … P3=cosmetic.",
+                },
+                "affects": {
+                    "type": "string",
+                    "description": "Relative file path the fix/answer lands in. Required for bug/feature; optional for question.",
+                },
+                "needs": {
+                    "type": "string",
+                    "enum": VALID_NEEDS,
+                    "description": "Workflow state for bug/feature. Defaults to 'tdd' on intake.",
+                },
+                "status": {
+                    "type": "string",
+                    "enum": VALID_STATUS,
+                    "description": "Initial status. Defaults to 'open' for bug/feature/question.",
+                },
+                "blocked_by": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Question ids (e.g. ['Q001']) blocking a bug/feature.",
+                },
+                "pattern": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Root-cause pattern tags (kebab-case).",
+                },
+                "pattern_ids": {
+                    "type": "array",
+                    "items": {"type": "string", "pattern": "^P[0-9]{3}$"},
+                    "description": "Canonical pattern record ids. Existing aliases and merged ids resolve to the active P### identity.",
+                },
+                "done_when": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Verification criteria — become the required '## Done when' checklist for bug/feature/question.",
+                },
+                "source": {
+                    "type": "string",
+                    "description": "Question only: what surfaced this question.",
+                },
+                "subtype": {
+                    "type": "string",
+                    "enum": ["pattern", "finding", "principle"],
+                    "description": "Learning only. Required.",
+                },
+                "confidence": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"],
+                    "description": "Learning only. Required.",
+                },
+                "recurrence": {
+                    "type": "integer",
+                    "description": "Learning only. Number of resolved entries this is derived from. Required.",
+                },
+                "derived_from": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Learning only. Resolved entry ids that surfaced this pattern. Required.",
+                },
+                "takeaway": {
+                    "type": "string",
+                    "description": "Learning only: the durable lesson (becomes '## Takeaway').",
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Learning only: source lines for '## Sources' (defaults to derived_from).",
+                },
+                "applies_to": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Learning only: paths/components where this applies.",
+                },
+                "pattern_tag": {
+                    "type": "string",
+                    "description": "Learning only: original pattern: tag retained for cross-reference.",
+                },
+                "parent": {
+                    "type": "string",
+                    "description": "Optional parent entry id (e.g. 'F012') for subtask grouping. A dangling id is accepted with a warning in the response (it never blocks the entry).",
+                },
+                "body": {
+                    "type": "string",
+                    "description": "Free-form body (used as the section content when done_when/takeaway are not given).",
+                },
+                "discovered": {
+                    "type": "string",
+                    "description": "Discovery date YYYY-MM-DD. Defaults to today (UTC).",
+                },
                 "root": _ROOT_PROP,
             },
             "required": ["project", "type", "title"],
@@ -1984,11 +2168,20 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Restrict to one project (default: all projects in the router)."},
-                "type": {"type": "string", "enum": ["bug", "feature", "question", "observation", "learning"]},
+                "project": {
+                    "type": "string",
+                    "description": "Restrict to one project (default: all projects in the router).",
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["bug", "feature", "question", "observation", "learning"],
+                },
                 "status": {"type": "string", "enum": VALID_STATUS},
                 "needs": {"type": "string", "enum": VALID_NEEDS},
-                "ready": {"type": "boolean", "description": "true: only ready entries — status open AND every blocked_by id that resolves to an existing entry is resolved. Adds a dangling_blockers warning list to the result."},
+                "ready": {
+                    "type": "boolean",
+                    "description": "true: only ready entries — status open AND every blocked_by id that resolves to an existing entry is resolved. Adds a dangling_blockers warning list to the result.",
+                },
                 "root": _ROOT_PROP,
             },
         },
@@ -2022,15 +2215,32 @@ TOOLS = [
                 "needs": {"type": "string", "enum": VALID_NEEDS},
                 "priority": {"type": "string", "enum": VALID_PRIORITY},
                 "blocked_by": {"type": "array", "items": {"type": "string"}},
-                "pattern": {"type": "array", "items": {"type": "string"}, "description": "Observed root-cause labels. Unresolved values remain evidence and produce warnings."},
-                "pattern_ids": {"type": "array", "items": {"type": "string", "pattern": "^P[0-9]{3}$"}, "description": "Canonical pattern record ids."},
-                "parent": {"type": "string", "description": "Parent entry id for subtask grouping. A dangling id is accepted with a warning in the response."},
+                "pattern": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Observed root-cause labels. Unresolved values remain evidence and produce warnings.",
+                },
+                "pattern_ids": {
+                    "type": "array",
+                    "items": {"type": "string", "pattern": "^P[0-9]{3}$"},
+                    "description": "Canonical pattern record ids.",
+                },
+                "parent": {
+                    "type": "string",
+                    "description": "Parent entry id for subtask grouping. A dangling id is accepted with a warning in the response.",
+                },
                 "comment": {
                     "type": "object",
                     "description": "Append '- **<author>** <UTC ISO8601>: <text>' to the entry's '## Comments' section (section created on first comment; text flattened to one line; timestamp computed server-side).",
                     "properties": {
-                        "author": {"type": "string", "description": "Comment author (e.g. session or agent name)."},
-                        "text": {"type": "string", "description": "Comment text (single line; newlines are flattened)."},
+                        "author": {
+                            "type": "string",
+                            "description": "Comment author (e.g. session or agent name).",
+                        },
+                        "text": {
+                            "type": "string",
+                            "description": "Comment text (single line; newlines are flattened).",
+                        },
                     },
                     "required": ["author", "text"],
                 },
@@ -2038,7 +2248,10 @@ TOOLS = [
                     "type": "object",
                     "description": "Append a markdown section to the body.",
                     "properties": {
-                        "heading": {"type": "string", "description": "Section heading (## added if absent)."},
+                        "heading": {
+                            "type": "string",
+                            "description": "Section heading (## added if absent).",
+                        },
                         "body": {"type": "string", "description": "Section body markdown."},
                     },
                     "required": ["heading"],
@@ -2300,7 +2513,10 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "project": {"type": "string"},
-                "action": {"type": "string", "enum": ["list", "create", "alias", "assign", "correct"]},
+                "action": {
+                    "type": "string",
+                    "enum": ["list", "create", "alias", "assign", "correct"],
+                },
                 "label": {"type": "string"},
                 "aliases": {"type": "array", "items": {"type": "string"}},
                 "alias": {"type": "string"},
@@ -2355,7 +2571,10 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Project to rebuild (default: all projects in the router)."},
+                "project": {
+                    "type": "string",
+                    "description": "Project to rebuild (default: all projects in the router).",
+                },
                 "root": _ROOT_PROP,
             },
         },
@@ -2369,10 +2588,19 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "project": {"type": "string"},
-                "kind": {"type": "string", "description": "Finding kind, e.g. bug, feature, question, observation."},
+                "kind": {
+                    "type": "string",
+                    "description": "Finding kind, e.g. bug, feature, question, observation.",
+                },
                 "title": {"type": "string", "description": "One-line finding summary."},
-                "evidence": {"type": "string", "description": "Optional supporting evidence / quote."},
-                "affects": {"type": "string", "description": "Optional relative path the finding concerns."},
+                "evidence": {
+                    "type": "string",
+                    "description": "Optional supporting evidence / quote.",
+                },
+                "affects": {
+                    "type": "string",
+                    "description": "Optional relative path the finding concerns.",
+                },
                 "root": _ROOT_PROP,
             },
             "required": ["project", "kind", "title"],
@@ -2388,7 +2616,10 @@ TOOLS = [
             "properties": {
                 "project": {"type": "string"},
                 "entry_id": {"type": "string"},
-                "session_id": {"type": "string", "description": "Caller's session id (claim owner)."},
+                "session_id": {
+                    "type": "string",
+                    "description": "Caller's session id (claim owner).",
+                },
                 "root": _ROOT_PROP,
             },
             "required": ["project", "entry_id", "session_id"],
@@ -2418,9 +2649,18 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Target project (must already be board_init'd)."},
-                "insight": {"type": "string", "description": "The durable lesson to remember (becomes the title and '## Takeaway')."},
-                "context": {"type": "string", "description": "Optional: when/where the insight applies (becomes '## When this applies')."},
+                "project": {
+                    "type": "string",
+                    "description": "Target project (must already be board_init'd).",
+                },
+                "insight": {
+                    "type": "string",
+                    "description": "The durable lesson to remember (becomes the title and '## Takeaway').",
+                },
+                "context": {
+                    "type": "string",
+                    "description": "Optional: when/where the insight applies (becomes '## When this applies').",
+                },
                 "root": _ROOT_PROP,
             },
             "required": ["project", "insight"],
@@ -2434,7 +2674,10 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "project": {"type": "string", "description": "Restrict to one project (default: all)."},
+                "project": {
+                    "type": "string",
+                    "description": "Restrict to one project (default: all).",
+                },
                 "root": _ROOT_PROP,
             },
         },
@@ -2468,6 +2711,102 @@ class RpcError(Exception):
         self.message = message
 
 
+class ProtocolSession:
+    """One stdio connection's MCP lifecycle state."""
+
+    def __init__(self):
+        self.initialized = False
+        self.ready = False
+
+
+def _rpc_error(code, message, msg_id=None):
+    return {
+        "jsonrpc": "2.0",
+        "id": msg_id,
+        "error": {"code": code, "message": message},
+    }
+
+
+def _valid_request_id(value):
+    return (
+        value is None
+        or isinstance(value, str)
+        or (isinstance(value, int) and not isinstance(value, bool))
+    )
+
+
+def _diagnostic(error):
+    """Keep implementation diagnostics on stderr and bounded."""
+    sys.stderr.write("engineering-board MCP internal error: %s\n" % type(error).__name__)
+    sys.stderr.flush()
+
+
+def _schema_type_matches(value, expected):
+    matches = {
+        "object": isinstance(value, dict),
+        "array": isinstance(value, list),
+        "string": isinstance(value, str),
+        "integer": isinstance(value, int) and not isinstance(value, bool),
+        "boolean": isinstance(value, bool),
+    }
+    return expected not in matches or matches[expected]
+
+
+def _validate_schema_string(value, schema, field):
+    if "minLength" in schema and len(value) < schema["minLength"]:
+        raise RpcError(-32602, "%s is too short" % field)
+    if "maxLength" in schema and len(value) > schema["maxLength"]:
+        raise RpcError(-32602, "%s is too long" % field)
+    if "pattern" in schema and re.fullmatch(schema["pattern"], value) is None:
+        raise RpcError(-32602, "%s has an invalid format" % field)
+
+
+def _validate_schema_integer(value, schema, field):
+    if "minimum" in schema and value < schema["minimum"]:
+        raise RpcError(-32602, "%s is below the minimum" % field)
+    if "maximum" in schema and value > schema["maximum"]:
+        raise RpcError(-32602, "%s exceeds the maximum" % field)
+
+
+def _validate_schema_array(value, schema, field):
+    if "minItems" in schema and len(value) < schema["minItems"]:
+        raise RpcError(-32602, "%s has too few items" % field)
+    if "maxItems" in schema and len(value) > schema["maxItems"]:
+        raise RpcError(-32602, "%s has too many items" % field)
+    item_schema = schema.get("items")
+    if isinstance(item_schema, dict):
+        for index, item in enumerate(value):
+            _validate_schema_value(item, item_schema, "%s[%d]" % (field, index))
+
+
+def _validate_schema_object(value, schema, field):
+    for name in schema.get("required", []):
+        if name not in value:
+            raise RpcError(-32602, "%s requires %s" % (field, name))
+    properties = schema.get("properties", {})
+    for name, item in value.items():
+        child = properties.get(name)
+        if isinstance(child, dict):
+            _validate_schema_value(item, child, "%s.%s" % (field, name))
+
+
+def _validate_schema_value(value, schema, field):
+    """Validate the JSON Schema subset used by the public tool contracts."""
+    expected = schema.get("type")
+    if not _schema_type_matches(value, expected):
+        raise RpcError(-32602, "%s must be %s" % (field, expected))
+    if "enum" in schema and value not in schema["enum"]:
+        raise RpcError(-32602, "%s has an unsupported value" % field)
+    if isinstance(value, str):
+        _validate_schema_string(value, schema, field)
+    elif isinstance(value, int) and not isinstance(value, bool):
+        _validate_schema_integer(value, schema, field)
+    elif isinstance(value, list):
+        _validate_schema_array(value, schema, field)
+    elif isinstance(value, dict):
+        _validate_schema_object(value, schema, field)
+
+
 def call_tool(name, arguments):
     """Run a tool by name. Returns the tools/call result dict."""
     tool = TOOLS_BY_NAME.get(name)
@@ -2477,6 +2816,7 @@ def call_tool(name, arguments):
         arguments = {}
     if not isinstance(arguments, dict):
         raise RpcError(-32602, "tool arguments must be an object")
+    _validate_schema_value(arguments, tool["inputSchema"], "arguments")
     try:
         result = tool["handler"](arguments)
         text = json.dumps(result, ensure_ascii=False, indent=2)
@@ -2484,8 +2824,11 @@ def call_tool(name, arguments):
     except (ToolError, CoreError) as e:
         return {"content": [{"type": "text", "text": "Error: %s" % e}], "isError": True}
     except Exception as e:  # pragma: no cover - defensive
-        return {"content": [{"type": "text", "text": "Internal error: %s: %s" % (type(e).__name__, e)}],
-                "isError": True}
+        _diagnostic(e)
+        return {
+            "content": [{"type": "text", "text": "Internal error"}],
+            "isError": True,
+        }
 
 
 def dispatch(method, params):
@@ -2493,15 +2836,25 @@ def dispatch(method, params):
     protocol-level failures (unknown method, bad params)."""
     if params is None:
         params = {}
+    if not isinstance(params, dict):
+        raise RpcError(-32602, "params must be an object")
     if method == "initialize":
+        if params.get("protocolVersion") != PROTOCOL_VERSION:
+            raise RpcError(-32602, "unsupported protocol version")
+        capabilities = params.get("capabilities")
+        client_info = params.get("clientInfo")
+        if not isinstance(capabilities, dict):
+            raise RpcError(-32602, "initialize capabilities must be an object")
+        if client_info is not None and not isinstance(client_info, dict):
+            raise RpcError(-32602, "initialize clientInfo must be an object")
         return {
             "protocolVersion": PROTOCOL_VERSION,
             "capabilities": {"tools": {"listChanged": False}},
             "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
             "instructions": "Maintains the engineering-board markdown board: init projects, "
-                            "create/list/update/get entries, rebuild the index, capture scratch "
-                            "findings, canonical patterns, graph analysis, foreground "
-                            "promotion, and claim/release entry locks.",
+            "create/list/update/get entries, rebuild the index, capture scratch "
+            "findings, canonical patterns, graph analysis, foreground "
+            "promotion, and claim/release entry locks.",
         }
     if method == "ping":
         return {}
@@ -2515,53 +2868,104 @@ def dispatch(method, params):
     raise RpcError(-32601, "method not found: %s" % method)
 
 
-def handle_message(obj):
+def _request_fields(obj):
+    """Validate and return one JSON-RPC request's method, id, and params."""
+    if "id" in obj and not _valid_request_id(obj.get("id")):
+        raise RpcError(-32600, "invalid request: id must be a string, integer, or null")
+    method = obj.get("method")
+    if not isinstance(method, str) or not method:
+        raise RpcError(-32600, "invalid request: method must be a non-empty string")
+    params = obj.get("params")
+    if params is not None and not isinstance(params, dict):
+        raise RpcError(-32602, "params must be an object")
+    return method, obj.get("id"), params
+
+
+def handle_message(obj, session=None):
     """Handle one parsed JSON-RPC message object. Returns a response dict, or
     None for notifications (no reply)."""
+    session = session or ProtocolSession()
     if not isinstance(obj, dict):
-        return {"jsonrpc": "2.0", "id": None,
-                "error": {"code": -32600, "message": "invalid request: not an object"}}
-
-    method = obj.get("method")
-    msg_id = obj.get("id")
+        return _rpc_error(-32600, "invalid request: not an object")
+    if obj.get("jsonrpc") != "2.0":
+        return _rpc_error(-32600, "invalid request: jsonrpc must be '2.0'")
     is_notification = "id" not in obj
+    raw_id = obj.get("id")
+    msg_id = raw_id if _valid_request_id(raw_id) else None
+    try:
+        method, msg_id, params = _request_fields(obj)
+    except RpcError as e:
+        return None if is_notification else _rpc_error(e.code, e.message, msg_id)
 
     # Notifications (no id) get no response.
     if is_notification:
-        # notifications/initialized and any other notification: no reply.
+        if method == "notifications/initialized" and session.initialized:
+            session.ready = True
         return None
 
-    if not method:
-        return {"jsonrpc": "2.0", "id": msg_id,
-                "error": {"code": -32600, "message": "invalid request: missing method"}}
+    if method == "initialize":
+        if session.initialized:
+            return _rpc_error(-32600, "initialize has already completed", msg_id)
+    elif method != "ping":
+        if not session.initialized:
+            return _rpc_error(-32002, "server is not initialized", msg_id)
+        if not session.ready:
+            return _rpc_error(-32002, "client has not sent notifications/initialized", msg_id)
 
     try:
-        result = dispatch(method, obj.get("params"))
+        result = dispatch(method, params)
+        if method == "initialize":
+            session.initialized = True
         return {"jsonrpc": "2.0", "id": msg_id, "result": result}
     except RpcError as e:
-        return {"jsonrpc": "2.0", "id": msg_id, "error": {"code": e.code, "message": e.message}}
+        return _rpc_error(e.code, e.message, msg_id)
     except Exception as e:  # pragma: no cover - defensive
-        return {"jsonrpc": "2.0", "id": msg_id,
-                "error": {"code": -32603, "message": "internal error: %s: %s" % (type(e).__name__, e)}}
+        _diagnostic(e)
+        return _rpc_error(-32603, "internal error", msg_id)
+
+
+def _read_stdio_line(stdin):
+    """Read one bounded newline-delimited message and drain oversized input."""
+    line = stdin.readline(MAX_MESSAGE_BYTES + 2)
+    if line == "":
+        return None, False
+    oversized = len(line.encode("utf-8")) > MAX_MESSAGE_BYTES
+    if not line.endswith("\n") and len(line) > MAX_MESSAGE_BYTES:
+        oversized = True
+        while line and not line.endswith("\n"):
+            line = stdin.readline(MAX_MESSAGE_BYTES + 2)
+    return line, oversized
 
 
 def serve_stdio(stdin=None, stdout=None):
     """Run the newline-delimited JSON-RPC stdio loop."""
     stdin = stdin or sys.stdin
     stdout = stdout or sys.stdout
-    for line in stdin:
+    session = ProtocolSession()
+    while True:
+        line, oversized = _read_stdio_line(stdin)
+        if line is None:
+            break
+        if oversized:
+            resp = _rpc_error(-32001, "message exceeds maximum size")
+            stdout.write(json.dumps(resp) + "\n")
+            stdout.flush()
+            continue
         line = line.strip()
         if not line:
             continue
         try:
             obj = json.loads(line)
         except json.JSONDecodeError:
-            resp = {"jsonrpc": "2.0", "id": None,
-                    "error": {"code": -32700, "message": "parse error"}}
+            resp = {
+                "jsonrpc": "2.0",
+                "id": None,
+                "error": {"code": -32700, "message": "parse error"},
+            }
             stdout.write(json.dumps(resp) + "\n")
             stdout.flush()
             continue
-        resp = handle_message(obj)
+        resp = handle_message(obj, session)
         if resp is not None:
             # JSON-RPC must also work when Windows gives stdout a legacy code
             # page. Escaping non-ASCII keeps the wire representation portable.

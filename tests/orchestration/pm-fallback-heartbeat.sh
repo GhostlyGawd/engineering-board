@@ -34,19 +34,19 @@ mkdir -p "$CLAUDE_PROJECT_DIR/.engineering-board"
 plant_claim() {
   local id="$1" sess="$2"
   mkdir -p "$CLAIMS_DIR/$id"
-  printf 'session_id: %s\ncwd: /tmp\n' "$sess" > "$CLAIMS_DIR/$id/owner.txt"
-  printf 'OLD-HEARTBEAT\n' > "$CLAIMS_DIR/$id/heartbeat.txt"
+  printf 'session_id: %s\ncwd: /tmp\n' "$sess" >"$CLAIMS_DIR/$id/owner.txt"
+  printf 'OLD-HEARTBEAT\n' >"$CLAIMS_DIR/$id/heartbeat.txt"
 }
 
-plant_claim "ALIVE-001"  "sess-alive"
+plant_claim "ALIVE-001" "sess-alive"
 plant_claim "PAUSED-001" "sess-paused"
 plant_claim "ORPHAN-001" "sess-orphan-not-in-reg"
-plant_claim "STALE-001"  "sess-stale-reg"
+plant_claim "STALE-001" "sess-stale-reg"
 
 NOW="$(python3 -c 'import datetime; print(datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))')"
 OLD="$(python3 -c 'import datetime; print((datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=400)).strftime("%Y-%m-%dT%H:%M:%SZ"))')"
 
-cat > "$CLAUDE_PROJECT_DIR/.engineering-board/active-workers.json" <<EOF
+cat >"$CLAUDE_PROJECT_DIR/.engineering-board/active-workers.json" <<EOF
 [
   {"session_id":"sess-alive",    "started_at":"$NOW","last_seen":"$NOW","mode":"worker","discipline":"tdd","cwd":"/tmp","claim_ids_held":["ALIVE-001"], "paused":false},
   {"session_id":"sess-paused",   "started_at":"$NOW","last_seen":"$NOW","mode":"worker","discipline":"tdd","cwd":"/tmp","claim_ids_held":["PAUSED-001"],"paused":true},
@@ -60,9 +60,11 @@ PASS=0
 FAIL=0
 report() {
   if [ "$1" = "0" ]; then
-    printf "  [PASS] %s\n" "$2"; PASS=$((PASS + 1))
+    printf "  [PASS] %s\n" "$2"
+    PASS=$((PASS + 1))
   else
-    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"; FAIL=$((FAIL + 1))
+    printf "  [FAIL] %s%s\n" "$2" "${3:+ -- $3}"
+    FAIL=$((FAIL + 1))
   fi
 }
 

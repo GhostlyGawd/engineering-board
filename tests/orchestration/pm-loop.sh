@@ -59,7 +59,7 @@ mkdir -p \
   "$BOARD_DIR/_sessions" \
   "$PROJECT/.engineering-board"
 
-cat > "$PROJECT/engineering-board/BOARD-ROUTER.md" <<'EOF'
+cat >"$PROJECT/engineering-board/BOARD-ROUTER.md" <<'EOF'
 # Board Router
 
 | project | path | affects prefix |
@@ -67,33 +67,33 @@ cat > "$PROJECT/engineering-board/BOARD-ROUTER.md" <<'EOF'
 | demo | engineering-board/demo/ | demo/ |
 EOF
 
-cat > "$BOARD_DIR/BOARD.md" <<'EOF'
+cat >"$BOARD_DIR/BOARD.md" <<'EOF'
 # demo - Board
 
 ## Open
 
 EOF
 
-cat > "$BOARD_DIR/ARCHIVE.md" <<'EOF'
+cat >"$BOARD_DIR/ARCHIVE.md" <<'EOF'
 # demo - Archive
 EOF
 
 # Plant session-mode.json to mode=pm — this is the precondition Section 3
 # (pre) keys on to route to Section 3-PM.
-cat > "$PROJECT/.engineering-board/session-mode.json" <<EOF
+cat >"$PROJECT/.engineering-board/session-mode.json" <<EOF
 {"mode":"pm","session_id":"$SESSION_ID","started_at":"2026-05-11T12:00:00Z"}
 EOF
 
 # Synthetic transcript anchoring the confirmed/tentative findings below.
 TRANSCRIPT="$PROJECT/transcript.jsonl"
-cat > "$TRANSCRIPT" <<'EOF'
+cat >"$TRANSCRIPT" <<'EOF'
 {"role":"user","content":"please look at the ranker and Y feature"}
 {"role":"assistant","content":"The ranker drops keywords below the SV threshold. Also stale cache in module M. And second stale cache writeback bug in module M with full root cause."}
 {"role":"user","content":"could we add streaming Y"}
 {"role":"assistant","content":"That seems reasonable."}
 EOF
 
-cat > "$PROJECT/.engineering-board/last-stop-stdin.json" <<EOF
+cat >"$PROJECT/.engineering-board/last-stop-stdin.json" <<EOF
 {"session_id":"$SESSION_ID","transcript_path":"$TRANSCRIPT","hook_event_name":"Stop","stop_hook_active":false}
 EOF
 
@@ -106,7 +106,7 @@ EOF
 #   S-pm-3  confirmed bug   anchored, supersedes S-pm-2   -> promoted (longer title)
 #   S-pm-4  tentative feat  user-anchored                 -> promoted
 #   S-pm-5  confirmed bug   ghost quote (no anchor)       -> deferred_anchor_unmatched
-cat > "$BOARD_DIR/_sessions/$SESSION_ID.md" <<'EOF'
+cat >"$BOARD_DIR/_sessions/$SESSION_ID.md" <<'EOF'
 <!-- 2026-05-11T12:00:00Z -->
 {"schema_version":"0.2.1","findings":[
 {"scratch_id":"S-pm-1","type":"bug","confidence":"confirmed","title":"ranker SV threshold drop","affects":"demo/ranker","evidence_quote":"The ranker drops keywords below the SV threshold","discovered":"2026-05-11","tags":[]},
@@ -122,9 +122,9 @@ export CLAUDE_PROJECT_DIR="$PROJECT"
 
 # Step (b) consolidator substrate.
 if ! bash "$CONSOLIDATE" \
-       < "$PROJECT/.engineering-board/last-stop-stdin.json" \
-       > "$TMP/consolidate.stdout" \
-       2> "$TMP/consolidate.stderr"; then
+  <"$PROJECT/.engineering-board/last-stop-stdin.json" \
+  >"$TMP/consolidate.stdout" \
+  2>"$TMP/consolidate.stderr"; then
   echo "board-consolidate.sh exited non-zero. stderr:" >&2
   cat "$TMP/consolidate.stderr" >&2
   exit 1
@@ -132,15 +132,15 @@ fi
 
 # Step (c) tidier substrate — index check then scratch audit.
 INDEX_CHECK_EXIT=0
-bash "$INDEX_CHECK" > "$TMP/index.stdout" 2> "$TMP/index.stderr" || INDEX_CHECK_EXIT=$?
+bash "$INDEX_CHECK" >"$TMP/index.stdout" 2>"$TMP/index.stderr" || INDEX_CHECK_EXIT=$?
 AUDIT_EXIT=0
-bash "$AUDIT" > "$TMP/audit.stdout" 2> "$TMP/audit.stderr" || AUDIT_EXIT=$?
+bash "$AUDIT" >"$TMP/audit.stdout" 2>"$TMP/audit.stderr" || AUDIT_EXIT=$?
 
 # Step (d.1) — the live PM procedure uses the consolidator's promoted ids to
 # retrieve medium/high-confidence Learnings before it emits the summary. Plant
 # one eligible Learning and one low-confidence decoy against a promoted path.
 mkdir -p "$BOARD_DIR/learnings"
-cat > "$BOARD_DIR/learnings/L001-cache-boundary.md" <<'EOF'
+cat >"$BOARD_DIR/learnings/L001-cache-boundary.md" <<'EOF'
 ---
 id: L001
 type: learning
@@ -158,7 +158,7 @@ pattern_tag: cache-boundary
 
 Verify the cache boundary through its real call-sites.
 EOF
-cat > "$BOARD_DIR/learnings/L002-low-confidence-decoy.md" <<'EOF'
+cat >"$BOARD_DIR/learnings/L002-low-confidence-decoy.md" <<'EOF'
 ---
 id: L002
 type: learning
@@ -177,7 +177,8 @@ pattern_tag: cache-decoy
 This matching decoy must not enter the PM summary.
 EOF
 
-mapfile -t PROMOTED_IDS < <(python3 - "$BOARD_DIR/consolidation.log" <<'PY'
+mapfile -t PROMOTED_IDS < <(
+  python3 - "$BOARD_DIR/consolidation.log" <<'PY'
 import json
 import sys
 
@@ -246,7 +247,8 @@ fi
 check_disp() {
   local sid="$1" expect="$2"
   local actual
-  actual="$(python3 - "$LOG" "$sid" <<'PY'
+  actual="$(
+    python3 - "$LOG" "$sid" <<'PY'
 import json, sys
 log, sid = sys.argv[1], sys.argv[2]
 hit = ""
@@ -266,7 +268,7 @@ except Exception:
     pass
 print(hit)
 PY
-)"
+  )"
   if [ "$actual" = "$expect" ]; then
     report 0 "$sid -> $expect"
   else
@@ -282,13 +284,13 @@ check_disp "S-pm-5" "deferred_anchor_unmatched"
 
 # 8-10. Promoted live files exist where the dispositions say they should.
 for bug_id in B001 B002; do
-  if compgen -G "$BOARD_DIR/bugs/${bug_id}-*.md" > /dev/null; then
+  if compgen -G "$BOARD_DIR/bugs/${bug_id}-*.md" >/dev/null; then
     report 0 "$bug_id live file exists in bugs/"
   else
     report 1 "$bug_id live file exists in bugs/" "no match"
   fi
 done
-if compgen -G "$BOARD_DIR/features/F001-*.md" > /dev/null; then
+if compgen -G "$BOARD_DIR/features/F001-*.md" >/dev/null; then
   report 0 "F001 live file exists in features/"
 else
   report 1 "F001 live file exists in features/" "no match"
@@ -321,7 +323,7 @@ fi
 # 13. Scratch file archived to _sessions/_archive (not still in _sessions root).
 if [ -f "$BOARD_DIR/_sessions/$SESSION_ID.md" ]; then
   report 1 "scratch session archived" "still in _sessions/ root"
-elif compgen -G "$BOARD_DIR/_sessions/_archive/${SESSION_ID}-*.md" > /dev/null; then
+elif compgen -G "$BOARD_DIR/_sessions/_archive/${SESSION_ID}-*.md" >/dev/null; then
   report 0 "scratch session archived"
 else
   report 1 "scratch session archived" "no archive copy found"

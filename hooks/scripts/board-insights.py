@@ -68,13 +68,9 @@ def main(argv: list[str] | None = None) -> int:
                 payload = json.load(sys.stdin)
             if not isinstance(payload, dict):
                 raise GraphError("hypothesis payload must be an object")
-            result = plan_hypothesis_operation(
-                board_dir, args.project, args.action, payload
-            )
+            result = plan_hypothesis_operation(board_dir, args.project, args.action, payload)
         else:
-            result = apply_hypothesis_plan(
-                board_dir, args.project, args.token
-            )
+            result = apply_hypothesis_plan(board_dir, args.project, args.token)
     except (GraphError, OSError, ValueError, json.JSONDecodeError) as exc:
         print(
             json.dumps(

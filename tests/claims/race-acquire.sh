@@ -68,16 +68,18 @@ for i in $(seq 1 20); do
   # triggers set -e even on non-zero exit in bash), then write the variable.
   (
     sleep "$JITTER_A"
-    rc=0; bash "$ACQUIRE" "$BOARD_DIR" "$ENTRY_ID" "session-A-$i" > /dev/null 2>&1 || rc=$?
-    echo "$rc" > "$EXIT_A_FILE"
+    rc=0
+    bash "$ACQUIRE" "$BOARD_DIR" "$ENTRY_ID" "session-A-$i" >/dev/null 2>&1 || rc=$?
+    echo "$rc" >"$EXIT_A_FILE"
   ) &
   PID_A=$!
 
   # Fork racer B — same pattern
   (
     sleep "$JITTER_B"
-    rc=0; bash "$ACQUIRE" "$BOARD_DIR" "$ENTRY_ID" "session-B-$i" > /dev/null 2>&1 || rc=$?
-    echo "$rc" > "$EXIT_B_FILE"
+    rc=0
+    bash "$ACQUIRE" "$BOARD_DIR" "$ENTRY_ID" "session-B-$i" >/dev/null 2>&1 || rc=$?
+    echo "$rc" >"$EXIT_B_FILE"
   ) &
   PID_B=$!
 
@@ -88,8 +90,8 @@ for i in $(seq 1 20); do
   EXIT_B="$(cat "$EXIT_B_FILE" 2>/dev/null || echo "missing")"
 
   # Exactly one must exit 0 and the other exit 1
-  if { [ "$EXIT_A" = "0" ] && [ "$EXIT_B" = "1" ]; } || \
-     { [ "$EXIT_A" = "1" ] && [ "$EXIT_B" = "0" ]; }; then
+  if { [ "$EXIT_A" = "0" ] && [ "$EXIT_B" = "1" ]; } ||
+    { [ "$EXIT_A" = "1" ] && [ "$EXIT_B" = "0" ]; }; then
     report 0 "$i"
   else
     report 1 "$i" "exit_A=$EXIT_A exit_B=$EXIT_B (expected one 0 and one 1)"

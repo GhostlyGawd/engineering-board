@@ -63,7 +63,7 @@ mkdir -p "$OD_BOARD_DIR/_claims"
 
 OD_OUTPUT="$TMP/od_positive.out"
 set +e
-bash "$ACQUIRE" "$OD_BOARD_DIR" "od-test-entry" "session-od-positive-$$" > "$OD_OUTPUT" 2>&1
+bash "$ACQUIRE" "$OD_BOARD_DIR" "od-test-entry" "session-od-positive-$$" >"$OD_OUTPUT" 2>&1
 OD_EXIT=$?
 set -e
 
@@ -71,7 +71,7 @@ if grep -qF "$BUMP_LOG_LINE" "$OD_OUTPUT"; then
   report 0 "positive: OneDrive path emits cloud-sync bump log"
 else
   report 1 "positive: OneDrive path emits cloud-sync bump log" \
-    "output was: $(tr '\n' '|' < "$OD_OUTPUT")"
+    "output was: $(tr '\n' '|' <"$OD_OUTPUT")"
 fi
 
 # Acquire should succeed (exit 0) on OneDrive path
@@ -87,13 +87,13 @@ mkdir -p "$PLAIN_BOARD_DIR/_claims"
 
 PLAIN_OUTPUT="$TMP/od_negative.out"
 set +e
-bash "$ACQUIRE" "$PLAIN_BOARD_DIR" "plain-test-entry" "session-plain-negative-$$" > "$PLAIN_OUTPUT" 2>&1
+bash "$ACQUIRE" "$PLAIN_BOARD_DIR" "plain-test-entry" "session-plain-negative-$$" >"$PLAIN_OUTPUT" 2>&1
 PLAIN_EXIT=$?
 set -e
 
 if grep -qF "cloud-sync detected" "$PLAIN_OUTPUT" 2>/dev/null; then
   report 1 "negative: plain path emits no cloud-sync bump log" \
-    "unexpected output: $(tr '\n' '|' < "$PLAIN_OUTPUT")"
+    "unexpected output: $(tr '\n' '|' <"$PLAIN_OUTPUT")"
 else
   report 0 "negative: plain path emits no cloud-sync bump log"
 fi

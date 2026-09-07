@@ -8,15 +8,149 @@ run the tests.
 
 Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for the system structure.
 
-## Run the test suite
+## Set up the pinned development tools
 
-Run the full test suite:
+On macOS or Linux, install the repository-pinned development inventory:
 
 ```sh
+bash scripts/bootstrap-dev.sh
+```
+
+Verify it later without network access or filesystem changes:
+
+```sh
+bash scripts/bootstrap-dev.sh --check
+```
+
+On native Windows, run `python scripts/bootstrap_dev.py` to install, then run
+`python scripts/bootstrap_dev.py --check` directly from PowerShell or
+`python scripts\bootstrap_dev.py --check` from `cmd.exe`. Git Bash and WSL are
+compatibility environments, not native Windows evidence.
+
+The first installation requires Python and access to the public pinned
+sources. It installs below ignored `.engineering-board/dev-tools/`. Exact
+versions, lock files, immutable download URLs, and SHA-256 values are in
+[`support/dev-tools/`](support/dev-tools/). A failure names the missing or
+mismatched prerequisite and the recovery command. The development inventory
+also provisions the minimum and current Python package-test runtimes. It does
+not change the zero-dependency MCP runtime metadata.
+
+To use the containerized workspace, open the repository in a Dev Container or
+build it with:
+
+```sh
+docker build --no-cache \
+  -f .devcontainer/Dockerfile \
+  -t engineering-board-devcontainer .
+```
+
+The container uses user `vscode` and workspace
+`/workspaces/engineering-board`. Its post-create command checks the pinned
+inventory. The image marks only that workspace as a safe Git directory.
+When an amd64 container runs through an arm64 emulation host, it selects the
+checksum-pinned native arm64 Python, Node, and standalone validator toolchain
+that was installed during the image build. The container keeps its required
+and POSIX command layer that were installed during the image build. The final
+image stage keeps the required amd64 image identity without requiring a
+BuildKit-only command-line option, and validation does not install another
+tool.
+## Run the stable quality commands
+
+On macOS or Linux, use these exact repository entry points:
+
+```sh
+bash scripts/quality-gate.sh format
+bash scripts/quality-gate.sh lint
+bash scripts/quality-gate.sh typecheck
+bash scripts/quality-gate.sh test --workers 2
+bash scripts/quality-gate.sh security
+bash scripts/quality-gate.sh package
+bash scripts/quality-gate.sh all --workers 2
 bash tests/run-all.sh
 ```
 
-The continuous integration (CI) workflow runs this command for each push.
+The `test` selector is the quality test and coverage invocation. There is no
+standalone `coverage` selector. `all --workers 2` is the split-gate aggregate.
+`tests/run-all.sh` remains the supported compatibility aggregate.
+
+The platform-neutral compatibility runner is:
+
+```sh
+python3 scripts/legacy_run_all.py --root . --portable-only
+```
+
+On native Windows PowerShell use
+`python scripts/legacy_run_all.py --root . --portable-only`. From native
+`cmd.exe` use
+`python scripts\legacy_run_all.py --root . --portable-only`. The
+`--portable-only` journey runs the shared Python suites and records each
+Bash-only plugin suite as `posix-bash-only`; it is not a claim that Bash hooks
+run natively on Windows. Every form accepts an explicit repository root from
+an unrelated directory, including a path with spaces.
+
+On native Windows PowerShell, use:
+
+```powershell
+python scripts/quality_gate.py format
+python scripts/quality_gate.py lint
+python scripts/quality_gate.py typecheck
+python scripts/quality_gate.py test --workers 2
+python scripts/quality_gate.py security
+python scripts/quality_gate.py package
+python scripts/quality_gate.py all --workers 2
+```
+
+From native `cmd.exe`, use the same selectors with the Windows path:
+
+```bat
+python scripts\quality_gate.py format
+python scripts\quality_gate.py lint
+python scripts\quality_gate.py typecheck
+python scripts\quality_gate.py test --workers 2
+python scripts\quality_gate.py security
+python scripts\quality_gate.py package
+python scripts\quality_gate.py all --workers 2
+```
+
+Run `bash scripts/quality-gate.sh --help` or
+`python scripts/quality_gate.py --help` for selector help. Invalid selectors,
+unknown options, missing values, and worker counts outside 1 to 2 fail before
+any stage starts. Git Bash and WSL are compatibility environments. They are
+not native Windows evidence.
+
+The `test` selector writes ignored coverage evidence below
+`.engineering-board/validation/coverage/`. It enforces the versioned total,
+branch, root-plugin, MCP-server, and changed-line thresholds in
+`support/quality/coverage-policy.json`. Pull-request runs compare with the
+base branch. Local runs compare with the previous commit unless
+`ENGINEERING_BOARD_COVERAGE_BASE` names an explicit base. Both modes include
+staged, unstaged, and untracked Python changes in the reported identity and
+uncovered-line decision. Eligible changed source missing from the coverage
+report fails instead of being skipped. Native Windows starts the selector from
+PowerShell or `cmd.exe`. The selector uses the Bash bundled with the required
+Git for Windows installation only to measure Bash-plugin compatibility cases;
+this child coverage does not reclassify Git Bash as native Windows evidence.
+
+The `security` selector audits the complete pinned Python lock, scans for
+secret signatures, runs the pinned workflow analyzer, requires full action
+SHAs and immutable download URLs, verifies checksums and the installed tool
+inventory, enforces the tracked supply-chain policy, and exercises the
+canonical reject filter. It reports each family separately. Secret
+diagnostics show `<redacted>` instead of the detected value.
+
+The `package` selector builds the Python wheel and source distribution through
+the repository-owned zero-dependency PEP 517 backend. It also builds the MCPB,
+checks byte reproducibility and exact archive contents, installs the wheel and
+sdist separately on Python 3.8 and the matrix current Python, and runs the MCP
+stdio lifecycle from each distribution. Matching schema-valid CycloneDX SBOMs
+and the package report are written below ignored
+`.engineering-board/validation/package/`.
+
+Supported host, shell, runtime, and container versions are declared in
+[`support/platform-matrix.json`](support/platform-matrix.json) and documented
+in [`docs/SUPPORTED_PLATFORMS.md`](docs/SUPPORTED_PLATFORMS.md). Native
+Windows validation uses `scripts/platform_test.py` directly from PowerShell
+and `cmd.exe`; Git Bash and WSL are compatibility environments only.
 
 Add tests for new behavior. Change the tests when you change behavior.
 

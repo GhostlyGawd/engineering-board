@@ -48,7 +48,7 @@ mkdir -p "$BOARD_DIR/bugs" "$BOARD_DIR/_claims" "$TMP/work-log"
 POOL_SIZE=8
 for i in $(seq 1 $POOL_SIZE); do
   ID=$(printf "B4%02d" "$i")
-  cat > "$BOARD_DIR/bugs/${ID}-pool-entry.md" <<EOF
+  cat >"$BOARD_DIR/bugs/${ID}-pool-entry.md" <<EOF
 ---
 id: $ID
 type: bug
@@ -70,7 +70,7 @@ done
 # work log: `<session-id>\t<entry-id>`. After both loops exit, the test
 # verifies every pool entry appears in exactly one log line across both files.
 WORKER_BODY="$TMP/worker-body.sh"
-cat > "$WORKER_BODY" <<'WORKER'
+cat >"$WORKER_BODY" <<'WORKER'
 #!/usr/bin/env bash
 # Args: <board-dir> <session-id> <acquire-script> <release-script> <work-log-path>
 set -euo pipefail
@@ -147,16 +147,18 @@ chmod +x "$WORKER_BODY"
 # ── Launch two workers concurrently ──────────────────────────────────────────
 LOG_A="$TMP/work-log/session-A.tsv"
 LOG_B="$TMP/work-log/session-B.tsv"
-: > "$LOG_A"
-: > "$LOG_B"
+: >"$LOG_A"
+: >"$LOG_B"
 
 bash "$WORKER_BODY" "$BOARD_DIR" "session-A" "$ACQUIRE" "$RELEASE" "$LOG_A" &
 PID_A=$!
 bash "$WORKER_BODY" "$BOARD_DIR" "session-B" "$ACQUIRE" "$RELEASE" "$LOG_B" &
 PID_B=$!
 
-RC_A=0; wait $PID_A || RC_A=$?
-RC_B=0; wait $PID_B || RC_B=$?
+RC_A=0
+wait $PID_A || RC_A=$?
+RC_B=0
+wait $PID_B || RC_B=$?
 
 # ── Assertions ───────────────────────────────────────────────────────────────
 PASS=0

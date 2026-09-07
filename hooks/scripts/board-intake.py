@@ -55,9 +55,7 @@ def main(argv: list[str] | None = None) -> int:
     board_dir = Path(args.board_dir).resolve()
     if not board_dir.is_dir():
         print(
-            json.dumps(
-                {"error": "board_not_found", "path": str(board_dir)}
-            ),
+            json.dumps({"error": "board_not_found", "path": str(board_dir)}),
             file=sys.stderr,
         )
         return 2
@@ -73,9 +71,7 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 rebuild_board(str(board_dir), args.project)
             else:
-                result = plan_promotion(
-                    board_dir, args.project, args.session
-                )
+                result = plan_promotion(board_dir, args.project, args.session)
         elif args.action == "list":
             registry = load_pattern_registry(board_dir)
             result = {
@@ -99,9 +95,7 @@ def main(argv: list[str] | None = None) -> int:
             params = {
                 "label": args.label,
                 "aliases": args.aliases,
-                "alias": (
-                    args.aliases[0] if args.aliases else None
-                ),
+                "alias": (args.aliases[0] if args.aliases else None),
                 "pattern_id": args.pattern_id,
                 "entry_id": args.entry_id,
                 "replace": args.replace,
@@ -120,16 +114,10 @@ def main(argv: list[str] | None = None) -> int:
                     args.apply,
                 )
             else:
-                result = plan_pattern_operation(
-                    board_dir, args.action, params
-                )
+                result = plan_pattern_operation(board_dir, args.action, params)
     except GraphError as exc:
         detail = str(exc)
-        error = (
-            detail.split(":", 1)[0]
-            if ":" in detail
-            else "invalid_operation"
-        )
+        error = detail.split(":", 1)[0] if ":" in detail else "invalid_operation"
         print(
             json.dumps({"error": error, "detail": detail}),
             file=sys.stderr,

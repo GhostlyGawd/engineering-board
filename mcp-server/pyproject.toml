@@ -10,8 +10,9 @@
 # publishing in .github/workflows/release.yml (no stored secrets).
 
 [build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
+requires = []
+build-backend = "engineering_board_build_backend"
+backend-path = ["."]
 
 [project]
 name = "engineering-board-mcp"
@@ -19,7 +20,8 @@ version = "1.13.4"
 description = "Zero-dependency MCP server for repository-owned engineering pattern intelligence."
 readme = "README.md"
 requires-python = ">=3.8"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Acadia" }]
 keywords = ["mcp", "mcp-server", "kanban", "multi-agent", "agentic-workflow", "claude-code"]
 classifiers = [

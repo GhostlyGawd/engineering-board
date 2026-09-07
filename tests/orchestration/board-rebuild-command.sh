@@ -58,22 +58,22 @@ check_re() {
 }
 
 # ── Trigger surface ─────────────────────────────────────────────────────────
-check "trigger: /board-rebuild documented"                   "/board-rebuild"
-check "trigger: per-project variant"                         "/board-rebuild <project-name>"
+check "trigger: /board-rebuild documented" "/board-rebuild"
+check "trigger: per-project variant" "/board-rebuild <project-name>"
 
 # ── Outputs: BOARD.md + GRAPH.yml are the two regeneration targets ──────────
-check "regen target: BOARD.md"                               "BOARD.md"
-check "regen target: GRAPH.yml"                              "GRAPH.yml"
-check "single source of truth: entry .md files"              "single source of truth"
+check "regen target: BOARD.md" "BOARD.md"
+check "regen target: GRAPH.yml" "GRAPH.yml"
+check "single source of truth: entry .md files" "single source of truth"
 
 # ── Determinism + idempotency are non-negotiable contract terms ─────────────
-check "contract: deterministic regeneration"                 "deterministic"
-check "contract: idempotent"                                 "Idempotent"
+check "contract: deterministic regeneration" "deterministic"
+check "contract: idempotent" "Idempotent"
 check "contract: same input -> byte-identical (modulo generated_at)" "byte-identical"
 
 # ── Boards lookup: router-first with legacy fallback ────────────────────────
-check "boards: reads BOARD-ROUTER.md"                        "BOARD-ROUTER.md"
-check "boards: legacy fallback"                              "legacy"
+check "boards: reads BOARD-ROUTER.md" "BOARD-ROUTER.md"
+check "boards: legacy fallback" "legacy"
 
 # ── Four entry-type subdirs must all be enumerated ──────────────────────────
 for sub in bugs features questions observations; do
@@ -81,10 +81,10 @@ for sub in bugs features questions observations; do
 done
 
 # ── Validation pass surfaces (informational, does not block) ────────────────
-check "validation: duplicate IDs reported"                   "Duplicate IDs"
-check "validation: resolved-in-Open reported"                "Resolved entries still listed"
-check "validation: missing frontmatter reported"             "Missing required frontmatter"
-check "validation: dangling blocked_by reported"             "Dangling"
+check "validation: duplicate IDs reported" "Duplicate IDs"
+check "validation: resolved-in-Open reported" "Resolved entries still listed"
+check "validation: missing frontmatter reported" "Missing required frontmatter"
+check "validation: dangling blocked_by reported" "Dangling"
 
 # ── Step ordering: scan -> validate -> regen BOARD.md -> diff -> write ──────
 #    -> regen GRAPH.yml -> auto-resolve terminal pass -> report.
@@ -102,8 +102,8 @@ else
 fi
 
 # ── Auto-resolve terminal pass is mandatory and references the protocol ─────
-check "auto-resolve: mandatory terminal pass"                "Auto-resolve terminal pass (mandatory)"
-check "auto-resolve: references shared protocol"             "auto-resolve-pass.md"
+check "auto-resolve: mandatory terminal pass" "Auto-resolve terminal pass (mandatory)"
+check "auto-resolve: references shared protocol" "auto-resolve-pass.md"
 if [ -f "$AUTO_RESOLVE" ]; then
   report 0 "auto-resolve protocol file exists at references/auto-resolve-pass.md"
 else
@@ -115,16 +115,16 @@ fi
 check "graph integration: Step 7 invokes /board-graph logic" "/board-graph"
 
 # ── B004 framing: rebuild is the cache-invalidation fix ─────────────────────
-check "framing: B004 fix mechanism"                          "B004"
+check "framing: B004 fix mechanism" "B004"
 
 # ── Sort order documented for stable BOARD.md output ────────────────────────
-check "sort: bugs by priority then ID"                       "P0"
-check "sort: questions by ID ascending"                      "Questions by ID ascending"
-check "sort: observations by ID ascending"                   "Observations by ID ascending"
+check "sort: bugs by priority then ID" "P0"
+check "sort: questions by ID ascending" "Questions by ID ascending"
+check "sort: observations by ID ascending" "Observations by ID ascending"
 
 # ── Report shape (one block to chat) ────────────────────────────────────────
-check "report: BOARD.md add/remove/reorder counts"           "BOARD.md:"
-check "report: GRAPH.yml node/edge/cluster counts"           "GRAPH.yml:"
+check "report: BOARD.md add/remove/reorder counts" "BOARD.md:"
+check "report: GRAPH.yml node/edge/cluster counts" "GRAPH.yml:"
 
 echo ""
 echo "================================================================"

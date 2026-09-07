@@ -196,21 +196,26 @@ Add to `claude_desktop_config.json` (macOS:
 The Claude Code plugin auto-registers this server through the repository-root
 [`.mcp.json`](../.mcp.json). The Codex plugin selects
 [`codex-mcp.json`](../codex-mcp.json), which adds
-`default_tools_approval_mode: writes`. Both files use this transport:
+`default_tools_approval_mode: writes`. Claude resolves the launcher from its
+installed plugin root, rather than the active target repository:
 
 ```json
 {
   "mcpServers": {
     "engineering-board": {
       "command": "node",
-      "args": ["scripts/engineering-board-mcp-launcher.mjs"],
-      "cwd": "."
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/scripts/engineering-board-mcp-launcher.mjs"
+      ],
+      "cwd": "${CLAUDE_PLUGIN_ROOT}"
     }
   }
 }
 ```
 
-The plugins use `scripts/engineering-board-mcp-launcher.mjs`. The launcher selects `python3`,
+Codex resolves the relative launcher and `cwd: "."` from its separately
+installed plugin cache. Both hosts use
+`scripts/engineering-board-mcp-launcher.mjs`. The launcher selects `python3`,
 `python`, or the Windows `py -3` launcher without using a shell. Set `PYTHON`
 to an executable path when Python is not on `PATH`.
 
@@ -245,6 +250,14 @@ cloning the repo, the packaged channels are:
 `.claude-plugin/plugin.json`. The MCP test suite prevents silent drift.
 `smithery.yaml` is version-agnostic launch configuration.
 
+The Python wheel and sdist use the repository-owned
+`engineering_board_build_backend.py` PEP 517 backend. The backend has no build
+dependency and normalizes archive ordering, timestamps, permissions, and
+metadata. The stable package gate builds each byte-oriented artifact twice,
+checks the exact allowlist, installs wheel and sdist on Python 3.8 and the
+matrix current Python, runs the MCP lifecycle from wheel, sdist, and MCPB, and
+generates one digest-bound CycloneDX SBOM per artifact.
+
 ## Multi-client: two clients, one board
 
 Driving the same board from two MCP clients simultaneously (e.g. Claude Code
@@ -261,20 +274,46 @@ session id).
 
 ## Tests
 
+From the repository root, the MCP application participates in the stable
+quality gates:
+
+```sh
+bash scripts/quality-gate.sh format
+bash scripts/quality-gate.sh lint
+bash scripts/quality-gate.sh typecheck
+bash scripts/quality-gate.sh package
+```
+
+Native Windows uses `python scripts/quality_gate.py` with the same selectors.
+The strict typed MCP scope includes `engineering_board_core.py` and
+`engineering_board_build_backend.py`.
+`engineering_board_mcp.py` is a tracked staged exclusion in
+`support/quality/typing-policy.json`. Development checks do not add a runtime
+dependency to the wheel, source archive, or MCP bundle.
+
+Successful package validation writes ignored evidence to
+`.engineering-board/validation/package/`. The report records the two declared
+Python runtimes, exact artifact SHA-256 values, matching SBOM names and
+digests, and the empty runtime dependency set.
+
+The MCP compatibility suite remains:
+
 ```sh
 bash mcp-server/run-tests.sh
 ```
 
-`test_mcp_server.py` (pure python3, no deps) runs two suites:
+`run-tests.sh` runs two pure-Python, zero-dependency test modules:
 
-1. A **real end-to-end stdio session**: spawns the server as a subprocess and drives
-   `initialize` to `notifications/initialized` to `tools/list` to several `tools/call`,
-   asserting on the JSON-RPC responses (including `-32601`/`-32602` error paths).
-2. A **full board lifecycle** in a temp repo: `board_init` to `board_create_entry`
+1. `test_mcp_protocol.py` drives lifecycle ordering, protocol-version
+   negotiation, malformed and oversized message recovery, EOF/SIGINT,
+   launcher failure, root precedence, bundled explicit-root enforcement, and
+   traversal/symlink containment.
+2. `test_mcp_server.py` runs a real end-to-end stdio session and a **full board
+   lifecycle** in a temp repo: `board_init` to `board_create_entry`
    (bug + question + feature + learning) to `board_list_entries` to `board_update_entry`
    to `board_rebuild` to `board_status` to `board_capture_finding` to `board_claim` /
-   `board_release`, asserting every created file passes the real
-   `hooks/scripts/board-validate-entry.sh`.
+   `board_release`. It also pins the previous-release 19-tool public fixture
+   and asserts every created file passes the real `board-validate-entry.sh`.
 
 Exit 0 on all-pass. non-zero with detail on the first failure.
 

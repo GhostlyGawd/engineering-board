@@ -38,8 +38,14 @@ fi
 
 PASS=0
 FAIL=0
-report_pass() { printf "  [PASS] %s\n" "$1"; PASS=$((PASS + 1)); }
-report_fail() { printf "  [FAIL] %s -- %s\n" "$1" "$2"; FAIL=$((FAIL + 1)); }
+report_pass() {
+  printf "  [PASS] %s\n" "$1"
+  PASS=$((PASS + 1))
+}
+report_fail() {
+  printf "  [FAIL] %s -- %s\n" "$1" "$2"
+  FAIL=$((FAIL + 1))
+}
 
 # Strip pure-comment lines (optional whitespace + `#`) from input so the
 # rules below don't flag the script's own documentation. Trailing comments

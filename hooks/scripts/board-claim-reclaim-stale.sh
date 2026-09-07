@@ -43,7 +43,10 @@ BOARD_DIR_LOWER="$(echo "$BOARD_DIR" | tr '[:upper:]' '[:lower:]')"
 IS_CLOUD=0
 for marker in "onedrive" "dropbox" "icloud" "google drive" "googledrive" "box sync" "boxsync"; do
   case "$BOARD_DIR_LOWER" in
-    *"$marker"*) IS_CLOUD=1; break ;;
+    *"$marker"*)
+      IS_CLOUD=1
+      break
+      ;;
   esac
 done
 
@@ -151,4 +154,4 @@ for entry_id, claim_path in claim_dirs:
     }))
 '
 
-python3 - "$CLAIMS_DIR" "$STALE_SEC" "$RECLAIMED_LOG" <<< "$RECLAIM_PY"
+python3 - "$CLAIMS_DIR" "$STALE_SEC" "$RECLAIMED_LOG" <<<"$RECLAIM_PY"

@@ -61,9 +61,7 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "apply-learning":
             result = apply_learning_plan(board_dir, args.project, args.token)
         elif args.command == "curate":
-            result = curate_learning_feedback(
-                board_dir, args.project, args.min_recurrence
-            )
+            result = curate_learning_feedback(board_dir, args.project, args.min_recurrence)
         else:
             result = build_value_report(board_dir, args.project)
     except (GraphError, OSError, ValueError, json.JSONDecodeError) as exc:

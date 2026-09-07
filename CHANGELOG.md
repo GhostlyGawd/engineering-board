@@ -9,6 +9,112 @@ increases.
 
 ## [Unreleased]
 
+### Added
+
+- Added a schema-validated supported-platform matrix, a platform-neutral test
+  launcher, native PowerShell and `cmd.exe` validation on GitHub-hosted
+  Windows, and globally bounded validator resource locks.
+- Added checksum-verified pinned development bootstrap tooling for macOS,
+  Linux, native Windows, and a digest-pinned reproducible devcontainer with a
+  stable workspace, user, and normalized tool inventory.
+- Added stable Bash and native-Windows Python quality entry points with
+  equivalent selectors and early invocation validation; repository-wide
+  non-rewriting format/lint policy; strict root-plugin and MCP type scopes with
+  tracked staged exclusions; and exact contributor, agent, platform, and MCP
+  application guidance.
+- Added enforceable total, branch, root-plugin, MCP-server, and changed-line
+  coverage thresholds plus named fail-closed dependency, secret, workflow,
+  immutable-pin, checksum-integrity, and reject-filter security families with
+  advisory diagnostics and secret-value redaction.
+- Added a deterministic zero-dependency Python package backend and package
+  runtime matrix that reproduces wheel, sdist, and MCPB artifacts, installs
+  wheel and sdist on Python 3.8 and current Python, runs MCP stdio from every
+  distribution, and emits schema-valid digest-bound CycloneDX SBOMs.
+- Added exact canonical application discovery and per-application guidance,
+  documented-command and freshness auditing, diagnosable multi-failure split
+  aggregation, and a platform-neutral compatibility runner with normalized
+  repeatability evidence and explicit native-Windows portable-suite skips.
+- Added a schema-validated public landing surface policy with exact first-
+  viewport markers, focusable controls, product-owned theme values, and
+  script-free landmark, heading, link, and install-command inventories.
+- Added the canonical loopback browser QA lifecycle at
+  `bash scripts/serve-qa.sh`, with exclusive browser and port ownership,
+  current-checkout staging, recorded-PID cleanup, native-Windows parity, and
+  visible lock, listener, generation, and receipt failures.
+
+### Fixed
+
+- The MCP protocol host-termination harness now preserves POSIX `SIGINT` while
+  using supported explicit process termination on native Windows, with the
+  same clean lifecycle and JSON-RPC-only stdout assertions on both platforms.
+- MCP source, launcher, installed, and bundled stdio now enforce the
+  `2025-06-18` initialization lifecycle, reject malformed, invalid, and
+  oversized messages without stream desynchronization, preserve the exact
+  19-tool schema and annotation fixture across distributions, require an
+  explicit absolute repository root in bundled calls, and reject escaping
+  router, affects, symlink, and context paths before mutation.
+- The Claude plugin now resolves its bundled MCP launcher from
+  `${CLAUDE_PLUGIN_ROOT}` instead of the active target repository, so an
+  isolated installed session connects the plugin-owned 19-tool server without
+  copying plugin files into the project. Codex keeps its separate
+  release-pinned relative launcher and writes-only approval policy.
+- Generated boards now require explicit full-SHA stamping, validate source
+  links, atomically replace only the selected output, use stable empty and
+  unavailable markers, bound optional coordination data, and keep adversarial
+  values visible but inert across every rendered field.
+- The landing page now survives denied theme storage, missing enhancement
+  APIs, clipboard rejection, reduced motion, and disabled JavaScript while
+  preserving selectable install commands and closed `eb-theme` values.
+- The devcontainer now treats only its canonical workspace as a safe Git
+  directory, keeps nested quality tests on the image-pinned tool root, and
+  uses a checksum-pinned native arm64 validator and POSIX command layer when
+  its amd64 image runs through an arm64 emulation host. Its documented cold
+  build no longer requires a BuildKit-only platform option.
+- The platform-neutral legacy aggregate runner now preserves literal LF bytes
+  for stdout, stderr, and atomically replaced normalized JSON reports on
+  native Windows.
+- The application discovery and guidance contract now uses Python-3.8-safe
+  runtime typing forms while preserving its reports, diagnostics, and command
+  behavior.
+- The platform-neutral legacy aggregate runner now configures strict UTF-8
+  stdout and stderr before CLI output, forwards Unicode suite diagnostics
+  without changing decisions, and infers native PowerShell or `cmd.exe`
+  report identity from the Windows support row when the shell variable is
+  absent.
+- Packaged MCP graph writes now preserve exact UTF-8 and literal LF bytes on
+  native Windows, and package failures name `GRAPH.yml` or cache `state.json`
+  with the failing byte or temporary-file condition.
+- Changed-line coverage now executes the package backend, contract, gate, and
+  runtime tests under the pinned collector; includes committed, staged,
+  unstaged, and untracked Python changes in one deterministic identity; and
+  fails when eligible changed source is absent from the coverage report.
+- Native Windows validator lock probes now inspect process state without
+  signaling the lock owner, so occupied-resource checks fail promptly instead
+  of interrupting the workflow process tree.
+- Validator occupied-port probes now use a plain loopback bind without address
+  reuse, so reusable foreign listeners on ports 4173 and 4318 fail visibly on
+  native Windows and remain owned by the original process.
+- Linux-container `/opt` declarations now retain POSIX separators on every
+  host while configured executable tool roots keep host-native expansion and
+  canonicalization.
+- Linux arm64 bootstrap artifact selection now requires the exact canonical
+  POSIX devcontainer tool-root declaration and rejects host-normalized aliases.
+- Native Windows bootstrap failures now print the supported Python recovery
+  command, and Windows plus aggregate CI explicitly check out the pull-request
+  head and retain exact-head result manifests for the temporary foundation
+  evidence flow.
+- Temporary foundation evidence workflows now accept only pull-request open
+  and synchronization events with read-only repository contents permission,
+  and exercise explicit native-shell quality help, selectors, and rejection.
+- Native Windows quality checks now batch long repository file lists and
+  decode validator output as UTF-8 instead of the active console code page.
+- Native Windows coverage now measures the Bash-plugin compatibility cases
+  through the Bash bundled with Git for Windows while preserving PowerShell
+  and `cmd.exe` as the native quality entry points.
+- The evaluation harness now accepts fixed macOS system aliases such as
+  `/var` to `/private/var` without accepting user-created symbolic-link,
+  junction, or reparse-point escapes.
+
 ## [1.13.4] — 2026-08-16
 
 ### Fixed

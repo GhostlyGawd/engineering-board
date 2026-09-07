@@ -17,21 +17,20 @@ fi
 # Match both new multi-board layout and legacy single-board layout
 case "${file_path}" in
   "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/bugs/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/features/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/questions/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/observations/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/learnings/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/bugs/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/features/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/questions/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/observations/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/learnings/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/docs/board/bugs/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/docs/board/features/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/docs/board/questions/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/docs/board/observations/"*".md" | \
-  "${CLAUDE_PROJECT_DIR}/docs/board/learnings/"*".md")
-    ;;
+    "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/features/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/questions/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/observations/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/engineering-board/"*"/learnings/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/bugs/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/features/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/questions/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/observations/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/docs/boards/"*"/learnings/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/docs/board/bugs/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/docs/board/features/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/docs/board/questions/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/docs/board/observations/"*".md" | \
+    "${CLAUDE_PROJECT_DIR}/docs/board/learnings/"*".md") ;;
   *)
     exit 0
     ;;
@@ -59,7 +58,7 @@ done
 entry_type=$(echo "${frontmatter}" | grep "^type:" | awk '{print $2}' || true)
 
 case "${entry_type}" in
-  bug|feature)
+  bug | feature)
     for field in status priority affects; do
       if ! has_field "${field}"; then
         errors+=("Missing required frontmatter field for ${entry_type}: ${field}")
@@ -77,8 +76,7 @@ case "${entry_type}" in
       errors+=("Missing required '## Done when' section")
     fi
     ;;
-  observation|"")
-    ;;
+  observation | "") ;;
   learning)
     # Learning entries require subtype, confidence, recurrence, derived_from
     # (full schema in skills/board-intake/references/frontmatter-schema.md).
@@ -90,13 +88,13 @@ case "${entry_type}" in
     # subtype must be one of pattern|finding|principle
     subtype=$(echo "${frontmatter}" | grep "^subtype:" | awk '{print $2}' || true)
     case "${subtype}" in
-      pattern|finding|principle|"") ;;
+      pattern | finding | principle | "") ;;
       *) errors+=("Invalid subtype for learning: ${subtype} (allowed: pattern, finding, principle)") ;;
     esac
     # confidence must be low|medium|high
     confidence=$(echo "${frontmatter}" | grep "^confidence:" | awk '{print $2}' || true)
     case "${confidence}" in
-      low|medium|high|"") ;;
+      low | medium | high | "") ;;
       *) errors+=("Invalid confidence for learning: ${confidence} (allowed: low, medium, high)") ;;
     esac
     # Required body sections

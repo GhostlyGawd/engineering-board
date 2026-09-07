@@ -10,9 +10,8 @@ const server = join(pluginRoot, "mcp-server", "engineering_board_mcp.py");
 
 const candidates = [];
 if (process.env.PYTHON) {
-  candidates.push({ command: process.env.PYTHON, args: [] });
-}
-if (process.platform === "win32") {
+  candidates.push({ command: process.env.PYTHON, args: [], required: true });
+} else if (process.platform === "win32") {
   candidates.push(
     { command: "python", args: [] },
     { command: "py", args: ["-3"] },
@@ -44,8 +43,15 @@ function start(index) {
   });
 
   child.once("error", (error) => {
-    if (error.code === "ENOENT") {
+    if (error.code === "ENOENT" && !candidate.required) {
       start(index + 1);
+      return;
+    }
+    if (error.code === "ENOENT" && candidate.required) {
+      process.stderr.write(
+        `Engineering Board PYTHON override is unavailable: ${candidate.command}\n`,
+      );
+      process.exit(127);
       return;
     }
     process.stderr.write(`Engineering Board failed to start: ${error.message}\n`);

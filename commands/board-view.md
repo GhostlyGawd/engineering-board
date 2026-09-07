@@ -20,12 +20,13 @@ bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-view.sh" ${1:-} $([ "$ARGUMENTS" !
 - With no arguments it renders **every** project the router resolves.
 - With a project name it renders just that board.
 - `--stdout` prints the HTML instead of writing `board.html`.
-- `--link-base <url>` prefixes entry-card links with an absolute base (e.g. a
-  GitHub blob URL) so a *hosted* copy of `board.html` clicks through to the
-  entry sources. without it, links are relative (they resolve locally and in
-  the GitHub file view). Also settable via the `EB_VIEW_LINK_BASE` env var.
-- `--stamp` appends a "Generated from `<git short-sha>`" line to the footer -
-  opt-in because it deliberately breaks the default byte-determinism.
+- `--link-base <url>` prefixes canonical source links with an HTTPS or
+  `127.0.0.1` HTTP base that ends in `/`. Without it, safe source paths remain
+  relative. The equivalent `EB_VIEW_LINK_BASE` environment form emits the
+  same bytes.
+- `--stamp --revision <sha>` appends exactly one explicit full 40-character
+  lowercase Git SHA. The default has no ambient revision and remains
+  byte-deterministic.
 - `--demo-dir <run-dir>` is an internal `/board-demo` integration surface. It
   reads that run's `graph.json` and proposed hypothesis Markdown, writes
   `pattern-intelligence.html`, and never opens a browser. Normal users should
@@ -58,10 +59,13 @@ just re-run it anytime (it is safe and deterministic).
 
 ## Notes
 
-- Deterministic and side-effect-free apart from writing `board.html`. Never
-  edits entries or `BOARD.md`.
+- Deterministic and side-effect-free apart from atomically replacing the
+  selected `board.html`. Never edits entries, `BOARD.md`, runtime inputs, or
+  unrelated generated files.
 - Treats board content as data: it escapes all entry text into HTML, so a
   crafted title or hypothesis cannot inject markup into the view.
+- Unsafe flags, link bases, revisions, paths, and missing required inputs fail
+  with a stable error code before replacing a prior good output.
 - The normal view has no hypothesis mutation controls. Use
   `/board-hypothesis` for content-bound preview/apply actions.
 - Demo rendering is a separate static evidence to cluster to hypothesis layout.
