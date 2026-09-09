@@ -13,8 +13,20 @@ import threading
 
 
 def inventory(root):
-    return {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
-            for p in sorted(root.rglob("*")) if p.is_file()}
+    records = {}
+    for path in sorted(root.rglob("*")):
+        relative = path.relative_to(root).as_posix()
+        mode = path.lstat().st_mode & 0o7777
+        if path.is_symlink():
+            records[relative] = {"type": "symlink", "target": os.readlink(path), "mode": mode}
+        elif path.is_file():
+            records[relative] = {"type": "file", "mode": mode,
+                                 "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+        elif path.is_dir():
+            records[relative] = {"type": "directory", "mode": mode}
+        else:
+            records[relative] = {"type": "other", "mode": mode}
+    return records
 
 
 def main():
