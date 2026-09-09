@@ -824,6 +824,59 @@ class EvaluationHarnessTests(unittest.TestCase):
                              "no_local_correction_trial_keys" if mode == "no-local" else "invalid_reference_trial_keys")
                     self.assertIn(target_key, memory[field])
 
+    def test_failed_trial_cannot_be_omitted_from_both_manifest_lists(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-omission-") as temp:
+            run_dir = self.prepare(Path(temp), evaluation_version="2")
+            manifest = load_run(run_dir)
+            cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+            failed_key = manifest["evaluation_contract"]["eligible_trial_keys"][0]
+            for trial in manifest["trials"]:
+                attempt = self.v2_attempt(trial, cases[trial["case_id"]], before=trial["trial_key"] != failed_key)
+                record_attempt(run_dir, trial["trial_key"], attempt)
+            original = score_run(run_dir)["memory_evaluation"]
+            self.assertEqual(original["planned_context_arms"], 12)
+            self.assertEqual(original["rate_percent"], 91.67)
+            self.assertTrue(original["complete"])
+            manifest["trials"] = [trial for trial in manifest["trials"] if trial["trial_key"] != failed_key]
+            manifest["evaluation_contract"]["eligible_trial_keys"].remove(failed_key)
+            manifest.pop("manifest_fingerprint")
+            manifest["manifest_fingerprint"] = _digest(manifest)
+            (run_dir / "run-manifest.json").write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(EvaluationError, "preserved workspace cohort"):
+                score_run(run_dir)
+            with self.assertRaisesRegex(EvaluationError, "preserved workspace cohort"):
+                load_run(run_dir, manifest["trials"][0]["trial_key"])
+            # Enumerate directories, not only matching input.json files: an
+            # omitted directory with its input removed is still detectable.
+            omitted_input = run_dir / "workspaces" / failed_key / "input.json"
+            omitted_input.rename(omitted_input.with_name("retained-input.json"))
+            with self.assertRaisesRegex(EvaluationError, "workspace input is missing"):
+                score_run(run_dir)
+
+    def test_prepared_cohort_rejects_linked_or_redirected_input_paths(self) -> None:
+        for mode in ("input-link", "workspace-link", "redirected-workspace"):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory(prefix="eb-eval-cohort-path-") as temp:
+                run_dir = self.prepare(Path(temp), evaluation_version="2")
+                manifest = load_run(run_dir)
+                trial = manifest["trials"][0]
+                workspace = run_dir / trial["workspace"]
+                if mode == "input-link":
+                    source = workspace / "input.json"
+                    retained = workspace / "retained-input.json"
+                    source.rename(retained)
+                    source.symlink_to(retained)
+                elif mode == "workspace-link":
+                    retained = run_dir / "retained-workspace"
+                    workspace.rename(retained)
+                    workspace.symlink_to(retained, target_is_directory=True)
+                else:
+                    trial["workspace"] = "workspaces/../workspaces/" + trial["trial_key"]
+                    manifest.pop("manifest_fingerprint")
+                    manifest["manifest_fingerprint"] = _digest(manifest)
+                    (run_dir / "run-manifest.json").write_text(json.dumps(manifest))
+                with self.assertRaises(EvaluationError):
+                    load_run(run_dir)
+
     def test_v1_and_unconfigured_populations_never_infer_v2_eligibility(self) -> None:
         for version, attempts in (("1", "1"), (None, "1"), (None, "2")):
             with self.subTest(version=version, attempts=attempts), tempfile.TemporaryDirectory(prefix="eb-eval-legacy-") as temp:

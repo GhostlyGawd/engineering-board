@@ -771,6 +771,43 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
     return {"run_id": config["run_id"], "trial_arms": len(trials), "pairs": len(trials) // 2, "manifest": str(output / "run-manifest.json")}
 
 
+def _validate_workspace_cohort(run_dir: Path, trials: list[dict[str, Any]],
+                               contract: dict[str, Any]) -> None:
+    """Check the manifest against every preserved preparation input directory."""
+    workspace_root = run_dir / "workspaces"
+    _reject_linked_path(workspace_root)
+    _require(workspace_root.is_dir(), "missing prepared workspace cohort")
+    inputs: dict[str, dict[str, Any]] = {}
+    digests: dict[str, str] = {}
+    for workspace in sorted(workspace_root.iterdir()):
+        _reject_linked_path(workspace)
+        _require(workspace.is_dir(), f"unexpected artifact in prepared workspace cohort: {workspace.name}")
+        input_path = workspace / "input.json"
+        _reject_linked_path(input_path)
+        _require(input_path.is_file(), f"prepared workspace input is missing: {workspace.name}")
+        trial_input = _read_json(input_path)
+        key = trial_input.get("trial_key")
+        _require(isinstance(key, str) and SAFE_NAME.fullmatch(key) is not None
+                 and key == workspace.name and key not in inputs,
+                 f"invalid prepared workspace identity: {workspace.name}")
+        inputs[key] = trial_input
+        digests[key] = _file_digest(input_path)
+    _require(set(inputs) == {trial["trial_key"] for trial in trials},
+             "manifest trial cohort differs from preserved workspace cohort")
+    for trial in trials:
+        key = trial["trial_key"]
+        _require(trial.get("workspace") == f"workspaces/{key}",
+                 f"prepared workspace path differs from fixed trial path: {key}")
+        _require(trial.get("input_sha256") == digests[key], f"trial input fingerprint does not match: {key}")
+        _require(all(trial.get(field) == inputs[key].get(field) for field in
+                     ("trial_key", "profile", "profile_role", "case_id", "category", "arm", "evaluation_version"))
+                 and inputs[key].get("evaluation_version") == contract["evaluation_version"],
+                 f"prepared evaluation cohort differs from frozen input: {key}")
+    preserved_trials = [inputs[trial["trial_key"]] for trial in trials]
+    _require(contract == _evaluation_contract(preserved_trials, contract["evaluation_version"]),
+             "prepared evaluation population differs from preserved input cohort")
+
+
 def load_run(run_dir: Path, trial_key: str | None = None) -> dict[str, Any]:
     """Load a run and verify all artifacts or one selected trial workspace."""
     run_dir = run_dir.absolute()
@@ -795,6 +832,7 @@ def load_run(run_dir: Path, trial_key: str | None = None) -> dict[str, Any]:
                  "invalid prepared evaluation contract")
         _require(contract == _evaluation_contract(trials, contract["evaluation_version"]),
                  "prepared evaluation population differs from trial cohort")
+        _validate_workspace_cohort(run_dir, trials, contract)
     if trial_key is not None:
         _require(trial_key in keys, f"unknown trial key: {trial_key}")
     for trial in trials:

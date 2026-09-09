@@ -143,6 +143,17 @@ V1-only runs report ordering as unavailable. Observed safeguard checks are
 separate from full-population safeguards and readiness for interpretation;
 neither a partial clean sample nor a complete run establishes product effect.
 
+For manifests with a prepared evaluation contract, loading checks the complete
+preserved `workspaces/` directory cohort and every direct `input.json`, even
+when recording one trial. Every directory must have an input at its fixed
+`workspaces/<trial_key>/input.json` path, with no linked paths. The manifest
+must list exactly this cohort, and its eligibility must agree with those
+inputs. Removing a failed trial from both manifest lists and recomputing the
+manifest hash cannot hide its preserved workspace. These are artifact
+integrity checks, not protection against an actor rewriting or deleting all
+copies of the original evidence. Historical manifests without the prepared
+evaluation contract keep their prior loading behavior.
+
 The repository contract uses Codex as the required reference client. A dated
 contract can add one or more `replication` profiles for other clients. Each
 replication must use the same paired-trial rules and pinned inputs. A
