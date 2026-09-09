@@ -18,6 +18,10 @@ increases.
 
 ### Fixed
 
+- D.1 version-2 responses can represent absent memory as `null`. The recorder
+  requires an explicit null evaluation and false ordering classification for
+  baseline and empty-context attempts, and the response schema accepts surfaced
+  cluster identifiers.
 - Claim acquisition now falls back to the caller's explicit repository root
   when an in-session plugin upgrade removes the running MCP process working
   directory, instead of deleting the new lock and reporting false contention.

@@ -1,5 +1,16 @@
 # Repository agent instructions
 
+## Development team
+
+Follow [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for maintainer product work.
+Use a lead, a builder, and an independent verifier with one accountable owner
+per board entry. Delegate bounded review and implementation assignments when
+they can progress independently. Record scope and acceptance criteria before
+implementation; review substantive changes in a fresh agent context.
+Existing user authorization covers routine implementation and delivery. Changes
+to product goals or evaluation success criteria require a concrete owner decision.
+The lead records evidence and resolves entries only after the required review.
+
 ## Release work
 
 For Engineering Board release work, read these files before you change a

@@ -13,7 +13,7 @@
   ],
   "properties": {
     "memory_evaluation": {
-      "type": "object",
+      "type": ["object", "null"],
       "additionalProperties": false,
       "required": [
         "memory_id",
@@ -24,7 +24,7 @@
         "evidence_or_gap"
       ],
       "properties": {
-        "memory_id": {"type": "string", "pattern": "^(?:H|L|P)[0-9]{3,}$"},
+        "memory_id": {"type": "string", "pattern": "^(?:(?:H|L|P)[0-9]{3,}|c-[0-9a-f]{16})$"},
         "memory_status": {"type": "string", "minLength": 1},
         "current_incident_ids": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z][0-9]{3,}$"}},
         "prior_incident_ids": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z][0-9]{3,}$"}},

@@ -2944,7 +2944,9 @@ without a Learning line.
 ### 21.16 Memory evaluation before local correction
 
 _State: additive contract selected from Q001 after the Q003 presentation
-diagnostic. Historical response schema version 1 and frozen evidence remain
+diagnostic; implementation reopened following the independent 2026-09-09 audit
+(engineering-board/F002, B004-B007). Live evaluation and release readiness are
+on hold. Historical response schema version 1 and frozen evidence remain
 unchanged._
 
 D.1 measures explicit use of surfaced memory before it rewards adoption of a
