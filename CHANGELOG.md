@@ -24,6 +24,9 @@ increases.
 
 ### Fixed
 
+- Standalone MCP bundles and installed Python distributions now report their
+  release version in the MCP handshake instead of `0.0.0`, while plugin
+  manifests retain precedence and unrelated package metadata is ignored.
 - D.1 memory-evaluation reporting now requires retained response evidence and
   a rubric-bound reviewer assessment for before-local classifications, checks
   v2 rejected-memory and decoy use separately, and reports rates only for a

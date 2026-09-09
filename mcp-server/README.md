@@ -122,6 +122,11 @@ no absolute path. The clone path still works everywhere and is the fallback.
 
 All 19 tools are self-contained in the Python package.
 
+The MCP handshake reads the source/plugin version first, then an owned bundle
+manifest or the Python distribution that owns the running module. Missing or
+invalid version metadata falls back to `0.0.0`; unrelated installed metadata
+does not supply a version for a copied standalone server.
+
 ### Codex plugin
 
 ```sh
