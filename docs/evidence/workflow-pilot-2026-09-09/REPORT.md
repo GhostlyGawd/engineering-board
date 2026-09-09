@@ -1,7 +1,7 @@
 # Workflow-value pilot — 2026-09-09
 
-Status: execution and staged semantic review complete; final corrected-report
-check and integration pending.
+Status: execution, staged semantic review and final evidence audit complete.
+Delivery: [PR174](https://github.com/GhostlyGawd/engineering-board/pull/174).
 
 ## Finding
 
@@ -191,6 +191,13 @@ reviews and mapping are retained in Git under this directory. See
 [patch review](PATCH-REVIEW.json), and [application ledger](MEMORY-APPLICATION-LEDGER.md).
 The raw run was committed at `408a449`, with grading and descriptive analysis
 at `e763127`. Final byte-retrieval audit and delivery references follow below.
+
+Independent verifier `review_workflow_protocol` validated 549 retained Git
+blobs against their bytes, the freeze/start/end chains, sequential one-shot
+population, grades and usage. Final reporting PASS is pinned to `a8dd697`:
+the corrected script exactly reproduces `RESULTS-v2.json`, warnings and both
+event-count categories match raw streams, and reporting/ledger claims preserve
+the stated limits. No required evidence or reporting correction remains.
 
 The independent post-run audit found that the initial `RESULTS.json` label
 `distinct_tool_calls` excluded file-change items. Corrected `RESULTS-v2.json`

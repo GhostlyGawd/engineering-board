@@ -1,8 +1,8 @@
 ---
 id: F004
 type: feature
-status: in_progress
-needs: tdd
+status: resolved
+needs: validate
 priority: P2
 title: Validate D.1 v2 in a live pilot with retained evidence
 affects: evaluation/
@@ -16,10 +16,10 @@ parent: F002
 
 ## Done when
 
-- [ ] Before launch, independently review a predeclared non-scored plan with pinned source/client/model, tasks, comparisons, stopping rules and durable artifact destination.
-- [ ] Preserve retrievable exact inputs, responses, start/end receipts and blind semantic review, including absent-memory and negative controls.
-- [ ] Report memory-use quality separately from emitted ordering and preserve invalid or unfavorable outcomes.
-- [ ] Record limitations and the release decision without silently changing historical thresholds or corpus locks.
+- [x] Before launch, independently review a predeclared non-scored plan with pinned source/client/model, tasks, comparisons, stopping rules and durable artifact destination.
+- [x] Preserve retrievable exact inputs, responses, start/end receipts and blind semantic review, including absent-memory and negative controls.
+- [x] Report memory-use quality separately from emitted ordering and preserve invalid or unfavorable outcomes.
+- [x] Record limitations and the release decision without silently changing historical thresholds or corpus locks.
 
 ## Evidence
 
@@ -34,3 +34,7 @@ parent: F002
 ## Approved workflow-value study direction
 
 Owner approved the product-value review recommendation: distinguish procedural Learning use from proposed-hypothesis investigation; compare ordinary repository work, selected historical evidence, and Engineering Board retrieval through a supported host workflow; judge useful investigation, coverage, patch correctness and overhead separately from response ordering. Fresh synthetic pilot tasks will be explicitly labeled, not represented as customer or independently sampled real-world incidents. Historical D.1 gates and corpus locks remain unchanged. Source instrumentation alone is not the product-value outcome.
+
+## Completed workflow pilot and decision
+
+Owner-approved workflow study completed with 12 one-shot arms and no operator retries. Ordinary work repaired 3/4 tasks (14/16 checks); selected equivalent history and Board-assisted arms each repaired 4/4 (16/16). All four Board arms actually used MCP retrieval. Independent patch judgments were committed before partially blinded trace review; all grades agree. One ordinary precision arm noticed replay but wrongly preserved truncation as compatibility. No Board-specific correctness advantage, causal benefit, time-saved claim or D.1 pass follows. The workflow contract does not compute D.1 v2 emitted ordering. All historical thresholds and locks remain unchanged; no release or version change is made. Full report and exact artifacts: docs/evidence/workflow-pilot-2026-09-09/REPORT.md. Final report review PASS at a8dd697 and 549-blob Git/receipt audit. Delivery PR174. F005 tracks a bounded hypothesis-detail read route; O001/O002 retain observations. Parent/source instrumentation state remains distinct from measured product benefit.

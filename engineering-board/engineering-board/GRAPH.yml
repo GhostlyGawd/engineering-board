@@ -1,33 +1,15 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-09-09T15:39:59Z",
-  "source_fingerprint": "70b3e4ef089822062164d9dd8e58e9b67d7dea4a41ad97f57eb0583b84262a7f",
+  "generated_at": "2026-09-09T15:44:48Z",
+  "source_fingerprint": "3b42b64a2e642b1694f6420cdc2da209e6167f0bbe64d8f98fef68300212f0e4",
   "build_mode": "full",
   "project": "engineering-board",
   "entries_analyzed": {
-    "open": 5,
+    "open": 3,
     "archived": 0,
-    "total": 5
+    "total": 3
   },
   "nodes": {
-    "B008": {
-      "type": "bug",
-      "title": "Workflow-pilot hypothesis fixtures pass local checks but fail released Board retrieval validation",
-      "source": "bugs/B008-workflow-pilot-hypothesis-fixtures-pass-local-checks-but-fai.md",
-      "priority": "P2",
-      "status": "open",
-      "affects": "evaluation/workflow-pilot/cases/",
-      "discovered": "2026-09-09"
-    },
-    "F004": {
-      "type": "feature",
-      "title": "Validate D.1 v2 in a live pilot with retained evidence",
-      "source": "features/F004-validate-d-1-v2-in-a-live-pilot-with-retained-evidence.md",
-      "priority": "P2",
-      "status": "in_progress",
-      "affects": "evaluation/",
-      "discovered": "2026-09-09"
-    },
     "F005": {
       "type": "feature",
       "title": "Expose a read-only hypothesis-detail route from retrieved H records",
@@ -54,63 +36,6 @@
   },
   "edges": [
     {
-      "from": "B008",
-      "to": "F004",
-      "kind": "shared-affects-prefix",
-      "value": "evaluation/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B008",
-          "field": "affects",
-          "source": "bugs/B008-workflow-pilot-hypothesis-fixtures-pass-local-checks-but-fai.md"
-        },
-        {
-          "entry": "F004",
-          "field": "affects",
-          "source": "features/F004-validate-d-1-v2-in-a-live-pilot-with-retained-evidence.md"
-        }
-      ]
-    },
-    {
-      "from": "B008",
-      "to": "O001",
-      "kind": "shared-affects-prefix",
-      "value": "evaluation/workflow-pilot/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B008",
-          "field": "affects",
-          "source": "bugs/B008-workflow-pilot-hypothesis-fixtures-pass-local-checks-but-fai.md"
-        },
-        {
-          "entry": "O001",
-          "field": "affects",
-          "source": "observations/O001-independent-workflow-pilot-preflight-exposed-label-leakage-a.md"
-        }
-      ]
-    },
-    {
-      "from": "F004",
-      "to": "O001",
-      "kind": "shared-affects-prefix",
-      "value": "evaluation/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "F004",
-          "field": "affects",
-          "source": "features/F004-validate-d-1-v2-in-a-live-pilot-with-retained-evidence.md"
-        },
-        {
-          "entry": "O001",
-          "field": "affects",
-          "source": "observations/O001-independent-workflow-pilot-preflight-exposed-label-leakage-a.md"
-        }
-      ]
-    },
-    {
       "from": "F005",
       "to": "O002",
       "kind": "shared-affects-prefix",
@@ -134,40 +59,6 @@
     "clusters": [
       {
         "id": "C001",
-        "fingerprint": "c-7ffdb5748b1278ed",
-        "members": [
-          "B008",
-          "F004",
-          "O001"
-        ],
-        "pattern_ids": [],
-        "patterns": [],
-        "affected_domains": [
-          "evaluation"
-        ],
-        "signals": [
-          {
-            "kind": "shared-affects-prefix",
-            "value": "evaluation/",
-            "members": [
-              "B008",
-              "F004",
-              "O001"
-            ]
-          },
-          {
-            "kind": "shared-affects-prefix",
-            "value": "evaluation/workflow-pilot/",
-            "members": [
-              "B008",
-              "O001"
-            ]
-          }
-        ],
-        "density": 1.0
-      },
-      {
-        "id": "C002",
         "fingerprint": "c-3a34bc2ac96d53e0",
         "members": [
           "F005",
@@ -191,7 +82,9 @@
         "density": 1.0
       }
     ],
-    "isolated": [],
+    "isolated": [
+      "O001"
+    ],
     "cross_cluster_bridges": []
   },
   "unresolved_patterns": [],
@@ -199,20 +92,6 @@
     {
       "type": "dense-cluster",
       "cluster_id": "C001",
-      "members": [
-        "B008",
-        "F004",
-        "O001"
-      ],
-      "density": 1.0,
-      "shared_dimensions": {
-        "patterns": []
-      },
-      "internal_edges": 3
-    },
-    {
-      "type": "dense-cluster",
-      "cluster_id": "C002",
       "members": [
         "F005",
         "O002"
@@ -222,19 +101,18 @@
         "patterns": []
       },
       "internal_edges": 1
+    },
+    {
+      "type": "isolated-node",
+      "node": "O001"
     }
   ],
   "read_order": [
     "C001",
-    "C002"
+    "O001"
   ],
   "drill_in": {
     "C001": [
-      "B008",
-      "F004",
-      "O001"
-    ],
-    "C002": [
       "F005",
       "O002"
     ]
