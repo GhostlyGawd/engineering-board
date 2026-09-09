@@ -1,33 +1,15 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-09-09T16:19:06Z",
-  "source_fingerprint": "256785b61d7af139be9057c27645a4aba61f5c08595300d1ab2d350a6a2f271b",
+  "generated_at": "2026-09-09T16:53:44Z",
+  "source_fingerprint": "31895e3549400ebb81f300920e78133b5027825b6ddecbfd6cd7875a6228ccfc",
   "build_mode": "full",
   "project": "engineering-board",
   "entries_analyzed": {
-    "open": 5,
+    "open": 3,
     "archived": 0,
-    "total": 5
+    "total": 3
   },
   "nodes": {
-    "B009": {
-      "type": "bug",
-      "title": "Packaged MCP server reports 0.0.0 instead of its release version",
-      "source": "bugs/B009-packaged-mcp-server-reports-0-0-0-instead-of-its-release-ver.md",
-      "priority": "P1",
-      "status": "in_progress",
-      "affects": "mcp-server/engineering_board_mcp.py",
-      "discovered": "2026-09-09"
-    },
-    "F005": {
-      "type": "feature",
-      "title": "Expose a read-only hypothesis-detail route from retrieved H records",
-      "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md",
-      "priority": "P2",
-      "status": "blocked",
-      "affects": "mcp-server/engineering_board_mcp.py",
-      "discovered": "2026-09-09"
-    },
     "O001": {
       "type": "observation",
       "title": "Independent workflow-pilot preflight exposed label leakage and evidence-retention mismatches before live launch",
@@ -52,115 +34,6 @@
   },
   "edges": [
     {
-      "from": "B009",
-      "to": "F005",
-      "kind": "blocked-by",
-      "value": "blocked_by",
-      "weight": 3,
-      "evidence": [
-        {
-          "entry": "F005",
-          "field": "blocked_by",
-          "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md"
-        }
-      ]
-    },
-    {
-      "from": "B009",
-      "to": "F005",
-      "kind": "shared-affects-prefix",
-      "value": "mcp-server/engineering_board_mcp.py/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B009",
-          "field": "affects",
-          "source": "bugs/B009-packaged-mcp-server-reports-0-0-0-instead-of-its-release-ver.md"
-        },
-        {
-          "entry": "F005",
-          "field": "affects",
-          "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md"
-        }
-      ]
-    },
-    {
-      "from": "B009",
-      "to": "O002",
-      "kind": "shared-affects-prefix",
-      "value": "mcp-server/engineering_board_mcp.py/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B009",
-          "field": "affects",
-          "source": "bugs/B009-packaged-mcp-server-reports-0-0-0-instead-of-its-release-ver.md"
-        },
-        {
-          "entry": "O002",
-          "field": "affects",
-          "source": "observations/O002-hypotheses-retrieved-by-board-context-are-not-readable-throu.md"
-        }
-      ]
-    },
-    {
-      "from": "B009",
-      "to": "O003",
-      "kind": "shared-affects-prefix",
-      "value": "mcp-server/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B009",
-          "field": "affects",
-          "source": "bugs/B009-packaged-mcp-server-reports-0-0-0-instead-of-its-release-ver.md"
-        },
-        {
-          "entry": "O003",
-          "field": "affects",
-          "source": "observations/O003-wheel-build-emits-deprecation-warnings-for-legacy-license-me.md"
-        }
-      ]
-    },
-    {
-      "from": "F005",
-      "to": "O002",
-      "kind": "shared-affects-prefix",
-      "value": "mcp-server/engineering_board_mcp.py/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "F005",
-          "field": "affects",
-          "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md"
-        },
-        {
-          "entry": "O002",
-          "field": "affects",
-          "source": "observations/O002-hypotheses-retrieved-by-board-context-are-not-readable-throu.md"
-        }
-      ]
-    },
-    {
-      "from": "F005",
-      "to": "O003",
-      "kind": "shared-affects-prefix",
-      "value": "mcp-server/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "F005",
-          "field": "affects",
-          "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md"
-        },
-        {
-          "entry": "O003",
-          "field": "affects",
-          "source": "observations/O003-wheel-build-emits-deprecation-warnings-for-legacy-license-me.md"
-        }
-      ]
-    },
-    {
       "from": "O002",
       "to": "O003",
       "kind": "shared-affects-prefix",
@@ -184,10 +57,8 @@
     "clusters": [
       {
         "id": "C001",
-        "fingerprint": "c-3502d74f38faf303",
+        "fingerprint": "c-1813b322db439207",
         "members": [
-          "B009",
-          "F005",
           "O002",
           "O003"
         ],
@@ -198,30 +69,11 @@
         ],
         "signals": [
           {
-            "kind": "blocked-by",
-            "value": "blocked_by",
-            "members": [
-              "B009",
-              "F005"
-            ]
-          },
-          {
             "kind": "shared-affects-prefix",
             "value": "mcp-server/",
             "members": [
-              "B009",
-              "F005",
               "O002",
               "O003"
-            ]
-          },
-          {
-            "kind": "shared-affects-prefix",
-            "value": "mcp-server/engineering_board_mcp.py/",
-            "members": [
-              "B009",
-              "F005",
-              "O002"
             ]
           }
         ],
@@ -239,8 +91,6 @@
       "type": "dense-cluster",
       "cluster_id": "C001",
       "members": [
-        "B009",
-        "F005",
         "O002",
         "O003"
       ],
@@ -248,7 +98,7 @@
       "shared_dimensions": {
         "patterns": []
       },
-      "internal_edges": 6
+      "internal_edges": 1
     },
     {
       "type": "isolated-node",
@@ -261,8 +111,6 @@
   ],
   "drill_in": {
     "C001": [
-      "B009",
-      "F005",
       "O002",
       "O003"
     ]

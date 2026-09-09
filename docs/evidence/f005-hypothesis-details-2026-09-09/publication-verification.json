@@ -1,0 +1,142 @@
+{
+  "release_commit": "eb275b68369b04bbbc944a584f869fc07dcf05b3",
+  "release_workflow": 34379065314,
+  "github": {
+    "assets": [
+      {
+        "apiUrl": "https://api.github.com/repos/GhostlyGawd/engineering-board/releases/assets/553175108",
+        "contentType": "application/octet-stream",
+        "createdAt": "2026-09-09T16:49:01Z",
+        "digest": "sha256:0b259fac619543308043f804dd5d5b49612cf018fcf61209e72f3f752d66cc67",
+        "downloadCount": 0,
+        "id": "RA_kwDOSSeqgc4g-MhE",
+        "label": "",
+        "name": "engineering-board-mcp.mcpb",
+        "size": 68557,
+        "state": "uploaded",
+        "updatedAt": "2026-09-09T16:49:02Z",
+        "url": "https://github.com/GhostlyGawd/engineering-board/releases/download/v1.14.0/engineering-board-mcp.mcpb"
+      }
+    ],
+    "isDraft": false,
+    "isPrerelease": false,
+    "publishedAt": "2026-09-09T16:49:02Z",
+    "tagName": "v1.14.0",
+    "targetCommitish": "main",
+    "url": "https://github.com/GhostlyGawd/engineering-board/releases/tag/v1.14.0"
+  },
+  "registry": {
+    "server": {
+      "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+      "name": "io.github.GhostlyGawd/engineering-board",
+      "description": "Repository-owned engineering pattern intelligence - 19 MCP tools over stdio.",
+      "repository": {
+        "url": "https://github.com/GhostlyGawd/engineering-board",
+        "source": "github"
+      },
+      "version": "1.14.0",
+      "websiteUrl": "https://ghostlygawd.github.io/engineering-board/",
+      "packages": [
+        {
+          "registryType": "mcpb",
+          "identifier": "https://github.com/GhostlyGawd/engineering-board/releases/download/v1.14.0/engineering-board-mcp.mcpb",
+          "version": "1.14.0",
+          "fileSha256": "0b259fac619543308043f804dd5d5b49612cf018fcf61209e72f3f752d66cc67",
+          "transport": {
+            "type": "stdio"
+          },
+          "environmentVariables": [
+            {
+              "description": "Absolute path to the repository whose engineering-board/ tree the server operates on. Defaults to the current working directory when unset.",
+              "name": "CLAUDE_PROJECT_DIR"
+            }
+          ]
+        }
+      ]
+    },
+    "_meta": {
+      "io.modelcontextprotocol.registry/official": {
+        "status": "active",
+        "statusChangedAt": "2026-09-09T16:49:04.140006Z",
+        "publishedAt": "2026-09-09T16:49:04.140006Z",
+        "updatedAt": "2026-09-09T16:49:04.140006Z",
+        "isLatest": true
+      }
+    }
+  },
+  "pypi": {
+    "name": "engineering-board-mcp",
+    "version": "1.14.0",
+    "files": [
+      {
+        "filename": "engineering_board_mcp-1.14.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/c1/2f/2d73a7a6f86f1db14d152c5a22b0862fbd46de625688173ed0b72aa53962/engineering_board_mcp-1.14.0-py3-none-any.whl",
+        "digests": {
+          "blake2b_256": "c12f2d73a7a6f86f1db14d152c5a22b0862fbd46de625688173ed0b72aa53962",
+          "md5": "0e1052bf603cc9cc5b0472f5f7ba4a87",
+          "sha256": "6b12d9efa9590c2badbd29fb32d61730638d378eda49e8b6ca9e20db625d9b2f"
+        },
+        "size": 68714,
+        "yanked": false,
+        "upload_time_iso_8601": "2026-09-09T16:49:32.430641Z"
+      },
+      {
+        "filename": "engineering_board_mcp-1.14.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/d2/1c/bb4a179d1836174987ad5a05333358bf7c4b6c642731297941c3917daeeb/engineering_board_mcp-1.14.0.tar.gz",
+        "digests": {
+          "blake2b_256": "d21cbb4a179d1836174987ad5a05333358bf7c4b6c642731297941c3917daeeb",
+          "md5": "d81d76cc59c99f0fd57a204b2678283b",
+          "sha256": "6037631eae62dcb9b023014a0720a2dcbbb9b4b067dd2f652d5de86f55cfa8fd"
+        },
+        "size": 74530,
+        "yanked": false,
+        "upload_time_iso_8601": "2026-09-09T16:49:33.780095Z"
+      }
+    ]
+  },
+  "installed_source_hashes": {
+    "codex": {
+      ".claude-plugin/plugin.json": "aaf033aaf3fb799e59829e58f8ccc2e532a9db5474d20cc110eb5e2d7a05931c",
+      ".codex-plugin/plugin.json": "6b4038969dadcf82e5f70d83b743b585aaa044dd1a9873656f1efba441657ddb",
+      ".agents/plugins/marketplace.json": "66020fac1824a83a50d55577786aa000e6181283dcd6a64250b739842103b608",
+      ".claude-plugin/marketplace.json": "0b66f0b93be52b8823c7b568d54df26d98c95ed9f6bdabb5e8516fa9fc55f6dc",
+      "mcp-server/engineering_board_mcp.py": "7ba8d47542162f859aae557314edfcc070a141652d9f8fd21e68e2a30ee78d5a",
+      "mcp-server/engineering_board_core.py": "9f05705f388901988601d26b5427bd7fd64c4a2f12c4c55f381d4562dcd6e978",
+      "scripts/engineering-board-mcp-launcher.mjs": "353289c27d371e364927b8f459eeb2768e7c87b20f8ef3b17d1b52b74eb3b5ab"
+    },
+    "claude": {
+      ".claude-plugin/plugin.json": "aaf033aaf3fb799e59829e58f8ccc2e532a9db5474d20cc110eb5e2d7a05931c",
+      ".codex-plugin/plugin.json": "6b4038969dadcf82e5f70d83b743b585aaa044dd1a9873656f1efba441657ddb",
+      ".agents/plugins/marketplace.json": "66020fac1824a83a50d55577786aa000e6181283dcd6a64250b739842103b608",
+      ".claude-plugin/marketplace.json": "0b66f0b93be52b8823c7b568d54df26d98c95ed9f6bdabb5e8516fa9fc55f6dc",
+      "mcp-server/engineering_board_mcp.py": "7ba8d47542162f859aae557314edfcc070a141652d9f8fd21e68e2a30ee78d5a",
+      "mcp-server/engineering_board_core.py": "9f05705f388901988601d26b5427bd7fd64c4a2f12c4c55f381d4562dcd6e978",
+      "scripts/engineering-board-mcp-launcher.mjs": "353289c27d371e364927b8f459eeb2768e7c87b20f8ef3b17d1b52b74eb3b5ab"
+    }
+  },
+  "pypi_installed_identity": {
+    "version": "1.14.0",
+    "runtime": "1.14.0",
+    "module_sha256": "7ba8d47542162f859aae557314edfcc070a141652d9f8fd21e68e2a30ee78d5a",
+    "core_sha256": "9f05705f388901988601d26b5427bd7fd64c4a2f12c4c55f381d4562dcd6e978"
+  },
+  "verified_pypi_downloads": [
+    {
+      "filename": "engineering_board_mcp-1.14.0-py3-none-any.whl",
+      "downloaded_bytes": 68714,
+      "sha256": "6b12d9efa9590c2badbd29fb32d61730638d378eda49e8b6ca9e20db625d9b2f"
+    },
+    {
+      "filename": "engineering_board_mcp-1.14.0.tar.gz",
+      "downloaded_bytes": 74530,
+      "sha256": "6037631eae62dcb9b023014a0720a2dcbbb9b4b067dd2f652d5de86f55cfa8fd"
+    }
+  ],
+  "site": {
+    "url": "https://ghostlygawd.github.io/engineering-board/",
+    "status": 200,
+    "bytes": 33350,
+    "product_marker": true,
+    "tool_count_marker": true
+  }
+}
