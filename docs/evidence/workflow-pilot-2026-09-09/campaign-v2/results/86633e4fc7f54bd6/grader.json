@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "/Users/rhenmcleod/engineering-board-dogfood/docs/evidence/workflow-pilot-2026-09-09/campaign-v2/source/evaluation/workflow-pilot/cases/L-control-precision/evaluator.py",
+    "--repo",
+    "/Users/rhenmcleod/engineering-board-dogfood/docs/evidence/workflow-pilot-2026-09-09/campaign-v2/results/86633e4fc7f54bd6/workspace"
+  ],
+  "exit_code": 0,
+  "failure": null,
+  "grader_sha256": "0880cf4f3685df03f23ff8512dfa60e35f92a5a8f2e8a5a0fb9c9af89d21b3c3",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "c4691b33c0e60c5a6e1d7f4d46303411d9dde87cc15287cb805aed863c1d8c7f",
+  "wall_seconds": 0.07329962495714426
+}

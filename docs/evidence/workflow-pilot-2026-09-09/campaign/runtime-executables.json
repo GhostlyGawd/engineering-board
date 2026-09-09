@@ -1,0 +1,10 @@
+{
+  "/opt/homebrew/Cellar/node/26.7.0/bin/node": {
+    "bytes": 50320,
+    "sha256": "1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040"
+  },
+  "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14": {
+    "bytes": 34640,
+    "sha256": "87d4df53fd91304be5bac391fb204643c36b7df2023c04a0953bcbc7d4fdf634"
+  }
+}

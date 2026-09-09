@@ -1,0 +1,1 @@
+{"checks": {"check_csv_compatibility": {"failures": [], "passed": true}, "check_csv_empty_column": {"failures": [], "passed": true}, "check_exact_lookup": {"failures": [], "passed": true}, "check_negative_normalization_scope": {"failures": [], "passed": true}}, "passed": 4, "total": 4}

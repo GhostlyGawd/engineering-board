@@ -1,0 +1,38 @@
+--- a/readings.py
++++ b/readings.py
+@@ -4,12 +4,12 @@
+ 
+ def ingest_live(text):
+     """Return the signed sensor reading as a float, without quantization."""
+-    return float(int(float(text)))
++    return float(text)
+ 
+ 
+ def ingest_replay(text):
+     """Return the signed archived sensor reading as a float, without quantization."""
+-    return float(int(float(text)))
++    return float(text)
+ 
+ 
+ def sensor_summary(value):
+--- a/tests/test_ingestion.py
++++ b/tests/test_ingestion.py
+@@ -0,0 +1,18 @@
++import unittest
++
++from readings import ingest_live, ingest_replay
++
++
++class IngestionRegressionTests(unittest.TestCase):
++    def test_live_reading_keeps_fractional_component(self):
++        self.assertEqual(ingest_live("2.75"), 2.75)
++
++    def test_live_reading_keeps_negative_fractional_component(self):
++        self.assertEqual(ingest_live("-2.75"), -2.75)
++
++    def test_replay_reading_keeps_fractional_component(self):
++        self.assertEqual(ingest_replay("2.75"), 2.75)
++
++
++if __name__ == "__main__":
++    unittest.main()

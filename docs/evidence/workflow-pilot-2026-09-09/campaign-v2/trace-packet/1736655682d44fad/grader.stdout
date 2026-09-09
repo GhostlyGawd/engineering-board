@@ -1,0 +1,1 @@
+{"checks": {"check_negative_scope": {"failures": [], "passed": true}, "check_reported_failure": {"failures": [], "passed": true}, "check_sibling_owner": {"failures": [], "passed": true}, "check_view_sequence": {"failures": [], "passed": true}}, "passed": 4, "total": 4}

@@ -1,0 +1,198 @@
+{
+  "/Users/rhenmcleod/.codex/plugins/cache/engineering-board/engineering-board/1.13.5/hooks/scripts": {
+    "board-active-workers-bump.sh": {
+      "bytes": 3904,
+      "sha256": "77f6bc88ac032ee94ceb25a46a44a588e495e62976a7db6ed78d35006151a573"
+    },
+    "board-active-workers-cleanup.sh": {
+      "bytes": 2095,
+      "sha256": "b21a940392f90f4ed059aaa9507376bbecbdfaa0f27ac2a00d28211445790fa5"
+    },
+    "board-active-workers-register.sh": {
+      "bytes": 6057,
+      "sha256": "dc00128c069890e8bd7623db022e6f2311356a565e18f8e66a3daa4cbb0cf7e5"
+    },
+    "board-audit-scratch.sh": {
+      "bytes": 3177,
+      "sha256": "1c8f82ec50cba32cf227a0cc6f1f1dcaad90f3a2234acfe6e442c853ec9a8e62"
+    },
+    "board-claim-acquire.sh": {
+      "bytes": 6031,
+      "sha256": "e8c382d633cb42c17b46c38215129a9a212d11da5b183fb58ddc20d5ca39ca81"
+    },
+    "board-claim-heartbeat.sh": {
+      "bytes": 1244,
+      "sha256": "9ff0cd3e4248348e4119eb64a24c4049f04e463c07cf5c52dd4aa9a2492d9b7d"
+    },
+    "board-claim-reclaim-stale.sh": {
+      "bytes": 4877,
+      "sha256": "11648efaefdbad1fdc28bbfbcfcf6c553afd43611433fafa4a3d91053c5f09d4"
+    },
+    "board-claim-release.sh": {
+      "bytes": 2057,
+      "sha256": "c915762a5e9728f442731ca1dd0a0514958944d062274e4b8026bb8abf5b6368"
+    },
+    "board-consolidate.sh": {
+      "bytes": 14949,
+      "sha256": "4b95700ad150d4ffbd8377724821922f102b10a33c3ef8ae8d7cabde16bcdf81"
+    },
+    "board-context.py": {
+      "bytes": 3833,
+      "sha256": "f56a485769f1857b2a641ea20e4a1021cab73598cffe0a4c91afc7551a8deaa8"
+    },
+    "board-context.sh": {
+      "bytes": 149,
+      "sha256": "5090a8e085888a6f0d736a58f5fdd1a2e63eafdcf1837f8174996cf4376c707e"
+    },
+    "board-curate-learnings.sh": {
+      "bytes": 649,
+      "sha256": "c6776ba14201371adad19a45c58aac802b7f9240a7fa5aabf77c4deb229d7981"
+    },
+    "board-demo.sh": {
+      "bytes": 1621,
+      "sha256": "dfcb0513c2e3ae88f349003779d50de8c75cb3410f7da0d1d0e24f473713372c"
+    },
+    "board-graph-build.py": {
+      "bytes": 318,
+      "sha256": "0a0a4015bbc0802390af4e992236c13ad64e3a50a902711e3a0fe185de1dd124"
+    },
+    "board-graph-build.sh": {
+      "bytes": 153,
+      "sha256": "2fcc88d073cc8d622c53f1d6fa65e1ae49afeb57bc465d33795ffe19fba24be4"
+    },
+    "board-index-check.sh": {
+      "bytes": 2906,
+      "sha256": "0c435025ec119ae341cf66da0128c2827aecb911891314ccf0d449010e9f1dec"
+    },
+    "board-insights.py": {
+      "bytes": 2923,
+      "sha256": "787f738ba5c879dda0d36c694a4a41c21abbfbc42f29e4a1007e1538b2143c0d"
+    },
+    "board-insights.sh": {
+      "bytes": 150,
+      "sha256": "a9c3a5cffbe8580cb8bd2b0862acc2a59242b0f5651c00509819b9e677cf1bc5"
+    },
+    "board-intake.py": {
+      "bytes": 4471,
+      "sha256": "5eaa30aa56fe598bb4b4d9d8976ae28697e77879e5c106e73ef527fa24e9f097"
+    },
+    "board-intake.sh": {
+      "bytes": 148,
+      "sha256": "ea21195e33295d130e9023037dc5087551746ab9be32d22d1c9fc9e48539a34f"
+    },
+    "board-migrate.sh": {
+      "bytes": 8786,
+      "sha256": "07d874a6c3e99f089e539e62755c71c88294a2d61c6f1838001419321e622a9a"
+    },
+    "board-mode-guard.sh": {
+      "bytes": 6961,
+      "sha256": "93dc3710f9eeb280e29f7aca9458e7414d55c102fbd9da27001a30459c9bb314"
+    },
+    "board-outcome.py": {
+      "bytes": 2957,
+      "sha256": "5bc1246ae08c528055759068a5462db4982c6b8661c160596d21104225c62f65"
+    },
+    "board-outcome.sh": {
+      "bytes": 149,
+      "sha256": "a7dfd3edd50deaff1b4f7290bd03e4e16835c281ae0b9f5dd607034865abc525"
+    },
+    "board-paths.sh": {
+      "bytes": 4392,
+      "sha256": "30303f1c66b4091b3643587405110aeeb9302febe4ddbbdce61d23f451dd7d6a"
+    },
+    "board-permission-self-check.sh": {
+      "bytes": 2891,
+      "sha256": "df03a6deb1e9ec47d30f3a381bb94dd553afe69b0d394fb418b8f27edc28d0e9"
+    },
+    "board-pm-fallback-heartbeat.sh": {
+      "bytes": 5316,
+      "sha256": "6f99e5a5c3b313fc1ee50090c4f535f10de51d1a2cf35793e77c5f8a81199430"
+    },
+    "board-prompt-guard.sh": {
+      "bytes": 3531,
+      "sha256": "b82c0fe34a789e12758a6129235cf2f060b52ea647eda85d09c84d5a8b5c61f9"
+    },
+    "board-relocate.sh": {
+      "bytes": 8573,
+      "sha256": "3e6bbfdbc793becc011f71b196d08d8795f46f9ad4626afc996576d3642a588a"
+    },
+    "board-remember.sh": {
+      "bytes": 6167,
+      "sha256": "d694bf3bc3c8b41f90bb3dfbbad3115bb046fc8aea6a6938fa6b120238607f61"
+    },
+    "board-scratch-append.sh": {
+      "bytes": 6856,
+      "sha256": "bd94955273543a4c56578d2eb5971376e7c0ac3f8542f9f6f9dabb5360cd83ba"
+    },
+    "board-session-start.sh": {
+      "bytes": 10493,
+      "sha256": "35c30948c95fdcce16b77296af7a740268ff6c3892b6678cf442f8f86702f2e9"
+    },
+    "board-stop-gate.sh": {
+      "bytes": 1510,
+      "sha256": "a0381f360eff79e3cce047340ba8411fae94882d3fb3027a2912b53ed416669c"
+    },
+    "board-validate-entry.sh": {
+      "bytes": 5911,
+      "sha256": "44be5259ee0ef984d791d9743d2160ffa8c3a81e9ec7c5f5e68db6e6834b1569"
+    },
+    "board-view.sh": {
+      "bytes": 49644,
+      "sha256": "d0bff56a575dcfd33d14d281494d8d2b84bdd39bd7903428de6bd62019aac641"
+    },
+    "board_demo.py": {
+      "bytes": 20579,
+      "sha256": "6b27a63fea79bb70deba4f41ec99d8beca4e330c04d54cc046c173e70ba1d1a9"
+    },
+    "board_reject_check.py": {
+      "bytes": 18724,
+      "sha256": "dbd07b9fb3b8d33aed6523cdee374f6955c82144d2a24b4002a6bf9ba94538c0"
+    }
+  },
+  "/Users/rhenmcleod/.codex/plugins/cache/engineering-board/engineering-board/1.13.5/mcp-server": {
+    "README.md": {
+      "bytes": 14830,
+      "sha256": "6ca9a7198b407d9d639cd81de4b46677b22c8aa269706ad39fd5c2e0c36393f9"
+    },
+    "build-mcpb.sh": {
+      "bytes": 2847,
+      "sha256": "580822e4076ba8368fa695763ac49db22b162b8405a35e6531f00eb5f9ca9c66"
+    },
+    "engineering_board_core.py": {
+      "bytes": 167659,
+      "sha256": "9f05705f388901988601d26b5427bd7fd64c4a2f12c4c55f381d4562dcd6e978"
+    },
+    "engineering_board_mcp.py": {
+      "bytes": 105467,
+      "sha256": "5d490593233ca2f1ecf9213b950a9b7d4fa50246d732b1a9ba8e135eb9774c09"
+    },
+    "manifest.json": {
+      "bytes": 1314,
+      "sha256": "7bee575b55e0635dce6b9faf054cdfe3cdac65ef1f25a66d696539f548a7b4db"
+    },
+    "pyproject.toml": {
+      "bytes": 1787,
+      "sha256": "a7b96e88db11b9227c6634a83aecb20b2fbe46d59c671dd43652c99b0ad43cdd"
+    },
+    "run-tests.sh": {
+      "bytes": 632,
+      "sha256": "e8512122933301cd6e556cf1fa7f7c55f5d423728eb1bfc2983a796721574226"
+    },
+    "server.json": {
+      "bytes": 1130,
+      "sha256": "a6acc4377cea4c1b40b404d77eff1c97fea7691df8312b962085102031757896"
+    },
+    "smithery.yaml": {
+      "bytes": 1111,
+      "sha256": "4a9325decb8cbaa0d90c1c6f0e00da67667926e2082f6a454d207a79b9c1c854"
+    },
+    "test_mcp_server.py": {
+      "bytes": 69518,
+      "sha256": "3268fbcb2e64f7a526c4995f606a4e4030c1fdde1a7cf59d1d25c59915f579a5"
+    }
+  },
+  "/Users/rhenmcleod/.codex/plugins/cache/engineering-board/engineering-board/1.13.5/scripts/engineering-board-mcp-launcher.mjs": {
+    "bytes": 1568,
+    "sha256": "353289c27d371e364927b8f459eeb2768e7c87b20f8ef3b17d1b52b74eb3b5ab"
+  }
+}

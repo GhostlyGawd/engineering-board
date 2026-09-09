@@ -1,0 +1,39 @@
+--- a/job_options.py
++++ b/job_options.py
+@@ -1,14 +1,20 @@
+ """Job options shared by execution, preview, and heartbeat scheduling."""
++
++
++def _retries(options):
++    retries = options.get("retries")
++    return 3 if retries is None else retries
++
+ 
+ def execution_options(options):
+     """Missing/None retries mean 3; zero means no retries."""
+-    retries = options.get("retries") or 3
++    retries = _retries(options)
+     return {"retries": retries, "queue": options.get("queue", "default")}
+ 
+ 
+ def preview_options(options):
+     """Preview uses the same retries contract as execution."""
+-    retries = options.get("retries") or 3
++    retries = _retries(options)
+     return {"attempts": retries + 1}
+ 
+ 
+--- a/tests/test_public.py
++++ b/tests/test_public.py
+@@ -4,7 +4,11 @@
+ class PublicTests(unittest.TestCase):
+     def test_explicit_no_retry(self):
+         self.assertEqual(execution_options({"retries": 0})["retries"], 0)
++        self.assertEqual(preview_options({"retries": 0}), {"attempts": 1})
++
+     def test_defaults(self):
+         self.assertEqual(execution_options({})["retries"], 3)
++        self.assertEqual(execution_options({"retries": None})["retries"], 3)
+         self.assertEqual(preview_options({}), {"attempts": 4})
++        self.assertEqual(preview_options({"retries": None}), {"attempts": 4})
+         self.assertEqual(heartbeat_seconds({}), 30)

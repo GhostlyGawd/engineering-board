@@ -1,0 +1,498 @@
+{
+  "limits": "No causal or population efficacy estimate. End-to-end wall time includes host/tool startup; cost and preparation/review effort are not measured. Memory action attribution requires separate trace review.",
+  "patch_review_sha256": "bf6d27d3e835d519f95f3866076a764294bfda0dcb45f323a39aa1cf1d3233bf",
+  "prepared_manifest_sha256": "977a6fba9682798a48934ef9d32c359a0ec7598a9fa0ba0bf9a6151390335bf4",
+  "provenance": "Four authored synthetic cases, one run per case-condition; descriptive only",
+  "rows": [
+    {
+      "arm_id": "c33139a00c714707",
+      "case_id": "H-control-identifiers",
+      "client_failure": null,
+      "condition": "engineering_board",
+      "distinct_execution_mcp_calls": 7,
+      "end_receipt_sha256": "b7af88ccf3b985fd06681674d287314e909d3da43ff03050f33a4f38f541a96e",
+      "file_change_items": 1,
+      "grader_output_sha256": "0c4e254b34a520d2f3f13db7ba3d3df044b84ec9c182d6fcc76471a84bf7a2a0",
+      "hidden_checks": {
+        "failed": [],
+        "passed": 4,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [
+        {
+          "arguments": {
+            "files": [
+              "parts.py",
+              "tests/test_public.py"
+            ],
+            "limit": 10,
+            "project": "pilot",
+            "root": "/private/tmp/eb-workflow-trials-20260909-b/c33139a00c714707",
+            "task": "Correct CSV import of a row with an empty optional description (P7,,4) and exact part lookup so P7 does not return P70; preserve documented API contracts; add regression tests."
+          },
+          "error": null,
+          "id": "item_5",
+          "server": "engineering-board",
+          "status": "completed",
+          "tool": "board_context"
+        },
+        {
+          "arguments": {
+            "entry_id": "B107",
+            "project": "pilot",
+            "root": "/private/tmp/eb-workflow-trials-20260909-b/c33139a00c714707"
+          },
+          "error": null,
+          "id": "item_6",
+          "server": "engineering-board",
+          "status": "completed",
+          "tool": "board_get_entry"
+        },
+        {
+          "arguments": {
+            "entry_id": "B108",
+            "project": "pilot",
+            "root": "/private/tmp/eb-workflow-trials-20260909-b/c33139a00c714707"
+          },
+          "error": null,
+          "id": "item_7",
+          "server": "engineering-board",
+          "status": "completed",
+          "tool": "board_get_entry"
+        }
+      ],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 97792,
+        "input_tokens": 114704,
+        "output_tokens": 2036,
+        "reasoning_output_tokens": 337
+      },
+      "wall_seconds": 87.61275324993767
+    },
+    {
+      "arm_id": "1a55ff5a65494e0f",
+      "case_id": "H-control-identifiers",
+      "client_failure": null,
+      "condition": "history",
+      "distinct_execution_mcp_calls": 3,
+      "end_receipt_sha256": "289e12c8ecacf72606835f477638ae66b753021bbc552a3da4dc1b12dd502534",
+      "file_change_items": 1,
+      "grader_output_sha256": "0c4e254b34a520d2f3f13db7ba3d3df044b84ec9c182d6fcc76471a84bf7a2a0",
+      "hidden_checks": {
+        "failed": [],
+        "passed": 4,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 32128,
+        "input_tokens": 55613,
+        "output_tokens": 1650,
+        "reasoning_output_tokens": 366
+      },
+      "wall_seconds": 63.45748808293138
+    },
+    {
+      "arm_id": "7ae6650bfb2342cc",
+      "case_id": "H-control-identifiers",
+      "client_failure": null,
+      "condition": "ordinary",
+      "distinct_execution_mcp_calls": 5,
+      "end_receipt_sha256": "051a84756a2240f2794990d41f8f83f4176ec2774eaf254ec2e81804a9d8f9d8",
+      "file_change_items": 2,
+      "grader_output_sha256": "0c4e254b34a520d2f3f13db7ba3d3df044b84ec9c182d6fcc76471a84bf7a2a0",
+      "hidden_checks": {
+        "failed": [],
+        "passed": 4,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 75648,
+        "input_tokens": 90414,
+        "output_tokens": 2185,
+        "reasoning_output_tokens": 261
+      },
+      "wall_seconds": 87.27704391698353
+    },
+    {
+      "arm_id": "a3fdbe22065a4868",
+      "case_id": "H-useful-catalog",
+      "client_failure": null,
+      "condition": "engineering_board",
+      "distinct_execution_mcp_calls": 5,
+      "end_receipt_sha256": "74ac94befe39e55676a1625e4cf08985d364ff3e8428a55114932f672525d46b",
+      "file_change_items": 1,
+      "grader_output_sha256": "6b9c5dc52cb02042af4fb6fecf5c668f5d7f8f9d415318204f6901ba2c68a567",
+      "hidden_checks": {
+        "failed": [],
+        "passed": 4,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [
+        {
+          "arguments": {
+            "files": [
+              "catalog.py",
+              "tests/test_public.py",
+              "task.md"
+            ],
+            "limit": 10,
+            "project": "pilot",
+            "root": "/private/tmp/eb-workflow-trials-20260909-b/a3fdbe22065a4868",
+            "task": "Read-only catalog views must preserve export order. Export returns rows in import order until newest-items view is opened; afterward export order changes. Investigate and repair."
+          },
+          "error": null,
+          "id": "item_3",
+          "server": "engineering-board",
+          "status": "completed",
+          "tool": "board_context"
+        }
+      ],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 72576,
+        "input_tokens": 89467,
+        "output_tokens": 2171,
+        "reasoning_output_tokens": 308
+      },
+      "wall_seconds": 84.815983000095
+    },
+    {
+      "arm_id": "1736655682d44fad",
+      "case_id": "H-useful-catalog",
+      "client_failure": null,
+      "condition": "history",
+      "distinct_execution_mcp_calls": 6,
+      "end_receipt_sha256": "81bc5e212a4750ddf8e97f1364fb81b108a31d48a659376c62d69db5f89a2f22",
+      "file_change_items": 1,
+      "grader_output_sha256": "6b9c5dc52cb02042af4fb6fecf5c668f5d7f8f9d415318204f6901ba2c68a567",
+      "hidden_checks": {
+        "failed": [],
+        "passed": 4,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 77824,
+        "input_tokens": 93218,
+        "output_tokens": 2356,
+        "reasoning_output_tokens": 382
+      },
+      "wall_seconds": 91.66961366706528
+    },
+    {
+      "arm_id": "e77b64b297744b4e",
+      "case_id": "H-useful-catalog",
+      "client_failure": null,
+      "condition": "ordinary",
+      "distinct_execution_mcp_calls": 4,
+      "end_receipt_sha256": "d419f28ec91ea8d60fe5ee06b8cb17027535c627dd9c824d9c740c7dbffefaba",
+      "file_change_items": 1,
+      "grader_output_sha256": "6b9c5dc52cb02042af4fb6fecf5c668f5d7f8f9d415318204f6901ba2c68a567",
+      "hidden_checks": {
+        "failed": [],
+        "passed": 4,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 50048,
+        "input_tokens": 63040,
+        "output_tokens": 1599,
+        "reasoning_output_tokens": 285
+      },
+      "wall_seconds": 71.37224166595843
+    },
+    {
+      "arm_id": "bdb88ef7a0034ce1",
+      "case_id": "L-control-precision",
+      "client_failure": null,
+      "condition": "engineering_board",
+      "distinct_execution_mcp_calls": 18,
+      "end_receipt_sha256": "cf821e4c99008e456883c76306e8546de872fb5ce16da281b68a74642f56ca40",
+      "file_change_items": 1,
+      "grader_output_sha256": "c4691b33c0e60c5a6e1d7f4d46303411d9dde87cc15287cb805aed863c1d8c7f",
+      "hidden_checks": {
+        "failed": [],
+        "passed": 4,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [
+        {
+          "arguments": {
+            "files": [
+              "readings.py",
+              "tests"
+            ],
+            "project": "pilot",
+            "root": "/private/tmp/eb-workflow-trials-20260909-b/bdb88ef7a0034ce1",
+            "task": "Keep fractional sensor readings: a sensor value \"2.75\" is returned as 2.0 by the live ingestion path. Investigate and repair while preserving API compatibility."
+          },
+          "error": null,
+          "id": "item_2",
+          "server": "engineering-board",
+          "status": "completed",
+          "tool": "board_context"
+        },
+        {
+          "arguments": {
+            "entry_id": "B103",
+            "project": "pilot",
+            "root": "/private/tmp/eb-workflow-trials-20260909-b/bdb88ef7a0034ce1"
+          },
+          "error": null,
+          "id": "item_10",
+          "server": "engineering-board",
+          "status": "completed",
+          "tool": "board_get_entry"
+        },
+        {
+          "arguments": {
+            "entry_id": "B104",
+            "project": "pilot",
+            "root": "/private/tmp/eb-workflow-trials-20260909-b/bdb88ef7a0034ce1"
+          },
+          "error": null,
+          "id": "item_11",
+          "server": "engineering-board",
+          "status": "completed",
+          "tool": "board_get_entry"
+        },
+        {
+          "arguments": {
+            "entry_id": "L102",
+            "project": "pilot",
+            "root": "/private/tmp/eb-workflow-trials-20260909-b/bdb88ef7a0034ce1"
+          },
+          "error": null,
+          "id": "item_12",
+          "server": "engineering-board",
+          "status": "completed",
+          "tool": "board_get_entry"
+        }
+      ],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 63616,
+        "input_tokens": 97670,
+        "output_tokens": 2199,
+        "reasoning_output_tokens": 323
+      },
+      "wall_seconds": 89.00754100002814
+    },
+    {
+      "arm_id": "86633e4fc7f54bd6",
+      "case_id": "L-control-precision",
+      "client_failure": null,
+      "condition": "history",
+      "distinct_execution_mcp_calls": 4,
+      "end_receipt_sha256": "9280c45f6ad7b0c1cd6953b1c40b0a005a11a91607fb92a35f6f44e7a86e0222",
+      "file_change_items": 1,
+      "grader_output_sha256": "c4691b33c0e60c5a6e1d7f4d46303411d9dde87cc15287cb805aed863c1d8c7f",
+      "hidden_checks": {
+        "failed": [],
+        "passed": 4,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 52224,
+        "input_tokens": 65576,
+        "output_tokens": 1846,
+        "reasoning_output_tokens": 483
+      },
+      "wall_seconds": 93.09533566609025
+    },
+    {
+      "arm_id": "836c4078663e4d83",
+      "case_id": "L-control-precision",
+      "client_failure": null,
+      "condition": "ordinary",
+      "distinct_execution_mcp_calls": 4,
+      "end_receipt_sha256": "58def1724883dce6cbac8eef973c1cd74c769edfe0ce5fe13ca55c1451528b72",
+      "file_change_items": 1,
+      "grader_output_sha256": "c90b053d6fa2fd02517911eb717435f26c36fa71c7135d8f18cee145631d5e09",
+      "hidden_checks": {
+        "failed": [
+          "check_no_quantization",
+          "check_sibling_replay"
+        ],
+        "passed": 2,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 50176,
+        "input_tokens": 62610,
+        "output_tokens": 1333,
+        "reasoning_output_tokens": 241
+      },
+      "wall_seconds": 58.67927449999843
+    },
+    {
+      "arm_id": "75bd98ebef9d4419",
+      "case_id": "L-useful-retries",
+      "client_failure": null,
+      "condition": "engineering_board",
+      "distinct_execution_mcp_calls": 7,
+      "end_receipt_sha256": "8e0016918252c111152b2e5d160acbef8b7fe64fcd742ef4c399b52e62f73602",
+      "file_change_items": 1,
+      "grader_output_sha256": "905a709bcced0636c066a7581aa816e70adb30517cea9cac5e48ae0a63b524ac",
+      "hidden_checks": {
+        "failed": [],
+        "passed": 4,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [
+        {
+          "arguments": {
+            "files": [
+              "job_options.py",
+              "tests"
+            ],
+            "limit": 10,
+            "project": "pilot",
+            "root": "/private/tmp/eb-workflow-trials-20260909-b/75bd98ebef9d4419",
+            "task": "Preserve a zero retry setting: a job submitted with {\"retries\": 0} is unexpectedly retried three times. Investigate and repair; preserve API contracts."
+          },
+          "error": null,
+          "id": "item_2",
+          "server": "engineering-board",
+          "status": "completed",
+          "tool": "board_context"
+        },
+        {
+          "arguments": {
+            "entry_id": "L101",
+            "project": "pilot",
+            "root": "/private/tmp/eb-workflow-trials-20260909-b/75bd98ebef9d4419"
+          },
+          "error": null,
+          "id": "item_5",
+          "server": "engineering-board",
+          "status": "completed",
+          "tool": "board_get_entry"
+        }
+      ],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 73856,
+        "input_tokens": 90218,
+        "output_tokens": 1976,
+        "reasoning_output_tokens": 320
+      },
+      "wall_seconds": 80.82757087505888
+    },
+    {
+      "arm_id": "0534b4aa6fa44e4e",
+      "case_id": "L-useful-retries",
+      "client_failure": null,
+      "condition": "history",
+      "distinct_execution_mcp_calls": 7,
+      "end_receipt_sha256": "df5bf7ae93193a32f3c512104813a077d43d8db75b9bced5bfef0b5feeb58df3",
+      "file_change_items": 1,
+      "grader_output_sha256": "905a709bcced0636c066a7581aa816e70adb30517cea9cac5e48ae0a63b524ac",
+      "hidden_checks": {
+        "failed": [],
+        "passed": 4,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 53376,
+        "input_tokens": 80408,
+        "output_tokens": 2058,
+        "reasoning_output_tokens": 276
+      },
+      "wall_seconds": 83.17934291705023
+    },
+    {
+      "arm_id": "8b0fe431601d4685",
+      "case_id": "L-useful-retries",
+      "client_failure": null,
+      "condition": "ordinary",
+      "distinct_execution_mcp_calls": 4,
+      "end_receipt_sha256": "acfcb8ca124d2185a020298c36729e68af3edfd36de65eed39e61851f93e75c4",
+      "file_change_items": 1,
+      "grader_output_sha256": "905a709bcced0636c066a7581aa816e70adb30517cea9cac5e48ae0a63b524ac",
+      "hidden_checks": {
+        "failed": [],
+        "passed": 4,
+        "total": 4
+      },
+      "item_error_messages": [
+        "Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/rhenmcleod/.codex/config.toml."
+      ],
+      "mcp_calls": [],
+      "trace_violations": [],
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 50944,
+        "input_tokens": 63782,
+        "output_tokens": 1667,
+        "reasoning_output_tokens": 288
+      },
+      "wall_seconds": 69.32639299996663
+    }
+  ],
+  "run": {
+    "attempted": 12,
+    "ended_at": "2026-09-09T15:28:05.847375+00:00",
+    "planned": 12,
+    "status": "complete"
+  },
+  "source_commit": "3f256bf5949fdfaee39fb699181bc7b5497a7048"
+}

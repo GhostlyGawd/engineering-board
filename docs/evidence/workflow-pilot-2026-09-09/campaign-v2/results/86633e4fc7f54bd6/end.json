@@ -1,0 +1,128 @@
+{
+  "artifacts": {
+    "changes.patch": {
+      "bytes": 6143,
+      "sha256": "f318315c891e79556726488329faa1e63a25fc8ff9f5a0d52344f11fff9b72a8"
+    },
+    "response.json": {
+      "bytes": 688,
+      "sha256": "bca637e63ba7f6b80226987ef21d1f9b0158568ff38f7fe6fb01796b65365bf0"
+    },
+    "start.json": {
+      "bytes": 1844,
+      "sha256": "833b68a127c670f3c254680986e8f4fe0240393145eec37ac7a8f683cc6d30d1"
+    },
+    "stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout.jsonl": {
+      "bytes": 12770,
+      "sha256": "b2a6015a7ddbee2f93210b12a79012901061e6b7ae297a841f2a1ae813cf2d7a"
+    },
+    "workspace/AGENTS.md": {
+      "bytes": 489,
+      "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+    },
+    "workspace/HISTORY.md": {
+      "bytes": 2110,
+      "sha256": "3a281793696d35e1da7ec89b657654d2cc379d6ecb0f3dd30e0f3da9a91f997c"
+    },
+    "workspace/README.md": {
+      "bytes": 874,
+      "sha256": "00be7396674dbc0d238b3773a06fe8c694456f6697f8f1a49fb9cbcf43816056"
+    },
+    "workspace/__pycache__/readings.cpython-314.pyc": {
+      "bytes": 1210,
+      "sha256": "4687beb63d90737874f98cc3f6de88c4d9a4449750c8a5f16c2d0c72ff2ab728"
+    },
+    "workspace/readings.py": {
+      "bytes": 676,
+      "sha256": "aeeb355e2c497871f1805a7f5501f0e41cc5d37b51c8377f6ff859c192afa341"
+    },
+    "workspace/task.md": {
+      "bytes": 273,
+      "sha256": "842b0e0fc98e32d262927dbc8bb9efbcb3798770110e4148995dfb45bdf600d4"
+    },
+    "workspace/tests/__pycache__/test_ingestion.cpython-314.pyc": {
+      "bytes": 1562,
+      "sha256": "cce7684165929a4083421345b80cffa7f4c866f98febb8279579ae93a8aa9577"
+    },
+    "workspace/tests/__pycache__/test_public.cpython-314.pyc": {
+      "bytes": 1385,
+      "sha256": "eeaa279b84234037c8552660d177d364d3c07a135a2f21fb32c9b8d2f93ec313"
+    },
+    "workspace/tests/test_ingestion.py": {
+      "bytes": 520,
+      "sha256": "3a5ec41d9fdc5d01965e887f8debb93ab49ed5a6c45b0cfc730168a3465db264"
+    },
+    "workspace/tests/test_public.py": {
+      "bytes": 448,
+      "sha256": "aa3ed5ff8a2a77170ccf5f3fb3864e668434eaa6e70d55cb4424803e9cb3270a"
+    }
+  },
+  "ended_at": "2026-09-09T15:17:48.212084+00:00",
+  "exit_code": 0,
+  "failure": null,
+  "final_inventory": {
+    "AGENTS.md": {
+      "bytes": 489,
+      "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+    },
+    "HISTORY.md": {
+      "bytes": 2110,
+      "sha256": "3a281793696d35e1da7ec89b657654d2cc379d6ecb0f3dd30e0f3da9a91f997c"
+    },
+    "README.md": {
+      "bytes": 874,
+      "sha256": "00be7396674dbc0d238b3773a06fe8c694456f6697f8f1a49fb9cbcf43816056"
+    },
+    "__pycache__/readings.cpython-314.pyc": {
+      "bytes": 1210,
+      "sha256": "4687beb63d90737874f98cc3f6de88c4d9a4449750c8a5f16c2d0c72ff2ab728"
+    },
+    "readings.py": {
+      "bytes": 676,
+      "sha256": "aeeb355e2c497871f1805a7f5501f0e41cc5d37b51c8377f6ff859c192afa341"
+    },
+    "task.md": {
+      "bytes": 273,
+      "sha256": "842b0e0fc98e32d262927dbc8bb9efbcb3798770110e4148995dfb45bdf600d4"
+    },
+    "tests/__pycache__/test_ingestion.cpython-314.pyc": {
+      "bytes": 1562,
+      "sha256": "cce7684165929a4083421345b80cffa7f4c866f98febb8279579ae93a8aa9577"
+    },
+    "tests/__pycache__/test_public.cpython-314.pyc": {
+      "bytes": 1385,
+      "sha256": "eeaa279b84234037c8552660d177d364d3c07a135a2f21fb32c9b8d2f93ec313"
+    },
+    "tests/test_ingestion.py": {
+      "bytes": 520,
+      "sha256": "3a5ec41d9fdc5d01965e887f8debb93ab49ed5a6c45b0cfc730168a3465db264"
+    },
+    "tests/test_public.py": {
+      "bytes": 448,
+      "sha256": "aa3ed5ff8a2a77170ccf5f3fb3864e668434eaa6e70d55cb4424803e9cb3270a"
+    }
+  },
+  "start_sha256": "833b68a127c670f3c254680986e8f4fe0240393145eec37ac7a8f683cc6d30d1",
+  "trace": {
+    "audit_limit": "literal visible tool arguments only; not secure isolation",
+    "completed_turns": 1,
+    "tool_events": 8,
+    "tool_types": [
+      "command_execution"
+    ],
+    "trace_violations": [],
+    "turn_errors": [],
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 52224,
+      "input_tokens": 65576,
+      "output_tokens": 1846,
+      "reasoning_output_tokens": 483
+    }
+  },
+  "wall_seconds": 93.09533566609025
+}

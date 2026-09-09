@@ -1,0 +1,27 @@
+# Smithery deployment config for the engineering-board MCP server.
+# https://smithery.ai/docs/build/project-config
+#
+# The server is a zero-dependency python3 stdio server. It resolves the board
+# it operates on from CLAUDE_PROJECT_DIR (falling back to the working directory),
+# and shells out to sibling hooks/scripts/board-claim-*.sh for locking — so it is
+# published from the repo tree, not as a standalone single file.
+runtime: container
+startCommand:
+  type: stdio
+  # No required configuration: the server operates on the repository it is
+  # launched in. CLAUDE_PROJECT_DIR is optional and overrides the board root.
+  configSchema:
+    type: object
+    properties:
+      projectDir:
+        type: string
+        description: >-
+          Absolute path to the repository whose engineering-board/ tree the
+          server operates on. Defaults to the working directory when unset.
+    required: []
+  commandFunction: |
+    (config) => ({
+      command: "python3",
+      args: ["mcp-server/engineering_board_mcp.py"],
+      env: config.projectDir ? { CLAUDE_PROJECT_DIR: config.projectDir } : {}
+    })

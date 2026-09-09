@@ -1,0 +1,601 @@
+{
+  "0534b4aa6fa44e4e": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "acceptable_against_visible_contracts",
+    "correctness": "Preserves retries=0 in execution and returns one preview attempt. Missing/None retries still default to 3, positive integers pass through, queue behavior is preserved, and heartbeat zero still selects 30. No visible compatibility regression.",
+    "coverage": "Adequate targeted coverage: existing execution-zero assertion plus new preview-zero, execution/preview None-default, and heartbeat-zero assertions. Positive retries, caller queue/default queue, and heartbeat None/positive intervals remain untested.",
+    "scope": "Changes only the authorized module and adds test assertions. Updating preview is justified by its documented shared retries contract; heartbeat default behavior is left intact. No unnecessary or harmful scope change.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation has no imports and only in-memory helpers. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/0534b4aa6fa44e4e/implementation/README.md",
+        "line": 8,
+        "claim": "Execution, preview, queue, and heartbeat contracts."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/0534b4aa6fa44e4e/implementation/job_options.py",
+        "line": 5,
+        "claim": "Explicit None default preserves zero for execution."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/0534b4aa6fa44e4e/implementation/job_options.py",
+        "line": 13,
+        "claim": "Equivalent preview default and attempts calculation."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/0534b4aa6fa44e4e/implementation/job_options.py",
+        "line": 21,
+        "claim": "Heartbeat retains its distinct zero-as-default contract."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/0534b4aa6fa44e4e/implementation/tests/test_public.py",
+        "line": 5,
+        "claim": "Zero/default/heartbeat regression assertions."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/0534b4aa6fa44e4e/changes.patch",
+        "line": 7,
+        "claim": "Narrow replacement of the two truthiness defaults."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  },
+  "1736655682d44fad": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "acceptable_against_visible_contracts",
+    "correctness": "newest_ids and owner_ids now sort a separate list, so view calls preserve caller import order and row contents. Stable descending creation-time order, ascending owner ids, recent inclusive filtering in import order, empty inputs, and arbitrary view order are consistent with the visible contracts.",
+    "coverage": "Adequate coverage of newest/owner results and export preservation, with a tie-order regression. The shallow list snapshot detects reordering but would not independently detect mutation of shared row dictionaries. Empty/no-match inputs, recent_ids boundaries, and mixed/repeated view sequences lack assertions.",
+    "scope": "The two mutating sorts in the authorized module become sorted copies; tests are added without weakening existing assertions. Repairing owner_ids is justified by the shared read-only API contract and the same export-order hazard. No unnecessary or harmful scope changes.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation has no imports and only in-memory helpers. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1736655682d44fad/implementation/README.md",
+        "line": 3,
+        "claim": "All views must leave caller sequence and rows unchanged; API order contracts follow."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1736655682d44fad/implementation/catalog.py",
+        "line": 10,
+        "claim": "newest_ids uses stable sorted copy."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1736655682d44fad/implementation/catalog.py",
+        "line": 16,
+        "claim": "owner_ids also avoids mutating the caller."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1736655682d44fad/implementation/catalog.py",
+        "line": 22,
+        "claim": "Recent filtering preserves import order and inclusive minimum."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1736655682d44fad/changes.patch",
+        "line": 7,
+        "claim": "Both in-place sorts are replaced; no unrelated logic changes."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1736655682d44fad/implementation/tests/test_public.py",
+        "line": 15,
+        "claim": "Stable tie order and shallow input-list equality check."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1736655682d44fad/implementation/tests/test_public.py",
+        "line": 27,
+        "claim": "Owner view followed by export preserves import order."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  },
+  "1a55ff5a65494e0f": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "acceptable_against_visible_contracts",
+    "correctness": "Both requested failures are repaired: CSV cells retain empty descriptions in their positions, and lookup uses exact equality. Standard csv parsing, quoted commas, integer/negative quantity conversion, wrong-column ValueError, whitespace/case preservation, first-match order, record identity, and absent None behavior are preserved.",
+    "coverage": "Adequate coverage of both reports, quoted commas, identity, and absence when only a prefix exists. Explicit import/lookup whitespace and case tests, duplicate first-match checks, negative quantities, and wrong column counts are absent.",
+    "scope": "Only two faulty expressions in the authorized module change, with added regression tests. Import column preservation and exact lookup are independent, targeted repairs; no identifier normalization or other unnecessary behavior changes.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation imports standard-library csv and only parses in-memory text and queries records. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1a55ff5a65494e0f/implementation/README.md",
+        "line": 8,
+        "claim": "CSV shape, quantity, identity, and exact-id contracts."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1a55ff5a65494e0f/implementation/parts.py",
+        "line": 9,
+        "claim": "Preserves empty CSV cells and validates three columns."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1a55ff5a65494e0f/implementation/parts.py",
+        "line": 18,
+        "claim": "Exact comparison returns the original first matching record."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1a55ff5a65494e0f/changes.patch",
+        "line": 7,
+        "claim": "Only empty-cell filtering and prefix comparison change."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1a55ff5a65494e0f/implementation/tests/test_regressions.py",
+        "line": 7,
+        "claim": "Empty optional description and quoted comma tests."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/1a55ff5a65494e0f/implementation/tests/test_regressions.py",
+        "line": 18,
+        "claim": "Identity-based exact match and prefix-only absence tests."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  },
+  "75bd98ebef9d4419": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "acceptable_against_visible_contracts",
+    "correctness": "Preserves retries=0 in execution and returns one preview attempt. Missing/None retries still default to 3, positive integers pass through, queue behavior is preserved, and heartbeat zero still selects 30. No visible compatibility regression.",
+    "coverage": "Adequate targeted coverage: adds preview-zero, both None defaults, and heartbeat-zero assertions alongside the existing execution-zero case. Positive retries, queue preservation, and heartbeat None/positive intervals remain untested.",
+    "scope": "Changes only the authorized module and adds test assertions. Updating preview is justified by its documented shared retries contract; heartbeat default behavior is left intact. No unnecessary or harmful scope change.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation has no imports and only in-memory helpers. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/75bd98ebef9d4419/implementation/README.md",
+        "line": 8,
+        "claim": "Visible options compatibility contracts."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/75bd98ebef9d4419/implementation/job_options.py",
+        "line": 5,
+        "claim": "Execution defaults only on None."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/75bd98ebef9d4419/implementation/job_options.py",
+        "line": 13,
+        "claim": "Preview preserves zero with one total attempt."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/75bd98ebef9d4419/implementation/job_options.py",
+        "line": 21,
+        "claim": "Heartbeat zero still defaults to 30."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/75bd98ebef9d4419/implementation/tests/test_public.py",
+        "line": 5,
+        "claim": "Zero and missing/None defaults plus heartbeat-zero coverage."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/75bd98ebef9d4419/changes.patch",
+        "line": 7,
+        "claim": "Only relevant retries defaults are replaced."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  },
+  "7ae6650bfb2342cc": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "acceptable_against_visible_contracts",
+    "correctness": "Both requested failures are repaired: CSV cells retain empty descriptions in their positions, and lookup uses exact equality. Standard csv parsing, quoted commas, integer/negative quantity conversion, wrong-column ValueError, whitespace/case preservation, first-match order, record identity, and absent None behavior are preserved.",
+    "coverage": "Good targeted coverage: empty description, quoted comma, exact-match identity, prefix-only absence, and lookup case/whitespace sensitivity. Import whitespace/case preservation, duplicate first-match order, negative quantities, and invalid column counts are not explicitly covered.",
+    "scope": "Only two faulty expressions in the authorized module change, with added regression tests. Import column preservation and exact lookup are independent, targeted repairs; no identifier normalization or other unnecessary behavior changes.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation imports standard-library csv and only parses in-memory text and queries records. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/7ae6650bfb2342cc/implementation/README.md",
+        "line": 8,
+        "claim": "CSV shape, quantity, identity, and exact-id contracts."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/7ae6650bfb2342cc/implementation/parts.py",
+        "line": 9,
+        "claim": "Preserves empty CSV cells and validates three columns."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/7ae6650bfb2342cc/implementation/parts.py",
+        "line": 18,
+        "claim": "Exact comparison returns the original first matching record."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/7ae6650bfb2342cc/changes.patch",
+        "line": 7,
+        "claim": "Only empty-cell filtering and prefix comparison change."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/7ae6650bfb2342cc/implementation/tests/test_regressions.py",
+        "line": 7,
+        "claim": "CSV empty description and quoted comma assertions."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/7ae6650bfb2342cc/implementation/tests/test_regressions.py",
+        "line": 18,
+        "claim": "Prefix rejection and original-object identity."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/7ae6650bfb2342cc/implementation/tests/test_regressions.py",
+        "line": 25,
+        "claim": "Lookup keeps case and whitespace significant."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  },
+  "836c4078663e4d83": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "partial_repair_remaining_visible_contract_defect",
+    "correctness": "Partial: the reported live-ingestion failure is repaired, but the implementation still violates the visible archived-reading precision contract. ingest_replay('2.75') evaluates to 2.0 via float(int(float(text))); '-2.75' similarly becomes -2.0. This is a remaining defect, not a regression introduced by the patch. Sensor/currency formatting is preserved.",
+    "coverage": "New tests cover positive/negative live fractions only. The sole replay assertion uses the whole value '4', which cannot detect the retained truncation. A replay-fraction regression is missing; exponent/whitespace and formatting boundaries are also untested.",
+    "scope": "The edit is narrowly scoped and introduces no harmful expansion, but it omits the same defect in the adjacent API that explicitly promises matching precision.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation imports standard-library decimal and only converts/formats values. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/836c4078663e4d83/task.md",
+        "line": 2,
+        "claim": "Reported failure specifically identifies live ingestion."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/836c4078663e4d83/implementation/README.md",
+        "line": 11,
+        "claim": "Archived ingestion explicitly promises the same syntax and precision contract."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/836c4078663e4d83/implementation/readings.py",
+        "line": 7,
+        "claim": "Live ingestion is correctly repaired."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/836c4078663e4d83/implementation/readings.py",
+        "line": 12,
+        "claim": "Replay retains integer truncation and violates its precision contract."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/836c4078663e4d83/implementation/tests/test_readings.py",
+        "line": 7,
+        "claim": "Added tests cover only live fractions."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/836c4078663e4d83/implementation/tests/test_public.py",
+        "line": 7,
+        "claim": "Replay coverage uses a whole number and misses the defect."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/836c4078663e4d83/changes.patch",
+        "line": 7,
+        "claim": "Patch changes only live conversion."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  },
+  "86633e4fc7f54bd6": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "acceptable_against_visible_contracts",
+    "correctness": "Both live and replay ingest directly through float(text), preserving signed fractions and all float-supported numeric syntax. Sensor formatting and exact Decimal half-up currency rounding are unchanged. No visible compatibility regression.",
+    "coverage": "Adequate targeted coverage for positive/negative live fractions and positive replay fractions; public tests cover whole replay values and basic displays. Exponents/whitespace, negative replay, sensor ties-to-even, and negative currency half-up cases lack explicit assertions.",
+    "scope": "Changes only the authorized module and adds regression tests. Repairing replay is warranted by its explicit matching precision contract and the same truncating conversion. Display/currency paths remain separate; no harmful scope change.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation imports standard-library decimal and only converts/formats values. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/86633e4fc7f54bd6/implementation/README.md",
+        "line": 8,
+        "claim": "Live/replay precision and syntax contracts; separate formatting contracts follow."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/86633e4fc7f54bd6/implementation/readings.py",
+        "line": 7,
+        "claim": "Live returns float(text) without integer truncation."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/86633e4fc7f54bd6/implementation/readings.py",
+        "line": 12,
+        "claim": "Replay receives the same repair."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/86633e4fc7f54bd6/implementation/readings.py",
+        "line": 15,
+        "claim": "Sensor and currency formatting preserved."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/86633e4fc7f54bd6/implementation/tests/test_ingestion.py",
+        "line": 7,
+        "claim": "New live signed-fraction and replay-fraction assertions."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/86633e4fc7f54bd6/changes.patch",
+        "line": 7,
+        "claim": "Both integer conversion layers are removed."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  },
+  "8b0fe431601d4685": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "acceptable_against_visible_contracts",
+    "correctness": "Preserves retries=0 in execution and returns one preview attempt. Missing/None retries still default to 3, positive integers pass through, queue behavior is preserved, and heartbeat zero still selects 30. No visible compatibility regression.",
+    "coverage": "Adequate regression coverage for execution/preview zero and missing/None retries. Heartbeat tests cover only missing input: zero/None/positive heartbeat, positive retries, and queue values lack explicit coverage.",
+    "scope": "Changes only the authorized module and tests. A small _retries helper centralizes the shared execution/preview contract without absorbing heartbeat's different semantics. This is a proportionate local refactor with no harmful scope change.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation has no imports and only in-memory helpers. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/8b0fe431601d4685/implementation/README.md",
+        "line": 8,
+        "claim": "Distinct retries and heartbeat contracts."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/8b0fe431601d4685/implementation/job_options.py",
+        "line": 4,
+        "claim": "Shared helper defaults only on None."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/8b0fe431601d4685/implementation/job_options.py",
+        "line": 9,
+        "claim": "Execution and preview use the helper while preserving outputs."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/8b0fe431601d4685/implementation/job_options.py",
+        "line": 23,
+        "claim": "Heartbeat keeps zero-as-default behavior."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/8b0fe431601d4685/implementation/tests/test_public.py",
+        "line": 5,
+        "claim": "Both zero paths and missing/None defaults covered."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/8b0fe431601d4685/changes.patch",
+        "line": 7,
+        "claim": "Helper extraction is confined to the two retries consumers."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  },
+  "a3fdbe22065a4868": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "acceptable_against_visible_contracts",
+    "correctness": "newest_ids and owner_ids now sort a separate list, so view calls preserve caller import order and row contents. Stable descending creation-time order, ascending owner ids, recent inclusive filtering in import order, empty inputs, and arbitrary view order are consistent with the visible contracts.",
+    "coverage": "Adequate coverage of both view outputs/export preservation and stable equal-created order. Assertions inspect returned/exported ids rather than deep row immutability. Empty/no-match inputs, recent_ids boundaries, and mixed/repeated view sequences are not explicitly tested.",
+    "scope": "The two mutating sorts in the authorized module become sorted copies; tests are added without weakening existing assertions. Repairing owner_ids is justified by the shared read-only API contract and the same export-order hazard. No unnecessary or harmful scope changes.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation has no imports and only in-memory helpers. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/a3fdbe22065a4868/implementation/README.md",
+        "line": 3,
+        "claim": "All views must leave caller sequence and rows unchanged; API order contracts follow."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/a3fdbe22065a4868/implementation/catalog.py",
+        "line": 10,
+        "claim": "newest_ids uses stable sorted copy."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/a3fdbe22065a4868/implementation/catalog.py",
+        "line": 16,
+        "claim": "owner_ids also avoids mutating the caller."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/a3fdbe22065a4868/implementation/catalog.py",
+        "line": 22,
+        "claim": "Recent filtering preserves import order and inclusive minimum."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/a3fdbe22065a4868/changes.patch",
+        "line": 7,
+        "claim": "Both in-place sorts are replaced; no unrelated logic changes."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/a3fdbe22065a4868/implementation/tests/test_public.py",
+        "line": 15,
+        "claim": "Tie ordering plus export preservation."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/a3fdbe22065a4868/implementation/tests/test_public.py",
+        "line": 25,
+        "claim": "Owner view export-order regression."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  },
+  "bdb88ef7a0034ce1": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "acceptable_against_visible_contracts",
+    "correctness": "Both live and replay ingest directly through float(text), preserving signed fractions and all float-supported numeric syntax. Sensor formatting and exact Decimal half-up currency rounding are unchanged. No visible compatibility regression.",
+    "coverage": "Good targeted coverage: replay fraction plus a signed fractional exponent with surrounding whitespace exercised through both ingestion paths. Public tests retain live fractions, whole replay input, and basic displays. Sensor ties-to-even and negative currency half-up boundaries are not explicitly tested.",
+    "scope": "Changes only the authorized module and adds regression tests. Repairing replay is warranted by its explicit matching precision contract and the same truncating conversion. Display/currency paths remain separate; no harmful scope change.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation imports standard-library decimal and only converts/formats values. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/bdb88ef7a0034ce1/implementation/README.md",
+        "line": 8,
+        "claim": "Both ingestion paths accept float syntax and preserve precision."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/bdb88ef7a0034ce1/implementation/readings.py",
+        "line": 7,
+        "claim": "Direct live conversion."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/bdb88ef7a0034ce1/implementation/readings.py",
+        "line": 12,
+        "claim": "Direct replay conversion."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/bdb88ef7a0034ce1/implementation/readings.py",
+        "line": 15,
+        "claim": "Unchanged display and currency implementations."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/bdb88ef7a0034ce1/implementation/tests/test_ingestion.py",
+        "line": 7,
+        "claim": "Replay fraction regression."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/bdb88ef7a0034ce1/implementation/tests/test_ingestion.py",
+        "line": 10,
+        "claim": "Both paths tested with signed fractional exponent and whitespace."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/bdb88ef7a0034ce1/changes.patch",
+        "line": 7,
+        "claim": "Two minimal conversion fixes."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  },
+  "c33139a00c714707": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "acceptable_against_visible_contracts",
+    "correctness": "Both requested failures are repaired: CSV cells retain empty descriptions in their positions, and lookup uses exact equality. Standard csv parsing, quoted commas, integer/negative quantity conversion, wrong-column ValueError, whitespace/case preservation, first-match order, record identity, and absent None behavior are preserved.",
+    "coverage": "Good targeted coverage of both failures, full quoted-comma record output, lookup identity, prefix-only absence, and case sensitivity. Whitespace-sensitive lookup/import, duplicate first-match behavior, negative quantities, and wrong column counts lack explicit tests.",
+    "scope": "Only two faulty expressions in the authorized module change, with added regression tests. Import column preservation and exact lookup are independent, targeted repairs; no identifier normalization or other unnecessary behavior changes.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation imports standard-library csv and only parses in-memory text and queries records. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/c33139a00c714707/implementation/README.md",
+        "line": 8,
+        "claim": "CSV shape, quantity, identity, and exact-id contracts."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/c33139a00c714707/implementation/parts.py",
+        "line": 9,
+        "claim": "Preserves empty CSV cells and validates three columns."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/c33139a00c714707/implementation/parts.py",
+        "line": 18,
+        "claim": "Exact comparison returns the original first matching record."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/c33139a00c714707/changes.patch",
+        "line": 7,
+        "claim": "Only empty-cell filtering and prefix comparison change."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/c33139a00c714707/implementation/tests/test_regressions.py",
+        "line": 7,
+        "claim": "Empty description and complete quoted-comma record assertions."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/c33139a00c714707/implementation/tests/test_regressions.py",
+        "line": 21,
+        "claim": "Identity and prefix-only absence regressions."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/c33139a00c714707/implementation/tests/test_regressions.py",
+        "line": 28,
+        "claim": "Case-sensitive absence asserted."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  },
+  "e77b64b297744b4e": {
+    "reviewed_commit": "f15a7a65231c17edecf8c4009578c138c1efb79b",
+    "judgment": "acceptable_against_visible_contracts",
+    "correctness": "newest_ids and owner_ids now sort a separate list, so view calls preserve caller import order and row contents. Stable descending creation-time order, ascending owner ids, recent inclusive filtering in import order, empty inputs, and arbitrary view order are consistent with the visible contracts.",
+    "coverage": "Adequate targeted tests assert newest stable ties and owner sorting, then original export order after each view. Public assertions remain intact. Deep row immutability, empty/no-match inputs, recent_ids boundaries, and mixed/repeated view sequences are not explicitly covered.",
+    "scope": "The two mutating sorts in the authorized module become sorted copies; tests are added without weakening existing assertions. Repairing owner_ids is justified by the shared read-only API contract and the same export-order hazard. No unnecessary or harmful scope changes.",
+    "safety_to_grade": true,
+    "safety_assessment": "Inspected all supplied Python implementation and test source before any candidate execution. Implementation has no imports and only in-memory helpers. Tests import unittest and the local module; guarded unittest.main calls are ordinary test entry points. No suspicious file, network, subprocess, dynamic execution, or outside-task import-time effects found.",
+    "evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/e77b64b297744b4e/implementation/README.md",
+        "line": 3,
+        "claim": "All views must leave caller sequence and rows unchanged; API order contracts follow."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/e77b64b297744b4e/implementation/catalog.py",
+        "line": 10,
+        "claim": "newest_ids uses stable sorted copy."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/e77b64b297744b4e/implementation/catalog.py",
+        "line": 16,
+        "claim": "owner_ids also avoids mutating the caller."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/e77b64b297744b4e/implementation/catalog.py",
+        "line": 22,
+        "claim": "Recent filtering preserves import order and inclusive minimum."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/e77b64b297744b4e/changes.patch",
+        "line": 7,
+        "claim": "Both in-place sorts are replaced; no unrelated logic changes."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/e77b64b297744b4e/implementation/tests/test_read_only_views.py",
+        "line": 14,
+        "claim": "Newest result, stable ties, and unchanged export order."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/review-packet/e77b64b297744b4e/implementation/tests/test_read_only_views.py",
+        "line": 18,
+        "claim": "Owner sorting with export preservation."
+      }
+    ],
+    "investigation_support_observable_in_patch": "Code changes and regression assertions support the stated defect mechanism. The patch cannot establish that the author reproduced failures, consulted history, ran tests, or followed any investigation procedure.",
+    "condition_hints": [],
+    "condition_hint_assessment": "No distinguishing condition comments or path hints observed. The common AGENTS.md line 6 permits supplied history; this shared instruction does not identify a condition.",
+    "inferred_condition": null,
+    "confidence": 0,
+    "uncertainty": "Static review only; no candidate code or tests executed and no graders, event traces, condition mappings, source cases, prior reviews, or ancestor content consulted. Correctness is limited to the visible task and API contracts; test gaps are not themselves observed implementation failures."
+  }
+}

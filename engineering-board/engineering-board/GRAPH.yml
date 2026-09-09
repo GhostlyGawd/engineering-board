@@ -1,42 +1,120 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-09-09T14:10:08Z",
-  "source_fingerprint": "0f4d99dd528eb53b9a2b569e50e91060b2c2a5b3ab7bd9351851be6e8b17288f",
+  "generated_at": "2026-09-09T15:44:48Z",
+  "source_fingerprint": "3b42b64a2e642b1694f6420cdc2da209e6167f0bbe64d8f98fef68300212f0e4",
   "build_mode": "full",
   "project": "engineering-board",
   "entries_analyzed": {
-    "open": 1,
+    "open": 3,
     "archived": 0,
-    "total": 1
+    "total": 3
   },
   "nodes": {
-    "F004": {
+    "F005": {
       "type": "feature",
-      "title": "Validate D.1 v2 in a live pilot with retained evidence",
-      "source": "features/F004-validate-d-1-v2-in-a-live-pilot-with-retained-evidence.md",
+      "title": "Expose a read-only hypothesis-detail route from retrieved H records",
+      "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md",
       "priority": "P2",
       "status": "open",
-      "affects": "evaluation/",
+      "affects": "mcp-server/engineering_board_mcp.py",
+      "discovered": "2026-09-09"
+    },
+    "O001": {
+      "type": "observation",
+      "title": "Independent workflow-pilot preflight exposed label leakage and evidence-retention mismatches before live launch",
+      "source": "observations/O001-independent-workflow-pilot-preflight-exposed-label-leakage-a.md",
+      "affects": "evaluation/workflow-pilot/",
+      "discovered": "2026-09-09"
+    },
+    "O002": {
+      "type": "observation",
+      "title": "Hypotheses retrieved by board_context are not readable through board_get_entry in installed 1.13.5",
+      "source": "observations/O002-hypotheses-retrieved-by-board-context-are-not-readable-throu.md",
+      "affects": "mcp-server/engineering_board_mcp.py",
       "discovered": "2026-09-09"
     }
   },
-  "edges": [],
+  "edges": [
+    {
+      "from": "F005",
+      "to": "O002",
+      "kind": "shared-affects-prefix",
+      "value": "mcp-server/engineering_board_mcp.py/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "F005",
+          "field": "affects",
+          "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md"
+        },
+        {
+          "entry": "O002",
+          "field": "affects",
+          "source": "observations/O002-hypotheses-retrieved-by-board-context-are-not-readable-throu.md"
+        }
+      ]
+    }
+  ],
   "topology": {
-    "clusters": [],
+    "clusters": [
+      {
+        "id": "C001",
+        "fingerprint": "c-3a34bc2ac96d53e0",
+        "members": [
+          "F005",
+          "O002"
+        ],
+        "pattern_ids": [],
+        "patterns": [],
+        "affected_domains": [
+          "mcp-server"
+        ],
+        "signals": [
+          {
+            "kind": "shared-affects-prefix",
+            "value": "mcp-server/engineering_board_mcp.py/",
+            "members": [
+              "F005",
+              "O002"
+            ]
+          }
+        ],
+        "density": 1.0
+      }
+    ],
     "isolated": [
-      "F004"
+      "O001"
     ],
     "cross_cluster_bridges": []
   },
   "unresolved_patterns": [],
   "findings": [
     {
+      "type": "dense-cluster",
+      "cluster_id": "C001",
+      "members": [
+        "F005",
+        "O002"
+      ],
+      "density": 1.0,
+      "shared_dimensions": {
+        "patterns": []
+      },
+      "internal_edges": 1
+    },
+    {
       "type": "isolated-node",
-      "node": "F004"
+      "node": "O001"
     }
   ],
   "read_order": [
-    "F004"
+    "C001",
+    "O001"
   ],
-  "drill_in": {}
+  "drill_in": {
+    "C001": [
+      "F005",
+      "O002"
+    ]
+  }
 }

@@ -1,0 +1,120 @@
+{
+  "artifacts": {
+    "changes.patch": {
+      "bytes": 5482,
+      "sha256": "137f7b5dc9f9d0e02fa955933d079bac968932f460f427e40d0f43dea9d63c49"
+    },
+    "response.json": {
+      "bytes": 574,
+      "sha256": "365c8a23ad08df51e769881a2b7fbc0cc8b8a75fec68ea76a8746dcf6acc9899"
+    },
+    "start.json": {
+      "bytes": 1844,
+      "sha256": "3da133a183879827ceac352d269b9ea2a424086a998da9a4c1156dc0c1f85f54"
+    },
+    "stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout.jsonl": {
+      "bytes": 9711,
+      "sha256": "c3118aad5401f3d03d61be2243f9d4550a0642c88dde0589abaf8e5d534b3e7e"
+    },
+    "workspace/AGENTS.md": {
+      "bytes": 489,
+      "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+    },
+    "workspace/README.md": {
+      "bytes": 874,
+      "sha256": "00be7396674dbc0d238b3773a06fe8c694456f6697f8f1a49fb9cbcf43816056"
+    },
+    "workspace/__pycache__/readings.cpython-314.pyc": {
+      "bytes": 1275,
+      "sha256": "f7d19830f97fe3d3ba84b1a57c1b8a48337b52686925c90055cdf787c59cffae"
+    },
+    "workspace/readings.py": {
+      "bytes": 688,
+      "sha256": "09ef99d6e8625fe843090122a9c729f56ec120d5240bc8f8db1d5ecd8b0c2886"
+    },
+    "workspace/task.md": {
+      "bytes": 273,
+      "sha256": "842b0e0fc98e32d262927dbc8bb9efbcb3798770110e4148995dfb45bdf600d4"
+    },
+    "workspace/tests/__pycache__/test_public.cpython-314.pyc": {
+      "bytes": 1385,
+      "sha256": "eeaa279b84234037c8552660d177d364d3c07a135a2f21fb32c9b8d2f93ec313"
+    },
+    "workspace/tests/__pycache__/test_readings.cpython-314.pyc": {
+      "bytes": 1200,
+      "sha256": "7820c8c3d31c7c86db2eff7582715e8916f189f6daca0e278626d8087cc59c40"
+    },
+    "workspace/tests/test_public.py": {
+      "bytes": 448,
+      "sha256": "aa3ed5ff8a2a77170ccf5f3fb3864e668434eaa6e70d55cb4424803e9cb3270a"
+    },
+    "workspace/tests/test_readings.py": {
+      "bytes": 369,
+      "sha256": "aa1a9af903d2a6306613eb0552c57cdd748aabc56ed77493c0a96e1aa73f4e9f"
+    }
+  },
+  "ended_at": "2026-09-09T15:25:15.128794+00:00",
+  "exit_code": 0,
+  "failure": null,
+  "final_inventory": {
+    "AGENTS.md": {
+      "bytes": 489,
+      "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+    },
+    "README.md": {
+      "bytes": 874,
+      "sha256": "00be7396674dbc0d238b3773a06fe8c694456f6697f8f1a49fb9cbcf43816056"
+    },
+    "__pycache__/readings.cpython-314.pyc": {
+      "bytes": 1275,
+      "sha256": "f7d19830f97fe3d3ba84b1a57c1b8a48337b52686925c90055cdf787c59cffae"
+    },
+    "readings.py": {
+      "bytes": 688,
+      "sha256": "09ef99d6e8625fe843090122a9c729f56ec120d5240bc8f8db1d5ecd8b0c2886"
+    },
+    "task.md": {
+      "bytes": 273,
+      "sha256": "842b0e0fc98e32d262927dbc8bb9efbcb3798770110e4148995dfb45bdf600d4"
+    },
+    "tests/__pycache__/test_public.cpython-314.pyc": {
+      "bytes": 1385,
+      "sha256": "eeaa279b84234037c8552660d177d364d3c07a135a2f21fb32c9b8d2f93ec313"
+    },
+    "tests/__pycache__/test_readings.cpython-314.pyc": {
+      "bytes": 1200,
+      "sha256": "7820c8c3d31c7c86db2eff7582715e8916f189f6daca0e278626d8087cc59c40"
+    },
+    "tests/test_public.py": {
+      "bytes": 448,
+      "sha256": "aa3ed5ff8a2a77170ccf5f3fb3864e668434eaa6e70d55cb4424803e9cb3270a"
+    },
+    "tests/test_readings.py": {
+      "bytes": 369,
+      "sha256": "aa1a9af903d2a6306613eb0552c57cdd748aabc56ed77493c0a96e1aa73f4e9f"
+    }
+  },
+  "start_sha256": "3da133a183879827ceac352d269b9ea2a424086a998da9a4c1156dc0c1f85f54",
+  "trace": {
+    "audit_limit": "literal visible tool arguments only; not secure isolation",
+    "completed_turns": 1,
+    "tool_events": 8,
+    "tool_types": [
+      "command_execution"
+    ],
+    "trace_violations": [],
+    "turn_errors": [],
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 50176,
+      "input_tokens": 62610,
+      "output_tokens": 1333,
+      "reasoning_output_tokens": 241
+    }
+  },
+  "wall_seconds": 58.67927449999843
+}

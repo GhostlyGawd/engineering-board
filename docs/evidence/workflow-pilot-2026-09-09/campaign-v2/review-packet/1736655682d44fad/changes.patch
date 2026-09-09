@@ -1,0 +1,43 @@
+--- a/catalog.py
++++ b/catalog.py
+@@ -7,14 +7,14 @@
+ 
+ def newest_ids(rows):
+     """Read-only view, descending created time; preserve ties in input order."""
+-    rows.sort(key=lambda row: row["created"], reverse=True)
+-    return [row["id"] for row in rows]
++    ordered_rows = sorted(rows, key=lambda row: row["created"], reverse=True)
++    return [row["id"] for row in ordered_rows]
+ 
+ 
+ def owner_ids(rows, owner):
+     """Read-only view, ascending id, restricted to one owner."""
+-    rows.sort(key=lambda row: row["id"])
+-    return [row["id"] for row in rows if row["owner"] == owner]
++    ordered_rows = sorted(rows, key=lambda row: row["id"])
++    return [row["id"] for row in ordered_rows if row["owner"] == owner]
+ 
+ 
+ def recent_ids(rows, minimum):
+--- a/tests/test_public.py
++++ b/tests/test_public.py
+@@ -11,5 +11,19 @@
+     def test_export_after_newest(self):
+         newest_ids(self.rows)
+         self.assertEqual(export_ids(self.rows), ["z", "b", "c"])
++
++    def test_newest_preserves_tie_order_without_mutating_rows(self):
++        rows = [{"id": "first", "created": 2, "owner": "a"},
++                {"id": "old", "created": 1, "owner": "b"},
++                {"id": "second", "created": 2, "owner": "c"}]
++        original_rows = list(rows)
++
++        self.assertEqual(newest_ids(rows), ["first", "second", "old"])
++        self.assertEqual(rows, original_rows)
++
+     def test_owner_order(self):
+         self.assertEqual(owner_ids(self.rows, "a"), ["b", "z"])
++
++    def test_export_after_owner(self):
++        owner_ids(self.rows, "a")
++        self.assertEqual(export_ids(self.rows), ["z", "b", "c"])

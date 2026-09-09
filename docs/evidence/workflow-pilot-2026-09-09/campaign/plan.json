@@ -1,0 +1,568 @@
+{
+  "arms": [
+    {
+      "case_id": "H-useful-catalog",
+      "condition": "engineering_board",
+      "id": "f7642191e2c345e6",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "README.md": {
+          "bytes": 797,
+          "sha256": "c8332ba485f5ac8ea890287809d7ccf676dc02a66b38492f5d9e707caf3346a2"
+        },
+        "catalog.py": {
+          "bytes": 740,
+          "sha256": "bb121c027b2a3ecd3977d881e1063b8b7b9ba1720f40ba7ee5c2171fe75d787d"
+        },
+        "engineering-board/BOARD-ROUTER.md": {
+          "bytes": 264,
+          "sha256": "42b59abd508da16ca5aea971e9377314fa0917f36f5d21a2a05a40ab3055daf1"
+        },
+        "engineering-board/pilot/ARCHIVE.md": {
+          "bytes": 58,
+          "sha256": "3ce08ee795aee75f46c7c9f21dfd591a924b17896dda948648f1d389068d8f18"
+        },
+        "engineering-board/pilot/BOARD.md": {
+          "bytes": 617,
+          "sha256": "5a5112a58756c60d9f3d1df998bf3728f2c37679c496c059b3201957141cebcd"
+        },
+        "engineering-board/pilot/bugs/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/bugs/B105.md": {
+          "bytes": 460,
+          "sha256": "44981c84b2e351e5489794aba399878902e3d3395d1ec8d8ab98cd3eab678d48"
+        },
+        "engineering-board/pilot/bugs/B106.md": {
+          "bytes": 461,
+          "sha256": "772bc61df6d9fb94aaf8e16140fcfb410351339cbeee409d7e4549e13ff9d3d0"
+        },
+        "engineering-board/pilot/features/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/hypotheses/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/hypotheses/H101.md": {
+          "bytes": 1668,
+          "sha256": "be7db5e1b4288b5ec123c05173bc01120f0b382ee759118e81ae384515adce1e"
+        },
+        "engineering-board/pilot/learnings/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/observations/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/questions/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "task.md": {
+          "bytes": 329,
+          "sha256": "445d30e9ec277435de568c902572e4fb9af4b6419551d5ecefa40201b76c50b0"
+        },
+        "tests/test_public.py": {
+          "bytes": 645,
+          "sha256": "11988bab09082b1c2031eaa02b9b3532269be1da3fa0493b206265091ab67b1e"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/f7642191e2c345e6"
+    },
+    {
+      "case_id": "L-control-precision",
+      "condition": "history",
+      "id": "1f9b7297c32b41f6",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "HISTORY.md": {
+          "bytes": 2110,
+          "sha256": "3a281793696d35e1da7ec89b657654d2cc379d6ecb0f3dd30e0f3da9a91f997c"
+        },
+        "README.md": {
+          "bytes": 874,
+          "sha256": "00be7396674dbc0d238b3773a06fe8c694456f6697f8f1a49fb9cbcf43816056"
+        },
+        "readings.py": {
+          "bytes": 700,
+          "sha256": "e856ca8cfcaa1836e7e73d286ec85ce55b61f29b9672b7d38ec67c2ef837c381"
+        },
+        "task.md": {
+          "bytes": 273,
+          "sha256": "842b0e0fc98e32d262927dbc8bb9efbcb3798770110e4148995dfb45bdf600d4"
+        },
+        "tests/test_public.py": {
+          "bytes": 448,
+          "sha256": "aa3ed5ff8a2a77170ccf5f3fb3864e668434eaa6e70d55cb4424803e9cb3270a"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/1f9b7297c32b41f6"
+    },
+    {
+      "case_id": "H-useful-catalog",
+      "condition": "history",
+      "id": "472aff6d2da34938",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "HISTORY.md": {
+          "bytes": 2565,
+          "sha256": "e19d2c0b6032448d784f2ac0ed41f28f7905d1dc06271cd09e4abb50938eada6"
+        },
+        "README.md": {
+          "bytes": 797,
+          "sha256": "c8332ba485f5ac8ea890287809d7ccf676dc02a66b38492f5d9e707caf3346a2"
+        },
+        "catalog.py": {
+          "bytes": 740,
+          "sha256": "bb121c027b2a3ecd3977d881e1063b8b7b9ba1720f40ba7ee5c2171fe75d787d"
+        },
+        "task.md": {
+          "bytes": 329,
+          "sha256": "445d30e9ec277435de568c902572e4fb9af4b6419551d5ecefa40201b76c50b0"
+        },
+        "tests/test_public.py": {
+          "bytes": 645,
+          "sha256": "11988bab09082b1c2031eaa02b9b3532269be1da3fa0493b206265091ab67b1e"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/472aff6d2da34938"
+    },
+    {
+      "case_id": "H-control-identifiers",
+      "condition": "history",
+      "id": "6502582a9af04705",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "HISTORY.md": {
+          "bytes": 2602,
+          "sha256": "2aa33a813f4acba0ad61f2deadce2d9883787fb20782640747c7ba49b48fb9b3"
+        },
+        "README.md": {
+          "bytes": 881,
+          "sha256": "5e10676e335d12c459aa3b74227322272836031a40cc55e0db149fed1ff14a57"
+        },
+        "parts.py": {
+          "bytes": 667,
+          "sha256": "8b6681a3559180d7a4bf3713ae88d96730ce6864fedc2ea8840aba175769d440"
+        },
+        "task.md": {
+          "bytes": 346,
+          "sha256": "ab6ce2db96193f5f434ad33e668587fd1db0ad8ee47d7bcb445093eff6937603"
+        },
+        "tests/test_public.py": {
+          "bytes": 470,
+          "sha256": "d4e838095c23ae7e3fd9092828bb2c1ec09cde7147e6b7bd395be0bfe02a1c12"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/6502582a9af04705"
+    },
+    {
+      "case_id": "L-useful-retries",
+      "condition": "engineering_board",
+      "id": "e3c9f7d633d54521",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "README.md": {
+          "bytes": 876,
+          "sha256": "ec1a3af8b5e83bea9bd835f23c9558b451c54c21f9d6f685498f300fdfe7e801"
+        },
+        "engineering-board/BOARD-ROUTER.md": {
+          "bytes": 264,
+          "sha256": "42b59abd508da16ca5aea971e9377314fa0917f36f5d21a2a05a40ab3055daf1"
+        },
+        "engineering-board/pilot/ARCHIVE.md": {
+          "bytes": 58,
+          "sha256": "3ce08ee795aee75f46c7c9f21dfd591a924b17896dda948648f1d389068d8f18"
+        },
+        "engineering-board/pilot/BOARD.md": {
+          "bytes": 562,
+          "sha256": "9a67c2b6db81ace83a54b4888d12e7176b2ca8c2a15626a1c7731486bf34f9e6"
+        },
+        "engineering-board/pilot/bugs/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/bugs/B101.md": {
+          "bytes": 494,
+          "sha256": "d41d748bf952d7155265f765eb63b41c643fe40794eecdc10a585d85d762693f"
+        },
+        "engineering-board/pilot/bugs/B102.md": {
+          "bytes": 468,
+          "sha256": "30e6397af0d302ec68699cc9922417e5bba714416049b4f8e61aabdfcc39a6dc"
+        },
+        "engineering-board/pilot/features/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/hypotheses/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/learnings/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/learnings/L101.md": {
+          "bytes": 1029,
+          "sha256": "5139f08c006e2d8f22a04b999f459cdbe4d43fd82da9b4f0882b81ab5454fd1d"
+        },
+        "engineering-board/pilot/observations/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/questions/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "job_options.py": {
+          "bytes": 616,
+          "sha256": "a719d9c8d9a54aa1e21bc9806f308ffe9178371113f3a28722128f3efdb09cca"
+        },
+        "task.md": {
+          "bytes": 278,
+          "sha256": "ea8083a49d5a7bab8b3c7238b1fbae5d830d5ca1b093afba404a43f673a701b5"
+        },
+        "tests/test_public.py": {
+          "bytes": 451,
+          "sha256": "2af163f457825872cc07b2cdc6fa53b8aa20b399feb4b3c7ded1ab28b4e2155a"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/e3c9f7d633d54521"
+    },
+    {
+      "case_id": "L-useful-retries",
+      "condition": "ordinary",
+      "id": "0dc4cdd158b44588",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "README.md": {
+          "bytes": 876,
+          "sha256": "ec1a3af8b5e83bea9bd835f23c9558b451c54c21f9d6f685498f300fdfe7e801"
+        },
+        "job_options.py": {
+          "bytes": 616,
+          "sha256": "a719d9c8d9a54aa1e21bc9806f308ffe9178371113f3a28722128f3efdb09cca"
+        },
+        "task.md": {
+          "bytes": 278,
+          "sha256": "ea8083a49d5a7bab8b3c7238b1fbae5d830d5ca1b093afba404a43f673a701b5"
+        },
+        "tests/test_public.py": {
+          "bytes": 451,
+          "sha256": "2af163f457825872cc07b2cdc6fa53b8aa20b399feb4b3c7ded1ab28b4e2155a"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/0dc4cdd158b44588"
+    },
+    {
+      "case_id": "L-useful-retries",
+      "condition": "history",
+      "id": "3b7de4490ffe4e5e",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "HISTORY.md": {
+          "bytes": 2167,
+          "sha256": "ceea5b06cb0240a3c2189570e4eea5d1c972215c07d84918890e15ab0f1d18f0"
+        },
+        "README.md": {
+          "bytes": 876,
+          "sha256": "ec1a3af8b5e83bea9bd835f23c9558b451c54c21f9d6f685498f300fdfe7e801"
+        },
+        "job_options.py": {
+          "bytes": 616,
+          "sha256": "a719d9c8d9a54aa1e21bc9806f308ffe9178371113f3a28722128f3efdb09cca"
+        },
+        "task.md": {
+          "bytes": 278,
+          "sha256": "ea8083a49d5a7bab8b3c7238b1fbae5d830d5ca1b093afba404a43f673a701b5"
+        },
+        "tests/test_public.py": {
+          "bytes": 451,
+          "sha256": "2af163f457825872cc07b2cdc6fa53b8aa20b399feb4b3c7ded1ab28b4e2155a"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/3b7de4490ffe4e5e"
+    },
+    {
+      "case_id": "L-control-precision",
+      "condition": "ordinary",
+      "id": "61464a65a68c41e2",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "README.md": {
+          "bytes": 874,
+          "sha256": "00be7396674dbc0d238b3773a06fe8c694456f6697f8f1a49fb9cbcf43816056"
+        },
+        "readings.py": {
+          "bytes": 700,
+          "sha256": "e856ca8cfcaa1836e7e73d286ec85ce55b61f29b9672b7d38ec67c2ef837c381"
+        },
+        "task.md": {
+          "bytes": 273,
+          "sha256": "842b0e0fc98e32d262927dbc8bb9efbcb3798770110e4148995dfb45bdf600d4"
+        },
+        "tests/test_public.py": {
+          "bytes": 448,
+          "sha256": "aa3ed5ff8a2a77170ccf5f3fb3864e668434eaa6e70d55cb4424803e9cb3270a"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/61464a65a68c41e2"
+    },
+    {
+      "case_id": "H-control-identifiers",
+      "condition": "ordinary",
+      "id": "6b5acc00f0ca4059",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "README.md": {
+          "bytes": 881,
+          "sha256": "5e10676e335d12c459aa3b74227322272836031a40cc55e0db149fed1ff14a57"
+        },
+        "parts.py": {
+          "bytes": 667,
+          "sha256": "8b6681a3559180d7a4bf3713ae88d96730ce6864fedc2ea8840aba175769d440"
+        },
+        "task.md": {
+          "bytes": 346,
+          "sha256": "ab6ce2db96193f5f434ad33e668587fd1db0ad8ee47d7bcb445093eff6937603"
+        },
+        "tests/test_public.py": {
+          "bytes": 470,
+          "sha256": "d4e838095c23ae7e3fd9092828bb2c1ec09cde7147e6b7bd395be0bfe02a1c12"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/6b5acc00f0ca4059"
+    },
+    {
+      "case_id": "H-control-identifiers",
+      "condition": "engineering_board",
+      "id": "4ed9d73ac73a4c0d",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "README.md": {
+          "bytes": 881,
+          "sha256": "5e10676e335d12c459aa3b74227322272836031a40cc55e0db149fed1ff14a57"
+        },
+        "engineering-board/BOARD-ROUTER.md": {
+          "bytes": 264,
+          "sha256": "42b59abd508da16ca5aea971e9377314fa0917f36f5d21a2a05a40ab3055daf1"
+        },
+        "engineering-board/pilot/ARCHIVE.md": {
+          "bytes": 58,
+          "sha256": "3ce08ee795aee75f46c7c9f21dfd591a924b17896dda948648f1d389068d8f18"
+        },
+        "engineering-board/pilot/BOARD.md": {
+          "bytes": 615,
+          "sha256": "2bc145ed85f354d300798e659caea2e8db7eabb5c676ba03c850e560770711eb"
+        },
+        "engineering-board/pilot/bugs/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/bugs/B107.md": {
+          "bytes": 470,
+          "sha256": "5dd56e3b631f283a4f3e59e58bde9c5f83b1afca649cbfa6589c5a689e2fbe2f"
+        },
+        "engineering-board/pilot/bugs/B108.md": {
+          "bytes": 443,
+          "sha256": "6056428def83e64ba1b3b0105da580bde3d032990cf646fd832839e81bd323ef"
+        },
+        "engineering-board/pilot/features/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/hypotheses/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/hypotheses/H102.md": {
+          "bytes": 1714,
+          "sha256": "90a88e891caef43471c1e0d43343903b1b219be28f3fa2bcc0c54f073c51a790"
+        },
+        "engineering-board/pilot/learnings/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/observations/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/questions/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "parts.py": {
+          "bytes": 667,
+          "sha256": "8b6681a3559180d7a4bf3713ae88d96730ce6864fedc2ea8840aba175769d440"
+        },
+        "task.md": {
+          "bytes": 346,
+          "sha256": "ab6ce2db96193f5f434ad33e668587fd1db0ad8ee47d7bcb445093eff6937603"
+        },
+        "tests/test_public.py": {
+          "bytes": 470,
+          "sha256": "d4e838095c23ae7e3fd9092828bb2c1ec09cde7147e6b7bd395be0bfe02a1c12"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/4ed9d73ac73a4c0d"
+    },
+    {
+      "case_id": "L-control-precision",
+      "condition": "engineering_board",
+      "id": "9bdf5b122afe48f7",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "README.md": {
+          "bytes": 874,
+          "sha256": "00be7396674dbc0d238b3773a06fe8c694456f6697f8f1a49fb9cbcf43816056"
+        },
+        "engineering-board/BOARD-ROUTER.md": {
+          "bytes": 264,
+          "sha256": "42b59abd508da16ca5aea971e9377314fa0917f36f5d21a2a05a40ab3055daf1"
+        },
+        "engineering-board/pilot/ARCHIVE.md": {
+          "bytes": 58,
+          "sha256": "3ce08ee795aee75f46c7c9f21dfd591a924b17896dda948648f1d389068d8f18"
+        },
+        "engineering-board/pilot/BOARD.md": {
+          "bytes": 554,
+          "sha256": "acf7b3b29993e56c500d2ae9875f9fe7323ce728b099fe439af462bdb982d480"
+        },
+        "engineering-board/pilot/bugs/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/bugs/B103.md": {
+          "bytes": 455,
+          "sha256": "fa5e0dbb7738e03ca17e55c4337422128156923b74b709e30b8890bb6a0bc328"
+        },
+        "engineering-board/pilot/bugs/B104.md": {
+          "bytes": 452,
+          "sha256": "6d12f61e04b356ed64d00abd5c3ddbb9c11ca94e49f2a92c1be0233a9523fec0"
+        },
+        "engineering-board/pilot/features/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/hypotheses/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/learnings/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/learnings/L102.md": {
+          "bytes": 1024,
+          "sha256": "2dc9fe609e739c556915ed00ea83f9b4291bba46262c64fd2469bb13b2dbcdbe"
+        },
+        "engineering-board/pilot/observations/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "engineering-board/pilot/questions/.gitkeep": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "readings.py": {
+          "bytes": 700,
+          "sha256": "e856ca8cfcaa1836e7e73d286ec85ce55b61f29b9672b7d38ec67c2ef837c381"
+        },
+        "task.md": {
+          "bytes": 273,
+          "sha256": "842b0e0fc98e32d262927dbc8bb9efbcb3798770110e4148995dfb45bdf600d4"
+        },
+        "tests/test_public.py": {
+          "bytes": 448,
+          "sha256": "aa3ed5ff8a2a77170ccf5f3fb3864e668434eaa6e70d55cb4424803e9cb3270a"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/9bdf5b122afe48f7"
+    },
+    {
+      "case_id": "H-useful-catalog",
+      "condition": "ordinary",
+      "id": "401c5aa9830a4882",
+      "input_inventory": {
+        "AGENTS.md": {
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        "README.md": {
+          "bytes": 797,
+          "sha256": "c8332ba485f5ac8ea890287809d7ccf676dc02a66b38492f5d9e707caf3346a2"
+        },
+        "catalog.py": {
+          "bytes": 740,
+          "sha256": "bb121c027b2a3ecd3977d881e1063b8b7b9ba1720f40ba7ee5c2171fe75d787d"
+        },
+        "task.md": {
+          "bytes": 329,
+          "sha256": "445d30e9ec277435de568c902572e4fb9af4b6419551d5ecefa40201b76c50b0"
+        },
+        "tests/test_public.py": {
+          "bytes": 645,
+          "sha256": "11988bab09082b1c2031eaa02b9b3532269be1da3fa0493b206265091ab67b1e"
+        }
+      },
+      "workspace": "/private/tmp/eb-workflow-trials-20260909-a/401c5aa9830a4882"
+    }
+  ],
+  "client_sha256": "b973d440acac501fd2594a43e7ca9ce41e0a65b9dfb28d0d7a7837c99e1261e3",
+  "conditions": [
+    "ordinary",
+    "history",
+    "engineering_board"
+  ],
+  "isolation": "task-only instructions and trace audit; not secure read isolation",
+  "limits": {
+    "arms": 12,
+    "attempts_per_arm": 1,
+    "model": "gpt-5.6-sol",
+    "reasoning": "medium",
+    "timeout_seconds": 180
+  },
+  "prepared_at": "2026-09-09T14:58:14.387324+00:00",
+  "source_commit": "d7dcb6910e8ec65b6bb5637d0f5b8f9f78d31b65",
+  "source_repo": "/Users/rhenmcleod/engineering-board-dogfood",
+  "stopping_rule": "stop on first launch, turn, schema, trace-audit or timeout failure; no retries",
+  "trials": "/private/tmp/eb-workflow-trials-20260909-a",
+  "version": 1
+}
