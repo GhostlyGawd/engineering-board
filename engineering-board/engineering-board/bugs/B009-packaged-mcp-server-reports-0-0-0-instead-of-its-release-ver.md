@@ -16,7 +16,9 @@ parent: F005
 
 ## Done when
 
-- [ ] Define and verify the completion criterion.
+- [ ] Source/plugin manifest precedence remains intact, and owned bundle/distribution metadata supplies the runtime version when that manifest is absent.
+- [ ] Actual unpacked bundle and installed wheel handshakes report their declared release version; missing, invalid or unrelated metadata has a tested conservative fallback.
+- [ ] Independent review, refreshed reproducible bundle checksum, full tests and strict release validation pass before publication.
 
 ## Evidence
 

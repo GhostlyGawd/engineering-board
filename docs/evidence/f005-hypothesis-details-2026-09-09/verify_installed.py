@@ -33,6 +33,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--expected-version")
     parser.add_argument("--server-command", nargs="+", required=True)
     args = parser.parse_args()
     evidence = {"command": args.server_command, "model_calls": 0, "cases": []}
@@ -116,9 +117,13 @@ def main():
                 evidence["exit_code"] = process.returncode
         assert process.returncode == 0, evidence
     args.output.parent.mkdir(parents=True, exist_ok=True)
+    evidence["expected_version"] = args.expected_version
+    evidence["runtime_version_matches"] = (None if args.expected_version is None else
+        evidence["initialize"]["serverInfo"]["version"] == args.expected_version)
     with args.output.open("x") as output:
         json.dump(evidence, output, indent=2, sort_keys=True)
         output.write("\n")
+    assert evidence["runtime_version_matches"] is not False, "MCP runtime version differs from release metadata; receipt retained"
     print(json.dumps({"cases": len(evidence["cases"]), "unchanged": True,
                       "output": str(args.output), "model_calls": 0}))
 
