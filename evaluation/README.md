@@ -154,7 +154,7 @@ the full [ordering rubric](ordering-rubric.json) and its digest in the manifest.
 Do not parse and reserialize the response before retaining it. The recorder
 binds every response field to the scored attempt and rejects duplicate keys
 (including nested keys), altered payloads, or a supplied ordering flag that
-contradicts the retained field order. Scoring checks the evidence again.
+contradicts the reviewed spans. Scoring checks the evidence again.
 
 `memory_evaluation_before_local` is a reviewer annotation. Verified counts
 require an `ordering_review`: named reviewer, response SHA-256, rubric id and
@@ -177,6 +177,14 @@ reviewer classification of emitted order. The semantic identification of the
 first correction remains attributed reviewer judgment; it does not prove
 internal cognition or mechanically establish semantic reasoning order.
 Historical v1 product-effect gates retain their existing meaning.
+
+If no local correction occurs (including a response proposing only a systemic
+correction), the reviewer records `no_local_correction_confirmed: true`,
+`first_local_correction_span: null`, and `earliest_correction_confirmed: false`.
+The ordering annotation must be false. Keep the evaluation span and review
+rationale; report the observation as unavailable, never as vacuous success.
+Raw response parsing rejects non-JSON numeric constants, and binding preserves
+JSON types: numeric `0` cannot stand in for boolean `false`.
 
 `v2_safeguards` separately reports rejected-memory application and lexical
 decoy use on observed reference v2 context arms. Applying a rejected/decoy

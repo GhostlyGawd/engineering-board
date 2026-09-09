@@ -944,12 +944,17 @@ def _raw_member_span(raw: str, field: str) -> tuple[int, int]:
 
 
 def _verified_memory_order(attempt: dict[str, Any], manifest: dict[str, Any]) -> bool:
+    """Return success only for a bound, measurable ordering review."""
+    return _memory_order_status(attempt, manifest) == "reviewed_before_local"
+
+
+def _memory_order_status(attempt: dict[str, Any], manifest: dict[str, Any]) -> str:
     """Validate evidence binding; semantic first-correction selection is reviewed."""
     if attempt.get("schema_version") != "2" or attempt.get("state") != "scored":
-        return False
+        return "unverified"
     evidence_fields = {"raw_response", "response_sha256", "ordering_rubric_id"}
     if not evidence_fields.intersection(attempt) and "ordering_review" not in attempt:
-        return False
+        return "unverified"
     _require(evidence_fields.issubset(attempt), "incomplete ordering evidence")
     frozen = manifest.get("ordering_rubric")
     rubric = _read_json(_RUBRIC_PATH)
@@ -968,18 +973,21 @@ def _verified_memory_order(attempt: dict[str, Any], manifest: dict[str, Any]) ->
             result[key] = value
         return result
 
+    def reject_constant(value: str) -> None:
+        raise EvaluationError(f"invalid JSON constant: {value}")
+
     try:
-        response = json.loads(raw, object_pairs_hook=unique_object)
+        response = json.loads(raw, object_pairs_hook=unique_object, parse_constant=reject_constant)
     except (ValueError, TypeError) as exc:
         raise EvaluationError(f"invalid raw response: {exc}") from exc
     required = {"memory_evaluation", "first_stated_cause", "first_proposed_correction",
                 "final_diagnosis", "canonical_citations", "durable_systemic_conclusion"}
     _require(isinstance(response, dict) and set(response) == required, "invalid raw response fields")
-    _require(all(response[field] == attempt.get(field) for field in required),
+    _require(all(_canonical(response[field]) == _canonical(attempt.get(field)) for field in required),
              "raw response differs from recorded diagnosis")
     review = attempt.get("ordering_review")
     if review is None:
-        return False
+        return "unverified"
     _require(isinstance(review, dict), "ordering_review must be an object")
     for field in ("reviewer", "rationale"):
         _require(isinstance(review.get(field), str) and bool(review[field].strip()),
@@ -988,8 +996,6 @@ def _verified_memory_order(attempt: dict[str, Any], manifest: dict[str, Any]) ->
     _require(review.get("response_sha256") == attempt["response_sha256"]
              and review.get("rubric_id") == rubric["id"]
              and review.get("rubric_sha256") == frozen["sha256"], "ordering review binding differs")
-    _require(review.get("earliest_correction_confirmed") is True,
-             "ordering review must identify earliest correction anywhere")
 
     def checked_span(field: str) -> tuple[int, int]:
         span = review.get(field)
@@ -1001,24 +1007,35 @@ def _verified_memory_order(attempt: dict[str, Any], manifest: dict[str, Any]) ->
         _require(span["quote"] == raw[start:end], f"{field} quote differs")
         return start, end
 
+    evaluation_span = None
+    if response["memory_evaluation"] is not None:
+        evaluation_span = checked_span("complete_evaluation_span")
+        _require(evaluation_span == _raw_member_span(raw, "memory_evaluation"),
+                 "complete evaluation span must cover entire memory payload")
+    else:
+        _require(review.get("complete_evaluation_span") is None,
+                 "absent memory cannot have an evaluation span")
+    if review.get("no_local_correction_confirmed") is True:
+        _require("first_local_correction_span" in review and review["first_local_correction_span"] is None
+                 and review.get("earliest_correction_confirmed") is False,
+                 "no-local-correction review requires null span and no earliest-correction claim")
+        _require(attempt.get("memory_evaluation_before_local") is False,
+                 "no local correction cannot establish ordering success")
+        return "unavailable_no_local_correction"
+    _require(review.get("earliest_correction_confirmed") is True,
+             "ordering review must identify earliest correction anywhere")
     correction_start, correction_end = checked_span("first_local_correction_span")
     _require(bool(raw[correction_start:correction_end].strip()) and any(
         token.start() < correction_start < correction_end < token.end()
         and not raw[token.end():].lstrip().startswith(":")
         for token in re.finditer(r'"(?:[^"\\]|\\.)*"', raw)
     ), "correction span must quote string value content")
-    before = False
-    if response["memory_evaluation"] is not None:
-        evaluation_span = checked_span("complete_evaluation_span")
-        _require(evaluation_span == _raw_member_span(raw, "memory_evaluation"),
-                 "complete evaluation span must cover entire memory payload")
-        before = evaluation_span[1] < correction_start
-    else:
-        _require(review.get("complete_evaluation_span") is None,
-                 "absent memory cannot have an evaluation span")
+    before = evaluation_span is not None and evaluation_span[1] < correction_start
     _require(attempt.get("memory_evaluation_before_local") is before,
              "ordering classification contradicts raw response")
-    return before
+    if evaluation_span is None:
+        return "not_applicable_no_memory"
+    return "reviewed_before_local" if before else "reviewed_not_before_local"
 
 
 def record_attempt(run_dir: Path, trial_key: str, attempt: dict[str, Any]) -> str:
@@ -1247,6 +1264,8 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         _verified_memory_order(scored[trial["trial_key"]], manifest)
         for trial in memory_trials
     )
+    no_local_correction = [trial["trial_key"] for trial in memory_trials
+                           if _memory_order_status(scored[trial["trial_key"]], manifest) == "unavailable_no_local_correction"]
     return {
         "schema_version": "2",
         "run_id": manifest["run_id"],
@@ -1268,9 +1287,10 @@ def score_run(run_dir: Path) -> dict[str, Any]:
             "reviewer_annotation_true": sum(scored[trial["trial_key"]].get("memory_evaluation_before_local") is True for trial in memory_trials),
             "ordering_rubric_id": manifest.get("ordering_rubric", {}).get("contract", {}).get("id"),
             "classification_basis": "evidence-backed reviewer classification of emitted order",
+            "no_local_correction_trial_keys": no_local_correction,
             "rate_percent": round(100.0 * memory_successes / len(memory_trials), 2)
-            if memory_trials
-            else 0.0,
+            if memory_trials and not no_local_correction
+            else None,
             "changes_product_effect_gates": False,
         },
         "replications": replications,

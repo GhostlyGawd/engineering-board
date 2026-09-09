@@ -533,6 +533,7 @@ class EvaluationHarnessTests(unittest.TestCase):
                     "reviewer_annotation_true": 1,
                     "ordering_rubric_id": "d1-emitted-json-order-v1",
                     "classification_basis": "evidence-backed reviewer classification of emitted order",
+                    "no_local_correction_trial_keys": [],
                     "rate_percent": 0.0,
                     "changes_product_effect_gates": False,
                 },
@@ -622,6 +623,33 @@ class EvaluationHarnessTests(unittest.TestCase):
             score = score_run(run_dir)
             self.assertEqual(score["memory_evaluation"]["evaluated_before_local"], 0)
             self.assertEqual(score["memory_evaluation"]["reviewer_annotation_true"], 1)
+
+    def test_v2_raw_binding_preserves_json_types_and_no_local_correction_is_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-types-") as temp:
+            run_dir = self.prepare(Path(temp))
+            manifest = load_run(run_dir)
+            cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+            trial = next(trial for trial in manifest["trials"] if trial["arm"] == "context" and trial["category"] in POSITIVE_CATEGORIES)
+            attempt = self.v2_attempt(trial, cases[trial["case_id"]])
+            attempt["durable_systemic_conclusion"] = False
+            attempt = self.with_raw_response(attempt)
+            for value in ("0", "NaN", "Infinity", "-Infinity"):
+                raw = attempt["raw_response"].replace('"durable_systemic_conclusion": false', '"durable_systemic_conclusion": ' + value)
+                changed = {**attempt, "raw_response": raw, "response_sha256": hashlib.sha256(raw.encode()).hexdigest()}
+                with self.subTest(value=value), self.assertRaises(EvaluationError):
+                    record_attempt(run_dir, trial["trial_key"], changed)
+            attempt["first_proposed_correction"] = "Unify the cross-domain state contract. No local patch is proposed."
+            attempt = self.with_raw_response(attempt)
+            attempt["ordering_review"].update(no_local_correction_confirmed=True, earliest_correction_confirmed=False,
+                                              first_local_correction_span=None, rationale="The sole proposed correction is systemic; no local correction occurs in any field.")
+            with self.assertRaisesRegex(EvaluationError, "cannot establish"):
+                record_attempt(run_dir, trial["trial_key"], attempt)
+            attempt["memory_evaluation_before_local"] = False
+            record_attempt(run_dir, trial["trial_key"], attempt)
+            score = score_run(run_dir)
+            self.assertEqual(score["memory_evaluation"]["evaluated_before_local"], 0)
+            self.assertEqual(score["memory_evaluation"]["no_local_correction_trial_keys"], [trial["trial_key"]])
+            self.assertIsNone(score["memory_evaluation"]["rate_percent"])
 
     def test_complete_v2_run_exposes_rejected_and_decoy_use_without_durable_conclusions(self) -> None:
         scenarios = [
