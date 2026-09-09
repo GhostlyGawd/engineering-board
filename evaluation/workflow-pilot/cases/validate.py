@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -74,10 +75,16 @@ def validate():
                                "history_end_line": history[:start + len(body)].count("\n") + 1,
                                "extra_board_substantive_guidance": []})
             inventory = []
+            visible_label_scan = []
             for directory in (case["repo"], case["board"], str(Path(case["history"]).parent)):
                 for path in sorted((ROOT / directory).rglob("*")):
                     if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc":
                         data = path.read_bytes()
+                        forbidden = re.search(
+                            rb"useful|control|irrelevant_scope|wrong_shared_cause|expected_actions|reference repair|hidden (?:test|check|evaluator)",
+                            data, re.IGNORECASE)
+                        assert forbidden is None, (path, forbidden.group() if forbidden else "")
+                        visible_label_scan.append(str(path.relative_to(ROOT)))
                         inventory.append({"path": str(path.relative_to(ROOT)),
                                           "bytes": len(data),
                                           "sha256": hashlib.sha256(data).hexdigest()})
@@ -86,7 +93,9 @@ def validate():
                             "reference_public": reference_public,
                             "reference_hidden": reference_hidden,
                             "harmful_scope_mutation_hidden": mutation_hidden,
-                            "information_parity": parity, "input_inventory": inventory})
+                            "information_parity": parity, "input_inventory": inventory,
+                            "visible_condition_label_scan": {"passed": True,
+                                                             "files": visible_label_scan}})
     return {"version": 1, "provenance": "authored synthetic fixtures; not live evaluation",
             "command": "python3 evaluation/workflow-pilot/cases/validate.py",
             "metadata_parity_note": "Board ids, type, title, source status, confidence, dates, and affected paths appear in history prose. Fingerprints, revision bookkeeping and pattern tags are representation metadata only; no extra engineering assertions. Procedural guidance and hypothesis discriminating checks are authored synthetic historical content present identically in both conditions.",

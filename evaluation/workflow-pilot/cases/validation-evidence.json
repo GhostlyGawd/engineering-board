@@ -9,7 +9,7 @@
       "baseline_public": {
         "exit_code": 1,
         "stdout": "",
-        "stderr": "test_defaults (test_public.PublicTests.test_defaults) ... ok\ntest_explicit_no_retry (test_public.PublicTests.test_explicit_no_retry) ... FAIL\n\n======================================================================\nFAIL: test_explicit_no_retry (test_public.PublicTests.test_explicit_no_retry)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-f7wctkc7/repo/tests/test_public.py\", line 6, in test_explicit_no_retry\n    self.assertEqual(execution_options({\"retries\": 0})[\"retries\"], 0)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 3 != 0\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nFAILED (failures=1)\n"
+        "stderr": "test_defaults (test_public.PublicTests.test_defaults) ... ok\ntest_explicit_no_retry (test_public.PublicTests.test_explicit_no_retry) ... FAIL\n\n======================================================================\nFAIL: test_explicit_no_retry (test_public.PublicTests.test_explicit_no_retry)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-o2bwd4we/repo/tests/test_public.py\", line 6, in test_explicit_no_retry\n    self.assertEqual(execution_options({\"retries\": 0})[\"retries\"], 0)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 3 != 0\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nFAILED (failures=1)\n"
       },
       "baseline_hidden": {
         "exit_code": 1,
@@ -64,14 +64,19 @@
           "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
         },
         {
+          "path": "cases/L-useful-retries/taskrepo/README.md",
+          "bytes": 876,
+          "sha256": "ec1a3af8b5e83bea9bd835f23c9558b451c54c21f9d6f685498f300fdfe7e801"
+        },
+        {
           "path": "cases/L-useful-retries/taskrepo/job_options.py",
           "bytes": 616,
           "sha256": "a719d9c8d9a54aa1e21bc9806f308ffe9178371113f3a28722128f3efdb09cca"
         },
         {
           "path": "cases/L-useful-retries/taskrepo/task.md",
-          "bytes": 375,
-          "sha256": "44d607cb7f4de45788f8d376c785010dbafc16bcba69f3b53fb33e6cac84cb3b"
+          "bytes": 278,
+          "sha256": "ea8083a49d5a7bab8b3c7238b1fbae5d830d5ca1b093afba404a43f673a701b5"
         },
         {
           "path": "cases/L-useful-retries/taskrepo/tests/test_public.py",
@@ -98,14 +103,28 @@
           "bytes": 2167,
           "sha256": "ceea5b06cb0240a3c2189570e4eea5d1c972215c07d84918890e15ab0f1d18f0"
         }
-      ]
+      ],
+      "visible_condition_label_scan": {
+        "passed": true,
+        "files": [
+          "cases/L-useful-retries/taskrepo/AGENTS.md",
+          "cases/L-useful-retries/taskrepo/README.md",
+          "cases/L-useful-retries/taskrepo/job_options.py",
+          "cases/L-useful-retries/taskrepo/task.md",
+          "cases/L-useful-retries/taskrepo/tests/test_public.py",
+          "cases/L-useful-retries/board/bugs/B101.md",
+          "cases/L-useful-retries/board/bugs/B102.md",
+          "cases/L-useful-retries/board/learnings/L101.md",
+          "cases/L-useful-retries/history/history.md"
+        ]
+      }
     },
     {
       "id": "L-control-precision",
       "baseline_public": {
         "exit_code": 1,
         "stdout": "",
-        "stderr": "test_displays (test_public.PublicTests.test_displays) ... ok\ntest_live_fraction (test_public.PublicTests.test_live_fraction) ... FAIL\ntest_whole_reading (test_public.PublicTests.test_whole_reading) ... ok\n\n======================================================================\nFAIL: test_live_fraction (test_public.PublicTests.test_live_fraction)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-yp9vuvkn/repo/tests/test_public.py\", line 6, in test_live_fraction\n    self.assertEqual(ingest_live(\"2.75\"), 2.75)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 2.0 != 2.75\n\n----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nFAILED (failures=1)\n"
+        "stderr": "test_displays (test_public.PublicTests.test_displays) ... ok\ntest_live_fraction (test_public.PublicTests.test_live_fraction) ... FAIL\ntest_whole_reading (test_public.PublicTests.test_whole_reading) ... ok\n\n======================================================================\nFAIL: test_live_fraction (test_public.PublicTests.test_live_fraction)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-igrfkt41/repo/tests/test_public.py\", line 6, in test_live_fraction\n    self.assertEqual(ingest_live(\"2.75\"), 2.75)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 2.0 != 2.75\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nFAILED (failures=1)\n"
       },
       "baseline_hidden": {
         "exit_code": 1,
@@ -160,14 +179,19 @@
           "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
         },
         {
+          "path": "cases/L-control-precision/taskrepo/README.md",
+          "bytes": 874,
+          "sha256": "00be7396674dbc0d238b3773a06fe8c694456f6697f8f1a49fb9cbcf43816056"
+        },
+        {
           "path": "cases/L-control-precision/taskrepo/readings.py",
           "bytes": 700,
           "sha256": "e856ca8cfcaa1836e7e73d286ec85ce55b61f29b9672b7d38ec67c2ef837c381"
         },
         {
           "path": "cases/L-control-precision/taskrepo/task.md",
-          "bytes": 382,
-          "sha256": "1c1304b4685e524a09c60d019f50642240b46f66976661c11eac9e4f72d99092"
+          "bytes": 273,
+          "sha256": "842b0e0fc98e32d262927dbc8bb9efbcb3798770110e4148995dfb45bdf600d4"
         },
         {
           "path": "cases/L-control-precision/taskrepo/tests/test_public.py",
@@ -194,14 +218,28 @@
           "bytes": 2110,
           "sha256": "3a281793696d35e1da7ec89b657654d2cc379d6ecb0f3dd30e0f3da9a91f997c"
         }
-      ]
+      ],
+      "visible_condition_label_scan": {
+        "passed": true,
+        "files": [
+          "cases/L-control-precision/taskrepo/AGENTS.md",
+          "cases/L-control-precision/taskrepo/README.md",
+          "cases/L-control-precision/taskrepo/readings.py",
+          "cases/L-control-precision/taskrepo/task.md",
+          "cases/L-control-precision/taskrepo/tests/test_public.py",
+          "cases/L-control-precision/board/bugs/B103.md",
+          "cases/L-control-precision/board/bugs/B104.md",
+          "cases/L-control-precision/board/learnings/L102.md",
+          "cases/L-control-precision/history/history.md"
+        ]
+      }
     },
     {
       "id": "H-useful-catalog",
       "baseline_public": {
         "exit_code": 1,
         "stdout": "",
-        "stderr": "test_export_after_newest (test_public.PublicTests.test_export_after_newest) ... FAIL\ntest_newest_order (test_public.PublicTests.test_newest_order) ... ok\ntest_owner_order (test_public.PublicTests.test_owner_order) ... ok\n\n======================================================================\nFAIL: test_export_after_newest (test_public.PublicTests.test_export_after_newest)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-ssbu0g2y/repo/tests/test_public.py\", line 13, in test_export_after_newest\n    self.assertEqual(export_ids(self.rows), [\"z\", \"b\", \"c\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['b', 'c', 'z'] != ['z', 'b', 'c']\n\nFirst differing element 0:\n'b'\n'z'\n\n- ['b', 'c', 'z']\n+ ['z', 'b', 'c']\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nFAILED (failures=1)\n"
+        "stderr": "test_export_after_newest (test_public.PublicTests.test_export_after_newest) ... FAIL\ntest_newest_order (test_public.PublicTests.test_newest_order) ... ok\ntest_owner_order (test_public.PublicTests.test_owner_order) ... ok\n\n======================================================================\nFAIL: test_export_after_newest (test_public.PublicTests.test_export_after_newest)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-d3o0ligp/repo/tests/test_public.py\", line 13, in test_export_after_newest\n    self.assertEqual(export_ids(self.rows), [\"z\", \"b\", \"c\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['b', 'c', 'z'] != ['z', 'b', 'c']\n\nFirst differing element 0:\n'b'\n'z'\n\n- ['b', 'c', 'z']\n+ ['z', 'b', 'c']\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nFAILED (failures=1)\n"
       },
       "baseline_hidden": {
         "exit_code": 1,
@@ -256,14 +294,19 @@
           "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
         },
         {
+          "path": "cases/H-useful-catalog/taskrepo/README.md",
+          "bytes": 797,
+          "sha256": "c8332ba485f5ac8ea890287809d7ccf676dc02a66b38492f5d9e707caf3346a2"
+        },
+        {
           "path": "cases/H-useful-catalog/taskrepo/catalog.py",
           "bytes": 740,
           "sha256": "bb121c027b2a3ecd3977d881e1063b8b7b9ba1720f40ba7ee5c2171fe75d787d"
         },
         {
           "path": "cases/H-useful-catalog/taskrepo/task.md",
-          "bytes": 408,
-          "sha256": "8ca0a30a2bcf476b58916f7edc45e40728f4b8d4b6e7a64a912da1ff99c049d6"
+          "bytes": 329,
+          "sha256": "445d30e9ec277435de568c902572e4fb9af4b6419551d5ecefa40201b76c50b0"
         },
         {
           "path": "cases/H-useful-catalog/taskrepo/tests/test_public.py",
@@ -282,26 +325,40 @@
         },
         {
           "path": "cases/H-useful-catalog/board/hypotheses/H101.md",
-          "bytes": 1658,
-          "sha256": "715c8c072ae72b8e7bef9a31c939ec5c0e22fd749d07f7f0cf16056152bffedb"
+          "bytes": 1668,
+          "sha256": "be7db5e1b4288b5ec123c05173bc01120f0b382ee759118e81ae384515adce1e"
         },
         {
           "path": "cases/H-useful-catalog/history/history.md",
           "bytes": 2565,
           "sha256": "e19d2c0b6032448d784f2ac0ed41f28f7905d1dc06271cd09e4abb50938eada6"
         }
-      ]
+      ],
+      "visible_condition_label_scan": {
+        "passed": true,
+        "files": [
+          "cases/H-useful-catalog/taskrepo/AGENTS.md",
+          "cases/H-useful-catalog/taskrepo/README.md",
+          "cases/H-useful-catalog/taskrepo/catalog.py",
+          "cases/H-useful-catalog/taskrepo/task.md",
+          "cases/H-useful-catalog/taskrepo/tests/test_public.py",
+          "cases/H-useful-catalog/board/bugs/B105.md",
+          "cases/H-useful-catalog/board/bugs/B106.md",
+          "cases/H-useful-catalog/board/hypotheses/H101.md",
+          "cases/H-useful-catalog/history/history.md"
+        ]
+      }
     },
     {
       "id": "H-control-identifiers",
       "baseline_public": {
         "exit_code": 1,
         "stdout": "",
-        "stderr": "test_exact_lookup (test_public.PublicTests.test_exact_lookup) ... FAIL\ntest_optional_description (test_public.PublicTests.test_optional_description) ... ERROR\ntest_regular_import (test_public.PublicTests.test_regular_import) ... ok\n\n======================================================================\nERROR: test_optional_description (test_public.PublicTests.test_optional_description)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-_s3cfmhx/repo/tests/test_public.py\", line 6, in test_optional_description\n    self.assertEqual(import_row(\"P7,,4\"), {\"id\": \"P7\", \"description\": \"\", \"quantity\": 4})\n                     ~~~~~~~~~~^^^^^^^^^\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-_s3cfmhx/repo/parts.py\", line 11, in import_row\n    raise ValueError(\"expected three columns\")\nValueError: expected three columns\n\n======================================================================\nFAIL: test_exact_lookup (test_public.PublicTests.test_exact_lookup)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-_s3cfmhx/repo/tests/test_public.py\", line 9, in test_exact_lookup\n    self.assertEqual(find_part(rows, \"P7\"), {\"id\": \"P7\"})\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'id': 'P70'} != {'id': 'P7'}\n- {'id': 'P70'}\n?           -\n\n+ {'id': 'P7'}\n\n----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nFAILED (failures=1, errors=1)\n"
+        "stderr": "test_exact_lookup (test_public.PublicTests.test_exact_lookup) ... FAIL\ntest_optional_description (test_public.PublicTests.test_optional_description) ... ERROR\ntest_regular_import (test_public.PublicTests.test_regular_import) ... ok\n\n======================================================================\nERROR: test_optional_description (test_public.PublicTests.test_optional_description)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-a17rv038/repo/tests/test_public.py\", line 6, in test_optional_description\n    self.assertEqual(import_row(\"P7,,4\"), {\"id\": \"P7\", \"description\": \"\", \"quantity\": 4})\n                     ~~~~~~~~~~^^^^^^^^^\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-a17rv038/repo/parts.py\", line 11, in import_row\n    raise ValueError(\"expected three columns\")\nValueError: expected three columns\n\n======================================================================\nFAIL: test_exact_lookup (test_public.PublicTests.test_exact_lookup)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-a17rv038/repo/tests/test_public.py\", line 9, in test_exact_lookup\n    self.assertEqual(find_part(rows, \"P7\"), {\"id\": \"P7\"})\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'id': 'P70'} != {'id': 'P7'}\n- {'id': 'P70'}\n?           -\n\n+ {'id': 'P7'}\n\n----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nFAILED (failures=1, errors=1)\n"
       },
       "baseline_hidden": {
         "exit_code": 1,
-        "stdout": "{\"checks\": {\"check_csv_compatibility\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-control-identifiers/evaluator.py\\\", line 33, in check_csv_compatibility\\n    with self.assertRaises(ValueError):\\n         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\\nAssertionError: ValueError not raised\\n\"], \"passed\": false}, \"check_csv_empty_column\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-control-identifiers/evaluator.py\\\", line 16, in check_csv_empty_column\\n    self.assertEqual(m.import_row(\\\"P7,,4\\\"), {\\\"id\\\": \\\"P7\\\", \\\"description\\\": \\\"\\\", \\\"quantity\\\": 4})\\n                     ~~~~~~~~~~~~^^^^^^^^^\\n  File \\\"/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-grade-3ljv72n7/parts.py\\\", line 11, in import_row\\n    raise ValueError(\\\"expected three columns\\\")\\nValueError: expected three columns\\n\"], \"passed\": false}, \"check_exact_lookup\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-control-identifiers/evaluator.py\\\", line 19, in check_exact_lookup\\n    self.assertEqual(m.find_part([{\\\"id\\\": \\\"P70\\\"}, {\\\"id\\\": \\\"P7\\\"}], \\\"P7\\\"), {\\\"id\\\": \\\"P7\\\"})\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: {'id': 'P70'} != {'id': 'P7'}\\n- {'id': 'P70'}\\n?           -\\n\\n+ {'id': 'P7'}\\n\"], \"passed\": false}, \"check_negative_normalization_scope\": {\"failures\": [], \"passed\": true}}, \"passed\": 1, \"total\": 4}\n",
+        "stdout": "{\"checks\": {\"check_csv_compatibility\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-control-identifiers/evaluator.py\\\", line 33, in check_csv_compatibility\\n    with self.assertRaises(ValueError):\\n         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\\nAssertionError: ValueError not raised\\n\"], \"passed\": false}, \"check_csv_empty_column\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-control-identifiers/evaluator.py\\\", line 16, in check_csv_empty_column\\n    self.assertEqual(m.import_row(\\\"P7,,4\\\"), {\\\"id\\\": \\\"P7\\\", \\\"description\\\": \\\"\\\", \\\"quantity\\\": 4})\\n                     ~~~~~~~~~~~~^^^^^^^^^\\n  File \\\"/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-grade-jcu6dqfj/parts.py\\\", line 11, in import_row\\n    raise ValueError(\\\"expected three columns\\\")\\nValueError: expected three columns\\n\"], \"passed\": false}, \"check_exact_lookup\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-control-identifiers/evaluator.py\\\", line 19, in check_exact_lookup\\n    self.assertEqual(m.find_part([{\\\"id\\\": \\\"P70\\\"}, {\\\"id\\\": \\\"P7\\\"}], \\\"P7\\\"), {\\\"id\\\": \\\"P7\\\"})\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: {'id': 'P70'} != {'id': 'P7'}\\n- {'id': 'P70'}\\n?           -\\n\\n+ {'id': 'P7'}\\n\"], \"passed\": false}, \"check_negative_normalization_scope\": {\"failures\": [], \"passed\": true}}, \"passed\": 1, \"total\": 4}\n",
         "stderr": ""
       },
       "reference_public": {
@@ -352,14 +409,19 @@
           "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
         },
         {
+          "path": "cases/H-control-identifiers/taskrepo/README.md",
+          "bytes": 881,
+          "sha256": "5e10676e335d12c459aa3b74227322272836031a40cc55e0db149fed1ff14a57"
+        },
+        {
           "path": "cases/H-control-identifiers/taskrepo/parts.py",
           "bytes": 667,
           "sha256": "8b6681a3559180d7a4bf3713ae88d96730ce6864fedc2ea8840aba175769d440"
         },
         {
           "path": "cases/H-control-identifiers/taskrepo/task.md",
-          "bytes": 377,
-          "sha256": "aeb4740431cbe13264b4ebd1544e23d9a2801240cecd12ecafc65c4ec4c09998"
+          "bytes": 346,
+          "sha256": "ab6ce2db96193f5f434ad33e668587fd1db0ad8ee47d7bcb445093eff6937603"
         },
         {
           "path": "cases/H-control-identifiers/taskrepo/tests/test_public.py",
@@ -378,15 +440,29 @@
         },
         {
           "path": "cases/H-control-identifiers/board/hypotheses/H102.md",
-          "bytes": 1706,
-          "sha256": "8706132d680e1d6fa0ff29a90fd6af166a770c215f43cda9012026e4edd512f5"
+          "bytes": 1714,
+          "sha256": "90a88e891caef43471c1e0d43343903b1b219be28f3fa2bcc0c54f073c51a790"
         },
         {
           "path": "cases/H-control-identifiers/history/history.md",
           "bytes": 2602,
           "sha256": "2aa33a813f4acba0ad61f2deadce2d9883787fb20782640747c7ba49b48fb9b3"
         }
-      ]
+      ],
+      "visible_condition_label_scan": {
+        "passed": true,
+        "files": [
+          "cases/H-control-identifiers/taskrepo/AGENTS.md",
+          "cases/H-control-identifiers/taskrepo/README.md",
+          "cases/H-control-identifiers/taskrepo/parts.py",
+          "cases/H-control-identifiers/taskrepo/task.md",
+          "cases/H-control-identifiers/taskrepo/tests/test_public.py",
+          "cases/H-control-identifiers/board/bugs/B107.md",
+          "cases/H-control-identifiers/board/bugs/B108.md",
+          "cases/H-control-identifiers/board/hypotheses/H102.md",
+          "cases/H-control-identifiers/history/history.md"
+        ]
+      }
     }
   ]
 }
