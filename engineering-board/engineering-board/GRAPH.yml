@@ -1,254 +1,42 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-09-09T13:18:18Z",
-  "source_fingerprint": "b828d76436f688edf2e0a351b97c263a490c85e7d2d1cf1b762cdb661b6331f0",
+  "generated_at": "2026-09-09T14:10:08Z",
+  "source_fingerprint": "0f4d99dd528eb53b9a2b569e50e91060b2c2a5b3ab7bd9351851be6e8b17288f",
   "build_mode": "full",
   "project": "engineering-board",
   "entries_analyzed": {
-    "open": 5,
+    "open": 1,
     "archived": 0,
-    "total": 5
+    "total": 1
   },
   "nodes": {
-    "B004": {
-      "type": "bug",
-      "title": "D.1 v2 schema cannot represent baseline or empty-context attempts",
-      "source": "bugs/B004-d-1-v2-schema-cannot-represent-baseline-or-empty-context-att.md",
-      "priority": "P2",
-      "status": "in_progress",
-      "affects": "evaluation/memory-evaluation-response.schema.json",
-      "discovered": "2026-09-09"
-    },
-    "B005": {
-      "type": "bug",
-      "title": "D.1 before-local metric has no preserved ordering evidence",
-      "source": "bugs/B005-d-1-before-local-metric-has-no-preserved-ordering-evidence.md",
-      "priority": "P2",
-      "status": "open",
-      "affects": "evaluation/harness.py",
-      "discovered": "2026-09-09"
-    },
-    "B006": {
-      "type": "bug",
-      "title": "D.1 v2 rejected-memory application passes reported safeguards",
-      "source": "bugs/B006-d-1-v2-rejected-memory-application-passes-reported-safeguard.md",
-      "priority": "P2",
-      "status": "open",
-      "affects": "evaluation/harness.py",
-      "discovered": "2026-09-09"
-    },
-    "B007": {
-      "type": "bug",
-      "title": "D.1 memory-evaluation rate hides missing planned arms",
-      "source": "bugs/B007-d-1-memory-evaluation-rate-hides-missing-planned-arms.md",
-      "priority": "P2",
-      "status": "open",
-      "affects": "evaluation/harness.py",
-      "discovered": "2026-09-09"
-    },
-    "F003": {
+    "F004": {
       "type": "feature",
-      "title": "Establish a small agent development team with independent evidence review",
-      "source": "features/F003-establish-a-small-agent-development-team-with-independent-ev.md",
+      "title": "Validate D.1 v2 in a live pilot with retained evidence",
+      "source": "features/F004-validate-d-1-v2-in-a-live-pilot-with-retained-evidence.md",
       "priority": "P2",
-      "status": "in_progress",
-      "affects": "docs/DEVELOPMENT.md",
+      "status": "open",
+      "affects": "evaluation/",
       "discovered": "2026-09-09"
     }
   },
-  "edges": [
-    {
-      "from": "B004",
-      "to": "B005",
-      "kind": "shared-affects-prefix",
-      "value": "evaluation/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B004",
-          "field": "affects",
-          "source": "bugs/B004-d-1-v2-schema-cannot-represent-baseline-or-empty-context-att.md"
-        },
-        {
-          "entry": "B005",
-          "field": "affects",
-          "source": "bugs/B005-d-1-before-local-metric-has-no-preserved-ordering-evidence.md"
-        }
-      ]
-    },
-    {
-      "from": "B004",
-      "to": "B006",
-      "kind": "shared-affects-prefix",
-      "value": "evaluation/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B004",
-          "field": "affects",
-          "source": "bugs/B004-d-1-v2-schema-cannot-represent-baseline-or-empty-context-att.md"
-        },
-        {
-          "entry": "B006",
-          "field": "affects",
-          "source": "bugs/B006-d-1-v2-rejected-memory-application-passes-reported-safeguard.md"
-        }
-      ]
-    },
-    {
-      "from": "B004",
-      "to": "B007",
-      "kind": "shared-affects-prefix",
-      "value": "evaluation/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B004",
-          "field": "affects",
-          "source": "bugs/B004-d-1-v2-schema-cannot-represent-baseline-or-empty-context-att.md"
-        },
-        {
-          "entry": "B007",
-          "field": "affects",
-          "source": "bugs/B007-d-1-memory-evaluation-rate-hides-missing-planned-arms.md"
-        }
-      ]
-    },
-    {
-      "from": "B005",
-      "to": "B006",
-      "kind": "shared-affects-prefix",
-      "value": "evaluation/harness.py/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B005",
-          "field": "affects",
-          "source": "bugs/B005-d-1-before-local-metric-has-no-preserved-ordering-evidence.md"
-        },
-        {
-          "entry": "B006",
-          "field": "affects",
-          "source": "bugs/B006-d-1-v2-rejected-memory-application-passes-reported-safeguard.md"
-        }
-      ]
-    },
-    {
-      "from": "B005",
-      "to": "B007",
-      "kind": "shared-affects-prefix",
-      "value": "evaluation/harness.py/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B005",
-          "field": "affects",
-          "source": "bugs/B005-d-1-before-local-metric-has-no-preserved-ordering-evidence.md"
-        },
-        {
-          "entry": "B007",
-          "field": "affects",
-          "source": "bugs/B007-d-1-memory-evaluation-rate-hides-missing-planned-arms.md"
-        }
-      ]
-    },
-    {
-      "from": "B006",
-      "to": "B007",
-      "kind": "shared-affects-prefix",
-      "value": "evaluation/harness.py/",
-      "weight": 2,
-      "evidence": [
-        {
-          "entry": "B006",
-          "field": "affects",
-          "source": "bugs/B006-d-1-v2-rejected-memory-application-passes-reported-safeguard.md"
-        },
-        {
-          "entry": "B007",
-          "field": "affects",
-          "source": "bugs/B007-d-1-memory-evaluation-rate-hides-missing-planned-arms.md"
-        }
-      ]
-    }
-  ],
+  "edges": [],
   "topology": {
-    "clusters": [
-      {
-        "id": "C001",
-        "fingerprint": "c-cee2946159c23143",
-        "members": [
-          "B004",
-          "B005",
-          "B006",
-          "B007"
-        ],
-        "pattern_ids": [],
-        "patterns": [],
-        "affected_domains": [
-          "evaluation"
-        ],
-        "signals": [
-          {
-            "kind": "shared-affects-prefix",
-            "value": "evaluation/",
-            "members": [
-              "B004",
-              "B005",
-              "B006",
-              "B007"
-            ]
-          },
-          {
-            "kind": "shared-affects-prefix",
-            "value": "evaluation/harness.py/",
-            "members": [
-              "B005",
-              "B006",
-              "B007"
-            ]
-          }
-        ],
-        "density": 1.0
-      }
-    ],
+    "clusters": [],
     "isolated": [
-      "F003"
+      "F004"
     ],
     "cross_cluster_bridges": []
   },
   "unresolved_patterns": [],
   "findings": [
     {
-      "type": "dense-cluster",
-      "cluster_id": "C001",
-      "members": [
-        "B004",
-        "B005",
-        "B006",
-        "B007"
-      ],
-      "density": 1.0,
-      "shared_dimensions": {
-        "patterns": []
-      },
-      "internal_edges": 6
-    },
-    {
       "type": "isolated-node",
-      "node": "F003"
+      "node": "F004"
     }
   ],
   "read_order": [
-    "C001",
-    "F003"
+    "F004"
   ],
-  "drill_in": {
-    "C001": [
-      "B004",
-      "B005",
-      "B006",
-      "B007"
-    ]
-  }
+  "drill_in": {}
 }

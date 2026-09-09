@@ -97,6 +97,7 @@ digest of `evaluation/tool-contracts.json`. Require each client response to conf
   "run_id": "d1-YYYY-MM-DD",
   "source_commit": "e26149bf505ea7f5ae2d95294a8a108e6b3c429f",
   "trial_policy": "d1-client-neutral-v2",
+  "evaluation_version": "1",
   "profiles": {
     "reference": {
       "client_version": "exact-version",
@@ -122,6 +123,37 @@ The `context_fingerprints` object must contain all eight case identifiers. The
 prepare command fails if a configured value differs from frozen product
 output.
 
+Predeclare `evaluation_version` as `"1"` for historical product-effect trials
+or `"2"` for the memory-evaluation contract. For v2, pin the v2 operator
+instructions and use `memory-evaluation-response.schema.json`. Preparation
+binds this version in each input and freezes the exact eligible trial keys in
+`evaluation_contract`: positive reference context arms, including any planned
+arm with no surfaced memory. Baseline, negative controls, and replications do
+not enter that denominator. Baseline and empty-context v2 responses still
+require null memory evaluation and a false ordering annotation.
+
+The report lists planned, observed, missing, invalid/mixed, unverified, and
+no-local-correction populations. Rates are `null` until all required reference
+arms (including baseline and negative controls) have valid matching-version
+records and all eligible memory-bearing arms have measurable evidence-backed
+reviews. No-memory arms stay in the planned denominator as non-successes.
+Missing `evaluation_version` is explicitly unconfigured; old manifests remain
+readable but cannot acquire a v2 success rate from whichever results arrived.
+V1-only runs report ordering as unavailable. Observed safeguard checks are
+separate from full-population safeguards and readiness for interpretation;
+neither a partial clean sample nor a complete run establishes product effect.
+
+For manifests with a prepared evaluation contract, loading checks the complete
+preserved `workspaces/` directory cohort and every direct `input.json`, even
+when recording one trial. Every directory must have an input at its fixed
+`workspaces/<trial_key>/input.json` path, with no linked paths. The manifest
+must list exactly this cohort, and its eligibility must agree with those
+inputs. Removing a failed trial from both manifest lists and recomputing the
+manifest hash cannot hide its preserved workspace. These are artifact
+integrity checks, not protection against an actor rewriting or deleting all
+copies of the original evidence. Historical manifests without the prepared
+evaluation contract keep their prior loading behavior.
+
 The repository contract uses Codex as the required reference client. A dated
 contract can add one or more `replication` profiles for other clients. Each
 replication must use the same paired-trial rules and pinned inputs. A
@@ -146,6 +178,54 @@ contract. A separate authorized operator must run the pinned client and record
 its structured result.
 
 ## Record and score evidence
+
+For v2 ordering evidence, preserve the client's exact UTF-8 response as the
+attempt's `raw_response` string. Include its byte SHA-256 in `response_sha256`
+and set `ordering_rubric_id` to `d1-emitted-json-order-v1`. Preparation freezes
+the full [ordering rubric](ordering-rubric.json) and its digest in the manifest.
+Do not parse and reserialize the response before retaining it. The recorder
+binds every response field to the scored attempt and rejects duplicate keys
+(including nested keys), altered payloads, or a supplied ordering flag that
+contradicts the reviewed spans. Scoring checks the evidence again.
+
+`memory_evaluation_before_local` is a reviewer annotation. Verified counts
+require an `ordering_review`: named reviewer, response SHA-256, rubric id and
+SHA-256, rationale, and `earliest_correction_confirmed: true`. The reviewer
+must locate the first local correction anywhere in the response, including
+`evidence_or_gap`, `first_stated_cause`, and `final_diagnosis`; dedicated field
+order alone is insufficient. Retain `complete_evaluation_span` and
+`first_local_correction_span`, each with `start`, `end`, and exact raw `quote`.
+Offsets are zero-based Unicode character indices with an exclusive end. The
+correction quote is raw JSON string content without surrounding quotes;
+retain JSON escapes in the quoted slice. SHA-256 hashes UTF-8 bytes, while
+span offsets count characters in the retained raw string. The
+evaluation span must cover the entire raw memory payload, and its end must
+strictly precede the correction start. For absent memory its span is null.
+The review's `reviewer` must equal the attempt reviewer. An honest
+false annotation for correction-first output remains a scored failure. Legacy
+v2 records without evidence or review remain annotations and never supply
+verified ordering successes. Reports label the metric as evidence-backed
+reviewer classification of emitted order. The semantic identification of the
+first correction remains attributed reviewer judgment; it does not prove
+internal cognition or mechanically establish semantic reasoning order.
+Historical v1 product-effect gates retain their existing meaning.
+
+If no local correction occurs (including a response proposing only a systemic
+correction), the reviewer records `no_local_correction_confirmed: true`,
+`first_local_correction_span: null`, and `earliest_correction_confirmed: false`.
+The ordering annotation must be false. Keep the evaluation span and review
+rationale; report the observation as unavailable, never as vacuous success.
+Raw response parsing rejects non-JSON numeric constants, and binding preserves
+JSON types: numeric `0` cannot stand in for boolean `false`.
+
+`v2_safeguards` separately reports rejected-memory application and lexical
+decoy use on observed reference v2 context arms. Applying a rejected/decoy
+target or recording its treatment as `used` fails the corresponding safeguard,
+even when `durable_systemic_conclusion` is false or another treatment annotation
+contradicts the action. These attempts remain scored evidence. The historical
+`gates` and `overall_pass` fields retain their v1 meaning and do not establish
+that v2 safeguards passed. With no v2 observations the safeguard result is
+unavailable (`null`), not a pass.
 
 ```sh
 python3 evaluation/harness.py record \
@@ -220,12 +300,16 @@ evidence or information gap. The harness reports this rate separately from
 remain unchanged. Use `operator-instructions-v2.md` with
 `memory-evaluation-response.schema.json` for this contract.
 
-Independent audit on 2026-09-09 found that v2 does not yet establish that
-behavior: its ordering flag is a supplied reviewer annotation, its rate omits
-missing planned arms, and rejected-memory application can pass existing gates.
-F002 is reopened with B004-B007 as correction work. Hold live v2 evaluation and
-release-readiness claims pending correction and independent review. See the
-[audit record](../docs/evidence/2026-09-09-development-team-pilot.md).
+Independent audit on 2026-09-09 found unsupported ordering flags, omitted planned
+arms, and gaps in rejected-memory safeguards. Corrections B004-B007 now pass
+independent source review: retained responses and reviewer-selected spans bind
+ordering judgments, v2 safeguards report prohibited use separately, and the
+planned population is checked against complete retained workspace inputs.
+The metric remains a reviewed classification of emitted response order. It
+does not prove internal reasoning order or useful memory judgment. Live pilot
+and release verification are separate follow-up work. See the
+[audit record](../docs/evidence/2026-09-09-development-team-pilot.md) and
+[correction record](../docs/evidence/2026-09-09-d1-measurement-corrections.md).
 
 Engineering Board does not claim that Milestone D context improves agent
 diagnoses. Version 4 remains an unlocked proposal. Its exact corpus digest and

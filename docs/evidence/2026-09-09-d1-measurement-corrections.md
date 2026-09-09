@@ -1,0 +1,196 @@
+# D.1 measurement correction cycle — 2026-09-09
+
+## Assignment before implementation
+
+The owner approved correction of engineering-board/B005, B006 and B007 through
+one builder and an independent verifier. Base source:
+`117c542c8a65e57c421fca09f8483a3c146ce7d0`.
+
+- Lead: `/root`; owns integration, canonical board changes, product documentation
+  and delivery.
+- Builder: `/root/build_measurement`, branch `build/d1-measurement-evidence` in
+  a separate worktree; owns harness, operator/response contract, tests and usage
+  documentation under evaluation/.
+- Verifier: `/root/verify_measurement`; fresh context, read-only; reads the
+  requirements and artifacts independently and rechecks committed revisions.
+- Work order: B005 evidence contract, B006 safeguards, B007 planned population.
+  Each phase has a separate lead-owned claim on behalf of the builder.
+- Evidence destination: this versioned record, committed rubric and regression
+  fixtures/tests. No live client or experimental results are part of this cycle.
+
+## Acceptance and product boundary
+
+| Entry | Acceptance fixed before implementation | Independent adversarial checks |
+|---|---|---|
+| B005 | Retained response or ordered emitted events bind the evaluated memory and first correction. Only supported observable ordering counts. | Missing evidence, changed target/status/disposition/correction, mismatched spans/indices, correction-first order, and a supplied true flag alone cannot produce verified success. Score-time validation detects edited evidence. |
+| B006 | Separate v2 safeguards expose rejected-memory application and lexical-decoy use; v1 gates retain their meaning. | A complete run fails the v2 safeguard even with durable_systemic_conclusion=false when either disposition or treatment records prohibited use. Contradictory annotations cannot conceal it. Healthy hold/reject are permitted. |
+| B007 | Preparation pins evaluation version and eligible positive reference-context trial keys. Eligibility never depends on arrived attempts. | Zero-attempt, one-of-many, v1-only, mixed and complete v2 runs distinguish planned, observed, missing, incompatible and available results. Headline and per-case counts agree. |
+
+Observable response order is narrower than an agent's internal reasoning order.
+The metric must state that limit. Semantic judgments about the quality of a
+memory decision remain reviewer judgments with supporting evidence. Supplying
+a label or arranging output fields does not itself demonstrate useful reasoning.
+
+This cycle implements evidence integrity and honest reporting for the existing
+memory-evaluation target. It does not introduce a new product-effect threshold,
+rescore old evidence as a success, lock the proposal corpus, or establish that
+memory improves diagnoses. Historical v2 attempts without sufficient evidence
+can remain readable as reviewer annotations but cannot become verified ordering
+successes. V1-only historical score fields must remain reproducible.
+
+## Independent verification plan
+
+The verifier defined the acceptance matrix before seeing builder conclusions.
+It additionally identified two integration hazards: stored attempts are editable
+and scoring currently trusts them, and the per-case counter independently trusts
+the raw supplied ordering flag. Verification covers recording and rescoring,
+both report levels, and negative controls.
+
+The lead will record builder revisions, independent verdicts, corrective rounds,
+integration checks and remaining limitations here before closing the entries.
+All live-evaluation and release holds remain in effect while this work is pending.
+
+## B005 implementation contract
+
+Before code changes, the lead selected the builder's smaller raw-response
+design: retain the exact JSON response string and SHA-256, reject duplicate
+keys, and bind the parsed response fields to the recorded attempt. Preparation
+stores the complete versioned rubric; recording and scoring verify the rubric
+and response evidence. The classifier compares the emitted top-level
+memory_evaluation field with first_proposed_correction. Sorted serialization of
+the enclosing attempt must not change the order retained inside the string.
+
+A correction-first response with an honest false classification remains a
+measured failure. Missing legacy evidence remains an annotation, and a
+contradictory supplied true classification cannot count as verified success.
+Both detailed and aggregate reporting use the same classifier. This verifies
+structured output order; it cannot establish internal reasoning order or the
+semantic quality of an evaluation.
+
+### Independent pre-implementation correction
+
+The verifier identified an early-correction counterexample: evidence_or_gap or
+first_stated_cause may itself propose a patch before the dedicated correction
+field. Field order alone is therefore insufficient for B005's target. The lead
+revised the contract before implementation completion to require a semantic
+ordering review under a frozen rubric, with reviewer identity, rationale and
+exact retained-response spans/quotes for the complete evaluation and the first
+local correction anywhere in the response. Machine checks bind those claims to
+the response bytes and compare their positions; selection of the semantic
+spans remains explicitly attributed to the reviewer. Field order can be
+reported only as a narrower structural diagnostic. This preserves the target
+instead of silently substituting an easier measurement.
+
+## First review round
+
+B005 builder revision `bc40217` passed 30 evaluation tests. Independent
+verification confirmed duplicate rejection, span bounds and quote matching,
+Unicode/escape handling, early correction controls, legacy annotation exclusion
+and score-time raw-response tamper detection. It required two corrections:
+
+- Python equality allowed raw JSON numeric 0 to bind to recorded boolean false.
+  Response binding must compare types as well as values and reject non-JSON
+  numeric constants.
+- A response containing no local correction needs explicit null correction
+  evidence and a reviewer attestation that none exists. Its ordering measurement
+  is unavailable/not applicable; it must not force a false semantic label or
+  receive vacuous before-local credit.
+
+The lead returned B005 to implementation. B006 builder revision `edbfb07`
+passed 32 tests and moved to independent review. None of these intermediate
+passes resolve the pending correction entries or release hold.
+
+B006 independent review passed `edbfb07`. The verifier retained all 48 scored
+arms per complete synthetic run and combined contradictory annotations,
+independent rejected-only/decoy-only signals and healthy hold controls. Exactly
+four rejected-use and four decoy-use keys were reported for its mixed adversarial
+case. Historical v1 gates matched the complete v1 comparison. Observed-only
+safeguards were explicitly left insufficient for complete-run clearance; B007
+owns that completeness correction.
+
+B005 corrective revision `782594a` passed 33 builder tests and moved to
+independent recheck. It adds strict JSON value binding, rejects non-finite
+constants and permits an explicit no-local-correction review with unavailable
+ordering. The same builder then moved to B007 under a new claim.
+
+B005 independent recheck passed `782594a`. Recorder/scorer probes rejected raw
+0, 0.0 and non-finite constants in place of false. A systemic-only response with
+an honest no-local-correction review remained retained with unavailable ordering;
+contradictory declarations rejected. Combining that response with a healthy
+ordering success still left the aggregate rate unavailable. This closes the
+two findings from the first review without claiming automatic semantic judgment.
+
+## Combined builder handoff
+
+Initial combined handoff revision: `51d4fb7cec619d2287bc2649f5e1c7f80f285253`.
+The evaluation suite passed 37 tests; final targeted missing-negative and legacy
+manifest checks passed. The complete repository suite passed 21 of 21 suites
+at this revision. These are deterministic implementation checks, not measured
+model outcomes.
+
+B007 freezes evaluation_version and the positive reference-context population
+in the manifest and binds cohort metadata to trial input files. Reports expose
+planned, observed, missing, invalid, mixed, unverified, no-local-correction and
+no-memory populations. All required reference controls must be present before
+a rate is available; no-memory planned trials remain denominator members.
+Observed safeguard checks and full-population results are distinct.
+
+The independent verifier is checking this complete revision in a separate
+checkout before integration and feature reassessment.
+
+### B007 final-review regression
+
+At `51d4fb7`, the verifier started from an actual complete prepared run with one
+honest ordering failure (11/12, 91.67%). It removed the failed trial from both
+manifest.trials and the eligible-key list, recalculated the manifest digest,
+and left all frozen workspace inputs intact. Scoring accepted the shortened
+cohort as complete and reported 100%. Comparing two lists from the same mutable
+manifest did not bind the entire predeclared population. The lead returned
+B007 to implementation for a complete input-inventory check and a permanent
+regression. No live evidence was produced or reclassified.
+
+## Final independent verdict
+
+The verifier passed the combined correction set at
+`72ebeeaf6889e5d441781ead23e780e858abaac6`. It repeated the actual 11/12
+cohort-omission reproduction and separately removed a negative control. Both
+scoring and single-trial loading reject each alteration against the retained
+workspace cohort. The intact run stays 11/12 (91.67%). Inputs missing from a
+retained directory, redirected paths and links are covered by regression tests.
+
+The earlier independent combined matrix also passed: missing negative,
+mixed baseline/negative versions, unreviewed positive, no-local positive and
+invalid-response-digest variants kept the planned denominator at 12 and left
+interpretation unavailable. An unsafe negative response retained its observed
+ordering rate but failed v2 safeguards and interpretation readiness. Per-case
+counts equaled the aggregate throughout. The builder's corrected evaluation
+suite passed 39 tests. The final complete repository suite is recorded at
+integration closeout below.
+
+This satisfies B005-B007 source acceptance when combined with the earlier B004
+verification. It does not authenticate an actor who replaces all evidence
+copies, prove a reviewer's semantic judgment correct, prove cognitive order,
+or demonstrate live product effect. Retained inputs make the planned cohort
+independently inspectable against the manifest; reviewer evidence makes an
+ordering judgment inspectable against the response.
+
+## Integration closeout
+
+The lead integrated the complete reviewed history through final builder
+revision `72ebeeaf6889e5d441781ead23e780e858abaac6`. The integrated
+`bash tests/run-all.sh` passed 21 of 21 suites, including 39 evaluation tests
+in 43.597 seconds. Documentation review passed subject to three clarity edits
+incorporated here: distinguish initial/final handoffs, record integration
+verification, and qualify the surfaced-memory requirement for null controls.
+
+B005-B007 and F002 are source-complete with independent review evidence. F004
+tracks the retained-evidence non-scored live pilot and release decision. No
+live result, corpus lock, new success threshold, publication or installed-copy
+verification occurred in this correction cycle. Installation verification is
+part of any future release under docs/RELEASING.md.
+
+The cycle exercised one builder and one independent verifier. The lead changed
+the proposed field-order shortcut before acceptance, and the verifier returned
+two concrete B005 issues and one B007 cohort omission for correction. All were
+rechecked at pinned revisions before source acceptance. Agent cost and user
+productivity effect were not measured.
