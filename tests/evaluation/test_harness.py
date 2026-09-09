@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT))
 
 from evaluation.harness import (  # noqa: E402
     EvaluationError,
+    _reject_linked_path,
     build_context_evidence,
     load_run,
     prepare_run,
@@ -503,6 +504,20 @@ class EvaluationHarnessTests(unittest.TestCase):
                     linked / "run",
                 )
 
+    @unittest.skipUnless(
+        Path("/var").is_symlink()
+        and Path("/var").resolve() == Path("/private/var"),
+        "requires the macOS /var system alias",
+    )
+    def test_root_owned_system_temp_alias_is_not_an_attacker_link(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as temp:
+            base = Path(temp)
+            _reject_linked_path(base / "output.json")
+
+            linked = base / "linked"
+            linked.symlink_to(base / "elsewhere", target_is_directory=True)
+            with self.assertRaisesRegex(EvaluationError, "linked path"):
+                _reject_linked_path(linked / "output.json")
 
     def test_load_rejects_linked_run_and_tampered_evidence(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-integrity-") as temp:

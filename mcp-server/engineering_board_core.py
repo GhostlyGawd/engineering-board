@@ -727,6 +727,61 @@ def apply_pattern_operation(
     }
 
 
+def plan_pattern_operation_token(
+    board_dir: Path,
+    project: str,
+    action: str,
+    params: dict[str, Any],
+) -> dict[str, Any]:
+    """Return a self-contained pattern plan through the MCP plan_id field."""
+    preview = plan_pattern_operation(board_dir, action, params)
+    payload = {
+        "version": 1,
+        "project": project,
+        "action": preview["action"],
+        "request": preview["operation"],
+        "plan_digest": preview["plan_id"],
+    }
+    token, _ = _encode_plan(payload)
+    return {**preview, "plan_id": token}
+
+
+def apply_pattern_plan(
+    board_dir: Path,
+    project: str,
+    plan_token: str,
+) -> dict[str, Any]:
+    """Revalidate and apply one self-contained MCP pattern plan."""
+    board_dir = board_dir.resolve()
+    envelope = _decode_plan(plan_token, "pattern")
+    payload = envelope["payload"]
+    if payload.get("version") != 1 or payload.get("project") != project:
+        raise GraphError("pattern plan project mismatch")
+    action = payload.get("action")
+    request = payload.get("request")
+    if not isinstance(action, str) or not isinstance(request, dict):
+        raise GraphError("invalid pattern plan payload")
+    try:
+        fresh = plan_pattern_operation(board_dir, action, request)
+    except GraphError as exc:
+        raise GraphError(
+            "plan_stale: canonical inputs changed; request a fresh preview"
+        ) from exc
+    if fresh["plan_id"] != payload.get("plan_digest"):
+        raise GraphError(
+            "plan_stale: canonical inputs changed; request a fresh preview"
+        )
+    receipt = apply_pattern_operation(
+        board_dir,
+        project,
+        action,
+        request,
+        fresh["plan_id"],
+    )
+    receipt["plan_id"] = plan_token
+    return receipt
+
+
 def load_scratch_findings(
     board_dir: Path, session: str | None = None
 ) -> list[dict[str, Any]]:
@@ -2967,19 +3022,19 @@ def _encode_plan(payload: dict[str, Any]) -> tuple[str, str]:
     return token, plan_id
 
 
-def _decode_plan(token: str) -> dict[str, Any]:
+def _decode_plan(token: str, kind: str = "hypothesis") -> dict[str, Any]:
     token = str(token or "")
     if not token or len(token) > 65536 or not re.fullmatch(r"[A-Za-z0-9_-]+", token):
-        raise GraphError("invalid hypothesis plan token")
+        raise GraphError(f"invalid {kind} plan token")
     try:
         raw = base64.urlsafe_b64decode(token + "=" * (-len(token) % 4))
         envelope = json.loads(raw.decode("utf-8"))
         payload = envelope["payload"]
         plan_id = envelope["plan_id"]
     except (ValueError, KeyError, TypeError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise GraphError("invalid hypothesis plan token") from exc
+        raise GraphError(f"invalid {kind} plan token") from exc
     if not isinstance(payload, dict) or plan_id != _plan_id(payload):
-        raise GraphError("invalid hypothesis plan checksum")
+        raise GraphError(f"invalid {kind} plan checksum")
     return envelope
 
 

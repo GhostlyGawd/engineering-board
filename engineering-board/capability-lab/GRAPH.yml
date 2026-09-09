@@ -1,0 +1,374 @@
+{
+  "schema_version": "3",
+  "generated_at": "2026-09-09T03:03:34Z",
+  "source_fingerprint": "9db94eab3e25007d1a216a77edd2bbbcf6c0c8722a4428a4ea08d97dca66d414",
+  "build_mode": "full",
+  "project": "capability-lab",
+  "entries_analyzed": {
+    "open": 4,
+    "archived": 0,
+    "total": 4
+  },
+  "nodes": {
+    "B001": {
+      "type": "bug",
+      "title": "Synthetic parser path drops capability marker",
+      "source": "bugs/B001-synthetic-parser-path-drops-capability-marker.md",
+      "priority": "P2",
+      "status": "open",
+      "affects": "tests/capability_lab/parser_a.py",
+      "discovered": "2026-09-08",
+      "pattern": [
+        "capability-marker-loss"
+      ],
+      "pattern_ids": [
+        "P001"
+      ],
+      "resolved_patterns": [
+        {
+          "id": "P001",
+          "label": "capability-marker-loss",
+          "observed_labels": [
+            "capability-marker-loss"
+          ],
+          "resolution": "canonical-id",
+          "source_field": "pattern_ids"
+        }
+      ]
+    },
+    "B002": {
+      "type": "bug",
+      "title": "Synthetic validator path drops capability marker",
+      "source": "bugs/B002-synthetic-validator-path-drops-capability-marker.md",
+      "priority": "P2",
+      "status": "open",
+      "affects": "tests/capability_lab/validator_b.py",
+      "discovered": "2026-09-08",
+      "pattern": [
+        "capability-marker-loss"
+      ],
+      "pattern_ids": [
+        "P001"
+      ],
+      "resolved_patterns": [
+        {
+          "id": "P001",
+          "label": "capability-marker-loss",
+          "observed_labels": [
+            "capability-marker-loss"
+          ],
+          "resolution": "canonical-id",
+          "source_field": "pattern_ids"
+        }
+      ]
+    },
+    "B003": {
+      "type": "bug",
+      "title": "Synthetic reporter path drops capability marker",
+      "source": "bugs/B003-synthetic-reporter-path-drops-capability-marker.md",
+      "priority": "P2",
+      "status": "open",
+      "affects": "tests/capability_lab/reporter_c.py",
+      "discovered": "2026-09-08",
+      "pattern": [
+        "capability-marker-loss"
+      ],
+      "pattern_ids": [
+        "P001"
+      ],
+      "resolved_patterns": [
+        {
+          "id": "P001",
+          "label": "capability-marker-loss",
+          "observed_labels": [
+            "capability-marker-loss"
+          ],
+          "resolution": "canonical-id",
+          "source_field": "pattern_ids"
+        }
+      ]
+    },
+    "Q001": {
+      "type": "question",
+      "title": "How should completed synthetic capability probes leave the ready queue?",
+      "source": "questions/Q001-how-should-completed-synthetic-capability-probes-leave-the-r.md",
+      "status": "open",
+      "affects": "tests/capability_lab/",
+      "discovered": "2026-09-09"
+    }
+  },
+  "edges": [
+    {
+      "from": "B001",
+      "to": "B002",
+      "kind": "shared-affects-prefix",
+      "value": "tests/capability_lab/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B001",
+          "field": "affects",
+          "source": "bugs/B001-synthetic-parser-path-drops-capability-marker.md"
+        },
+        {
+          "entry": "B002",
+          "field": "affects",
+          "source": "bugs/B002-synthetic-validator-path-drops-capability-marker.md"
+        }
+      ]
+    },
+    {
+      "from": "B001",
+      "to": "B002",
+      "kind": "shared-pattern",
+      "value": "capability-marker-loss",
+      "weight": 2,
+      "pattern_ids": [
+        "P001"
+      ],
+      "evidence": [
+        {
+          "entry": "B001",
+          "field": "pattern_ids",
+          "source": "bugs/B001-synthetic-parser-path-drops-capability-marker.md"
+        },
+        {
+          "entry": "B002",
+          "field": "pattern_ids",
+          "source": "bugs/B002-synthetic-validator-path-drops-capability-marker.md"
+        }
+      ]
+    },
+    {
+      "from": "B001",
+      "to": "B003",
+      "kind": "shared-affects-prefix",
+      "value": "tests/capability_lab/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B001",
+          "field": "affects",
+          "source": "bugs/B001-synthetic-parser-path-drops-capability-marker.md"
+        },
+        {
+          "entry": "B003",
+          "field": "affects",
+          "source": "bugs/B003-synthetic-reporter-path-drops-capability-marker.md"
+        }
+      ]
+    },
+    {
+      "from": "B001",
+      "to": "B003",
+      "kind": "shared-pattern",
+      "value": "capability-marker-loss",
+      "weight": 2,
+      "pattern_ids": [
+        "P001"
+      ],
+      "evidence": [
+        {
+          "entry": "B001",
+          "field": "pattern_ids",
+          "source": "bugs/B001-synthetic-parser-path-drops-capability-marker.md"
+        },
+        {
+          "entry": "B003",
+          "field": "pattern_ids",
+          "source": "bugs/B003-synthetic-reporter-path-drops-capability-marker.md"
+        }
+      ]
+    },
+    {
+      "from": "B001",
+      "to": "Q001",
+      "kind": "shared-affects-prefix",
+      "value": "tests/capability_lab/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B001",
+          "field": "affects",
+          "source": "bugs/B001-synthetic-parser-path-drops-capability-marker.md"
+        },
+        {
+          "entry": "Q001",
+          "field": "affects",
+          "source": "questions/Q001-how-should-completed-synthetic-capability-probes-leave-the-r.md"
+        }
+      ]
+    },
+    {
+      "from": "B002",
+      "to": "B003",
+      "kind": "shared-affects-prefix",
+      "value": "tests/capability_lab/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B002",
+          "field": "affects",
+          "source": "bugs/B002-synthetic-validator-path-drops-capability-marker.md"
+        },
+        {
+          "entry": "B003",
+          "field": "affects",
+          "source": "bugs/B003-synthetic-reporter-path-drops-capability-marker.md"
+        }
+      ]
+    },
+    {
+      "from": "B002",
+      "to": "B003",
+      "kind": "shared-pattern",
+      "value": "capability-marker-loss",
+      "weight": 2,
+      "pattern_ids": [
+        "P001"
+      ],
+      "evidence": [
+        {
+          "entry": "B002",
+          "field": "pattern_ids",
+          "source": "bugs/B002-synthetic-validator-path-drops-capability-marker.md"
+        },
+        {
+          "entry": "B003",
+          "field": "pattern_ids",
+          "source": "bugs/B003-synthetic-reporter-path-drops-capability-marker.md"
+        }
+      ]
+    },
+    {
+      "from": "B002",
+      "to": "Q001",
+      "kind": "shared-affects-prefix",
+      "value": "tests/capability_lab/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B002",
+          "field": "affects",
+          "source": "bugs/B002-synthetic-validator-path-drops-capability-marker.md"
+        },
+        {
+          "entry": "Q001",
+          "field": "affects",
+          "source": "questions/Q001-how-should-completed-synthetic-capability-probes-leave-the-r.md"
+        }
+      ]
+    },
+    {
+      "from": "B003",
+      "to": "Q001",
+      "kind": "shared-affects-prefix",
+      "value": "tests/capability_lab/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B003",
+          "field": "affects",
+          "source": "bugs/B003-synthetic-reporter-path-drops-capability-marker.md"
+        },
+        {
+          "entry": "Q001",
+          "field": "affects",
+          "source": "questions/Q001-how-should-completed-synthetic-capability-probes-leave-the-r.md"
+        }
+      ]
+    }
+  ],
+  "topology": {
+    "clusters": [
+      {
+        "id": "C001",
+        "fingerprint": "c-8e7d39d1b0ff1e5d",
+        "members": [
+          "B001",
+          "B002",
+          "B003",
+          "Q001"
+        ],
+        "pattern_ids": [
+          "P001"
+        ],
+        "patterns": [
+          "capability-marker-loss"
+        ],
+        "affected_domains": [
+          "tests"
+        ],
+        "signals": [
+          {
+            "kind": "shared-affects-prefix",
+            "value": "tests/capability_lab/",
+            "members": [
+              "B001",
+              "B002",
+              "B003",
+              "Q001"
+            ]
+          },
+          {
+            "kind": "shared-pattern",
+            "value": "capability-marker-loss",
+            "members": [
+              "B001",
+              "B002",
+              "B003"
+            ],
+            "pattern_ids": [
+              "P001"
+            ]
+          }
+        ],
+        "density": 1.0
+      }
+    ],
+    "isolated": [],
+    "cross_cluster_bridges": []
+  },
+  "unresolved_patterns": [],
+  "findings": [
+    {
+      "type": "dense-cluster",
+      "cluster_id": "C001",
+      "members": [
+        "B001",
+        "B002",
+        "B003",
+        "Q001"
+      ],
+      "density": 1.0,
+      "shared_dimensions": {
+        "patterns": [
+          "capability-marker-loss"
+        ]
+      },
+      "internal_edges": 6
+    },
+    {
+      "type": "pattern-recurrence",
+      "pattern_id": "P001",
+      "pattern": "capability-marker-loss",
+      "count": 3,
+      "members": [
+        "B001",
+        "B002",
+        "B003"
+      ]
+    }
+  ],
+  "read_order": [
+    "C001"
+  ],
+  "drill_in": {
+    "C001": [
+      "B001",
+      "B002",
+      "B003",
+      "Q001"
+    ]
+  }
+}

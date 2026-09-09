@@ -5,3 +5,5 @@ Maps each project to its board directory. The `affects:` prefix on entry frontma
 | project | path | affects prefix |
 |---------|------|----------------|
 | eb-self | engineering-board/eb-self | eb-self/ |
+| engineering-board | engineering-board/engineering-board | . |
+| capability-lab | engineering-board/capability-lab | tests/ |

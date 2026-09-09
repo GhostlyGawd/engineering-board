@@ -797,6 +797,85 @@ def suite_read_only_side_effects(mod):
 
 
 # ---------------------------------------------------------------------------
+# Suite: token-only apply parity
+# ---------------------------------------------------------------------------
+def suite_token_only_apply(mod):
+    """Pattern and hypothesis previews both support apply-only follow-ups."""
+    print("\n== Suite: token-only apply parity ==")
+    root = tempfile.mkdtemp(prefix="eb-mcp-token-apply-")
+    project = "tokens"
+    try:
+        mod.tool_board_init({"project": project, "root": root})
+
+        pattern_preview = mod.tool_board_patterns({
+            "project": project,
+            "root": root,
+            "action": "create",
+            "label": "Token Apply",
+        })
+        pattern_receipt = mod.tool_board_patterns({
+            "project": project,
+            "root": root,
+            "apply": pattern_preview["plan_id"],
+        })
+        check(
+            pattern_receipt.get("applied") is True,
+            "board_patterns accepts an apply-only follow-up",
+            json.dumps(pattern_receipt),
+        )
+
+        for title, affects in (
+            ("Parser loses token", "parser/read.py"),
+            ("Writer loses token", "writer/write.py"),
+        ):
+            mod.tool_board_create_entry({
+                "project": project,
+                "root": root,
+                "type": "bug",
+                "title": title,
+                "priority": "P2",
+                "affects": affects,
+                "pattern": ["token-apply"],
+                "done_when": ["The shared token survives."],
+            })
+        cluster = mod.tool_board_insights({
+            "project": project,
+            "root": root,
+        })["ranked_clusters"][0]
+        hypothesis_preview = mod.tool_board_hypotheses({
+            "project": project,
+            "root": root,
+            "action": "propose",
+            "cluster_fingerprint": cluster["cluster_fingerprint"],
+            "claim_key": "shared-token-boundary",
+            "title": "A shared boundary drops the token",
+            "root_cause": "Both paths cross one token-normalization boundary.",
+            "supporting_evidence": [
+                {"id": entry_id, "reason": "The path loses the same token."}
+                for entry_id in cluster["members"]
+            ],
+            "alternatives": ["The paths contain independent defects."],
+            "counter_evidence": [],
+            "confidence": "medium",
+            "confidence_basis": "Two paths share one canonical pattern.",
+            "falsifier": "Independent boundaries reproduce both failures.",
+            "actor": "mcp-token-apply-test",
+        })
+        hypothesis_receipt = mod.tool_board_hypotheses({
+            "project": project,
+            "root": root,
+            "apply": hypothesis_preview["plan_token"],
+        })
+        check(
+            hypothesis_receipt.get("applied") is True,
+            "board_hypotheses accepts an apply-only follow-up",
+            json.dumps(hypothesis_receipt),
+        )
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+
+
+# ---------------------------------------------------------------------------
 # Suite: C5 — deterministic ready queue
 # ---------------------------------------------------------------------------
 def suite_ready(mod):
@@ -1330,6 +1409,7 @@ def main():
         suite_stdio(tmp1)
         suite_lifecycle(mod, tmp2)
         suite_read_only_side_effects(mod)
+        suite_token_only_apply(mod)
         suite_ready(mod)
         suite_remember(mod)
         suite_comments_parent(mod)
