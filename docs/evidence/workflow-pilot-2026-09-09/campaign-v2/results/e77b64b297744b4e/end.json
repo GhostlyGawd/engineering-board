@@ -1,0 +1,120 @@
+{
+  "artifacts": {
+    "changes.patch": {
+      "bytes": 8276,
+      "sha256": "4b852f3403df06fca25df96a926ee33638389464e7b6aab067d88ce1ae7af0f4"
+    },
+    "response.json": {
+      "bytes": 630,
+      "sha256": "bd293425745fa37044309e6267ddc075215bb1b0754850d7fe6c9ed51097367a"
+    },
+    "start.json": {
+      "bytes": 1844,
+      "sha256": "031a168a34969f57e1c75794fedb99b5ae44bd697eaee1d2f149720355cdd670"
+    },
+    "stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout.jsonl": {
+      "bytes": 9846,
+      "sha256": "0d51eef2e55fe1c43c2a8e268cef0c75bb39ce5ab7dac79e214b15a680fa0697"
+    },
+    "workspace/AGENTS.md": {
+      "bytes": 489,
+      "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+    },
+    "workspace/README.md": {
+      "bytes": 797,
+      "sha256": "c8332ba485f5ac8ea890287809d7ccf676dc02a66b38492f5d9e707caf3346a2"
+    },
+    "workspace/__pycache__/catalog.cpython-314.pyc": {
+      "bytes": 1747,
+      "sha256": "77cbb02ba5ff3db013fd6198daad5d50607d24bc0f2c2b529d2db1207e51c9e6"
+    },
+    "workspace/catalog.py": {
+      "bytes": 792,
+      "sha256": "747dfb4fc5802d0dfb87f495ba06e66b85cad6e1df75a8f22f71ed3b3dae776b"
+    },
+    "workspace/task.md": {
+      "bytes": 329,
+      "sha256": "445d30e9ec277435de568c902572e4fb9af4b6419551d5ecefa40201b76c50b0"
+    },
+    "workspace/tests/__pycache__/test_public.cpython-314.pyc": {
+      "bytes": 1723,
+      "sha256": "44c6208a0e7bd4804d0643dc21e7fca96c67d9ccb26e4dc8b301caeb15dd750a"
+    },
+    "workspace/tests/__pycache__/test_read_only_views.cpython-314.pyc": {
+      "bytes": 1862,
+      "sha256": "cb36c5306846890903002089da49914a8041a74d58955aba516d8a87aa418dfa"
+    },
+    "workspace/tests/test_public.py": {
+      "bytes": 645,
+      "sha256": "11988bab09082b1c2031eaa02b9b3532269be1da3fa0493b206265091ab67b1e"
+    },
+    "workspace/tests/test_read_only_views.py": {
+      "bytes": 764,
+      "sha256": "1cdbbb91ab3d0c3bc7f7c22df50ebac025c3977eb61274620e9a8b8d3c70a17d"
+    }
+  },
+  "ended_at": "2026-09-09T15:13:15.380994+00:00",
+  "exit_code": 0,
+  "failure": null,
+  "final_inventory": {
+    "AGENTS.md": {
+      "bytes": 489,
+      "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+    },
+    "README.md": {
+      "bytes": 797,
+      "sha256": "c8332ba485f5ac8ea890287809d7ccf676dc02a66b38492f5d9e707caf3346a2"
+    },
+    "__pycache__/catalog.cpython-314.pyc": {
+      "bytes": 1747,
+      "sha256": "77cbb02ba5ff3db013fd6198daad5d50607d24bc0f2c2b529d2db1207e51c9e6"
+    },
+    "catalog.py": {
+      "bytes": 792,
+      "sha256": "747dfb4fc5802d0dfb87f495ba06e66b85cad6e1df75a8f22f71ed3b3dae776b"
+    },
+    "task.md": {
+      "bytes": 329,
+      "sha256": "445d30e9ec277435de568c902572e4fb9af4b6419551d5ecefa40201b76c50b0"
+    },
+    "tests/__pycache__/test_public.cpython-314.pyc": {
+      "bytes": 1723,
+      "sha256": "44c6208a0e7bd4804d0643dc21e7fca96c67d9ccb26e4dc8b301caeb15dd750a"
+    },
+    "tests/__pycache__/test_read_only_views.cpython-314.pyc": {
+      "bytes": 1862,
+      "sha256": "cb36c5306846890903002089da49914a8041a74d58955aba516d8a87aa418dfa"
+    },
+    "tests/test_public.py": {
+      "bytes": 645,
+      "sha256": "11988bab09082b1c2031eaa02b9b3532269be1da3fa0493b206265091ab67b1e"
+    },
+    "tests/test_read_only_views.py": {
+      "bytes": 764,
+      "sha256": "1cdbbb91ab3d0c3bc7f7c22df50ebac025c3977eb61274620e9a8b8d3c70a17d"
+    }
+  },
+  "start_sha256": "031a168a34969f57e1c75794fedb99b5ae44bd697eaee1d2f149720355cdd670",
+  "trace": {
+    "audit_limit": "literal visible tool arguments only; not secure isolation",
+    "completed_turns": 1,
+    "tool_events": 8,
+    "tool_types": [
+      "command_execution"
+    ],
+    "trace_violations": [],
+    "turn_errors": [],
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 50048,
+      "input_tokens": 63040,
+      "output_tokens": 1599,
+      "reasoning_output_tokens": 285
+    }
+  },
+  "wall_seconds": 71.37224166595843
+}

@@ -1,0 +1,104 @@
+{
+  "artifacts": {
+    "changes.patch": {
+      "bytes": 4862,
+      "sha256": "947d3b18c3c2390201b349500c45894fc8e121629b850f56077970f534b38d96"
+    },
+    "response.json": {
+      "bytes": 554,
+      "sha256": "9019fde0b7c118abc06ee342e85edb3c634e041dbce610ad62f81fd73e943910"
+    },
+    "start.json": {
+      "bytes": 1844,
+      "sha256": "462858b5f90b2c6b4b5c97ee7b754bab4bc5f0dd453756d1ec61db4fdde514d3"
+    },
+    "stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout.jsonl": {
+      "bytes": 11393,
+      "sha256": "d3f342fb0ec8496ea293397b5b90dbc60ac0d3f30485c12424e3bb2e6cc0405f"
+    },
+    "workspace/AGENTS.md": {
+      "bytes": 489,
+      "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+    },
+    "workspace/README.md": {
+      "bytes": 876,
+      "sha256": "ec1a3af8b5e83bea9bd835f23c9558b451c54c21f9d6f685498f300fdfe7e801"
+    },
+    "workspace/__pycache__/job_options.cpython-314.pyc": {
+      "bytes": 1197,
+      "sha256": "746928a3280670df981361b774d561ded8c659c0df3a5f588bd590183e9a0318"
+    },
+    "workspace/job_options.py": {
+      "bytes": 704,
+      "sha256": "04b47d98a8d1e8fff675e395d754187d1bcb576ce9d1fa2ad669af9829c09f4e"
+    },
+    "workspace/task.md": {
+      "bytes": 278,
+      "sha256": "ea8083a49d5a7bab8b3c7238b1fbae5d830d5ca1b093afba404a43f673a701b5"
+    },
+    "workspace/tests/__pycache__/test_public.cpython-314.pyc": {
+      "bytes": 1563,
+      "sha256": "f691d11c85fa01566f6f22c1abeb1dd13160bbc7f1a329dea6f186d608f61e72"
+    },
+    "workspace/tests/test_public.py": {
+      "bytes": 682,
+      "sha256": "f3b64b29f731e4bbdfb9958a5f94180a97de09a2dc52baf0736e167dc3112d5d"
+    }
+  },
+  "ended_at": "2026-09-09T15:22:55.334253+00:00",
+  "exit_code": 0,
+  "failure": null,
+  "final_inventory": {
+    "AGENTS.md": {
+      "bytes": 489,
+      "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+    },
+    "README.md": {
+      "bytes": 876,
+      "sha256": "ec1a3af8b5e83bea9bd835f23c9558b451c54c21f9d6f685498f300fdfe7e801"
+    },
+    "__pycache__/job_options.cpython-314.pyc": {
+      "bytes": 1197,
+      "sha256": "746928a3280670df981361b774d561ded8c659c0df3a5f588bd590183e9a0318"
+    },
+    "job_options.py": {
+      "bytes": 704,
+      "sha256": "04b47d98a8d1e8fff675e395d754187d1bcb576ce9d1fa2ad669af9829c09f4e"
+    },
+    "task.md": {
+      "bytes": 278,
+      "sha256": "ea8083a49d5a7bab8b3c7238b1fbae5d830d5ca1b093afba404a43f673a701b5"
+    },
+    "tests/__pycache__/test_public.cpython-314.pyc": {
+      "bytes": 1563,
+      "sha256": "f691d11c85fa01566f6f22c1abeb1dd13160bbc7f1a329dea6f186d608f61e72"
+    },
+    "tests/test_public.py": {
+      "bytes": 682,
+      "sha256": "f3b64b29f731e4bbdfb9958a5f94180a97de09a2dc52baf0736e167dc3112d5d"
+    }
+  },
+  "start_sha256": "462858b5f90b2c6b4b5c97ee7b754bab4bc5f0dd453756d1ec61db4fdde514d3",
+  "trace": {
+    "audit_limit": "literal visible tool arguments only; not secure isolation",
+    "completed_turns": 1,
+    "tool_events": 8,
+    "tool_types": [
+      "command_execution"
+    ],
+    "trace_violations": [],
+    "turn_errors": [],
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 50944,
+      "input_tokens": 63782,
+      "output_tokens": 1667,
+      "reasoning_output_tokens": 288
+    }
+  },
+  "wall_seconds": 69.32639299996663
+}

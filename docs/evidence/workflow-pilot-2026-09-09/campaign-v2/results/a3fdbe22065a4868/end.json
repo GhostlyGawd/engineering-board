@@ -1,0 +1,201 @@
+{
+  "artifacts": {
+    "changes.patch": {
+      "bytes": 6969,
+      "sha256": "f15e775571cac23f83f1b602a88d098bfc0bc5edbec69cb51bff944b80369861"
+    },
+    "response.json": {
+      "bytes": 540,
+      "sha256": "abec8eeca1c29821de7105e99e8cec67b54d5cbeea6b641ffaf1cf7cd9694274"
+    },
+    "start.json": {
+      "bytes": 2386,
+      "sha256": "e04844b48f17a4034ba26aa7c792151331087ec565c5ca4b5305eeb41283a55c"
+    },
+    "stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout.jsonl": {
+      "bytes": 16916,
+      "sha256": "1e2db1e9ed73e3f2f33c812559ac1c23182cb17015c548289fac52694534d758"
+    },
+    "workspace/AGENTS.md": {
+      "bytes": 489,
+      "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+    },
+    "workspace/README.md": {
+      "bytes": 797,
+      "sha256": "c8332ba485f5ac8ea890287809d7ccf676dc02a66b38492f5d9e707caf3346a2"
+    },
+    "workspace/__pycache__/catalog.cpython-314.pyc": {
+      "bytes": 1747,
+      "sha256": "868461353efb9fc7d50200da547c7e885a464d9d07f05161e41d9e2d5d2e51fb"
+    },
+    "workspace/catalog.py": {
+      "bytes": 792,
+      "sha256": "747dfb4fc5802d0dfb87f495ba06e66b85cad6e1df75a8f22f71ed3b3dae776b"
+    },
+    "workspace/engineering-board/BOARD-ROUTER.md": {
+      "bytes": 264,
+      "sha256": "42b59abd508da16ca5aea971e9377314fa0917f36f5d21a2a05a40ab3055daf1"
+    },
+    "workspace/engineering-board/pilot/ARCHIVE.md": {
+      "bytes": 58,
+      "sha256": "3ce08ee795aee75f46c7c9f21dfd591a924b17896dda948648f1d389068d8f18"
+    },
+    "workspace/engineering-board/pilot/BOARD.md": {
+      "bytes": 617,
+      "sha256": "5a5112a58756c60d9f3d1df998bf3728f2c37679c496c059b3201957141cebcd"
+    },
+    "workspace/engineering-board/pilot/bugs/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/engineering-board/pilot/bugs/B105.md": {
+      "bytes": 460,
+      "sha256": "44981c84b2e351e5489794aba399878902e3d3395d1ec8d8ab98cd3eab678d48"
+    },
+    "workspace/engineering-board/pilot/bugs/B106.md": {
+      "bytes": 461,
+      "sha256": "772bc61df6d9fb94aaf8e16140fcfb410351339cbeee409d7e4549e13ff9d3d0"
+    },
+    "workspace/engineering-board/pilot/features/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/engineering-board/pilot/hypotheses/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/engineering-board/pilot/hypotheses/H101.md": {
+      "bytes": 1712,
+      "sha256": "2f25ad19ffe25a72828f36a595d3ee996867eb9949dc62ce3698e1322bc76123"
+    },
+    "workspace/engineering-board/pilot/learnings/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/engineering-board/pilot/observations/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/engineering-board/pilot/questions/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/task.md": {
+      "bytes": 329,
+      "sha256": "445d30e9ec277435de568c902572e4fb9af4b6419551d5ecefa40201b76c50b0"
+    },
+    "workspace/tests/__pycache__/test_public.cpython-314.pyc": {
+      "bytes": 2618,
+      "sha256": "d2cf5e05a33f634ebad4b78f8810398e2d934fc5d2b1968652d966d2908ca3a0"
+    },
+    "workspace/tests/test_public.py": {
+      "bytes": 1168,
+      "sha256": "7c8faa6d0ec550136c70f7baf1e7ea131b255414ea70abf8c757c125e7b7842b"
+    }
+  },
+  "ended_at": "2026-09-09T15:19:13.155548+00:00",
+  "exit_code": 0,
+  "failure": null,
+  "final_inventory": {
+    "AGENTS.md": {
+      "bytes": 489,
+      "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+    },
+    "README.md": {
+      "bytes": 797,
+      "sha256": "c8332ba485f5ac8ea890287809d7ccf676dc02a66b38492f5d9e707caf3346a2"
+    },
+    "__pycache__/catalog.cpython-314.pyc": {
+      "bytes": 1747,
+      "sha256": "868461353efb9fc7d50200da547c7e885a464d9d07f05161e41d9e2d5d2e51fb"
+    },
+    "catalog.py": {
+      "bytes": 792,
+      "sha256": "747dfb4fc5802d0dfb87f495ba06e66b85cad6e1df75a8f22f71ed3b3dae776b"
+    },
+    "engineering-board/BOARD-ROUTER.md": {
+      "bytes": 264,
+      "sha256": "42b59abd508da16ca5aea971e9377314fa0917f36f5d21a2a05a40ab3055daf1"
+    },
+    "engineering-board/pilot/ARCHIVE.md": {
+      "bytes": 58,
+      "sha256": "3ce08ee795aee75f46c7c9f21dfd591a924b17896dda948648f1d389068d8f18"
+    },
+    "engineering-board/pilot/BOARD.md": {
+      "bytes": 617,
+      "sha256": "5a5112a58756c60d9f3d1df998bf3728f2c37679c496c059b3201957141cebcd"
+    },
+    "engineering-board/pilot/bugs/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "engineering-board/pilot/bugs/B105.md": {
+      "bytes": 460,
+      "sha256": "44981c84b2e351e5489794aba399878902e3d3395d1ec8d8ab98cd3eab678d48"
+    },
+    "engineering-board/pilot/bugs/B106.md": {
+      "bytes": 461,
+      "sha256": "772bc61df6d9fb94aaf8e16140fcfb410351339cbeee409d7e4549e13ff9d3d0"
+    },
+    "engineering-board/pilot/features/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "engineering-board/pilot/hypotheses/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "engineering-board/pilot/hypotheses/H101.md": {
+      "bytes": 1712,
+      "sha256": "2f25ad19ffe25a72828f36a595d3ee996867eb9949dc62ce3698e1322bc76123"
+    },
+    "engineering-board/pilot/learnings/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "engineering-board/pilot/observations/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "engineering-board/pilot/questions/.gitkeep": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "task.md": {
+      "bytes": 329,
+      "sha256": "445d30e9ec277435de568c902572e4fb9af4b6419551d5ecefa40201b76c50b0"
+    },
+    "tests/__pycache__/test_public.cpython-314.pyc": {
+      "bytes": 2618,
+      "sha256": "d2cf5e05a33f634ebad4b78f8810398e2d934fc5d2b1968652d966d2908ca3a0"
+    },
+    "tests/test_public.py": {
+      "bytes": 1168,
+      "sha256": "7c8faa6d0ec550136c70f7baf1e7ea131b255414ea70abf8c757c125e7b7842b"
+    }
+  },
+  "start_sha256": "e04844b48f17a4034ba26aa7c792151331087ec565c5ca4b5305eeb41283a55c",
+  "trace": {
+    "audit_limit": "literal visible tool arguments only; not secure isolation",
+    "completed_turns": 1,
+    "tool_events": 10,
+    "tool_types": [
+      "command_execution",
+      "mcp_tool_call"
+    ],
+    "trace_violations": [],
+    "turn_errors": [],
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 72576,
+      "input_tokens": 89467,
+      "output_tokens": 2171,
+      "reasoning_output_tokens": 308
+    }
+  },
+  "wall_seconds": 84.815983000095
+}
