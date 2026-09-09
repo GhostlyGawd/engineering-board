@@ -2969,6 +2969,22 @@ product-effect gates or silently promote H### state.
 | MEV-REQ-004 | The report shall expose eligible context arms, before-local successes, and rate without changing existing gates. | Mixed version-1/version-2 score test |
 | MEV-REQ-005 | A local correction may follow an explicit hold or reject without promoting a proposed hypothesis. | Operator contract and response schema |
 
+The 2026-09-09 independent audit requires the following corrections before a
+new measured v2 run. These preserve the existing memory-use target and do not
+change any historical product-effect threshold.
+
+| ID | Correction requirement | Verification |
+|---|---|---|
+| MEV-REQ-006 | A before-local classification shall retain the exact response, checksum, frozen rubric and reviewer evidence identifying the complete evaluation and earliest local correction anywhere in that response. | Missing, contradictory, mismatched and overlapping span controls at recording and scoring |
+| MEV-REQ-007 | Reports shall distinguish mechanically checked evidence binding from the reviewer's semantic interpretation. Dedicated field order alone shall not count as before-local evaluation. | Early local correction inside evaluation or diagnosis text |
+| MEV-REQ-008 | Separate v2 safeguards shall expose rejected-memory application and lexical-decoy use, including contradictory annotations. | Complete-run negative controls even when durable_systemic_conclusion is false |
+| MEV-REQ-009 | Preparation shall pin the evaluation contract and eligible positive reference-context population before responses arrive. Partial, mixed or unconfigured populations shall have an unavailable rate with completeness details. | Zero, partial, mixed-version, legacy-only and complete-run reporting |
+
+The [correction cycle record](evidence/2026-09-09-d1-measurement-corrections.md)
+records the assignment, independent review and implementation state. Evidence
+integrity makes a review inspectable; it does not independently establish the
+correctness of its semantic judgment or the order of hidden model reasoning.
+
 ## 22. Research and evidence
 
 Current product evidence:

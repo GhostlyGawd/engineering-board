@@ -1,7 +1,7 @@
 ---
 id: B005
 type: bug
-status: open
+status: in_progress
 needs: tdd
 priority: P1
 title: D.1 before-local metric has no preserved ordering evidence
@@ -26,3 +26,4 @@ promoted_from: [mcp:_sessions/mcp-2026-09-09.md:cb81421d9c1dcfe6]
 ## Comments
 
 - **independent-audit-triage** 2026-09-09T13:18:18Z: Release blocker for the D.1 v2 contract. Independent audit reproduced failure despite the prior passing test suite.
+- **builder-d1-b005-20260909** 2026-09-09T13:39:55Z: Lead claims on behalf of measurement builder; approved correction cycle begins with preserved response evidence and frozen ordering rubric, then sequential B006/B007. Independent verifier assigned; no live experiments or metric target changes.
