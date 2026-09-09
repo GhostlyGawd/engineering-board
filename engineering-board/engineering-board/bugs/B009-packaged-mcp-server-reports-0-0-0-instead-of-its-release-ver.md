@@ -27,3 +27,7 @@ parent: F005
 ## Accepted scope and verification
 
 Release identity blocker. Keep authoritative source/installed-plugin manifest precedence; use owned bundle manifest or installed Python distribution metadata when the plugin manifest is absent, with conservative unknown-version fallback. Verify actual standalone-bundle and installed-wheel initialize versions against their manifest/metadata, plus source precedence, invalid/missing metadata and legacy reader invariance. Lead claim release-runtime-identity-20260909 owns the bounded follow-up builder assignment; no version target change or publication until reviewed and refreshed checksum matches.
+
+## Comments
+
+- **lead-hypothesis-details-20260909** 2026-09-09T16:12:38Z: Independent review at39aa5f6 reproduced an uncaught Path.resolve RuntimeError for a self-referential symlink row in owning distribution RECORD on Python3.9.6. Builder correcting conservative fallback and adding real/forced resolution-failure regression, testing3.9 and3.14. Actual installed-wheel bytes match reviewed source and two H read workflows pass version1.14.0; deliberately wrong expected-version exits1 with retained receipt. Publication remains held.
