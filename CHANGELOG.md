@@ -9,6 +9,8 @@ increases.
 
 ## [Unreleased]
 
+## [1.13.5] — 2026-09-09
+
 ### Fixed
 
 - The evaluation harness now accepts the root-owned macOS `/var` and `/tmp`
