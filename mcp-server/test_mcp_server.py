@@ -835,6 +835,202 @@ def suite_read_only_side_effects(mod):
         shutil.rmtree(root, ignore_errors=True)
 
 
+def suite_hypothesis_details(mod):
+    """Retrieve H memory, then read validated full detail without side effects."""
+    print("\n== Suite: read-only hypothesis details ==")
+    with tempfile.TemporaryDirectory(prefix="eb-mcp-h-details-") as root:
+        project = "details"
+        mod.tool_board_init({"project": project, "root": root,
+                             "agents_md": False})
+        board = Path(root) / "engineering-board" / project
+        for kind, prefix, subdir in (
+            ("bug", "B", "bugs"), ("feature", "F", "features"),
+            ("question", "Q", "questions"),
+            ("observation", "O", "observations"),
+            ("learning", "L", "learnings"),
+        ):
+            entry_id = prefix + "001"
+            markdown = ("---\nid: %s\ntype: %s\nstatus: open\n"
+                        "title: Detail fixture\naffects: src/read.py\n"
+                        "discovered: 2026-09-09\nconfidence: low\n---\n"
+                        "\n## Evidence\n\nPreserve this full body.\n" %
+                        (entry_id, kind))
+            path = board / subdir / (entry_id + "-detail.md")
+            path.write_text(markdown, encoding="utf-8")
+        cluster = mod.tool_board_insights({"project": project, "root": root})[
+            "ranked_clusters"][0]
+        preview = mod.tool_board_hypotheses({
+            "project": project, "root": root, "action": "propose",
+            "cluster_fingerprint": cluster["cluster_fingerprint"],
+            "claim_key": "shared-reader-boundary", "title": "Reader boundary",
+            "root_cause": "A shared reader boundary drops evidence.",
+            "supporting_evidence": [
+                {"id": entry_id, "reason": "The same reader loses evidence."}
+                for entry_id in cluster["members"]
+            ],
+            "alternatives": ["Independent defects produce similar symptoms."],
+            "counter_evidence": ["A separate reader preserves all evidence."],
+            "confidence": "medium", "confidence_basis": "A shared path only.",
+            "falsifier": "Independent readers reproduce the same losses.",
+            "actor": "hypothesis-detail-fixture",
+        })
+        mod.tool_board_hypotheses({"project": project, "root": root,
+                                   "apply": preview["plan_token"]})
+        path = next((board / "hypotheses").glob("H*.md"))
+        original = path.read_text(encoding="utf-8")
+        mod.tool_board_graph({"project": project, "root": root, "full": True})
+
+        def call(name, **arguments):
+            return mod.dispatch("tools/call", {"name": name, "arguments": {
+                "project": project, "root": root, **arguments}})
+
+        def read_error(entry_id, expected):
+            baseline = _tree_snapshot(root)
+            result = call("board_get_entry", entry_id=entry_id)
+            check(result["isError"] and expected in result["content"][0]["text"],
+                  "H detail rejects %s" % expected, json.dumps(result))
+            check(_tree_snapshot(root) == baseline,
+                  "failed H detail preserves paths and bytes: %s" % expected)
+
+        # One live server exercises the public transport, including discovery.
+        env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+        proc = subprocess.Popen([sys.executable, SERVER_PATH], cwd=root, env=env,
+                                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, text=True)
+        sequence = 0
+
+        def rpc(method, params):
+            nonlocal sequence
+            sequence += 1
+            proc.stdin.write(json.dumps({"jsonrpc": "2.0", "id": sequence,
+                                         "method": method, "params": params}) + "\n")
+            proc.stdin.flush()
+            response = json.loads(proc.stdout.readline())
+            check(response.get("id") == sequence, "detail stdio response id")
+            return response["result"]
+
+        try:
+            rpc("initialize", {"protocolVersion": "2025-06-18", "capabilities": {}})
+            listed = {tool["name"]: tool for tool in rpc("tools/list", {})["tools"]}
+            # Check behavior before wording so the original regression is explicit.
+            for status in ("proposed", "confirmed", "weakened", "rejected",
+                           "split", "merged"):
+                markdown = original.replace("status: proposed", "status: " + status)
+                path.write_text(markdown, encoding="utf-8")
+                baseline = _tree_snapshot(root)
+                context_args = {"project": project, "root": root,
+                                "files": ["src/read.py"], "task": "Reader boundary"}
+                context = rpc("tools/call", {"name": "board_context",
+                                             "arguments": context_args})
+                check(context["isError"] is False, "stdio H context: " + status,
+                      json.dumps(context))
+                context_payload = json.loads(context["content"][0]["text"])
+                memory = next(item for item in context_payload["results"]
+                              if item["id"] == "H001")
+                args = {"project": project, "root": root, "entry_id": memory["id"]}
+                result = rpc("tools/call", {"name": "board_get_entry", "arguments": args})
+                check(result["isError"] is False, "stdio retrieved H detail: " + status,
+                      json.dumps(result))
+                detail = json.loads(result["content"][0]["text"])
+                check(set(detail) == {"id", "project", "file", "frontmatter", "markdown"}
+                      and detail["id"] == "H001" and detail["project"] == project
+                      and detail["file"] == str(path.relative_to(root))
+                      and detail["frontmatter"]["status"] == status
+                      and detail["frontmatter"]["derived_from"] == cluster["members"]
+                      and detail["markdown"] == markdown,
+                      "H detail preserves full canonical content and status: " + status)
+                check(call("board_get_entry", entry_id="H001") == result,
+                      "dispatcher and stdio H details agree: " + status)
+                check(rpc("tools/call", {"name": "board_context", "arguments": context_args})
+                      == context, "H detail preserves context payload and token: " + status)
+                check(_tree_snapshot(root) == baseline,
+                      "retrieve-to-detail preserves board/cache/runtime bytes: " + status)
+            check("H###" in listed["board_get_entry"]["description"]
+                  and "board_get_entry" in listed["board_context"]["description"],
+                  "public tool descriptions expose H detail route")
+            baseline = _tree_snapshot(root)
+            missing = rpc("tools/call", {"name": "board_get_entry", "arguments": {
+                "project": project, "root": root, "entry_id": "H999"}})
+            check(missing["isError"] and "not found" in missing["content"][0]["text"],
+                  "stdio missing H returns a tool error")
+            check(_tree_snapshot(root) == baseline, "stdio failed H read preserves bytes")
+        finally:
+            proc.stdin.close()
+            proc.wait(timeout=5)
+
+        path.write_text(original, encoding="utf-8")
+        baseline = _tree_snapshot(root)
+        update = call("board_update_entry", entry_id="H001", status="resolved")
+        check(update["isError"] and "not found" in update["content"][0]["text"],
+              "H detail does not enable generic entry mutation")
+        listed_entries = json.loads(call("board_list_entries")["content"][0]["text"])
+        check({entry["id"] for entry in listed_entries["entries"]}
+              == {"B001", "F001", "Q001", "O001", "L001"},
+              "H detail preserves generic entry listing scope")
+        check(_tree_snapshot(root) == baseline,
+              "generic H update rejection and list preserve bytes")
+        read_error("H999", "not found")
+        for invalid in ("H1", "H001/../../B001", "H001\n", "H../secret"):
+            read_error(invalid, "invalid hypothesis id")
+        for old, new, expected in (
+            ("type: hypothesis", "type: bug", "type must be"),
+            ("status: proposed", "status: open", "invalid hypothesis status"),
+            ("derived_from:", "missing_derived_from:", "missing required hypothesis field"),
+            ("## Falsifier", "## Missing falsifier", "missing required section"),
+            ("claim_fingerprint: h-", "claim_fingerprint: x-", "invalid claim_fingerprint"),
+        ):
+            path.write_text(original.replace(old, new), encoding="utf-8")
+            read_error("H001", expected)
+        path.write_text(original, encoding="utf-8")
+        duplicate = path.with_name("H001-duplicate.md")
+        duplicate.write_text(original, encoding="utf-8")
+        read_error("H001", "duplicate hypothesis id")
+        duplicate.unlink()
+        duplicate.write_text(original.replace("id: H001", "id: H002"), encoding="utf-8")
+        read_error("H001", "duplicate hypothesis claim fingerprint")
+        duplicate.unlink()
+
+        with tempfile.TemporaryDirectory(prefix="eb-h-detail-external-") as external:
+            outside = Path(external) / "H001-outside.md"
+            outside.write_text(original, encoding="utf-8")
+            path.unlink()
+            for target in (outside, board / "bugs" / "B001-detail.md"):
+                path.symlink_to(target)
+                read_error("H001", "linked hypothesis record")
+                path.unlink()
+            hypotheses = board / "hypotheses"
+            saved_hypotheses = board / "saved-hypotheses"
+            hypotheses.rename(saved_hypotheses)
+            hypotheses.symlink_to(external, target_is_directory=True)
+            read_error("H001", "linked canonical directory")
+            hypotheses.unlink()
+            saved_hypotheses.rename(hypotheses)
+            path.write_text(original, encoding="utf-8")
+            router = Path(root) / "engineering-board" / "BOARD-ROUTER.md"
+            router_text = router.read_text(encoding="utf-8")
+            router.write_text(router_text.replace("engineering-board/details", external),
+                              encoding="utf-8")
+            read_error("H001", "escapes root")
+            router.write_text(router_text, encoding="utf-8")
+
+        # Corrupt H memory must not interfere with the legacy read contracts.
+        path.write_text("malformed hypothesis\n", encoding="utf-8")
+        baseline = _tree_snapshot(root)
+        for prefix, subdir in (("B", "bugs"), ("F", "features"), ("Q", "questions"),
+                               ("O", "observations"), ("L", "learnings")):
+            entry_id = prefix + "001"
+            legacy_path = board / subdir / (entry_id + "-detail.md")
+            result = call("board_get_entry", entry_id=entry_id)
+            check(result["isError"] is False, "legacy detail succeeds: " + prefix)
+            detail = json.loads(result["content"][0]["text"])
+            markdown = legacy_path.read_text(encoding="utf-8")
+            check(detail == {"id": entry_id, "project": project,
+                             "file": str(legacy_path.relative_to(root)),
+                             "frontmatter": mod.parse_frontmatter(markdown)[0],
+                             "markdown": markdown}, "legacy detail contract: " + prefix)
+        check(_tree_snapshot(root) == baseline, "legacy details preserve all bytes")
+
+
 # ---------------------------------------------------------------------------
 # Suite: token-only apply parity
 # ---------------------------------------------------------------------------
@@ -1448,6 +1644,7 @@ def main():
         suite_stdio(tmp1)
         suite_lifecycle(mod, tmp2)
         suite_read_only_side_effects(mod)
+        suite_hypothesis_details(mod)
         suite_token_only_apply(mod)
         suite_ready(mod)
         suite_remember(mod)
