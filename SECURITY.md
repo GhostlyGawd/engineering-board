@@ -28,7 +28,7 @@ Security corrections apply to the current minor release.
 
 | Version | Support |
 |---|---|
-| Current minor release, 1.13.x | Supported |
+| Current minor release, 1.14.x | Supported |
 | Earlier releases | Not supported |
 
 Install the latest release to receive a security correction.

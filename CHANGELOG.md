@@ -9,6 +9,8 @@ increases.
 
 ## [Unreleased]
 
+## [1.14.0] — 2026-09-09
+
 ### Added
 
 - `board_get_entry` can read full canonical H### hypotheses from context

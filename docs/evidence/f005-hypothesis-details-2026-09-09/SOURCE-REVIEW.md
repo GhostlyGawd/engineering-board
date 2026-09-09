@@ -68,3 +68,14 @@ verification. A separate dated release record will identify those results.
 Agent cost and isolated engineering effort were not measured. This feature
 makes full hypothesis evidence reachable; it does not establish better
 diagnoses, time saved or a historical D.1 pass.
+
+## Prepared release gates
+
+`scripts/prepare-release.py 1.14.0` preview and apply produced the same twelve
+coordinated version surfaces and bundle SHA-256:
+`d506f1348a6248f3a9cf6583468122e49e0fb07c4e64328d0b80fec68be9a782`.
+The prepared tree passed all 22 suites and `claude plugin validate --strict .`
+without warnings. Its retained two-case transport receipt is
+`prepared-1.14.0-smoke.json`. Publication and actual installed-host receipts are
+still separate gates; the prepared marketplace ref must not be installed before
+the release workflow creates its tag.
