@@ -30,3 +30,14 @@ systemic answer.
 Cite only the supplied case evidence identifiers. Return one JSON object that
 conforms to `evaluation/memory-evaluation-response.schema.json`. Do not add
 Markdown or other text.
+
+Emit `memory_evaluation` before `first_proposed_correction`, and emit
+`first_proposed_correction` before `final_diagnosis`. The evaluator retains the
+exact response and measures this observable structured-field order. It does
+not infer when you internally considered a cause or correction. Never repeat
+a JSON object key.
+
+A correction proposed in any field, including the evaluation's
+`evidence_or_gap` or `first_stated_cause`, counts as a correction. A reviewer
+identifies its earliest occurrence in the retained response; the dedicated
+field order alone does not establish that evaluation happened first.
