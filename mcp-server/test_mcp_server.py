@@ -1505,8 +1505,9 @@ with patch.object(Path, "resolve", resolve):
                                     capture_output=True, text=True, timeout=10)
             check(result.returncode == 0, label + " starts", result.stderr)
             response = json.loads(result.stdout)
-            check(response["result"]["serverInfo"]["version"] == expected,
-                  label + " reports owned version", result.stdout)
+            expected_versions = expected if isinstance(expected, tuple) else (expected,)
+            check(response["result"]["serverInfo"]["version"] in expected_versions,
+                  label + " reports expected version", result.stdout)
 
         expected = json.loads((source / ".claude-plugin" / "plugin.json").read_text())["version"]
         handshake(unpacked / "mcp-server" / "engineering_board_mcp.py", expected,
@@ -1538,14 +1539,11 @@ with patch.object(Path, "resolve", resolve):
         cycle = package / "cycle"
         cycle.symlink_to("cycle")
         record.write_text("cycle,,\nengineering_board_mcp.py,,\n")
-        # Older pathlib raises RuntimeError; newer non-strict resolve can
-        # return the unresolved path and continue to the actual module owner.
-        try:
-            cycle.resolve()
-            cycle_version = "7.8.9"
-        except (OSError, RuntimeError):
-            cycle_version = "0.0.0"
-        handshake(server, cycle_version, "RECORD symlink cycle", package)
+        # metadata.files may filter the cyclic row before ownership resolution;
+        # otherwise pathlib may raise or leave it unresolved. A real owner is
+        # present, so only its version or the conservative unknown fallback is
+        # valid. The forced error below independently requires that fallback.
+        handshake(server, ("7.8.9", "0.0.0"), "RECORD symlink cycle", package)
         handshake(server, "0.0.0", "ownership resolution RuntimeError", package,
                   resolve_error=True)
         cycle.unlink()
