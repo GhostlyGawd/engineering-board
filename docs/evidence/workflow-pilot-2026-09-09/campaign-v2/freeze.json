@@ -1,0 +1,9 @@
+{
+  "acceptance_review_sha256": "0bac0caf12364a430954a8cacce7c68366b121473d1f773a080fc4648f2e1682",
+  "frozen_at": "2026-09-09T15:11:47.325918+00:00",
+  "manifest_sha256": "977a6fba9682798a48934ef9d32c359a0ec7598a9fa0ba0bf9a6151390335bf4",
+  "retention_owner": "Rhen McLeod / GhostlyGawd engineering-board repository",
+  "reviewer": "review_workflow_protocol",
+  "runner_sha256": "7b4aab4029c447bd708d4df4878e487225e40e81392ec7861ad696be28d5fe60",
+  "source_commit": "3f256bf5949fdfaee39fb699181bc7b5497a7048"
+}
