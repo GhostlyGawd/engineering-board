@@ -71,14 +71,47 @@ PLUGIN_ROOT = os.path.dirname(SCRIPT_DIR)  # repo root (mcp-server/..)
 
 
 def _plugin_version():
-    """Read the version from the plugin manifest so the server always reports
-    the same version as the plugin (single source of truth; the two manifests
-    are already coherence-checked by tests/version-coherence.sh)."""
+    """Read source, bundle, then owning installed-distribution metadata."""
+    def valid_version(value):
+        return (isinstance(value, str)
+                and re.fullmatch(r"[0-9]+(?:\.[0-9]+)+(?:[A-Za-z0-9.+-]*)", value))
+
+    for relative, expected_name in (
+        (".claude-plugin/plugin.json", None),
+        ("manifest.json", SERVER_NAME),
+    ):
+        try:
+            with open(os.path.join(PLUGIN_ROOT, relative), encoding="utf-8") as f:
+                manifest = json.load(f)
+            if not isinstance(manifest, dict):
+                continue
+            if expected_name is not None and manifest.get("name") != expected_name:
+                continue
+            version = manifest.get("version")
+            if valid_version(version):
+                return version
+        except (OSError, ValueError):
+            continue
+
+    # A copied standalone module must not borrow the version of a different
+    # installation merely because its metadata is visible on sys.path.
+    from importlib import metadata
+
     try:
-        with open(os.path.join(PLUGIN_ROOT, ".claude-plugin", "plugin.json")) as f:
-            return json.load(f).get("version", "0.0.0")
-    except (OSError, ValueError):
-        return "0.0.0"
+        distribution = metadata.distribution("engineering-board-mcp")
+        name = distribution.metadata.get("Name", "")
+        if re.sub(r"[-_.]+", "-", name).lower() != "engineering-board-mcp":
+            return "0.0.0"
+        module_path = Path(__file__).resolve()
+        owns_module = any(
+            Path(distribution.locate_file(item)).resolve() == module_path
+            for item in (distribution.files or [])
+        )
+        if owns_module and valid_version(distribution.version):
+            return distribution.version
+    except (metadata.PackageNotFoundError, OSError, ValueError, TypeError):
+        pass
+    return "0.0.0"
 
 
 SERVER_VERSION = _plugin_version()

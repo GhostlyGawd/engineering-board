@@ -29,6 +29,7 @@ import shutil
 import tempfile
 import subprocess
 import importlib.util
+import zipfile
 from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -1458,6 +1459,99 @@ def suite_agents_md(mod):
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+def suite_runtime_version():
+    """Installed transports report the version of their own distribution."""
+    print("\n== Suite: installed runtime version ==")
+    with tempfile.TemporaryDirectory(prefix="eb-runtime-version-") as temporary:
+        root = Path(temporary)
+        source = root / "source"
+        (source / "mcp-server").mkdir(parents=True)
+        (source / ".claude-plugin").mkdir()
+        for filename in ("engineering_board_mcp.py", "engineering_board_core.py",
+                         "README.md", "manifest.json", "server.json", "build-mcpb.sh"):
+            shutil.copy2(Path(HERE) / filename, source / "mcp-server" / filename)
+        shutil.copy2(Path(PLUGIN_ROOT) / ".claude-plugin" / "plugin.json",
+                     source / ".claude-plugin" / "plugin.json")
+        shutil.copy2(Path(PLUGIN_ROOT) / "LICENSE", source / "LICENSE")
+        built = subprocess.run(["bash", str(source / "mcp-server" / "build-mcpb.sh")],
+                               capture_output=True, text=True, timeout=30)
+        check(built.returncode == 0, "runtime fixture builds the actual MCP bundle",
+              built.stdout + built.stderr)
+        unpacked = root / "unpacked"
+        with zipfile.ZipFile(source / "dist" / "engineering-board-mcp.mcpb") as bundle:
+            bundle.extractall(unpacked)
+
+        def handshake(server, expected, label, metadata_path=None):
+            env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1",
+                       PYTHONPATH=str(metadata_path) if metadata_path else "")
+            request = {"jsonrpc": "2.0", "id": 1, "method": "initialize",
+                       "params": {"protocolVersion": "2025-06-18", "capabilities": {}}}
+            result = subprocess.run([sys.executable, "-S", str(server)], cwd=root,
+                                    env=env, input=json.dumps(request) + "\n",
+                                    capture_output=True, text=True, timeout=10)
+            check(result.returncode == 0, label + " starts", result.stderr)
+            response = json.loads(result.stdout)
+            check(response["result"]["serverInfo"]["version"] == expected,
+                  label + " reports owned version", result.stdout)
+
+        expected = json.loads((source / ".claude-plugin" / "plugin.json").read_text())["version"]
+        handshake(unpacked / "mcp-server" / "engineering_board_mcp.py", expected,
+                  "actual unpacked bundle")
+
+        fixture = root / "fixture"
+        package = fixture / "site-packages"
+        package.mkdir(parents=True)
+        for filename in ("engineering_board_mcp.py", "engineering_board_core.py"):
+            shutil.copy2(Path(HERE) / filename, package / filename)
+        server = package / "engineering_board_mcp.py"
+        plugin_dir = fixture / ".claude-plugin"
+        plugin_dir.mkdir()
+        plugin = plugin_dir / "plugin.json"
+        manifest = fixture / "manifest.json"
+        dist = package / "engineering_board_mcp-7.8.9.dist-info"
+        dist.mkdir()
+        metadata = dist / "METADATA"
+        metadata.write_text("Metadata-Version: 2.1\nName: engineering-board-mcp\nVersion: 7.8.9\n")
+        record = dist / "RECORD"
+        record.write_text("engineering_board_mcp.py,,\nengineering_board_core.py,,\n")
+        manifest.write_text(json.dumps({"name": "engineering-board", "version": "4.5.6"}))
+        plugin.write_text(json.dumps({"name": "engineering-board", "version": "1.2.3"}))
+        handshake(server, "1.2.3", "source takes precedence", package)
+        plugin.unlink()
+        handshake(server, "4.5.6", "bundle takes precedence over installed metadata", package)
+        manifest.unlink()
+        handshake(server, "7.8.9", "installed distribution metadata", package)
+        for malformed in ("{", "[]", '{"version": null}', '{"version": ""}',
+                          '{"version": {}}', '{"version": "not-a-version"}'):
+            plugin.write_text(malformed)
+            manifest.write_text(malformed)
+            handshake(server, "7.8.9", "invalid manifests fall back to owned metadata", package)
+        plugin.unlink()
+        manifest.write_text(json.dumps({"name": "another-project", "version": "9.9.9"}))
+        handshake(server, "7.8.9", "unrelated bundle manifest is ignored", package)
+        manifest.unlink()
+        record.unlink()
+        handshake(server, "0.0.0", "metadata without module ownership", package)
+        record.write_text("another_module.py,,\n")
+        handshake(server, "0.0.0", "metadata for another module", package)
+        record.write_text("engineering_board_mcp.py,,\n")
+        for invalid_version in ("", "not-a-version"):
+            metadata.write_text("Metadata-Version: 2.1\nName: engineering-board-mcp\n"
+                                "Version: " + invalid_version + "\n")
+            handshake(server, "0.0.0", "invalid installed version", package)
+        metadata.write_text("Metadata-Version: 2.1\nName: unrelated\nVersion: 7.8.9\n")
+        handshake(server, "0.0.0", "unrelated installed identity", package)
+        metadata.write_text("Metadata-Version: 2.1\nName: engineering-board-mcp\nVersion: 7.8.9\n")
+        copied = root / "standalone"
+        copied.mkdir()
+        for filename in ("engineering_board_mcp.py", "engineering_board_core.py"):
+            shutil.copy2(package / filename, copied / filename)
+        handshake(copied / "engineering_board_mcp.py", "0.0.0",
+                  "standalone module ignores another installed distribution", package)
+        shutil.rmtree(dist)
+        handshake(server, "0.0.0", "missing version sources", package)
+
+
 def suite_distribution():
     """Validate the distribution manifests so they cannot silently rot.
 
@@ -1651,6 +1745,7 @@ def main():
         suite_comments_parent(mod)
         suite_agents_md(mod)
         suite_multiclient()
+        suite_runtime_version()
         # Distribution runs LAST: its fileSha256 pin intentionally trips on any
         # server/hooks-script change until the release coherence pass re-pins
         # via build-mcpb.sh — running it last keeps that expected drift from
