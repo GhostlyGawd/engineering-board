@@ -2944,17 +2944,18 @@ without a Learning line.
 ### 21.16 Memory evaluation before local correction
 
 _State: additive contract selected from Q001 after the Q003 presentation
-diagnostic; implementation reopened following the independent 2026-09-09 audit
-(engineering-board/F002, B004-B007). Live evaluation and release readiness are
-on hold. Historical response schema version 1 and frozen evidence remain
-unchanged._
+diagnostic. Independent corrections for engineering-board/B004-B007 now pass
+source review. Live evaluation and release/installation evidence remain
+separate follow-up work. Historical response schema version 1 and frozen
+evidence remain unchanged._
 
 D.1 measures explicit use of surfaced memory before it rewards adoption of a
 systemic cause. A version-2 context response identifies the selected memory
 and its epistemic status, names the current and prior incidents, chooses
 `apply`, `hold`, or `reject`, and states the supporting evidence or information
-gap before the first local correction. `Hold` is a successful memory-use
-decision when the prompt lacks enough evidence to adopt a proposed cause.
+gap before the first local correction. `Hold` can be an appropriate memory-use
+decision when the prompt lacks enough evidence to adopt a proposed cause; its
+semantic quality is evaluated by the reviewer rather than inferred from the label.
 
 The harness reports `memory_evaluation_before_local` separately from
 `systemic_before_local`. The existing systemic-first-cause rate remains a
@@ -2963,15 +2964,15 @@ product-effect gates or silently promote H### state.
 
 | ID | Product requirement | Verification |
 |---|---|---|
-| MEV-REQ-001 | Version-2 responses shall record memory id, status, current incidents, prior incidents, disposition, and evidence or gap. | Response-schema field and enum assertions |
+| MEV-REQ-001 | Version-2 responses with surfaced memory shall record memory id, status, current incidents, prior incidents, disposition, and evidence or gap. Absent memory uses null evaluation. | Response-schema field, enum and absent-memory assertions |
 | MEV-REQ-002 | The recorder shall reject a memory id or status that differs from the surfaced context brief. | Attempt validation tests |
 | MEV-REQ-003 | Version-4 positive cases shall bind current and prior incident ids to the scoring-only information boundary. | Boundary validation tests |
 | MEV-REQ-004 | The report shall expose eligible context arms, before-local successes, and rate without changing existing gates. | Mixed version-1/version-2 score test |
 | MEV-REQ-005 | A local correction may follow an explicit hold or reject without promoting a proposed hypothesis. | Operator contract and response schema |
 
-The 2026-09-09 independent audit requires the following corrections before a
-new measured v2 run. These preserve the existing memory-use target and do not
-change any historical product-effect threshold.
+The 2026-09-09 independent audit required the following corrections before a
+new measured v2 run. The reviewed implementation preserves the existing
+memory-use target and does not change any historical product-effect threshold.
 
 | ID | Correction requirement | Verification |
 |---|---|---|

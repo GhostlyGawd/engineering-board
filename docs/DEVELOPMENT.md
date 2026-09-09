@@ -123,4 +123,7 @@ owner decision. The first trial's evidence determines the next live evaluation.
 
 The [first independent audit](evidence/2026-09-09-development-team-pilot.md)
 found release blockers B004-B007. F002 was reopened; v2 live evaluation and
-release-readiness claims are held until those findings are addressed.
+release-readiness claims were held until those findings were addressed. The
+[correction cycle](evidence/2026-09-09-d1-measurement-corrections.md) records
+their independent source verification. A retained-evidence live pilot and
+release verification remain separate follow-up work.

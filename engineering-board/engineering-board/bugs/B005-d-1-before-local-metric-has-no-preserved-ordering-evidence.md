@@ -1,7 +1,7 @@
 ---
 id: B005
 type: bug
-status: open
+status: resolved
 needs: validate
 priority: P1
 title: D.1 before-local metric has no preserved ordering evidence
@@ -34,3 +34,9 @@ promoted_from: [mcp:_sessions/mcp-2026-09-09.md:cb81421d9c1dcfe6]
 ## Independent reverification
 
 /root/verify_measurement passed 782594a59955d844c937af37191658320189a1f5. Record/score probes reject numeric and nonfinite JSON in place of bool; no-local response remains retained, null ordering rate and zero success; contradictory no-local declarations reject. Mixed healthy success plus no-local stays unavailable. Semantic correction selection remains attributed reviewer judgment.
+
+## Final source acceptance
+
+Retained exact raw responses, checksums, frozen rubric and named semantic reviewer spans now support ordering classifications. Legacy bare flags never count; invalid binding, duplicate keys, numeric/bool substitution and overlapping/early corrections are tested. No-local correction remains unavailable. Independent final pass at 72ebeea; integrated 21 suites/39 evaluation tests pass.
+
+Evidence: docs/evidence/2026-09-09-d1-measurement-corrections.md. Live pilot and release decision are separate F004 follow-up; no product-effect claim.

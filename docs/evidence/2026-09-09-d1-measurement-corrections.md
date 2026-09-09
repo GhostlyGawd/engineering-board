@@ -122,7 +122,7 @@ two findings from the first review without claiming automatic semantic judgment.
 
 ## Combined builder handoff
 
-Final builder revision: `51d4fb7cec619d2287bc2649f5e1c7f80f285253`.
+Initial combined handoff revision: `51d4fb7cec619d2287bc2649f5e1c7f80f285253`.
 The evaluation suite passed 37 tests; final targeted missing-negative and legacy
 manifest checks passed. The complete repository suite passed 21 of 21 suites
 at this revision. These are deterministic implementation checks, not measured
@@ -148,3 +148,49 @@ cohort as complete and reported 100%. Comparing two lists from the same mutable
 manifest did not bind the entire predeclared population. The lead returned
 B007 to implementation for a complete input-inventory check and a permanent
 regression. No live evidence was produced or reclassified.
+
+## Final independent verdict
+
+The verifier passed the combined correction set at
+`72ebeeaf6889e5d441781ead23e780e858abaac6`. It repeated the actual 11/12
+cohort-omission reproduction and separately removed a negative control. Both
+scoring and single-trial loading reject each alteration against the retained
+workspace cohort. The intact run stays 11/12 (91.67%). Inputs missing from a
+retained directory, redirected paths and links are covered by regression tests.
+
+The earlier independent combined matrix also passed: missing negative,
+mixed baseline/negative versions, unreviewed positive, no-local positive and
+invalid-response-digest variants kept the planned denominator at 12 and left
+interpretation unavailable. An unsafe negative response retained its observed
+ordering rate but failed v2 safeguards and interpretation readiness. Per-case
+counts equaled the aggregate throughout. The builder's corrected evaluation
+suite passed 39 tests. The final complete repository suite is recorded at
+integration closeout below.
+
+This satisfies B005-B007 source acceptance when combined with the earlier B004
+verification. It does not authenticate an actor who replaces all evidence
+copies, prove a reviewer's semantic judgment correct, prove cognitive order,
+or demonstrate live product effect. Retained inputs make the planned cohort
+independently inspectable against the manifest; reviewer evidence makes an
+ordering judgment inspectable against the response.
+
+## Integration closeout
+
+The lead integrated the complete reviewed history through final builder
+revision `72ebeeaf6889e5d441781ead23e780e858abaac6`. The integrated
+`bash tests/run-all.sh` passed 21 of 21 suites, including 39 evaluation tests
+in 43.597 seconds. Documentation review passed subject to three clarity edits
+incorporated here: distinguish initial/final handoffs, record integration
+verification, and qualify the surfaced-memory requirement for null controls.
+
+B005-B007 and F002 are source-complete with independent review evidence. F004
+tracks the retained-evidence non-scored live pilot and release decision. No
+live result, corpus lock, new success threshold, publication or installed-copy
+verification occurred in this correction cycle. Installation verification is
+part of any future release under docs/RELEASING.md.
+
+The cycle exercised one builder and one independent verifier. The lead changed
+the proposed field-order shortcut before acceptance, and the verifier returned
+two concrete B005 issues and one B007 cohort omission for correction. All were
+rechecked at pinned revisions before source acceptance. Agent cost and user
+productivity effect were not measured.
