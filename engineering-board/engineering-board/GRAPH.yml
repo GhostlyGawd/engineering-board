@@ -1,50 +1,30 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-09-09T00:04:32Z",
-  "source_fingerprint": "7a6e97350c150d6857ae122ca40b7b60479adb840783296b3cb8a24463d185bc",
+  "generated_at": "2026-09-09T05:07:44Z",
+  "source_fingerprint": "4ef042d8e17a39d5a02ae4647d279f241ed1bd088ba4c12be4d53795494cd801",
   "build_mode": "full",
   "project": "engineering-board",
   "entries_analyzed": {
-    "open": 3,
+    "open": 1,
     "archived": 0,
-    "total": 3
+    "total": 1
   },
   "nodes": {
-    "B001": {
-      "type": "bug",
-      "title": "Evaluation harness rejects macOS system temp paths",
-      "source": "bugs/B001-evaluation-harness-rejects-macos-system-temp-paths.md",
-      "priority": "P1",
-      "status": "open",
-      "affects": "evaluation/harness.py",
-      "discovered": "2026-09-08"
-    },
-    "B002": {
-      "type": "bug",
-      "title": "Token-only pattern and hypothesis apply falls through to list",
-      "source": "bugs/B002-token-only-pattern-and-hypothesis-apply-falls-through-to-lis.md",
+    "F002": {
+      "type": "feature",
+      "title": "Score explicit memory evaluation before local correction in D.1",
+      "source": "features/F002-score-explicit-memory-evaluation-before-local-correction-in-.md",
       "priority": "P2",
       "status": "open",
-      "affects": "mcp-server/engineering_board_mcp.py",
+      "affects": "evaluation/harness.py",
       "discovered": "2026-09-09"
-    },
-    "F001": {
-      "type": "feature",
-      "title": "Add exhaustive Codex dogfood capability matrix",
-      "source": "features/F001-add-exhaustive-codex-dogfood-capability-matrix.md",
-      "priority": "P1",
-      "status": "open",
-      "affects": "tests/codex-plugin.sh",
-      "discovered": "2026-09-08"
     }
   },
   "edges": [],
   "topology": {
     "clusters": [],
     "isolated": [
-      "B001",
-      "B002",
-      "F001"
+      "F002"
     ],
     "cross_cluster_bridges": []
   },
@@ -52,21 +32,11 @@
   "findings": [
     {
       "type": "isolated-node",
-      "node": "B001"
-    },
-    {
-      "type": "isolated-node",
-      "node": "B002"
-    },
-    {
-      "type": "isolated-node",
-      "node": "F001"
+      "node": "F002"
     }
   ],
   "read_order": [
-    "B001",
-    "B002",
-    "F001"
+    "F002"
   ],
   "drill_in": {}
 }

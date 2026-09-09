@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT))
 from evaluation.harness import (  # noqa: E402
     EvaluationError,
     _reject_linked_path,
+    _validate_attempt,
     build_context_evidence,
     load_run,
     prepare_run,
@@ -347,6 +348,123 @@ class EvaluationHarnessTests(unittest.TestCase):
         self.assertIsNotNone(re.fullmatch(pattern, "E-D1-C01"))
         self.assertIsNotNone(re.fullmatch(pattern, "E-D1-V4-C01"))
         self.assertIsNone(re.fullmatch(pattern, "E-D1-V4-01"))
+
+    def test_memory_evaluation_schema_requires_explicit_disposition(self) -> None:
+        schema = json.loads(
+            (ROOT / "evaluation" / "memory-evaluation-response.schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        required = schema["properties"]["memory_evaluation"]["required"]
+        self.assertEqual(
+            set(required),
+            {
+                "memory_id",
+                "memory_status",
+                "current_incident_ids",
+                "prior_incident_ids",
+                "disposition",
+                "evidence_or_gap",
+            },
+        )
+        self.assertEqual(
+            schema["properties"]["memory_evaluation"]["properties"]["disposition"]["enum"],
+            ["apply", "hold", "reject"],
+        )
+
+    def test_v2_memory_evaluation_is_reported_separately(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-memory-use-") as temp:
+            run_dir = self.prepare(Path(temp))
+            manifest = load_run(run_dir)
+            cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+            trial = next(
+                item
+                for item in manifest["trials"]
+                if item["arm"] == "context"
+                and item["category"] in POSITIVE_CATEGORIES
+            )
+            case = cases[trial["case_id"]]
+            expected = case["expected_relevant_memory"]
+            surfaced = next(
+                item for item in trial["context_brief"]["results"] if item["id"] == expected
+            )
+            overrides = {
+                trial["trial_key"]: {
+                    "schema_version": "2",
+                    "memory_evaluation_before_local": True,
+                    "memory_evaluation": {
+                        "memory_id": expected,
+                        "memory_status": surfaced["status"],
+                        "current_incident_ids": ["B001"],
+                        "prior_incident_ids": ["B002"],
+                        "disposition": "hold",
+                        "evidence_or_gap": "The prior incident is not visible in case evidence.",
+                    },
+                }
+            }
+            self.record_complete_run(run_dir, overrides)
+            score = score_run(run_dir)
+            self.assertEqual(
+                score["memory_evaluation"],
+                {
+                    "eligible_context_arms": 1,
+                    "evaluated_before_local": 1,
+                    "rate_percent": 100.0,
+                    "changes_product_effect_gates": False,
+                },
+            )
+            self.assertTrue(score["overall_pass"])
+
+    def test_v2_memory_evaluation_binds_v4_incidents_and_status(self) -> None:
+        case = next(
+            item
+            for item in json.loads(self.proposal_corpus_path.read_text())["cases"]
+            if item["id"] == "D1-V4-C04"
+        )
+        brief = {
+            "context_fingerprint": "ctx-0000000000000000",
+            "results": [{"id": "H104", "status": "proposed"}],
+        }
+        trial = {"arm": "context", "context_brief": brief}
+        attempt = {
+            "schema_version": "2",
+            "attempt_id": "v2-attempt",
+            "state": "scored",
+            "first_proposed_correction": "Refresh the extension cache.",
+            "first_stated_cause": "The extension cache is stale.",
+            "final_diagnosis": "Hold H104 pending prior-incident evidence.",
+            "classification_evidence": "H104 is evaluated before correction.",
+            "reviewer": "test-reviewer",
+            "systemic_before_local": False,
+            "durable_systemic_conclusion": False,
+            "canonical_citations": ["E-D1-V4-C04"],
+            "surfaced_memories": [{"id": "H104", "rank": 1}],
+            "context_fingerprint": brief["context_fingerprint"],
+            "expected_memory_rank": 1,
+            "irrelevant_memory_count": 0,
+            "rejected_memory_treatment": "not_surfaced",
+            "lexical_decoy_treatment": "not_applicable",
+            "memory_evaluation_before_local": True,
+            "memory_evaluation": {
+                "memory_id": "H104",
+                "memory_status": "proposed",
+                "current_incident_ids": ["B108"],
+                "prior_incident_ids": ["B107"],
+                "disposition": "hold",
+                "evidence_or_gap": "The prior CLI incident is not visible.",
+            },
+        }
+        _validate_attempt(trial, case, attempt)
+
+        wrong_status = copy.deepcopy(attempt)
+        wrong_status["memory_evaluation"]["memory_status"] = "confirmed"
+        with self.assertRaisesRegex(EvaluationError, "status differs"):
+            _validate_attempt(trial, case, wrong_status)
+
+        wrong_incident = copy.deepcopy(attempt)
+        wrong_incident["memory_evaluation"]["prior_incident_ids"] = ["B999"]
+        with self.assertRaisesRegex(EvaluationError, "prior incidents"):
+            _validate_attempt(trial, case, wrong_incident)
 
     def test_corpus_rejects_category_drift_and_path_escape(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-corpus-") as temp:

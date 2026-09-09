@@ -814,7 +814,8 @@ def _attempt_files(run_dir: Path, trial_key: str) -> list[Path]:
 
 
 def _validate_attempt(trial: dict[str, Any], case: dict[str, Any], attempt: dict[str, Any]) -> None:
-    _require(attempt.get("schema_version") == "1", "unsupported attempt schema")
+    schema_version = attempt.get("schema_version")
+    _require(schema_version in {"1", "2"}, "unsupported attempt schema")
     _require(isinstance(attempt.get("attempt_id"), str) and SAFE_NAME.fullmatch(attempt["attempt_id"]) is not None, "invalid attempt id")
     _require(attempt.get("state") in {"scored", "infrastructure_failure"}, "invalid attempt state")
     if attempt["state"] == "infrastructure_failure":
@@ -832,6 +833,12 @@ def _validate_attempt(trial: dict[str, Any], case: dict[str, Any], attempt: dict
         _require(isinstance(memory, dict) and isinstance(memory.get("id"), str) and isinstance(memory.get("rank"), int) and memory["rank"] >= 1, "invalid surfaced memory")
     if trial["arm"] == "baseline":
         _require(memories == [], "baseline arm cannot receive surfaced memories")
+        if schema_version == "2":
+            _require(
+                attempt.get("memory_evaluation") is None
+                and attempt.get("memory_evaluation_before_local") is False,
+                "baseline v2 attempt cannot evaluate unsupplied memory",
+            )
         return
     brief = trial["context_brief"]
     _require(attempt.get("context_fingerprint") == brief["context_fingerprint"], "context fingerprint does not match the trial")
@@ -854,6 +861,56 @@ def _validate_attempt(trial: dict[str, Any], case: dict[str, Any], attempt: dict
     _require(isinstance(attempt.get("irrelevant_memory_count"), int) and attempt["irrelevant_memory_count"] >= 0, "invalid irrelevant memory count")
     _require(attempt.get("rejected_memory_treatment") in {"not_surfaced", "rejected", "used"}, "invalid rejected memory treatment")
     _require(attempt.get("lexical_decoy_treatment") in {"ignored", "not_applicable", "used"}, "invalid lexical decoy treatment")
+    if schema_version == "2":
+        evaluation = attempt.get("memory_evaluation")
+        _require(isinstance(evaluation, dict), "context v2 attempt requires memory_evaluation")
+        required = {
+            "memory_id",
+            "memory_status",
+            "current_incident_ids",
+            "prior_incident_ids",
+            "disposition",
+            "evidence_or_gap",
+        }
+        _require(set(evaluation) == required, "invalid memory_evaluation fields")
+        surfaced = next(
+            (item for item in brief["results"] if item["id"] == evaluation["memory_id"]),
+            None,
+        )
+        _require(surfaced is not None, "memory_evaluation must target surfaced memory")
+        _require(
+            evaluation["memory_status"] == surfaced["status"],
+            "memory_evaluation status differs from surfaced memory",
+        )
+        _require(
+            evaluation["disposition"] in {"apply", "hold", "reject"},
+            "invalid memory_evaluation disposition",
+        )
+        _require(
+            isinstance(evaluation["evidence_or_gap"], str)
+            and bool(evaluation["evidence_or_gap"].strip()),
+            "memory_evaluation requires evidence_or_gap",
+        )
+        for field in ("current_incident_ids", "prior_incident_ids"):
+            _require(
+                isinstance(evaluation[field], list)
+                and all(isinstance(item, str) and bool(item) for item in evaluation[field]),
+                f"invalid memory_evaluation {field}",
+            )
+        boundary = case.get("scoring", {}).get("information_boundary")
+        if isinstance(boundary, dict) and case["category"] in POSITIVE_CATEGORIES:
+            _require(
+                evaluation["current_incident_ids"] == [boundary["current_entry_id"]],
+                "memory_evaluation current incident differs from case boundary",
+            )
+            _require(
+                evaluation["prior_incident_ids"] == boundary["prior_entry_ids"],
+                "memory_evaluation prior incidents differ from case boundary",
+            )
+        _require(
+            isinstance(attempt.get("memory_evaluation_before_local"), bool),
+            "context v2 attempt requires boolean memory_evaluation_before_local",
+        )
 
 
 def record_attempt(run_dir: Path, trial_key: str, attempt: dict[str, Any]) -> str:
@@ -971,7 +1028,7 @@ def score_run(run_dir: Path) -> dict[str, Any]:
     failed_cases: set[str] = set()
     false_positive_count = 0
     per_case: dict[str, dict[str, Any]] = {
-        case_id: {"category": case["category"], "scored_arms": 0, "systemic_before_local": 0, "durable_systemic_conclusions": 0, "failures": []}
+        case_id: {"category": case["category"], "scored_arms": 0, "systemic_before_local": 0, "memory_evaluation_before_local": 0, "durable_systemic_conclusions": 0, "failures": []}
         for case_id, case in cases.items()
     }
     for trial in reference_trials:
@@ -984,6 +1041,9 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         summary = per_case[trial["case_id"]]
         summary["scored_arms"] += 1
         summary["systemic_before_local"] += int(attempt["systemic_before_local"])
+        summary["memory_evaluation_before_local"] += int(
+            attempt.get("memory_evaluation_before_local") is True
+        )
         summary["durable_systemic_conclusions"] += int(attempt["durable_systemic_conclusion"])
         if attempt["systemic_before_local"]:
             citation_total += 1
@@ -1024,6 +1084,15 @@ def score_run(run_dir: Path) -> dict[str, Any]:
     }
     if reference_complete and (not gates["reference_absolute_rate"] or not gates["reference_improvement"]):
         failed_cases.update(case["id"] for case in cases.values() if case["category"] in POSITIVE_CATEGORIES)
+    memory_trials = [
+        trial
+        for trial in context_trials
+        if scored.get(trial["trial_key"], {}).get("schema_version") == "2"
+    ]
+    memory_successes = sum(
+        scored[trial["trial_key"]].get("memory_evaluation_before_local") is True
+        for trial in memory_trials
+    )
     return {
         "schema_version": "2",
         "run_id": manifest["run_id"],
@@ -1037,6 +1106,14 @@ def score_run(run_dir: Path) -> dict[str, Any]:
             "context_rate_percent": context_rate,
             "baseline_rate_percent": baseline_rate,
             "improvement_percentage_points": round(context_rate - baseline_rate, 2),
+        },
+        "memory_evaluation": {
+            "eligible_context_arms": len(memory_trials),
+            "evaluated_before_local": memory_successes,
+            "rate_percent": round(100.0 * memory_successes / len(memory_trials), 2)
+            if memory_trials
+            else 0.0,
+            "changes_product_effect_gates": False,
         },
         "replications": replications,
         "canonical_citation_coverage": {"valid": citation_valid, "total": citation_total, "percent": round(100.0 * citation_valid / citation_total, 2) if citation_total else 0.0},
@@ -1106,6 +1183,7 @@ def write_report(run_dir: Path) -> dict[str, str]:
             f"- Category: `{item['category']}`",
             f"- Scored arms: {item['scored_arms']}",
             f"- Systemic-before-local classifications: {item['systemic_before_local']}",
+            f"- Memory-evaluation-before-local classifications: {item['memory_evaluation_before_local']}",
             f"- Durable systemic conclusions: {item['durable_systemic_conclusions']}",
             f"- Failures: {failures}",
             "",
