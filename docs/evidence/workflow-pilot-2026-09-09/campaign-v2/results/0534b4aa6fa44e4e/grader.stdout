@@ -1,0 +1,1 @@
+{"checks": {"check_compatibility_defaults": {"failures": [], "passed": true}, "check_negative_scope": {"failures": [], "passed": true}, "check_reported_failure": {"failures": [], "passed": true}, "check_sibling_preview": {"failures": [], "passed": true}}, "passed": 4, "total": 4}

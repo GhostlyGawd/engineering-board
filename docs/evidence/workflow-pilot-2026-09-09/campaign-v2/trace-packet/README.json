@@ -1,0 +1,5 @@
+{
+  "blindness": "partial; tool traces reveal condition",
+  "instructions": "Assess investigation sequence and evidence use; retain prior patch judgments. Mapping is withheld.",
+  "patch_review_sha256": "bf6d27d3e835d519f95f3866076a764294bfda0dcb45f323a39aa1cf1d3233bf"
+}

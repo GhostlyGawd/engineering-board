@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "/Users/rhenmcleod/engineering-board-dogfood/docs/evidence/workflow-pilot-2026-09-09/campaign-v2/source/evaluation/workflow-pilot/cases/L-useful-retries/evaluator.py",
+    "--repo",
+    "/Users/rhenmcleod/engineering-board-dogfood/docs/evidence/workflow-pilot-2026-09-09/campaign-v2/results/8b0fe431601d4685/workspace"
+  ],
+  "exit_code": 0,
+  "failure": null,
+  "grader_sha256": "50ff45df9f33daa911ad1065d710d0f58ab4f49ba584e984da2cb16c046da176",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "905a709bcced0636c066a7581aa816e70adb30517cea9cac5e48ae0a63b524ac",
+  "wall_seconds": 0.07208245794754475
+}
