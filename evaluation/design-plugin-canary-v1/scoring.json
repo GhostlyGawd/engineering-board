@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "replicate_count": 3,
+  "normalized_lane_minimum": 75,
+  "matched_baseline_improvement_minimum": 5,
+  "maximum_median_time_regression_percent": 20,
+  "failed_replicate_prevents_advancement": true,
+  "hard_gates": ["security", "accessibility", "cost", "evidence"],
+  "cross_lane_leaderboard_prohibited": true,
+  "lane_denominators": {
+    "workflow-code-native": 90,
+    "editable-canvas": 85,
+    "free-brand-assets": 35,
+    "qa-augmentation": 40
+  },
+  "task_floors_percent": {
+    "workflow-code-native:C4": 70,
+    "editable-canvas:C4": 70,
+    "editable-canvas:C6": 70,
+    "free-brand-assets:C2": 80
+  },
+  "task_points": {"C1": 15, "C2": 20, "C3": 15, "C4": 25, "C5": 15, "C6": 25}
+}

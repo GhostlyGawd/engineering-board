@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/design-plugin-canary-v1/zero-cost-receipt.schema.json",
+  "title": "Zero incremental cost receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "arm_id", "product", "capability", "account_plan", "price_displayed", "trial_state", "renewal_or_conversion", "remaining_quota", "payment_method_required", "paid_seat_required", "subscription_required", "addon_required", "paid_hosting_required", "commercial_license_trigger", "upgrade_required", "checked_evidence_locator", "checked_at_utc", "checker", "evidence_sha256", "eligible"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "arm_id": {"type": "string", "pattern": "^arm-[a-z][0-9]{2}$"},
+    "product": {"type": "string", "minLength": 1},
+    "capability": {"type": "string", "minLength": 1},
+    "account_plan": {"type": "string", "minLength": 1},
+    "price_displayed": {"const": "$0"},
+    "trial_state": {"const": "none"},
+    "renewal_or_conversion": {"const": "none"},
+    "remaining_quota": {"type": "string", "minLength": 1},
+    "payment_method_required": {"const": false},
+    "paid_seat_required": {"const": false},
+    "subscription_required": {"const": false},
+    "addon_required": {"const": false},
+    "paid_hosting_required": {"const": false},
+    "commercial_license_trigger": {"const": false},
+    "upgrade_required": {"const": false},
+    "checked_evidence_locator": {"type": "string", "minLength": 1},
+    "checked_at_utc": {"type": "string", "format": "date-time"},
+    "checker": {"type": "string", "minLength": 1},
+    "evidence_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "eligible": {"const": true}
+  }
+}

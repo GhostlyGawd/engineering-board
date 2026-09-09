@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "arm_id": "arm-f24",
+  "activation": "planned_requires_receipt",
+  "arm_class": "editable-canvas",
+  "lanes": ["editable-canvas"],
+  "tasks": ["C1", "C2", "C4", "C6"],
+  "instruction_layer": "winning workflow arm plus sealed canvas candidate",
+  "candidate_source_pin": {"kind": "exact-version", "value": "2.15.0"},
+  "security_requirements": ["version at least 2.15.0", "listener host exactly 127.0.0.1 or ::1", "observed listener command/output/hash retained", "no public REPL listener"],
+  "zero_cost_receipt_required": true,
+  "native_imagegen": "fixed_when_task_requires_images",
+  "allowed_capabilities": ["local repository", "included local browser", "native Codex ImageGen", "isolated editable canvas"],
+  "blocked_capabilities": ["public network binding", "environment API credentials", "separately billed image endpoint", "paid hosting", "paid seat"]
+}

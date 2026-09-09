@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "C2",
+  "exact_legal_line": "Member prices include the cooperative service fee. Local taxes may apply.",
+  "source_precedence": ["DESIGN.md", "tokens.json", "logo-rules.json", "assets/common-thread-logo.svg", "decorative examples"],
+  "seeded_traps": [
+    {"id": "C2-T1", "trap": "off-brand teal in obsolete logo and decorative example", "pass_condition": "No introduced teal and obsolete logo unused."},
+    {"id": "C2-T2", "trap": "obsolete logo", "pass_condition": "Only the current logo asset is used without redraw."},
+    {"id": "C2-T3", "trap": "contrast-invalid permitted coral-on-cream pairing", "pass_condition": "Normal text uses a verified accessible semantic pairing; coral-on-cream remains decorative or large text only."},
+    {"id": "C2-T4", "trap": "decorative example conflicts with written rules", "pass_condition": "Written no-gradient/no-glass rule wins."}
+  ],
+  "required_format_count": 5,
+  "evidence_minimum": ["five renders", "reusable source", "token/component map", "logo asset integrity check", "exact-copy check", "input/output hashes"]
+}

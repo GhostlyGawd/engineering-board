@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "arm_id": "arm-f24",
+  "product": "candidate",
+  "capability": "complete assigned canary path",
+  "account_plan": "free",
+  "price_displayed": "$0",
+  "trial_state": "none",
+  "renewal_or_conversion": "none",
+  "remaining_quota": "sufficient for three complete runs",
+  "payment_method_required": false,
+  "paid_seat_required": false,
+  "subscription_required": false,
+  "addon_required": false,
+  "paid_hosting_required": false,
+  "commercial_license_trigger": false,
+  "upgrade_required": false,
+  "checked_evidence_locator": "retained://receipt-evidence",
+  "checked_at_utc": "2026-09-09T00:00:00Z",
+  "checker": "operations-reviewer",
+  "evidence_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "eligible": true
+}

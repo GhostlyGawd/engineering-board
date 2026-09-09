@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "sealed": true,
+  "opening_rule": "Only the operations/security reviewer may open before all blinded scores and pairwise preferences are locked.",
+  "entries": [
+    {"arm_id": "arm-a17", "identity": "Control A — plain Codex", "version": "run-manifest pinned Codex snapshot", "role": "matched baseline"},
+    {"arm_id": "arm-b42", "identity": "Control B — OpenAI Product Design", "version": "0.1.54", "role": "included workflow control"},
+    {"arm_id": "arm-c08", "identity": "Taste Skill", "version": "ccbc15639c97057cbfcf32ecebc38ef716e4bb37", "role": "community challenger"},
+    {"arm_id": "arm-d31", "identity": "UI/UX Pro Max", "version": "4aad0584d92131626b16d4ff4d77f0455385013c", "role": "community challenger"},
+    {"arm_id": "arm-e59", "identity": "Stark by f0d010c", "version": "ff94e5b4e1c98d259f3cde9f806406c4528deed4", "role": "optional reserve"},
+    {"arm_id": "arm-f24", "identity": "Penpot MCP", "version": "2.15.0", "role": "editable canvas"},
+    {"arm_id": "arm-g73", "identity": "Google Stitch", "version": "must pin immutable commit before activation", "role": "conditional exploratory canvas"},
+    {"arm_id": "arm-h66", "identity": "Figma Starter", "version": "2.0.21", "role": "conditional read-only unscored context"},
+    {"arm_id": "arm-j11", "identity": "OpenAI Creative Production", "version": "0.1.25", "role": "conditional brand workflow"},
+    {"arm_id": "arm-k90", "identity": "Local QA augmentation", "version": "fixtures/shared/allowed-packages.json", "role": "deterministic QA overlay"}
+  ]
+}

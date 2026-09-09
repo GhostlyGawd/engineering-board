@@ -1,0 +1,4 @@
+.pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+.plan-card { background:var(--plan-standard); border:2px solid transparent; padding:24px; }
+.plan-card[data-featured="true"] { background:var(--plan-featured); color:white; }
+@media(max-width:600px){.pricing-grid{grid-template-columns:1fr}.plan-card{order:0}}

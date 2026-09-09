@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "C2",
+  "maximum_points": 20,
+  "items": [
+    {"id": "brand-rule-compliance", "points": 8, "anchors": {"0": "Multiple material rule, logo, copy, or prohibited-pattern violations.", "4": "Core brand is recognizable with one material or several minor violations.", "8": "All written voice, type, color, logo, photo, copy, and prohibited-pattern rules pass."}},
+    {"id": "cross-format-consistency", "points": 4, "anchors": {"0": "Missing or contradictory formats.", "2": "All formats exist with uneven system use.", "4": "All five formats form one coherent adaptable system."}},
+    {"id": "source-precedence", "points": 3, "anchors": {"0": "Obsolete or decorative source overrides written rules.", "1.5": "Correct assets with an unresolved source conflict.", "3": "Every conflict resolves in the frozen precedence order."}},
+    {"id": "accessible-adaptation", "points": 3, "anchors": {"0": "Known invalid pairing remains in normal text or equivalent harm.", "1.5": "Main content passes with a minor adaptation gap.", "3": "All formats adapt brand tokens accessibly and document the mapping."}},
+    {"id": "editability", "points": 2, "anchors": {"0": "Flattened text/UI or missing source.", "1": "Partly reusable source.", "2": "Reusable structured source for all formats."}}
+  ]
+}

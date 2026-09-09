@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "C1",
+  "maximum_points": 15,
+  "items": [
+    {"id": "brief-semantic-fidelity", "points": 4, "anchors": {"0": "Contradicts audience, model, or exact copy.", "2": "Covers the app but weakly expresses the cooperative and slow-travel brief.", "4": "Every format clearly expresses audience, cooperative value, and exact factual constraints."}},
+    {"id": "visual-hierarchy-craft", "points": 4, "anchors": {"0": "Unreadable or structurally broken.", "2": "Usable but generic or uneven.", "4": "Clear scan path, balanced composition, legible type, and polished image treatment in both formats."}},
+    {"id": "coherent-distinctness", "points": 3, "anchors": {"0": "Fewer than three or palette-only variants.", "1.5": "Three variants with partial structural difference.", "3": "Three coherent, brief-compatible directions with materially different design strategies."}},
+    {"id": "image-text-integrity", "points": 2, "anchors": {"0": "Copy mismatch, broken image, or lost alpha.", "1": "Minor asset misuse without factual damage.", "2": "Exact copy and intact/correctly used supplied imagery."}},
+    {"id": "editability-evidence", "points": 2, "anchors": {"0": "Flattened or missing evidence.", "1": "Editable source or evidence is incomplete.", "2": "Reusable source and complete traceable evidence."}}
+  ]
+}

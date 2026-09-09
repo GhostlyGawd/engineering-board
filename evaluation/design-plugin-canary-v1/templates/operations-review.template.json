@@ -1,0 +1,1 @@
+{"schema_version":"1.0.0","reviewer_id":"operations-reviewer-01","reviewer_role":"operations_security","arm_id":"arm-a17","task_id":"C1","replicate_id":"r1","hard_gates":{"security":"pass","accessibility":"pass","cost":"pass","evidence":"pass"},"evidence_ids":["run-manifest","tool-receipts","cost-receipt"],"locked_at_utc":"2026-09-09T00:00:02Z"}

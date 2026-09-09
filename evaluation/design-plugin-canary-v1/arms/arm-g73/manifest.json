@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "arm_id": "arm-g73",
+  "activation": "conditional_unpinned",
+  "arm_class": "optional-editable-canvas-exploratory",
+  "lanes": ["editable-canvas"],
+  "tasks": ["C1", "C2", "C4", "C6"],
+  "instruction_layer": "winning workflow arm plus sealed canvas candidate",
+  "candidate_source_pin": null,
+  "retained_package_sha256": null,
+  "activation_requirements": ["same-day complete-task $0 receipt", "immutable package commit", "retained package SHA-256", "quota sufficient for three complete runs"],
+  "zero_cost_receipt_required": true,
+  "native_imagegen": "fixed_when_task_requires_images",
+  "allowed_capabilities": ["local repository", "included local browser", "native Codex ImageGen", "free eligible canvas path"],
+  "blocked_capabilities": ["purchase", "upgrade", "paid retry", "environment API credentials", "separately billed image endpoint", "paid hosting"]
+}

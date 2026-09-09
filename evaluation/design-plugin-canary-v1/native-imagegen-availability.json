@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "capability": "native Codex ImageGen",
+  "model": "gpt-image-2",
+  "owner_decision": "approved_as_fixed_included_capability",
+  "owner_decision_date": "2026-09-09",
+  "availability": "pending_pre_run_check",
+  "checked_at_utc": null,
+  "checker": null,
+  "evidence_sha256": null,
+  "included_limit_treatment": "Counts against normal Codex usage limits; pause or defer the complete affected matched set on exhaustion.",
+  "openai_api_key_prohibited": true,
+  "paid_api_fallback_prohibited": true,
+  "capacity_purchase_prohibited": true
+}

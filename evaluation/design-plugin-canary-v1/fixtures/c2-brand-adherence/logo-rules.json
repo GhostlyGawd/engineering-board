@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0.0",
+  "current_asset": "assets/common-thread-logo.svg",
+  "obsolete_asset": "assets/common-thread-logo-obsolete.svg",
+  "minimum_width_px": 112,
+  "clear_space_formula": "one emblem width on all sides",
+  "distortion_allowed": false,
+  "redraw_allowed": false,
+  "busy_image_background_allowed": false
+}

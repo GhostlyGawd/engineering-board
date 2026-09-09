@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "C2",
+  "title": "Brand adherence",
+  "prompt": "prompt.md",
+  "inputs": ["selected-direction.md", "DESIGN.md", "tokens.json", "logo-rules.json", "assets/common-thread-logo.svg", "assets/common-thread-logo-obsolete.svg", "assets/decorative-conflict.svg"],
+  "sealed_answer_key": "sealed/answer-key.json",
+  "rubric": "sealed/rubric.json",
+  "allowed_packages": "../shared/allowed-packages.json",
+  "viewports": [{"name": "pricing-desktop", "width": 1440, "height": 1000}, {"name": "email-header", "width": 1200, "height": 480}, {"name": "social-square", "width": 1080, "height": 1080}, {"name": "social-portrait", "width": 1080, "height": 1350}, {"name": "social-story", "width": 1080, "height": 1920}],
+  "required_outputs": ["pricing-page-source", "pricing-1440x1000.png", "email-header-1200x480.png", "social-1080x1080.png", "social-1080x1350.png", "social-1080x1920.png", "token-component-map.json", "evidence.json"]
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "arm_id": "arm-e59",
+  "activation": "conditional_requires_retained_package_approval",
+  "arm_class": "optional-community-instruction-reserve",
+  "lanes": ["workflow-code-native"],
+  "tasks": ["C1", "C2", "C3", "C4", "C5"],
+  "instruction_layer": "sealed-map candidate",
+  "candidate_source_pin": {"kind": "commit", "value": "ff94e5b4e1c98d259f3cde9f806406c4528deed4"},
+  "retained_package_sha256": null,
+  "activation_requirements": ["retained package SHA-256", "zero-cost receipt", "operator approval before unblinding"],
+  "zero_cost_receipt_required": true,
+  "native_imagegen": "fixed_when_task_requires_images",
+  "allowed_capabilities": ["local repository", "included local browser", "native Codex ImageGen", "retained instruction files"],
+  "blocked_capabilities": ["network fetch", "environment API credentials", "separately billed image endpoint", "Sites publishing", "paid service"]
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/design-plugin-canary-v1/native-imagegen-availability.schema.json",
+  "title": "Native ImageGen availability record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "capability", "model", "owner_decision", "owner_decision_date", "availability", "checked_at_utc", "checker", "evidence_sha256", "included_limit_treatment", "openai_api_key_prohibited", "paid_api_fallback_prohibited", "capacity_purchase_prohibited"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "capability": {"const": "native Codex ImageGen"},
+    "model": {"const": "gpt-image-2"},
+    "owner_decision": {"const": "approved_as_fixed_included_capability"},
+    "owner_decision_date": {"type": "string", "format": "date"},
+    "availability": {"enum": ["pending_pre_run_check", "available", "unavailable"]},
+    "checked_at_utc": {"type": ["string", "null"], "format": "date-time"},
+    "checker": {"type": ["string", "null"]},
+    "evidence_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "included_limit_treatment": {"type": "string", "minLength": 1},
+    "openai_api_key_prohibited": {"const": true},
+    "paid_api_fallback_prohibited": {"const": true},
+    "capacity_purchase_prohibited": {"const": true}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"availability": {"const": "available"}}},
+      "then": {"properties": {"checked_at_utc": {"type": "string"}, "checker": {"type": "string", "minLength": 1}, "evidence_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}
+    }
+  ]
+}

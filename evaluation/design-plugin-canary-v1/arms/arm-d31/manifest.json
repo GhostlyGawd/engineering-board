@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "arm_id": "arm-d31",
+  "activation": "planned_requires_retained_package",
+  "arm_class": "community-instruction-challenger",
+  "lanes": ["workflow-code-native"],
+  "tasks": ["C1", "C2", "C3", "C4", "C5"],
+  "instruction_layer": "sealed-map candidate",
+  "candidate_source_pin": {"kind": "commit", "value": "4aad0584d92131626b16d4ff4d77f0455385013c"},
+  "retained_package_sha256": null,
+  "zero_cost_receipt_required": true,
+  "native_imagegen": "fixed_when_task_requires_images",
+  "allowed_capabilities": ["local repository", "included local browser", "native Codex ImageGen", "retained instruction and data files"],
+  "blocked_capabilities": ["installer execution", "generator execution", "network fetch", "environment API credentials", "separately billed image endpoint", "Sites publishing", "paid service"]
+}
