@@ -11,6 +11,9 @@ increases.
 
 ### Fixed
 
+- The evaluation harness now accepts the root-owned macOS `/var` and `/tmp`
+  aliases while continuing to reject attacker-controlled symlink traversal
+  beneath those paths.
 - `board_patterns` now applies its self-contained preview identifier without
   requiring callers to repeat the action payload, matching the apply-only
   contract already provided by `board_hypotheses`.
