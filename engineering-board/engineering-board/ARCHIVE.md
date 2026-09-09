@@ -1,6 +1,9 @@
 # engineering-board — Archive
 
 Resolved entries. Newest at the top.
+- F002 | Score explicit memory evaluation before local correction in D.1 | resolved: 2026-09-09
+- Q001 | Should D.1 score memory evaluation before local correction instead of first-cause adoption? | resolved: 2026-09-09
+- B003 | Claim reports false contention after a plugin upgrade removes the server working directory | resolved: 2026-09-09
 - B002 | Token-only pattern and hypothesis apply falls through to list | resolved: 2026-09-09
 - F001 | Add exhaustive Codex dogfood capability matrix | resolved: 2026-09-09
 - B001 | Evaluation harness rejects macOS system temp paths | resolved: 2026-09-09

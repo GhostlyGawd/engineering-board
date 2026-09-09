@@ -1724,6 +1724,17 @@ def _claim_age_seconds(raw_timestamp):
     return int((datetime.now(timezone.utc) - heartbeat).total_seconds())
 
 
+def _claim_cwd(root):
+    """Return the process cwd, or the explicit repository root if it vanished."""
+    try:
+        return os.getcwd()
+    except OSError:
+        # A plugin upgrade can remove the cache directory used to launch a
+        # still-running MCP process. The caller-supplied root remains stable
+        # and is more useful than discarding an otherwise valid claim.
+        return root
+
+
 def _is_nonempty_file(path):
     try:
         return path.is_file() and path.stat().st_size > 0
@@ -1792,7 +1803,7 @@ def tool_board_claim(params):
     try:
         owner_file.write_text(
             "session_id: %s\ntimestamp: %s\ncwd: %s\n"
-            % (session_id, timestamp, os.getcwd()),
+            % (session_id, timestamp, _claim_cwd(root)),
             encoding="utf-8",
         )
         heartbeat_file.write_text(timestamp + "\n", encoding="utf-8")

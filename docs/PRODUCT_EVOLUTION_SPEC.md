@@ -2941,6 +2941,32 @@ titles before it joins multiple records. A retrieval failure does not stop PM
 consolidation; the procedure logs the failure and emits the normal PM summary
 without a Learning line.
 
+### 21.16 Memory evaluation before local correction
+
+_State: additive contract selected from Q001 after the Q003 presentation
+diagnostic. Historical response schema version 1 and frozen evidence remain
+unchanged._
+
+D.1 measures explicit use of surfaced memory before it rewards adoption of a
+systemic cause. A version-2 context response identifies the selected memory
+and its epistemic status, names the current and prior incidents, chooses
+`apply`, `hold`, or `reject`, and states the supporting evidence or information
+gap before the first local correction. `Hold` is a successful memory-use
+decision when the prompt lacks enough evidence to adopt a proposed cause.
+
+The harness reports `memory_evaluation_before_local` separately from
+`systemic_before_local`. The existing systemic-first-cause rate remains a
+stricter secondary signal. The additive metric does not alter historical
+product-effect gates or silently promote H### state.
+
+| ID | Product requirement | Verification |
+|---|---|---|
+| MEV-REQ-001 | Version-2 responses shall record memory id, status, current incidents, prior incidents, disposition, and evidence or gap. | Response-schema field and enum assertions |
+| MEV-REQ-002 | The recorder shall reject a memory id or status that differs from the surfaced context brief. | Attempt validation tests |
+| MEV-REQ-003 | Version-4 positive cases shall bind current and prior incident ids to the scoring-only information boundary. | Boundary validation tests |
+| MEV-REQ-004 | The report shall expose eligible context arms, before-local successes, and rate without changing existing gates. | Mixed version-1/version-2 score test |
+| MEV-REQ-005 | A local correction may follow an explicit hold or reject without promoting a proposed hypothesis. | Operator contract and response schema |
+
 ## 22. Research and evidence
 
 Current product evidence:

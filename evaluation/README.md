@@ -211,6 +211,15 @@ sufficient for C04 under that single-case diagnostic. This does not establish
 product effect or authorize a corpus lock. See
 [`2026-09-09 Q003 context-presentation reset`](../docs/evidence/2026-09-09-q003-context-presentation-reset.md).
 
+The next additive contract measures whether an agent explicitly evaluates
+surfaced repository memory before it proposes a local correction. Version-2
+responses identify the memory and epistemic status, current and prior
+incidents, an `apply`, `hold`, or `reject` disposition, and the supporting
+evidence or information gap. The harness reports this rate separately from
+`systemic_before_local`; version-1 attempts and existing product-effect gates
+remain unchanged. Use `operator-instructions-v2.md` with
+`memory-evaluation-response.schema.json` for this contract.
+
 Engineering Board does not claim that Milestone D context improves agent
 diagnoses. Version 4 remains an unlocked proposal. Its exact corpus digest and
 the draft structured-requirement digest are recorded in the current dated

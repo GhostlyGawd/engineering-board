@@ -629,6 +629,45 @@ def suite_lifecycle(mod, tmp_repo):
           "board_release replay adds no environment effect",
           json.dumps(rel_replay))
 
+    # A running plugin server can outlive its installed cache directory during
+    # an in-session upgrade. Its process cwd then becomes unavailable even
+    # though the caller supplies a valid absolute repository root. Claim
+    # creation must keep the lock and record that stable root as its fallback.
+    real_getcwd = mod.os.getcwd
+    fallback_cwd = root
+    try:
+        def missing_process_cwd():
+            raise FileNotFoundError(2, "No such file or directory")
+
+        mod.os.getcwd = missing_process_cwd
+        deleted_cwd_claim = mod.tool_board_claim({
+            "project": "atlas", "root": root, "entry_id": "B001",
+            "session_id": "sess-deleted-cwd",
+        })
+    finally:
+        mod.os.getcwd = real_getcwd
+    check(
+        deleted_cwd_claim["exit_code"] == 0
+        and deleted_cwd_claim["acquired"] is True,
+        "board_claim survives an unavailable process cwd",
+        json.dumps(deleted_cwd_claim),
+    )
+    deleted_owner = (claims_dir / "B001" / "owner.txt").read_text()
+    check(
+        "cwd: %s\n" % fallback_cwd in deleted_owner,
+        "board_claim records the explicit repository root when cwd is unavailable",
+        deleted_owner,
+    )
+    deleted_cwd_release = mod.tool_board_release({
+        "project": "atlas", "root": root, "entry_id": "B001",
+        "session_id": "sess-deleted-cwd",
+    })
+    check(
+        deleted_cwd_release["released"] is True,
+        "deleted-cwd claim releases normally",
+        json.dumps(deleted_cwd_release),
+    )
+
     observation = mod.tool_board_create_entry({
         "project": "atlas", "root": root, "type": "observation",
         "title": "Resolution archive contract", "affects": "src/archive.py",

@@ -9,6 +9,19 @@ increases.
 
 ## [Unreleased]
 
+### Added
+
+- D.1 now has an additive version-2 response contract for explicit
+  `apply`/`hold`/`reject` evaluation of surfaced memory before a local
+  correction, with a separate harness-reported rate that does not rewrite
+  historical product-effect gates.
+
+### Fixed
+
+- Claim acquisition now falls back to the caller's explicit repository root
+  when an in-session plugin upgrade removes the running MCP process working
+  directory, instead of deleting the new lock and reporting false contention.
+
 ## [1.13.5] — 2026-09-09
 
 ### Fixed
