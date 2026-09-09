@@ -10,9 +10,9 @@ Record kind: hypothesis; status: proposed.
 Recorded: 2026-09-08. Confidence: medium.
 Relevant implementation: parts.py. Derived from: B107, B108.
 
-Synthetic evaluation fixture; not customer or real held-out evidence.
-
 ## Proposed root cause
+
+Synthetic evaluation fixture; not customer or real held-out evidence.
 
 CSV import rejection and prefix-adjacent lookup confusion may both arise
 because import and query paths apply inconsistent normalization to part ids.
