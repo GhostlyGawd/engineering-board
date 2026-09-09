@@ -50,3 +50,20 @@ limits. Final freeze acceptance still requires prepared-artifact review.
 Direct reads of Board Markdown are possible within the declared workspace.
 Review must distinguish that route from actual MCP retrieval; Board availability
 does not establish use of the retrieval mechanism.
+
+## Rejected preparation 1
+
+Final artifact acceptance held on prepared manifest
+`dfd906090616c296b95ec545f5caefa21ea8549fb2b42ef618a044849c6ca5f5`.
+The actual installed 1.13.5 launcher returned `isError: true` for a read-only
+`board_context` query against the prepared catalog fixture:
+`hypotheses/H101.md: invalid claim_fingerprint 'synthetic-h101'`.
+Schema listing and reference-repair tests had not exercised canonical hypothesis
+retrieval validation. The independently detected gap is in the synthetic fixture
+and its validation, not evidence that the released server should accept it.
+
+`campaign/` is the retained **rejected preparation**, committed at `c1d5f91`.
+Do not freeze or run it. No live model call occurred. Corrections require actual
+retrieval checks across all four cases, a new committed fixture revision, and a
+fresh `campaign-v2/` preparation and independent acceptance. The rejected bytes
+remain available for audit rather than being overwritten.

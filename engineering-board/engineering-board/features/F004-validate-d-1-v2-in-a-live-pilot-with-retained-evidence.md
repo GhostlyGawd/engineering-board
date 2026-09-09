@@ -29,6 +29,7 @@ parent: F002
 
 - **measurement-cycle-closeout** 2026-09-09T14:10:08Z: Only live study and release decision remain after B004-B007 source correction and independent verification. Preserve current measurement/semantic limits, comparison and artifacts before launch; no result is implied by source completion.
 - **lead-workflow-pilot-20260909** 2026-09-09T14:52:02Z: Lead owns claim on behalf of design_workflow_cases (cases/**, cases.json; isolated worktree), build_workflow_runner (runner.py/tests; isolated worktree), and read-only review_workflow_protocol. Prelaunch review found label leakage and retention/input-check mismatches; builders correcting before any live calls. Protocol and direct-Learning ledger retained under docs/evidence/workflow-pilot-2026-09-09/. Assisted MCP mechanism pilot explicitly excludes natural-host activation and customer-value claims.
+- **lead-workflow-pilot-20260909** 2026-09-09T15:00:45Z: Final artifact acceptance held: installed1.13.5 actual board_context rejects H101 fixture fingerprint. No live calls. Retain rejected preparation campaign/ manifest dfd906... in Git c1d5f91. Fixture designer correcting canonical fields and adding source/released actual retrieval checks across all4 cases; new preparation will use campaign-v2, not edit/reuse rejected inputs. Full22 deterministic suites passed but were insufficient to establish released retrieval usability.
 
 ## Approved workflow-value study direction
 
