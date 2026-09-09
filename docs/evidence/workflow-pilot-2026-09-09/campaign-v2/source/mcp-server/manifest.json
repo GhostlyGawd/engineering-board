@@ -1,0 +1,40 @@
+{
+  "manifest_version": "0.2",
+  "name": "engineering-board",
+  "display_name": "engineering-board",
+  "version": "1.13.5",
+  "description": "Repository-owned engineering pattern intelligence. 19 MCP tools over canonical Markdown.",
+  "long_description": "A zero-dependency MCP server exposing Engineering Board's canonical Markdown as tools: retrieve relevant systemic context, manage P### pattern identities and H### hypotheses, record explicit fix outcomes, update L### Learning confidence, and coordinate work. Pure python3, no third-party dependencies.",
+  "author": {
+    "name": "Acadia",
+    "url": "https://github.com/GhostlyGawd"
+  },
+  "homepage": "https://ghostlygawd.github.io/engineering-board/",
+  "documentation": "https://github.com/GhostlyGawd/engineering-board/blob/main/mcp-server/README.md",
+  "license": "MIT",
+  "keywords": [
+    "kanban",
+    "multi-agent",
+    "board",
+    "agentic-workflow",
+    "tdd"
+  ],
+  "server": {
+    "type": "python",
+    "entry_point": "mcp-server/engineering_board_mcp.py",
+    "mcp_config": {
+      "command": "python3",
+      "args": [
+        "${__dirname}/mcp-server/engineering_board_mcp.py"
+      ],
+      "env": {
+        "CLAUDE_PROJECT_DIR": "${__dirname}"
+      }
+    }
+  },
+  "compatibility": {
+    "runtimes": {
+      "python": ">=3.8"
+    }
+  }
+}

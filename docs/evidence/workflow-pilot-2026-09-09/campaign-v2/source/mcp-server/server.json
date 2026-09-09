@@ -1,0 +1,30 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.GhostlyGawd/engineering-board",
+  "description": "Repository-owned engineering pattern intelligence - 19 MCP tools over stdio.",
+  "repository": {
+    "url": "https://github.com/GhostlyGawd/engineering-board",
+    "source": "github"
+  },
+  "version": "1.13.5",
+  "websiteUrl": "https://ghostlygawd.github.io/engineering-board/",
+  "packages": [
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/GhostlyGawd/engineering-board/releases/download/v1.13.5/engineering-board-mcp.mcpb",
+      "version": "1.13.5",
+      "fileSha256": "96311c67f284fa7a48a50ffb10a73947e7e66355de4702a2b60b152101632d45",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CLAUDE_PROJECT_DIR",
+          "description": "Absolute path to the repository whose engineering-board/ tree the server operates on. Defaults to the current working directory when unset.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}
