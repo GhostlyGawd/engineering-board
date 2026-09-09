@@ -29,6 +29,7 @@ import shutil
 import tempfile
 import subprocess
 import importlib.util
+import zipfile
 from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -835,6 +836,202 @@ def suite_read_only_side_effects(mod):
         shutil.rmtree(root, ignore_errors=True)
 
 
+def suite_hypothesis_details(mod):
+    """Retrieve H memory, then read validated full detail without side effects."""
+    print("\n== Suite: read-only hypothesis details ==")
+    with tempfile.TemporaryDirectory(prefix="eb-mcp-h-details-") as root:
+        project = "details"
+        mod.tool_board_init({"project": project, "root": root,
+                             "agents_md": False})
+        board = Path(root) / "engineering-board" / project
+        for kind, prefix, subdir in (
+            ("bug", "B", "bugs"), ("feature", "F", "features"),
+            ("question", "Q", "questions"),
+            ("observation", "O", "observations"),
+            ("learning", "L", "learnings"),
+        ):
+            entry_id = prefix + "001"
+            markdown = ("---\nid: %s\ntype: %s\nstatus: open\n"
+                        "title: Detail fixture\naffects: src/read.py\n"
+                        "discovered: 2026-09-09\nconfidence: low\n---\n"
+                        "\n## Evidence\n\nPreserve this full body.\n" %
+                        (entry_id, kind))
+            path = board / subdir / (entry_id + "-detail.md")
+            path.write_text(markdown, encoding="utf-8")
+        cluster = mod.tool_board_insights({"project": project, "root": root})[
+            "ranked_clusters"][0]
+        preview = mod.tool_board_hypotheses({
+            "project": project, "root": root, "action": "propose",
+            "cluster_fingerprint": cluster["cluster_fingerprint"],
+            "claim_key": "shared-reader-boundary", "title": "Reader boundary",
+            "root_cause": "A shared reader boundary drops evidence.",
+            "supporting_evidence": [
+                {"id": entry_id, "reason": "The same reader loses evidence."}
+                for entry_id in cluster["members"]
+            ],
+            "alternatives": ["Independent defects produce similar symptoms."],
+            "counter_evidence": ["A separate reader preserves all evidence."],
+            "confidence": "medium", "confidence_basis": "A shared path only.",
+            "falsifier": "Independent readers reproduce the same losses.",
+            "actor": "hypothesis-detail-fixture",
+        })
+        mod.tool_board_hypotheses({"project": project, "root": root,
+                                   "apply": preview["plan_token"]})
+        path = next((board / "hypotheses").glob("H*.md"))
+        original = path.read_text(encoding="utf-8")
+        mod.tool_board_graph({"project": project, "root": root, "full": True})
+
+        def call(name, **arguments):
+            return mod.dispatch("tools/call", {"name": name, "arguments": {
+                "project": project, "root": root, **arguments}})
+
+        def read_error(entry_id, expected):
+            baseline = _tree_snapshot(root)
+            result = call("board_get_entry", entry_id=entry_id)
+            check(result["isError"] and expected in result["content"][0]["text"],
+                  "H detail rejects %s" % expected, json.dumps(result))
+            check(_tree_snapshot(root) == baseline,
+                  "failed H detail preserves paths and bytes: %s" % expected)
+
+        # One live server exercises the public transport, including discovery.
+        env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+        proc = subprocess.Popen([sys.executable, SERVER_PATH], cwd=root, env=env,
+                                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, text=True)
+        sequence = 0
+
+        def rpc(method, params):
+            nonlocal sequence
+            sequence += 1
+            proc.stdin.write(json.dumps({"jsonrpc": "2.0", "id": sequence,
+                                         "method": method, "params": params}) + "\n")
+            proc.stdin.flush()
+            response = json.loads(proc.stdout.readline())
+            check(response.get("id") == sequence, "detail stdio response id")
+            return response["result"]
+
+        try:
+            rpc("initialize", {"protocolVersion": "2025-06-18", "capabilities": {}})
+            listed = {tool["name"]: tool for tool in rpc("tools/list", {})["tools"]}
+            # Check behavior before wording so the original regression is explicit.
+            for status in ("proposed", "confirmed", "weakened", "rejected",
+                           "split", "merged"):
+                markdown = original.replace("status: proposed", "status: " + status)
+                path.write_text(markdown, encoding="utf-8")
+                baseline = _tree_snapshot(root)
+                context_args = {"project": project, "root": root,
+                                "files": ["src/read.py"], "task": "Reader boundary"}
+                context = rpc("tools/call", {"name": "board_context",
+                                             "arguments": context_args})
+                check(context["isError"] is False, "stdio H context: " + status,
+                      json.dumps(context))
+                context_payload = json.loads(context["content"][0]["text"])
+                memory = next(item for item in context_payload["results"]
+                              if item["id"] == "H001")
+                args = {"project": project, "root": root, "entry_id": memory["id"]}
+                result = rpc("tools/call", {"name": "board_get_entry", "arguments": args})
+                check(result["isError"] is False, "stdio retrieved H detail: " + status,
+                      json.dumps(result))
+                detail = json.loads(result["content"][0]["text"])
+                check(set(detail) == {"id", "project", "file", "frontmatter", "markdown"}
+                      and detail["id"] == "H001" and detail["project"] == project
+                      and detail["file"] == str(path.relative_to(root))
+                      and detail["frontmatter"]["status"] == status
+                      and detail["frontmatter"]["derived_from"] == cluster["members"]
+                      and detail["markdown"] == markdown,
+                      "H detail preserves full canonical content and status: " + status)
+                check(call("board_get_entry", entry_id="H001") == result,
+                      "dispatcher and stdio H details agree: " + status)
+                check(rpc("tools/call", {"name": "board_context", "arguments": context_args})
+                      == context, "H detail preserves context payload and token: " + status)
+                check(_tree_snapshot(root) == baseline,
+                      "retrieve-to-detail preserves board/cache/runtime bytes: " + status)
+            check("H###" in listed["board_get_entry"]["description"]
+                  and "board_get_entry" in listed["board_context"]["description"],
+                  "public tool descriptions expose H detail route")
+            baseline = _tree_snapshot(root)
+            missing = rpc("tools/call", {"name": "board_get_entry", "arguments": {
+                "project": project, "root": root, "entry_id": "H999"}})
+            check(missing["isError"] and "not found" in missing["content"][0]["text"],
+                  "stdio missing H returns a tool error")
+            check(_tree_snapshot(root) == baseline, "stdio failed H read preserves bytes")
+        finally:
+            proc.stdin.close()
+            proc.wait(timeout=5)
+
+        path.write_text(original, encoding="utf-8")
+        baseline = _tree_snapshot(root)
+        update = call("board_update_entry", entry_id="H001", status="resolved")
+        check(update["isError"] and "not found" in update["content"][0]["text"],
+              "H detail does not enable generic entry mutation")
+        listed_entries = json.loads(call("board_list_entries")["content"][0]["text"])
+        check({entry["id"] for entry in listed_entries["entries"]}
+              == {"B001", "F001", "Q001", "O001", "L001"},
+              "H detail preserves generic entry listing scope")
+        check(_tree_snapshot(root) == baseline,
+              "generic H update rejection and list preserve bytes")
+        read_error("H999", "not found")
+        for invalid in ("H1", "H001/../../B001", "H001\n", "H../secret"):
+            read_error(invalid, "invalid hypothesis id")
+        for old, new, expected in (
+            ("type: hypothesis", "type: bug", "type must be"),
+            ("status: proposed", "status: open", "invalid hypothesis status"),
+            ("derived_from:", "missing_derived_from:", "missing required hypothesis field"),
+            ("## Falsifier", "## Missing falsifier", "missing required section"),
+            ("claim_fingerprint: h-", "claim_fingerprint: x-", "invalid claim_fingerprint"),
+        ):
+            path.write_text(original.replace(old, new), encoding="utf-8")
+            read_error("H001", expected)
+        path.write_text(original, encoding="utf-8")
+        duplicate = path.with_name("H001-duplicate.md")
+        duplicate.write_text(original, encoding="utf-8")
+        read_error("H001", "duplicate hypothesis id")
+        duplicate.unlink()
+        duplicate.write_text(original.replace("id: H001", "id: H002"), encoding="utf-8")
+        read_error("H001", "duplicate hypothesis claim fingerprint")
+        duplicate.unlink()
+
+        with tempfile.TemporaryDirectory(prefix="eb-h-detail-external-") as external:
+            outside = Path(external) / "H001-outside.md"
+            outside.write_text(original, encoding="utf-8")
+            path.unlink()
+            for target in (outside, board / "bugs" / "B001-detail.md"):
+                path.symlink_to(target)
+                read_error("H001", "linked hypothesis record")
+                path.unlink()
+            hypotheses = board / "hypotheses"
+            saved_hypotheses = board / "saved-hypotheses"
+            hypotheses.rename(saved_hypotheses)
+            hypotheses.symlink_to(external, target_is_directory=True)
+            read_error("H001", "linked canonical directory")
+            hypotheses.unlink()
+            saved_hypotheses.rename(hypotheses)
+            path.write_text(original, encoding="utf-8")
+            router = Path(root) / "engineering-board" / "BOARD-ROUTER.md"
+            router_text = router.read_text(encoding="utf-8")
+            router.write_text(router_text.replace("engineering-board/details", external),
+                              encoding="utf-8")
+            read_error("H001", "escapes root")
+            router.write_text(router_text, encoding="utf-8")
+
+        # Corrupt H memory must not interfere with the legacy read contracts.
+        path.write_text("malformed hypothesis\n", encoding="utf-8")
+        baseline = _tree_snapshot(root)
+        for prefix, subdir in (("B", "bugs"), ("F", "features"), ("Q", "questions"),
+                               ("O", "observations"), ("L", "learnings")):
+            entry_id = prefix + "001"
+            legacy_path = board / subdir / (entry_id + "-detail.md")
+            result = call("board_get_entry", entry_id=entry_id)
+            check(result["isError"] is False, "legacy detail succeeds: " + prefix)
+            detail = json.loads(result["content"][0]["text"])
+            markdown = legacy_path.read_text(encoding="utf-8")
+            check(detail == {"id": entry_id, "project": project,
+                             "file": str(legacy_path.relative_to(root)),
+                             "frontmatter": mod.parse_frontmatter(markdown)[0],
+                             "markdown": markdown}, "legacy detail contract: " + prefix)
+        check(_tree_snapshot(root) == baseline, "legacy details preserve all bytes")
+
+
 # ---------------------------------------------------------------------------
 # Suite: token-only apply parity
 # ---------------------------------------------------------------------------
@@ -1262,6 +1459,126 @@ def suite_agents_md(mod):
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+def suite_runtime_version():
+    """Installed transports report the version of their own distribution."""
+    print("\n== Suite: installed runtime version ==")
+    with tempfile.TemporaryDirectory(prefix="eb-runtime-version-") as temporary:
+        root = Path(temporary)
+        source = root / "source"
+        (source / "mcp-server").mkdir(parents=True)
+        (source / ".claude-plugin").mkdir()
+        for filename in ("engineering_board_mcp.py", "engineering_board_core.py",
+                         "README.md", "manifest.json", "server.json", "build-mcpb.sh"):
+            shutil.copy2(Path(HERE) / filename, source / "mcp-server" / filename)
+        shutil.copy2(Path(PLUGIN_ROOT) / ".claude-plugin" / "plugin.json",
+                     source / ".claude-plugin" / "plugin.json")
+        shutil.copy2(Path(PLUGIN_ROOT) / "LICENSE", source / "LICENSE")
+        built = subprocess.run(["bash", str(source / "mcp-server" / "build-mcpb.sh")],
+                               capture_output=True, text=True, timeout=30)
+        check(built.returncode == 0, "runtime fixture builds the actual MCP bundle",
+              built.stdout + built.stderr)
+        unpacked = root / "unpacked"
+        with zipfile.ZipFile(source / "dist" / "engineering-board-mcp.mcpb") as bundle:
+            bundle.extractall(unpacked)
+
+        def handshake(server, expected, label, metadata_path=None, resolve_error=False):
+            env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1",
+                       PYTHONPATH=str(metadata_path) if metadata_path else "")
+            request = {"jsonrpc": "2.0", "id": 1, "method": "initialize",
+                       "params": {"protocolVersion": "2025-06-18", "capabilities": {}}}
+            command = [sys.executable, "-S", str(server)]
+            if resolve_error:
+                command = [sys.executable, "-S", "-c", """
+import runpy, sys
+from pathlib import Path
+from unittest.mock import patch
+original_resolve = Path.resolve
+def resolve(path, *args, **kwargs):
+    if path.name == "engineering_board_mcp.py":
+        raise RuntimeError("Symlink loop during ownership resolution")
+    return original_resolve(path, *args, **kwargs)
+with patch.object(Path, "resolve", resolve):
+    runpy.run_path(sys.argv[1], run_name="__main__")
+""", str(server)]
+            result = subprocess.run(command, cwd=root,
+                                    env=env, input=json.dumps(request) + "\n",
+                                    capture_output=True, text=True, timeout=10)
+            check(result.returncode == 0, label + " starts", result.stderr)
+            response = json.loads(result.stdout)
+            expected_versions = expected if isinstance(expected, tuple) else (expected,)
+            check(response["result"]["serverInfo"]["version"] in expected_versions,
+                  label + " reports expected version", result.stdout)
+
+        expected = json.loads((source / ".claude-plugin" / "plugin.json").read_text())["version"]
+        handshake(unpacked / "mcp-server" / "engineering_board_mcp.py", expected,
+                  "actual unpacked bundle")
+
+        fixture = root / "fixture"
+        package = fixture / "site-packages"
+        package.mkdir(parents=True)
+        for filename in ("engineering_board_mcp.py", "engineering_board_core.py"):
+            shutil.copy2(Path(HERE) / filename, package / filename)
+        server = package / "engineering_board_mcp.py"
+        plugin_dir = fixture / ".claude-plugin"
+        plugin_dir.mkdir()
+        plugin = plugin_dir / "plugin.json"
+        manifest = fixture / "manifest.json"
+        dist = package / "engineering_board_mcp-7.8.9.dist-info"
+        dist.mkdir()
+        metadata = dist / "METADATA"
+        metadata.write_text("Metadata-Version: 2.1\nName: engineering-board-mcp\nVersion: 7.8.9\n")
+        record = dist / "RECORD"
+        record.write_text("engineering_board_mcp.py,,\nengineering_board_core.py,,\n")
+        manifest.write_text(json.dumps({"name": "engineering-board", "version": "4.5.6"}))
+        plugin.write_text(json.dumps({"name": "engineering-board", "version": "1.2.3"}))
+        handshake(server, "1.2.3", "source takes precedence", package)
+        plugin.unlink()
+        handshake(server, "4.5.6", "bundle takes precedence over installed metadata", package)
+        manifest.unlink()
+        handshake(server, "7.8.9", "installed distribution metadata", package)
+        cycle = package / "cycle"
+        cycle.symlink_to("cycle")
+        record.write_text("cycle,,\nengineering_board_mcp.py,,\n")
+        # metadata.files may filter the cyclic row before ownership resolution;
+        # otherwise pathlib may raise or leave it unresolved. A real owner is
+        # present, so only its version or the conservative unknown fallback is
+        # valid. The forced error below independently requires that fallback.
+        handshake(server, ("7.8.9", "0.0.0"), "RECORD symlink cycle", package)
+        handshake(server, "0.0.0", "ownership resolution RuntimeError", package,
+                  resolve_error=True)
+        cycle.unlink()
+        record.write_text("engineering_board_mcp.py,,\nengineering_board_core.py,,\n")
+        for malformed in ("{", "[]", '{"version": null}', '{"version": ""}',
+                          '{"version": {}}', '{"version": "not-a-version"}'):
+            plugin.write_text(malformed)
+            manifest.write_text(malformed)
+            handshake(server, "7.8.9", "invalid manifests fall back to owned metadata", package)
+        plugin.unlink()
+        manifest.write_text(json.dumps({"name": "another-project", "version": "9.9.9"}))
+        handshake(server, "7.8.9", "unrelated bundle manifest is ignored", package)
+        manifest.unlink()
+        record.unlink()
+        handshake(server, "0.0.0", "metadata without module ownership", package)
+        record.write_text("another_module.py,,\n")
+        handshake(server, "0.0.0", "metadata for another module", package)
+        record.write_text("engineering_board_mcp.py,,\n")
+        for invalid_version in ("", "not-a-version"):
+            metadata.write_text("Metadata-Version: 2.1\nName: engineering-board-mcp\n"
+                                "Version: " + invalid_version + "\n")
+            handshake(server, "0.0.0", "invalid installed version", package)
+        metadata.write_text("Metadata-Version: 2.1\nName: unrelated\nVersion: 7.8.9\n")
+        handshake(server, "0.0.0", "unrelated installed identity", package)
+        metadata.write_text("Metadata-Version: 2.1\nName: engineering-board-mcp\nVersion: 7.8.9\n")
+        copied = root / "standalone"
+        copied.mkdir()
+        for filename in ("engineering_board_mcp.py", "engineering_board_core.py"):
+            shutil.copy2(package / filename, copied / filename)
+        handshake(copied / "engineering_board_mcp.py", "0.0.0",
+                  "standalone module ignores another installed distribution", package)
+        shutil.rmtree(dist)
+        handshake(server, "0.0.0", "missing version sources", package)
+
+
 def suite_distribution():
     """Validate the distribution manifests so they cannot silently rot.
 
@@ -1448,12 +1765,14 @@ def main():
         suite_stdio(tmp1)
         suite_lifecycle(mod, tmp2)
         suite_read_only_side_effects(mod)
+        suite_hypothesis_details(mod)
         suite_token_only_apply(mod)
         suite_ready(mod)
         suite_remember(mod)
         suite_comments_parent(mod)
         suite_agents_md(mod)
         suite_multiclient()
+        suite_runtime_version()
         # Distribution runs LAST: its fileSha256 pin intentionally trips on any
         # server/hooks-script change until the release coherence pass re-pins
         # via build-mcpb.sh — running it last keeps that expected drift from

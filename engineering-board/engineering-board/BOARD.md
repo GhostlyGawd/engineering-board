@@ -4,9 +4,11 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ## Open
 
-- F005 P2 | [Expose a read-only hypothesis-detail route from retrieved H records](features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md)
+- B009 P1 | [Packaged MCP server reports 0.0.0 instead of its release version](bugs/B009-packaged-mcp-server-reports-0-0-0-instead-of-its-release-ver.md) (in_progress)
+- F005 P2 | [Expose a read-only hypothesis-detail route from retrieved H records](features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md) ⊘ B009 (blocked)
 - O001 | [Independent workflow-pilot preflight exposed label leakage and evidence-retention mismatches before live launch](observations/O001-independent-workflow-pilot-preflight-exposed-label-leakage-a.md)
 - O002 | [Hypotheses retrieved by board_context are not readable through board_get_entry in installed 1.13.5](observations/O002-hypotheses-retrieved-by-board-context-are-not-readable-throu.md)
+- O003 | [Wheel build emits deprecation warnings for legacy license metadata](observations/O003-wheel-build-emits-deprecation-warnings-for-legacy-license-me.md)
 
 ## Conventions
 

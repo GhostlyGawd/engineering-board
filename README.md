@@ -14,7 +14,7 @@ _The board is the database._
 
 [![Website](https://img.shields.io/badge/website-ghostlygawd.github.io-E6A94E.svg)](https://ghostlygawd.github.io/engineering-board/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.13.5-E6A94E.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.14.0-E6A94E.svg)](CHANGELOG.md)
 [![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
 [![Codex plugin](https://img.shields.io/badge/Codex-plugin-171719.svg)](https://developers.openai.com/codex/plugins)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
@@ -82,6 +82,9 @@ Milestone D puts this memory in the agent's decision path:
 - Each result shows a stable title, a typed summary of at most 2,000
   characters, the epistemic state, structural signals, score components,
   match reason, and canonical sources.
+- `board_get_entry` opens a retrieved H### record in full, including its
+  alternatives and falsifier. Reading preserves its status; it does not confirm
+  a proposed cause or record an outcome.
 - A task-only miss tells the caller to add a file, entry identifier, or current
   directory. Task words do not bypass structural eligibility.
 - `board_outcomes` records an explicit fix result against an H### hypothesis.
@@ -366,7 +369,7 @@ same deterministic core.
 | `board_list_projects` | List router projects |
 | `board_create_entry` | Create a valid entry |
 | `board_list_entries` | List and filter entries |
-| `board_get_entry` | Get one entry |
+| `board_get_entry` | Get one entry, including full canonical H### details |
 | `board_update_entry` | Change one entry and archive a new resolution |
 | `board_graph` | Build the deterministic graph |
 | `board_context` | Retrieve bounded and explainable systemic memory |

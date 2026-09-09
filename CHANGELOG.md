@@ -9,8 +9,14 @@ increases.
 
 ## [Unreleased]
 
+## [1.14.0] — 2026-09-09
+
 ### Added
 
+- `board_get_entry` can read full canonical H### hypotheses from context
+  results, preserving status, provenance, alternatives and falsifier. Tool
+  guidance makes the detail route discoverable without adding a write or
+  changing ordinary entry reads.
 - D.1 now has an additive version-2 response contract for explicit
   `apply`/`hold`/`reject` evaluation of surfaced memory before a local
   correction, with a separate harness-reported rate that does not rewrite
@@ -18,6 +24,9 @@ increases.
 
 ### Fixed
 
+- Standalone MCP bundles and installed Python distributions now report their
+  release version in the MCP handshake instead of `0.0.0`, while plugin
+  manifests retain precedence and unrelated package metadata is ignored.
 - D.1 memory-evaluation reporting now requires retained response evidence and
   a rubric-bound reviewer assessment for before-local classifications, checks
   v2 rejected-memory and decoy use separately, and reports rates only for a
