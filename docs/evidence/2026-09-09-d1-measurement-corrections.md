@@ -119,3 +119,32 @@ an honest no-local-correction review remained retained with unavailable ordering
 contradictory declarations rejected. Combining that response with a healthy
 ordering success still left the aggregate rate unavailable. This closes the
 two findings from the first review without claiming automatic semantic judgment.
+
+## Combined builder handoff
+
+Final builder revision: `51d4fb7cec619d2287bc2649f5e1c7f80f285253`.
+The evaluation suite passed 37 tests; final targeted missing-negative and legacy
+manifest checks passed. The complete repository suite passed 21 of 21 suites
+at this revision. These are deterministic implementation checks, not measured
+model outcomes.
+
+B007 freezes evaluation_version and the positive reference-context population
+in the manifest and binds cohort metadata to trial input files. Reports expose
+planned, observed, missing, invalid, mixed, unverified, no-local-correction and
+no-memory populations. All required reference controls must be present before
+a rate is available; no-memory planned trials remain denominator members.
+Observed safeguard checks and full-population results are distinct.
+
+The independent verifier is checking this complete revision in a separate
+checkout before integration and feature reassessment.
+
+### B007 final-review regression
+
+At `51d4fb7`, the verifier started from an actual complete prepared run with one
+honest ordering failure (11/12, 91.67%). It removed the failed trial from both
+manifest.trials and the eligible-key list, recalculated the manifest digest,
+and left all frozen workspace inputs intact. Scoring accepted the shortened
+cohort as complete and reported 100%. Comparing two lists from the same mutable
+manifest did not bind the entire predeclared population. The lead returned
+B007 to implementation for a complete input-inventory check and a permanent
+regression. No live evidence was produced or reclassified.

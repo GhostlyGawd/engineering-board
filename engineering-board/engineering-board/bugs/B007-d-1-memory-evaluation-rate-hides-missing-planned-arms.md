@@ -1,8 +1,8 @@
 ---
 id: B007
 type: bug
-status: in_progress
-needs: tdd
+status: open
+needs: review
 priority: P2
 title: D.1 memory-evaluation rate hides missing planned arms
 affects: evaluation/harness.py
@@ -26,3 +26,6 @@ promoted_from: [mcp:_sessions/mcp-2026-09-09.md:28c8efe5cd69d890]
 ## Comments
 
 - **builder-d1-b007-20260909** 2026-09-09T13:53:26Z: Same builder now owns planned version/eligible population, truthful partial/mixed/legacy reports and all-reference completeness separate from observed safeguards. No thresholds changed.
+- **builder-d1-b007-20260909** 2026-09-09T14:00:15Z: Combined commit 51d4fb7 ready for independent review. 37 evaluation tests and two final missing-negative/historical-manifest checks pass; full suite running. Configuration pins version and population; partial/mixed/invalid/unverified/no-local have explicit unavailable rate reasons.
+- **builder-d1-b007-fix-20260909** 2026-09-09T14:02:22Z: Independent verifier reproduced denominator shrink at 51d4fb7: delete failed trial from trials+eligible keys and recompute manifest digest; remaining frozen inputs still show original cohort, but report falsely becomes 100/complete. Add complete-cohort binding/check against retained workspace inventory; reverify before integration.
+- **builder-d1-b007-fix-20260909** 2026-09-09T14:05:04Z: Correction commit 72ebeea checks exact retained workspace directory/input cohort independently, rejects omitted/redirected/linked inputs and changed population. Three targeted regressions pass; 39-test evaluation suite running. Independent final recheck assigned.
