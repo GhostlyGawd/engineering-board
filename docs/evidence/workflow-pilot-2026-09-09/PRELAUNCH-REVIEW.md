@@ -35,3 +35,18 @@ was empty; `/`, `/private`, `/private/tmp` and `/tmp` had no ancestor AGENTS.md.
 
 Final acceptance must cite the integrated source commit and complete prepared
 inventory. No live trial starts on this provisional review record.
+
+## Pinned preparation acceptance
+
+Independent reviewer `review_workflow_protocol` returned preparation PASS at
+`2682cd8b3fb9ab9c38cba769b798d54e1a498dd2`. It independently ran all seven
+runner tests and fixture validation: four reference repairs passed 4/4 hidden
+checks each, harmful-scope mutations failed, all twelve Board bodies matched
+history, and visible condition-label scans passed. Previous blocking findings
+were verified corrected. The reviewer authorized marking the host isolation
+review field true for no-model preparation, with the documented procedural-only
+limits. Final freeze acceptance still requires prepared-artifact review.
+
+Direct reads of Board Markdown are possible within the declared workspace.
+Review must distinguish that route from actual MCP retrieval; Board availability
+does not establish use of the retrieval mechanism.

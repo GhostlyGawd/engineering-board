@@ -19,7 +19,7 @@
   "timeout_seconds": 180,
   "reviewer": "review_workflow_protocol",
   "retention_owner": "Rhen McLeod / GhostlyGawd engineering-board repository",
-  "isolation_reviewed": false,
+  "isolation_reviewed": true,
   "runtime_executables": ["/opt/homebrew/bin/node", "/opt/homebrew/bin/python3"],
   "runtime_paths": [
     "/Users/rhenmcleod/.codex/plugins/cache/engineering-board/engineering-board/1.13.5/scripts/engineering-board-mcp-launcher.mjs",
