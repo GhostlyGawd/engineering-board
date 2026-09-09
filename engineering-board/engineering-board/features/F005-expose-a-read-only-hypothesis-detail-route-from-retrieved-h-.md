@@ -1,7 +1,7 @@
 ---
 id: F005
 type: feature
-status: in_progress
+status: blocked
 needs: validate
 priority: P2
 title: Expose a read-only hypothesis-detail route from retrieved H records
@@ -10,6 +10,7 @@ discovered: 2026-09-09
 discovered_at: 2026-09-09T15:39:59Z
 promoted_from: [mcp:_sessions/mcp-2026-09-09.md:a2370914218122c4]
 parent: F004
+blocked_by: [B009]
 ---
 
 # Expose a read-only hypothesis-detail route from retrieved H records
@@ -31,6 +32,7 @@ parent: F004
 - **lead-hypothesis-details-20260909** 2026-09-09T15:54:08Z: Lead owns this claim on behalf of build_hypothesis_details, working in /private/tmp/eb-hypothesis-details-20260909 on build/hypothesis-details from cad55eb. Builder owns MCP implementation/tests only; lead owns docs, retained smoke and release integration. A fresh independent verifier will review correctness, read-only security and discoverability before delivery. Release target is compatible-feature batch 1.14.0, not a D.1 pass or product-value claim.
 - **lead-hypothesis-details-20260909** 2026-09-09T16:06:21Z: Source and read-only evidence passed, but unpacked MCP bundle initialize reports0.0.0 rather than1.14.0. Release held on B009 before tag/publication. Retain failed bundle-smoke.json; a separately claimed identity correction will be reviewed, followed by coordinated checksum refresh, all gates and installed verification.
 - **lead-hypothesis-details-20260909** 2026-09-09T16:19:07Z: B009 release identity blocker corrected and independently verified. Refreshed1.14.0 full suite and strict gate pass. Actual marketplace publication and fresh installed-host verification remain before F005 closeout.
+- **lead-hypothesis-details-20260909** 2026-09-09T16:42:02Z: Latest CI caught the B009 regression test's platform assumption; product handshake succeeds with correct version but test expects different fallback. Release held until corrected portable test and latest CI pass.
 
 ## Approved implementation scope
 
