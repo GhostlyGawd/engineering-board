@@ -76,9 +76,18 @@ null/false for baseline and empty context, rejection of fabricated memory use,
 support for surfaced cluster IDs, and preserved v1 behavior. Ordering evidence,
 safeguard scoring and denominator design remain separate findings.
 
-The independent auditor will verify B004 at its committed revision before the
-lead integrates or resolves it. F003 closes after the process and first audit
-are delivered; F002 stays open until its own requirements are met.
+The independent auditor passed builder commit
+`19edddcb84c6d5fc3bc57ffb780f841c4ad92073` before integration as `10fec3e`.
+It ran 28 evaluation tests and independently validated/recorded all 48 prepared
+arms: 24 baseline null responses, six empty-context null responses and 18
+surfaced-cluster evaluations. All 54 populated-context adversarial checks
+rejected null evaluations, unsupplied targets and changed statuses. Complete
+v1 scoring matched the parent commit; historical inputs remain unchanged.
+
+B004 is verified within that scope. B005-B007 remain open; this pass does not
+establish trustworthy before-local measurement or authorize a live evaluation.
+F003 closes after the process and first audit are delivered; F002 stays blocked
+until its own requirements are met.
 
 ## Pilot measures
 
@@ -86,8 +95,14 @@ are delivered; F002 stays open until its own requirements are met.
   existing tests; all four linked to board work.
 - Process review: no blocker, three clarity suggestions incorporated.
 - Product or live-model outcomes: not measured in this pilot.
+- Integrated verification: all 21 repository suites passed, including 28
+  evaluation tests. B004 and F003 resolved as source-complete; owning claims
+  released. F002 remains blocked by B005-B007.
 - Agent token cost and comparable prior cycle time: not measured.
-- Time to verified delivery and B004 review result: recorded at closeout.
+- B004 builder-to-verifier handoff: passed at the first submitted revision;
+  source integration recorded above. Installation/release has not occurred.
+- Cycle timing: F003 claimed at approximately 13:14 UTC; final source delivery
+  timing is available from the PR merge and board closeout records.
 
 These counts describe this trial only. Team productivity and defect escape
 rates require observations across several delivered outcomes.

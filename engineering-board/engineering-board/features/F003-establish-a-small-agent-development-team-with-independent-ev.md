@@ -1,8 +1,8 @@
 ---
 id: F003
 type: feature
-status: in_progress
-needs: tdd
+status: resolved
+needs: validate
 priority: P2
 title: Establish a small agent development team with independent evidence review
 affects: docs/DEVELOPMENT.md
@@ -31,3 +31,11 @@ promoted_from: [mcp:_sessions/mcp-2026-09-09.md:96a6b41441468aec]
 - Review lenses, escalation, durable evidence, and release verification have explicit handoffs.
 - An independent process review and D.1 v2 audit are preserved; confirmed defects have canonical follow-up work.
 - No product-effect claim or new evaluation baseline is inferred from process adoption.
+
+## Comments
+
+- **codex-development-team-20260909** 2026-09-09T13:23:49Z: Independent process review passed and suggestions incorporated. Pilot audit found B004-B007; F002 reopened. Separate B004 builder commit independently verified; integration suite running. Release hold retained for remaining audit gaps.
+
+## Resolution evidence
+
+Maintainer roles and handoffs linked from AGENTS.md and CONTRIBUTING.md, templates delivered, independent process reviewer passed, first D.1 audit recorded four canonical defects and a separate builder/verifier completed B004. Integrated suite 21/21. Pilot report retains limits and pending B005-B007; no product benefit or live evaluation claim.
