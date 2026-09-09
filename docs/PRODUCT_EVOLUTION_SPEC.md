@@ -82,7 +82,7 @@ selected milestone is approved.
 | Milestone B implementation | Accepted and shipped | Section 18 shipped in v1.9.1 without Milestone C reasoning, SQLite, hosted services, or cross-repository aggregation. The v1.9.0 publication workflow failed closed on a packaging-check mismatch before a GitHub Release. v1.9.1 is the corrected publication boundary. |
 | Milestone C direction | Accepted and shipped | Deterministic cluster ranking, evidence-linked H### hypotheses, explicit evaluation, negative memory, adapter parity, and the normal pattern-intelligence view shipped in v1.10.0. Section 19 remains the approved contract. |
 | Milestone D direction | Accepted and shipped | Relevant repository-local pattern memory now enters the agent decision path. Explicit fix outcomes improve later retrieval and Learning confidence. Section 20 remains the accepted implementation contract. |
-| Milestone D.1 direction | Current non-scored preflight complete; version 4 remains unlocked | Prove whether context changes an agent diagnosis before a local fix. Keep version 3 locked with its failed result. Context contract version 2 introduced bounded canonical memory content; current version 3 preserves it and adds matched-Learning confidence. The current one-repetition version 4 preflight observed 0/4 qualifying first causes in both arms. The owner still controls the exact baseline decision. |
+| Milestone D.1 direction | Current non-scored preflight and presentation diagnostic complete; version 4 remains unlocked | Prove whether context changes an agent diagnosis before a local fix. Keep version 3 locked with its failed result. Context contract version 2 introduced bounded canonical memory content; current version 3 preserves it and adds matched-Learning confidence. The one-repetition version 4 preflight observed 0/4 qualifying first causes in both arms. A later source-locked C04 factorial observed 0/4 across raw/prose and before/after presentation, so presentation alone is not the next mechanism. The owner still controls the exact baseline decision. |
 
 ## 3. Product thesis
 
@@ -2843,6 +2843,15 @@ and independent reviews found zero cross-incident-before-local first causes in
 both arms, for an observed change of zero percentage points. The context
 responses did not connect the current incident to the prior incident in their
 first stated cause.
+
+The owner later authorized a clean Q003 protocol reset after the prior scratch
+artifacts became unrecoverable. A source-locked C04 factorial tested raw JSON
+and shipped prompt-guard prose before and after case evidence under one current
+client. Response-only blind review found zero cross-incident first causes in
+all four treatments. None mentioned the prior CLI incident; all preserved H104
+as proposed. This falsifies rearrangement of the same memory as a sufficient
+C04 mechanism under the bounded diagnostic. It does not establish general
+product effect or authorize a corpus lock.
 
 This one-repetition proposal result is not scored evidence. It does not prove
 that the delivered memory has no effect, and it does not authorize a corpus

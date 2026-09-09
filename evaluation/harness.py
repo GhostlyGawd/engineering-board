@@ -29,6 +29,10 @@ SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 CONTEXT_FINGERPRINT = re.compile(r"^ctx-[0-9a-f]{16}$")
+SYSTEM_TEMP_LINKS = {
+    Path("/tmp"): Path("/private/tmp"),
+    Path("/var"): Path("/private/var"),
+}
 
 
 class EvaluationError(ValueError):
@@ -97,6 +101,17 @@ def _reject_linked_path(path: Path) -> None:
     current = path.absolute()
     for candidate in (current, *current.parents):
         if candidate.is_symlink():
+            expected = SYSTEM_TEMP_LINKS.get(candidate)
+            try:
+                system_temp_link = (
+                    expected is not None
+                    and candidate.lstat().st_uid == 0
+                    and candidate.resolve(strict=True) == expected
+                )
+            except OSError:
+                system_temp_link = False
+            if system_temp_link:
+                continue
             raise EvaluationError(f"linked path is not allowed: {candidate}")
 
 

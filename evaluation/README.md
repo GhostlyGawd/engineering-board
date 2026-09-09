@@ -201,6 +201,16 @@ responses did not explicitly connect the visible incident to the prior
 incident. The result does not distinguish a stable product limitation from
 one-sample model variation or an operator-output limitation.
 
+A later Q003 protocol-reset diagnostic isolated presentation for C04. It ran
+raw JSON and shipped prompt-guard prose both before and after the case evidence
+under one source-locked current client. Response-only blind review classified
+all four first causes as current-incident-only: none mentioned the prior CLI
+incident, all mentioned without using the broader memory, and all preserved
+H104 as proposed. Presentation format and position are therefore not
+sufficient for C04 under that single-case diagnostic. This does not establish
+product effect or authorize a corpus lock. See
+[`2026-09-09 Q003 context-presentation reset`](../docs/evidence/2026-09-09-q003-context-presentation-reset.md).
+
 Engineering Board does not claim that Milestone D context improves agent
 diagnoses. Version 4 remains an unlocked proposal. Its exact corpus digest and
 the draft structured-requirement digest are recorded in the current dated

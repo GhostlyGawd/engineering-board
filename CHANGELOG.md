@@ -9,6 +9,12 @@ increases.
 
 ## [Unreleased]
 
+### Fixed
+
+- `board_patterns` now applies its self-contained preview identifier without
+  requiring callers to repeat the action payload, matching the apply-only
+  contract already provided by `board_hypotheses`.
+
 ## [1.13.4] — 2026-08-16
 
 ### Fixed

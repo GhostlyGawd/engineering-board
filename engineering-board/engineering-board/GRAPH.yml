@@ -1,0 +1,72 @@
+{
+  "schema_version": "3",
+  "generated_at": "2026-09-09T00:04:32Z",
+  "source_fingerprint": "7a6e97350c150d6857ae122ca40b7b60479adb840783296b3cb8a24463d185bc",
+  "build_mode": "full",
+  "project": "engineering-board",
+  "entries_analyzed": {
+    "open": 3,
+    "archived": 0,
+    "total": 3
+  },
+  "nodes": {
+    "B001": {
+      "type": "bug",
+      "title": "Evaluation harness rejects macOS system temp paths",
+      "source": "bugs/B001-evaluation-harness-rejects-macos-system-temp-paths.md",
+      "priority": "P1",
+      "status": "open",
+      "affects": "evaluation/harness.py",
+      "discovered": "2026-09-08"
+    },
+    "B002": {
+      "type": "bug",
+      "title": "Token-only pattern and hypothesis apply falls through to list",
+      "source": "bugs/B002-token-only-pattern-and-hypothesis-apply-falls-through-to-lis.md",
+      "priority": "P2",
+      "status": "open",
+      "affects": "mcp-server/engineering_board_mcp.py",
+      "discovered": "2026-09-09"
+    },
+    "F001": {
+      "type": "feature",
+      "title": "Add exhaustive Codex dogfood capability matrix",
+      "source": "features/F001-add-exhaustive-codex-dogfood-capability-matrix.md",
+      "priority": "P1",
+      "status": "open",
+      "affects": "tests/codex-plugin.sh",
+      "discovered": "2026-09-08"
+    }
+  },
+  "edges": [],
+  "topology": {
+    "clusters": [],
+    "isolated": [
+      "B001",
+      "B002",
+      "F001"
+    ],
+    "cross_cluster_bridges": []
+  },
+  "unresolved_patterns": [],
+  "findings": [
+    {
+      "type": "isolated-node",
+      "node": "B001"
+    },
+    {
+      "type": "isolated-node",
+      "node": "B002"
+    },
+    {
+      "type": "isolated-node",
+      "node": "F001"
+    }
+  ],
+  "read_order": [
+    "B001",
+    "B002",
+    "F001"
+  ],
+  "drill_in": {}
+}

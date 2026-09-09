@@ -115,8 +115,12 @@ one-repetition preflight then produced zero qualifying cross-incident first
 causes in both the four baseline arms and the four context arms. The expected
 memories ranked first or second, but the responses did not connect their
 current incident to the prior incident. This is not a scored product-effect
-result. The proposal remains unlocked, and the exact baseline decision remains
-with the product owner. See
+result. A later source-locked C04 diagnostic tested raw JSON versus shipped
+prompt-guard prose, each before and after case evidence. All four treatments
+again produced current-incident-only first causes, so presentation format and
+position are not sufficient for C04 under that bounded current-client test.
+The proposal remains unlocked, and the exact baseline decision remains with
+the product owner. See
 [`evaluation/README.md`](evaluation/README.md) for the proof boundary and
 operator commands.
 

@@ -2,6 +2,7 @@
 
 Resolved entries. Newest at the top.
 
+- Q003 | Does context presentation prevent cross-incident first causes? | resolved: 2026-09-09
 - Q002 | Does current D.1 version 4 context change cross-incident diagnosis? | resolved: 2026-08-16
 - B078 | Claude strict plugin validation rejects the ignored marketplace policy field | resolved: 2026-08-16
 - B077 | Codex exec cancels read-only board tools while MCP schemas omit approval annotations | resolved: 2026-08-16

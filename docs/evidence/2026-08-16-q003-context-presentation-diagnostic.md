@@ -1,8 +1,14 @@
 # Q003 context-presentation diagnostic — 2026-08-16
 
+> Historical failed-campaign record. The owner later declared its external
+> artifacts permanently lost and authorized a clean protocol reset. The valid
+> reset result is recorded in
+> [`2026-09-09-q003-context-presentation-reset.md`](2026-09-09-q003-context-presentation-reset.md).
+> Statements below describe the 2026-08-16 checkpoint, not current Q003 state.
+
 ## Identity and authoritative state
 
-This is the single durable workpad for Q003. The authoritative repository is
+This is the historical workpad for the failed Q003 campaigns. The authoritative repository is
 `GhostlyGawd/engineering-board`. Work started from exact main
 `9fa969a5658775d8e53c90a55996fa1507529c50` on branch
 `codex/q003-context-presentation`.

@@ -43,6 +43,7 @@ from engineering_board_core import (
     GraphError as CoreError,
     apply_learning_plan,
     apply_outcome_plan,
+    apply_pattern_plan,
     apply_pattern_operation,
     apply_hypothesis_plan,
     apply_promotion,
@@ -54,7 +55,7 @@ from engineering_board_core import (
     load_pattern_registry,
     plan_outcome,
     plan_hypothesis_operation,
-    plan_pattern_operation,
+    plan_pattern_operation_token,
     plan_promotion,
     resolve_entry_patterns,
 )
@@ -1191,6 +1192,22 @@ def tool_board_patterns(params):
     root = resolve_root(params)
     bd = ensure_board_exists(root, project)
     action = params.get("action", "list")
+    operation_params = {
+        key: value
+        for key, value in params.items()
+        if key not in {"root", "project", "action", "apply"}
+    }
+    plan_id = params.get("apply")
+    if plan_id:
+        if not re.fullmatch(r"[0-9a-f]{64}", str(plan_id)):
+            return apply_pattern_plan(Path(bd), project, str(plan_id))
+        if action == "list":
+            raise ToolError(
+                "legacy pattern plan ids require the original action and inputs"
+            )
+        return apply_pattern_operation(
+            Path(bd), project, action, operation_params, plan_id
+        )
     if action == "list":
         registry = load_pattern_registry(Path(bd))
         return {
@@ -1210,17 +1227,9 @@ def tool_board_patterns(params):
                 for _, record in sorted(registry["by_id"].items())
             ]
         }
-    operation_params = {
-        key: value
-        for key, value in params.items()
-        if key not in {"root", "project", "action", "apply"}
-    }
-    plan_id = params.get("apply")
-    if plan_id:
-        return apply_pattern_operation(
-            Path(bd), project, action, operation_params, plan_id
-        )
-    return plan_pattern_operation(Path(bd), action, operation_params)
+    return plan_pattern_operation_token(
+        Path(bd), project, action, operation_params
+    )
 
 
 def tool_board_insights(params):
