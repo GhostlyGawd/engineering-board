@@ -371,6 +371,90 @@ class EvaluationHarnessTests(unittest.TestCase):
             schema["properties"]["memory_evaluation"]["properties"]["disposition"]["enum"],
             ["apply", "hold", "reject"],
         )
+        self.assertIn("memory_evaluation", schema["required"])
+        self.assertEqual(
+            schema["properties"]["memory_evaluation"]["type"], ["object", "null"]
+        )
+
+    def test_v2_records_absent_memory_without_claiming_evaluation(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-absent-memory-") as temp:
+            run_dir = self.prepare(Path(temp))
+            manifest = load_run(run_dir)
+            cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+            baseline = next(item for item in manifest["trials"] if item["arm"] == "baseline")
+            empty_contexts = [
+                item for item in manifest["trials"]
+                if item["arm"] == "context" and not item["context_brief"]["results"]
+            ]
+            self.assertEqual({item["case_id"] for item in empty_contexts}, {"D1-C07", "D1-C08"})
+            for trial in [baseline, *empty_contexts]:
+                with self.subTest(trial=trial["trial_key"]):
+                    attempt = self.scored_attempt(
+                        trial, cases[trial["case_id"]], schema_version="2",
+                        memory_evaluation=None, memory_evaluation_before_local=False,
+                    )
+                    false_claims = [
+                        {"memory_evaluation_before_local": True},
+                        {"memory_evaluation_before_local": 0},
+                        {"memory_evaluation_before_local": None},
+                        {"memory_evaluation": {
+                            "memory_id": "H101", "memory_status": "proposed",
+                            "current_incident_ids": [], "prior_incident_ids": [],
+                            "disposition": "hold", "evidence_or_gap": "No memory was supplied.",
+                        }},
+                    ]
+                    for claim in false_claims:
+                        with self.subTest(claim=claim), self.assertRaisesRegex(
+                            EvaluationError, "cannot evaluate unsupplied memory"
+                        ):
+                            record_attempt(run_dir, trial["trial_key"], {**attempt, **claim})
+                    for field in ("memory_evaluation", "memory_evaluation_before_local"):
+                        missing = dict(attempt)
+                        del missing[field]
+                        with self.subTest(missing=field), self.assertRaisesRegex(
+                            EvaluationError, "cannot evaluate unsupplied memory"
+                        ):
+                            record_attempt(run_dir, trial["trial_key"], missing)
+                    record = record_attempt(run_dir, trial["trial_key"], attempt)
+                    self.assertEqual(json.loads(Path(record).read_text()), attempt)
+
+    def test_v2_records_supplied_cluster_and_rejects_unsupplied_evaluations(self) -> None:
+        schema = json.loads(
+            (ROOT / "evaluation" / "memory-evaluation-response.schema.json").read_text()
+        )
+        pattern = schema["properties"]["memory_evaluation"]["properties"]["memory_id"]["pattern"]
+        for memory_id in ("H101", "L001", "P101", "c-53730b325de4f920"):
+            self.assertIsNotNone(re.fullmatch(pattern, memory_id))
+        for memory_id in ("B101", "c-53730b325de4f92", "c-53730b325de4f9200", "c-53730b325de4f92g"):
+            self.assertIsNone(re.fullmatch(pattern, memory_id))
+        with tempfile.TemporaryDirectory(prefix="eb-eval-cluster-memory-") as temp:
+            run_dir = self.prepare(Path(temp))
+            manifest = load_run(run_dir)
+            cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+            trial = next(
+                item for item in manifest["trials"]
+                if item["arm"] == "context" and item["case_id"] == "D1-C01"
+            )
+            cluster = next(item for item in trial["context_brief"]["results"] if item["kind"] == "cluster")
+            self.assertIsNotNone(re.fullmatch(pattern, cluster["id"]))
+            evaluation = {
+                "memory_id": cluster["id"], "memory_status": cluster["status"],
+                "current_incident_ids": ["B101"], "prior_incident_ids": ["B102"],
+                "disposition": "hold", "evidence_or_gap": "Cluster membership alone does not establish a shared cause.",
+            }
+            attempt = self.scored_attempt(
+                trial, cases[trial["case_id"]], schema_version="2",
+                memory_evaluation=evaluation, memory_evaluation_before_local=True,
+            )
+            for value, message in (
+                (None, "requires memory_evaluation"),
+                ({**evaluation, "memory_id": "H999"}, "must target surfaced memory"),
+                ({**evaluation, "memory_status": "confirmed"}, "status differs"),
+            ):
+                with self.subTest(evaluation=value), self.assertRaisesRegex(EvaluationError, message):
+                    record_attempt(run_dir, trial["trial_key"], {**attempt, "memory_evaluation": value})
+            record = record_attempt(run_dir, trial["trial_key"], attempt)
+            self.assertEqual(json.loads(Path(record).read_text()), attempt)
 
     def test_v2_memory_evaluation_is_reported_separately(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-memory-use-") as temp:

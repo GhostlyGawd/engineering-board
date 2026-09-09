@@ -835,7 +835,8 @@ def _validate_attempt(trial: dict[str, Any], case: dict[str, Any], attempt: dict
         _require(memories == [], "baseline arm cannot receive surfaced memories")
         if schema_version == "2":
             _require(
-                attempt.get("memory_evaluation") is None
+                "memory_evaluation" in attempt
+                and attempt["memory_evaluation"] is None
                 and attempt.get("memory_evaluation_before_local") is False,
                 "baseline v2 attempt cannot evaluate unsupplied memory",
             )
@@ -862,6 +863,14 @@ def _validate_attempt(trial: dict[str, Any], case: dict[str, Any], attempt: dict
     _require(attempt.get("rejected_memory_treatment") in {"not_surfaced", "rejected", "used"}, "invalid rejected memory treatment")
     _require(attempt.get("lexical_decoy_treatment") in {"ignored", "not_applicable", "used"}, "invalid lexical decoy treatment")
     if schema_version == "2":
+        if not brief["results"]:
+            _require(
+                "memory_evaluation" in attempt
+                and attempt["memory_evaluation"] is None
+                and attempt.get("memory_evaluation_before_local") is False,
+                "empty context v2 attempt cannot evaluate unsupplied memory",
+            )
+            return
         evaluation = attempt.get("memory_evaluation")
         _require(isinstance(evaluation, dict), "context v2 attempt requires memory_evaluation")
         required = {
