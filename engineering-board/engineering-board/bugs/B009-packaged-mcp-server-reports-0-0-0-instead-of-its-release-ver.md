@@ -1,8 +1,8 @@
 ---
 id: B009
 type: bug
-status: in_progress
-needs: tdd
+status: resolved
+needs: validate
 priority: P1
 title: Packaged MCP server reports 0.0.0 instead of its release version
 affects: mcp-server/engineering_board_mcp.py
@@ -16,9 +16,9 @@ parent: F005
 
 ## Done when
 
-- [ ] Source/plugin manifest precedence remains intact, and owned bundle/distribution metadata supplies the runtime version when that manifest is absent.
-- [ ] Actual unpacked bundle and installed wheel handshakes report their declared release version; missing, invalid or unrelated metadata has a tested conservative fallback.
-- [ ] Independent review, refreshed reproducible bundle checksum, full tests and strict release validation pass before publication.
+- [x] Source/plugin manifest precedence remains intact, and owned bundle/distribution metadata supplies the runtime version when that manifest is absent.
+- [x] Actual unpacked bundle and installed wheel handshakes report their declared release version; missing, invalid or unrelated metadata has a tested conservative fallback.
+- [x] Independent review, refreshed reproducible bundle checksum, full tests and strict release validation pass before publication.
 
 ## Evidence
 
@@ -31,3 +31,4 @@ Release identity blocker. Keep authoritative source/installed-plugin manifest pr
 ## Comments
 
 - **lead-hypothesis-details-20260909** 2026-09-09T16:12:38Z: Independent review at39aa5f6 reproduced an uncaught Path.resolve RuntimeError for a self-referential symlink row in owning distribution RECORD on Python3.9.6. Builder correcting conservative fallback and adding real/forced resolution-failure regression, testing3.9 and3.14. Actual installed-wheel bytes match reviewed source and two H read workflows pass version1.14.0; deliberately wrong expected-version exits1 with retained receipt. Publication remains held.
+- **release-runtime-identity-20260909** 2026-09-09T16:19:07Z: Verified before publication: independent PASS at770ced9;41runtime checks pass Python3.9/3.14; final real bundle and installed-wheel handshakes report1.14.0 with fullH read invariance. Coordinated refresh SHA0b259fac619543308043f804dd5d5b49612cf018fcf61209e72f3f752d66cc67; all22suites and strictClaude validation pass. See SOURCE-REVIEW.md and refreshed bundle/wheel receipts. Old failure evidence preserved.

@@ -79,3 +79,33 @@ without warnings. Its retained two-case transport receipt is
 `prepared-1.14.0-smoke.json`. Publication and actual installed-host receipts are
 still separate gates; the prepared marketplace ref must not be installed before
 the release workflow creates its tag.
+
+## B009 packaged identity correction and refreshed gates
+
+The first unpacked bundle passed detail reads but reported handshake version
+`0.0.0`. Publication stopped before a tag was created. The retained
+`bundle-smoke.json` and expected-version failure receipt preserve this result;
+the initial checksum above is superseded for the unpublished release.
+
+B009 adds source-manifest precedence, an identity-checked bundle manifest,
+and metadata from the Python distribution whose RECORD owns the running module.
+An independent Python 3.9 test then found an uncaught symlink-resolution
+`RuntimeError` in malformed distribution metadata. Correction `21340d6` adds
+the conservative fallback and regression. Final B009 source review PASS:
+`770ced9284e8f6d7a58e1c33f9f1f12378178ee0`, with 41 runtime checks independently
+passing on Python 3.9.6 and 3.14.7. F005 semantics remain unchanged.
+
+Coordinated `prepare-release.py 1.14.0 --refresh` preview/apply produced final
+bundle SHA-256
+`0b259fac619543308043f804dd5d5b49612cf018fcf61209e72f3f752d66cc67`.
+The refreshed tree passed all 22 suites and strict Claude validation without
+warnings. Both `refreshed-bundle-smoke.json` and `refreshed-wheel-smoke.json`
+report runtime 1.14.0, exact full H details, unchanged repository layout/bytes
+and zero model calls. The wheel was genuinely built and installed in an
+isolated Python 3.9 environment, not simulated distribution metadata.
+
+Setuptools emitted pre-existing license-table/classifier deprecation warnings
+while building the wheel; the build succeeded. O003 retains that maintenance
+follow-up. These are not strict Claude validation warnings. No version target,
+published tag, historical corpus or product-effect threshold was changed while
+correcting the unpublished package.

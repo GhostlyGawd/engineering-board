@@ -1,6 +1,7 @@
 # engineering-board — Archive
 
 Resolved entries. Newest at the top.
+- B009 | Packaged MCP server reports 0.0.0 instead of its release version | resolved: 2026-09-09
 - F004 | Validate D.1 v2 in a live pilot with retained evidence | resolved: 2026-09-09
 - B008 | Workflow-pilot hypothesis fixtures pass local checks but fail released Board retrieval validation | resolved: 2026-09-09
 - B007 | D.1 memory-evaluation rate hides missing planned arms | resolved: 2026-09-09

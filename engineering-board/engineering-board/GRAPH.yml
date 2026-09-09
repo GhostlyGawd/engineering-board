@@ -1,21 +1,21 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-09-09T16:06:21Z",
-  "source_fingerprint": "88fa880d8a6ff1014eb67aec65cb81c32ced911eb32b183b82f41bdcf4523e03",
+  "generated_at": "2026-09-09T16:19:06Z",
+  "source_fingerprint": "256785b61d7af139be9057c27645a4aba61f5c08595300d1ab2d350a6a2f271b",
   "build_mode": "full",
   "project": "engineering-board",
   "entries_analyzed": {
-    "open": 4,
+    "open": 5,
     "archived": 0,
-    "total": 4
+    "total": 5
   },
   "nodes": {
     "B009": {
       "type": "bug",
       "title": "Packaged MCP server reports 0.0.0 instead of its release version",
       "source": "bugs/B009-packaged-mcp-server-reports-0-0-0-instead-of-its-release-ver.md",
-      "priority": "P2",
-      "status": "open",
+      "priority": "P1",
+      "status": "in_progress",
       "affects": "mcp-server/engineering_board_mcp.py",
       "discovered": "2026-09-09"
     },
@@ -24,7 +24,7 @@
       "title": "Expose a read-only hypothesis-detail route from retrieved H records",
       "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md",
       "priority": "P2",
-      "status": "in_progress",
+      "status": "blocked",
       "affects": "mcp-server/engineering_board_mcp.py",
       "discovered": "2026-09-09"
     },
@@ -41,9 +41,30 @@
       "source": "observations/O002-hypotheses-retrieved-by-board-context-are-not-readable-throu.md",
       "affects": "mcp-server/engineering_board_mcp.py",
       "discovered": "2026-09-09"
+    },
+    "O003": {
+      "type": "observation",
+      "title": "Wheel build emits deprecation warnings for legacy license metadata",
+      "source": "observations/O003-wheel-build-emits-deprecation-warnings-for-legacy-license-me.md",
+      "affects": "mcp-server/pyproject.toml",
+      "discovered": "2026-09-09"
     }
   },
   "edges": [
+    {
+      "from": "B009",
+      "to": "F005",
+      "kind": "blocked-by",
+      "value": "blocked_by",
+      "weight": 3,
+      "evidence": [
+        {
+          "entry": "F005",
+          "field": "blocked_by",
+          "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md"
+        }
+      ]
+    },
     {
       "from": "B009",
       "to": "F005",
@@ -83,6 +104,25 @@
       ]
     },
     {
+      "from": "B009",
+      "to": "O003",
+      "kind": "shared-affects-prefix",
+      "value": "mcp-server/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B009",
+          "field": "affects",
+          "source": "bugs/B009-packaged-mcp-server-reports-0-0-0-instead-of-its-release-ver.md"
+        },
+        {
+          "entry": "O003",
+          "field": "affects",
+          "source": "observations/O003-wheel-build-emits-deprecation-warnings-for-legacy-license-me.md"
+        }
+      ]
+    },
+    {
       "from": "F005",
       "to": "O002",
       "kind": "shared-affects-prefix",
@@ -100,17 +140,56 @@
           "source": "observations/O002-hypotheses-retrieved-by-board-context-are-not-readable-throu.md"
         }
       ]
+    },
+    {
+      "from": "F005",
+      "to": "O003",
+      "kind": "shared-affects-prefix",
+      "value": "mcp-server/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "F005",
+          "field": "affects",
+          "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md"
+        },
+        {
+          "entry": "O003",
+          "field": "affects",
+          "source": "observations/O003-wheel-build-emits-deprecation-warnings-for-legacy-license-me.md"
+        }
+      ]
+    },
+    {
+      "from": "O002",
+      "to": "O003",
+      "kind": "shared-affects-prefix",
+      "value": "mcp-server/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "O002",
+          "field": "affects",
+          "source": "observations/O002-hypotheses-retrieved-by-board-context-are-not-readable-throu.md"
+        },
+        {
+          "entry": "O003",
+          "field": "affects",
+          "source": "observations/O003-wheel-build-emits-deprecation-warnings-for-legacy-license-me.md"
+        }
+      ]
     }
   ],
   "topology": {
     "clusters": [
       {
         "id": "C001",
-        "fingerprint": "c-871a58beb94842fd",
+        "fingerprint": "c-3502d74f38faf303",
         "members": [
           "B009",
           "F005",
-          "O002"
+          "O002",
+          "O003"
         ],
         "pattern_ids": [],
         "patterns": [],
@@ -118,6 +197,24 @@
           "mcp-server"
         ],
         "signals": [
+          {
+            "kind": "blocked-by",
+            "value": "blocked_by",
+            "members": [
+              "B009",
+              "F005"
+            ]
+          },
+          {
+            "kind": "shared-affects-prefix",
+            "value": "mcp-server/",
+            "members": [
+              "B009",
+              "F005",
+              "O002",
+              "O003"
+            ]
+          },
           {
             "kind": "shared-affects-prefix",
             "value": "mcp-server/engineering_board_mcp.py/",
@@ -144,13 +241,14 @@
       "members": [
         "B009",
         "F005",
-        "O002"
+        "O002",
+        "O003"
       ],
       "density": 1.0,
       "shared_dimensions": {
         "patterns": []
       },
-      "internal_edges": 3
+      "internal_edges": 6
     },
     {
       "type": "isolated-node",
@@ -165,7 +263,8 @@
     "C001": [
       "B009",
       "F005",
-      "O002"
+      "O002",
+      "O003"
     ]
   }
 }
