@@ -178,6 +178,15 @@ first correction remains attributed reviewer judgment; it does not prove
 internal cognition or mechanically establish semantic reasoning order.
 Historical v1 product-effect gates retain their existing meaning.
 
+`v2_safeguards` separately reports rejected-memory application and lexical
+decoy use on observed reference v2 context arms. Applying a rejected/decoy
+target or recording its treatment as `used` fails the corresponding safeguard,
+even when `durable_systemic_conclusion` is false or another treatment annotation
+contradicts the action. These attempts remain scored evidence. The historical
+`gates` and `overall_pass` fields retain their v1 meaning and do not establish
+that v2 safeguards passed. With no v2 observations the safeguard result is
+unavailable (`null`), not a pass.
+
 ```sh
 python3 evaluation/harness.py record \
   --run /safe/path/run-directory \

@@ -623,6 +623,55 @@ class EvaluationHarnessTests(unittest.TestCase):
             self.assertEqual(score["memory_evaluation"]["evaluated_before_local"], 0)
             self.assertEqual(score["memory_evaluation"]["reviewer_annotation_true"], 1)
 
+    def test_complete_v2_run_exposes_rejected_and_decoy_use_without_durable_conclusions(self) -> None:
+        scenarios = [
+            ("safe-hold", "hold", "rejected", "ignored", 0, 0),
+            ("apply-denied-by-treatment", "apply", "rejected", "ignored", 6, 6),
+            ("reject-but-used", "reject", "used", "used", 6, 6),
+            ("rejected-used-only", "hold", "used", "ignored", 6, 0),
+            ("decoy-used-only", "reject", "rejected", "used", 0, 6),
+        ]
+        for name, disposition, rejected, decoy, rejected_count, decoy_count in scenarios:
+            with self.subTest(scenario=name), tempfile.TemporaryDirectory(prefix="eb-eval-safeguard-") as temp:
+                run_dir = self.prepare(Path(temp))
+                manifest = load_run(run_dir)
+                cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+                for trial in manifest["trials"]:
+                    case = cases[trial["case_id"]]
+                    attempt = self.v2_attempt(trial, case)
+                    if trial["arm"] == "context" and case["category"] == "lexical-decoy":
+                        target = next(item for item in trial["context_brief"]["results"] if item["id"] in case["rejected_memories"])
+                        attempt["memory_evaluation"].update(memory_id=target["id"], memory_status=target["status"], disposition=disposition)
+                        attempt.update(rejected_memory_treatment=rejected, lexical_decoy_treatment=decoy)
+                        self.assertFalse(attempt["durable_systemic_conclusion"])
+                        attempt = self.with_raw_response(attempt)
+                    record_attempt(run_dir, trial["trial_key"], attempt)
+                score = score_run(run_dir)
+                self.assertTrue(score["overall_pass"])
+                self.assertEqual(score["missing_trial_arms"], [])
+                self.assertEqual(score["false_positive_count"], 0)
+                self.assertEqual(score["invalid_attempts"], [])
+                safeguard = score["v2_safeguards"]
+                self.assertEqual(safeguard["observed_context_arms"], 24)
+                self.assertEqual(safeguard["rejected_memory_application"]["count"], rejected_count)
+                self.assertEqual(safeguard["lexical_decoy_use"]["count"], decoy_count)
+                self.assertIs(safeguard["overall_pass"], not (rejected_count or decoy_count))
+                report = Path(write_report(run_dir)["markdown"]).read_text()
+                self.assertIn("Separate v2 memory-use safeguards", report)
+                self.assertIn("does not cover v2 safeguards", report)
+
+    def test_complete_v1_run_keeps_historical_gates_when_treatment_is_used(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-v1-safeguard-") as temp:
+            run_dir = self.prepare(Path(temp))
+            manifest = load_run(run_dir)
+            overrides = {trial["trial_key"]: {"rejected_memory_treatment": "used", "lexical_decoy_treatment": "used"}
+                         for trial in manifest["trials"] if trial["arm"] == "context" and trial["category"] == "lexical-decoy"}
+            self.record_complete_run(run_dir, overrides)
+            score = score_run(run_dir)
+            self.assertTrue(score["overall_pass"])
+            self.assertTrue(all(score["gates"].values()))
+            self.assertIsNone(score["v2_safeguards"]["overall_pass"])
+
     def test_v2_memory_evaluation_binds_v4_incidents_and_status(self) -> None:
         case = next(
             item

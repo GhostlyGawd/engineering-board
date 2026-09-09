@@ -1068,6 +1068,41 @@ def _collect_results(run_dir: Path, manifest: dict[str, Any]) -> tuple[dict[str,
     return scored, invalid
 
 
+def _v2_safeguards(trials: list[dict[str, Any]], cases: dict[str, Any],
+                   scored: dict[str, Any]) -> dict[str, Any]:
+    """Report unsafe memory use separately from historical product-effect gates."""
+    observed = [trial for trial in trials if trial["arm"] == "context"
+                and scored.get(trial["trial_key"], {}).get("schema_version") == "2"]
+    rejected_use: list[str] = []
+    decoy_use: list[str] = []
+    for trial in observed:
+        key = trial["trial_key"]
+        attempt = scored[key]
+        case = cases[trial["case_id"]]
+        evaluation = attempt.get("memory_evaluation") or {}
+        applied = evaluation.get("disposition") == "apply"
+        rejected_target = evaluation.get("memory_status") == "rejected" or (
+            evaluation.get("memory_id") in case["rejected_memories"]
+        )
+        if (applied and rejected_target) or attempt.get("rejected_memory_treatment") == "used":
+            rejected_use.append(key)
+        decoy_target = case["category"] == "lexical-decoy" and (
+            evaluation.get("memory_id") in case["rejected_memories"]
+        )
+        if (applied and decoy_target) or attempt.get("lexical_decoy_treatment") == "used":
+            decoy_use.append(key)
+    return {
+        "scope": "observed reference v2 context arms; separate from historical v1 gates",
+        "observed_context_arms": len(observed),
+        "rejected_memory_application": {"count": len(rejected_use), "trial_keys": rejected_use,
+                                         "pass": not rejected_use if observed else None},
+        "lexical_decoy_use": {"count": len(decoy_use), "trial_keys": decoy_use,
+                              "pass": not decoy_use if observed else None},
+        "overall_pass": not (rejected_use or decoy_use) if observed else None,
+        "changes_product_effect_gates": False,
+    }
+
+
 def score_run(run_dir: Path) -> dict[str, Any]:
     """Score a run against the accepted D.1 product-effect gates."""
     run_dir = run_dir.absolute()
@@ -1219,6 +1254,7 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         "manifest_fingerprint": manifest["manifest_fingerprint"],
         "overall_pass": all(gates.values()),
         "gates": gates,
+        "v2_safeguards": _v2_safeguards(reference_trials, cases, scored),
         "reference": {
             "positive_context_denominator": len(context_trials),
             "positive_baseline_denominator": len(baseline_trials),
@@ -1271,7 +1307,7 @@ def write_report(run_dir: Path) -> dict[str, str]:
         "",
         f"- Run: `{score['run_id']}`",
         f"- Source commit: `{score['source_commit']}`",
-        f"- Result: **{status}**",
+        f"- Historical product-effect gate result: **{status}** (does not cover v2 safeguards)",
         f"- Reference context rate: {score['reference']['context_rate_percent']}%",
         f"- Reference baseline rate: {score['reference']['baseline_rate_percent']}%",
         f"- Improvement: {score['reference']['improvement_percentage_points']} percentage points",
@@ -1282,6 +1318,13 @@ def write_report(run_dir: Path) -> dict[str, str]:
     ]
     for name, passed in score["gates"].items():
         lines.append(f"- {'PASS' if passed else 'FAIL'}: `{name}`")
+    safeguards = score["v2_safeguards"]
+    lines.extend(["", "## Separate v2 memory-use safeguards", "", f"- Scope: {safeguards['scope']}",
+                  f"- Observed context arms: {safeguards['observed_context_arms']}"])
+    for name in ("rejected_memory_application", "lexical_decoy_use"):
+        result = safeguards[name]
+        label = "UNAVAILABLE" if result["pass"] is None else "PASS" if result["pass"] else "FAIL"
+        lines.append(f"- {label}: `{name}`; failures: {result['count']}; trials: {', '.join(result['trial_keys']) or 'none'}")
     if score["replications"]:
         lines.extend(["", "## Optional replications", ""])
         for profile, replication in score["replications"].items():
