@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "provenance": "synthetic; not customer or real held-out evidence",
+  "cases": [
+    {
+      "id": "L-useful-retries",
+      "cohort": "procedural_learning",
+      "control": "useful",
+      "task": "cases/L-useful-retries/taskrepo/task.md",
+      "repo": "cases/L-useful-retries/taskrepo",
+      "history": "cases/L-useful-retries/history/history.md",
+      "board": "cases/L-useful-retries/board",
+      "grader": "cases/L-useful-retries/evaluator.py",
+      "reference": "cases/L-useful-retries/reference",
+      "allowed_implementation_files": [
+        "job_options.py"
+      ],
+      "allowed_edit_prefixes": [
+        "tests/"
+      ],
+      "public_test_command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "expected_actions": {
+        "investigation": [
+          "Reproduce zero retries through execution and compare preview's contract.",
+          "Inspect consumers of the retries option before applying the prior procedure."
+        ],
+        "coverage": [
+          "Add execution and preview zero-retry regressions.",
+          "Check missing/None retries and heartbeat zero compatibility."
+        ],
+        "scope": [
+          "Repair both retry consumers; preserve heartbeat zero-as-default semantics."
+        ]
+      }
+    },
+    {
+      "id": "L-control-precision",
+      "cohort": "procedural_learning",
+      "control": "irrelevant_scope",
+      "task": "cases/L-control-precision/taskrepo/task.md",
+      "repo": "cases/L-control-precision/taskrepo",
+      "history": "cases/L-control-precision/history/history.md",
+      "board": "cases/L-control-precision/board",
+      "grader": "cases/L-control-precision/evaluator.py",
+      "reference": "cases/L-control-precision/reference",
+      "allowed_implementation_files": [
+        "readings.py"
+      ],
+      "allowed_edit_prefixes": [
+        "tests/"
+      ],
+      "public_test_command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "expected_actions": {
+        "investigation": [
+          "Trace live and replay precision loss.",
+          "Check whether prior currency-display procedure applies to unquantized sensor ingestion."
+        ],
+        "coverage": [
+          "Add signed fractional live/replay regressions.",
+          "Preserve sensor ties-to-even and currency half-up displays."
+        ],
+        "scope": [
+          "Do not apply payment rounding to sensor ingestion or sensor_summary."
+        ]
+      }
+    },
+    {
+      "id": "H-useful-catalog",
+      "cohort": "proposed_hypothesis",
+      "control": "useful",
+      "task": "cases/H-useful-catalog/taskrepo/task.md",
+      "repo": "cases/H-useful-catalog/taskrepo",
+      "history": "cases/H-useful-catalog/history/history.md",
+      "board": "cases/H-useful-catalog/board",
+      "grader": "cases/H-useful-catalog/evaluator.py",
+      "reference": "cases/H-useful-catalog/reference",
+      "allowed_implementation_files": [
+        "catalog.py"
+      ],
+      "allowed_edit_prefixes": [
+        "tests/"
+      ],
+      "public_test_command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "expected_actions": {
+        "investigation": [
+          "Compare the input sequence before/after each read-only view as a falsifiable mutation check.",
+          "Distinguish shared mutable-sequence effects from export sorting or stale view cache."
+        ],
+        "coverage": [
+          "Add before/after checks for newest and owner views.",
+          "Exercise sequential views, stable ties, and import-order export."
+        ],
+        "scope": [
+          "Preserve each view's ordering and recent_ids filtering contract."
+        ]
+      }
+    },
+    {
+      "id": "H-control-identifiers",
+      "cohort": "proposed_hypothesis",
+      "control": "wrong_shared_cause",
+      "task": "cases/H-control-identifiers/taskrepo/task.md",
+      "repo": "cases/H-control-identifiers/taskrepo",
+      "history": "cases/H-control-identifiers/history/history.md",
+      "board": "cases/H-control-identifiers/board",
+      "grader": "cases/H-control-identifiers/evaluator.py",
+      "reference": "cases/H-control-identifiers/reference",
+      "allowed_implementation_files": [
+        "parts.py"
+      ],
+      "allowed_edit_prefixes": [
+        "tests/"
+      ],
+      "public_test_command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "expected_actions": {
+        "investigation": [
+          "Test CSV field preservation and exact lookup independently with identical id bytes.",
+          "Evaluate and reject shared identifier normalization when direct-path checks contradict it."
+        ],
+        "coverage": [
+          "Add empty-description and prefix-collision regressions.",
+          "Cover quoted CSV, arity rejection, exact case and whitespace."
+        ],
+        "scope": [
+          "Fix the two local defects without adding broad identifier normalization."
+        ]
+      }
+    }
+  ]
+}
