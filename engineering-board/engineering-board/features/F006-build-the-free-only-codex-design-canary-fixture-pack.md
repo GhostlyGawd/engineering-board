@@ -35,6 +35,7 @@ promoted_from: [mcp:_sessions/mcp-2026-09-09-design-canary-root.md:ac0c5c2fba1ac
 - **root-f006-design-canary-20260909** 2026-09-09T19:49:05Z: Definitive correction: the second independent review covered SHA256SUMS hash 1141eb1a7feb0ce9d052de713a24e0c1009a785a64c00a525f5301bfca3f15d6, verified directly from the file. Disregard only the malformed hash strings in the preceding two comments; their blocker list remains valid.
 - **root-f006-design-canary-20260909** 2026-09-09T20:14:54Z: Third independent review at SHA256SUMS 244e451e0ca58d760d74e2c369125e2e319d7e6af0a0243c51384ebd9d8a8161 leaves three blockers: enforce protocol lane threshold 75; bind C6 referenced paths/components/tokens semantically in validator/tests; and update pinned Vite/Storybook/Playwright/Pa11y dependency chain until npm audit has no relevant unresolved vulnerabilities.
 - **root-f006-integration-20260909** 2026-09-09T20:31:13Z: Resolved after independent fresh-clone verification passed source commit d74fd0285d69c26c733c4a0a9a58e237201c1526. Final closeout is metadata and board state only; no live canary ran.
+- **root-f006-integration-20260909** 2026-09-09T20:38:45Z: Delivery: branch codex/f006-free-design-canary-20260909 pushed; draft PR #177 opened at https://github.com/GhostlyGawd/engineering-board/pull/177. Both push and pull_request run-all CI checks passed (1m29s and 1m52s). Merge and live canary execution remain separate.
 
 ## Verification
 
