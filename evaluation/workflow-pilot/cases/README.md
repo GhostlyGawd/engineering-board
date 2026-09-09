@@ -32,6 +32,21 @@ The reference directories contain one correct repair per task, outside visible
 repositories and history. They demonstrate satisfiability, not a required patch
 shape. Evaluation may accept any implementation satisfying the public contract.
 
+Run `python3 evaluation/workflow-pilot/cases/validate.py` from the repository
+root to verify baseline failures, reference repairs, harmful mutations, history
+parity, and real Board retrieval. The validator initializes isolated temporary
+boards and calls the repository MCP server's actual `tools/call` dispatcher for
+`board_init`, `board_rebuild`, and `board_context`. It requires the expected
+Learning or proposed hypothesis to be returned without an error or stale flag.
+Use `--server-module /path/to/installed/mcp-server/engineering_board_mcp.py`
+to repeat the same validation against an installed release. This check runs
+offline without model calls or access to product boards.
+
+Canonical hypothesis claim fingerprints are derived from the actual claim key
+and pattern ids. Cluster and graph fingerprints refer to the source fixture
+graph, not invented placeholders. Schema parsing and retrieval are both tested;
+Markdown-body parity by itself is insufficient to establish valid retrieval.
+
 The cases.json expected_actions fields, hidden evaluators, reference repairs, and
 this README are evaluator metadata: do not include them in agent prompts or
 candidate repositories. Automated checks score repair correctness, sibling

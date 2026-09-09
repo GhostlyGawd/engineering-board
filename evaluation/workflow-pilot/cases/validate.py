@@ -1,5 +1,7 @@
 """Offline fixture satisfiability and harmful-scope mutation checks."""
+import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -32,14 +34,57 @@ def run(command, cwd):
             "stderr": result.stderr}
 
 
-def validate():
+def load_server(server_path):
+    spec = importlib.util.spec_from_file_location("workflow_validation_server", server_path)
+    server = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(server)
+    return server
+
+
+def validate_context(server, case, trial):
+    def call(name, arguments):
+        response = server.dispatch("tools/call", {"name": name, "arguments": arguments})
+        assert response.get("isError") is False, (case["id"], name, response)
+        return json.loads(response["content"][0]["text"])
+
+    call("board_init", {"root": str(trial), "project": "pilot", "agents_md": False})
+    board_dir = trial / "engineering-board" / "pilot"
+    shutil.copytree(ROOT / case["board"], board_dir, dirs_exist_ok=True)
+    call("board_rebuild", {"root": str(trial), "project": "pilot"})
+    context = call("board_context", {"root": str(trial), "project": "pilot",
+                                    "files": case["allowed_implementation_files"],
+                                    "task": (ROOT / case["task"]).read_text(),
+                                    "limit": 10})
+    kind = "learning" if case["cohort"] == "procedural_learning" else "hypothesis"
+    subdir = "learnings" if kind == "learning" else "hypotheses"
+    records = list((ROOT / case["board"] / subdir).glob("*.md"))
+    assert len(records) == 1, records
+    expected_id = records[0].stem
+    matches = [item for item in context["results"]
+               if item["id"] == expected_id and item["kind"] == kind]
+    assert matches, (case["id"], expected_id, context)
+    assert matches[0].get("stale") is False, matches[0]
+    if kind == "hypothesis":
+        assert matches[0]["status"] == "proposed", matches[0]
+    return {"isError": False, "expected_id": expected_id, "expected_kind": kind,
+            "returned_ids": [item["id"] for item in context["results"]],
+            "matched_result": matches[0], "warnings": context.get("warnings", [])}
+
+
+def validate(server_path=None):
     records = []
+    command = "python3 evaluation/workflow-pilot/cases/validate.py"
+    if server_path is not None:
+        command += " --server-module " + str(server_path)
+    server_path = Path(server_path or ROOT.parents[1] / "mcp-server" / "engineering_board_mcp.py").resolve()
+    server = load_server(server_path)
     manifest = json.loads((ROOT / "cases.json").read_text())
     for case in manifest["cases"]:
         with tempfile.TemporaryDirectory(prefix="workflow-fixture-validation-") as temporary:
             trial = Path(temporary) / "repo"
             shutil.copytree(ROOT / case["repo"], trial,
                             ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+            retrieval = validate_context(server, case, trial)
             command = [sys.executable, str(ROOT / case["grader"]), "--repo", str(trial)]
             public = [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"]
             baseline_public = run(public, trial)
@@ -94,13 +139,21 @@ def validate():
                             "reference_hidden": reference_hidden,
                             "harmful_scope_mutation_hidden": mutation_hidden,
                             "information_parity": parity, "input_inventory": inventory,
+                            "board_context_retrieval": retrieval,
                             "visible_condition_label_scan": {"passed": True,
                                                              "files": visible_label_scan}})
     return {"version": 1, "provenance": "authored synthetic fixtures; not live evaluation",
-            "command": "python3 evaluation/workflow-pilot/cases/validate.py",
+            "command": command,
+            "retrieval_server": {"path": str(server_path), "version": server.SERVER_VERSION,
+                                 "sha256": hashlib.sha256(server_path.read_bytes()).hexdigest(),
+                                 "core_sha256": hashlib.sha256((server_path.parent / "engineering_board_core.py").read_bytes()).hexdigest()},
             "metadata_parity_note": "Board ids, type, title, source status, confidence, dates, and affected paths appear in history prose. Fingerprints, revision bookkeeping and pattern tags are representation metadata only; no extra engineering assertions. Procedural guidance and hypothesis discriminating checks are authored synthetic historical content present identically in both conditions.",
             "cases": records}
 
 
 if __name__ == "__main__":
-    print(json.dumps(validate(), indent=2))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--server-module", type=Path,
+                        help="MCP server module; defaults to this checkout, accepts installed-release module")
+    args = parser.parse_args()
+    print(json.dumps(validate(args.server_module), indent=2))

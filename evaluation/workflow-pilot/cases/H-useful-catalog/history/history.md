@@ -10,9 +10,9 @@ Record kind: hypothesis; status: proposed.
 Recorded: 2026-09-08. Confidence: medium.
 Relevant implementation: catalog.py. Derived from: B105, B106.
 
-Synthetic evaluation fixture; not customer or real held-out evidence.
-
 ## Proposed root cause
+
+Synthetic evaluation fixture; not customer or real held-out evidence.
 
 The newest-items and owner views may reorder the caller-owned sequence in
 place, so opening either view changes later exports. This is a proposed
