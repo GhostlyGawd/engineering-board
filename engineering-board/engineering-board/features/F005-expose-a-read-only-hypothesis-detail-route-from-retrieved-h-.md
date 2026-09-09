@@ -41,4 +41,20 @@ Owner approved F005 after the retained workflow pilot. Extend a read-only detail
 
 ## Released and installed verification
 
-Released v1.14.0 from exact main/tag commit eb275b68369b04bbbc944a584f869fc07dcf05b3 via PR175 and workflow34379065314. GitHub asset and MCPRegistry match SHA0b259fac619543308043f804dd5d5b49612cf018fcf61209e72f3f752d66cc67; PyPI1.14.0 wheel/sdist present and unyanked. LatestPRCI and mergedmainCI pass all22suites; independent F005/B009 reviews passed and MCPsuite382checks passed on3.12. Actual updatedClaude plugin and fresh publicPyPI installation return runtime1.14.0 and exactH101/H102 details with unchanged repository inventories. Receipts in docs/evidence/f005-hypothesis-details-2026-09-09/. Codex host update and final release closeout are being completed separately; current session may still run old MCP process until restart. No product-effect, time-saved or D.1-pass claim; historical thresholds and frozen evidence unchanged.
+Released v1.14.0 from exact main/tag commit
+eb275b68369b04bbbc944a584f869fc07dcf05b3 via PR175 and workflow 34379065314.
+GitHub asset and MCP Registry match SHA-256
+0b259fac619543308043f804dd5d5b49612cf018fcf61209e72f3f752d66cc67;
+PyPI 1.14.0 wheel/sdist are present and unyanked. Latest PR CI and merged-main
+CI pass all 22 suites; independent F005/B009 reviews passed and the MCP suite
+passed 382 checks on Python 3.12.
+
+Updated Codex and Claude plugins and a fresh public PyPI installation return
+runtime 1.14.0 and exact H101/H102 details with unchanged repository inventories.
+Codex cache HEAD and both hosts' runtime/manifest files match the tagged source.
+Receipts are in docs/evidence/f005-hypothesis-details-2026-09-09/; the final
+release record is docs/evidence/2026-09-09-v1.14.0-release-validation.md.
+Existing sessions may still run their old MCP process until restart.
+
+No product-effect, time-saved or D.1-pass claim is made; historical thresholds
+and frozen evidence are unchanged.
