@@ -1,21 +1,30 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-09-09T15:44:48Z",
-  "source_fingerprint": "3b42b64a2e642b1694f6420cdc2da209e6167f0bbe64d8f98fef68300212f0e4",
+  "generated_at": "2026-09-09T16:06:21Z",
+  "source_fingerprint": "88fa880d8a6ff1014eb67aec65cb81c32ced911eb32b183b82f41bdcf4523e03",
   "build_mode": "full",
   "project": "engineering-board",
   "entries_analyzed": {
-    "open": 3,
+    "open": 4,
     "archived": 0,
-    "total": 3
+    "total": 4
   },
   "nodes": {
+    "B009": {
+      "type": "bug",
+      "title": "Packaged MCP server reports 0.0.0 instead of its release version",
+      "source": "bugs/B009-packaged-mcp-server-reports-0-0-0-instead-of-its-release-ver.md",
+      "priority": "P2",
+      "status": "open",
+      "affects": "mcp-server/engineering_board_mcp.py",
+      "discovered": "2026-09-09"
+    },
     "F005": {
       "type": "feature",
       "title": "Expose a read-only hypothesis-detail route from retrieved H records",
       "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "affects": "mcp-server/engineering_board_mcp.py",
       "discovered": "2026-09-09"
     },
@@ -35,6 +44,44 @@
     }
   },
   "edges": [
+    {
+      "from": "B009",
+      "to": "F005",
+      "kind": "shared-affects-prefix",
+      "value": "mcp-server/engineering_board_mcp.py/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B009",
+          "field": "affects",
+          "source": "bugs/B009-packaged-mcp-server-reports-0-0-0-instead-of-its-release-ver.md"
+        },
+        {
+          "entry": "F005",
+          "field": "affects",
+          "source": "features/F005-expose-a-read-only-hypothesis-detail-route-from-retrieved-h-.md"
+        }
+      ]
+    },
+    {
+      "from": "B009",
+      "to": "O002",
+      "kind": "shared-affects-prefix",
+      "value": "mcp-server/engineering_board_mcp.py/",
+      "weight": 2,
+      "evidence": [
+        {
+          "entry": "B009",
+          "field": "affects",
+          "source": "bugs/B009-packaged-mcp-server-reports-0-0-0-instead-of-its-release-ver.md"
+        },
+        {
+          "entry": "O002",
+          "field": "affects",
+          "source": "observations/O002-hypotheses-retrieved-by-board-context-are-not-readable-throu.md"
+        }
+      ]
+    },
     {
       "from": "F005",
       "to": "O002",
@@ -59,8 +106,9 @@
     "clusters": [
       {
         "id": "C001",
-        "fingerprint": "c-3a34bc2ac96d53e0",
+        "fingerprint": "c-871a58beb94842fd",
         "members": [
+          "B009",
           "F005",
           "O002"
         ],
@@ -74,6 +122,7 @@
             "kind": "shared-affects-prefix",
             "value": "mcp-server/engineering_board_mcp.py/",
             "members": [
+              "B009",
               "F005",
               "O002"
             ]
@@ -93,6 +142,7 @@
       "type": "dense-cluster",
       "cluster_id": "C001",
       "members": [
+        "B009",
         "F005",
         "O002"
       ],
@@ -100,7 +150,7 @@
       "shared_dimensions": {
         "patterns": []
       },
-      "internal_edges": 1
+      "internal_edges": 3
     },
     {
       "type": "isolated-node",
@@ -113,6 +163,7 @@
   ],
   "drill_in": {
     "C001": [
+      "B009",
       "F005",
       "O002"
     ]
