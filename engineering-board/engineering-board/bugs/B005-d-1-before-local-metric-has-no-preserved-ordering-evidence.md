@@ -1,8 +1,8 @@
 ---
 id: B005
 type: bug
-status: in_progress
-needs: tdd
+status: open
+needs: validate
 priority: P1
 title: D.1 before-local metric has no preserved ordering evidence
 affects: evaluation/harness.py
@@ -27,3 +27,10 @@ promoted_from: [mcp:_sessions/mcp-2026-09-09.md:cb81421d9c1dcfe6]
 
 - **independent-audit-triage** 2026-09-09T13:18:18Z: Release blocker for the D.1 v2 contract. Independent audit reproduced failure despite the prior passing test suite.
 - **builder-d1-b005-20260909** 2026-09-09T13:39:55Z: Lead claims on behalf of measurement builder; approved correction cycle begins with preserved response evidence and frozen ordering rubric, then sequential B006/B007. Independent verifier assigned; no live experiments or metric target changes.
+- **builder-d1-b005-20260909** 2026-09-09T13:47:24Z: Builder phase committed bc40217, 30 evaluation tests pass. Awaiting independent review at isolated pinned revision while same builder advances sequentially to B006. Not resolved.
+- **builder-d1-b005-fix-20260909** 2026-09-09T13:50:31Z: Independent verifier requires correction: raw 0 equals recorded False in Python payload comparison; review cannot represent no-local-correction responses. Add type-sensitive binding and explicit unavailable no-local review, then reverify. Prior 30 tests green did not establish these criteria.
+- **builder-d1-b005-fix-20260909** 2026-09-09T13:53:26Z: Revised commit 782594a addresses numeric/bool binding and truthful no-local correction representation; 33 evaluation tests pass. Independent recheck pending.
+
+## Independent reverification
+
+/root/verify_measurement passed 782594a59955d844c937af37191658320189a1f5. Record/score probes reject numeric and nonfinite JSON in place of bool; no-local response remains retained, null ordering rate and zero success; contradictory no-local declarations reject. Mixed healthy success plus no-local stays unavailable. Semantic correction selection remains attributed reviewer judgment.

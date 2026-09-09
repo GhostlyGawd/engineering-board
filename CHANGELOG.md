@@ -18,6 +18,11 @@ increases.
 
 ### Fixed
 
+- D.1 memory-evaluation reporting now requires retained response evidence and
+  a rubric-bound reviewer assessment for before-local classifications, checks
+  v2 rejected-memory and decoy use separately, and reports rates only for a
+  complete predeclared population. Historical product-effect gates remain
+  unchanged.
 - D.1 version-2 responses can represent absent memory as `null`. The recorder
   requires an explicit null evaluation and false ordering classification for
   baseline and empty-context attempts, and the response schema accepts surfaced

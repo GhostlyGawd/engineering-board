@@ -1,7 +1,7 @@
 ---
 id: B007
 type: bug
-status: open
+status: in_progress
 needs: tdd
 priority: P2
 title: D.1 memory-evaluation rate hides missing planned arms
@@ -22,3 +22,7 @@ promoted_from: [mcp:_sessions/mcp-2026-09-09.md:28c8efe5cd69d890]
 ## Evidence
 
 > Independent audit at 151a356: one successful positive v2 attempt plus 47 missing reference arms yields eligible_context_arms 1 and rate_percent 100. Eligibility depends on recorded schema version rather than planned contract. Complete when eligibility/version is pinned before observations and report labels scope, completeness, missing arms and unavailable rates; partial/mixed/v1-only/complete tests required.
+
+## Comments
+
+- **builder-d1-b007-20260909** 2026-09-09T13:53:26Z: Same builder now owns planned version/eligible population, truthful partial/mixed/legacy reports and all-reference completeness separate from observed safeguards. No thresholds changed.
