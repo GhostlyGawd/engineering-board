@@ -11,6 +11,10 @@ increases.
 
 ### Added
 
+- `board_get_entry` can read full canonical H### hypotheses from context
+  results, preserving status, provenance, alternatives and falsifier. Tool
+  guidance makes the detail route discoverable without adding a write or
+  changing ordinary entry reads.
 - D.1 now has an additive version-2 response contract for explicit
   `apply`/`hold`/`reject` evaluation of surfaced memory before a local
   correction, with a separate harness-reported rate that does not rewrite

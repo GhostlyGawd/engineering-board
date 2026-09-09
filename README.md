@@ -82,6 +82,9 @@ Milestone D puts this memory in the agent's decision path:
 - Each result shows a stable title, a typed summary of at most 2,000
   characters, the epistemic state, structural signals, score components,
   match reason, and canonical sources.
+- `board_get_entry` opens a retrieved H### record in full, including its
+  alternatives and falsifier. Reading preserves its status; it does not confirm
+  a proposed cause or record an outcome.
 - A task-only miss tells the caller to add a file, entry identifier, or current
   directory. Task words do not bypass structural eligibility.
 - `board_outcomes` records an explicit fix result against an H### hypothesis.
@@ -366,7 +369,7 @@ same deterministic core.
 | `board_list_projects` | List router projects |
 | `board_create_entry` | Create a valid entry |
 | `board_list_entries` | List and filter entries |
-| `board_get_entry` | Get one entry |
+| `board_get_entry` | Get one entry, including full canonical H### details |
 | `board_update_entry` | Change one entry and archive a new resolution |
 | `board_graph` | Build the deterministic graph |
 | `board_context` | Retrieve bounded and explainable systemic memory |

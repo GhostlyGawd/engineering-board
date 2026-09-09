@@ -1,7 +1,7 @@
 ---
 id: F005
 type: feature
-status: open
+status: in_progress
 needs: tdd
 priority: P2
 title: Expose a read-only hypothesis-detail route from retrieved H records
@@ -28,3 +28,7 @@ parent: F004
 ## Comments
 
 - **lead-workflow-pilot-20260909** 2026-09-09T15:43:06Z: Next bounded product task from the completed synthetic pilot, not implemented here. Local Markdown remains supported; add a discoverable read-only detail route without implicit causal confirmation. Future value validation must test normal installed activation and less-obvious real tasks rather than reusing these synthetic outcomes as efficacy proof.
+
+## Approved implementation scope
+
+Owner approved F005 after the retained workflow pilot. Extend a read-only detail route for canonical H records, preserving full claim/status/provenance/alternatives/falsifier, legacy entry-read contracts, clear missing/malformed errors, and no write or confirmation side effects. Lead session lead-hypothesis-details-20260909 owns implementation coordination and bounded builder assignment. Evidence and independent correctness/security/UX review precede closeout. No evaluation threshold, outcome counter, or agent-organization expansion.
