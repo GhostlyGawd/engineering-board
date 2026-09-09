@@ -109,7 +109,7 @@ def _plugin_version():
         )
         if owns_module and valid_version(distribution.version):
             return distribution.version
-    except (metadata.PackageNotFoundError, OSError, ValueError, TypeError):
+    except (metadata.PackageNotFoundError, OSError, ValueError, TypeError, RuntimeError):
         pass
     return "0.0.0"
 

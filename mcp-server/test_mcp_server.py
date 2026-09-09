@@ -1481,12 +1481,26 @@ def suite_runtime_version():
         with zipfile.ZipFile(source / "dist" / "engineering-board-mcp.mcpb") as bundle:
             bundle.extractall(unpacked)
 
-        def handshake(server, expected, label, metadata_path=None):
+        def handshake(server, expected, label, metadata_path=None, resolve_error=False):
             env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1",
                        PYTHONPATH=str(metadata_path) if metadata_path else "")
             request = {"jsonrpc": "2.0", "id": 1, "method": "initialize",
                        "params": {"protocolVersion": "2025-06-18", "capabilities": {}}}
-            result = subprocess.run([sys.executable, "-S", str(server)], cwd=root,
+            command = [sys.executable, "-S", str(server)]
+            if resolve_error:
+                command = [sys.executable, "-S", "-c", """
+import runpy, sys
+from pathlib import Path
+from unittest.mock import patch
+original_resolve = Path.resolve
+def resolve(path, *args, **kwargs):
+    if path.name == "engineering_board_mcp.py":
+        raise RuntimeError("Symlink loop during ownership resolution")
+    return original_resolve(path, *args, **kwargs)
+with patch.object(Path, "resolve", resolve):
+    runpy.run_path(sys.argv[1], run_name="__main__")
+""", str(server)]
+            result = subprocess.run(command, cwd=root,
                                     env=env, input=json.dumps(request) + "\n",
                                     capture_output=True, text=True, timeout=10)
             check(result.returncode == 0, label + " starts", result.stderr)
@@ -1521,6 +1535,21 @@ def suite_runtime_version():
         handshake(server, "4.5.6", "bundle takes precedence over installed metadata", package)
         manifest.unlink()
         handshake(server, "7.8.9", "installed distribution metadata", package)
+        cycle = package / "cycle"
+        cycle.symlink_to("cycle")
+        record.write_text("cycle,,\nengineering_board_mcp.py,,\n")
+        # Older pathlib raises RuntimeError; newer non-strict resolve can
+        # return the unresolved path and continue to the actual module owner.
+        try:
+            cycle.resolve()
+            cycle_version = "7.8.9"
+        except (OSError, RuntimeError):
+            cycle_version = "0.0.0"
+        handshake(server, cycle_version, "RECORD symlink cycle", package)
+        handshake(server, "0.0.0", "ownership resolution RuntimeError", package,
+                  resolve_error=True)
+        cycle.unlink()
+        record.write_text("engineering_board_mcp.py,,\nengineering_board_core.py,,\n")
         for malformed in ("{", "[]", '{"version": null}', '{"version": ""}',
                           '{"version": {}}', '{"version": "not-a-version"}'):
             plugin.write_text(malformed)
