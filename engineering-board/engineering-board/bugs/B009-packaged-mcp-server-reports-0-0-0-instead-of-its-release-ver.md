@@ -1,8 +1,8 @@
 ---
 id: B009
 type: bug
-status: in_progress
-needs: tdd
+status: resolved
+needs: validate
 priority: P1
 title: Packaged MCP server reports 0.0.0 instead of its release version
 affects: mcp-server/engineering_board_mcp.py
@@ -33,3 +33,4 @@ Release identity blocker. Keep authoritative source/installed-plugin manifest pr
 - **lead-hypothesis-details-20260909** 2026-09-09T16:12:38Z: Independent review at39aa5f6 reproduced an uncaught Path.resolve RuntimeError for a self-referential symlink row in owning distribution RECORD on Python3.9.6. Builder correcting conservative fallback and adding real/forced resolution-failure regression, testing3.9 and3.14. Actual installed-wheel bytes match reviewed source and two H read workflows pass version1.14.0; deliberately wrong expected-version exits1 with retained receipt. Publication remains held.
 - **release-runtime-identity-20260909** 2026-09-09T16:19:07Z: Verified before publication: independent PASS at770ced9;41runtime checks pass Python3.9/3.14; final real bundle and installed-wheel handshakes report1.14.0 with fullH read invariance. Coordinated refresh SHA0b259fac619543308043f804dd5d5b49612cf018fcf61209e72f3f752d66cc67; all22suites and strictClaude validation pass. See SOURCE-REVIEW.md and refreshed bundle/wheel receipts. Old failure evidence preserved.
 - **release-runtime-identity-20260909** 2026-09-09T16:42:18Z: Reopened for Linux CI test-oracle mismatch on Python3.12.3: RECORD cycle startup succeeds with valid owning version7.8.9 but test expects0.0.0 from direct Path.resolve. Preserve no-crash and forced RuntimeError fallback assertions; correct actual metadata-path expectation and verify across available Python3.8-3.14. No publication or gate bypass.
+- **release-runtime-identity-20260909** 2026-09-09T16:49:26Z: Latest source review PASS c50d814; portable cycle test preserves exact forced-error fallback and valid ownership/precedence. Runtime41checks pass all7installedPython3.8-3.14; fullMCP382checks pass3.12. Bothlatest PR CI runs34378552368/34378559126 and merged-main CI34378838422 passed. Finalchecksum0b259fac619543308043f804dd5d5b49612cf018fcf61209e72f3f752d66cc67 unchanged; no gate bypass. Prior Linux test-oracle failure retained in Actions and source review narrative.
