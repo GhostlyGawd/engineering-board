@@ -1,0 +1,392 @@
+{
+  "version": 1,
+  "provenance": "authored synthetic fixtures; not live evaluation",
+  "command": "python3 evaluation/workflow-pilot/cases/validate.py",
+  "metadata_parity_note": "Board ids, type, title, source status, confidence, dates, and affected paths appear in history prose. Fingerprints, revision bookkeeping and pattern tags are representation metadata only; no extra engineering assertions. Procedural guidance and hypothesis discriminating checks are authored synthetic historical content present identically in both conditions.",
+  "cases": [
+    {
+      "id": "L-useful-retries",
+      "baseline_public": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "test_defaults (test_public.PublicTests.test_defaults) ... ok\ntest_explicit_no_retry (test_public.PublicTests.test_explicit_no_retry) ... FAIL\n\n======================================================================\nFAIL: test_explicit_no_retry (test_public.PublicTests.test_explicit_no_retry)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-f7wctkc7/repo/tests/test_public.py\", line 6, in test_explicit_no_retry\n    self.assertEqual(execution_options({\"retries\": 0})[\"retries\"], 0)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 3 != 0\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nFAILED (failures=1)\n"
+      },
+      "baseline_hidden": {
+        "exit_code": 1,
+        "stdout": "{\"checks\": {\"check_compatibility_defaults\": {\"failures\": [], \"passed\": true}, \"check_negative_scope\": {\"failures\": [], \"passed\": true}, \"check_reported_failure\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/L-useful-retries/evaluator.py\\\", line 16, in check_reported_failure\\n    self.assertEqual(m.execution_options({\\\"retries\\\": 0})[\\\"retries\\\"], 0)\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: 3 != 0\\n\"], \"passed\": false}, \"check_sibling_preview\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/L-useful-retries/evaluator.py\\\", line 19, in check_sibling_preview\\n    self.assertEqual(m.preview_options({\\\"retries\\\": 0}), {\\\"attempts\\\": 1})\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: {'attempts': 4} != {'attempts': 1}\\n- {'attempts': 4}\\n?              ^\\n\\n+ {'attempts': 1}\\n?              ^\\n\\n\"], \"passed\": false}}, \"passed\": 2, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "reference_public": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_defaults (test_public.PublicTests.test_defaults) ... ok\ntest_explicit_no_retry (test_public.PublicTests.test_explicit_no_retry) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n"
+      },
+      "reference_hidden": {
+        "exit_code": 0,
+        "stdout": "{\"checks\": {\"check_compatibility_defaults\": {\"failures\": [], \"passed\": true}, \"check_negative_scope\": {\"failures\": [], \"passed\": true}, \"check_reported_failure\": {\"failures\": [], \"passed\": true}, \"check_sibling_preview\": {\"failures\": [], \"passed\": true}}, \"passed\": 4, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "harmful_scope_mutation_hidden": {
+        "exit_code": 1,
+        "stdout": "{\"checks\": {\"check_compatibility_defaults\": {\"failures\": [], \"passed\": true}, \"check_negative_scope\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/L-useful-retries/evaluator.py\\\", line 31, in check_negative_scope\\n    self.assertEqual(m.heartbeat_seconds(options), 30)\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: 0 != 30\\n\"], \"passed\": false}, \"check_reported_failure\": {\"failures\": [], \"passed\": true}, \"check_sibling_preview\": {\"failures\": [], \"passed\": true}}, \"passed\": 3, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "information_parity": [
+        {
+          "board_path": "cases/L-useful-retries/board/bugs/B101.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/L-useful-retries/history/history.md",
+          "history_start_line": 39,
+          "history_end_line": 46,
+          "extra_board_substantive_guidance": []
+        },
+        {
+          "board_path": "cases/L-useful-retries/board/bugs/B102.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/L-useful-retries/history/history.md",
+          "history_start_line": 53,
+          "history_end_line": 59,
+          "extra_board_substantive_guidance": []
+        },
+        {
+          "board_path": "cases/L-useful-retries/board/learnings/L101.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/L-useful-retries/history/history.md",
+          "history_start_line": 14,
+          "history_end_line": 32,
+          "extra_board_substantive_guidance": []
+        }
+      ],
+      "input_inventory": [
+        {
+          "path": "cases/L-useful-retries/taskrepo/AGENTS.md",
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        {
+          "path": "cases/L-useful-retries/taskrepo/job_options.py",
+          "bytes": 616,
+          "sha256": "a719d9c8d9a54aa1e21bc9806f308ffe9178371113f3a28722128f3efdb09cca"
+        },
+        {
+          "path": "cases/L-useful-retries/taskrepo/task.md",
+          "bytes": 375,
+          "sha256": "44d607cb7f4de45788f8d376c785010dbafc16bcba69f3b53fb33e6cac84cb3b"
+        },
+        {
+          "path": "cases/L-useful-retries/taskrepo/tests/test_public.py",
+          "bytes": 451,
+          "sha256": "2af163f457825872cc07b2cdc6fa53b8aa20b399feb4b3c7ded1ab28b4e2155a"
+        },
+        {
+          "path": "cases/L-useful-retries/board/bugs/B101.md",
+          "bytes": 494,
+          "sha256": "d41d748bf952d7155265f765eb63b41c643fe40794eecdc10a585d85d762693f"
+        },
+        {
+          "path": "cases/L-useful-retries/board/bugs/B102.md",
+          "bytes": 468,
+          "sha256": "30e6397af0d302ec68699cc9922417e5bba714416049b4f8e61aabdfcc39a6dc"
+        },
+        {
+          "path": "cases/L-useful-retries/board/learnings/L101.md",
+          "bytes": 1029,
+          "sha256": "5139f08c006e2d8f22a04b999f459cdbe4d43fd82da9b4f0882b81ab5454fd1d"
+        },
+        {
+          "path": "cases/L-useful-retries/history/history.md",
+          "bytes": 2167,
+          "sha256": "ceea5b06cb0240a3c2189570e4eea5d1c972215c07d84918890e15ab0f1d18f0"
+        }
+      ]
+    },
+    {
+      "id": "L-control-precision",
+      "baseline_public": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "test_displays (test_public.PublicTests.test_displays) ... ok\ntest_live_fraction (test_public.PublicTests.test_live_fraction) ... FAIL\ntest_whole_reading (test_public.PublicTests.test_whole_reading) ... ok\n\n======================================================================\nFAIL: test_live_fraction (test_public.PublicTests.test_live_fraction)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-yp9vuvkn/repo/tests/test_public.py\", line 6, in test_live_fraction\n    self.assertEqual(ingest_live(\"2.75\"), 2.75)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 2.0 != 2.75\n\n----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nFAILED (failures=1)\n"
+      },
+      "baseline_hidden": {
+        "exit_code": 1,
+        "stdout": "{\"checks\": {\"check_negative_scope\": {\"failures\": [], \"passed\": true}, \"check_no_quantization\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/L-control-precision/evaluator.py\\\", line 24, in check_no_quantization\\n    self.assertEqual(ingest(text), float(text))\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: 0.0 != 0.000125\\n\"], \"passed\": false}, \"check_reported_failure\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/L-control-precision/evaluator.py\\\", line 16, in check_reported_failure\\n    self.assertEqual(m.ingest_live(\\\"2.75\\\"), 2.75)\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: 2.0 != 2.75\\n\"], \"passed\": false}, \"check_sibling_replay\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/L-control-precision/evaluator.py\\\", line 19, in check_sibling_replay\\n    self.assertEqual(m.ingest_replay(\\\"-0.125\\\"), -0.125)\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: 0.0 != -0.125\\n\"], \"passed\": false}}, \"passed\": 1, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "reference_public": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_displays (test_public.PublicTests.test_displays) ... ok\ntest_live_fraction (test_public.PublicTests.test_live_fraction) ... ok\ntest_whole_reading (test_public.PublicTests.test_whole_reading) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK\n"
+      },
+      "reference_hidden": {
+        "exit_code": 0,
+        "stdout": "{\"checks\": {\"check_negative_scope\": {\"failures\": [], \"passed\": true}, \"check_no_quantization\": {\"failures\": [], \"passed\": true}, \"check_reported_failure\": {\"failures\": [], \"passed\": true}, \"check_sibling_replay\": {\"failures\": [], \"passed\": true}}, \"passed\": 4, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "harmful_scope_mutation_hidden": {
+        "exit_code": 1,
+        "stdout": "{\"checks\": {\"check_negative_scope\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/L-control-precision/evaluator.py\\\", line 27, in check_negative_scope\\n    self.assertEqual(m.sensor_summary(1.125), \\\"1.12\\\")\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: '1.13' != '1.12'\\n- 1.13\\n?    ^\\n+ 1.12\\n?    ^\\n\\n\"], \"passed\": false}, \"check_no_quantization\": {\"failures\": [], \"passed\": true}, \"check_reported_failure\": {\"failures\": [], \"passed\": true}, \"check_sibling_replay\": {\"failures\": [], \"passed\": true}}, \"passed\": 3, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "information_parity": [
+        {
+          "board_path": "cases/L-control-precision/board/bugs/B103.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/L-control-precision/history/history.md",
+          "history_start_line": 39,
+          "history_end_line": 45,
+          "extra_board_substantive_guidance": []
+        },
+        {
+          "board_path": "cases/L-control-precision/board/bugs/B104.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/L-control-precision/history/history.md",
+          "history_start_line": 52,
+          "history_end_line": 58,
+          "extra_board_substantive_guidance": []
+        },
+        {
+          "board_path": "cases/L-control-precision/board/learnings/L102.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/L-control-precision/history/history.md",
+          "history_start_line": 14,
+          "history_end_line": 32,
+          "extra_board_substantive_guidance": []
+        }
+      ],
+      "input_inventory": [
+        {
+          "path": "cases/L-control-precision/taskrepo/AGENTS.md",
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        {
+          "path": "cases/L-control-precision/taskrepo/readings.py",
+          "bytes": 700,
+          "sha256": "e856ca8cfcaa1836e7e73d286ec85ce55b61f29b9672b7d38ec67c2ef837c381"
+        },
+        {
+          "path": "cases/L-control-precision/taskrepo/task.md",
+          "bytes": 382,
+          "sha256": "1c1304b4685e524a09c60d019f50642240b46f66976661c11eac9e4f72d99092"
+        },
+        {
+          "path": "cases/L-control-precision/taskrepo/tests/test_public.py",
+          "bytes": 448,
+          "sha256": "aa3ed5ff8a2a77170ccf5f3fb3864e668434eaa6e70d55cb4424803e9cb3270a"
+        },
+        {
+          "path": "cases/L-control-precision/board/bugs/B103.md",
+          "bytes": 455,
+          "sha256": "fa5e0dbb7738e03ca17e55c4337422128156923b74b709e30b8890bb6a0bc328"
+        },
+        {
+          "path": "cases/L-control-precision/board/bugs/B104.md",
+          "bytes": 452,
+          "sha256": "6d12f61e04b356ed64d00abd5c3ddbb9c11ca94e49f2a92c1be0233a9523fec0"
+        },
+        {
+          "path": "cases/L-control-precision/board/learnings/L102.md",
+          "bytes": 1024,
+          "sha256": "2dc9fe609e739c556915ed00ea83f9b4291bba46262c64fd2469bb13b2dbcdbe"
+        },
+        {
+          "path": "cases/L-control-precision/history/history.md",
+          "bytes": 2110,
+          "sha256": "3a281793696d35e1da7ec89b657654d2cc379d6ecb0f3dd30e0f3da9a91f997c"
+        }
+      ]
+    },
+    {
+      "id": "H-useful-catalog",
+      "baseline_public": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "test_export_after_newest (test_public.PublicTests.test_export_after_newest) ... FAIL\ntest_newest_order (test_public.PublicTests.test_newest_order) ... ok\ntest_owner_order (test_public.PublicTests.test_owner_order) ... ok\n\n======================================================================\nFAIL: test_export_after_newest (test_public.PublicTests.test_export_after_newest)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-ssbu0g2y/repo/tests/test_public.py\", line 13, in test_export_after_newest\n    self.assertEqual(export_ids(self.rows), [\"z\", \"b\", \"c\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['b', 'c', 'z'] != ['z', 'b', 'c']\n\nFirst differing element 0:\n'b'\n'z'\n\n- ['b', 'c', 'z']\n+ ['z', 'b', 'c']\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nFAILED (failures=1)\n"
+      },
+      "baseline_hidden": {
+        "exit_code": 1,
+        "stdout": "{\"checks\": {\"check_negative_scope\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-useful-catalog/evaluator.py\\\", line 42, in check_negative_scope\\n    self.assertEqual(self.rows, self.before)\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: Lists differ: [{'id': 'a', 'created': 2, 'owner': 'a'}, {'id': '[109 chars]'a'}] != [{'id': 'z', 'created': 1, 'owner': 'a'}, {'id': '[109 chars]'a'}]\\n\\nFirst differing element 0:\\n{'id': 'a', 'created': 2, 'owner': 'a'}\\n{'id': 'z', 'created': 1, 'owner': 'a'}\\n\\n- [{'created': 2, 'id': 'a', 'owner': 'a'},\\n?              ^         ^\\n\\n+ [{'created': 1, 'id': 'z', 'owner': 'a'},\\n?              ^         ^\\n\\n   {'created': 3, 'id': 'b', 'owner': 'a'},\\n   {'created': 3, 'id': 'c', 'owner': 'b'},\\n-  {'created': 1, 'id': 'z', 'owner': 'a'}]\\n?              ^         ^\\n\\n+  {'created': 2, 'id': 'a', 'owner': 'a'}]\\n?              ^         ^\\n\\n\"], \"passed\": false}, \"check_reported_failure\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-useful-catalog/evaluator.py\\\", line 24, in check_reported_failure\\n    self.assertEqual(self.rows, self.before)\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: Lists differ: [{'id': 'b', 'created': 3, 'owner': 'a'}, {'id': '[109 chars]'a'}] != [{'id': 'z', 'created': 1, 'owner': 'a'}, {'id': '[109 chars]'a'}]\\n\\nFirst differing element 0:\\n{'id': 'b', 'created': 3, 'owner': 'a'}\\n{'id': 'z', 'created': 1, 'owner': 'a'}\\n\\n- [{'created': 3, 'id': 'b', 'owner': 'a'},\\n?              ^         ^\\n\\n+ [{'created': 1, 'id': 'z', 'owner': 'a'},\\n?              ^         ^\\n\\n+  {'created': 3, 'id': 'b', 'owner': 'a'},\\n   {'created': 3, 'id': 'c', 'owner': 'b'},\\n-  {'created': 2, 'id': 'a', 'owner': 'a'},\\n?                                         ^\\n\\n+  {'created': 2, 'id': 'a', 'owner': 'a'}]\\n?                                         ^\\n\\n-  {'created': 1, 'id': 'z', 'owner': 'a'}]\\n\"], \"passed\": false}, \"check_sibling_owner\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-useful-catalog/evaluator.py\\\", line 29, in check_sibling_owner\\n    self.assertEqual(self.rows, self.before)\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: Lists differ: [{'id': 'a', 'created': 2, 'owner': 'a'}, {'id': '[109 chars]'a'}] != [{'id': 'z', 'created': 1, 'owner': 'a'}, {'id': '[109 chars]'a'}]\\n\\nFirst differing element 0:\\n{'id': 'a', 'created': 2, 'owner': 'a'}\\n{'id': 'z', 'created': 1, 'owner': 'a'}\\n\\n- [{'created': 2, 'id': 'a', 'owner': 'a'},\\n?              ^         ^\\n\\n+ [{'created': 1, 'id': 'z', 'owner': 'a'},\\n?              ^         ^\\n\\n   {'created': 3, 'id': 'b', 'owner': 'a'},\\n   {'created': 3, 'id': 'c', 'owner': 'b'},\\n-  {'created': 1, 'id': 'z', 'owner': 'a'}]\\n?              ^         ^\\n\\n+  {'created': 2, 'id': 'a', 'owner': 'a'}]\\n?              ^         ^\\n\\n\"], \"passed\": false}, \"check_view_sequence\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-useful-catalog/evaluator.py\\\", line 35, in check_view_sequence\\n    self.assertEqual(self.rows, self.before)\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: Lists differ: [{'id': 'b', 'created': 3, 'owner': 'a'}, {'id': '[109 chars]'a'}] != [{'id': 'z', 'created': 1, 'owner': 'a'}, {'id': '[109 chars]'a'}]\\n\\nFirst differing element 0:\\n{'id': 'b', 'created': 3, 'owner': 'a'}\\n{'id': 'z', 'created': 1, 'owner': 'a'}\\n\\n- [{'created': 3, 'id': 'b', 'owner': 'a'},\\n?              ^         ^\\n\\n+ [{'created': 1, 'id': 'z', 'owner': 'a'},\\n?              ^         ^\\n\\n+  {'created': 3, 'id': 'b', 'owner': 'a'},\\n   {'created': 3, 'id': 'c', 'owner': 'b'},\\n-  {'created': 2, 'id': 'a', 'owner': 'a'},\\n?                                         ^\\n\\n+  {'created': 2, 'id': 'a', 'owner': 'a'}]\\n?                                         ^\\n\\n-  {'created': 1, 'id': 'z', 'owner': 'a'}]\\n\"], \"passed\": false}}, \"passed\": 0, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "reference_public": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_export_after_newest (test_public.PublicTests.test_export_after_newest) ... ok\ntest_newest_order (test_public.PublicTests.test_newest_order) ... ok\ntest_owner_order (test_public.PublicTests.test_owner_order) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK\n"
+      },
+      "reference_hidden": {
+        "exit_code": 0,
+        "stdout": "{\"checks\": {\"check_negative_scope\": {\"failures\": [], \"passed\": true}, \"check_reported_failure\": {\"failures\": [], \"passed\": true}, \"check_sibling_owner\": {\"failures\": [], \"passed\": true}, \"check_view_sequence\": {\"failures\": [], \"passed\": true}}, \"passed\": 4, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "harmful_scope_mutation_hidden": {
+        "exit_code": 1,
+        "stdout": "{\"checks\": {\"check_negative_scope\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-useful-catalog/evaluator.py\\\", line 38, in check_negative_scope\\n    self.assertEqual(m.export_ids(self.rows), [\\\"z\\\", \\\"b\\\", \\\"c\\\", \\\"a\\\"])\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: Lists differ: ['a', 'b', 'c', 'z'] != ['z', 'b', 'c', 'a']\\n\\nFirst differing element 0:\\n'a'\\n'z'\\n\\n- ['a', 'b', 'c', 'z']\\n?   ^              ^\\n\\n+ ['z', 'b', 'c', 'a']\\n?   ^              ^\\n\\n\"], \"passed\": false}, \"check_reported_failure\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-useful-catalog/evaluator.py\\\", line 25, in check_reported_failure\\n    self.assertEqual(m.export_ids(self.rows), [\\\"z\\\", \\\"b\\\", \\\"c\\\", \\\"a\\\"])\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: Lists differ: ['a', 'b', 'c', 'z'] != ['z', 'b', 'c', 'a']\\n\\nFirst differing element 0:\\n'a'\\n'z'\\n\\n- ['a', 'b', 'c', 'z']\\n?   ^              ^\\n\\n+ ['z', 'b', 'c', 'a']\\n?   ^              ^\\n\\n\"], \"passed\": false}, \"check_sibling_owner\": {\"failures\": [], \"passed\": true}, \"check_view_sequence\": {\"failures\": [], \"passed\": true}}, \"passed\": 2, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "information_parity": [
+        {
+          "board_path": "cases/H-useful-catalog/board/bugs/B105.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/H-useful-catalog/history/history.md",
+          "history_start_line": 55,
+          "history_end_line": 61,
+          "extra_board_substantive_guidance": []
+        },
+        {
+          "board_path": "cases/H-useful-catalog/board/bugs/B106.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/H-useful-catalog/history/history.md",
+          "history_start_line": 68,
+          "history_end_line": 74,
+          "extra_board_substantive_guidance": []
+        },
+        {
+          "board_path": "cases/H-useful-catalog/board/hypotheses/H101.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/H-useful-catalog/history/history.md",
+          "history_start_line": 13,
+          "history_end_line": 48,
+          "extra_board_substantive_guidance": []
+        }
+      ],
+      "input_inventory": [
+        {
+          "path": "cases/H-useful-catalog/taskrepo/AGENTS.md",
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        {
+          "path": "cases/H-useful-catalog/taskrepo/catalog.py",
+          "bytes": 740,
+          "sha256": "bb121c027b2a3ecd3977d881e1063b8b7b9ba1720f40ba7ee5c2171fe75d787d"
+        },
+        {
+          "path": "cases/H-useful-catalog/taskrepo/task.md",
+          "bytes": 408,
+          "sha256": "8ca0a30a2bcf476b58916f7edc45e40728f4b8d4b6e7a64a912da1ff99c049d6"
+        },
+        {
+          "path": "cases/H-useful-catalog/taskrepo/tests/test_public.py",
+          "bytes": 645,
+          "sha256": "11988bab09082b1c2031eaa02b9b3532269be1da3fa0493b206265091ab67b1e"
+        },
+        {
+          "path": "cases/H-useful-catalog/board/bugs/B105.md",
+          "bytes": 460,
+          "sha256": "44981c84b2e351e5489794aba399878902e3d3395d1ec8d8ab98cd3eab678d48"
+        },
+        {
+          "path": "cases/H-useful-catalog/board/bugs/B106.md",
+          "bytes": 461,
+          "sha256": "772bc61df6d9fb94aaf8e16140fcfb410351339cbeee409d7e4549e13ff9d3d0"
+        },
+        {
+          "path": "cases/H-useful-catalog/board/hypotheses/H101.md",
+          "bytes": 1658,
+          "sha256": "715c8c072ae72b8e7bef9a31c939ec5c0e22fd749d07f7f0cf16056152bffedb"
+        },
+        {
+          "path": "cases/H-useful-catalog/history/history.md",
+          "bytes": 2565,
+          "sha256": "e19d2c0b6032448d784f2ac0ed41f28f7905d1dc06271cd09e4abb50938eada6"
+        }
+      ]
+    },
+    {
+      "id": "H-control-identifiers",
+      "baseline_public": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "test_exact_lookup (test_public.PublicTests.test_exact_lookup) ... FAIL\ntest_optional_description (test_public.PublicTests.test_optional_description) ... ERROR\ntest_regular_import (test_public.PublicTests.test_regular_import) ... ok\n\n======================================================================\nERROR: test_optional_description (test_public.PublicTests.test_optional_description)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-_s3cfmhx/repo/tests/test_public.py\", line 6, in test_optional_description\n    self.assertEqual(import_row(\"P7,,4\"), {\"id\": \"P7\", \"description\": \"\", \"quantity\": 4})\n                     ~~~~~~~~~~^^^^^^^^^\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-_s3cfmhx/repo/parts.py\", line 11, in import_row\n    raise ValueError(\"expected three columns\")\nValueError: expected three columns\n\n======================================================================\nFAIL: test_exact_lookup (test_public.PublicTests.test_exact_lookup)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-fixture-validation-_s3cfmhx/repo/tests/test_public.py\", line 9, in test_exact_lookup\n    self.assertEqual(find_part(rows, \"P7\"), {\"id\": \"P7\"})\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'id': 'P70'} != {'id': 'P7'}\n- {'id': 'P70'}\n?           -\n\n+ {'id': 'P7'}\n\n----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nFAILED (failures=1, errors=1)\n"
+      },
+      "baseline_hidden": {
+        "exit_code": 1,
+        "stdout": "{\"checks\": {\"check_csv_compatibility\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-control-identifiers/evaluator.py\\\", line 33, in check_csv_compatibility\\n    with self.assertRaises(ValueError):\\n         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\\nAssertionError: ValueError not raised\\n\"], \"passed\": false}, \"check_csv_empty_column\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-control-identifiers/evaluator.py\\\", line 16, in check_csv_empty_column\\n    self.assertEqual(m.import_row(\\\"P7,,4\\\"), {\\\"id\\\": \\\"P7\\\", \\\"description\\\": \\\"\\\", \\\"quantity\\\": 4})\\n                     ~~~~~~~~~~~~^^^^^^^^^\\n  File \\\"/var/folders/3r/mm394ldj6fx82vpdgz3tmwj00000gp/T/workflow-grade-3ljv72n7/parts.py\\\", line 11, in import_row\\n    raise ValueError(\\\"expected three columns\\\")\\nValueError: expected three columns\\n\"], \"passed\": false}, \"check_exact_lookup\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-control-identifiers/evaluator.py\\\", line 19, in check_exact_lookup\\n    self.assertEqual(m.find_part([{\\\"id\\\": \\\"P70\\\"}, {\\\"id\\\": \\\"P7\\\"}], \\\"P7\\\"), {\\\"id\\\": \\\"P7\\\"})\\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: {'id': 'P70'} != {'id': 'P7'}\\n- {'id': 'P70'}\\n?           -\\n\\n+ {'id': 'P7'}\\n\"], \"passed\": false}, \"check_negative_normalization_scope\": {\"failures\": [], \"passed\": true}}, \"passed\": 1, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "reference_public": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_exact_lookup (test_public.PublicTests.test_exact_lookup) ... ok\ntest_optional_description (test_public.PublicTests.test_optional_description) ... ok\ntest_regular_import (test_public.PublicTests.test_regular_import) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK\n"
+      },
+      "reference_hidden": {
+        "exit_code": 0,
+        "stdout": "{\"checks\": {\"check_csv_compatibility\": {\"failures\": [], \"passed\": true}, \"check_csv_empty_column\": {\"failures\": [], \"passed\": true}, \"check_exact_lookup\": {\"failures\": [], \"passed\": true}, \"check_negative_normalization_scope\": {\"failures\": [], \"passed\": true}}, \"passed\": 4, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "harmful_scope_mutation_hidden": {
+        "exit_code": 1,
+        "stdout": "{\"checks\": {\"check_csv_compatibility\": {\"failures\": [], \"passed\": true}, \"check_csv_empty_column\": {\"failures\": [], \"passed\": true}, \"check_exact_lookup\": {\"failures\": [], \"passed\": true}, \"check_negative_normalization_scope\": {\"failures\": [\"Traceback (most recent call last):\\n  File \\\"/private/tmp/eb-workflow-fixtures-20260909/evaluation/workflow-pilot/cases/H-control-identifiers/evaluator.py\\\", line 25, in check_negative_normalization_scope\\n    self.assertIs(m.find_part(rows, row[\\\"id\\\"]), row)\\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nAssertionError: {'id': ' p7 '} is not {'id': 'P7'}\\n\"], \"passed\": false}}, \"passed\": 3, \"total\": 4}\n",
+        "stderr": ""
+      },
+      "information_parity": [
+        {
+          "board_path": "cases/H-control-identifiers/board/bugs/B107.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/H-control-identifiers/history/history.md",
+          "history_start_line": 56,
+          "history_end_line": 62,
+          "extra_board_substantive_guidance": []
+        },
+        {
+          "board_path": "cases/H-control-identifiers/board/bugs/B108.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/H-control-identifiers/history/history.md",
+          "history_start_line": 69,
+          "history_end_line": 75,
+          "extra_board_substantive_guidance": []
+        },
+        {
+          "board_path": "cases/H-control-identifiers/board/hypotheses/H102.md",
+          "assertion_scope": "entire substantive Markdown body",
+          "history_path": "cases/H-control-identifiers/history/history.md",
+          "history_start_line": 13,
+          "history_end_line": 49,
+          "extra_board_substantive_guidance": []
+        }
+      ],
+      "input_inventory": [
+        {
+          "path": "cases/H-control-identifiers/taskrepo/AGENTS.md",
+          "bytes": 489,
+          "sha256": "514d08386842b0580c714a5cbc242e802fb12b8ffef9cd0630030d3e148b12a3"
+        },
+        {
+          "path": "cases/H-control-identifiers/taskrepo/parts.py",
+          "bytes": 667,
+          "sha256": "8b6681a3559180d7a4bf3713ae88d96730ce6864fedc2ea8840aba175769d440"
+        },
+        {
+          "path": "cases/H-control-identifiers/taskrepo/task.md",
+          "bytes": 377,
+          "sha256": "aeb4740431cbe13264b4ebd1544e23d9a2801240cecd12ecafc65c4ec4c09998"
+        },
+        {
+          "path": "cases/H-control-identifiers/taskrepo/tests/test_public.py",
+          "bytes": 470,
+          "sha256": "d4e838095c23ae7e3fd9092828bb2c1ec09cde7147e6b7bd395be0bfe02a1c12"
+        },
+        {
+          "path": "cases/H-control-identifiers/board/bugs/B107.md",
+          "bytes": 470,
+          "sha256": "5dd56e3b631f283a4f3e59e58bde9c5f83b1afca649cbfa6589c5a689e2fbe2f"
+        },
+        {
+          "path": "cases/H-control-identifiers/board/bugs/B108.md",
+          "bytes": 443,
+          "sha256": "6056428def83e64ba1b3b0105da580bde3d032990cf646fd832839e81bd323ef"
+        },
+        {
+          "path": "cases/H-control-identifiers/board/hypotheses/H102.md",
+          "bytes": 1706,
+          "sha256": "8706132d680e1d6fa0ff29a90fd6af166a770c215f43cda9012026e4edd512f5"
+        },
+        {
+          "path": "cases/H-control-identifiers/history/history.md",
+          "bytes": 2602,
+          "sha256": "2aa33a813f4acba0ad61f2deadce2d9883787fb20782640747c7ba49b48fb9b3"
+        }
+      ]
+    }
+  ]
+}
