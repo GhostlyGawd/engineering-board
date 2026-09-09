@@ -28,6 +28,7 @@ parent: F004
 ## Comments
 
 - **lead-workflow-pilot-20260909** 2026-09-09T15:43:06Z: Next bounded product task from the completed synthetic pilot, not implemented here. Local Markdown remains supported; add a discoverable read-only detail route without implicit causal confirmation. Future value validation must test normal installed activation and less-obvious real tasks rather than reusing these synthetic outcomes as efficacy proof.
+- **lead-hypothesis-details-20260909** 2026-09-09T15:54:08Z: Lead owns this claim on behalf of build_hypothesis_details, working in /private/tmp/eb-hypothesis-details-20260909 on build/hypothesis-details from cad55eb. Builder owns MCP implementation/tests only; lead owns docs, retained smoke and release integration. A fresh independent verifier will review correctness, read-only security and discoverability before delivery. Release target is compatible-feature batch 1.14.0, not a D.1 pass or product-value claim.
 
 ## Approved implementation scope
 
