@@ -1,0 +1,8 @@
+{
+  "artifacts": 12,
+  "attempted": 12,
+  "instructions": "Review task and implementation before reading any files outside this packet. Record correctness, investigation support observable in patch, regression coverage, and scope restraint. Do not infer unavailable investigation traces. Return review keyed by opaque ID before unblinding.",
+  "limitation": "Artifact comments may reveal condition; record suspected unblinding.",
+  "reviewer": "review_workflow_protocol",
+  "status": "complete"
+}

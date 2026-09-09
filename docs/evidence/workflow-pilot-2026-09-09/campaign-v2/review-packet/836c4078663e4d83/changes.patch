@@ -1,0 +1,29 @@
+--- a/readings.py
++++ b/readings.py
+@@ -4,7 +4,7 @@
+ 
+ def ingest_live(text):
+     """Return the signed sensor reading as a float, without quantization."""
+-    return float(int(float(text)))
++    return float(text)
+ 
+ 
+ def ingest_replay(text):
+--- a/tests/test_readings.py
++++ b/tests/test_readings.py
+@@ -0,0 +1,15 @@
++import unittest
++
++from readings import ingest_live
++
++
++class LiveIngestionTests(unittest.TestCase):
++    def test_preserves_positive_fractional_reading(self):
++        self.assertEqual(ingest_live("2.75"), 2.75)
++
++    def test_preserves_negative_fractional_reading(self):
++        self.assertEqual(ingest_live("-2.75"), -2.75)
++
++
++if __name__ == "__main__":
++    unittest.main()
