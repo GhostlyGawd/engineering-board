@@ -1,0 +1,3 @@
+Create three distinct launch directions for the fictional cooperative travel app described in `brief.md`, using the four supplied synthetic product images and mood reference. Select one direction and refine it into a desktop landing-page concept and a 1:1 campaign tile.
+
+Deliver three visibly distinct concepts, a concise selection rationale tied to the audience and brief, editable or code-native source, a 1440×1000 desktop render, and a 1080×1080 campaign render. Preserve the supplied headline and CTA exactly. Do not name or infer the evaluation arm. Use only the supplied local assets and allowlisted packages. Retain evidence metadata for every output.

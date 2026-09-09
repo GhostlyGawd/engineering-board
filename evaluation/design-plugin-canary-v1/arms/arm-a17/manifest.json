@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "arm_id": "arm-a17",
+  "activation": "planned",
+  "arm_class": "control",
+  "lanes": ["workflow-code-native", "free-brand-assets"],
+  "tasks": ["C1", "C2", "C3", "C4", "C5"],
+  "instruction_layer": "none",
+  "candidate_source_pin": {"kind": "builtin", "value": "pinned Codex snapshot from run manifest"},
+  "zero_cost_receipt_required": false,
+  "native_imagegen": "fixed_when_task_requires_images",
+  "allowed_capabilities": ["local repository", "included local browser", "native Codex ImageGen"],
+  "blocked_capabilities": ["environment API credentials", "separately billed image endpoint", "Sites publishing", "paid connector", "paid hosting"]
+}

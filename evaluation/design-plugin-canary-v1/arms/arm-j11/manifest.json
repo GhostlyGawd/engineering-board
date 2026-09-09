@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "arm_id": "arm-j11",
+  "activation": "conditional_requires_receipt",
+  "arm_class": "optional-brand-production-workflow",
+  "lanes": ["free-brand-assets"],
+  "tasks": ["C1", "C2"],
+  "instruction_layer": "sealed-map candidate",
+  "candidate_source_pin": {"kind": "catalog-version", "value": "0.1.25"},
+  "retained_package_sha256": null,
+  "activation_requirements": ["complete non-image path included at $0", "Figma and Canva disabled", "retained package SHA-256"],
+  "zero_cost_receipt_required": true,
+  "native_imagegen": "fixed_when_task_requires_images",
+  "allowed_capabilities": ["local repository", "native Codex ImageGen", "included sealed workflow path"],
+  "blocked_capabilities": ["Figma", "Canva", "Adobe", "external image service", "environment API credentials", "separately billed image endpoint", "Sites publishing"]
+}

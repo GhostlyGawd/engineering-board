@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "arm_id": "arm-b42",
+  "activation": "planned",
+  "arm_class": "included-workflow-control",
+  "lanes": ["workflow-code-native", "free-brand-assets"],
+  "tasks": ["C1", "C2", "C3", "C4", "C5"],
+  "instruction_layer": "sealed-map candidate",
+  "candidate_source_pin": {"kind": "catalog-version", "value": "0.1.54"},
+  "zero_cost_receipt_required": true,
+  "native_imagegen": "fixed_when_task_requires_images",
+  "allowed_capabilities": ["local repository", "included local browser", "native Codex ImageGen", "sealed workflow instructions"],
+  "blocked_capabilities": ["environment API credentials", "separately billed image endpoint", "Sites publishing", "paid connector", "paid hosting"]
+}

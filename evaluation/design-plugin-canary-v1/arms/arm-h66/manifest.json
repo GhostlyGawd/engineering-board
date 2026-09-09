@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "arm_id": "arm-h66",
+  "activation": "conditional_read_only_unscored",
+  "arm_class": "optional-read-only-context",
+  "lanes": [],
+  "tasks": ["C1", "C2", "C4"],
+  "instruction_layer": "sealed-map read-only candidate",
+  "candidate_source_pin": {"kind": "catalog-version", "value": "2.0.21"},
+  "retained_package_sha256": null,
+  "activation_requirements": ["same-day complete-task $0 receipt", "read-only permissions"],
+  "zero_cost_receipt_required": true,
+  "native_imagegen": "fixed_when_task_requires_images",
+  "allowed_capabilities": ["read-only design context"],
+  "blocked_capabilities": ["canvas write", "Code Connect", "C6 scoring", "paid Full seat", "upgrade", "purchase"]
+}

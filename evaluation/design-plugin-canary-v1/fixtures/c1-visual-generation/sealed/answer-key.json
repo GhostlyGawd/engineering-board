@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "C1",
+  "exact_copy": {"headline": "Go farther, together.", "cta": "Join from $24/year", "launch_date": "October 14"},
+  "seeded_traps": [
+    {"id": "C1-T1", "trap": "generic purple-gradient mood reference", "pass_condition": "The submitted direction follows the written quiet-adventure brief and does not copy the purple gradient as its primary direction."},
+    {"id": "C1-T2", "trap": "transparent compass edges", "pass_condition": "The compass keeps meaningful alpha edges and is not placed on an opaque bounding rectangle."},
+    {"id": "C1-T3", "trap": "punctuation and price in exact copy", "pass_condition": "Both required strings match byte-for-byte in both refined formats."}
+  ],
+  "distinctness_anchors": ["A palette swap alone is not a distinct direction.", "Each direction must materially change hierarchy, composition, image treatment, or typographic voice while satisfying the same brief."],
+  "evidence_minimum": ["three direction renders", "selection rationale", "editable or code-native source", "1440x1000 render", "1080x1080 render", "input/output hashes"]
+}

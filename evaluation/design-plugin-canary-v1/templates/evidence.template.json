@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "arm-a17-C1-r1",
+  "artifacts": [
+    {
+      "artifact_id": "render-desktop",
+      "kind": "screenshot",
+      "path_or_uri": "runs/arm-a17/C1/r1/render-desktop.png",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "size_bytes": 1,
+      "created_at_utc": "2026-09-09T00:00:01Z",
+      "retention_owner": "execution-entry-lead",
+      "retention_expires_at": "2027-09-09",
+      "viewport": {"width": 1440, "height": 1000},
+      "source_event_id": "event-1"
+    }
+  ],
+  "event_log_path": "runs/arm-a17/C1/r1/events.jsonl",
+  "stdout_path": "runs/arm-a17/C1/r1/stdout.txt",
+  "stderr_path": "runs/arm-a17/C1/r1/stderr.txt",
+  "code_diff_path": null,
+  "dependency_diff_path": null,
+  "accessibility_report_paths": [],
+  "tool_receipt_paths": []
+}

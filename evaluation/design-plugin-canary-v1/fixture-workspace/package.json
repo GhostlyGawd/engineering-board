@@ -1,0 +1,28 @@
+{
+  "name": "design-plugin-canary-fixtures",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "build-storybook": "storybook build --quiet",
+    "test": "node --test tests/*.test.mjs",
+    "dev": "vite --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "6.1.1",
+    "vite": "8.2.2",
+    "typescript": "5.9.2",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@storybook/react-vite": "10.6.0",
+    "@types/react": "19.1.12",
+    "@types/react-dom": "19.1.9",
+    "axe-core": "4.13.0",
+    "pa11y": "10.0.0",
+    "storybook": "10.6.0"
+  }
+}

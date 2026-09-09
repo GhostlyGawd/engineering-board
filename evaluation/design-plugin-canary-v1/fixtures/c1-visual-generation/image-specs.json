@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0.0",
+  "images": [
+    {"path": "input-images/coast-cabin.png", "prompt": "Editorial travel photograph, a small cedar cabin above a windswept Atlantic cove at blue hour, two adult friends arriving with canvas weekender bags, warm window light, natural grain, muted navy and coral palette, no text, no logos, landscape 3:2.", "required_mode": "RGB_or_RGBA", "minimum_width": 1200, "minimum_height": 800},
+    {"path": "input-images/night-train.png", "prompt": "Editorial travel photograph inside a modern overnight train compartment, diverse adult travelers sharing a paper map and tea, deep navy upholstery, warm amber practical light, candid documentary framing, no text, no logos, landscape 3:2.", "required_mode": "RGB_or_RGBA", "minimum_width": 1200, "minimum_height": 800},
+    {"path": "input-images/market-table.png", "prompt": "Overhead editorial travel photograph of a cooperative neighborhood market table, seasonal fruit, bread, ceramic cups, ticket stubs and a folded route map, coral and cream accents, natural daylight, no readable text, no logos, landscape 3:2.", "required_mode": "RGB_or_RGBA", "minimum_width": 1200, "minimum_height": 800},
+    {"path": "input-images/transparent-compass.png", "prompt": "Studio product cutout of a small brushed-brass compass with a coral fabric loop, centered, photorealistic, transparent background with clean antialiased edges and preserved soft contact shadow, no text, no logo, square 1:1.", "required_mode": "RGBA", "minimum_width": 1024, "minimum_height": 1024, "requires_transparency": true}
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "registry_policy": "local lockfile only; no install or network resolution during a run",
+  "packages": [
+    {"name": "react", "version": "19.1.1", "purpose": "fixture UI runtime"},
+    {"name": "react-dom", "version": "19.1.1", "purpose": "fixture rendering"},
+    {"name": "typescript", "version": "5.9.2", "purpose": "fixture source"},
+    {"name": "vite", "version": "8.2.2", "purpose": "local build"},
+    {"name": "@vitejs/plugin-react", "version": "6.1.1", "purpose": "local Vite React transform"},
+    {"name": "@types/react", "version": "19.1.12", "purpose": "local TypeScript declarations"},
+    {"name": "@types/react-dom", "version": "19.1.9", "purpose": "local TypeScript declarations"},
+    {"name": "@playwright/test", "version": "1.63.0", "purpose": "local interaction and viewport tests"},
+    {"name": "axe-core", "version": "4.13.0", "purpose": "local automated accessibility checks"},
+    {"name": "pa11y", "version": "10.0.0", "purpose": "local automated accessibility checks"},
+    {"name": "storybook", "version": "10.6.0", "purpose": "local component grounding"},
+    {"name": "@storybook/react-vite", "version": "10.6.0", "purpose": "local Storybook React/Vite integration"}
+  ],
+  "component_policy": "The retained src/ui components are shadcn-compatible local components; no shadcn CLI or runtime package is required.",
+  "prohibited": ["hosted visual regression", "paid accessibility service", "unlocked dependency", "remote runtime asset"]
+}

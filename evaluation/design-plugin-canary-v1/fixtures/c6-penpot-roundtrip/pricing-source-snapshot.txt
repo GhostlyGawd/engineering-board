@@ -1,0 +1,4 @@
+LOCKED SNAPSHOT v1
+UnrelatedTrustSection|sha256=7a2a3a56fba75c2d3f6b9f18d4c5ca4e83a69f94c29ed9e3d657722e027a2f55
+Exact content: Member-owned. Locally rooted. Clear prices.
+This file and the represented section must remain byte-identical through C6.

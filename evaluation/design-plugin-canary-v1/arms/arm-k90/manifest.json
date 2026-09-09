@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "arm_id": "arm-k90",
+  "activation": "planned_overlay",
+  "arm_class": "local-qa-augmentation",
+  "lanes": ["qa-augmentation"],
+  "tasks": ["C4", "C5"],
+  "instruction_layer": "winning workflow arm unchanged",
+  "candidate_source_pin": {"kind": "allowlisted-package-lock", "value": "fixtures/shared/allowed-packages.json"},
+  "zero_cost_receipt_required": true,
+  "native_imagegen": "not_applicable",
+  "allowed_capabilities": ["local Storybook", "retained shadcn-compatible components", "local Playwright", "local axe-core", "local Pa11y"],
+  "blocked_capabilities": ["hosted visual regression", "paid accessibility service", "network package drift", "Sites publishing", "paid hosting"]
+}

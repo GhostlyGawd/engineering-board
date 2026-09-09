@@ -1,0 +1,23 @@
+{
+  "schema_version":"1.0.0","task_id":"C3",
+  "issues":[
+    {"id":"I01","category":"discoverability","step":"S1","severity":"high","expected":"Recovery entry is visually buried below promotion."},
+    {"id":"I02","category":"misleading-status","step":"S2","severity":"high","expected":"Selected method is conveyed only by color."},
+    {"id":"I03","category":"destructive-action-recovery","step":"S5","severity":"high","expected":"Start over clears progress immediately with no confirm or undo."},
+    {"id":"I04","category":"error-copy","step":"S3","severity":"medium","expected":"Generic error gives no recovery action."},
+    {"id":"I05","category":"keyboard-order","step":"S1","severity":"medium","expected":"Promotion receives focus before recovery task."},
+    {"id":"I06","category":"focus-visibility","step":"S3","severity":"high","expected":"Code-cell focus ring is clipped."},
+    {"id":"I07","category":"screen-reader-name","step":"S4","severity":"high","expected":"Duplicate Show icon buttons lack distinct accessible names."},
+    {"id":"I08","category":"touch-target","step":"S2","severity":"medium","expected":"SMS card target is 34x34 px."},
+    {"id":"I09","category":"mobile-overflow","step":"S4","severity":"high","expected":"Password content horizontally overflows at 390 px."},
+    {"id":"I10","category":"contrast","step":"S4","severity":"high","expected":"Instruction text fails the supplied normal-text contrast target."},
+    {"id":"I11","category":"loading-feedback","step":"S3","severity":"medium","expected":"Resend has no busy/disabled/status feedback."},
+    {"id":"I12","category":"dead-end","step":"S5","severity":"critical","expected":"Continue targets a missing route."}
+  ],
+  "intentional_nonissues":[
+    {"id":"N01","step":"S2","choice":"Masked email uses centered dots instead of asterisks","reason":"Readable, non-sensitive, and consistently announced."},
+    {"id":"N02","step":"S3","choice":"Code cells use alternating cream backgrounds","reason":"Decoration does not encode state and passes contrast."},
+    {"id":"N03","step":"S5","choice":"Success icon is asymmetrical","reason":"Decorative SVG is hidden from assistive technology and does not affect use."}
+  ],
+  "required_fields":["finding_id","step_id","severity","confidence","evidence_id","evidence_type","bounded_fix","cannot_prove"]
+}

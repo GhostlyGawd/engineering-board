@@ -1,0 +1,11 @@
+{
+  "schema_version":"1.0.0","app":"Lantern account recovery","route":"/recover","synthetic_only":true,
+  "steps":[
+    {"id":"S1","name":"Find recovery","elements":["account information","email input","recovery action"]},
+    {"id":"S2","name":"Choose method","elements":["masked synthetic email","SMS ending 0142","method choices"]},
+    {"id":"S3","name":"Enter code","elements":["six code inputs","resend action","continue action"]},
+    {"id":"S4","name":"Reset password","elements":["new password","confirm password","visibility controls","save action"]},
+    {"id":"S5","name":"Recovery complete","elements":["status","continue action","restart action"]}
+  ],
+  "data":"All names, addresses, identifiers, and account state are synthetic."
+}

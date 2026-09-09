@@ -1,0 +1,1 @@
+export function BillingToggle() { return <fieldset><legend>Billing</legend><label><input type="radio" name="billing" defaultChecked/>Yearly</label><label><input type="radio" name="billing"/>Monthly</label></fieldset>; }

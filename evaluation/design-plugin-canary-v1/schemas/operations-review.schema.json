@@ -1,0 +1,7 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://example.invalid/design-plugin-canary-v1/operations-review.schema.json",
+  "type":"object","additionalProperties":false,
+  "required":["schema_version","reviewer_id","reviewer_role","arm_id","task_id","replicate_id","hard_gates","evidence_ids","locked_at_utc"],
+  "properties":{"schema_version":{"const":"1.0.0"},"reviewer_id":{"type":"string","minLength":1},"reviewer_role":{"const":"operations_security"},"arm_id":{"type":"string","pattern":"^arm-[a-z][0-9]{2}$"},"task_id":{"enum":["C1","C2","C3","C4","C5","C6"]},"replicate_id":{"enum":["r1","r2","r3"]},"hard_gates":{"type":"object","additionalProperties":false,"required":["security","accessibility","cost","evidence"],"properties":{"security":{"enum":["pass","fail"]},"accessibility":{"enum":["pass","fail"]},"cost":{"enum":["pass","fail"]},"evidence":{"enum":["pass","fail"]}}},"evidence_ids":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string","minLength":1}},"locked_at_utc":{"type":"string","format":"date-time"}}
+}

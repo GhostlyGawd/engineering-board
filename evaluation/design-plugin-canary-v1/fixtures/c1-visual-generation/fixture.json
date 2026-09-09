@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "C1",
+  "title": "Visual generation",
+  "prompt": "prompt.md",
+  "inputs": ["brief.md", "image-specs.json", "mood-reference-generic-purple.svg", "input-images/coast-cabin.png", "input-images/night-train.png", "input-images/market-table.png", "input-images/transparent-compass.png"],
+  "sealed_answer_key": "sealed/answer-key.json",
+  "rubric": "sealed/rubric.json",
+  "allowed_packages": "../shared/allowed-packages.json",
+  "viewports": [{"name": "desktop", "width": 1440, "height": 1000}, {"name": "campaign-square", "width": 1080, "height": 1080}],
+  "required_outputs": ["direction-1", "direction-2", "direction-3", "selection-rationale.md", "refined-source", "desktop-1440x1000.png", "campaign-1080x1080.png", "evidence.json"],
+  "forbidden_outputs": ["flattened screenshot used as UI", "external paid image asset", "unlicensed asset"]
+}

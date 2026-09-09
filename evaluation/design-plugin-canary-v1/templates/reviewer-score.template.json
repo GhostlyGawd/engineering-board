@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "reviewer_id": "blind-reviewer-01",
+  "reviewer_role": "blinded_human",
+  "arm_id": "arm-a17",
+  "task_id": "C1",
+  "replicate_id": "r1",
+  "rubric_version": "1.0.0",
+  "item_scores": [
+    {"item_id": "brief-semantic-fidelity", "score": 0, "maximum": 4, "evidence_ids": ["render-desktop"], "note": ""},
+    {"item_id": "visual-hierarchy-craft", "score": 0, "maximum": 4, "evidence_ids": ["render-desktop"], "note": ""},
+    {"item_id": "coherent-distinctness", "score": 0, "maximum": 3, "evidence_ids": ["direction-1", "direction-2", "direction-3"], "note": ""},
+    {"item_id": "image-text-integrity", "score": 0, "maximum": 2, "evidence_ids": ["render-desktop", "render-square"], "note": ""},
+    {"item_id": "editability-evidence", "score": 0, "maximum": 2, "evidence_ids": ["source"], "note": ""}
+  ],
+  "raw_score": 0,
+  "maximum_score": 15,
+  "pairwise_baseline_preference": "tie",
+  "hard_gates": {"security": "pass", "accessibility": "pass", "cost": "pass", "evidence": "pass"},
+  "locked_at_utc": "2026-09-09T00:00:02Z",
+  "adjudication_required": false
+}

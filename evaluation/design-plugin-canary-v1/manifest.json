@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "protocol_version": "1.0.0",
+  "pack_id": "design-plugin-canary-v1",
+  "status": "preparation_only",
+  "pack_revision": "containing_git_commit",
+  "base_commit": "b423a159e2107ee4c06e4a899e9fbf1bd01a70dd",
+  "source_contract": {
+    "path": "docs/evidence/2026-09-09-codex-design-plugin-landscape.md",
+    "sha256": "3356a15322afcaaebb3cc7d96af2ba0107a6c0e1f4917532282f4731a4c76143"
+  },
+  "replicates": ["r1", "r2", "r3"],
+  "fixture_ids": ["C1", "C2", "C3", "C4", "C5", "C6"],
+  "opaque_arm_ids": ["arm-a17", "arm-b42", "arm-c08", "arm-d31", "arm-e59", "arm-f24", "arm-g73", "arm-h66", "arm-j11", "arm-k90"],
+  "schemas": {
+    "run": "schemas/run-manifest.schema.json",
+    "evidence": "schemas/evidence.schema.json",
+    "score": "schemas/score.schema.json",
+    "operations_review": "schemas/operations-review.schema.json",
+    "zero_cost_receipt": "schemas/zero-cost-receipt.schema.json",
+    "native_imagegen_availability": "schemas/native-imagegen-availability.schema.json"
+    ,"editable_canvas_receipt": "schemas/editable-canvas-receipt.schema.json"
+  },
+  "templates": {
+    "run": "templates/run-manifest.template.json",
+    "evidence": "templates/evidence.template.json",
+    "score": "templates/reviewer-score.template.json",
+    "operations_review": "templates/operations-review.template.json",
+    "zero_cost_receipt": "templates/zero-cost-receipt.template.json"
+    ,"editable_canvas_receipt": "templates/editable-canvas-receipt.template.json"
+  },
+  "prohibitions": [
+    "OPENAI_API_KEY",
+    "paid Image API",
+    "Sites publishing",
+    "purchased capacity",
+    "paid external tools",
+    "customer or production data"
+  ],
+  "retention_months": 12,
+  "execution_entry": null,
+  "retention_owner": null
+}
