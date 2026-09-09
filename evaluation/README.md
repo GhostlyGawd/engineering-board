@@ -97,6 +97,7 @@ digest of `evaluation/tool-contracts.json`. Require each client response to conf
   "run_id": "d1-YYYY-MM-DD",
   "source_commit": "e26149bf505ea7f5ae2d95294a8a108e6b3c429f",
   "trial_policy": "d1-client-neutral-v2",
+  "evaluation_version": "1",
   "profiles": {
     "reference": {
       "client_version": "exact-version",
@@ -121,6 +122,26 @@ digest of `evaluation/tool-contracts.json`. Require each client response to conf
 The `context_fingerprints` object must contain all eight case identifiers. The
 prepare command fails if a configured value differs from frozen product
 output.
+
+Predeclare `evaluation_version` as `"1"` for historical product-effect trials
+or `"2"` for the memory-evaluation contract. For v2, pin the v2 operator
+instructions and use `memory-evaluation-response.schema.json`. Preparation
+binds this version in each input and freezes the exact eligible trial keys in
+`evaluation_contract`: positive reference context arms, including any planned
+arm with no surfaced memory. Baseline, negative controls, and replications do
+not enter that denominator. Baseline and empty-context v2 responses still
+require null memory evaluation and a false ordering annotation.
+
+The report lists planned, observed, missing, invalid/mixed, unverified, and
+no-local-correction populations. Rates are `null` until all required reference
+arms (including baseline and negative controls) have valid matching-version
+records and all eligible memory-bearing arms have measurable evidence-backed
+reviews. No-memory arms stay in the planned denominator as non-successes.
+Missing `evaluation_version` is explicitly unconfigured; old manifests remain
+readable but cannot acquire a v2 success rate from whichever results arrived.
+V1-only runs report ordering as unavailable. Observed safeguard checks are
+separate from full-population safeguards and readiness for interpretation;
+neither a partial clean sample nor a complete run establishes product effect.
 
 The repository contract uses Codex as the required reference client. A dated
 contract can add one or more `replication` profiles for other clients. Each

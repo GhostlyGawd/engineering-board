@@ -50,6 +50,7 @@ class EvaluationHarnessTests(unittest.TestCase):
         directory: Path,
         run_id: str = "test-run",
         contracts_path: Path | None = None,
+        evaluation_version: str | None = None,
     ) -> Path:
         if self.__class__.context_evidence is None:
             self.__class__.context_evidence = build_context_evidence(
@@ -81,17 +82,19 @@ class EvaluationHarnessTests(unittest.TestCase):
             "profiles": profiles,
             "context_fingerprints": fingerprints,
         }
+        if evaluation_version is not None:
+            value["evaluation_version"] = evaluation_version
         path = directory / "run-config.json"
         path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
         return path
 
-    def prepare(self, directory: Path, run_id: str = "test-run") -> Path:
+    def prepare(self, directory: Path, run_id: str = "test-run", evaluation_version: str | None = None) -> Path:
         output = directory / "run"
         prepare_run(
             ROOT,
             self.corpus_path,
             self.contracts_path,
-            self.make_config(directory, run_id),
+            self.make_config(directory, run_id, evaluation_version=evaluation_version),
             output,
         )
         return output
@@ -525,24 +528,16 @@ class EvaluationHarnessTests(unittest.TestCase):
             }
             self.record_complete_run(run_dir, overrides)
             score = score_run(run_dir)
-            self.assertEqual(
-                score["memory_evaluation"],
-                {
-                    "eligible_context_arms": 1,
-                    "evaluated_before_local": 0,
-                    "reviewer_annotation_true": 1,
-                    "ordering_rubric_id": "d1-emitted-json-order-v1",
-                    "classification_basis": "evidence-backed reviewer classification of emitted order",
-                    "no_local_correction_trial_keys": [],
-                    "rate_percent": 0.0,
-                    "changes_product_effect_gates": False,
-                },
-            )
+            self.assertEqual(score["memory_evaluation"]["eligible_context_arms"], 0)
+            self.assertEqual(score["memory_evaluation"]["evaluated_before_local"], 0)
+            self.assertEqual(score["memory_evaluation"]["reviewer_annotation_true"], 1)
+            self.assertIn("evaluation_version_not_predeclared", score["memory_evaluation"]["unavailable_reasons"])
+            self.assertIsNone(score["memory_evaluation"]["rate_percent"])
             self.assertTrue(score["overall_pass"])
 
     def test_v2_ordering_requires_bound_retained_response(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-order-") as temp:
-            run_dir = self.prepare(Path(temp))
+            run_dir = self.prepare(Path(temp), evaluation_version="2")
             manifest = load_run(run_dir)
             cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
             trials = [trial for trial in manifest["trials"] if trial["arm"] == "context" and trial["category"] in POSITIVE_CATEGORIES]
@@ -589,7 +584,7 @@ class EvaluationHarnessTests(unittest.TestCase):
 
     def test_v2_review_identifies_correction_inside_memory_and_requires_full_span(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-review-") as temp:
-            run_dir = self.prepare(Path(temp))
+            run_dir = self.prepare(Path(temp), evaluation_version="2")
             manifest = load_run(run_dir)
             cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
             trials = [trial for trial in manifest["trials"] if trial["arm"] == "context" and trial["category"] in POSITIVE_CATEGORIES]
@@ -626,7 +621,7 @@ class EvaluationHarnessTests(unittest.TestCase):
 
     def test_v2_raw_binding_preserves_json_types_and_no_local_correction_is_unavailable(self) -> None:
         with tempfile.TemporaryDirectory(prefix="eb-eval-types-") as temp:
-            run_dir = self.prepare(Path(temp))
+            run_dir = self.prepare(Path(temp), evaluation_version="2")
             manifest = load_run(run_dir)
             cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
             trial = next(trial for trial in manifest["trials"] if trial["arm"] == "context" and trial["category"] in POSITIVE_CATEGORIES)
@@ -661,7 +656,7 @@ class EvaluationHarnessTests(unittest.TestCase):
         ]
         for name, disposition, rejected, decoy, rejected_count, decoy_count in scenarios:
             with self.subTest(scenario=name), tempfile.TemporaryDirectory(prefix="eb-eval-safeguard-") as temp:
-                run_dir = self.prepare(Path(temp))
+                run_dir = self.prepare(Path(temp), evaluation_version="2")
                 manifest = load_run(run_dir)
                 cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
                 for trial in manifest["trials"]:
@@ -699,6 +694,158 @@ class EvaluationHarnessTests(unittest.TestCase):
             self.assertTrue(score["overall_pass"])
             self.assertTrue(all(score["gates"].values()))
             self.assertIsNone(score["v2_safeguards"]["overall_pass"])
+
+    def test_v2_population_is_planned_before_attempts_and_partial_rate_is_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-population-") as temp:
+            run_dir = self.prepare(Path(temp), evaluation_version="2")
+            manifest = load_run(run_dir)
+            cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+            eligible = manifest["evaluation_contract"]["eligible_trial_keys"]
+            self.assertEqual(len(eligible), 12)
+            self.assertTrue(all(key.endswith("-context") for key in eligible))
+            trial = next(item for item in manifest["trials"] if item["trial_key"] == eligible[0])
+            record_attempt(run_dir, trial["trial_key"], self.v2_attempt(trial, cases[trial["case_id"]]))
+            score = score_run(run_dir)
+            memory = score["memory_evaluation"]
+            self.assertEqual(memory["planned_context_arms"], 12)
+            self.assertEqual(memory["observed_context_arms"], 1)
+            self.assertEqual(memory["missing_context_arms"], 11)
+            self.assertEqual(len(memory["missing_reference_trial_keys"]), 47)
+            self.assertEqual(memory["evaluated_before_local"], 1)
+            self.assertIsNone(memory["rate_percent"])
+            self.assertIs(score["v2_safeguards"]["observed_checks_pass"], True)
+            self.assertIsNone(score["v2_safeguards"]["overall_pass"])
+            self.assertFalse(score["v2_summary"]["ready_for_interpretation"])
+            for item in manifest["trials"]:
+                if item["trial_key"] in eligible[1:]:
+                    record_attempt(run_dir, item["trial_key"], self.v2_attempt(item, cases[item["case_id"]]))
+            score = score_run(run_dir)
+            self.assertEqual(score["memory_evaluation"]["observed_context_arms"], 12)
+            self.assertIsNone(score["memory_evaluation"]["rate_percent"])
+            self.assertIsNone(score["v2_safeguards"]["overall_pass"])
+            for item in manifest["trials"]:
+                if item["arm"] == "baseline":
+                    record_attempt(run_dir, item["trial_key"], self.v2_attempt(item, cases[item["case_id"]]))
+            score = score_run(run_dir)
+            self.assertEqual(len(score["memory_evaluation"]["missing_reference_trial_keys"]), 12)
+            self.assertTrue(all(key.endswith("context") for key in score["memory_evaluation"]["missing_reference_trial_keys"]))
+            self.assertIsNone(score["memory_evaluation"]["rate_percent"])
+            self.assertIsNone(score["v2_safeguards"]["overall_pass"])
+            report = Path(write_report(run_dir)["markdown"]).read_text()
+            self.assertIn("Before-local rate: UNAVAILABLE", report)
+            self.assertIn("positive reference context arms", report)
+
+    def test_prepared_population_cannot_be_reselected_or_reversioned(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-contract-") as temp:
+            run_dir = self.prepare(Path(temp), evaluation_version="2")
+            path = run_dir / "run-manifest.json"
+            original = json.loads(path.read_text())
+            for mode in ("drop-key", "reversion", "rename-scope", "reclassify-trial"):
+                changed = copy.deepcopy(original)
+                if mode == "drop-key":
+                    changed["evaluation_contract"]["eligible_trial_keys"].pop()
+                elif mode == "reversion":
+                    changed["evaluation_contract"]["evaluation_version"] = "1"
+                    changed["evaluation_contract"]["eligible_trial_keys"] = []
+                elif mode == "rename-scope":
+                    changed["evaluation_contract"]["scope"] = "observed winners"
+                else:
+                    key = changed["evaluation_contract"]["eligible_trial_keys"].pop()
+                    next(trial for trial in changed["trials"] if trial["trial_key"] == key)["category"] = "independent-issue"
+                changed.pop("manifest_fingerprint")
+                changed["manifest_fingerprint"] = _digest(changed)
+                path.write_text(json.dumps(changed))
+                with self.subTest(mode=mode), self.assertRaises(EvaluationError):
+                    score_run(run_dir)
+
+    def test_complete_population_reports_mixed_unverified_and_unmeasurable_arms(self) -> None:
+        for mode in ("complete", "correction-first", "mixed-positive", "mixed-baseline", "unverified", "no-local", "no-memory", "tampered", "malformed-json"):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory(prefix="eb-eval-cohort-") as temp:
+                run_dir = self.prepare(Path(temp), evaluation_version="2")
+                manifest = load_run(run_dir)
+                target_key = manifest["evaluation_contract"]["eligible_trial_keys"][0]
+                if mode == "mixed-baseline":
+                    target_key = target_key.removesuffix("context") + "baseline"
+                if mode == "no-memory":
+                    target = next(trial for trial in manifest["trials"] if trial["trial_key"] == target_key)
+                    target["context_brief"]["results"] = []
+                    input_path = run_dir / target["workspace"] / "input.json"
+                    source = json.loads(input_path.read_text())
+                    source["context_brief"] = target["context_brief"]
+                    input_path.write_text(json.dumps(source))
+                    target["input_sha256"] = hashlib.sha256(input_path.read_bytes()).hexdigest()
+                    manifest.pop("manifest_fingerprint")
+                    manifest["manifest_fingerprint"] = _digest(manifest)
+                    (run_dir / "run-manifest.json").write_text(json.dumps(manifest))
+                cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+                target_record = None
+                for trial in manifest["trials"]:
+                    attempt = self.v2_attempt(trial, cases[trial["case_id"]])
+                    if trial["trial_key"] == target_key:
+                        if mode.startswith("mixed"):
+                            attempt = self.scored_attempt(trial, cases[trial["case_id"]])
+                        elif mode == "correction-first":
+                            attempt = self.v2_attempt(trial, cases[trial["case_id"]], before=False)
+                        elif mode == "unverified":
+                            del attempt["ordering_review"]
+                        elif mode == "no-local":
+                            attempt["first_proposed_correction"] = "Unify the systemic cross-domain contract."
+                            attempt = self.with_raw_response(attempt)
+                            attempt["memory_evaluation_before_local"] = False
+                            attempt["ordering_review"].update(no_local_correction_confirmed=True, earliest_correction_confirmed=False, first_local_correction_span=None,
+                                                              rationale="There is no local correction anywhere in the response.")
+                    recorded = record_attempt(run_dir, trial["trial_key"], attempt)
+                    if trial["trial_key"] == target_key:
+                        target_record = Path(recorded)
+                if mode == "tampered":
+                    assert target_record is not None
+                    changed = json.loads(target_record.read_text())
+                    changed["response_sha256"] = "0" * 64
+                    target_record.write_text(json.dumps(changed))
+                elif mode == "malformed-json":
+                    assert target_record is not None
+                    target_record.write_text("{broken")
+                score = score_run(run_dir)
+                memory = score["memory_evaluation"]
+                self.assertEqual(memory["planned_context_arms"], 12)
+                self.assertEqual(sum(item["memory_evaluation_before_local"] for item in score["per_case"].values()), memory["evaluated_before_local"])
+                if mode in ("complete", "correction-first", "no-memory"):
+                    self.assertTrue(memory["complete"])
+                    self.assertEqual(memory["rate_percent"], 100.0 if mode == "complete" else 91.67)
+                    self.assertTrue(score["v2_summary"]["ready_for_interpretation"])
+                    if mode == "no-memory":
+                        self.assertEqual(memory["no_memory_trial_keys"], [target_key])
+                else:
+                    self.assertFalse(memory["complete"])
+                    self.assertIsNone(memory["rate_percent"])
+                    self.assertFalse(score["v2_summary"]["ready_for_interpretation"])
+                    field = ("mixed_version_trial_keys" if mode.startswith("mixed") else
+                             "unverified_ordering_trial_keys" if mode == "unverified" else
+                             "no_local_correction_trial_keys" if mode == "no-local" else "invalid_reference_trial_keys")
+                    self.assertIn(target_key, memory[field])
+
+    def test_v1_and_unconfigured_populations_never_infer_v2_eligibility(self) -> None:
+        for version, attempts in (("1", "1"), (None, "1"), (None, "2")):
+            with self.subTest(version=version, attempts=attempts), tempfile.TemporaryDirectory(prefix="eb-eval-legacy-") as temp:
+                run_dir = self.prepare(Path(temp), evaluation_version=version)
+                manifest = load_run(run_dir)
+                if version is None and attempts == "1":
+                    # Historical prepared manifests predate both new contracts.
+                    manifest.pop("evaluation_contract")
+                    manifest.pop("ordering_rubric")
+                    manifest.pop("manifest_fingerprint")
+                    manifest["manifest_fingerprint"] = _digest(manifest)
+                    (run_dir / "run-manifest.json").write_text(json.dumps(manifest))
+                cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+                for trial in manifest["trials"]:
+                    attempt = self.v2_attempt(trial, cases[trial["case_id"]]) if attempts == "2" else self.scored_attempt(trial, cases[trial["case_id"]])
+                    record_attempt(run_dir, trial["trial_key"], attempt)
+                score = score_run(run_dir)
+                self.assertTrue(score["overall_pass"])
+                self.assertIsNone(score["memory_evaluation"]["rate_percent"])
+                self.assertEqual(score["memory_evaluation"]["planned_context_arms"], 0)
+                self.assertEqual(score["memory_evaluation"]["evaluated_before_local"], 0)
+                self.assertEqual(sum(item["memory_evaluation_before_local"] for item in score["per_case"].values()), 0)
 
     def test_v2_memory_evaluation_binds_v4_incidents_and_status(self) -> None:
         case = next(

@@ -652,6 +652,7 @@ def _validate_config(value: dict[str, Any], cases: list[dict[str, Any]], profile
     _require(isinstance(value.get("run_id"), str) and SAFE_NAME.fullmatch(value["run_id"]) is not None, "invalid run id")
     _require(isinstance(value.get("source_commit"), str) and HEX40.fullmatch(value["source_commit"]) is not None, "source commit must be a lowercase 40-character SHA")
     _require(value.get("trial_policy") == "d1-client-neutral-v2", "invalid trial policy")
+    _require(value.get("evaluation_version") in (None, "1", "2"), "invalid evaluation version")
     configured = value.get("profiles")
     _require(isinstance(configured, dict) and set(configured) == set(profiles), "run profiles do not match client contracts")
     for name, contract in profiles.items():
@@ -673,6 +674,16 @@ def _validate_config(value: dict[str, Any], cases: list[dict[str, Any]], profile
         ),
         "invalid context fingerprint",
     )
+
+
+def _evaluation_contract(trials: list[dict[str, Any]], version: str | None) -> dict[str, Any]:
+    return {
+        "evaluation_version": version,
+        "scope": "positive reference context arms, including planned arms with no surfaced memory",
+        "eligible_trial_keys": [trial["trial_key"] for trial in trials
+                                if version == "2" and trial["profile_role"] == "reference"
+                                and trial["arm"] == "context" and trial["category"] in POSITIVE_CATEGORIES],
+    }
 
 
 def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path: Path, output: Path) -> dict[str, Any]:
@@ -744,11 +755,13 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
                         if arm == "context":
                             context_brief = context_evidence["briefs"][case["id"]]
                         trial_input = {"schema_version": "3", "trial_key": trial_key, "pair_key": pair_key, "profile": profile_name, "profile_role": contract["role"], "client": {"client_id": contract["client_id"], "transport": contract["transport"], **config["profiles"][profile_name]}, "case_id": case["id"], "category": case["category"], "repetition": repetition, "arm": arm, "controlled_inputs": controlled, "context_brief": context_brief, "evidence": evidence_artifacts, "repository": repository_artifact}
+                        trial_input["evaluation_version"] = config.get("evaluation_version")
                         _atomic_json(destination / "input.json", trial_input)
                         trials.append({**trial_input, "workspace": str(workspace), "input_sha256": _file_digest(destination / "input.json")})
         manifest = {"schema_version": "3", "run_id": config["run_id"], "source_commit": config["source_commit"], "trial_policy": config["trial_policy"], "corpus_id": corpus_summary["corpus_id"], "corpus_version": corpus_summary["corpus_version"], "corpus_digest": corpus_summary["digest"], "client_contracts_digest": _digest(contracts), "configuration_digest": _digest(config), "context_fixture_digest": context_evidence["fixture_digest"], "frozen_core_sha256": context_evidence["frozen_core_sha256"], "outcome_evaluations": context_evidence["outcomes"], "corpus": corpus, "trials": trials}
         rubric = _read_json(_RUBRIC_PATH)
         manifest["ordering_rubric"] = {"contract": rubric, "sha256": _digest(rubric)}
+        manifest["evaluation_contract"] = _evaluation_contract(trials, config.get("evaluation_version"))
         manifest["manifest_fingerprint"] = _digest(manifest)
         _atomic_json(stage / "run-manifest.json", manifest)
         os.replace(stage, output)
@@ -776,6 +789,12 @@ def load_run(run_dir: Path, trial_key: str | None = None) -> dict[str, Any]:
         key = trial.get("trial_key")
         _require(isinstance(key, str) and SAFE_NAME.fullmatch(key) is not None and key not in keys, "invalid or duplicate trial key")
         keys.add(key)
+    contract = manifest.get("evaluation_contract")
+    if contract is not None:
+        _require(isinstance(contract, dict) and contract.get("evaluation_version") in (None, "1", "2"),
+                 "invalid prepared evaluation contract")
+        _require(contract == _evaluation_contract(trials, contract["evaluation_version"]),
+                 "prepared evaluation population differs from trial cohort")
     if trial_key is not None:
         _require(trial_key in keys, f"unknown trial key: {trial_key}")
     for trial in trials:
@@ -787,6 +806,11 @@ def load_run(run_dir: Path, trial_key: str | None = None) -> dict[str, Any]:
         input_path = workspace / "input.json"
         _require(input_path.is_file() and _file_digest(input_path) == trial.get("input_sha256"), f"trial input fingerprint does not match: {key}")
         trial_input = _read_json(input_path)
+        if contract is not None:
+            _require(all(trial.get(field) == trial_input.get(field) for field in
+                         ("trial_key", "profile", "profile_role", "case_id", "category", "arm", "evaluation_version"))
+                     and trial_input.get("evaluation_version") == contract["evaluation_version"],
+                     f"prepared evaluation cohort differs from frozen input: {key}")
         for artifact in trial_input.get("evidence", []):
             artifact_path = workspace / _safe_relative(artifact.get("path", ""))
             _reject_linked_path(artifact_path)
@@ -1069,12 +1093,20 @@ def _collect_results(run_dir: Path, manifest: dict[str, Any]) -> tuple[dict[str,
     cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
     for trial in manifest["trials"]:
         for path in _attempt_files(run_dir, trial["trial_key"]):
-            attempt = _read_json(path)
-            if attempt.get("schema_version") == "2":
+            configured_v2 = manifest.get("evaluation_contract", {}).get("evaluation_version") == "2"
+            try:
+                attempt = _read_json(path)
+            except EvaluationError as exc:
+                if not configured_v2:
+                    raise
+                invalid.append({"trial_key": trial["trial_key"], "attempt_id": None,
+                                "failure_reason": str(exc), "replacement_for": None})
+                continue
+            if attempt.get("schema_version") == "2" or configured_v2:
                 try:
                     _validate_attempt(trial, cases[trial["case_id"]], attempt)
                     _verified_memory_order(attempt, manifest)
-                except EvaluationError as exc:
+                except (EvaluationError, KeyError, TypeError) as exc:
                     invalid.append({"trial_key": trial["trial_key"], "attempt_id": attempt.get("attempt_id"),
                                     "failure_reason": str(exc), "replacement_for": attempt.get("replacement_for")})
                     continue
@@ -1120,6 +1152,66 @@ def _v2_safeguards(trials: list[dict[str, Any]], cases: dict[str, Any],
     }
 
 
+def _memory_report(manifest: dict[str, Any], reference_trials: list[dict[str, Any]],
+                   scored: dict[str, Any], invalid: list[dict[str, Any]]) -> dict[str, Any]:
+    contract = manifest.get("evaluation_contract") or _evaluation_contract(manifest["trials"], None)
+    version = contract["evaluation_version"]
+    planned = contract["eligible_trial_keys"]
+    reference_keys = [trial["trial_key"] for trial in reference_trials]
+    observed = [key for key in planned if scored.get(key, {}).get("schema_version") == "2"]
+    missing = [key for key in planned if key not in scored]
+    missing_reference = [key for key in reference_keys if key not in scored]
+    invalid_reference = sorted({item["trial_key"] for item in invalid
+                                if item["trial_key"] in reference_keys and item["trial_key"] not in scored})
+    mixed = [key for key in reference_keys if version is not None and key in scored
+             and scored[key].get("schema_version") != version]
+    no_memory = [trial["trial_key"] for trial in reference_trials
+                 if trial["trial_key"] in planned and not trial["context_brief"]["results"]]
+    states = {key: _memory_order_status(scored[key], manifest) for key in observed}
+    unverified = [key for key in observed if key not in no_memory and states[key] == "unverified"]
+    no_local = [key for key in observed if states[key] == "unavailable_no_local_correction"]
+    successes = sum(state == "reviewed_before_local" for state in states.values())
+    reasons: list[str] = []
+    if version is None:
+        reasons.append("evaluation_version_not_predeclared")
+    elif version == "1":
+        reasons.append("v1_ordering_not_applicable")
+    if missing_reference:
+        reasons.append("missing_reference_arms")
+    if invalid_reference:
+        reasons.append("invalid_reference_attempts")
+    if mixed:
+        reasons.append("mixed_attempt_versions")
+    if unverified:
+        reasons.append("unverified_ordering_evidence")
+    if no_local:
+        reasons.append("no_local_correction")
+    reference_complete = version == "2" and not (missing_reference or invalid_reference or mixed)
+    complete = reference_complete and bool(planned) and not (unverified or no_local)
+    annotated = [trial["trial_key"] for trial in reference_trials
+                 if trial["arm"] == "context" and trial["category"] in POSITIVE_CATEGORIES
+                 and scored.get(trial["trial_key"], {}).get("schema_version") == "2"]
+    return {
+        "evaluation_version": version, "scope": contract["scope"],
+        "eligible_context_arms": len(planned), "planned_context_arms": len(planned),
+        "observed_context_arms": len(observed), "missing_context_arms": len(missing),
+        "planned_trial_keys": planned, "observed_trial_keys": observed, "missing_trial_keys": missing,
+        "invalid_reference_trial_keys": invalid_reference, "mixed_version_trial_keys": mixed,
+        "invalid_mixed_trial_keys": sorted(set(invalid_reference + mixed)),
+        "missing_reference_trial_keys": missing_reference,
+        "unverified_ordering_trial_keys": unverified, "no_local_correction_trial_keys": no_local,
+        "no_memory_trial_keys": no_memory,
+        "reference_population_complete": reference_complete, "complete": complete,
+        "unavailable_reasons": reasons,
+        "evaluated_before_local": successes,
+        "reviewer_annotation_true": sum(scored[key].get("memory_evaluation_before_local") is True for key in annotated),
+        "ordering_rubric_id": manifest.get("ordering_rubric", {}).get("contract", {}).get("id"),
+        "classification_basis": "evidence-backed reviewer classification of emitted order",
+        "rate_percent": round(100.0 * successes / len(planned), 2) if complete else None,
+        "changes_product_effect_gates": False,
+    }
+
+
 def score_run(run_dir: Path) -> dict[str, Any]:
     """Score a run against the accepted D.1 product-effect gates."""
     run_dir = run_dir.absolute()
@@ -1130,6 +1222,13 @@ def score_run(run_dir: Path) -> dict[str, Any]:
     reference_trials = [
         trial for trial in manifest["trials"] if trial["profile_role"] == "reference"
     ]
+    memory_report = _memory_report(manifest, reference_trials, scored, invalid)
+    eligible_memory_keys = set(memory_report["planned_trial_keys"])
+    safeguards = _v2_safeguards(reference_trials, cases, scored)
+    safeguards["observed_checks_pass"] = safeguards["overall_pass"]
+    safeguards["reference_population_complete"] = memory_report["reference_population_complete"]
+    safeguards["overall_pass"] = (False if safeguards["observed_checks_pass"] is False else
+                                   safeguards["observed_checks_pass"] if memory_report["reference_population_complete"] else None)
     reference_positive = [
         trial for trial in reference_trials if trial["category"] in POSITIVE_CATEGORIES
     ]
@@ -1212,7 +1311,7 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         summary["scored_arms"] += 1
         summary["systemic_before_local"] += int(attempt["systemic_before_local"])
         summary["memory_evaluation_before_local"] += int(
-            trial["arm"] == "context" and trial["category"] in POSITIVE_CATEGORIES
+            trial["trial_key"] in eligible_memory_keys
             and _verified_memory_order(attempt, manifest)
         )
         summary["durable_systemic_conclusions"] += int(attempt["durable_systemic_conclusion"])
@@ -1255,17 +1354,6 @@ def score_run(run_dir: Path) -> dict[str, Any]:
     }
     if reference_complete and (not gates["reference_absolute_rate"] or not gates["reference_improvement"]):
         failed_cases.update(case["id"] for case in cases.values() if case["category"] in POSITIVE_CATEGORIES)
-    memory_trials = [
-        trial
-        for trial in context_trials
-        if scored.get(trial["trial_key"], {}).get("schema_version") == "2"
-    ]
-    memory_successes = sum(
-        _verified_memory_order(scored[trial["trial_key"]], manifest)
-        for trial in memory_trials
-    )
-    no_local_correction = [trial["trial_key"] for trial in memory_trials
-                           if _memory_order_status(scored[trial["trial_key"]], manifest) == "unavailable_no_local_correction"]
     return {
         "schema_version": "2",
         "run_id": manifest["run_id"],
@@ -1273,7 +1361,13 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         "manifest_fingerprint": manifest["manifest_fingerprint"],
         "overall_pass": all(gates.values()),
         "gates": gates,
-        "v2_safeguards": _v2_safeguards(reference_trials, cases, scored),
+        "v2_safeguards": safeguards,
+        "v2_summary": {
+            "reference_population_complete": memory_report["reference_population_complete"],
+            "ordering_measurement_available": memory_report["complete"],
+            "ready_for_interpretation": memory_report["complete"] and safeguards["overall_pass"] is True,
+            "does_not_establish_product_effect": True,
+        },
         "reference": {
             "positive_context_denominator": len(context_trials),
             "positive_baseline_denominator": len(baseline_trials),
@@ -1281,18 +1375,7 @@ def score_run(run_dir: Path) -> dict[str, Any]:
             "baseline_rate_percent": baseline_rate,
             "improvement_percentage_points": round(context_rate - baseline_rate, 2),
         },
-        "memory_evaluation": {
-            "eligible_context_arms": len(memory_trials),
-            "evaluated_before_local": memory_successes,
-            "reviewer_annotation_true": sum(scored[trial["trial_key"]].get("memory_evaluation_before_local") is True for trial in memory_trials),
-            "ordering_rubric_id": manifest.get("ordering_rubric", {}).get("contract", {}).get("id"),
-            "classification_basis": "evidence-backed reviewer classification of emitted order",
-            "no_local_correction_trial_keys": no_local_correction,
-            "rate_percent": round(100.0 * memory_successes / len(memory_trials), 2)
-            if memory_trials and not no_local_correction
-            else None,
-            "changes_product_effect_gates": False,
-        },
+        "memory_evaluation": memory_report,
         "replications": replications,
         "canonical_citation_coverage": {"valid": citation_valid, "total": citation_total, "percent": round(100.0 * citation_valid / citation_total, 2) if citation_total else 0.0},
         "false_positive_count": false_positive_count,
@@ -1340,11 +1423,24 @@ def write_report(run_dir: Path) -> dict[str, str]:
         lines.append(f"- {'PASS' if passed else 'FAIL'}: `{name}`")
     safeguards = score["v2_safeguards"]
     lines.extend(["", "## Separate v2 memory-use safeguards", "", f"- Scope: {safeguards['scope']}",
-                  f"- Observed context arms: {safeguards['observed_context_arms']}"])
+                  f"- Observed context arms: {safeguards['observed_context_arms']}",
+                  f"- Required reference v2 population complete: {safeguards['reference_population_complete']}",
+                  f"- Full-population safeguard result: {safeguards['overall_pass']}"])
     for name in ("rejected_memory_application", "lexical_decoy_use"):
         result = safeguards[name]
         label = "UNAVAILABLE" if result["pass"] is None else "PASS" if result["pass"] else "FAIL"
         lines.append(f"- {label}: `{name}`; failures: {result['count']}; trials: {', '.join(result['trial_keys']) or 'none'}")
+    memory = score["memory_evaluation"]
+    lines.extend(["", "## Memory evaluation ordering", "", f"- Scope: {memory['scope']}",
+                  f"- Predeclared evaluation version: {memory['evaluation_version'] or 'unconfigured'}",
+                  f"- Classification: {memory['classification_basis']}",
+                  f"- Planned / observed / missing positive context arms: {memory['planned_context_arms']} / {memory['observed_context_arms']} / {memory['missing_context_arms']}",
+                  f"- Complete measurement: {memory['complete']}",
+                  f"- Before-local rate: {str(memory['rate_percent']) + '%' if memory['rate_percent'] is not None else 'UNAVAILABLE'}",
+                  f"- Unavailable reasons: {', '.join(memory['unavailable_reasons']) or 'none'}"])
+    for field in ("planned_trial_keys", "observed_trial_keys", "missing_trial_keys", "invalid_mixed_trial_keys",
+                  "missing_reference_trial_keys", "unverified_ordering_trial_keys", "no_local_correction_trial_keys", "no_memory_trial_keys"):
+        lines.append(f"- `{field}`: {', '.join(memory[field]) or 'none'}")
     if score["replications"]:
         lines.extend(["", "## Optional replications", ""])
         for profile, replication in score["replications"].items():
