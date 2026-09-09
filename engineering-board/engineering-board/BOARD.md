@@ -4,7 +4,7 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ## Open
 
-- F004 P2 | [Validate D.1 v2 in a live pilot with retained evidence](features/F004-validate-d-1-v2-in-a-live-pilot-with-retained-evidence.md)
+- F004 P2 | [Validate D.1 v2 in a live pilot with retained evidence](features/F004-validate-d-1-v2-in-a-live-pilot-with-retained-evidence.md) (in_progress)
 
 ## Conventions
 

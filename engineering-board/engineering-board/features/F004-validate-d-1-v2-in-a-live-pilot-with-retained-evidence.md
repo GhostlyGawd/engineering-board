@@ -1,7 +1,7 @@
 ---
 id: F004
 type: feature
-status: open
+status: in_progress
 needs: tdd
 priority: P2
 title: Validate D.1 v2 in a live pilot with retained evidence
@@ -28,3 +28,8 @@ parent: F002
 ## Comments
 
 - **measurement-cycle-closeout** 2026-09-09T14:10:08Z: Only live study and release decision remain after B004-B007 source correction and independent verification. Preserve current measurement/semantic limits, comparison and artifacts before launch; no result is implied by source completion.
+- **lead-workflow-pilot-20260909** 2026-09-09T14:52:02Z: Lead owns claim on behalf of design_workflow_cases (cases/**, cases.json; isolated worktree), build_workflow_runner (runner.py/tests; isolated worktree), and read-only review_workflow_protocol. Prelaunch review found label leakage and retention/input-check mismatches; builders correcting before any live calls. Protocol and direct-Learning ledger retained under docs/evidence/workflow-pilot-2026-09-09/. Assisted MCP mechanism pilot explicitly excludes natural-host activation and customer-value claims.
+
+## Approved workflow-value study direction
+
+Owner approved the product-value review recommendation: distinguish procedural Learning use from proposed-hypothesis investigation; compare ordinary repository work, selected historical evidence, and Engineering Board retrieval through a supported host workflow; judge useful investigation, coverage, patch correctness and overhead separately from response ordering. Fresh synthetic pilot tasks will be explicitly labeled, not represented as customer or independently sampled real-world incidents. Historical D.1 gates and corpus locks remain unchanged. Source instrumentation alone is not the product-value outcome.
