@@ -67,3 +67,14 @@ Do not freeze or run it. No live model call occurred. Corrections require actual
 retrieval checks across all four cases, a new committed fixture revision, and a
 fresh `campaign-v2/` preparation and independent acceptance. The rejected bytes
 remain available for audit rather than being overwritten.
+
+Correction `16b841997c017832ad5a84e399319f4a32a81685` generates canonical
+claim/cluster/graph fingerprints and valid H section structure. Fixture
+validation now calls the actual MCP dispatcher for all four cases on isolated
+temporary boards. Source and installed 1.13.5 checks returned L101, L102, H101
+and H102 without errors or stale flags; the lead reran the installed check
+successfully after integration at `25fd3323d562168fa9a388745be0340e59a55aa1`.
+Exact commands, module hashes and returned context receipts are retained in
+`evaluation/workflow-pilot/cases/validation-evidence.json`.
+This correction permits a new no-model preparation, not automatic acceptance
+of the resulting trial inputs.
