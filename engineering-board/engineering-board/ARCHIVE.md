@@ -1,6 +1,7 @@
 # engineering-board — Archive
 
 Resolved entries. Newest at the top.
+- F006 | Build the free-only Codex design canary fixture pack | resolved: 2026-09-09
 - Q002 | Which Codex design plugins should enter a canary evaluation? | resolved: 2026-09-09
 - F005 | Expose a read-only hypothesis-detail route from retrieved H records | resolved: 2026-09-09
 - B009 | Packaged MCP server reports 0.0.0 instead of its release version | resolved: 2026-09-09

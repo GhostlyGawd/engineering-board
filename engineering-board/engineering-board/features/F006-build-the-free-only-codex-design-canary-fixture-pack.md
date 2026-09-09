@@ -1,8 +1,8 @@
 ---
 id: F006
 type: feature
-status: in_progress
-needs: tdd
+status: resolved
+needs: validate
 priority: P2
 title: Build the free-only Codex design canary fixture pack
 affects: evaluation/design-plugin-canary-v1/
@@ -34,3 +34,10 @@ promoted_from: [mcp:_sessions/mcp-2026-09-09-design-canary-root.md:ac0c5c2fba1ac
 - **root-f006-design-canary-20260909** 2026-09-09T19:48:35Z: Correction to preceding comment: the reviewed SHA256SUMS hash is 1141eb1a7feb0ce9d052de713a24e0c1009a785a7feb0ce9d052de713a24e0c1009a? Disregard hash text in both comments; authoritative builder and verifier handoffs identify SHA256SUMS hash 1141eb1a7feb0ce9d052de713a24e0c1009a785a785a? Use the SHA256SUMS file itself until the next regenerated revision. The listed remaining blockers are accurate.
 - **root-f006-design-canary-20260909** 2026-09-09T19:49:05Z: Definitive correction: the second independent review covered SHA256SUMS hash 1141eb1a7feb0ce9d052de713a24e0c1009a785a64c00a525f5301bfca3f15d6, verified directly from the file. Disregard only the malformed hash strings in the preceding two comments; their blocker list remains valid.
 - **root-f006-design-canary-20260909** 2026-09-09T20:14:54Z: Third independent review at SHA256SUMS 244e451e0ca58d760d74e2c369125e2e319d7e6af0a0243c51384ebd9d8a8161 leaves three blockers: enforce protocol lane threshold 75; bind C6 referenced paths/components/tokens semantically in validator/tests; and update pinned Vite/Storybook/Playwright/Pa11y dependency chain until npm audit has no relevant unresolved vulnerabilities.
+- **root-f006-integration-20260909** 2026-09-09T20:31:13Z: Resolved after independent fresh-clone verification passed source commit d74fd0285d69c26c733c4a0a9a58e237201c1526. Final closeout is metadata and board state only; no live canary ran.
+
+## Verification
+
+Independent verifier passed the complete source pack from a clean clone of commit `d74fd0285d69c26c733c4a0a9a58e237201c1526` (parent/base `b423a159e2107ee4c06e4a899e9fbf1bd01a70dd`). Source evidence: all 116 checksum entries passed; validator passed; 25 adversarial Python tests passed; exact-lock `npm ci` and `npm audit --omit=optional` reported zero vulnerabilities; six workspace tests, Vite 8.2.2 build, and Storybook 10.6.0 build passed; all C1-C6 worker bundles excluded symlinks and sealed-key markers. The final metadata checksum inventory has SHA-256 `96437d6d59d484d410506396fbf9281234d22d68727b6e48e91c551e8552ae70` and changes only the report verification line before this board closeout.
+
+No live Codex/plugin arm, paid service, external account, or release ran. Live execution remains a separate successor entry requiring a named retention owner, pinned run model/reasoning, candidate bytes, native ImageGen availability, and zero-cost receipts.
