@@ -29,6 +29,7 @@ SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 CONTEXT_FINGERPRINT = re.compile(r"^ctx-[0-9a-f]{16}$")
+_RUBRIC_PATH = Path(__file__).with_name("ordering-rubric.json")
 SYSTEM_TEMP_LINKS = {
     Path("/tmp"): Path("/private/tmp"),
     Path("/var"): Path("/private/var"),
@@ -746,6 +747,8 @@ def prepare_run(root: Path, corpus_path: Path, contracts_path: Path, config_path
                         _atomic_json(destination / "input.json", trial_input)
                         trials.append({**trial_input, "workspace": str(workspace), "input_sha256": _file_digest(destination / "input.json")})
         manifest = {"schema_version": "3", "run_id": config["run_id"], "source_commit": config["source_commit"], "trial_policy": config["trial_policy"], "corpus_id": corpus_summary["corpus_id"], "corpus_version": corpus_summary["corpus_version"], "corpus_digest": corpus_summary["digest"], "client_contracts_digest": _digest(contracts), "configuration_digest": _digest(config), "context_fixture_digest": context_evidence["fixture_digest"], "frozen_core_sha256": context_evidence["frozen_core_sha256"], "outcome_evaluations": context_evidence["outcomes"], "corpus": corpus, "trials": trials}
+        rubric = _read_json(_RUBRIC_PATH)
+        manifest["ordering_rubric"] = {"contract": rubric, "sha256": _digest(rubric)}
         manifest["manifest_fingerprint"] = _digest(manifest)
         _atomic_json(stage / "run-manifest.json", manifest)
         os.replace(stage, output)
@@ -922,6 +925,102 @@ def _validate_attempt(trial: dict[str, Any], case: dict[str, Any], attempt: dict
         )
 
 
+def _raw_member_span(raw: str, field: str) -> tuple[int, int]:
+    """Locate a top-level value in an already validated JSON object."""
+    decoder = json.JSONDecoder()
+    position = raw.index("{") + 1
+    while True:
+        position += len(raw[position:]) - len(raw[position:].lstrip())
+        key, position = decoder.raw_decode(raw, position)
+        position += len(raw[position:]) - len(raw[position:].lstrip())
+        position += 1  # colon
+        position += len(raw[position:]) - len(raw[position:].lstrip())
+        start = position
+        _, position = decoder.raw_decode(raw, position)
+        if key == field:
+            return start, position
+        position += len(raw[position:]) - len(raw[position:].lstrip())
+        position += 1  # comma
+
+
+def _verified_memory_order(attempt: dict[str, Any], manifest: dict[str, Any]) -> bool:
+    """Validate evidence binding; semantic first-correction selection is reviewed."""
+    if attempt.get("schema_version") != "2" or attempt.get("state") != "scored":
+        return False
+    evidence_fields = {"raw_response", "response_sha256", "ordering_rubric_id"}
+    if not evidence_fields.intersection(attempt) and "ordering_review" not in attempt:
+        return False
+    _require(evidence_fields.issubset(attempt), "incomplete ordering evidence")
+    frozen = manifest.get("ordering_rubric")
+    rubric = _read_json(_RUBRIC_PATH)
+    _require(isinstance(frozen, dict) and frozen.get("contract") == rubric
+             and frozen.get("sha256") == _digest(rubric), "missing or unsupported frozen ordering rubric")
+    _require(attempt["ordering_rubric_id"] == rubric["id"], "ordering rubric id differs")
+    raw = attempt["raw_response"]
+    _require(isinstance(raw, str), "raw_response must be a string")
+    _require(hashlib.sha256(raw.encode("utf-8")).hexdigest() == attempt["response_sha256"],
+             "raw response fingerprint differs")
+
+    def unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            _require(key not in result, "duplicate raw response key")
+            result[key] = value
+        return result
+
+    try:
+        response = json.loads(raw, object_pairs_hook=unique_object)
+    except (ValueError, TypeError) as exc:
+        raise EvaluationError(f"invalid raw response: {exc}") from exc
+    required = {"memory_evaluation", "first_stated_cause", "first_proposed_correction",
+                "final_diagnosis", "canonical_citations", "durable_systemic_conclusion"}
+    _require(isinstance(response, dict) and set(response) == required, "invalid raw response fields")
+    _require(all(response[field] == attempt.get(field) for field in required),
+             "raw response differs from recorded diagnosis")
+    review = attempt.get("ordering_review")
+    if review is None:
+        return False
+    _require(isinstance(review, dict), "ordering_review must be an object")
+    for field in ("reviewer", "rationale"):
+        _require(isinstance(review.get(field), str) and bool(review[field].strip()),
+                 f"ordering review requires {field}")
+    _require(review["reviewer"] == attempt["reviewer"], "ordering reviewer differs")
+    _require(review.get("response_sha256") == attempt["response_sha256"]
+             and review.get("rubric_id") == rubric["id"]
+             and review.get("rubric_sha256") == frozen["sha256"], "ordering review binding differs")
+    _require(review.get("earliest_correction_confirmed") is True,
+             "ordering review must identify earliest correction anywhere")
+
+    def checked_span(field: str) -> tuple[int, int]:
+        span = review.get(field)
+        _require(isinstance(span, dict) and set(span) == {"start", "end", "quote"},
+                 f"invalid {field}")
+        start, end = span["start"], span["end"]
+        _require(type(start) is int and type(end) is int and 0 <= start < end <= len(raw),
+                 f"invalid {field} bounds")
+        _require(span["quote"] == raw[start:end], f"{field} quote differs")
+        return start, end
+
+    correction_start, correction_end = checked_span("first_local_correction_span")
+    _require(bool(raw[correction_start:correction_end].strip()) and any(
+        token.start() < correction_start < correction_end < token.end()
+        and not raw[token.end():].lstrip().startswith(":")
+        for token in re.finditer(r'"(?:[^"\\]|\\.)*"', raw)
+    ), "correction span must quote string value content")
+    before = False
+    if response["memory_evaluation"] is not None:
+        evaluation_span = checked_span("complete_evaluation_span")
+        _require(evaluation_span == _raw_member_span(raw, "memory_evaluation"),
+                 "complete evaluation span must cover entire memory payload")
+        before = evaluation_span[1] < correction_start
+    else:
+        _require(review.get("complete_evaluation_span") is None,
+                 "absent memory cannot have an evaluation span")
+    _require(attempt.get("memory_evaluation_before_local") is before,
+             "ordering classification contradicts raw response")
+    return before
+
+
 def record_attempt(run_dir: Path, trial_key: str, attempt: dict[str, Any]) -> str:
     """Record one scored attempt or one permitted infrastructure replacement."""
     run_dir = run_dir.absolute()
@@ -941,6 +1040,7 @@ def record_attempt(run_dir: Path, trial_key: str, attempt: dict[str, Any]) -> st
         _require(attempt.get("replacement_for") == existing[0]["attempt_id"], "replacement relation does not match the failed attempt")
     _require(all(item.get("attempt_id") != attempt.get("attempt_id") for item in existing), "duplicate attempt id")
     _validate_attempt(trial, cases[trial["case_id"]], attempt)
+    _verified_memory_order(attempt, manifest)
     path = run_dir / "records" / trial_key / f"{len(existing) + 1:02d}-{attempt['attempt_id']}.json"
     _atomic_json(path, attempt, exclusive=True)
     return str(path)
@@ -949,9 +1049,18 @@ def record_attempt(run_dir: Path, trial_key: str, attempt: dict[str, Any]) -> st
 def _collect_results(run_dir: Path, manifest: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
     scored: dict[str, dict[str, Any]] = {}
     invalid: list[dict[str, Any]] = []
+    cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
     for trial in manifest["trials"]:
         for path in _attempt_files(run_dir, trial["trial_key"]):
             attempt = _read_json(path)
+            if attempt.get("schema_version") == "2":
+                try:
+                    _validate_attempt(trial, cases[trial["case_id"]], attempt)
+                    _verified_memory_order(attempt, manifest)
+                except EvaluationError as exc:
+                    invalid.append({"trial_key": trial["trial_key"], "attempt_id": attempt.get("attempt_id"),
+                                    "failure_reason": str(exc), "replacement_for": attempt.get("replacement_for")})
+                    continue
             if attempt.get("state") == "scored":
                 scored[trial["trial_key"]] = attempt
             else:
@@ -1051,7 +1160,8 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         summary["scored_arms"] += 1
         summary["systemic_before_local"] += int(attempt["systemic_before_local"])
         summary["memory_evaluation_before_local"] += int(
-            attempt.get("memory_evaluation_before_local") is True
+            trial["arm"] == "context" and trial["category"] in POSITIVE_CATEGORIES
+            and _verified_memory_order(attempt, manifest)
         )
         summary["durable_systemic_conclusions"] += int(attempt["durable_systemic_conclusion"])
         if attempt["systemic_before_local"]:
@@ -1099,7 +1209,7 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         if scored.get(trial["trial_key"], {}).get("schema_version") == "2"
     ]
     memory_successes = sum(
-        scored[trial["trial_key"]].get("memory_evaluation_before_local") is True
+        _verified_memory_order(scored[trial["trial_key"]], manifest)
         for trial in memory_trials
     )
     return {
@@ -1119,6 +1229,9 @@ def score_run(run_dir: Path) -> dict[str, Any]:
         "memory_evaluation": {
             "eligible_context_arms": len(memory_trials),
             "evaluated_before_local": memory_successes,
+            "reviewer_annotation_true": sum(scored[trial["trial_key"]].get("memory_evaluation_before_local") is True for trial in memory_trials),
+            "ordering_rubric_id": manifest.get("ordering_rubric", {}).get("contract", {}).get("id"),
+            "classification_basis": "evidence-backed reviewer classification of emitted order",
             "rate_percent": round(100.0 * memory_successes / len(memory_trials), 2)
             if memory_trials
             else 0.0,

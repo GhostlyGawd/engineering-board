@@ -147,6 +147,37 @@ its structured result.
 
 ## Record and score evidence
 
+For v2 ordering evidence, preserve the client's exact UTF-8 response as the
+attempt's `raw_response` string. Include its byte SHA-256 in `response_sha256`
+and set `ordering_rubric_id` to `d1-emitted-json-order-v1`. Preparation freezes
+the full [ordering rubric](ordering-rubric.json) and its digest in the manifest.
+Do not parse and reserialize the response before retaining it. The recorder
+binds every response field to the scored attempt and rejects duplicate keys
+(including nested keys), altered payloads, or a supplied ordering flag that
+contradicts the retained field order. Scoring checks the evidence again.
+
+`memory_evaluation_before_local` is a reviewer annotation. Verified counts
+require an `ordering_review`: named reviewer, response SHA-256, rubric id and
+SHA-256, rationale, and `earliest_correction_confirmed: true`. The reviewer
+must locate the first local correction anywhere in the response, including
+`evidence_or_gap`, `first_stated_cause`, and `final_diagnosis`; dedicated field
+order alone is insufficient. Retain `complete_evaluation_span` and
+`first_local_correction_span`, each with `start`, `end`, and exact raw `quote`.
+Offsets are zero-based Unicode character indices with an exclusive end. The
+correction quote is raw JSON string content without surrounding quotes;
+retain JSON escapes in the quoted slice. SHA-256 hashes UTF-8 bytes, while
+span offsets count characters in the retained raw string. The
+evaluation span must cover the entire raw memory payload, and its end must
+strictly precede the correction start. For absent memory its span is null.
+The review's `reviewer` must equal the attempt reviewer. An honest
+false annotation for correction-first output remains a scored failure. Legacy
+v2 records without evidence or review remain annotations and never supply
+verified ordering successes. Reports label the metric as evidence-backed
+reviewer classification of emitted order. The semantic identification of the
+first correction remains attributed reviewer judgment; it does not prove
+internal cognition or mechanically establish semantic reasoning order.
+Historical v1 product-effect gates retain their existing meaning.
+
 ```sh
 python3 evaluation/harness.py record \
   --run /safe/path/run-directory \

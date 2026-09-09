@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Milestone D.1 memory-evaluation diagnosis",
+  "description": "Emit memory_evaluation before first_proposed_correction, then final_diagnosis. JSON Schema does not enforce member order; the frozen raw-response rubric verifies observable emitted order, not internal cognition. Duplicate keys are forbidden.",
   "type": "object",
   "additionalProperties": false,
   "required": [

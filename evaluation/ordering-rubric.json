@@ -1,0 +1,10 @@
+{
+  "id": "d1-emitted-json-order-v1",
+  "evidence": "Exact raw UTF-8 JSON response retained in raw_response with response_sha256; duplicate keys are invalid.",
+  "binding": "All response fields must equal the recorded diagnosis fields; memory target, status, incidents and disposition must match the validated evaluation.",
+  "order": "A named reviewer identifies the earliest local correction anywhere in the exact response, including evidence_or_gap, first_stated_cause and final_diagnosis. The complete raw memory_evaluation value span must end strictly before that correction span starts. Offsets are zero-based Unicode character indices, end exclusive; quotes must exactly match raw slices.",
+  "review": "Retain reviewer identity, response and rubric digests, complete evaluation and first local correction spans with exact quotes, explicit earliest-correction attestation, and rationale. Correction spans quote nonempty string value content excluding surrounding JSON quotes, retaining raw JSON escapes. Identifying the semantic first correction is reviewer judgment, not mechanically verified by field order.",
+  "success": "A non-null complete evaluation precedes the reviewer-identified first local correction anywhere. The supplied boolean must agree with the reviewed spans.",
+  "unsupported": "Without retained evidence and a frozen rubric, supplied flags are reviewer annotations and cannot count as verified success.",
+  "limit": "Evidence-backed reviewer classification of observable emitted order; does not establish internal cognition or mechanically prove semantic reasoning order."
+}

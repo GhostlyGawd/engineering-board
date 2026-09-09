@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -20,6 +21,8 @@ sys.path.insert(0, str(ROOT))
 from evaluation.harness import (  # noqa: E402
     EvaluationError,
     _reject_linked_path,
+    _raw_member_span,
+    _digest,
     _validate_attempt,
     build_context_evidence,
     load_run,
@@ -167,6 +170,40 @@ class EvaluationHarnessTests(unittest.TestCase):
             attempt = self.scored_attempt(trial, cases[trial["case_id"]])
             attempt.update(overrides.get(trial["trial_key"], {}))
             record_attempt(run_dir, trial["trial_key"], attempt)
+
+    def v2_attempt(self, trial: dict, case: dict, *, before: bool = True) -> dict:
+        attempt = self.scored_attempt(trial, case, schema_version="2")
+        results = (trial.get("context_brief") or {}).get("results", [])
+        target = next((item for item in results if item["id"] == case["expected_relevant_memory"]), results[0] if results else None)
+        evaluation = None if target is None else {
+            "memory_id": target["id"], "memory_status": target["status"],
+            "current_incident_ids": [], "prior_incident_ids": [],
+            "disposition": "hold", "evidence_or_gap": "Prior evidence is unavailable.",
+        }
+        attempt.update(memory_evaluation=evaluation, memory_evaluation_before_local=bool(target and before))
+        return self.with_raw_response(attempt, before=before)
+
+    @staticmethod
+    def with_raw_response(attempt: dict, *, before: bool = True) -> dict:
+        fields = ["memory_evaluation", "first_stated_cause", "first_proposed_correction", "final_diagnosis", "canonical_citations", "durable_systemic_conclusion"]
+        if not before:
+            fields = ["first_proposed_correction", "memory_evaluation", "first_stated_cause", "final_diagnosis", "canonical_citations", "durable_systemic_conclusion"]
+        raw = json.dumps({key: attempt[key] for key in fields}, indent=2)
+        digest = hashlib.sha256(raw.encode()).hexdigest()
+        rubric = json.loads((ROOT / "evaluation/ordering-rubric.json").read_text())
+        def span(field: str) -> dict:
+            start, end = _raw_member_span(raw, field)
+            if field == "first_proposed_correction":
+                start, end = start + 1, end - 1
+            return {"start": start, "end": end, "quote": raw[start:end]}
+        return {**attempt, "raw_response": raw, "response_sha256": digest,
+                "ordering_rubric_id": rubric["id"], "ordering_review": {
+                    "reviewer": attempt["reviewer"], "rationale": "Reviewed all response fields for the earliest correction.",
+                    "response_sha256": digest, "rubric_id": rubric["id"], "rubric_sha256": _digest(rubric),
+                    "earliest_correction_confirmed": True,
+                    "complete_evaluation_span": span("memory_evaluation") if attempt["memory_evaluation"] else None,
+                    "first_local_correction_span": span("first_proposed_correction"),
+                }}
 
     def test_corpus_contract_has_balanced_sanitized_cases(self) -> None:
         summary = validate_corpus(ROOT, self.corpus_path)
@@ -492,12 +529,99 @@ class EvaluationHarnessTests(unittest.TestCase):
                 score["memory_evaluation"],
                 {
                     "eligible_context_arms": 1,
-                    "evaluated_before_local": 1,
-                    "rate_percent": 100.0,
+                    "evaluated_before_local": 0,
+                    "reviewer_annotation_true": 1,
+                    "ordering_rubric_id": "d1-emitted-json-order-v1",
+                    "classification_basis": "evidence-backed reviewer classification of emitted order",
+                    "rate_percent": 0.0,
                     "changes_product_effect_gates": False,
                 },
             )
             self.assertTrue(score["overall_pass"])
+
+    def test_v2_ordering_requires_bound_retained_response(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-order-") as temp:
+            run_dir = self.prepare(Path(temp))
+            manifest = load_run(run_dir)
+            cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+            trials = [trial for trial in manifest["trials"] if trial["arm"] == "context" and trial["category"] in POSITIVE_CATEGORIES]
+            trial = trials[0]
+            valid = self.v2_attempt(trial, cases[trial["case_id"]])
+            self.assertEqual(manifest["ordering_rubric"]["contract"]["id"], valid["ordering_rubric_id"])
+            variants = []
+            variants.append({**valid, "response_sha256": "0" * 64})
+            variants.append({key: value for key, value in valid.items() if key != "raw_response"})
+            variants.append({**valid, "first_proposed_correction": "Unbound replacement."})
+            variants.append(self.with_raw_response(valid, before=False))
+            for field, value in [("start", -1), ("end", 100000), ("end", 0), ("quote", "not the raw quote")]:
+                changed = copy.deepcopy(valid)
+                changed["ordering_review"]["first_local_correction_span"][field] = value
+                variants.append(changed)
+            for field, value in [("reviewer", "someone-else"), ("rationale", ""), ("earliest_correction_confirmed", False), ("rubric_sha256", "0" * 64)]:
+                changed = copy.deepcopy(valid)
+                changed["ordering_review"][field] = value
+                variants.append(changed)
+            for field, value in [("memory_id", "H999"), ("memory_status", "confirmed"), ("disposition", "apply")]:
+                changed = copy.deepcopy(valid)
+                changed["memory_evaluation"][field] = value
+                variants.append(changed)
+            for duplicate in [valid["raw_response"].replace('"memory_evaluation":', '"memory_evaluation": null, "memory_evaluation":', 1),
+                              valid["raw_response"].replace('"disposition":', '"disposition": "apply", "disposition":', 1)]:
+                variants.append({**valid, "raw_response": duplicate, "response_sha256": hashlib.sha256(duplicate.encode()).hexdigest()})
+            for variant in variants:
+                with self.subTest(variant=variant), self.assertRaises(EvaluationError):
+                    record_attempt(run_dir, trial["trial_key"], variant)
+            stored = Path(record_attempt(run_dir, trial["trial_key"], valid))
+            self.assertEqual(json.loads(stored.read_text())["raw_response"], valid["raw_response"])
+            score = score_run(run_dir)
+            self.assertEqual(score["memory_evaluation"]["evaluated_before_local"], 1)
+            self.assertEqual(score["per_case"][trial["case_id"]]["memory_evaluation_before_local"], 1)
+            failed_trial = trials[1]
+            failed = self.v2_attempt(failed_trial, cases[failed_trial["case_id"]], before=False)
+            record_attempt(run_dir, failed_trial["trial_key"], failed)
+            self.assertEqual(score_run(run_dir)["memory_evaluation"]["evaluated_before_local"], 1)
+            stored.write_text(json.dumps({**valid, "raw_response": valid["raw_response"] + " "}))
+            score = score_run(run_dir)
+            self.assertEqual(score["memory_evaluation"]["evaluated_before_local"], 0)
+            self.assertEqual(score["per_case"][trial["case_id"]]["memory_evaluation_before_local"], 0)
+            self.assertIn("fingerprint", score["invalid_attempts"][0]["failure_reason"])
+
+    def test_v2_review_identifies_correction_inside_memory_and_requires_full_span(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="eb-eval-review-") as temp:
+            run_dir = self.prepare(Path(temp))
+            manifest = load_run(run_dir)
+            cases = {case["id"]: case for case in manifest["corpus"]["cases"]}
+            trials = [trial for trial in manifest["trials"] if trial["arm"] == "context" and trial["category"] in POSITIVE_CATEGORIES]
+            trial = trials[0]
+            attempt = self.v2_attempt(trial, cases[trial["case_id"]])
+            attempt["memory_evaluation"]["evidence_or_gap"] = 'Patch the café cache with "fresh" state now.'
+            attempt = self.with_raw_response(attempt)
+            # Unicode and escaped quote offsets refer to the retained source string.
+            raw = attempt["raw_response"].replace("caf\\u00e9", "café")
+            attempt["raw_response"] = raw
+            attempt["response_sha256"] = hashlib.sha256(raw.encode()).hexdigest()
+            review = attempt["ordering_review"]
+            review["response_sha256"] = attempt["response_sha256"]
+            start, end = _raw_member_span(raw, "memory_evaluation")
+            review["complete_evaluation_span"] = {"start": start, "end": end, "quote": raw[start:end]}
+            correction_start = raw.index("Patch the café")
+            correction_end = raw.index("now.", correction_start) + len("now.")
+            review["first_local_correction_span"] = {"start": correction_start, "end": correction_end, "quote": raw[correction_start:correction_end]}
+            review["rationale"] = "The evidence-or-gap field already proposes a patch before evaluation is complete."
+            with self.assertRaisesRegex(EvaluationError, "contradicts"):
+                record_attempt(run_dir, trial["trial_key"], attempt)
+            attempt["memory_evaluation_before_local"] = False
+            fragment = copy.deepcopy(attempt)
+            fragment["ordering_review"]["complete_evaluation_span"] = {"start": start, "end": start + 1, "quote": raw[start:start + 1]}
+            with self.assertRaisesRegex(EvaluationError, "entire memory"):
+                record_attempt(run_dir, trial["trial_key"], fragment)
+            record_attempt(run_dir, trial["trial_key"], attempt)
+            unreviewed = self.v2_attempt(trials[1], cases[trials[1]["case_id"]])
+            del unreviewed["ordering_review"]
+            record_attempt(run_dir, trials[1]["trial_key"], unreviewed)
+            score = score_run(run_dir)
+            self.assertEqual(score["memory_evaluation"]["evaluated_before_local"], 0)
+            self.assertEqual(score["memory_evaluation"]["reviewer_annotation_true"], 1)
 
     def test_v2_memory_evaluation_binds_v4_incidents_and_status(self) -> None:
         case = next(
