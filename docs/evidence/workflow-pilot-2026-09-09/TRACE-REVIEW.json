@@ -1,0 +1,887 @@
+{
+  "0534b4aa6fa44e4e": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "acceptable_against_visible_contracts",
+    "prior_patch_judgment_changed": false,
+    "access_route": "direct_history_markdown",
+    "memory_ids": {
+      "delivered_full": [
+        "L101",
+        "B101",
+        "B102"
+      ],
+      "delivered_summary": [],
+      "reference_only": [],
+      "explicit_id_citations": []
+    },
+    "disposition": "L101 and both supporting observations were delivered in a shell read of HISTORY.md. Subsequent sibling enumeration, both retry repairs, and heartbeat-zero testing align with the procedure. No explicit attribution to L101 or its IDs appears, so classify as delivered plus action-aligned, not demonstrated causal reliance.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/0534b4aa6fa44e4e/stdout.jsonl",
+        "line": 8,
+        "event_id": "item_3",
+        "quote": "Do not assume every use of `or default` is a defect.",
+        "assessment": "Direct HISTORY.md output delivers the principle and B101/B102; no MCP call."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/0534b4aa6fa44e4e/stdout.jsonl",
+        "line": 11,
+        "event_id": "item_5",
+        "quote": "rg -n",
+        "assessment": "Repository-wide search enumerates retry/heartbeat consumers and README contracts; subsequent Git check fails."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/0534b4aa6fa44e4e/stdout.jsonl",
+        "line": 13,
+        "event_id": "item_6",
+        "quote": "AssertionError: 3 != 0",
+        "assessment": "Executed baseline suite reproduces the reported execution failure."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/0534b4aa6fa44e4e/stdout.jsonl",
+        "line": 20,
+        "event_id": "item_10",
+        "quote": "self.assertEqual(heartbeat_seconds({\"heartbeat\": 0}), 30)",
+        "assessment": "Post-edit source/test output shows both retry paths, None defaults, and compatibility sentinel coverage."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/0534b4aa6fa44e4e/stdout.jsonl",
+        "line": 22,
+        "event_id": "item_11",
+        "quote": "Ran 3 tests",
+        "assessment": "Full suite output ends OK after the repair."
+      }
+    ],
+    "coverage": "Both retries consumers changed and tested; heartbeat zero is explicitly preserved. Missing/None defaults covered. Positive retries, queue preservation, and positive/None heartbeat remain candidate-test gaps.",
+    "epistemics": "Diagnosis is restricted to the two retry readers and distinguishes heartbeat's contract. Final 'None' uncertainty is stronger than exhaustive coverage, but no unsupported systemic claim or harmful broadening is observed.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "plain HISTORY.md memory condition",
+    "confidence": 0.99,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 4,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/0534b4aa6fa44e4e/grader.stdout:1",
+      "assessment": "All four supplied grader checks pass, consistent with the static acceptance. This does not eliminate the candidate regression-test gaps recorded in the patch review."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted.",
+      "HISTORY.md describes itself as semantically identical to a board condition, an explicit condition clue. Git history was not retrieved: item_5 failed at git status."
+    ]
+  },
+  "1736655682d44fad": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "acceptable_against_visible_contracts",
+    "prior_patch_judgment_changed": false,
+    "access_route": "direct_history_markdown",
+    "memory_ids": {
+      "delivered_full": [
+        "H101",
+        "B105",
+        "B106"
+      ],
+      "delivered_summary": [],
+      "reference_only": [],
+      "explicit_id_citations": []
+    },
+    "disposition": "Direct HISTORY.md read delivers proposed shared mutation, alternatives, and snapshot falsifier. The author explicitly references the historical hypothesis, then executes before/after snapshots for both views and repairs both. This is substantive action-supported local hypothesis evaluation, without establishing causal benefit from memory.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1736655682d44fad/stdout.jsonl",
+        "line": 8,
+        "event_id": "item_3",
+        "quote": "Snapshot the caller sequence immediately before and after each view",
+        "assessment": "Direct read delivers the full hypothesis and both observations; no MCP."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1736655682d44fad/stdout.jsonl",
+        "line": 9,
+        "event_id": "item_4",
+        "quote": "The historical hypothesis is confirmed by inspection",
+        "assessment": "Local source supports the mechanism, but this message precedes dynamic checks."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1736655682d44fad/stdout.jsonl",
+        "line": 11,
+        "event_id": "item_5",
+        "quote": "fatal: not a git repository",
+        "assessment": "First chained reproduction attempt stops before tests/snapshots."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1736655682d44fad/stdout.jsonl",
+        "line": 13,
+        "event_id": "item_6",
+        "quote": "owner_ids preserved: False export: ['b', 'c', 'z']",
+        "assessment": "Rerun executes snapshots for both views and shows changed caller sequences, plus baseline suite failure."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1736655682d44fad/stdout.jsonl",
+        "line": 16,
+        "event_id": "item_8",
+        "quote": "this was not an export-layer ordering bug or stale cache",
+        "assessment": "For this inspected minimal implementation, source plus snapshots support excluding those alternatives."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1736655682d44fad/stdout.jsonl",
+        "line": 18,
+        "event_id": "item_9",
+        "quote": "Ran 5 tests",
+        "assessment": "Final tests visibly pass, including owner export and stable-tie/direct-list preservation."
+      }
+    ],
+    "coverage": "Both view mutations directly measured before editing; post-change regressions cover newest tie order and export after owner. Shallow snapshots do not detect deep row-field mutations. Recent/empty/no-match/mixed sequences remain candidate-test gaps.",
+    "epistemics": "Memory remains proposed until checked locally; wording 'confirmed by inspection' is defensible for explicit list.sort but should not be promoted into general systemic confirmation. Final response limits uncertainty to documented API and supplied suite. No harmful broadening.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "plain HISTORY.md memory condition",
+    "confidence": 0.99,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 4,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1736655682d44fad/grader.stdout:1",
+      "assessment": "All four supplied grader checks pass, consistent with the static acceptance. This does not eliminate the candidate regression-test gaps recorded in the patch review."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted.",
+      "README is read after the repair/tests at item_10 line 20; source docstrings already supplied the core read-only and tie-order contracts."
+    ]
+  },
+  "1a55ff5a65494e0f": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "acceptable_against_visible_contracts",
+    "prior_patch_judgment_changed": false,
+    "access_route": "direct_history_markdown",
+    "memory_ids": {
+      "delivered_full": [
+        "H102",
+        "B107",
+        "B108"
+      ],
+      "delivered_summary": [],
+      "reference_only": [],
+      "explicit_id_citations": []
+    },
+    "disposition": "HISTORY.md delivers the proposed shared-normalization hypothesis, alternatives, and falsifier. The author explicitly rejects the historical theory and implements independent field-preservation/exact-match repairs. Source inspection plus baseline direct-record lookup supports rejection, although the exact prescribed fixed-ID contrast was not executed.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1a55ff5a65494e0f/stdout.jsonl",
+        "line": 6,
+        "event_id": "item_2",
+        "quote": "Hold the identifier bytes constant while varying an empty description",
+        "assessment": "Full H102 falsifier and observations delivered by direct history read."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1a55ff5a65494e0f/stdout.jsonl",
+        "line": 8,
+        "event_id": "item_3",
+        "quote": "fatal: not a git repository",
+        "assessment": "Git failure skips the chained custom reproducer; the separately sequenced unittest command still runs and reproduces both reports."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1a55ff5a65494e0f/stdout.jsonl",
+        "line": 9,
+        "event_id": "item_4",
+        "quote": "The historical shared-normalization hypothesis is falsified",
+        "assessment": "Explicit rejection; supported by separate faulty operations, but not a completed literal run of the supplied falsifier."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1a55ff5a65494e0f/stdout.jsonl",
+        "line": 11,
+        "event_id": "item_5",
+        "quote": "file_change",
+        "assessment": "Only parts.py and regression tests change; committed patch preserves identifiers."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1a55ff5a65494e0f/stdout.jsonl",
+        "line": 13,
+        "event_id": "item_6",
+        "quote": "Ran 7 tests",
+        "assessment": "Visible final suite is OK, covering independent CSV/lookup behavior and quoted fields."
+      }
+    ],
+    "coverage": "Both reported failures reproduced by baseline tests, then fixed/tested independently. The attempted custom command did not run after Git failed; no pre-fix comparison of P7 with empty versus nonempty description is shown. Quoted comma, identity, and prefix-only absence covered; case/whitespace and invalid-shape candidate tests remain gaps.",
+    "epistemics": "Rejection of shared normalization is supported by the current code and independently constructed lookup records. 'Falsified' should be scoped to this implementation; do not credit a fully executed prescribed controlled experiment or general disproof across systems. No normalization broadening.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "plain HISTORY.md memory condition",
+    "confidence": 0.99,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 4,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/1a55ff5a65494e0f/grader.stdout:1",
+      "assessment": "All four supplied grader checks pass, consistent with the static acceptance. This does not eliminate the candidate regression-test gaps recorded in the patch review."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted.",
+      "The direct custom reproducer in item_3 must not be credited merely because its text appears in the command. No actual MCP retrieval occurred."
+    ]
+  },
+  "75bd98ebef9d4419": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "acceptable_against_visible_contracts",
+    "prior_patch_judgment_changed": false,
+    "access_route": "engineering_board_mcp",
+    "memory_ids": {
+      "delivered_full": [
+        "L101"
+      ],
+      "delivered_summary": [
+        "L101"
+      ],
+      "reference_only": [
+        "B101",
+        "B102"
+      ],
+      "explicit_id_citations": []
+    },
+    "disposition": "Actual board_context returns L101, followed by board_get_entry(L101). B101/B102 appear as source references/titles, not fetched full observations. Both retry consumers and the distinct heartbeat sentinel are addressed in code/tests, aligning with L101 without an explicit causal-use claim.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/75bd98ebef9d4419/stdout.jsonl",
+        "line": 6,
+        "event_id": "item_2",
+        "quote": "board_context",
+        "assessment": "Successful MCP result delivers L101 summary and source references."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/75bd98ebef9d4419/stdout.jsonl",
+        "line": 11,
+        "event_id": "item_5",
+        "quote": "board_get_entry",
+        "assessment": "Successful MCP fetch delivers full L101; no direct Board Markdown read observed."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/75bd98ebef9d4419/stdout.jsonl",
+        "line": 15,
+        "event_id": "item_7",
+        "quote": "AssertionError: 3 != 0",
+        "assessment": "Separate baseline execution occurs after a Git-gated combined command stopped."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/75bd98ebef9d4419/stdout.jsonl",
+        "line": 16,
+        "event_id": "item_8",
+        "quote": "incorrect for retries but intentional for heartbeat",
+        "assessment": "Reported interpretation matches the contract and the committed patch's scoped changes."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/75bd98ebef9d4419/stdout.jsonl",
+        "line": 22,
+        "event_id": "item_11",
+        "quote": "Ran 2 tests",
+        "assessment": "Observed final unittest output is OK; multiple new assertions are within these test methods."
+      }
+    ],
+    "coverage": "Execution/preview zero and None defaults plus heartbeat zero are asserted in the committed patch and exercised by the final suite. No separate pre-fix preview invocation is shown. Positive retries and queue values remain gaps.",
+    "epistemics": "The source defaults support the local diagnosis; no blanket truthiness rewrite occurs. 'None after the focused and full-suite verification passes' is prospective at item_8, not evidence verification had already completed. Final no-uncertainty statement remains bounded by available tests.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "Engineering Board MCP memory condition",
+    "confidence": 0.99,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 4,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/75bd98ebef9d4419/grader.stdout:1",
+      "assessment": "All four supplied grader checks pass, consistent with the static acceptance. This does not eliminate the candidate regression-test gaps recorded in the patch review."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted.",
+      "Some completed shell events have sparse/empty aggregated_output (item_3, item_10); do not invent visible source output. Their commands/status and the committed patch support narrower execution claims."
+    ]
+  },
+  "7ae6650bfb2342cc": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "acceptable_against_visible_contracts",
+    "prior_patch_judgment_changed": false,
+    "access_route": "none_observed",
+    "memory_ids": {
+      "delivered_full": [],
+      "delivered_summary": [],
+      "reference_only": [],
+      "explicit_id_citations": []
+    },
+    "disposition": "No supplied history/Board delivery or MCP use observed. The author diagnoses two independent operations from source and confirms exact-id compatibility from README, with direct baseline reproductions and targeted repairs.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/7ae6650bfb2342cc/stdout.jsonl",
+        "line": 6,
+        "event_id": "item_2",
+        "quote": "if record[\"id\"].startswith(part_id):",
+        "assessment": "Source output exposes prefix matching and empty-cell filtering."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/7ae6650bfb2342cc/stdout.jsonl",
+        "line": 9,
+        "event_id": "item_4",
+        "quote": "the initial combined check stopped at unavailable Git metadata",
+        "assessment": "Accurately acknowledges the initially skipped execution."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/7ae6650bfb2342cc/stdout.jsonl",
+        "line": 11,
+        "event_id": "item_5",
+        "quote": "{'id': 'P70'}",
+        "assessment": "Separate baseline suite and direct custom reproducer show both import rejection and wrong lookup."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/7ae6650bfb2342cc/stdout.jsonl",
+        "line": 13,
+        "event_id": "item_6",
+        "quote": "Ids preserve whitespace and case.",
+        "assessment": "README contract is explicitly delivered before final changes."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/7ae6650bfb2342cc/stdout.jsonl",
+        "line": 20,
+        "event_id": "item_10",
+        "quote": "Ran 8 tests",
+        "assessment": "Visible final suite is OK including case/whitespace, quoted comma, identity, and absent exact-match coverage."
+      }
+    ],
+    "coverage": "Both reports independently reproduced and tested; compatibility coverage includes case/whitespace-sensitive lookup and quoted commas. Import whitespace, duplicate first-match, negative quantities and wrong-column candidate cases remain gaps.",
+    "epistemics": "Diagnosis stays local to two independent operations; no unsupported systemic theory or harmful normalization is introduced. Final no-uncertainty wording should not be read as exhaustive verification.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "no supplied-memory condition (inferred from absence of observed retrieval)",
+    "confidence": 0.9,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 4,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/7ae6650bfb2342cc/grader.stdout:1",
+      "assessment": "All four supplied grader checks pass, consistent with the static acceptance. This does not eliminate the candidate regression-test gaps recorded in the patch review."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted."
+    ]
+  },
+  "836c4078663e4d83": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "partial_repair_remaining_visible_contract_defect",
+    "prior_patch_judgment_changed": false,
+    "access_route": "none_observed",
+    "memory_ids": {
+      "delivered_full": [],
+      "delivered_summary": [],
+      "reference_only": [],
+      "explicit_id_citations": []
+    },
+    "disposition": "No memory delivery or MCP use observed. The author notices the replay sibling and its identical truncation but intentionally leaves it as alleged compatibility. This is an explicit contract-interpretation error, not lack of source visibility.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/836c4078663e4d83/stdout.jsonl",
+        "line": 6,
+        "event_id": "item_2",
+        "quote": "Return the signed archived sensor reading as a float, without quantization.",
+        "assessment": "Initial source output delivers the replay contract alongside the truncating implementation."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/836c4078663e4d83/stdout.jsonl",
+        "line": 9,
+        "event_id": "item_4",
+        "quote": "the stated repair is specifically the live path and compatibility contracts should be preserved",
+        "assessment": "Sibling is recognized but incorrectly excluded."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/836c4078663e4d83/stdout.jsonl",
+        "line": 11,
+        "event_id": "item_5",
+        "quote": "AssertionError: 2.0 != 2.75",
+        "assessment": "Baseline reproduces only the reported live failure; replay's whole-number public test passes."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/836c4078663e4d83/stdout.jsonl",
+        "line": 15,
+        "event_id": "item_7",
+        "quote": "return float(int(float(text)))",
+        "assessment": "Post-edit output retains replay truncation; exit-0 AND-chain supports successful candidate tests/compile, but unittest report is omitted."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/836c4078663e4d83/stdout.jsonl",
+        "line": 16,
+        "event_id": "item_8",
+        "quote": "The replay path was intentionally left unchanged to preserve existing compatibility.",
+        "assessment": "Final compatibility rationale conflicts with the delivered docstring and visible README."
+      }
+    ],
+    "coverage": "Live positive/negative fraction coverage passes; replay fractional/no-quantization behavior remains defective and untested by the candidate suite. Independent graders fail replay and no-quantization exactly as prior static review anticipated.",
+    "epistemics": "No unsupported shared-cause expansion; instead excessive narrowing preserves a defect. Final uncertainty is explicitly limited to reported live behavior, but calling replay truncation compatibility is unsupported and contradicted by the visible contract.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "no supplied-memory condition (inferred from absence of observed retrieval)",
+    "confidence": 0.9,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 2,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/836c4078663e4d83/grader.stdout:1",
+      "assessment": "Reported live failure and negative scope pass; sibling replay and no-quantization fail, confirming the previously identified retained truncation."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted.",
+      "The allowed grader output incidentally exposes a source evaluator path containing 'L-control-precision'. Recorded as a case-label leak only; no referenced evaluator file was opened or mapping hunted."
+    ]
+  },
+  "86633e4fc7f54bd6": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "acceptable_against_visible_contracts",
+    "prior_patch_judgment_changed": false,
+    "access_route": "direct_history_markdown",
+    "memory_ids": {
+      "delivered_full": [
+        "L102",
+        "B103",
+        "B104"
+      ],
+      "delivered_summary": [],
+      "reference_only": [],
+      "explicit_id_citations": []
+    },
+    "disposition": "HISTORY.md delivers a currency-only rounding procedure plus exclusions for ingestion/scientific summaries. The author does not explicitly cite the history; subsequent unquantized float repairs and untouched currency code are consistent with respecting that boundary. Do not label mere non-application as proven causal memory use.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/86633e4fc7f54bd6/stdout.jsonl",
+        "line": 6,
+        "event_id": "item_2",
+        "quote": "It does not prescribe rounding for sensor measurements, ingestion, or",
+        "assessment": "Direct history read delivers L102's applicability exclusion and full B103/B104 observations."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/86633e4fc7f54bd6/stdout.jsonl",
+        "line": 9,
+        "event_id": "item_4",
+        "quote": "The display and currency paths are separate",
+        "assessment": "Reported interpretation separates unrelated rounding from ingestion and considers replay's contract."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/86633e4fc7f54bd6/stdout.jsonl",
+        "line": 11,
+        "event_id": "item_5",
+        "quote": "AssertionError: 2.0 != 2.75",
+        "assessment": "Baseline failure reproduced."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/86633e4fc7f54bd6/stdout.jsonl",
+        "line": 14,
+        "event_id": "item_7",
+        "quote": "each explicitly promises an unquantized float",
+        "assessment": "Replay repair is justified from the local contract rather than currency history."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/86633e4fc7f54bd6/stdout.jsonl",
+        "line": 16,
+        "event_id": "item_8",
+        "quote": "python3 -m unittest discover -s tests -v &&",
+        "assessment": "Completed exit-0 AND-chain supports successful test/compile execution; aggregated output omits the unittest report and displays final source/tests."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/86633e4fc7f54bd6/stdout.jsonl",
+        "line": 17,
+        "event_id": "item_9",
+        "quote": "passed all 6 tests",
+        "assessment": "Six-test count is agent-reported and consistent with supplied test definitions, not a visible unittest count line."
+      }
+    ],
+    "coverage": "Live positive/negative fractions and replay positive fraction covered. No direct pre-fix replay execution shown. Exponent/whitespace and negative replay lack candidate assertions; display boundary coverage remains basic.",
+    "epistemics": "Narrow, contract-grounded repair of both ingestion paths; no currency procedure is generalized to sensor values. Final no-uncertainty language does not establish exhaustive testing. No harmful broadening.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "plain HISTORY.md memory condition",
+    "confidence": 0.99,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 4,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/86633e4fc7f54bd6/grader.stdout:1",
+      "assessment": "All four supplied grader checks pass, consistent with the static acceptance. This does not eliminate the candidate regression-test gaps recorded in the patch review."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted.",
+      "Direct HISTORY.md content exposes its experimental representation. Failed Git metadata check delivered no Git history."
+    ]
+  },
+  "8b0fe431601d4685": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "acceptable_against_visible_contracts",
+    "prior_patch_judgment_changed": false,
+    "access_route": "none_observed",
+    "memory_ids": {
+      "delivered_full": [],
+      "delivered_summary": [],
+      "reference_only": [],
+      "explicit_id_citations": []
+    },
+    "disposition": "No HISTORY.md or Board content is delivered and no MCP retrieval occurs. Code/docstrings identify both retries consumers and the distinct heartbeat sentinel; direct reproduction and the shared helper repair are independently observable.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/8b0fe431601d4685/stdout.jsonl",
+        "line": 6,
+        "event_id": "item_2",
+        "quote": "return options.get(\"heartbeat\") or 30",
+        "assessment": "Initial source output includes both retry defects and heartbeat's documented sentinel."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/8b0fe431601d4685/stdout.jsonl",
+        "line": 9,
+        "event_id": "item_4",
+        "quote": "the source docstrings and tests provide the compatibility evidence",
+        "assessment": "Agent identifies evidence actually available after Git failed."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/8b0fe431601d4685/stdout.jsonl",
+        "line": 11,
+        "event_id": "item_5",
+        "quote": "preview: {'attempts': 4}",
+        "assessment": "Executed baseline plus direct execution/preview reproducer exposes both failures."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/8b0fe431601d4685/stdout.jsonl",
+        "line": 15,
+        "event_id": "item_7",
+        "quote": "Ran 2 tests",
+        "assessment": "Final suite is visibly OK; source shows a shared retry helper and untouched heartbeat."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/8b0fe431601d4685/stdout.jsonl",
+        "line": 16,
+        "event_id": "item_8",
+        "quote": "Heartbeat behavior remains unchanged per its separate contract.",
+        "assessment": "Final diagnosis maintains the option-specific boundary."
+      }
+    ],
+    "coverage": "Both retry consumers are reproduced and covered post-change; missing/None defaults tested. Heartbeat zero remains untested despite correct unchanged implementation. Positive retries and queue values remain gaps.",
+    "epistemics": "No historical/systemic assertion is made. The statement 'no history is available' follows failed Git metadata checks and should be read as no usable Git history, not proof no other possible memory source exists. No harmful scope broadening.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "no supplied-memory condition (inferred from absence of observed retrieval)",
+    "confidence": 0.9,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 4,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/8b0fe431601d4685/grader.stdout:1",
+      "assessment": "All four supplied grader checks pass, consistent with the static acceptance. This does not eliminate the candidate regression-test gaps recorded in the patch review."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted.",
+      "Condition inference is based on no observed memory retrieval, not proof of every possible prompt input or memory availability."
+    ]
+  },
+  "a3fdbe22065a4868": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "acceptable_against_visible_contracts",
+    "prior_patch_judgment_changed": false,
+    "access_route": "engineering_board_mcp",
+    "memory_ids": {
+      "delivered_full": [],
+      "delivered_summary": [
+        "H101",
+        "c-6543ffbdd07de5fa"
+      ],
+      "reference_only": [
+        "B105",
+        "B106"
+      ],
+      "explicit_id_citations": []
+    },
+    "disposition": "Actual board_context delivers H101's proposed mechanism and a cluster. No board_get_entry or direct Board Markdown body reads occur, so full supporting observations/alternatives/falsifier are not delivered. The author explicitly labels the history proposed, checks source, and demonstrates changed exports after both views.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/a3fdbe22065a4868/stdout.jsonl",
+        "line": 8,
+        "event_id": "item_3",
+        "quote": "This is a proposed mechanism, not a confirmed diagnosis.",
+        "assessment": "MCP context returns H101 summary plus cluster/source references only."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/a3fdbe22065a4868/stdout.jsonl",
+        "line": 10,
+        "event_id": "item_4",
+        "quote": "rows.sort(key=lambda row: row[\"id\"])",
+        "assessment": "Source shows owner as well as newest mutating the input."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/a3fdbe22065a4868/stdout.jsonl",
+        "line": 11,
+        "event_id": "item_5",
+        "quote": "Historical board context supports this hypothesis but labels it proposed",
+        "assessment": "Explicitly distinguishes historical status from current source evidence."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/a3fdbe22065a4868/stdout.jsonl",
+        "line": 13,
+        "event_id": "item_6",
+        "quote": "after owner: ['b', 'c', 'z']",
+        "assessment": "Direct pre-fix output demonstrates export changes for each view; no full snapshot experiment is shown."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/a3fdbe22065a4868/stdout.jsonl",
+        "line": 18,
+        "event_id": "item_9",
+        "quote": "python3 -m unittest discover -s tests -v",
+        "assessment": "Final shell command invokes tests/compile/source reads, but only source output is present and newline sequencing means final exit 0 alone does not prove earlier test commands passed."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/a3fdbe22065a4868/stdout.jsonl",
+        "line": 19,
+        "event_id": "item_10",
+        "quote": "all 5 tests passed",
+        "assessment": "This exact test success/count is an agent claim; independent grader agreement supports final behavior, not recovery of absent unittest output."
+      }
+    ],
+    "coverage": "Both views have direct pre-fix export-order reproductions, followed by tie-order and owner/newest export regression code. Candidate final unittest outcome is not independently visible in the saved aggregated output; prior patch correctness and four grader passes remain intact. Empty/recent/deep-row/mixed-sequence gaps persist.",
+    "epistemics": "Appropriately checks proposed memory against source and runtime outputs, with no harmful scope expansion. Local mutation diagnosis is supported. Keep reported baseline/final unittest counts distinguished from captured execution output; no full-source/falsifier reading can be inferred.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "Engineering Board MCP memory condition",
+    "confidence": 0.99,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 4,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/a3fdbe22065a4868/grader.stdout:1",
+      "assessment": "All four supplied grader checks pass, consistent with the static acceptance. This does not eliminate the candidate regression-test gaps recorded in the patch review."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted.",
+      "Item_6 baseline command includes unittest, but its output includes only the direct reproducer. Item_8 claims 1 of 3 tests failed; that count is not visible in this saved baseline output."
+    ]
+  },
+  "bdb88ef7a0034ce1": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "acceptable_against_visible_contracts",
+    "prior_patch_judgment_changed": false,
+    "access_route": "engineering_board_mcp",
+    "memory_ids": {
+      "delivered_full": [
+        "L102",
+        "B103",
+        "B104"
+      ],
+      "delivered_summary": [
+        "L102"
+      ],
+      "reference_only": [],
+      "explicit_id_citations": []
+    },
+    "disposition": "Actual board_context plus board_get_entry fetches deliver the learning and both sources. The author explicitly identifies historical currency guidance as inapplicable, reads README, repairs both ingestion APIs, and leaves Decimal/payment logic untouched. This is action-supported boundary handling; it is not evidence the memory caused success.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/bdb88ef7a0034ce1/stdout.jsonl",
+        "line": 6,
+        "event_id": "item_2",
+        "quote": "board_context",
+        "assessment": "MCP delivers L102 summary on affected-path overlap; matching path is not proof the currency procedure applies."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/bdb88ef7a0034ce1/stdout.jsonl",
+        "line": 23,
+        "event_id": "item_11",
+        "quote": "board_get_entry",
+        "assessment": "Full B104 fetched; B103 and L102 follow at lines 24/25, items item_10/item_12."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/bdb88ef7a0034ce1/stdout.jsonl",
+        "line": 29,
+        "event_id": "item_14",
+        "quote": "same supported numeric syntax and precision contract",
+        "assessment": "README read confirms replay compatibility."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/bdb88ef7a0034ce1/stdout.jsonl",
+        "line": 31,
+        "event_id": "item_15",
+        "quote": "AssertionError: 2.0 != 2.75",
+        "assessment": "Baseline live failure reproduced."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/bdb88ef7a0034ce1/stdout.jsonl",
+        "line": 32,
+        "event_id": "item_16",
+        "quote": "Historical currency-rounding guidance explicitly does not apply to sensor ingestion",
+        "assessment": "Explicit applicability rejection backed by separate ingestion-only edits."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/bdb88ef7a0034ce1/stdout.jsonl",
+        "line": 42,
+        "event_id": "item_21",
+        "quote": "Ran 5 tests",
+        "assessment": "Final suite visibly OK with replay and supported syntax regressions."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/bdb88ef7a0034ce1/stdout.jsonl",
+        "line": 44,
+        "event_id": "item_22",
+        "quote": "2.75",
+        "assessment": "Direct post-fix live and replay checks both print 2.75."
+      }
+    ],
+    "coverage": "Both ingestion APIs fixed; signed exponent/whitespace and replay fraction tests exercised. Basic display tests remain; negative currency and sensor rounding ties not newly tested, consistent with leaving those paths unchanged.",
+    "epistemics": "Strong explicit distinction between retrieved path relevance and semantic applicability. Local contracts independently justify replay scope. No unsupported generalization or harmful currency broadening; final no-uncertainty statement is limited by tested cases.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "Engineering Board MCP memory condition",
+    "confidence": 0.99,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 4,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/bdb88ef7a0034ce1/grader.stdout:1",
+      "assessment": "All four supplied grader checks pass, consistent with the static acceptance. This does not eliminate the candidate regression-test gaps recorded in the patch review."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted.",
+      "Board paths are listed by rg, but listing is not a direct Markdown content read. All observed memory-content delivery here is through actual MCP."
+    ]
+  },
+  "c33139a00c714707": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "acceptable_against_visible_contracts",
+    "prior_patch_judgment_changed": false,
+    "access_route": "engineering_board_mcp",
+    "memory_ids": {
+      "delivered_full": [
+        "B107",
+        "B108"
+      ],
+      "delivered_summary": [
+        "H102",
+        "c-5ef697f40171cc2a"
+      ],
+      "reference_only": [],
+      "explicit_id_citations": []
+    },
+    "disposition": "MCP board_context delivers proposed H102 and a cluster; board_get_entry retrieves both observations. Full H102, its alternatives, and its falsifier are not fetched. The author explicitly rejects the shared-normalization proposal as unsupported and makes independent fixes; do not claim execution of the undelivered falsifier.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/c33139a00c714707/stdout.jsonl",
+        "line": 11,
+        "event_id": "item_5",
+        "quote": "This is a plausible proposed mechanism, not a confirmed diagnosis.",
+        "assessment": "MCP context delivers hypothesis summary with epistemic status plus cluster membership."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/c33139a00c714707/stdout.jsonl",
+        "line": 14,
+        "event_id": "item_6",
+        "quote": "board_get_entry",
+        "assessment": "Full B107 fetched; full B108 follows at line 15/item_7 and says records were supplied directly."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/c33139a00c714707/stdout.jsonl",
+        "line": 17,
+        "event_id": "item_8",
+        "quote": "FAILED (failures=1, errors=1)",
+        "assessment": "Baseline independently reproduces import rejection and constructed-record lookup error."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/c33139a00c714707/stdout.jsonl",
+        "line": 18,
+        "event_id": "item_9",
+        "quote": "Historical entries only restate the observations",
+        "assessment": "Explicitly separates source reports from proof of the shared mechanism."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/c33139a00c714707/stdout.jsonl",
+        "line": 22,
+        "event_id": "item_11",
+        "quote": "Ran 8 tests",
+        "assessment": "Final suite visibly OK after two targeted repairs."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/c33139a00c714707/stdout.jsonl",
+        "line": 23,
+        "event_id": "item_12",
+        "quote": "Historical normalization theory was not supported by the implementation.",
+        "assessment": "Final explicit rejection aligns with preserved exact identifiers."
+      }
+    ],
+    "coverage": "Both bugs reproduced and repaired; quoted comma, original record identity, prefix-only absence and case sensitivity covered. No fixed-ID empty/nonempty pre-fix experiment shown; whitespace, invalid column count and duplicate-order candidate gaps remain.",
+    "epistemics": "Appropriate refusal to equate cluster co-membership or proposed hypothesis with causation. Source inspection and direct-record tests support independent defects. No harmful broadening or unsupported normalization claim.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "Engineering Board MCP memory condition",
+    "confidence": 0.99,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 4,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/c33139a00c714707/grader.stdout:1",
+      "assessment": "All four supplied grader checks pass, consistent with the static acceptance. This does not eliminate the candidate regression-test gaps recorded in the patch review."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted.",
+      "Initial source-read event item_3 completes with empty aggregated_output; do not invent its visible output. Later baseline trace and committed patch establish the defect behavior and final repair."
+    ]
+  },
+  "e77b64b297744b4e": {
+    "patch_review_commit": "101ec7140c9eafea8584df2bca17828dce93331f",
+    "prior_patch_judgment": "acceptable_against_visible_contracts",
+    "prior_patch_judgment_changed": false,
+    "access_route": "none_observed",
+    "memory_ids": {
+      "delivered_full": [],
+      "delivered_summary": [],
+      "reference_only": [],
+      "explicit_id_citations": []
+    },
+    "disposition": "No memory content delivery or MCP retrieval observed. Source/docstrings expose both in-place sorts; the author reproduces newest/export failure and repairs/tests both read-only views.",
+    "action_evidence": [
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/e77b64b297744b4e/stdout.jsonl",
+        "line": 6,
+        "event_id": "item_2",
+        "quote": "Read-only view, ascending id, restricted to one owner.",
+        "assessment": "Source output includes owner contract and mutating sort."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/e77b64b297744b4e/stdout.jsonl",
+        "line": 9,
+        "event_id": "item_4",
+        "quote": "both sorted views call `rows.sort(...)`",
+        "assessment": "Local sibling diagnosis is made without historical attribution."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/e77b64b297744b4e/stdout.jsonl",
+        "line": 11,
+        "event_id": "item_5",
+        "quote": "test_export_after_newest",
+        "assessment": "Baseline visibly fails the reported ordering test."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/e77b64b297744b4e/stdout.jsonl",
+        "line": 15,
+        "event_id": "item_7",
+        "quote": "python3 -m unittest discover -s tests -v &&",
+        "assessment": "Exit-0 AND-chain supports final suite/compile success; source/test output is captured while the test report is absent."
+      },
+      {
+        "file": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/e77b64b297744b4e/stdout.jsonl",
+        "line": 16,
+        "event_id": "item_8",
+        "quote": "all 5 tests passed",
+        "assessment": "Agent-reported count matches supplied definitions; no visible final unittest count line."
+      }
+    ],
+    "coverage": "Both views repaired; candidate regressions cover their export preservation and newest stable ties. No direct pre-fix owner mutation probe is shown. Deep row immutability, empty/no-match, recent boundaries, and mixed-sequence gaps remain.",
+    "epistemics": "Source-based shared-mutation diagnosis is specific and supported. No historical or broader systemic conclusion; no harmful scope expansion. Final no-uncertainty statement is limited by candidate tests.",
+    "causal_limit": "This is evidence of delivered content, reported reasoning, and executed actions only. Retrieval order, citations, aligned edits, and grader outcomes do not establish internal memory use or causal benefit. Local code/docstrings/public tests also expose the mechanisms. No model or workflow superiority is inferred from these attempts.",
+    "inferred_condition": "no supplied-memory condition (inferred from absence of observed retrieval)",
+    "confidence": 0.9,
+    "condition_inference_update": "Prior patch-stage inference was null with confidence 0. Updated only after the partially blind trace packet; official mapping remains unread. Confidence concerns inferred access condition, not causal effectiveness.",
+    "gradeagreement": {
+      "agrees_with_committed_patch_judgment": true,
+      "passed": 4,
+      "total": 4,
+      "evidence": "docs/evidence/workflow-pilot-2026-09-09/campaign-v2/trace-packet/e77b64b297744b4e/grader.stdout:1",
+      "assessment": "All four supplied grader checks pass, consistent with the static acceptance. This does not eliminate the candidate regression-test gaps recorded in the patch review."
+    },
+    "notes": [
+      "No candidate code executed by this reviewer. Read only authorized patch/trace packets and prior judgments; no source cases, original evaluator files, condition mapping, or RESULTS consulted."
+    ]
+  }
+}

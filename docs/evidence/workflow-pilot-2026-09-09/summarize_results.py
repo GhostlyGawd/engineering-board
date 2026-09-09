@@ -28,10 +28,14 @@ def main():
         grade = read(result / "grader.stdout")
         # Started/completed events repeat the same id. Count distinct tool ids,
         # not the runner's raw tool-event count; keep the latest observed event.
-        tool_items = {}
+        tool_items, file_changes, item_errors = {}, {}, {}
         for line in (result / "stdout.jsonl").read_text().splitlines():
             event = json.loads(line)
             item = event.get("item", {})
+            if item.get("type") == "file_change":
+                file_changes[item["id"]] = item
+            if item.get("type") == "error":
+                item_errors[item["id"]] = item.get("message")
             if item.get("type") in ("command_execution", "mcp_tool_call", "web_search", "collab_tool_call"):
                 if not item.get("id"):
                     raise RuntimeError("Tool event without identity; cannot deduplicate")
@@ -44,7 +48,9 @@ def main():
             "client_failure": receipt["failure"], "trace_violations": receipt["trace"].get("trace_violations"),
             "hidden_checks": {"passed": grade["passed"], "total": grade["total"],
                               "failed": [name for name, check in grade["checks"].items() if not check["passed"]]},
-            "distinct_tool_calls": len(tool_items), "mcp_calls": mcp,
+            "distinct_execution_mcp_calls": len(tool_items),
+            "file_change_items": len(file_changes), "item_error_messages": list(item_errors.values()),
+            "mcp_calls": mcp,
             "end_receipt_sha256": hashlib.sha256((result / "end.json").read_bytes()).hexdigest(),
             "grader_output_sha256": hashlib.sha256((result / "grader.stdout").read_bytes()).hexdigest()
         })
