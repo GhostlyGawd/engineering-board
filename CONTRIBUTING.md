@@ -8,6 +8,10 @@ run the tests.
 
 Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for the system structure.
 
+Read [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) for the maintainer team,
+assignment and independent review process. Reusable briefs are in
+[`maintainers/templates/`](maintainers/templates/).
+
 ## Run the test suite
 
 Run the full test suite:

@@ -220,6 +220,13 @@ evidence or information gap. The harness reports this rate separately from
 remain unchanged. Use `operator-instructions-v2.md` with
 `memory-evaluation-response.schema.json` for this contract.
 
+Independent audit on 2026-09-09 found that v2 does not yet establish that
+behavior: its ordering flag is a supplied reviewer annotation, its rate omits
+missing planned arms, and rejected-memory application can pass existing gates.
+F002 is reopened with B004-B007 as correction work. Hold live v2 evaluation and
+release-readiness claims pending correction and independent review. See the
+[audit record](../docs/evidence/2026-09-09-development-team-pilot.md).
+
 Engineering Board does not claim that Milestone D context improves agent
 diagnoses. Version 4 remains an unlocked proposal. Its exact corpus digest and
 the draft structured-requirement digest are recorded in the current dated
