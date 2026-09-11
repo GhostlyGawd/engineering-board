@@ -57,6 +57,74 @@ if [ "${EXPECT_DEMO_DIR}" -eq 1 ]; then
   exit 1
 fi
 
+# Both renderers consume the same packaged brand source. Reduced script-only
+# fixtures remain usable with a neutral system-font fallback; never fetch assets.
+EB_VIEW_STYLES="$(python3 - "${EB_VIEW_PLUGIN_ROOT}" <<'PYBRAND'
+import base64
+import re
+from pathlib import Path
+import sys
+root = Path(sys.argv[1])
+tokens = root / "brand/tokens.css"
+font = root / "brand/fonts/manrope-latin-wght-normal.woff2"
+if tokens.is_file():
+    css = tokens.read_text(encoding="utf-8")
+    if font.is_file():
+        encoded = base64.b64encode(font.read_bytes()).decode("ascii")
+        css = css.replace('fonts/manrope-latin-wght-normal.woff2', 'data:font/woff2;base64,' + encoded)
+    else:
+        # A reduced fixture may keep tokens but omit the packaged font.
+        css = re.sub(r'@font-face\s*\{[^}]*\}', '', css)
+    print(css, end="")
+else:
+    print(""":root{color-scheme:dark;--eb-bg:#08090a;--eb-panel:#141516;--eb-selected:#242629;--eb-text:#f7f8f8;--eb-body:#d0d6e0;--eb-muted:#a5aab3;--eb-line:#34343a;--eb-strong:#d0d2d5;--eb-danger:#f7f8f8;
+--eb-surface:var(--eb-panel);--eb-card:var(--eb-panel);--eb-text-muted:var(--eb-muted);--eb-border:var(--eb-line);--eb-accent:var(--eb-text);--eb-accent-dark:var(--eb-text);--eb-accent-cur:var(--eb-text);
+--eb-font-sans:Manrope,Arial,sans-serif;--eb-font-mono:ui-monospace,SFMono-Regular,Consolas,monospace;--eb-fs-2xs:.875rem;--eb-fs-xs:.875rem;--eb-fs-sm:1rem;--eb-fs-base:1rem;--eb-fs-md:1.25rem;--eb-fs-lg:1.5rem;--eb-dur-fast:150ms;--eb-ease-out:ease-out}
+:root[data-theme="light"]{color-scheme:light;--eb-bg:#fafafa;--eb-panel:#fff;--eb-selected:#eaecef;--eb-text:#151619;--eb-body:#353b44;--eb-muted:#595f68;--eb-line:#c7c9ce;--eb-strong:#353b44;--eb-danger:#151619}""")
+
+PYBRAND
+)"
+export EB_VIEW_STYLES
+
+read -r -d '' EB_VIEW_CHROME_CSS <<'CSS' || true
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--eb-text);outline-offset:4px}
+a{color:inherit;text-underline-offset:4px}
+body{margin:0;background:var(--eb-bg);color:var(--eb-text);font:1rem/1.6 var(--eb-font-sans);-webkit-font-smoothing:antialiased}
+.site-header{max-width:88rem;margin:auto;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--eb-border)}
+.wordmark{font:800 25px/1.2 var(--eb-font-sans);letter-spacing:-1.35px;text-decoration:none}
+.theme{font:inherit;font-size:.875rem;color:var(--eb-text);background:transparent;border:1px solid var(--eb-strong);border-radius:24px;padding:.5rem 1rem;min-height:44px;cursor:pointer}
+.theme:hover,.theme[aria-pressed="true"]{background:var(--eb-selected)}
+.skip{position:absolute;left:1rem;top:-10rem;padding:.75rem 1rem;background:var(--eb-text);color:var(--eb-bg);z-index:10}
+.skip:focus{top:1rem}
+.view-note{max-width:88rem;margin:0 auto;padding:1.5rem 2rem;color:var(--eb-text-muted);font-size:.875rem}
+.view-note p{margin:0}.view-note strong{color:var(--eb-text);font-weight:600}
+code{font-family:var(--eb-font-mono);overflow-wrap:anywhere}
+@media(max-width:600px){.site-header{padding:1.25rem;flex-wrap:wrap}.wordmark{font-size:24px}.view-note{padding:1.25rem}}
+@media print{.theme,.skip{display:none!important}}
+CSS
+read -r -d '' EB_VIEW_HEADER <<'HTML' || true
+<a class="skip" href="#main">Skip to board</a>
+<header class="site-header"><span class="wordmark">engineering board</span><button class="theme" id="eb-theme" type="button" aria-pressed="false" hidden>Light theme</button></header>
+HTML
+read -r -d '' EB_VIEW_THEME_SCRIPT <<'HTML' || true
+<script>
+(function () {
+  'use strict';
+  var button = document.getElementById('eb-theme');
+  if (!button) { return; }
+  button.hidden = false;
+  button.addEventListener('click', function () {
+    var light = document.documentElement.getAttribute('data-theme') !== 'light';
+    document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+    button.setAttribute('aria-pressed', String(light));
+  });
+})();
+</script>
+HTML
+export EB_VIEW_CHROME_CSS EB_VIEW_HEADER EB_VIEW_THEME_SCRIPT
+
 render_demo() {
   python3 - "$1" <<'PY'
 import glob
@@ -149,50 +217,54 @@ domains = " · ".join(cluster.get("affected_domains", []))
 patterns = " · ".join(cluster.get("patterns", []))
 
 document = f"""<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Engineering Board pattern-intelligence sample</title>
+<style id="eb-brand-tokens">
+{os.environ["EB_VIEW_STYLES"]}</style>
 <style>
-html{{--paper:#faf9f5;--ink:#17191e;--muted:#5b6068;--line:#dedbd1;--surface:#fff;
---accent:#9a5b00;--accent-soft:#fff3df;--blue:#31577a;--green:#346b4c}}
-*{{box-sizing:border-box}}body{{margin:0;background:var(--paper);color:var(--ink);
-font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}}
+{os.environ["EB_VIEW_CHROME_CSS"]}
+*{{box-sizing:border-box}}body{{margin:0;background:var(--eb-bg);color:var(--eb-text);
+font-family:var(--eb-font-sans);line-height:1.5}}
 main{{max-width:1160px;margin:0 auto;padding:48px 28px 72px}}
-.eyebrow{{font:700 12px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}}
+.eyebrow{{font:700 14px var(--eb-font-mono);letter-spacing:.04em;text-transform:none;color:var(--eb-text)}}
 h1{{font-size:clamp(34px,5vw,62px);line-height:1.03;letter-spacing:-.045em;max-width:850px;margin:10px 0 14px}}
-.lead{{font-size:18px;color:var(--muted);max-width:760px;margin:0 0 36px}}
-.meta{{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}}.pill{{border:1px solid var(--line);
-border-radius:999px;padding:5px 10px;font:12px ui-monospace,monospace;background:var(--surface)}}
+.lead{{font-size:18px;color:var(--eb-text-muted);max-width:760px;margin:0 0 36px}}
+.meta{{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}}.pill{{border:1px solid var(--eb-border);
+border-radius:999px;padding:5px 10px;font:14px var(--eb-font-mono);background:var(--eb-surface)}}
 .findings{{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}}
-.finding{{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;min-height:180px}}
-.finding-top{{display:flex;justify-content:space-between;gap:12px;font:12px ui-monospace,monospace;color:var(--muted)}}
-.finding-top a{{color:var(--blue);font-weight:700}}.finding h2{{font-size:18px;line-height:1.25;margin:22px 0 18px}}
-.signal{{font:12px ui-monospace,monospace;color:var(--accent);margin:0}}
-.connector{{display:grid;place-items:center;height:64px;color:var(--muted);font:12px ui-monospace,monospace}}
-.connector:before{{content:"";display:block;width:1px;height:32px;background:var(--line);margin-bottom:5px}}
-.cluster{{background:var(--ink);color:#fff;border-radius:14px;padding:24px 26px;display:grid;
+.finding{{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:14px;padding:18px;min-height:180px}}
+.finding-top{{display:flex;justify-content:space-between;gap:14px;font:14px var(--eb-font-mono);color:var(--eb-text-muted)}}
+.finding-top a{{color:var(--eb-text);font-weight:700}}.finding h2{{font-size:18px;line-height:1.25;margin:22px 0 18px}}
+.signal{{font:14px var(--eb-font-mono);color:var(--eb-text);margin:0}}
+.connector{{display:grid;place-items:center;height:64px;color:var(--eb-text-muted);font:14px var(--eb-font-mono)}}
+.connector:before{{content:"";display:block;width:1px;height:32px;background:var(--eb-border);margin-bottom:5px}}
+.cluster{{background:var(--eb-selected);color:var(--eb-text);border-radius:14px;padding:24px 26px;display:grid;
 grid-template-columns:110px 1fr auto;gap:22px;align-items:center}}
-.cluster-id{{font:700 28px ui-monospace,monospace;color:#e6a94e}}.cluster h2{{margin:0 0 5px;font-size:24px}}
-.cluster p{{margin:0;color:#c7c8c9}}.density{{font:12px ui-monospace,monospace;color:#c7c8c9;text-align:right}}
-.hypothesis{{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent);
-border-radius:12px;padding:26px}}.hypothesis-head{{display:flex;align-items:center;gap:12px;flex-wrap:wrap}}
-.status{{font:700 11px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;
-color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:5px 9px}}
+.cluster-id{{font:700 28px var(--eb-font-mono);color:var(--eb-text)}}.cluster h2{{margin:0 0 5px;font-size:24px}}
+.cluster p{{margin:0;color:var(--eb-body)}}.density{{font:14px var(--eb-font-mono);color:var(--eb-body);text-align:right}}
+.hypothesis{{margin-top:20px;background:var(--eb-surface);border:1px solid var(--eb-border);border-left:5px solid var(--eb-text);
+border-radius:14px;padding:26px}}.hypothesis-head{{display:flex;align-items:center;gap:14px;flex-wrap:wrap}}
+.status{{font:700 14px var(--eb-font-mono);letter-spacing:.02em;text-transform:none;
+color:var(--eb-text);background:var(--eb-selected);border-radius:999px;padding:5px 9px}}
 .hypothesis h2{{font-size:27px;letter-spacing:-.02em;margin:10px 0}}.root{{font-size:18px;max-width:900px}}
 .columns{{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}}
-.columns h3,.falsifier h3{{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}}
-ul{{padding-left:20px}}.falsifier{{margin-top:18px;border-top:1px solid var(--line);padding-top:12px}}
-footer{{margin-top:30px;color:var(--muted);font:12px ui-monospace,monospace}}
+.columns h3,.falsifier h3{{font-size:14px;text-transform:none;letter-spacing:.02em;color:var(--eb-text-muted)}}
+ul{{padding-left:20px}}.falsifier{{margin-top:18px;border-top:1px solid var(--eb-border);padding-top:14px}}
+footer{{margin-top:30px;color:var(--eb-text-muted);font:14px var(--eb-font-mono)}}
 @media(max-width:760px){{.findings,.columns{{grid-template-columns:1fr}}.cluster{{grid-template-columns:1fr}}.density{{text-align:left}}}}
-@media(prefers-color-scheme:dark){{html{{--paper:#17191e;--ink:#f4f1e8;--muted:#a8abb0;--line:#34373d;
---surface:#22252b;--accent:#e6a94e;--accent-soft:#3a2d18;--blue:#8bb8e0}}.cluster{{background:#0e0f12;color:#fff}}}}
+.finding,.cluster,.hypothesis{{border-radius:8px;overflow-wrap:anywhere}}
+.cluster{{border:1px solid var(--eb-border)}}
+.finding-top{{flex-wrap:wrap}}.findings{{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){{.findings{{grid-template-columns:1fr}}main{{padding:28px 20px 48px}}}}
 </style>
 </head>
 <body>
-<main>
-<p class="eyebrow">Engineering Board · synthetic first-win sample</p>
+{os.environ["EB_VIEW_HEADER"]}
+<main id="main">
+<p class="eyebrow">Synthetic example · Read-only</p>
 <h1>Three symptoms. One systemic investigation.</h1>
 <p class="lead">Visible Markdown evidence becomes deterministic graph structure, then a separate proposed root-cause hypothesis. Correlation stays distinct from confirmation.</p>
 <div class="meta"><span class="pill">3 findings</span><span class="pill">3 domains</span>
@@ -212,8 +284,9 @@ footer{{margin-top:30px;color:var(--muted);font:12px ui-monospace,monospace}}
 <div><h3>Alternative explanations</h3><ul>{alternatives_html}</ul></div></div>
 <div class="falsifier"><h3>Falsifier</h3><p>{esc(section("Falsifier"))}</p></div>
 </section>
-<footer>Generated from this run's graph.json and H001 Markdown · local, static, no network · synthetic evidence</footer>
+<footer>Static, read-only sample generated from this run's graph.json and H001 Markdown. Run <code>/board-demo</code> again to generate a new synthetic example.</footer>
 </main>
+{os.environ["EB_VIEW_THEME_SCRIPT"]}
 </body>
 </html>
 """
@@ -716,154 +789,134 @@ fi
 # Assemble the full self-contained document (brand tokens inlined; light + dark).
 read -r -d '' HEAD <<'HTML' || true
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>engineering-board — board view</title>
+<style id="eb-brand-tokens">
+__EB_BRAND_STYLES__</style>
 <style>
-:root{
-  --eb-paper:#FAF9F5;--eb-paper-2:#F1F0EA;--eb-ink:#17191E;--eb-ink-2:#1E2127;
-  --eb-line:#E3E1D9;--eb-line-dark:#2A2D34;--eb-accent:#9A5B00;--eb-accent-dark:#E6A94E;
-  --eb-text:#17191E;--eb-text-muted:#5B6068;
-  --eb-bg:var(--eb-paper);--eb-surface:var(--eb-paper-2);--eb-card:#FFFFFF;--eb-danger:#B23A2E;
-  --eb-border:var(--eb-line);--eb-accent-cur:var(--eb-accent);
-  --eb-fs-2xs:.6875rem;--eb-fs-xs:.75rem;--eb-fs-sm:.875rem;--eb-fs-base:1rem;--eb-fs-md:1.125rem;--eb-fs-lg:1.375rem;
-  --eb-dur-fast:150ms;--eb-ease-out:cubic-bezier(.16,1,.30,1);
-  --eb-font-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-  --eb-font-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --eb-text:#ECEBE6;--eb-text-muted:#9EA3AB;--eb-bg:var(--eb-ink);
-  --eb-surface:var(--eb-ink-2);--eb-card:#23262D;--eb-danger:#E4685A;--eb-border:var(--eb-line-dark);
-  --eb-accent-cur:var(--eb-accent-dark);
-}}
-:root[data-theme="dark"]{
-  --eb-text:#ECEBE6;--eb-text-muted:#9EA3AB;--eb-bg:var(--eb-ink);
-  --eb-surface:var(--eb-ink-2);--eb-card:#23262D;--eb-danger:#E4685A;--eb-border:var(--eb-line-dark);
-  --eb-accent-cur:var(--eb-accent-dark);
-}
+__EB_CHROME_STYLES__
 *{box-sizing:border-box}
 :focus-visible{outline:2px solid var(--eb-accent-cur);outline-offset:2px;border-radius:3px}
 body{margin:0;background:var(--eb-bg);color:var(--eb-text);font-family:var(--eb-font-sans);
-  font-size:var(--eb-fs-base);line-height:1.5;-webkit-font-smoothing:antialiased;padding:2rem 1.25rem}
-.board{max-width:80rem;margin:0 auto 2.5rem}
+  font-size:var(--eb-fs-base);line-height:1.6;-webkit-font-smoothing:antialiased}
+.board{max-width:84rem;margin:0 auto 2.5rem}
 .board-head{display:flex;align-items:baseline;gap:.75rem;margin:0 0 1rem}
-.board-head h1{font-size:var(--eb-fs-lg);margin:0;letter-spacing:-.02em}
-.summary{font-family:var(--eb-font-mono);font-size:.8rem;color:var(--eb-text-muted)}
-.cols{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
+.board-head h1{font-size:clamp(1.75rem,3vw,2.5rem);margin:0;letter-spacing:-.02em}
+.summary{font-family:var(--eb-font-mono);font-size:.875rem;color:var(--eb-text-muted)}
+.cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem}
 @media (max-width:820px){.cols{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:520px){.cols{grid-template-columns:1fr}}
-.col{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:10px;padding:.6rem;min-height:3rem}
-/* Done is already-finished work: recede it so open, actionable cards win the
-   squint test — via a muted title + flat card, NOT opacity. (opacity:.6
-   composited the card metadata to 2.69:1, below WCAG AA; muted text stays AA.)
-   Hover/focus restores full weight for scanning. */
+.col{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:8px;padding:1rem;min-height:3rem}
+/* Completed work uses the shared muted text token. Hover/focus restores
+   full text contrast for scanning; metadata never uses reduced opacity. */
 .col-done .card{box-shadow:none}
 .col-done .ctitle{color:var(--eb-text-muted);transition:color var(--eb-dur-fast) var(--eb-ease-out)}
 .col-done .card:hover .ctitle,.col-done .card:focus-within .ctitle{color:var(--eb-text)}
 @media print{.col-done .ctitle{color:var(--eb-text)}}
-.col-h{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--eb-text-muted);
+.col-h{font-size:.875rem;text-transform:none;letter-spacing:.02em;color:var(--eb-text-muted);
   font-weight:600;margin:0 0 .5rem;display:flex;justify-content:space-between}
 .count{font-family:var(--eb-font-mono);font-weight:600;color:var(--eb-text)}
 .card{background:var(--eb-card);border:1px solid var(--eb-border);border-radius:6px;
-  padding:.55rem .6rem;margin-bottom:.5rem;box-shadow:0 1px 2px rgba(23,25,30,.05)}
-.cardhead{display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem}
-.cid{font-family:var(--eb-font-mono);font-size:.7rem;color:var(--eb-text-muted)}
+  padding:1rem;margin-bottom:.75rem}
+.cardhead{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin-bottom:.25rem}
+.cid{font-family:var(--eb-font-mono);font-size:.875rem;color:var(--eb-text-muted)}
 a.cid{text-decoration:none;border-bottom:1px dotted var(--eb-border)}
 a.cid:hover,a.cid:focus-visible{color:var(--eb-accent-cur);border-bottom-color:var(--eb-accent-cur)}
 details.more{margin-top:.35rem}
-details.more>summary{cursor:pointer;font-size:.72rem;font-family:var(--eb-font-mono);color:var(--eb-text-muted);padding:.3rem .2rem}
+details.more>summary{cursor:pointer;font-size:.875rem;font-family:var(--eb-font-mono);color:var(--eb-text-muted);padding:.3rem .2rem}
 details.more>summary:hover{color:var(--eb-accent-cur)}
 .ctitle{font-size:var(--eb-fs-sm);line-height:1.35}
-.affects{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-text-muted);margin-top:.3rem;overflow-wrap:anywhere}
+.affects{font-family:var(--eb-font-mono);font-size:max(.875rem,var(--eb-fs-2xs));color:var(--eb-text-muted);margin-top:.3rem;overflow-wrap:anywhere}
 .tags{margin-top:.35rem;display:flex;flex-wrap:wrap;gap:.25rem}
-.tag{font-size:var(--eb-fs-2xs);font-family:var(--eb-font-mono);color:var(--eb-text-muted);
-  border:1px solid var(--eb-border);border-radius:999px;padding:.05rem .4rem}
-.prio{font-size:var(--eb-fs-2xs);font-weight:700;font-family:var(--eb-font-mono);border-radius:4px;padding:.05rem .3rem;
+.tag{font-size:max(.875rem,var(--eb-fs-2xs));font-family:var(--eb-font-mono);color:var(--eb-text-muted);
+  border:1px solid var(--eb-border);border-radius:6px;padding:.05rem .4rem}
+.prio{font-size:max(.875rem,var(--eb-fs-2xs));font-weight:700;font-family:var(--eb-font-mono);border-radius:4px;padding:.05rem .3rem;
   color:var(--eb-text-muted);border:1px solid var(--eb-border)}
 .prio.p0{background:var(--eb-danger);border-color:var(--eb-danger);color:var(--eb-bg)}
 .prio.p1{background:var(--eb-accent-cur);border-color:var(--eb-accent-cur);color:var(--eb-bg)}
-.badge{font-size:var(--eb-fs-2xs);font-family:var(--eb-font-mono)}
+.badge{font-size:max(.875rem,var(--eb-fs-2xs));font-family:var(--eb-font-mono)}
 .badge.blocked{color:var(--eb-danger)}
-.empty{color:var(--eb-text-muted);text-align:center;font-size:.8rem;padding:.4rem 0}
-.lane-h{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--eb-text-muted);margin:1.4rem 0 .5rem}
+.empty{color:var(--eb-text-muted);text-align:center;font-size:.875rem;padding:.4rem 0}
+.lane-h{font-size:.875rem;text-transform:none;letter-spacing:.02em;color:var(--eb-text-muted);margin:1.4rem 0 .5rem}
 /* Learnings are the durable-memory moat — give their heading real weight
    (full contrast, sentence case, larger) so it reads as a section, not a lane. */
 .lane-h-learn{font-size:var(--eb-fs-md);text-transform:none;letter-spacing:-.01em;color:var(--eb-text);font-weight:600}
 .lane{list-style:none;margin:0;padding:0;display:grid;gap:.3rem}
-.lane li{font-size:.82rem;padding:.35rem .5rem;background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:6px}
-.kind{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-accent-cur);text-transform:uppercase;letter-spacing:.05em}
-.learn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.5rem}
-.lcard{background:var(--eb-surface);border:1px solid var(--eb-border);border-left:3px solid var(--eb-accent-cur);border-radius:6px;padding:.5rem .6rem}
-.lcard .lhead{display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem}
-.ltitle{font-size:.82rem;line-height:1.3}
-.conf{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);text-transform:uppercase;letter-spacing:.05em;padding:.05rem .3rem;border-radius:3px;border:1px solid var(--eb-border);color:var(--eb-text-muted)}
+.lane li{font-size:.875rem;padding:.35rem .5rem;background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:6px}
+.kind{font-family:var(--eb-font-mono);font-size:max(.875rem,var(--eb-fs-2xs));color:var(--eb-accent-cur);text-transform:none;letter-spacing:.05em}
+.learn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),1fr));gap:.5rem}
+.lcard{background:var(--eb-surface);border:1px solid var(--eb-border);border-left:3px solid var(--eb-accent-cur);border-radius:6px;padding:1rem}
+.lcard .lhead{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin-bottom:.25rem}
+.ltitle{font-size:.875rem;line-height:1.3}
+.conf{font-family:var(--eb-font-mono);font-size:max(.875rem,var(--eb-fs-2xs));text-transform:none;letter-spacing:.05em;padding:.05rem .3rem;border-radius:3px;border:1px solid var(--eb-border);color:var(--eb-text-muted)}
 .conf.high{color:var(--eb-accent-cur);border-color:var(--eb-accent-cur)}
-.rec{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
-.lbasis{margin-top:.3rem;font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
-.lapplies{margin-top:.3rem;font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
-footer{max-width:80rem;margin:0 auto;color:var(--eb-text-muted);font-size:.72rem;font-family:var(--eb-font-mono);text-align:center}
-/* C4 — search + filter controls. Shipped `hidden`; the embedded JS un-hides
-   them on load, so a no-JS render is exactly the pre-C4 static page. */
-.controls{max-width:80rem;margin:0 auto 1.25rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.rec{font-family:var(--eb-font-mono);font-size:max(.875rem,var(--eb-fs-2xs));color:var(--eb-text-muted)}
+.lbasis{margin-top:.3rem;font-size:max(.875rem,var(--eb-fs-2xs));color:var(--eb-text-muted)}
+.lapplies{margin-top:.3rem;font-family:var(--eb-font-mono);font-size:max(.875rem,var(--eb-fs-2xs));color:var(--eb-text-muted)}
+footer{max-width:84rem;margin:0 auto;color:var(--eb-text-muted);font-size:.875rem;font-family:var(--eb-font-mono);text-align:center}
+/* Search + filters are hidden until their embedded JavaScript is ready.
+   Without JavaScript the full board remains readable through native HTML. */
+.controls{max-width:84rem;margin:0 auto 1.25rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
 .controls .search{flex:1 1 16rem;min-width:12rem;background:var(--eb-card);color:var(--eb-text);
-  border:1px solid var(--eb-border);border-radius:8px;padding:.45rem .7rem;
+  border:1px solid var(--eb-border);border-radius:8px;padding:.7rem 1rem;min-height:44px;
   font-family:var(--eb-font-sans);font-size:var(--eb-fs-sm)}
 .controls .search::placeholder{color:var(--eb-text-muted)}
 .chips{display:flex;flex-wrap:wrap;gap:.25rem}
-.chip{font-size:var(--eb-fs-2xs);font-family:var(--eb-font-mono);color:var(--eb-text-muted);
-  background:transparent;border:1px solid var(--eb-border);border-radius:999px;padding:.15rem .55rem;cursor:pointer;
+.chip{font-size:max(.875rem,var(--eb-fs-2xs));font-family:var(--eb-font-mono);color:var(--eb-text-muted);
+  background:transparent;border:1px solid var(--eb-border);border-radius:6px;padding:.4rem .7rem;min-height:44px;cursor:pointer;
   transition:color var(--eb-dur-fast) var(--eb-ease-out),border-color var(--eb-dur-fast) var(--eb-ease-out)}
 .chip:hover{color:var(--eb-accent-cur);border-color:var(--eb-accent-cur)}
 .chip[aria-pressed="true"]{background:var(--eb-accent-cur);border-color:var(--eb-accent-cur);color:var(--eb-bg);font-weight:700}
 .f-hide{display:none !important}
-.no-match{color:var(--eb-text-muted);font-size:.82rem;text-align:center;padding:.8rem 0;
+.no-match{color:var(--eb-text-muted);font-size:.875rem;text-align:center;padding:.8rem 0;
   border:1px dashed var(--eb-border);border-radius:8px;margin-top:.6rem}
 /* C7 — parent badge: the muted-outline pill register (like P2 pills). */
 .badge.parent{color:var(--eb-text-muted);border:1px solid var(--eb-border);border-radius:4px;padding:.05rem .3rem}
 /* C12 — Stats + Coordination panels. */
-.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));gap:.7rem;margin-top:1.4rem}
-.panel{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:10px;padding:.6rem .8rem;margin:0}
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:.7rem;margin-top:1.4rem}
+.panel{background:var(--eb-surface);border:1px solid var(--eb-border);border-radius:8px;padding:1.25rem;margin:0}
 .panel .lane-h{margin:.2rem 0 .5rem}
 .stat-list,.coord-list{list-style:none;margin:0 0 .4rem;padding:0;display:grid;gap:.25rem}
-.stat-list li{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.82rem}
-.stat-k{color:var(--eb-text-muted);font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);text-transform:uppercase;letter-spacing:.05em}
-.stat-v{font-family:var(--eb-font-mono);font-size:var(--eb-fs-xs)}
+.stat-list li{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.875rem}
+.stat-k{color:var(--eb-text-muted);font-family:var(--eb-font-mono);font-size:max(.875rem,var(--eb-fs-2xs));text-transform:none;letter-spacing:.05em}
+.stat-v{font-family:var(--eb-font-mono);font-size:max(.875rem,var(--eb-fs-xs))}
 .stat-tags .tags{margin-top:0;justify-content:flex-end}
-.coord-h{font-size:var(--eb-fs-2xs);text-transform:uppercase;letter-spacing:.08em;color:var(--eb-text-muted);font-weight:600;margin:.5rem 0 .25rem}
-.coord-list li{font-size:var(--eb-fs-xs);font-family:var(--eb-font-mono);overflow-wrap:anywhere}
+.coord-h{font-size:max(.875rem,var(--eb-fs-2xs));text-transform:none;letter-spacing:.08em;color:var(--eb-text-muted);font-weight:600;margin:.5rem 0 .25rem}
+.coord-list li{font-size:max(.875rem,var(--eb-fs-xs));font-family:var(--eb-font-mono);overflow-wrap:anywhere}
 .coord-list code{font-family:var(--eb-font-mono);color:var(--eb-text-muted)}
 .empty-line{color:var(--eb-text-muted)}
 /* Milestone C — read-only pattern-intelligence projection. */
-.intel{border:1px solid var(--eb-border);border-radius:12px;background:var(--eb-surface);padding:1rem;margin:0 0 1rem}
-.intel-head,.cluster-top,.hypothesis-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem}
+.intel{border:1px solid var(--eb-border);border-radius:8px;background:var(--eb-surface);padding:1.5rem;margin:0 0 1.5rem}
+.intel-head,.cluster-top,.hypothesis-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:.75rem}
 .intel-head h2{font-size:var(--eb-fs-md);margin:.15rem 0 .8rem}
-.eyebrow,.rule{font-family:var(--eb-font-mono);font-size:var(--eb-fs-2xs);text-transform:uppercase;letter-spacing:.08em;color:var(--eb-accent-cur)}
+.eyebrow,.rule{font-family:var(--eb-font-mono);font-size:max(.875rem,var(--eb-fs-2xs));text-transform:none;letter-spacing:.08em;color:var(--eb-accent-cur)}
 .rule{color:var(--eb-text-muted);text-transform:none;letter-spacing:0}
 .value-strip{display:flex;flex-wrap:wrap;gap:.45rem;margin:0 0 .7rem}
-.value-strip span{font-size:var(--eb-fs-xs);color:var(--eb-text-muted);border:1px solid var(--eb-border);border-radius:999px;padding:.15rem .5rem}
+.value-strip span{font-size:max(.875rem,var(--eb-fs-xs));color:var(--eb-text-muted);border:1px solid var(--eb-border);border-radius:6px;padding:.15rem .5rem}
 .value-strip strong{color:var(--eb-text);font-family:var(--eb-font-mono)}
-.cluster-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));gap:.65rem}
-.cluster-card{background:var(--eb-card);border:1px solid var(--eb-border);border-radius:9px;padding:.75rem;min-width:0}
-.cluster-id{font-family:var(--eb-font-mono);font-weight:700;margin-right:.4rem}.cluster-card code{font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
+.cluster-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:.65rem}
+.cluster-card{background:var(--eb-card);border:1px solid var(--eb-border);border-radius:9px;padding:1.25rem;min-width:0}
+.cluster-id{font-family:var(--eb-font-mono);font-weight:700;margin-right:.4rem}.cluster-card code{font-size:max(.875rem,var(--eb-fs-2xs));color:var(--eb-text-muted)}
 .cluster-score{text-align:right}.cluster-score strong{font:700 1.6rem var(--eb-font-mono);display:block;color:var(--eb-accent-cur)}
-.cluster-score span{font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
-.intel-members{display:flex;flex-wrap:wrap;gap:.3rem;margin:.6rem 0}.intel-member{font:700 var(--eb-fs-xs) var(--eb-font-mono);color:var(--eb-accent-cur)}
-.cluster-meta{font-size:var(--eb-fs-xs);color:var(--eb-text-muted);overflow-wrap:anywhere}
+.cluster-score span{font-size:max(.875rem,var(--eb-fs-2xs));color:var(--eb-text-muted)}
+.intel-members{display:flex;flex-wrap:wrap;gap:.3rem;margin:.6rem 0}.intel-member{font:700 max(.875rem,var(--eb-fs-xs)) var(--eb-font-mono);color:var(--eb-accent-cur)}
+.cluster-meta{font-size:max(.875rem,var(--eb-fs-xs));color:var(--eb-text-muted);overflow-wrap:anywhere}
 .score-components{list-style:none;padding:0;margin:.5rem 0;display:grid;grid-template-columns:1fr 1fr;gap:.15rem .6rem}
-.score-components li{display:flex;justify-content:space-between;font-size:var(--eb-fs-2xs);color:var(--eb-text-muted)}
+.score-components li{display:flex;justify-content:space-between;font-size:max(.875rem,var(--eb-fs-2xs));color:var(--eb-text-muted)}
 .score-components strong{font-family:var(--eb-font-mono);color:var(--eb-text)}
 .hypothesis-card{border-left:3px solid var(--eb-accent-cur);padding:.55rem .6rem;margin-top:.6rem;background:var(--eb-surface);border-radius:5px}
 .hypothesis-card.state-rejected,.hypothesis-card.state-split,.hypothesis-card.state-merged{border-left-color:var(--eb-text-muted)}
-.hypothesis-card h4{font-size:var(--eb-fs-sm);margin:.35rem 0}.hypothesis-card p,.hypothesis-card li{font-size:var(--eb-fs-xs)}
-.hypothesis-card h5{margin:.5rem 0 .15rem}.hypothesis-card pre{white-space:pre-wrap;font:var(--eb-fs-xs) var(--eb-font-sans);margin:.15rem 0}
-.hypothesis-card summary{cursor:pointer;font-size:var(--eb-fs-xs);color:var(--eb-accent-cur)}
-.hstate{font:700 var(--eb-fs-2xs) var(--eb-font-mono);text-transform:uppercase;border:1px solid var(--eb-border);border-radius:999px;padding:.05rem .35rem}
-.hstate.stale{color:var(--eb-danger)}.intel-empty,.intel-error{font-size:var(--eb-fs-xs);color:var(--eb-text-muted)}
+.hypothesis-card h4{font-size:var(--eb-fs-sm);margin:.35rem 0}.hypothesis-card p,.hypothesis-card li{font-size:max(.875rem,var(--eb-fs-xs))}
+.hypothesis-card h5{margin:.5rem 0 .15rem}.hypothesis-card pre{white-space:pre-wrap;font:max(.875rem,var(--eb-fs-xs)) var(--eb-font-sans);margin:.15rem 0}
+.hypothesis-card summary{cursor:pointer;font-size:max(.875rem,var(--eb-fs-xs));color:var(--eb-accent-cur)}
+.hstate{font:700 max(.875rem,var(--eb-fs-2xs)) var(--eb-font-mono);text-transform:none;border:1px solid var(--eb-border);border-radius:6px;padding:.05rem .35rem}
+.hstate.stale{color:var(--eb-danger)}.intel-empty,.intel-error{font-size:max(.875rem,var(--eb-fs-xs));color:var(--eb-text-muted)}
 @media print{
   .controls{display:none}
-  :root{--eb-bg:#FFFFFF;--eb-surface:#FFFFFF;--eb-card:#FFFFFF;--eb-text:#000000;--eb-text-muted:#333333;--eb-border:#BBBBBB}
+  :root,:root[data-theme="dark"],:root[data-theme="light"]{--eb-bg:#FFFFFF;--eb-surface:#FFFFFF;--eb-card:#FFFFFF;--eb-text:#000000;--eb-text-muted:#333333;--eb-border:#BBBBBB}
   body{padding:0}
   .card,.lcard{break-inside:avoid;box-shadow:none}
   .cols{grid-template-columns:repeat(2,1fr)}
@@ -871,23 +924,44 @@ footer{max-width:80rem;margin:0 auto;color:var(--eb-text-muted);font-size:.72rem
   details.more>summary{display:none}
   details.more[open]>*,details.more>*{display:block}
 }
+
+main{max-width:88rem;margin:auto;padding:0 2rem 2.5rem;min-width:0}
+.board-head{flex-wrap:wrap;margin-bottom:1.5rem}
+.col-h{min-height:2rem}.ctitle,.ltitle{font-size:1rem;line-height:1.55;overflow-wrap:anywhere}
+.card,.lcard,.lane li,.panel{min-width:0;overflow-wrap:anywhere}
+.cluster-card code{overflow-wrap:anywhere}.cluster-top>div{min-width:0}
+.hypothesis-card{padding:1rem;margin-top:1rem}.hypothesis-card h4{font-size:1.25rem;line-height:1.4}
+.hypothesis-card summary{padding:.5rem 0;min-height:44px}.hypothesis-card pre{overflow-wrap:anywhere;line-height:1.65}
+.score-components{grid-template-columns:1fr;gap:.35rem}.score-components li{gap:1rem}
+.filter-note{width:100%;margin:.25rem 0 0;color:var(--eb-text-muted);font-size:.875rem}
+@media(max-width:600px){main{padding:0 1.25rem 2rem}.intel{padding:1rem}.cluster-card{padding:1rem}.controls .search{min-width:0;width:100%}.stat-list li{flex-wrap:wrap}.cluster-score{text-align:left}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
 HTML
+HEAD="${HEAD/__EB_BRAND_STYLES__/${EB_VIEW_STYLES}}"
+HEAD="${HEAD/__EB_CHROME_STYLES__/${EB_VIEW_CHROME_CSS}}"
+HEAD="${HEAD}
+${EB_VIEW_HEADER}"
+read -r -d '' VIEW_INTRO <<'HTML' || true
+<div class="view-note"><p><strong>Static board · Read-only.</strong> Open an entry ID to inspect its Markdown source. Regenerate with <code>/board-view</code> after the board changes.</p></div>
+<main id="main">
+HTML
+HEAD="${HEAD}
+${VIEW_INTRO}"
 
-# C4 controls: static markup shipped `hidden` (a no-JS page stays exactly the
-# pre-C4 render); the script below un-hides them on load. All static — the
-# document stays byte-deterministic.
+# Filter controls are hidden until their script is ready. Native HTML keeps
+# the full board readable without JavaScript. The output is byte-deterministic.
 read -r -d '' CONTROLS <<'HTML' || true
 <div class="controls" id="eb-controls" hidden>
-<input id="eb-search" class="search" type="search" placeholder="Search id, title, affects, pattern — press /" aria-label="Search board entries">
+<input id="eb-search" class="search" type="search" placeholder="Search entry ID, title, path, or pattern — press /" aria-describedby="eb-filter-note" aria-label="Search board entries">
 <div class="chips" role="group" aria-label="Filter by type">
-<button type="button" class="chip" data-fgroup="type" data-fval="bug" aria-pressed="false">B</button>
-<button type="button" class="chip" data-fgroup="type" data-fval="feature" aria-pressed="false">F</button>
-<button type="button" class="chip" data-fgroup="type" data-fval="question" aria-pressed="false">Q</button>
-<button type="button" class="chip" data-fgroup="type" data-fval="observation" aria-pressed="false">O</button>
-<button type="button" class="chip" data-fgroup="type" data-fval="learning" aria-pressed="false">L</button>
+<button type="button" class="chip" data-fgroup="type" data-fval="bug" aria-pressed="false">Bugs</button>
+<button type="button" class="chip" data-fgroup="type" data-fval="feature" aria-pressed="false">Features</button>
+<button type="button" class="chip" data-fgroup="type" data-fval="question" aria-pressed="false">Questions</button>
+<button type="button" class="chip" data-fgroup="type" data-fval="observation" aria-pressed="false">Observations</button>
+<button type="button" class="chip" data-fgroup="type" data-fval="learning" aria-pressed="false">Learnings</button>
 </div>
 <div class="chips" role="group" aria-label="Filter by priority">
 <button type="button" class="chip" data-fgroup="priority" data-fval="p0" aria-pressed="false">P0</button>
@@ -896,11 +970,12 @@ read -r -d '' CONTROLS <<'HTML' || true
 <button type="button" class="chip" data-fgroup="priority" data-fval="p3" aria-pressed="false">P3</button>
 </div>
 <div class="chips" role="group" aria-label="Filter by status">
-<button type="button" class="chip" data-fgroup="status" data-fval="open" aria-pressed="false">open</button>
-<button type="button" class="chip" data-fgroup="status" data-fval="in_progress" aria-pressed="false">in_progress</button>
-<button type="button" class="chip" data-fgroup="status" data-fval="blocked" aria-pressed="false">blocked</button>
-<button type="button" class="chip" data-fgroup="status" data-fval="resolved" aria-pressed="false">resolved</button>
+<button type="button" class="chip" data-fgroup="status" data-fval="open" aria-pressed="false">Open</button>
+<button type="button" class="chip" data-fgroup="status" data-fval="in_progress" aria-pressed="false">In progress</button>
+<button type="button" class="chip" data-fgroup="status" data-fval="blocked" aria-pressed="false">Blocked</button>
+<button type="button" class="chip" data-fgroup="status" data-fval="resolved" aria-pressed="false">Resolved</button>
 </div>
+<p class="filter-note" id="eb-filter-note">Search and filters apply to entry cards. Ranked investigations and their evidence remain visible.</p>
 </div>
 HTML
 
@@ -973,7 +1048,9 @@ if [ "${STAMP}" -eq 1 ]; then
   GIT_SHA="$(git -C "${CLAUDE_PROJECT_DIR}" rev-parse --short HEAD 2>/dev/null || echo "unknown")"
   STAMP_LINE=" Generated from <code>${GIT_SHA}</code>."
 fi
-FOOT="<footer>Generated by <code>/board-view</code> — a committed, offline projection of the board.${STAMP_LINE} The board is the database.</footer>
+FOOT="</main>
+<footer>Generated by <code>/board-view</code> — a committed, offline projection of the board.${STAMP_LINE} The board is the database.</footer>
+${EB_VIEW_THEME_SCRIPT}
 ${SCRIPT}
 </body>
 </html>"

@@ -149,11 +149,103 @@ fi
 # The Q/O lane header no longer claims to include Learnings.
 echo "$OUT" | grep -qF 'Questions · Observations<' && pass "Q/O lane header no longer lists Learnings" || fail "Q/O lane header not updated"
 
-# IMPROVEMENTS #2: the blocked badge uses the --eb-danger token, and the dark
-# roots override it (the hardcoded #B23A2E measured 2.96:1 on the dark bg).
-echo "$OUT" | grep -qF '.badge.blocked{color:var(--eb-danger)}' && pass "blocked badge uses --eb-danger token" || fail "blocked badge still hardcoded"
-DARKS=$(echo "$OUT" | grep -o -- '--eb-danger:#E4685A' | wc -l | tr -d ' ')
-[ "$DARKS" = "2" ] && pass "dark roots override --eb-danger (both blocks)" || fail "dark --eb-danger override missing (found $DARKS of 2)"
+# Graphite uses explicit state labels and shared semantic contrast in both themes.
+echo "$OUT" | grep -qF '.badge.blocked{color:var(--eb-danger)}' && pass "blocked badge uses semantic danger token" || fail "blocked badge token missing"
+printf '%s\n' "$OUT" > "$TMP/view.html"
+python3 - "$TMP/view.html" "$ROOT" <<'PYSTYLE' && pass "Graphite: source tokens, embedded font, landmarks, contrast and offline assets" || fail "Graphite source/offline/accessibility contract"
+import base64, re, sys
+from html.parser import HTMLParser
+from pathlib import Path
+page = Path(sys.argv[1]).read_text()
+root = Path(sys.argv[2])
+source = (root / "brand/tokens.css").read_text()
+font = (root / "brand/fonts/manrope-latin-wght-normal.woff2").read_bytes()
+style = re.search(r'<style id="eb-brand-tokens">\n(.*?)</style>', page, re.S).group(1)
+embedded = re.search(r'data:font/woff2;base64,([A-Za-z0-9+/=]+)', style)
+assert embedded and base64.b64decode(embedded.group(1)) == font, "font differs from packaged bytes"
+assert style.replace(embedded.group(0), 'fonts/manrope-latin-wght-normal.woff2').strip() == source.strip(), "shared CSS drift"
+assert not re.search(r'url\([\s\'"]*(?!data:)[^\s\'"]', style), "nonembedded CSS resource"
+assert '#9a5b00' not in page.lower() and '#e6a94e' not in page.lower(), "old amber palette"
+class Document(HTMLParser):
+    def __init__(self):
+        super().__init__(); self.tags=[]
+    def handle_starttag(self, tag, attrs): self.tags.append((tag, dict(attrs)))
+doc = Document(); doc.feed(page)
+assert any(t == 'html' and a.get('data-theme') == 'dark' for t,a in doc.tags)
+assert sum(t == 'main' and a.get('id') == 'main' for t,a in doc.tags) == 1
+assert any(t == 'a' and a.get('href') == '#main' for t,a in doc.tags)
+assert any(t == 'button' and a.get('id') == 'eb-theme' and 'hidden' in a and a.get('aria-pressed') == 'false' for t,a in doc.tags)
+assert 'Static board · Read-only.' in page and 'Regenerate with <code>/board-view</code>' in page
+assert 'Ranked investigations and their evidence remain visible.' in page
+assert '[hidden]{display:none!important}' in page
+assert all(not a.get('src') and not (t == 'link' and a.get('rel') == 'stylesheet') for t,a in doc.tags), "external render dependency"
+assert not any(t in ('img','svg') for t,a in doc.tags), "viewer identity must be wordmark only"
+def luminance(h):
+    h=h.lstrip('#'); h=''.join(c*2 for c in h) if len(h)==3 else h
+    rgb=[int(h[i:i+2],16)/255 for i in (0,2,4)]
+    rgb=[c/12.92 if c<=.04045 else ((c+.055)/1.055)**2.4 for c in rgb]
+    return sum(c*w for c,w in zip(rgb,[.2126,.7152,.0722]))
+base=dict(re.findall(r'(--eb-[\w-]+):\s*(#[0-9A-Fa-f]+)',re.search(r':root\s*{(.*?)}',source,re.S).group(1)))
+light=dict(base); light.update(re.findall(r'(--eb-[\w-]+):\s*(#[0-9A-Fa-f]+)',re.search(r':root\[data-theme="light"\]\s*{(.*?)}',source,re.S).group(1)))
+for theme in (base,light):
+    for fg in ('--eb-text','--eb-muted','--eb-danger'):
+        for bg in ('--eb-bg','--eb-panel'):
+            hi,lo=sorted([luminance(theme[fg]),luminance(theme[bg])],reverse=True)
+            assert (hi+.05)/(lo+.05)>=4.5,(fg,bg,"contrast below 4.5")
+PYSTYLE
+
+# Script-only distributions retain a complete offline fallback, and token-only
+# distributions must not leave a dangling font URL in generated HTML.
+mkdir -p "$TMP/reduced/hooks/scripts" "$TMP/reduced/brand"
+cp "$VIEW" "$ROOT/hooks/scripts/board-paths.sh" "$TMP/reduced/hooks/scripts/"
+FALLBACK="$(CLAUDE_PROJECT_DIR="$P" bash "$TMP/reduced/hooks/scripts/board-view.sh" demo --stdout 2>/dev/null)"
+if echo "$FALLBACK" | grep -q '<main id="main">' && echo "$FALLBACK" | grep -q 'B001' && ! echo "$FALLBACK" | grep -q 'url('; then
+  pass "Graphite: script-only fallback renders entries without asset requests"
+else
+  fail "Graphite: script-only fallback broken"
+fi
+cp "$ROOT/brand/tokens.css" "$TMP/reduced/brand/tokens.css"
+TOKEN_ONLY="$(CLAUDE_PROJECT_DIR="$P" bash "$TMP/reduced/hooks/scripts/board-view.sh" demo --stdout 2>/dev/null)"
+if echo "$TOKEN_ONLY" | grep -q 'B001' && ! echo "$TOKEN_ONLY" | grep -q 'url('; then
+  pass "Graphite: missing optional font falls back without a dangling URL"
+else
+  fail "Graphite: token-only font fallback broken"
+fi
+
+# The synthetic demo must consume the same exact theme and font as normal
+# boards while retaining its explicit proposed-state, evidence and falsifier.
+mkdir -p "$TMP/sample/hypotheses"
+cat > "$TMP/sample/graph.json" <<'JSON'
+{"nodes":{"B001":{"title":"Synthetic <finding>","source":"bugs/B001.md","affects":"src/a.py","pattern":["alpha"]}},"topology":{"clusters":[{"id":"C001","members":["B001"],"affected_domains":["src"],"patterns":["alpha"],"density":1}]}}
+JSON
+cat > "$TMP/sample/hypotheses/H001.md" <<'MD'
+---
+id: H001
+title: A proposed explanation
+status: proposed
+---
+## Proposed root cause
+One shared rule may differ.
+## Supporting evidence
+- B001 records the symptom.
+## Alternative explanations
+- Independent local errors.
+## Falsifier
+All adapters use the same rule.
+MD
+CLAUDE_PROJECT_DIR="$P" bash "$VIEW" --demo-dir "$TMP/sample" --stdout > "$TMP/sample.html"
+python3 - "$TMP/view.html" "$TMP/sample.html" <<'PYDEMO' && pass "Graphite: demo shares exact self-contained brand styles and preserves evidence states" || fail "Graphite demo contract"
+from pathlib import Path
+import re, sys
+normal, demo = (Path(p).read_text() for p in sys.argv[1:])
+def style(page): return re.search(r'<style id="eb-brand-tokens">\n(.*?)</style>',page,re.S).group(1)
+assert style(normal) == style(demo)
+for expected in ('<main id="main">', 'id="eb-theme"', 'Synthetic example · Read-only',
+                 '&lt;finding&gt;', 'status: proposed', 'Supporting evidence', 'Alternative explanations',
+                 'Falsifier', 'All adapters use the same rule.', '<code>/board-demo</code>'):
+    assert expected in demo, expected
+assert not re.search(r'#[0-9a-f]*[a-f0-9]',re.sub(r'<style id="eb-brand-tokens">.*?</style>','',demo,flags=re.S),re.I), 'demo duplicates palette'
+PYDEMO
 
 # IMPROVEMENTS #8: entry cards link to their markdown sources.
 echo "$OUT" | grep -q '<a class="cid" href="bugs/B001.md">B001</a>' && pass "card id links to its entry file (relative)" || fail "card link missing"
