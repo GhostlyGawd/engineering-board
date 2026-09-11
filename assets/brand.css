@@ -1,0 +1,84 @@
+/* Engineering Board — Graphite. Canonical shared tokens, default dark.
+   Wordmark-led identity approved 2026-09-11. Status is conveyed by text.
+   Local font; retained OFL license in brand/fonts/. */
+@font-face { font-family: Manrope; src: url("fonts/manrope-latin-wght-normal.woff2") format("woff2"); font-weight: 200 800; font-style: normal; font-display: swap; }
+:root {
+  color-scheme: dark;
+  --eb-ink: #08090A;
+  --eb-paper: #FAFAFA;
+  --eb-ink-2: #141516;
+  --eb-paper-2: #FFFFFF;
+  --eb-line-dark: #34343A;
+  --eb-bg: #08090A;
+  --eb-panel: #141516;
+  --eb-card: #141516;
+  --eb-selected: #242629;
+  --eb-text: #F7F8F8;
+  --eb-body: #D0D6E0;
+  --eb-muted: #A5AAB3;
+  --eb-line: #34343A;
+  --eb-strong: #D0D2D5;
+  --eb-icon-filter: invert(1);
+  --eb-accent: #F7F8F8;
+  --eb-accent-strong: #D0D6E0;
+  --eb-accent-dark: #F7F8F8;
+  --eb-on-accent: #08090A;
+  --eb-danger: #F7F8F8;
+  --eb-surface: var(--eb-panel);
+  --eb-border: var(--eb-line);
+  --eb-text-muted: var(--eb-muted);
+  --eb-text-faint: var(--eb-muted);
+  --eb-link: var(--eb-text);
+  --eb-accent-cur: var(--eb-accent);
+  --eb-font-sans: Manrope, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --eb-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --eb-fs-2xs: .75rem;
+  --eb-fs-xs: .8125rem;
+  --eb-fs-sm: .875rem;
+  --eb-fs-base: 1rem;
+  --eb-fs-md: 1.125rem;
+  --eb-fs-lg: 1.375rem;
+  --eb-fs-xl: 1.75rem;
+  --eb-fs-2xl: 2.25rem;
+  --eb-fs-3xl: 3rem;
+  --eb-fs-4xl: 3.75rem;
+  --eb-lh-tight: 1.1;
+  --eb-lh-snug: 1.28;
+  --eb-lh-body: 1.6;
+  --eb-fw-regular: 400;
+  --eb-fw-medium: 500;
+  --eb-fw-semibold: 600;
+  --eb-fw-wordmark: 800;
+  --eb-tracking-tight: -.02em;
+  --eb-tracking-wide: .06em;
+  --eb-sp-1: .25rem; --eb-sp-2: .5rem; --eb-sp-3: .75rem;
+  --eb-sp-4: 1rem; --eb-sp-5: 1.5rem; --eb-sp-6: 2rem;
+  --eb-sp-7: 3rem; --eb-sp-8: 4rem; --eb-sp-9: 6rem;
+  --eb-maxw: 84.5rem;
+  --eb-radius-sm: 6px;
+  --eb-radius-card: 8px;
+  --eb-radius-lg: 16px;
+  --eb-radius-pill: 999px;
+  --eb-shadow-card: none;
+  --eb-shadow-lift: none;
+  --eb-dur-fast: 150ms; --eb-dur-base: 240ms; --eb-dur-slow: 360ms;
+  --eb-ease-out: cubic-bezier(.16,1,.30,1);
+  --eb-ease-spring: cubic-bezier(.16,1,.30,1);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --eb-bg: #FAFAFA;
+  --eb-panel: #FFFFFF;
+  --eb-card: #FFFFFF;
+  --eb-selected: #EAECEF;
+  --eb-text: #151619;
+  --eb-body: #353B44;
+  --eb-muted: #595F68;
+  --eb-line: #C7C9CE;
+  --eb-strong: #353B44;
+  --eb-icon-filter: none;
+  --eb-accent: #151619;
+  --eb-accent-strong: #353B44;
+  --eb-on-accent: #FFFFFF;
+  --eb-danger: #151619;
+}
