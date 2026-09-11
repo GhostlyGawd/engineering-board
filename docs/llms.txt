@@ -9,6 +9,18 @@
 > Code plugins and as a zero-dependency MCP server (19 tools over stdio,
 > protocol 2025-06-18).
 
+## Public site
+
+- Home and installation: https://ghostlygawd.github.io/engineering-board/
+- Guide: https://ghostlygawd.github.io/engineering-board/guide.html
+- Actual project board: https://ghostlygawd.github.io/engineering-board/board.html
+- Synthetic walkthrough: https://ghostlygawd.github.io/engineering-board/#example
+
+The walkthrough uses synthetic findings and an illustrative proposed hypothesis.
+It is separate from the actual project board. The website is read-only. Hosted
+board source links open canonical Markdown on GitHub. Investigation rank is not
+causal confidence; no improvement in agent diagnoses is claimed.
+
 ## What it is
 
 engineering-board turns a committed markdown tree (engineering-board/<project>/)
@@ -71,7 +83,8 @@ Claude Code plugin (full autonomous pipeline. requires Claude Code, free):
     /plugin marketplace add GhostlyGawd/engineering-board
     /plugin install engineering-board
     /board-setup
-    /board-demo
+
+Then optionally run /board-demo for the isolated synthetic walkthrough.
 
 MCP server, primary path: one line from PyPI:
 

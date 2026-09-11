@@ -32,7 +32,7 @@ bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-view.sh" ${1:-} $([ "$ARGUMENTS" !
   invoke `/board-demo`, which validates and reports the contained run.
 
 The script writes `engineering-board/<project>/board.html`: a **single
-self-contained file** (all CSS inlined, no network, no JavaScript required). It
+self-contained file** (shared brand CSS and packaged Manrope font inlined, no network, no JavaScript required). It
 is byte-deterministic (stable sort by entry id, no embedded timestamp), so it
 can be committed alongside `BOARD.md` without spurious diffs, and it renders
 directly on GitHub or in any browser.
@@ -48,7 +48,13 @@ directly on GitHub or in any browser.
   to **Done** (`status: resolved`). Cards show id, priority, title, `affects`,
   `pattern` tags, and a `blocked` badge when applicable.
 - Separate lanes for Questions and Observations, and for durable Learnings.
-- Light/dark theme (follows the viewer's `prefers-color-scheme`).
+- Graphite typography and neutral surfaces, with a wordmark-only header.
+- Dark theme by default, with an accessible Light theme toggle when JavaScript
+  is available. The toggle changes only this page's presentation.
+- Search by entry ID, title, path, or pattern, plus type, priority, and status
+  filters. These controls affect entry cards; ranked investigations and their
+  evidence remain visible. Without JavaScript, every entry and source link is
+  available; the interactive controls are hidden.
 
 ## Report
 
@@ -62,6 +68,11 @@ just re-run it anytime (it is safe and deterministic).
   edits entries or `BOARD.md`.
 - Treats board content as data: it escapes all entry text into HTML, so a
   crafted title or hypothesis cannot inject markup into the view.
+- The header labels the board as static and read-only and explains how to
+  regenerate it. Keyboard users can skip to the board's main landmark.
+- Both normal and demo output embed `brand/tokens.css` and the local Manrope
+  font. A reduced script-only installation falls back to neutral system fonts
+  if these optional brand assets are absent; it never fetches replacements.
 - The normal view has no hypothesis mutation controls. Use
   `/board-hypothesis` for content-bound preview/apply actions.
 - Demo rendering is a separate static evidence to cluster to hypothesis layout.

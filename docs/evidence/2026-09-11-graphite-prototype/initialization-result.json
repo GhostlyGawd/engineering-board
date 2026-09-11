@@ -1,0 +1,40 @@
+{
+  "scope": "current repository core board_init in disposable directory; not fresh Codex installation",
+  "first_call": {
+    "project": "example",
+    "board_dir": "engineering-board/example",
+    "affects_prefix": ".",
+    "created": [
+      "engineering-board/BOARD-ROUTER.md",
+      "engineering-board/example/bugs/.gitkeep",
+      "engineering-board/example/features/.gitkeep",
+      "engineering-board/example/questions/.gitkeep",
+      "engineering-board/example/observations/.gitkeep",
+      "engineering-board/example/learnings/.gitkeep",
+      "engineering-board/example/hypotheses/.gitkeep",
+      "engineering-board/example/BOARD.md",
+      "engineering-board/example/ARCHIVE.md",
+      "AGENTS.md"
+    ],
+    "existed": []
+  },
+  "second_call": {
+    "project": "example",
+    "board_dir": "engineering-board/example",
+    "affects_prefix": ".",
+    "created": [],
+    "existed": [
+      "engineering-board/BOARD-ROUTER.md (row present)",
+      "engineering-board/example/BOARD.md",
+      "engineering-board/example/ARCHIVE.md",
+      "AGENTS.md (block current)"
+    ]
+  },
+  "assertions": [
+    "BOARD.md exists",
+    "AGENTS.md exists",
+    "repeat initialization has no new creations"
+  ],
+  "result": "passed",
+  "core_sha256": "7ba8d47542162f859aae557314edfcc070a141652d9f8fd21e68e2a30ee78d5a"
+}

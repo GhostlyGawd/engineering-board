@@ -1,0 +1,185 @@
+- generic
+  - searchbox "Search board entries" [ref=e1]
+  - group "Filter by type"
+    - button "B" [ref=e20]
+    - button "F" [ref=e21]
+    - button "Q" [ref=e22]
+    - button "O" [ref=e23]
+    - button "L" [ref=e24]
+  - group "Filter by priority"
+    - button "P0" [ref=e25]
+    - button "P1" [ref=e26]
+    - button "P2" [ref=e27]
+    - button "P3" [ref=e28]
+  - group "Filter by status"
+    - button "open" [ref=e29]
+    - button "in_progress" [ref=e30]
+    - button "blocked" [ref=e31]
+    - button "resolved" [ref=e32]
+- generic
+  - heading "eb-self" [level=1, ref=e2]
+  - StaticText "0 open · 90 total"
+  - generic
+    - StaticText "PATTERN INTELLIGENCE"
+    - heading "Ranked systemic investigations" [level=2, ref=e33]
+    - StaticText "rule v1 · score is not confidence"
+    - strong
+    - StaticText "useful resurfacing"
+    - strong
+    - StaticText "confirmed systemic fixes"
+    - strong
+    - StaticText "hypotheses with outcomes"
+    - paragraph
+      - StaticText "No multi-entry clusters are present."
+  - StaticText "TO DO"
+  - StaticText "0"
+  - StaticText "—"
+  - StaticText "REVIEW"
+  - StaticText "0"
+  - StaticText "—"
+  - StaticText "VALIDATE"
+  - StaticText "0"
+  - StaticText "—"
+  - StaticText "DONE"
+  - StaticText "82"
+  - link "B001" [ref=e3]
+  - StaticText "P1"
+  - StaticText "SessionStart O(n^2) blocked_by loop exceeds 10s timeout on large boards"
+  - StaticText "hooks/scripts/board-session-start.sh"
+  - StaticText "o-n-squared"
+  - StaticText "hook-latency"
+  - link "B002" [ref=e4]
+  - StaticText "P1"
+  - StaticText "Injection reject-blocklist is trivially bypassable; payloads promote to live board"
+  - StaticText "hooks/scripts/board-consolidate.sh"
+  - StaticText "injection-filter-bypass"
+  - StaticText "untrusted-input"
+  - link "B003" [ref=e5]
+  - StaticText "P1"
+  - StaticText "Adversarial/benign fixtures are dead code; ARCHITECTURE claims a reject-rate guarantee"
+  - StaticText "tests/smoke/automated.sh"
+  - StaticText "untested-claim"
+  - StaticText "test-coverage-gap"
+  - link "B004" [ref=e6]
+  - StaticText "P1"
+  - StaticText "Permission allowlist does not cover the scripts the hooks actually invoke"
+  - StaticText "references/required-permissions.json"
+  - StaticText "permission-mismatch"
+  - StaticText "silent-failure"
+  - link "B005" [ref=e7]
+  - StaticText "P2"
+  - StaticText "First captured finding is invisible — buried in _sessions/, only a count shown"
+  - StaticText "hooks/stop-hook-procedure.md"
+  - StaticText "invisible-feedback"
+  - StaticText "ux-affordance"
+  - link "B006" [ref=e8]
+  - StaticText "P2"
+  - StaticText "Advancing one entry through tdd->review->validate requires two session restarts"
+  - StaticText "commands/worker-start.md"
+  - StaticText "ux-friction"
+  - link "B007" [ref=e9]
+  - StaticText "P2"
+  - StaticText "Validator success is a dead end the board does not reflect"
+  - StaticText "agents/validator.md"
+  - StaticText "ux-affordance"
+  - link "B008" [ref=e10]
+  - StaticText "P2"
+  - StaticText "Corrupt/truncated session-mode.json silently un-pauses a paused session"
+  - StaticText "hooks/scripts/board-stop-gate.sh"
+  - StaticText "fail-open"
+  - StaticText "silent-failure"
+  - link "B009" [ref=e11]
+  - StaticText "P2"
+  - StaticText "Consolidator silently no-ops (findings lost) when python3 is broken/absent"
+  - StaticText "hooks/scripts/board-consolidate.sh"
+  - StaticText "silent-failure"
+  - link "B010" [ref=e12]
+  - StaticText "Empty board renders a broken two-line open-count (0 then 0)"
+  - StaticText "hooks/scripts/board-session-start.sh"
+  - StaticText "cosmetic"
+  - group
+    - DisclosureTriangle "+ 72 more resolved" [expanded=false]
+      - StaticText "+ 72 more resolved"
+  - heading "Learnings · durable memory" [level=2, ref=e13]
+  - link "L004" [ref=e14]
+  - StaticText "HIGH"
+  - StaticText "×11"
+  - StaticText "untested"
+  - StaticText "A denylist heuristic is never done — assume every pattern has an adjacent bypass"
+  - StaticText "applies to: hooks/scripts/board_reject_check.py, tests/security/"
+  - StaticText "filter-completeness"
+  - link "L003" [ref=e15]
+  - StaticText "HIGH"
+  - StaticText "×7"
+  - StaticText "untested"
+  - StaticText "The newest surface carries the most risk — red-team it hardest"
+  - StaticText "applies to: mcp-server/"
+  - StaticText "new-surface-risk"
+  - link "L005" [ref=e16]
+  - StaticText "HIGH"
+  - StaticText "×7"
+  - StaticText "untested"
+  - StaticText "Fix an input-handling class across every site at once, not one site per cycle"
+  - StaticText "applies to: hooks/scripts/board_reject_check.py, hooks/scripts/board-consolidate.sh, mcp-server/engineering_board_mcp.py"
+  - StaticText "whole-class-sweep"
+  - link "L001" [ref=e17]
+  - StaticText "HIGH"
+  - StaticText "×3"
+  - StaticText "untested"
+  - StaticText "Ship every deterministic guard with a test that drives its real fixtures and call-sites"
+  - StaticText "applies to: hooks/scripts/, tests/, references/"
+  - StaticText "untested-claim"
+  - link "L002" [ref=e18]
+  - StaticText "MEDIUM"
+  - StaticText "×2"
+  - StaticText "untested"
+  - StaticText "Board health invariants must respect the open-vs-resolved entry lifecycle"
+  - StaticText "applies to: hooks/scripts/board-index-check.sh, hooks/scripts/board-session-start.sh"
+  - StaticText "invariant-mismatch"
+  - heading "QUESTIONS · OBSERVATIONS" [level=2, ref=e19]
+  - list
+    - listitem [level=1]
+      - StaticText "Q001 QUESTION Does driving one board from Claude Code + Claude Desktop simultaneously work, and what breaks?"
+    - listitem [level=1]
+      - StaticText "Q002 QUESTION Does current D.1 version 4 context change cross-incident diagnosis?"
+    - listitem [level=1]
+      - StaticText "Q003 QUESTION Does context presentation prevent cross-incident first causes?"
+  - generic
+    - heading "STATS" [level=2, ref=e34]
+    - list
+      - listitem [level=1]
+        - StaticText "BUGS"
+        - StaticText "0 open · 78 resolved"
+      - listitem [level=1]
+        - StaticText "FEATURES"
+        - StaticText "0 open · 4 resolved"
+      - listitem [level=1]
+        - StaticText "QUESTIONS"
+        - StaticText "0 open · 3 resolved"
+      - listitem [level=1]
+        - StaticText "LEARNINGS"
+        - StaticText "5"
+      - listitem [level=1]
+        - StaticText "TOP PATTERNS"
+        - StaticText "filter-completeness ×1"
+        - StaticText "invariant-mismatch ×1"
+        - StaticText "new-surface-risk ×1"
+  - generic
+    - heading "COORDINATION" [level=2, ref=e35]
+    - heading "CLAIMS" [level=3, ref=e36]
+    - list
+      - listitem [level=1]
+        - StaticText "no active claims"
+    - heading "RECENT RECLAIMS" [level=3, ref=e37]
+    - list
+      - listitem [level=1]
+        - StaticText "no recent reclaims"
+    - heading "ACTIVE WORKERS" [level=3, ref=e38]
+    - list
+      - listitem [level=1]
+        - StaticText "no active workers"
+- contentinfo
+  - StaticText "Generated by "
+  - code
+    - StaticText "/board-view"
+  - StaticText " — a committed, offline projection of the board. The board is the database."

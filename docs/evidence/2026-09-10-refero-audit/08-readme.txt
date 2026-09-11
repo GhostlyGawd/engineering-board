@@ -1,0 +1,1629 @@
+- generic
+  - link "Skip to content" [ref=e1]
+  - banner
+    - heading "Navigation Menu" [level=2, ref=e8]
+    - generic
+      - link "Homepage" [ref=e10]
+      - navigation "Global" [ref=e19]
+        - list
+          - listitem [level=1]
+            - generic
+              - button "Platform" [expanded=false, ref=e371]
+          - listitem [level=1]
+            - generic
+              - button "Solutions" [expanded=false, ref=e372]
+          - listitem [level=1]
+            - generic
+              - button "Resources" [expanded=false, ref=e373]
+          - listitem [level=1]
+            - generic
+              - button "Open Source" [expanded=false, ref=e374]
+          - listitem [level=1]
+            - generic
+              - button "Enterprise" [expanded=false, ref=e375]
+          - listitem [level=1]
+            - link "Pricing" [ref=e308]
+      - button "Search or jump to, type / to search" [expanded=false, ref=e20]
+        - StaticText "Search"
+      - link "Sign in" [ref=e68]
+        - StaticText "Sign in"
+      - link "Sign up" [ref=e21]
+        - StaticText "Sign up"
+      - button "Appearance settings" [ref=e22]
+- main
+  - generic
+    - link "GhostlyGawd" [ref=e5]
+    - StaticText "/"
+    - strong
+      - link "engineering-board" [ref=e9]
+    - StaticText "Public"
+    - list
+      - listitem [level=1]
+        - link "Sponsor @GhostlyGawd" [ref=e23]
+          - StaticText "Sponsor"
+      - listitem [level=1]
+        - link "You must be signed in to change notification settings" [ref=e24]
+          - StaticText "Notifications"
+      - listitem [level=1]
+        - link "Fork 0" [ref=e25]
+          - StaticText "Fork "
+          - StaticText "0"
+      - listitem [level=1]
+        - link "You must be signed in to star a repository" [ref=e26]
+          - StaticText " Star "
+          - StaticText "0"
+    - navigation "Repository" [ref=e6]
+      - list
+        - listitem [level=1]
+          - link "Code" [ref=e27]
+            - StaticText "Code"
+        - listitem [level=1]
+          - link "Issues" [ref=e28]
+            - StaticText "Issues"
+        - listitem [level=1]
+          - link "Pull requests 1" [ref=e29]
+            - StaticText "Pull requests"
+            - StaticText "1"
+        - listitem [level=1]
+          - link "Discussions" [ref=e30]
+            - StaticText "Discussions"
+        - listitem [level=1]
+          - link "Actions" [ref=e31]
+            - StaticText "Actions"
+        - listitem [level=1]
+          - link "Projects" [ref=e32]
+            - StaticText "Projects"
+        - listitem [level=1]
+          - link "Security and quality" [ref=e33]
+            - StaticText "Security and quality"
+        - listitem [level=1]
+          - link "Insights" [ref=e34]
+            - StaticText "Insights"
+  - generic [ref=e11] focusable [tabindex]
+    - sectionheader
+    - button "main branch" [expanded=false, ref=e69]
+      - StaticText "main"
+    - link "77 Branches" [ref=e35]
+      - strong
+        - StaticText "77 "
+      - StaticText "Branches"
+    - link "19 Tags" [ref=e36]
+      - strong
+        - StaticText "19 "
+      - StaticText "Tags"
+    - generic [ref=e37] clickable [onclick]
+      - combobox "Go to file" [expanded=false, ref=e70]
+    - button "Code" [expanded=false, ref=e38]
+      - StaticText "Code"
+    - heading "Latest commit" [level=2, ref=e39]
+    - generic [ref=e40] focusable [tabindex]
+      - image "GhostlyGawd"
+      - image "rhen-bot"
+    - link "commits by GhostlyGawd" [ref=e41]
+      - StaticText "GhostlyGawd"
+    - StaticText "and"
+    - link "commits by rhen-bot" [ref=e42]
+      - StaticText "rhen-bot"
+    - link "Add free-only Codex design canary fixtures (" [ref=e43]
+    - link "#177" [ref=e44]
+    - link ")" [ref=e45]
+    - button "Open commit details" [expanded=false, ref=e46]
+    - button "success" [ref=e47]
+    - link "Commit 02c019e" [ref=e48]
+      - StaticText "02c019e"
+    - StaticText "·"
+    - StaticText "yesterday"
+    - heading "History" [level=2, ref=e49]
+    - link "379 Commits" [ref=e50]
+      - StaticText "379 Commits"
+    - heading "Folders and files" [level=2, ref=e51]
+    - table "Folders and files"
+      - rowgroup
+        - row
+          - columnheader "Name" [ref=e309]
+          - columnheader "Last commit message" [ref=e310]
+            - StaticText "Last commit message"
+          - columnheader "Last commit date" [ref=e311]
+            - StaticText "Last commit date"
+      - row [ref=e71] clickable [onclick]
+        - cell ".agents/plugins, (Directory)" [ref=e138]
+          - link ".agents/plugins, (Directory)" [ref=e541]
+            - StaticText ".agents/plugins"
+        - cell "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e139]
+          - link "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e376]
+        - cell "yesterday" [ref=e140]
+          - StaticText "yesterday"
+      - row [ref=e72] clickable [onclick]
+        - cell ".claude-plugin, (Directory)" [ref=e141]
+          - link ".claude-plugin, (Directory)" [ref=e542]
+            - StaticText ".claude-plugin"
+        - cell "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e142]
+          - link "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e377]
+        - cell "yesterday" [ref=e143]
+          - StaticText "yesterday"
+      - row [ref=e73] clickable [onclick]
+        - cell ".codex-plugin, (Directory)" [ref=e144]
+          - link ".codex-plugin, (Directory)" [ref=e543]
+            - StaticText ".codex-plugin"
+        - cell "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e145]
+          - link "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e378]
+        - cell "yesterday" [ref=e146]
+          - StaticText "yesterday"
+      - row [ref=e74] clickable [onclick]
+        - cell ".github, (Directory)" [ref=e147]
+          - link ".github, (Directory)" [ref=e544]
+            - StaticText ".github"
+        - cell "Upgrade checkout workflows to v7 (#132)" [ref=e148]
+          - generic
+            - link "Upgrade checkout workflows to v7 (" [ref=e379]
+            - link "#132" [ref=e380]
+            - link ")" [ref=e381]
+        - cell "last month" [ref=e149]
+          - StaticText "last month"
+      - row [ref=e75] clickable [onclick]
+        - cell ".goal, (Directory)" [ref=e150]
+          - link ".goal, (Directory)" [ref=e545]
+            - StaticText ".goal"
+        - cell "fix: harden self-hosted MCP dogfooding" [ref=e151]
+          - link "fix: harden self-hosted MCP dogfooding" [ref=e382]
+        - cell "last month" [ref=e152]
+          - StaticText "last month"
+      - row [ref=e76] clickable [onclick]
+        - cell ".omc, (Directory)" [ref=e153]
+          - link ".omc, (Directory)" [ref=e546]
+            - StaticText ".omc"
+        - cell "v0.2.1 - Scratch Capture: per-turn extractor + scratch boards" [ref=e154]
+          - link "v0.2.1 - Scratch Capture: per-turn extractor + scratch boards" [ref=e383]
+        - cell "4 months ago" [ref=e155]
+          - StaticText "4 months ago"
+      - row [ref=e77] clickable [onclick]
+        - cell "agents, (Directory)" [ref=e156]
+          - link "agents, (Directory)" [ref=e547]
+            - StaticText "agents"
+        - cell "fix: keep resolved archive newest-first (#139)" [ref=e157]
+          - generic
+            - link "fix: keep resolved archive newest-first (" [ref=e384]
+            - link "#139" [ref=e385]
+            - link ")" [ref=e386]
+        - cell "last month" [ref=e158]
+          - StaticText "last month"
+      - row [ref=e78] clickable [onclick]
+        - cell "brand, (Directory)" [ref=e159]
+          - link "brand, (Directory)" [ref=e548]
+            - StaticText "brand"
+        - cell "release: prepare v1.8.0" [ref=e160]
+          - link "release: prepare v1.8.0" [ref=e387]
+        - cell "2 months ago" [ref=e161]
+          - StaticText "2 months ago"
+      - row [ref=e79] clickable [onclick]
+        - cell "commands, (Directory)" [ref=e162]
+          - link "commands, (Directory)" [ref=e549]
+            - StaticText "commands"
+        - cell "Document read-only hypothesis detail contract and verification workflow" [ref=e163]
+          - link "Document read-only hypothesis detail contract and verification workflow" [ref=e388]
+        - cell "yesterday" [ref=e164]
+          - StaticText "yesterday"
+      - row [ref=e80] clickable [onclick]
+        - cell "docs, (Directory)" [ref=e165]
+          - link "docs, (Directory)" [ref=e550]
+            - StaticText "docs"
+        - cell "Add free-only Codex design canary fixtures (#177)" [ref=e166]
+          - generic
+            - link "Add free-only Codex design canary fixtures (" [ref=e389]
+            - link "#177" [ref=e390]
+            - link ")" [ref=e391]
+        - cell "yesterday" [ref=e167]
+          - StaticText "yesterday"
+      - row [ref=e81] clickable [onclick]
+        - cell "engineering-board, (Directory)" [ref=e168]
+          - link "engineering-board, (Directory)" [ref=e551]
+            - StaticText "engineering-board"
+        - cell "Add free-only Codex design canary fixtures (#177)" [ref=e169]
+          - generic
+            - link "Add free-only Codex design canary fixtures (" [ref=e392]
+            - link "#177" [ref=e393]
+            - link ")" [ref=e394]
+        - cell "yesterday" [ref=e170]
+          - StaticText "yesterday"
+      - row [ref=e82] clickable [onclick]
+        - cell "evaluation, (Directory)" [ref=e171]
+          - link "evaluation, (Directory)" [ref=e552]
+            - StaticText "evaluation"
+        - cell "Add free-only Codex design canary fixtures (#177)" [ref=e172]
+          - generic
+            - link "Add free-only Codex design canary fixtures (" [ref=e395]
+            - link "#177" [ref=e396]
+            - link ")" [ref=e397]
+        - cell "yesterday" [ref=e173]
+          - StaticText "yesterday"
+      - row [ref=e83] clickable [onclick]
+        - cell "hooks, (Directory)" [ref=e174]
+          - link "hooks, (Directory)" [ref=e553]
+            - StaticText "hooks"
+        - cell "fix: isolate Codex hooks and SessionStart truth (#150)" [ref=e175]
+          - generic
+            - link "fix: isolate Codex hooks and SessionStart truth (" [ref=e398]
+            - link "#150" [ref=e399]
+            - link ")" [ref=e400]
+        - cell "last month" [ref=e176]
+          - StaticText "last month"
+      - row [ref=e84] clickable [onclick]
+        - cell "maintainers, (Directory)" [ref=e177]
+          - link "maintainers, (Directory)" [ref=e554]
+            - StaticText "maintainers"
+        - cell "docs: establish independent agent development process" [ref=e178]
+          - link "docs: establish independent agent development process" [ref=e401]
+        - cell "2 days ago" [ref=e179]
+          - StaticText "2 days ago"
+      - row [ref=e85] clickable [onclick]
+        - cell "mcp-server, (Directory)" [ref=e180]
+          - link "mcp-server, (Directory)" [ref=e555]
+            - StaticText "mcp-server"
+        - cell "test: account for metadata filtering of cyclic records" [ref=e181]
+          - link "test: account for metadata filtering of cyclic records" [ref=e402]
+        - cell "yesterday" [ref=e182]
+          - StaticText "yesterday"
+      - row [ref=e86] clickable [onclick]
+        - cell "references, (Directory)" [ref=e183]
+          - link "references, (Directory)" [ref=e556]
+            - StaticText "references"
+        - cell "fix: keep resolved archive newest-first (#139)" [ref=e184]
+          - generic
+            - link "fix: keep resolved archive newest-first (" [ref=e403]
+            - link "#139" [ref=e404]
+            - link ")" [ref=e405]
+        - cell "last month" [ref=e185]
+          - StaticText "last month"
+      - row [ref=e87] clickable [onclick]
+        - cell "scripts, (Directory)" [ref=e186]
+          - link "scripts, (Directory)" [ref=e557]
+            - StaticText "scripts"
+        - cell "fix: isolate Codex hooks and SessionStart truth (#150)" [ref=e187]
+          - generic
+            - link "fix: isolate Codex hooks and SessionStart truth (" [ref=e406]
+            - link "#150" [ref=e407]
+            - link ")" [ref=e408]
+        - cell "last month" [ref=e188]
+          - StaticText "last month"
+      - row [ref=e88] clickable [onclick]
+        - cell "skills, (Directory)" [ref=e189]
+          - link "skills, (Directory)" [ref=e558]
+            - StaticText "skills"
+        - cell "fix: keep resolved archive newest-first (#139)" [ref=e190]
+          - generic
+            - link "fix: keep resolved archive newest-first (" [ref=e409]
+            - link "#139" [ref=e410]
+            - link ")" [ref=e411]
+        - cell "last month" [ref=e191]
+          - StaticText "last month"
+      - row [ref=e89] clickable [onclick]
+        - cell "specs, (Directory)" [ref=e192]
+          - link "specs, (Directory)" [ref=e559]
+            - StaticText "specs"
+        - cell "Competitive-parity build: reposition for the 2026 field + close table…" [ref=e193]
+          - link "Competitive-parity build: reposition for the 2026 field + close table…" [ref=e412]
+        - cell "2 months ago" [ref=e194]
+          - StaticText "2 months ago"
+      - row [ref=e90] clickable [onclick]
+        - cell "tests, (Directory)" [ref=e195]
+          - link "tests, (Directory)" [ref=e560]
+            - StaticText "tests"
+        - cell "Include no-model workflow-pilot checks in CI" [ref=e196]
+          - link "Include no-model workflow-pilot checks in CI" [ref=e413]
+        - cell "yesterday" [ref=e197]
+          - StaticText "yesterday"
+      - row [ref=e91] clickable [onclick]
+        - cell ".gitattributes, (File)" [ref=e198]
+          - link ".gitattributes, (File)" [ref=e561]
+            - StaticText ".gitattributes"
+        - cell "Initial commit: engineering-board plugin v0.1.0" [ref=e199]
+          - link "Initial commit: engineering-board plugin v0.1.0" [ref=e414]
+        - cell "5 months ago" [ref=e200]
+          - StaticText "5 months ago"
+      - row [ref=e92] clickable [onclick]
+        - cell ".gitignore, (File)" [ref=e201]
+          - link ".gitignore, (File)" [ref=e562]
+            - StaticText ".gitignore"
+        - cell "fix: isolate Codex hooks and SessionStart truth (#150)" [ref=e202]
+          - generic
+            - link "fix: isolate Codex hooks and SessionStart truth (" [ref=e415]
+            - link "#150" [ref=e416]
+            - link ")" [ref=e417]
+        - cell "last month" [ref=e203]
+          - StaticText "last month"
+      - row [ref=e93] clickable [onclick]
+        - cell ".mcp.json, (File)" [ref=e204]
+          - link ".mcp.json, (File)" [ref=e563]
+            - StaticText ".mcp.json"
+        - cell "feat: add Codex plugin package" [ref=e205]
+          - link "feat: add Codex plugin package" [ref=e418]
+        - cell "last month" [ref=e206]
+          - StaticText "last month"
+      - row [ref=e94] clickable [onclick]
+        - cell "ACTIVATION.md, (File)" [ref=e207]
+          - link "ACTIVATION.md, (File)" [ref=e564]
+            - StaticText "ACTIVATION.md"
+        - cell "Experience Optimization audit — 6 reports + shipped fixes (#87)" [ref=e208]
+          - generic
+            - link "Experience Optimization audit — 6 reports + shipped fixes (" [ref=e419]
+            - link "#87" [ref=e420]
+            - link ")" [ref=e421]
+        - cell "2 months ago" [ref=e209]
+          - StaticText "2 months ago"
+      - row [ref=e95] clickable [onclick]
+        - cell "AGENTS.md, (File)" [ref=e210]
+          - link "AGENTS.md, (File)" [ref=e565]
+            - StaticText "AGENTS.md"
+        - cell "docs: establish independent agent development process" [ref=e211]
+          - link "docs: establish independent agent development process" [ref=e422]
+        - cell "2 days ago" [ref=e212]
+          - StaticText "2 days ago"
+      - row [ref=e96] clickable [onclick]
+        - cell "ARCHITECTURE.md, (File)" [ref=e213]
+          - link "ARCHITECTURE.md, (File)" [ref=e566]
+            - StaticText "ARCHITECTURE.md"
+        - cell "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e214]
+          - link "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e423]
+        - cell "yesterday" [ref=e215]
+          - StaticText "yesterday"
+      - row [ref=e97] clickable [onclick]
+        - cell "BRAND-COHERENCE.md, (File)" [ref=e216]
+          - link "BRAND-COHERENCE.md, (File)" [ref=e567]
+            - StaticText "BRAND-COHERENCE.md"
+        - cell "feat(design): apply design-audit fixes across surfaces (v1.6.0) (#86)" [ref=e217]
+          - generic
+            - link "feat(design): apply design-audit fixes across surfaces (v1.6.0) (" [ref=e424]
+            - link "#86" [ref=e425]
+            - link ")" [ref=e426]
+        - cell "2 months ago" [ref=e218]
+          - StaticText "2 months ago"
+      - row [ref=e98] clickable [onclick]
+        - cell "BRAND.md, (File)" [ref=e219]
+          - link "BRAND.md, (File)" [ref=e568]
+            - StaticText "BRAND.md"
+        - cell "Prepare v1.10.1 and owner-approved controlled English (#103)" [ref=e220]
+          - generic
+            - link "Prepare v1.10.1 and owner-approved controlled English (" [ref=e427]
+            - link "#103" [ref=e428]
+            - link ")" [ref=e429]
+        - cell "2 months ago" [ref=e221]
+          - StaticText "2 months ago"
+      - row [ref=e99] clickable [onclick]
+        - cell "CHANGELOG.md, (File)" [ref=e222]
+          - link "CHANGELOG.md, (File)" [ref=e569]
+            - StaticText "CHANGELOG.md"
+        - cell "Record packaged identity correction and installed-wheel evidence" [ref=e223]
+          - link "Record packaged identity correction and installed-wheel evidence" [ref=e430]
+        - cell "yesterday" [ref=e224]
+          - StaticText "yesterday"
+      - row [ref=e100] clickable [onclick]
+        - cell "CLAUDE.md, (File)" [ref=e225]
+          - link "CLAUDE.md, (File)" [ref=e570]
+            - StaticText "CLAUDE.md"
+        - cell "Prepare v1.10.1 and owner-approved controlled English (#103)" [ref=e226]
+          - generic
+            - link "Prepare v1.10.1 and owner-approved controlled English (" [ref=e431]
+            - link "#103" [ref=e432]
+            - link ")" [ref=e433]
+        - cell "2 months ago" [ref=e227]
+          - StaticText "2 months ago"
+      - row [ref=e101] clickable [onclick]
+        - cell "CODE_OF_CONDUCT.md, (File)" [ref=e228]
+          - link "CODE_OF_CONDUCT.md, (File)" [ref=e571]
+            - StaticText "CODE_OF_CONDUCT.md"
+        - cell "community: add contributor + community scaffolding (Lever 4) (#59)" [ref=e229]
+          - generic
+            - link "community: add contributor + community scaffolding (Lever 4) (" [ref=e434]
+            - link "#59" [ref=e435]
+            - link ")" [ref=e436]
+        - cell "2 months ago" [ref=e230]
+          - StaticText "2 months ago"
+      - row [ref=e102] clickable [onclick]
+        - cell "COLOR.md, (File)" [ref=e231]
+          - link "COLOR.md, (File)" [ref=e572]
+            - StaticText "COLOR.md"
+        - cell "feat(design): apply design-audit fixes across surfaces (v1.6.0) (#86)" [ref=e232]
+          - generic
+            - link "feat(design): apply design-audit fixes across surfaces (v1.6.0) (" [ref=e437]
+            - link "#86" [ref=e438]
+            - link ")" [ref=e439]
+        - cell "2 months ago" [ref=e233]
+          - StaticText "2 months ago"
+      - row [ref=e103] clickable [onclick]
+        - cell "COMPREHENSION.md, (File)" [ref=e234]
+          - link "COMPREHENSION.md, (File)" [ref=e573]
+            - StaticText "COMPREHENSION.md"
+        - cell "fix: isolate Codex hooks and SessionStart truth (#150)" [ref=e235]
+          - generic
+            - link "fix: isolate Codex hooks and SessionStart truth (" [ref=e440]
+            - link "#150" [ref=e441]
+            - link ")" [ref=e442]
+        - cell "last month" [ref=e236]
+          - StaticText "last month"
+      - row [ref=e104] clickable [onclick]
+        - cell "CONTRIBUTING.md, (File)" [ref=e237]
+          - link "CONTRIBUTING.md, (File)" [ref=e574]
+            - StaticText "CONTRIBUTING.md"
+        - cell "docs: establish independent agent development process" [ref=e238]
+          - link "docs: establish independent agent development process" [ref=e443]
+        - cell "2 days ago" [ref=e239]
+          - StaticText "2 days ago"
+      - row [ref=e105] clickable [onclick]
+        - cell "CRO.md, (File)" [ref=e240]
+          - link "CRO.md, (File)" [ref=e575]
+            - StaticText "CRO.md"
+        - cell "Experience Optimization audit — 6 reports + shipped fixes (#87)" [ref=e241]
+          - generic
+            - link "Experience Optimization audit — 6 reports + shipped fixes (" [ref=e444]
+            - link "#87" [ref=e445]
+            - link ")" [ref=e446]
+        - cell "2 months ago" [ref=e242]
+          - StaticText "2 months ago"
+      - row [ref=e106] clickable [onclick]
+        - cell "FIXLOG.md, (File)" [ref=e243]
+          - link "FIXLOG.md, (File)" [ref=e576]
+            - StaticText "FIXLOG.md"
+        - cell "Experience Optimization audit — 6 reports + shipped fixes (#87)" [ref=e244]
+          - generic
+            - link "Experience Optimization audit — 6 reports + shipped fixes (" [ref=e447]
+            - link "#87" [ref=e448]
+            - link ")" [ref=e449]
+        - cell "2 months ago" [ref=e245]
+          - StaticText "2 months ago"
+      - row [ref=e107] clickable [onclick]
+        - cell "HIERARCHY.md, (File)" [ref=e246]
+          - link "HIERARCHY.md, (File)" [ref=e577]
+            - StaticText "HIERARCHY.md"
+        - cell "feat(design): apply design-audit fixes across surfaces (v1.6.0) (#86)" [ref=e247]
+          - generic
+            - link "feat(design): apply design-audit fixes across surfaces (v1.6.0) (" [ref=e450]
+            - link "#86" [ref=e451]
+            - link ")" [ref=e452]
+        - cell "2 months ago" [ref=e248]
+          - StaticText "2 months ago"
+      - row [ref=e108] clickable [onclick]
+        - cell "IMPROVEMENTS.md, (File)" [ref=e249]
+          - link "IMPROVEMENTS.md, (File)" [ref=e578]
+            - StaticText "IMPROVEMENTS.md"
+        - cell "Competitive-parity build: reposition for the 2026 field + close table…" [ref=e250]
+          - link "Competitive-parity build: reposition for the 2026 field + close table…" [ref=e453]
+        - cell "2 months ago" [ref=e251]
+          - StaticText "2 months ago"
+      - row [ref=e109] clickable [onclick]
+        - cell "LAYOUT.md, (File)" [ref=e252]
+          - link "LAYOUT.md, (File)" [ref=e579]
+            - StaticText "LAYOUT.md"
+        - cell "feat(design): apply design-audit fixes across surfaces (v1.6.0) (#86)" [ref=e253]
+          - generic
+            - link "feat(design): apply design-audit fixes across surfaces (v1.6.0) (" [ref=e454]
+            - link "#86" [ref=e455]
+            - link ")" [ref=e456]
+        - cell "2 months ago" [ref=e254]
+          - StaticText "2 months ago"
+      - row [ref=e110] clickable [onclick]
+        - cell "LICENSE, (File)" [ref=e255]
+          - link "LICENSE, (File)" [ref=e580]
+            - StaticText "LICENSE"
+        - cell "Initial commit: engineering-board plugin v0.1.0" [ref=e256]
+          - link "Initial commit: engineering-board plugin v0.1.0" [ref=e457]
+        - cell "5 months ago" [ref=e257]
+          - StaticText "5 months ago"
+      - row [ref=e111] clickable [onclick]
+        - cell "NEXT-PHASE.md, (File)" [ref=e258]
+          - link "NEXT-PHASE.md, (File)" [ref=e581]
+            - StaticText "NEXT-PHASE.md"
+        - cell "Bump version 1.0.0 -> 1.0.1 so the scratch-append fix ships" [ref=e259]
+          - link "Bump version 1.0.0 -> 1.0.1 so the scratch-append fix ships" [ref=e458]
+        - cell "4 months ago" [ref=e260]
+          - StaticText "4 months ago"
+      - row [ref=e112] clickable [onclick]
+        - cell "PROOF.md, (File)" [ref=e261]
+          - link "PROOF.md, (File)" [ref=e582]
+            - StaticText "PROOF.md"
+        - cell "fix: isolate Codex hooks and SessionStart truth (#150)" [ref=e262]
+          - generic
+            - link "fix: isolate Codex hooks and SessionStart truth (" [ref=e459]
+            - link "#150" [ref=e460]
+            - link ")" [ref=e461]
+        - cell "last month" [ref=e263]
+          - StaticText "last month"
+      - row [ref=e113] clickable [onclick]
+        - cell "README.md, (File)" [ref=e264]
+          - link "README.md, (File)" [ref=e583]
+            - StaticText "README.md"
+        - cell "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e265]
+          - link "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e462]
+        - cell "yesterday" [ref=e266]
+          - StaticText "yesterday"
+      - row [ref=e114] clickable [onclick]
+        - cell "RETENTION.md, (File)" [ref=e267]
+          - link "RETENTION.md, (File)" [ref=e584]
+            - StaticText "RETENTION.md"
+        - cell "fix: isolate Codex hooks and SessionStart truth (#150)" [ref=e268]
+          - generic
+            - link "fix: isolate Codex hooks and SessionStart truth (" [ref=e463]
+            - link "#150" [ref=e464]
+            - link ")" [ref=e465]
+        - cell "last month" [ref=e269]
+          - StaticText "last month"
+      - row [ref=e115] clickable [onclick]
+        - cell "ROADMAP.md, (File)" [ref=e270]
+          - link "ROADMAP.md, (File)" [ref=e585]
+            - StaticText "ROADMAP.md"
+        - cell "feat: surface matched learnings in PM summaries (#144)" [ref=e271]
+          - generic
+            - link "feat: surface matched learnings in PM summaries (" [ref=e466]
+            - link "#144" [ref=e467]
+            - link ")" [ref=e468]
+        - cell "last month" [ref=e272]
+          - StaticText "last month"
+      - row [ref=e116] clickable [onclick]
+        - cell "SECURITY.md, (File)" [ref=e273]
+          - link "SECURITY.md, (File)" [ref=e586]
+            - StaticText "SECURITY.md"
+        - cell "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e274]
+          - link "Release: prepare 1.14.0 with canonical hypothesis details" [ref=e469]
+        - cell "yesterday" [ref=e275]
+          - StaticText "yesterday"
+      - row [ref=e117] clickable [onclick]
+        - cell "SHOWCASE.md, (File)" [ref=e276]
+          - link "SHOWCASE.md, (File)" [ref=e587]
+            - StaticText "SHOWCASE.md"
+        - cell "Experience Optimization audit — 6 reports + shipped fixes (#87)" [ref=e277]
+          - generic
+            - link "Experience Optimization audit — 6 reports + shipped fixes (" [ref=e470]
+            - link "#87" [ref=e471]
+            - link ")" [ref=e472]
+        - cell "2 months ago" [ref=e278]
+          - StaticText "2 months ago"
+      - row [ref=e118] clickable [onclick]
+        - cell "STATES.md, (File)" [ref=e279]
+          - link "STATES.md, (File)" [ref=e588]
+            - StaticText "STATES.md"
+        - cell "feat(design): apply design-audit fixes across surfaces (v1.6.0) (#86)" [ref=e280]
+          - generic
+            - link "feat(design): apply design-audit fixes across surfaces (v1.6.0) (" [ref=e473]
+            - link "#86" [ref=e474]
+            - link ")" [ref=e475]
+        - cell "2 months ago" [ref=e281]
+          - StaticText "2 months ago"
+      - row [ref=e119] clickable [onclick]
+        - cell "TYPOGRAPHY.md, (File)" [ref=e282]
+          - link "TYPOGRAPHY.md, (File)" [ref=e589]
+            - StaticText "TYPOGRAPHY.md"
+        - cell "feat(design): apply design-audit fixes across surfaces (v1.6.0) (#86)" [ref=e283]
+          - generic
+            - link "feat(design): apply design-audit fixes across surfaces (v1.6.0) (" [ref=e476]
+            - link "#86" [ref=e477]
+            - link ")" [ref=e478]
+        - cell "2 months ago" [ref=e284]
+          - StaticText "2 months ago"
+      - row [ref=e120] clickable [onclick]
+        - cell "codex-mcp.json, (File)" [ref=e285]
+          - link "codex-mcp.json, (File)" [ref=e590]
+            - StaticText "codex-mcp.json"
+        - cell "fix: expose safe MCP approval annotations" [ref=e286]
+          - link "fix: expose safe MCP approval annotations" [ref=e479]
+        - cell "last month" [ref=e287]
+          - StaticText "last month"
+      - row [ref=e121] clickable [onclick]
+        - cell "state.md, (File)" [ref=e288]
+          - link "state.md, (File)" [ref=e591]
+            - StaticText "state.md"
+        - cell "Competitive-parity build: reposition for the 2026 field + close table…" [ref=e289]
+          - link "Competitive-parity build: reposition for the 2026 field + close table…" [ref=e480]
+        - cell "2 months ago" [ref=e290]
+          - StaticText "2 months ago"
+    - generic
+      - heading "Repository files navigation" [level=2, ref=e122]
+      - navigation "Repository files" [ref=e123]
+        - list
+          - listitem [level=1]
+            - link "README" [ref=e481]
+              - StaticText "README"
+          - listitem [level=1]
+            - link "Code of conduct" [ref=e482]
+              - StaticText "Code of conduct"
+          - listitem [level=1]
+            - link "Contributing" [ref=e483]
+              - StaticText "Contributing"
+          - listitem [level=1]
+            - link "MIT license" [ref=e484]
+              - StaticText "MIT license"
+          - listitem [level=1]
+            - link "Security" [ref=e485]
+              - StaticText "Security"
+      - button "Outline" [expanded=false, ref=e124]
+    - generic [ref=e52] clickable [onclick]
+      - article
+        - image "Engineering Board logomark"
+        - generic
+          - heading "Engineering Board" [level=1, ref=e312]
+          - link "Permalink: Engineering Board" [ref=e313]
+        - paragraph
+          - strong
+            - StaticText "Repository pattern memory that helps an engineering agent find a root cause."
+        - paragraph
+          - emphasis
+            - StaticText "The board is the database."
+        - paragraph
+          - link "Website" [ref=e314]
+            - image "Website"
+          - StaticText " "
+          - link "License: MIT" [ref=e315]
+            - image "License: MIT"
+          - StaticText " "
+          - link "Version" [ref=e316]
+            - image "Version"
+          - StaticText " "
+          - link "tests" [ref=e317]
+            - image "tests"
+          - StaticText " "
+          - link "Codex plugin" [ref=e318]
+            - image "Codex plugin"
+          - StaticText " "
+          - link "Claude Code plugin" [ref=e319]
+            - image "Claude Code plugin"
+          - StaticText " "
+          - link "MCP" [ref=e320]
+            - image "MCP"
+          - StaticText " "
+          - link "GitHub stars" [ref=e321]
+            - image "GitHub stars"
+          - StaticText " "
+          - link "Last release" [ref=e322]
+            - image "Last release"
+        - link "Three synthetic findings connect to cluster C001 and one proposed root-cause hypothesis." [ref=e291]
+          - image "Three synthetic findings connect to cluster C001 and one proposed root-cause hypothesis."
+        - paragraph
+          - emphasis
+            - StaticText "Run "
+            - code
+              - StaticText "/board-demo"
+            - StaticText " to make this synthetic example."
+        - link "The Milestone B validation shows stable pattern P001 and cluster c-a4609c958c398d90." [ref=e292]
+          - image "The Milestone B validation shows stable pattern P001 and cluster c-a4609c958c398d90."
+        - paragraph
+          - emphasis
+            - StaticText "This visual shows real deterministic fixture output for the pattern pipeline."
+        - link "The Milestone C validation shows cluster rank, hypothesis states, and negative memory." [ref=e293]
+          - image "The Milestone C validation shows cluster rank, hypothesis states, and negative memory."
+        - paragraph
+          - emphasis
+            - StaticText "This visual shows real deterministic fixture output for root-cause memory."
+        - link "The Milestone D validation shows context retrieval, explicit fix outcomes, and outcome-aware Learning confidence." [ref=e294]
+          - image "The Milestone D validation shows context retrieval, explicit fix outcomes, and outcome-aware Learning confidence."
+        - paragraph
+          - emphasis
+            - StaticText "This visual shows the tested context-to-outcome memory loop."
+        - link "The repository board has search, filters, and four Kanban columns." [ref=e295]
+          - image "The repository board has search, filters, and four Kanban columns."
+        - paragraph
+          - emphasis
+            - StaticText "This repository uses its own Engineering Board."
+        - generic
+          - heading "Product description" [level=2, ref=e323]
+          - link "Permalink: Product description" [ref=e324]
+        - paragraph
+          - StaticText "Engineering Board is a repository-owned pattern-intelligence system for engineering agents."
+        - paragraph
+          - StaticText "The system records bugs, features, questions, and observations as Markdown evidence. It connects recurring findings in a deterministic graph."
+        - paragraph
+          - StaticText "The graph helps an agent investigate a shared cause across different domains. This method reduces repeated corrections of individual symptoms."
+        - paragraph
+          - StaticText "Markdown is the canonical record. A pull request can show each change to this record."
+        - paragraph
+          - code
+            - StaticText "BOARD.md"
+          - StaticText ", "
+          - code
+            - StaticText "GRAPH.yml"
+          - StaticText ", JSON analysis, and HTML are derived views. The system can build these views again from the canonical record."
+        - paragraph
+          - StaticText "A hypothesis is separate from a deterministic graph fact. Only investigation evidence or fix evidence can confirm a hypothesis."
+        - paragraph
+          - StaticText "The optional "
+          - code
+            - StaticText "tdd → review → validate"
+          - StaticText " loop can test a fix. This loop supports the pattern memory, but it does not define the product."
+        - paragraph
+          - StaticText "Milestone C adds:"
+        - list
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "A transparent investigation score from 0 through 100"
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "A durable H### hypothesis lifecycle"
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Negative memory for a rejected claim."
+        - paragraph
+          - StaticText "Each score component is visible. A score does not prove that a cause is true."
+        - paragraph
+          - StaticText "Milestone D puts this memory in the agent's decision path:"
+        - list
+          - listitem [level=1]
+            - ListMarker "• "
+            - code
+              - StaticText "board_context"
+            - StaticText " retrieves relevant clusters, hypotheses, negative memory, and Learnings before the agent selects a fix."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Each result shows a stable title, a typed summary of at most 2,000 characters, the epistemic state, structural signals, score components, match reason, and canonical sources."
+          - listitem [level=1]
+            - ListMarker "• "
+            - code
+              - StaticText "board_get_entry"
+            - StaticText " opens a retrieved H### record in full, including its alternatives and falsifier. Reading preserves its status; it does not confirm a proposed cause or record an outcome."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "A task-only miss tells the caller to add a file, entry identifier, or current directory. Task words do not bypass structural eligibility."
+          - listitem [level=1]
+            - ListMarker "• "
+            - code
+              - StaticText "board_outcomes"
+            - StaticText " records an explicit fix result against an H### hypothesis."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Structured outcomes update Learning state and confidence through a separate preview and apply operation."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "A derived value report counts verified reuse and systemic fix evidence. It does not count prompts, sessions, or other activity."
+        - paragraph
+          - StaticText "Milestone D.1 adds a repository-only evaluation harness and eight sanitized cases. The default contract prepares 24 isolated baseline/context pairs for a Codex reference run. Other clients can run as optional replications without changing the product gate. Protocol and package tests establish supported client surfaces without requiring provider accounts. The first Codex run scored 100 percent in both positive baseline and context arms, so the corpus was retained as a non-scored calibration set. A separate locked evidence corpus excludes declared scoring oracles and requires rejected memory in its lexical-decoy contexts. Its reference run scored 100 percent for context and 83.33 percent for baseline. The 16.67-point difference did not meet the required 25-point improvement. The project does not claim that the context improves agent diagnoses."
+        - paragraph
+          - StaticText "The unlocked version 4 proposal now limits each positive case to one visible current incident. It also requires a positive classification to connect that incident to prior repository evidence. A non-scored proposal preflight found that v1.11.0 ranks the expected memory but does not include the memory title, cause, or summary in the returned result. Context contract version 2 added that bounded canonical content with its separate epistemic state, match reason, and sources. Current contract version 3 preserves those limits and adds confidence for moment-of-need Learning delivery. A current-source, one-repetition preflight then produced zero qualifying cross-incident first causes in both the four baseline arms and the four context arms. The expected memories ranked first or second, but the responses did not connect their current incident to the prior incident. This is not a scored product-effect result. A later source-locked C04 diagnostic tested raw JSON versus shipped prompt-guard prose, each before and after case evidence. All four treatments again produced current-incident-only first causes, so presentation format and position are not sufficient for C04 under that bounded current-client test. The proposal remains unlocked, and the exact baseline decision remains with the product owner. See "
+          - link "evaluation/README.md" [ref=e325]
+            - code
+              - StaticText "evaluation/README.md"
+          - StaticText " for the proof boundary and operator commands."
+        - generic
+          - heading "Product differences" [level=2, ref=e326]
+          - link "Permalink: Product differences" [ref=e327]
+        - paragraph
+          - StaticText "Some Git boards show visible state but have little analysis. Some memory systems have useful analysis but keep the source outside the repository."
+        - paragraph
+          - StaticText "Engineering Board combines these properties:"
+        - list
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Repository evidence that a pull request can review"
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "A cross-domain pattern graph with evidence links"
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "H### records with alternatives and falsifiers"
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Negative memory for rejected claims"
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Atomic claims for parallel agents"
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Passive capture"
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Codex and Claude Code plugins"
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "An MCP server."
+        - paragraph
+          - StaticText "Native Claude Code Tasks and Engineering Board have different purposes."
+        - paragraph
+          - StaticText "Native Tasks store personal task state in "
+          - code
+            - StaticText "~/.claude/tasks/"
+          - StaticText ". This state is not part of a project pull request."
+        - paragraph
+          - StaticText "Engineering Board stores shared project memory in the repository. Use Native Tasks for temporary personal work. Use Engineering Board for durable project knowledge."
+        - generic
+          - heading "Install the Codex plugin" [level=2, ref=e328]
+          - link "Permalink: Install the Codex plugin" [ref=e329]
+        - paragraph
+          - StaticText "Add the repository marketplace:"
+        - generic
+          - StaticText "codex plugin marketplace add GhostlyGawd/engineering-board"
+          - button "Copy code to clipboard" [ref=e330]
+        - paragraph
+          - StaticText "Install the plugin:"
+        - generic
+          - StaticText "codex plugin add engineering-board@engineering-board"
+          - button "Copy code to clipboard" [ref=e331]
+        - paragraph
+          - StaticText "The Codex marketplace installs the repository root from the immutable Git tag that matches the advertised plugin version. Refresh the marketplace before installing a newer released version."
+        - paragraph
+          - StaticText "Start a new Codex session. The plugin supplies five board skills and starts the 19-tool Engineering Board MCP server. It does not require a model-provider account. The Codex manifest explicitly selects "
+          - code
+            - StaticText "hooks/codex-hooks.json"
+          - StaticText ", which contains no automatic hooks. Codex therefore uses the skills and MCP server without loading the Claude Code hook workflow from "
+          - code
+            - StaticText "hooks/hooks.json"
+          - StaticText "."
+        - paragraph
+          - StaticText "Ask Codex to initialize Engineering Board in the active repository. The agent passes the absolute repository root to "
+          - code
+            - StaticText "board_init"
+          - StaticText " and uses the MCP tools for capture, promotion, context, graph, hypothesis, outcome, claim, and lifecycle operations."
+        - generic
+          - heading "Install the Claude Code plugin" [level=2, ref=e332]
+          - link "Permalink: Install the Claude Code plugin" [ref=e333]
+        - paragraph
+          - StaticText "Add the repository marketplace:"
+        - generic
+          - code
+            - StaticText "/plugin marketplace add GhostlyGawd/engineering-board\n"
+          - button "Copy code to clipboard" [ref=e334]
+        - paragraph
+          - StaticText "Install the plugin:"
+        - generic
+          - code
+            - StaticText "/plugin install engineering-board\n"
+          - button "Copy code to clipboard" [ref=e335]
+        - paragraph
+          - StaticText "Set up a board:"
+        - generic
+          - code
+            - StaticText "/board-setup\n"
+          - button "Copy code to clipboard" [ref=e336]
+        - paragraph
+          - code
+            - StaticText "/board-setup"
+          - StaticText " creates the board structure. It also checks the required permissions."
+        - paragraph
+          - StaticText "Run the contained demonstration:"
+        - generic
+          - code
+            - StaticText "/board-demo\n"
+          - button "Copy code to clipboard" [ref=e337]
+        - paragraph
+          - StaticText "The command creates a synthetic run in "
+          - code
+            - StaticText ".engineering-board/demo/pattern-intelligence/"
+          - StaticText "."
+        - paragraph
+          - StaticText "The command connects three findings from different domains. It then requests one hypothesis that cites the evidence."
+        - paragraph
+          - StaticText "The hypothesis has "
+          - code
+            - StaticText "status: proposed"
+          - StaticText ". It includes an alternative explanation and a falsifier."
+        - paragraph
+          - StaticText "The report gives an exact cleanup command. The cleanup operation preserves a changed run."
+        - paragraph
+          - StaticText "For explicit setup values, use:"
+        - generic
+          - code
+            - StaticText "/board-init <project> [affects-prefix]\n/board-install-permissions\n"
+          - button "Copy code to clipboard" [ref=e338]
+        - generic
+          - heading "Use the pattern-memory workflow" [level=2, ref=e339]
+          - link "Permalink: Use the pattern-memory workflow" [ref=e340]
+        - paragraph
+          - StaticText "With Codex or another MCP client:"
+        - list
+          - listitem [level=1]
+            - ListMarker "1. "
+            - StaticText "Initialize one project with "
+            - code
+              - StaticText "board_init"
+            - StaticText "."
+          - listitem [level=1]
+            - ListMarker "2. "
+            - StaticText "Retrieve relevant memory with "
+            - code
+              - StaticText "board_context"
+            - StaticText " before selecting a fix."
+          - listitem [level=1]
+            - ListMarker "3. "
+            - StaticText "Capture findings with "
+            - code
+              - StaticText "board_capture_finding"
+            - StaticText "."
+          - listitem [level=1]
+            - ListMarker "4. "
+            - StaticText "Preview and apply promotion with "
+            - code
+              - StaticText "board_promote_findings"
+            - StaticText "."
+          - listitem [level=1]
+            - ListMarker "5. "
+            - StaticText "Use "
+            - code
+              - StaticText "board_insights"
+            - StaticText " and "
+            - code
+              - StaticText "board_hypotheses"
+            - StaticText " for evidence-linked shared-cause analysis."
+          - listitem [level=1]
+            - ListMarker "6. "
+            - StaticText "Record the observed result with "
+            - code
+              - StaticText "board_outcomes"
+            - StaticText "."
+        - paragraph
+          - StaticText "Pass the absolute repository root in each bundled-plugin tool call. The plugin does not guess which open workspace a raw MCP call targets."
+        - paragraph
+          - StaticText "With Claude Code hooks and commands:"
+        - list
+          - listitem [level=1]
+            - ListMarker "1. "
+            - StaticText "Work in Claude Code."
+          - listitem [level=1]
+            - ListMarker "2. "
+            - StaticText "Let SessionStart and UserPromptSubmit retrieve relevant systemic memory."
+          - listitem [level=1]
+            - ListMarker "3. "
+            - StaticText "Run "
+            - code
+              - StaticText "/board-context <project>"
+            - StaticText " when you want the same bounded brief explicitly."
+          - listitem [level=1]
+            - ListMarker "4. "
+            - StaticText "Read the memory title, typed summary, epistemic state, match reason, and sources. Inspect the cited canonical record before you rely on a proposed cause."
+          - listitem [level=1]
+            - ListMarker "5. "
+            - StaticText "In PM mode, read the matched medium/high-confidence Learnings appended to the pass summary after new findings promote."
+          - listitem [level=1]
+            - ListMarker "6. "
+            - StaticText "Let the Stop hook capture a finding in "
+            - code
+              - StaticText "engineering-board/<project>/_sessions/"
+            - StaticText "."
+          - listitem [level=1]
+            - ListMarker "7. "
+            - StaticText "Run "
+            - code
+              - StaticText "/board-promote"
+            - StaticText " to preview canonical changes."
+          - listitem [level=1]
+            - ListMarker "8. "
+            - StaticText "Apply the unchanged promotion plan after you review it."
+          - listitem [level=1]
+            - ListMarker "9. "
+            - StaticText "Run "
+            - code
+              - StaticText "/board-insights <project>"
+            - StaticText " when you need the complete ranked investigation view."
+          - listitem [level=1]
+            - ListMarker "10. "
+            - StaticText "Run "
+            - code
+              - StaticText "/board-hypothesis <project> propose"
+            - StaticText " to preview an H### record."
+          - listitem [level=1]
+            - ListMarker "11. "
+            - StaticText "Review the evidence, alternative, counter-evidence, confidence basis, and falsifier."
+          - listitem [level=1]
+            - ListMarker "12. "
+            - StaticText "Apply the unchanged hypothesis plan."
+          - listitem [level=1]
+            - ListMarker "13. "
+            - StaticText "After verification, run "
+            - code
+              - StaticText "/board-outcome <project> preview ..."
+            - StaticText "."
+          - listitem [level=1]
+            - ListMarker "14. "
+            - StaticText "Apply the unchanged outcome plan. Review and apply each returned Learning plan separately."
+        - paragraph
+          - StaticText "An outcome records "
+          - code
+            - StaticText "held"
+          - StaticText ", "
+          - code
+            - StaticText "failed"
+          - StaticText ", "
+          - code
+            - StaticText "partial"
+          - StaticText ", or "
+          - code
+            - StaticText "inconclusive"
+          - StaticText ". It can confirm, weaken, reject, or leave a hypothesis unchanged only through a compatible explicit disposition."
+        - paragraph
+          - StaticText "Use "
+          - code
+            - StaticText "/pm-start"
+          - StaticText " only for advanced batch promotion. Use the optional Worker loop only when you want to test a selected fix."
+        - generic
+          - heading "Use one session mode" [level=2, ref=e341]
+          - link "Permalink: Use one session mode" [ref=e342]
+        - paragraph
+          - code
+            - StaticText "/pm-start"
+          - StaticText " and "
+          - code
+            - StaticText "/worker-start"
+          - StaticText " set "
+          - code
+            - StaticText ".engineering-board/session-mode.json"
+          - StaticText "."
+        - paragraph
+          - StaticText "A session can have one mode. Start a new session to change the mode."
+        - paragraph
+          - StaticText "On Claude Code web, each session uses a new clone. On a local installation, the mode file stays on disk."
+        - paragraph
+          - StaticText "To return to passive capture:"
+        - list
+          - listitem [level=1]
+            - ListMarker "1. "
+            - StaticText "Start a new session."
+          - listitem [level=1]
+            - ListMarker "2. "
+            - StaticText "Read the "
+            - code
+              - StaticText "SessionStart"
+            - StaticText " message."
+          - listitem [level=1]
+            - ListMarker "3. "
+            - StaticText "If a mode remains, delete "
+            - code
+              - StaticText ".engineering-board/session-mode.json"
+            - StaticText "."
+        - generic
+          - heading "Register the MCP server without a plugin" [level=2, ref=e343]
+          - link "Permalink: Register the MCP server without a plugin" [ref=e344]
+        - paragraph
+          - StaticText "Register the PyPI package with the Claude Code command-line interface (CLI):"
+        - generic
+          - StaticText "claude mcp add engineering-board -- uvx engineering-board-mcp"
+          - button "Copy code to clipboard" [ref=e345]
+        - paragraph
+          - StaticText "To run the server from a clone:"
+        - generic
+          - generic
+            - StaticText "git clone https://github.com/GhostlyGawd/engineering-board\nclaude mcp add engineering-board -- python3 \"$(pwd)/engineering-board/mcp-server/engineering_board_mcp.py\""
+          - button "Copy code to clipboard" [ref=e346]
+        - paragraph
+          - StaticText "For Claude Desktop, add this object to "
+          - code
+            - StaticText "claude_desktop_config.json"
+          - StaticText ":"
+        - generic
+          - generic
+            - StaticText "{\n  \"mcpServers\": {\n    \"engineering-board\": {\n      \"command\": \"uvx\",\n      \"args\": [\"engineering-board-mcp\"]\n    }\n  }\n}"
+          - button "Copy code to clipboard" [ref=e347]
+        - paragraph
+          - link "mcp-server/README.md" [ref=e348]
+            - code
+              - StaticText "mcp-server/README.md"
+          - StaticText " also contains setup procedures for Codex CLI, Gemini CLI, and Cursor."
+        - paragraph
+          - StaticText "The Claude Code plugin registers the server through "
+          - link ".mcp.json" [ref=e349]
+            - code
+              - StaticText ".mcp.json"
+          - StaticText ". The Codex manifest selects "
+          - link "codex-mcp.json" [ref=e350]
+          - StaticText ". Both files start only Engineering Board through the same cross-platform launcher. The Codex-specific file uses the "
+          - code
+            - StaticText "writes"
+          - StaticText " approval policy: read-only memory tools can run without a per-call prompt, while every write-capable tool stays gated."
+        - generic
+          - heading "Product surfaces" [level=2, ref=e351]
+          - link "Permalink: Product surfaces" [ref=e352]
+        - paragraph
+          - StaticText "The plugin has four session modes:"
+        - table
+          - rowgroup
+            - row
+              - columnheader "Mode" [ref=e592]
+              - columnheader "Start method" [ref=e593]
+              - columnheader "Stop action" [ref=e594]
+          - row
+            - cell "Passive" [ref=e486]
+            - cell "Default" [ref=e487]
+            - cell "Run finding-extractor" [ref=e488]
+              - StaticText "Run "
+              - code
+                - StaticText "finding-extractor"
+          - row
+            - cell "Paused" [ref=e489]
+            - cell "/board-pause" [ref=e490]
+              - code
+                - StaticText "/board-pause"
+            - cell "Do not capture a finding" [ref=e491]
+          - row
+            - cell "PM" [ref=e492]
+            - cell "/pm-start" [ref=e493]
+              - code
+                - StaticText "/pm-start"
+            - cell "Run the four PM agents" [ref=e494]
+          - row
+            - cell "Worker" [ref=e495]
+            - cell "/worker-start --discipline <tdd|review|validate>" [ref=e496]
+              - code
+                - StaticText "/worker-start --discipline <tdd|review|validate>"
+            - cell "Claim and process one entry" [ref=e497]
+        - paragraph
+          - StaticText "The canonical Stop procedure is "
+          - link "hooks/stop-hook-procedure.md" [ref=e353]
+            - code
+              - StaticText "hooks/stop-hook-procedure.md"
+          - StaticText "."
+        - paragraph
+          - strong
+            - StaticText "Commands (21):"
+          - StaticText " "
+          - code
+            - StaticText "/board-setup"
+          - StaticText ", "
+          - code
+            - StaticText "/board-demo"
+          - StaticText ", "
+          - code
+            - StaticText "/board-context"
+          - StaticText ", "
+          - code
+            - StaticText "/board-outcome"
+          - StaticText ", "
+          - code
+            - StaticText "/board-promote"
+          - StaticText ", "
+          - code
+            - StaticText "/board-pattern"
+          - StaticText ", "
+          - code
+            - StaticText "/board-insights"
+          - StaticText ", "
+          - code
+            - StaticText "/board-hypothesis"
+          - StaticText ", "
+          - code
+            - StaticText "/board-run"
+          - StaticText ", "
+          - code
+            - StaticText "/board-init"
+          - StaticText ", "
+          - code
+            - StaticText "/board-rebuild"
+          - StaticText ", "
+          - code
+            - StaticText "/board-graph"
+          - StaticText ", "
+          - code
+            - StaticText "/board-view"
+          - StaticText ", "
+          - code
+            - StaticText "/board-remember"
+          - StaticText ", "
+          - code
+            - StaticText "/board-pause"
+          - StaticText ", "
+          - code
+            - StaticText "/board-resume"
+          - StaticText ", "
+          - code
+            - StaticText "/pm-start"
+          - StaticText ", "
+          - code
+            - StaticText "/worker-start"
+          - StaticText ", "
+          - code
+            - StaticText "/board-install-permissions"
+          - StaticText ", "
+          - code
+            - StaticText "/board-claim-release"
+          - StaticText ", and "
+          - code
+            - StaticText "/board-migrate"
+          - StaticText "."
+        - paragraph
+          - strong
+            - StaticText "Agents (8):"
+          - StaticText " "
+          - code
+            - StaticText "board-manager"
+          - StaticText ", "
+          - code
+            - StaticText "finding-extractor"
+          - StaticText ", "
+          - code
+            - StaticText "consolidator"
+          - StaticText ", "
+          - code
+            - StaticText "tidier"
+          - StaticText ", "
+          - code
+            - StaticText "learnings-curator"
+          - StaticText ", "
+          - code
+            - StaticText "tdd-builder"
+          - StaticText ", "
+          - code
+            - StaticText "code-reviewer"
+          - StaticText ", and "
+          - code
+            - StaticText "validator"
+          - StaticText "."
+        - paragraph
+          - strong
+            - StaticText "Skills (5):"
+          - StaticText " "
+          - code
+            - StaticText "board-intake"
+          - StaticText ", "
+          - code
+            - StaticText "board-triage"
+          - StaticText ", "
+          - code
+            - StaticText "board-resolve"
+          - StaticText ", "
+          - code
+            - StaticText "board-consolidate"
+          - StaticText ", and "
+          - code
+            - StaticText "board-insights"
+          - StaticText "."
+        - paragraph
+          - strong
+            - StaticText "Claude Code hooks (4 events):"
+          - StaticText " "
+          - code
+            - StaticText "SessionStart"
+          - StaticText ", "
+          - code
+            - StaticText "PostToolUse(Write)"
+          - StaticText ", "
+          - code
+            - StaticText "UserPromptSubmit"
+          - StaticText ", and "
+          - code
+            - StaticText "Stop"
+          - StaticText ". The Codex plugin selects its separate empty hook manifest and uses the MCP-first workflow."
+        - paragraph
+          - StaticText "The MCP server has 19 tools. All tools use the same canonical Markdown and the same deterministic core."
+        - table
+          - rowgroup
+            - row
+              - columnheader "Tool" [ref=e595]
+              - columnheader "Function" [ref=e596]
+          - row
+            - cell "board_init" [ref=e498]
+              - code
+                - StaticText "board_init"
+            - cell "Create a project board" [ref=e499]
+          - row
+            - cell "board_list_projects" [ref=e500]
+              - code
+                - StaticText "board_list_projects"
+            - cell "List router projects" [ref=e501]
+          - row
+            - cell "board_create_entry" [ref=e502]
+              - code
+                - StaticText "board_create_entry"
+            - cell "Create a valid entry" [ref=e503]
+          - row
+            - cell "board_list_entries" [ref=e504]
+              - code
+                - StaticText "board_list_entries"
+            - cell "List and filter entries" [ref=e505]
+          - row
+            - cell "board_get_entry" [ref=e506]
+              - code
+                - StaticText "board_get_entry"
+            - cell "Get one entry, including full canonical H### details" [ref=e507]
+          - row
+            - cell "board_update_entry" [ref=e508]
+              - code
+                - StaticText "board_update_entry"
+            - cell "Change one entry and archive a new resolution" [ref=e509]
+          - row
+            - cell "board_graph" [ref=e510]
+              - code
+                - StaticText "board_graph"
+            - cell "Build the deterministic graph" [ref=e511]
+          - row
+            - cell "board_context" [ref=e512]
+              - code
+                - StaticText "board_context"
+            - cell "Retrieve bounded and explainable systemic memory" [ref=e513]
+          - row
+            - cell "board_insights" [ref=e514]
+              - code
+                - StaticText "board_insights"
+            - cell "Rank clusters and return linked evidence" [ref=e515]
+          - row
+            - cell "board_hypotheses" [ref=e516]
+              - code
+                - StaticText "board_hypotheses"
+            - cell "List, preview, or apply H### operations" [ref=e517]
+          - row
+            - cell "board_outcomes" [ref=e518]
+              - code
+                - StaticText "board_outcomes"
+            - cell "Preview or apply fix outcomes and Learning feedback" [ref=e519]
+          - row
+            - cell "board_patterns" [ref=e520]
+              - code
+                - StaticText "board_patterns"
+            - cell "List, preview, or apply P### operations" [ref=e521]
+          - row
+            - cell "board_promote_findings" [ref=e522]
+              - code
+                - StaticText "board_promote_findings"
+            - cell "Preview or apply scratch promotion without reusing resolved IDs; an unchanged plan id restores an omitted preview session selector" [ref=e523]
+          - row
+            - cell "board_rebuild" [ref=e524]
+              - code
+                - StaticText "board_rebuild"
+            - cell "Build BOARD.md again" [ref=e525]
+              - StaticText "Build "
+              - code
+                - StaticText "BOARD.md"
+              - StaticText " again"
+          - row
+            - cell "board_capture_finding" [ref=e526]
+              - code
+                - StaticText "board_capture_finding"
+            - cell "Add a finding to the scratch inbox" [ref=e527]
+          - row
+            - cell "board_claim" [ref=e528]
+              - code
+                - StaticText "board_claim"
+            - cell "Acquire an entry claim" [ref=e529]
+          - row
+            - cell "board_release" [ref=e530]
+              - code
+                - StaticText "board_release"
+            - cell "Release an entry claim" [ref=e531]
+          - row
+            - cell "board_remember" [ref=e532]
+              - code
+                - StaticText "board_remember"
+            - cell "Save a learning" [ref=e533]
+          - row
+            - cell "board_status" [ref=e534]
+              - code
+                - StaticText "board_status"
+            - cell "Show board state and ready work" [ref=e535]
+        - paragraph
+          - StaticText "The six pure-read tools are "
+          - code
+            - StaticText "board_list_projects"
+          - StaticText ", "
+          - code
+            - StaticText "board_list_entries"
+          - StaticText ", "
+          - code
+            - StaticText "board_get_entry"
+          - StaticText ", "
+          - code
+            - StaticText "board_insights"
+          - StaticText ", "
+          - code
+            - StaticText "board_context"
+          - StaticText ", and "
+          - code
+            - StaticText "board_status"
+          - StaticText ". Their MCP schemas set "
+          - code
+            - StaticText "readOnlyHint: true"
+          - StaticText ". Every other tool is classified by its maximum capability. A tool that can preview and apply a change is therefore write-capable for approval purposes. The Codex plugin's "
+          - code
+            - StaticText "writes"
+          - StaticText " approval policy lets the six pure-read tools run without a prompt and keeps every write-capable tool approval-gated. These annotations are advisory metadata. They do not replace host policy, root containment, content-bound plans, or claim ownership."
+        - generic
+          - heading "Architecture boundary" [level=2, ref=e354]
+          - link "Permalink: Architecture boundary" [ref=e355]
+        - paragraph
+          - StaticText "Canonical cards, hypotheses, Learnings, and "
+          - code
+            - StaticText "BOARD-ROUTER.md"
+          - StaticText " use Markdown. Derived views include "
+          - code
+            - StaticText "BOARD.md"
+          - StaticText ", "
+          - code
+            - StaticText "GRAPH.yml"
+          - StaticText ", context briefs, value reports, JSON, and HTML."
+        - paragraph
+          - StaticText "The product does not require SQLite. A future SQLite index must be disposable and rebuildable. Measured query requirements must justify it."
+        - paragraph
+          - StaticText "The shared MCP runtime uses Python 3 and has no third-party package dependency. The Codex plugin uses Node.js only to select a Python interpreter on Windows or Linux. Claude Code commands and hooks use Bash and Python 3."
+        - paragraph
+          - StaticText "Read "
+          - link "ARCHITECTURE.md" [ref=e356]
+            - code
+              - StaticText "ARCHITECTURE.md"
+          - StaticText " for the full system map."
+        - generic
+          - heading "Roadmap boundary" [level=2, ref=e357]
+          - link "Permalink: Roadmap boundary" [ref=e358]
+        - paragraph
+          - StaticText "Milestone D ships in v1.11.0."
+        - paragraph
+          - StaticText "The cross-session Conductor remains a draft RFC. "
+          - code
+            - StaticText "/board-run <entry-id>"
+          - StaticText " ships only the single-session inner loop."
+        - paragraph
+          - StaticText "Cross-repository intelligence, hosted services, and a required database remain outside the current product boundary."
+        - paragraph
+          - link "docs/PRODUCT_EVOLUTION_SPEC.md" [ref=e359]
+            - code
+              - StaticText "docs/PRODUCT_EVOLUTION_SPEC.md"
+          - StaticText " is the authoritative product-direction source."
+        - generic
+          - heading "Contribute" [level=2, ref=e360]
+          - link "Permalink: Contribute" [ref=e361]
+        - paragraph
+          - StaticText "Run the complete test suite:"
+        - generic
+          - StaticText "bash tests/run-all.sh"
+          - button "Copy code to clipboard" [ref=e362]
+        - paragraph
+          - StaticText "The run-all command uses the maintained suite list. Read "
+          - link "CONTRIBUTING.md" [ref=e363]
+            - code
+              - StaticText "CONTRIBUTING.md"
+          - StaticText " before you change the repository."
+        - generic
+          - heading "Support" [level=2, ref=e364]
+          - link "Permalink: Support" [ref=e365]
+        - list
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Use "
+            - link "GitHub Discussions" [ref=e536]
+            - StaticText " for questions."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Use "
+            - link "GitHub Issues" [ref=e537]
+            - StaticText " for bugs and features."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Use "
+            - link "GitHub Security Advisories" [ref=e538]
+            - StaticText " for a vulnerability."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Use the "
+            - link "live board" [ref=e539]
+            - StaticText " for current project work."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Use "
+            - link "GitHub Sponsors" [ref=e540]
+            - StaticText " to support the project."
+        - paragraph
+          - StaticText "GhostlyGawd maintains this open-source project."
+        - generic
+          - heading "License" [level=2, ref=e366]
+          - link "Permalink: License" [ref=e367]
+        - paragraph
+          - StaticText "The project uses the "
+          - link "MIT License" [ref=e368]
+          - StaticText "."
+        - generic
+          - heading "Language status" [level=2, ref=e369]
+          - link "Permalink: Language status" [ref=e370]
+        - paragraph
+          - StaticText "The owner approved the current controlled-English text. The project does not claim formal ASD-STE100 compliance, certification, or independent review."
+    - heading "About" [level=2, ref=e53]
+    - paragraph
+      - StaticText "Claude Code plugin: autonomous engineering board management — routes findings, validates entries, surfaces in-progress work, enforces routing before session end."
+    - link "ghostlygawd.github.io/engineering-board/" [ref=e125]
+    - heading "Resources" [level=3, ref=e54]
+    - link "Readme" [ref=e126]
+    - link "MIT license" [ref=e127]
+    - heading "Code of conduct" [level=3, ref=e55]
+    - link "Code of conduct" [ref=e128]
+    - heading "Contributing" [level=3, ref=e56]
+    - link "Contributing" [ref=e129]
+    - heading "Security policy" [level=3, ref=e57]
+    - link "Security policy" [ref=e130]
+    - link "Activity" [ref=e131]
+    - heading "Stars" [level=3, ref=e58]
+    - generic
+      - strong
+        - StaticText "0"
+      - StaticText " stars"
+    - heading "Watchers" [level=3, ref=e59]
+    - generic
+      - strong
+        - StaticText "0"
+      - StaticText " watching"
+    - heading "Forks" [level=3, ref=e60]
+    - link "0 forks" [ref=e132]
+      - strong
+        - StaticText "0"
+      - StaticText " forks"
+    - link "Report repository" [ref=e133]
+    - heading "Releases (18)" [level=2, ref=e61]
+      - link "Releases" [ref=e134]
+      - StaticText "("
+      - StaticText "18"
+      - StaticText ")"
+    - link "engineering-board v1.14.0 Latest yesterday" [ref=e62]
+      - StaticText "engineering-board v1.14.0"
+      - StaticText "Latest"
+      - StaticText "yesterday"
+    - link "+ 17 releases" [ref=e135]
+    - heading "Sponsor this project" [level=2, ref=e63]
+    - list
+      - listitem [level=1]
+        - link "@GhostlyGawd" [ref=e296]
+          - image "@GhostlyGawd"
+        - link "GhostlyGawd" [ref=e297]
+          - strong
+            - StaticText "GhostlyGawd"
+        - StaticText "Ghostlyyy"
+        - link "Sponsor @GhostlyGawd" [ref=e298]
+    - link "Learn more about GitHub Sponsors" [ref=e136]
+    - heading "Contributors (5)" [level=2, ref=e64]
+      - link "Contributors" [ref=e137]
+      - StaticText "("
+      - StaticText "5"
+      - StaticText ")"
+    - list
+      - listitem [level=1]
+        - link "@GhostlyGawd" [ref=e299]
+          - image "@GhostlyGawd"
+      - listitem [level=1]
+        - link "@claude" [ref=e300]
+          - image "@claude"
+      - listitem [level=1]
+        - link "@rhen-bot" [ref=e301]
+          - image "@rhen-bot"
+      - listitem [level=1]
+        - link "@github-actions[bot]" [ref=e302]
+          - image "@github-actions[bot]"
+      - listitem [level=1]
+        - link "@Rhenm" [ref=e303]
+          - image "@Rhenm"
+    - heading "Languages" [level=2, ref=e65]
+    - progressbar "Python: 50.7%": 51
+    - progressbar "Shell: 42.9%": 43
+    - progressbar "HTML: 5.1%": 5
+    - progressbar "Other: 1.3%": 1
+    - list
+      - listitem [level=1]
+        - link "Python 50.7%" [ref=e304]
+          - StaticText "Python"
+          - StaticText "50.7"
+          - StaticText "%"
+      - listitem [level=1]
+        - link "Shell 42.9%" [ref=e305]
+          - StaticText "Shell"
+          - StaticText "42.9"
+          - StaticText "%"
+      - listitem [level=1]
+        - link "HTML 5.1%" [ref=e306]
+          - StaticText "HTML"
+          - StaticText "5.1"
+          - StaticText "%"
+      - listitem [level=1]
+        - link "Other 1.3%" [ref=e307]
+          - StaticText "Other"
+          - StaticText "1.3"
+          - StaticText "%"
+- contentinfo
+  - heading "Footer" [level=2, ref=e2]
+  - link "GitHub Homepage" [ref=e3]
+  - StaticText "© 2026 GitHub,Inc."
+  - navigation "Footer" [ref=e4]
+    - heading "Footer navigation" [level=3, ref=e7]
+    - list "Footer navigation"
+      - listitem [level=1]
+        - link "Terms" [ref=e12]
+      - listitem [level=1]
+        - link "Privacy" [ref=e13]
+      - listitem [level=1]
+        - link "Security" [ref=e14]
+      - listitem [level=1]
+        - link "Status" [ref=e15]
+      - listitem [level=1]
+        - link "Community" [ref=e16]
+      - listitem [level=1]
+        - link "Docs" [ref=e17]
+      - listitem [level=1]
+        - link "Contact" [ref=e18]
+      - listitem [level=1]
+        - button "Manage cookies" [ref=e66]
+      - listitem [level=1]
+        - button "Do not share my personal information" [ref=e67]
+- alert

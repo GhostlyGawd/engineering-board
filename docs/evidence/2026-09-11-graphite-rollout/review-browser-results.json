@@ -1,0 +1,101 @@
+[
+  {
+    "page": "site",
+    "width": 1448,
+    "theme": "dark",
+    "scrollWidth": 1448,
+    "main": 1,
+    "font": "Manrope, system-ui, -apple-system, \"Segoe UI\", Arial, sans-serif"
+  },
+  {
+    "page": "site",
+    "width": 1448,
+    "theme": "light",
+    "scrollWidth": 1448,
+    "main": 1,
+    "font": "Manrope, system-ui, -apple-system, \"Segoe UI\", Arial, sans-serif"
+  },
+  {
+    "page": "site",
+    "width": 390,
+    "theme": "dark",
+    "scrollWidth": 390,
+    "main": 1,
+    "font": "Manrope, system-ui, -apple-system, \"Segoe UI\", Arial, sans-serif"
+  },
+  {
+    "page": "site",
+    "width": 390,
+    "theme": "light",
+    "scrollWidth": 390,
+    "main": 1,
+    "font": "Manrope, system-ui, -apple-system, \"Segoe UI\", Arial, sans-serif"
+  },
+  {
+    "page": "board",
+    "width": 1448,
+    "theme": "dark",
+    "scrollWidth": 1448,
+    "main": 1,
+    "font": "Manrope, system-ui, -apple-system, \"Segoe UI\", Arial, sans-serif"
+  },
+  {
+    "page": "board",
+    "width": 1448,
+    "theme": "light",
+    "scrollWidth": 1448,
+    "main": 1,
+    "font": "Manrope, system-ui, -apple-system, \"Segoe UI\", Arial, sans-serif"
+  },
+  {
+    "page": "board",
+    "width": 390,
+    "theme": "dark",
+    "scrollWidth": 390,
+    "main": 1,
+    "font": "Manrope, system-ui, -apple-system, \"Segoe UI\", Arial, sans-serif"
+  },
+  {
+    "page": "board",
+    "width": 390,
+    "theme": "light",
+    "scrollWidth": 390,
+    "main": 1,
+    "font": "Manrope, system-ui, -apple-system, \"Segoe UI\", Arial, sans-serif"
+  },
+  {
+    "source": "http://127.0.0.1:51330/example/B001.html",
+    "synthetic": 1
+  },
+  {
+    "returned": "http://127.0.0.1:51330/index.html#entry-B001",
+    "panel_visible": true
+  },
+  {
+    "site_no_results": true
+  },
+  {
+    "site_reset": 3
+  },
+  {
+    "B001_href": "https://github.com/GhostlyGawd/engineering-board/blob/main/engineering-board/eb-self/bugs/B001-sessionstart-on2-blockedby-loop-exceeds-10s-time.md"
+  },
+  {
+    "board_no_results": true
+  },
+  {
+    "errors": []
+  },
+  {
+    "nojs": "site",
+    "main_visible": true,
+    "theme_hidden": true,
+    "overflow": false
+  },
+  {
+    "nojs": "board",
+    "main_visible": true,
+    "theme_hidden": true,
+    "overflow": false
+  }
+]

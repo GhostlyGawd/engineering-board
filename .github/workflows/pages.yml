@@ -1,26 +1,26 @@
 name: pages
 
-# Publishes the landing page by syncing docs/{index.html,assets,.nojekyll,llms.txt}
-# to the gh-pages branch, which GitHub Pages serves (branch-deploy mode —
-# the site auto-enabled when gh-pages was first pushed). Also publishes the
-# committed eb-self board view as /board.html — the live public roadmap
-# (IMPROVEMENTS.md #3): every /board-view refresh merged to main updates it.
-#
-# Why not actions/deploy-pages? The workflow GITHUB_TOKEN on this repo cannot
-# create or manage the Pages site via the API ("Resource not accessible by
-# integration", run 28713202716), but it CAN push branches (contents: write).
-# Branch-deploy needs no special Pages permissions and keeps docs/ on main as
-# the single source of truth.
+# Build an allowlisted site and regenerate the current board with GitHub source links.
+# Keep branch publication: this repository's token cannot manage the Pages API.
 
 on:
   push:
     branches: [main]
     paths:
       - "docs/index.html"
+      - "docs/guide.html"
+      - "docs/site.css"
+      - "docs/site.js"
+      - "docs/example/**"
+      - "brand/**"
+      - "scripts/build-site.py"
+      - "hooks/scripts/**"
+      - "references/demo/pattern-intelligence/**"
+      - "engineering-board/BOARD-ROUTER.md"
       - "docs/assets/**"
       - "docs/.nojekyll"
       - "docs/llms.txt"
-      - "engineering-board/eb-self/board.html"
+      - "engineering-board/eb-self/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -43,8 +43,7 @@ jobs:
           set -euo pipefail
           SHA=$(git rev-parse --short HEAD)
           SITE=$(mktemp -d)
-          cp -r docs/index.html docs/assets docs/.nojekyll docs/llms.txt "$SITE"/
-          cp engineering-board/eb-self/board.html "$SITE"/board.html
+          python3 scripts/build-site.py --output "$SITE"
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout --orphan gh-pages

@@ -1,0 +1,158 @@
+[
+  {
+    "viewport": [
+      1448,
+      1086
+    ],
+    "theme": "dark",
+    "js": true,
+    "source_roundtrips": [
+      "B001",
+      "B002",
+      "B003",
+      "H001"
+    ],
+    "search": [
+      "id",
+      "title",
+      "path",
+      "empty",
+      "reset"
+    ],
+    "copy": true,
+    "keyboard": "skip, finding enter, focused panel, reset focus, source disclosure space, recovery disclosure enter",
+    "overflow": false,
+    "page_errors": [],
+    "external_requests": [],
+    "axe": {
+      "version": "4.13.0",
+      "violations": [],
+      "incomplete": []
+    }
+  },
+  {
+    "viewport": [
+      1448,
+      1086
+    ],
+    "theme": "light",
+    "js": true,
+    "source_roundtrips": [
+      "B001",
+      "B002",
+      "B003",
+      "H001"
+    ],
+    "search": [
+      "id",
+      "title",
+      "path",
+      "empty",
+      "reset"
+    ],
+    "copy": true,
+    "keyboard": "skip, finding enter, focused panel, reset focus, source disclosure space, recovery disclosure enter",
+    "overflow": false,
+    "page_errors": [],
+    "external_requests": [],
+    "axe": {
+      "version": "4.13.0",
+      "violations": [],
+      "incomplete": []
+    }
+  },
+  {
+    "viewport": [
+      1448,
+      1086
+    ],
+    "js": false,
+    "all_four_panels_visible": true,
+    "source_roundtrips": [
+      "B001",
+      "B002",
+      "B003",
+      "H001"
+    ],
+    "install_anchor": true,
+    "overflow": false
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "theme": "dark",
+    "js": true,
+    "source_roundtrips": [
+      "B001",
+      "B002",
+      "B003",
+      "H001"
+    ],
+    "search": [
+      "id",
+      "title",
+      "path",
+      "empty",
+      "reset"
+    ],
+    "copy": true,
+    "keyboard": "skip, finding enter, focused panel, reset focus, source disclosure space, recovery disclosure enter",
+    "overflow": false,
+    "page_errors": [],
+    "external_requests": [],
+    "axe": {
+      "version": "4.13.0",
+      "violations": [],
+      "incomplete": []
+    }
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "theme": "light",
+    "js": true,
+    "source_roundtrips": [
+      "B001",
+      "B002",
+      "B003",
+      "H001"
+    ],
+    "search": [
+      "id",
+      "title",
+      "path",
+      "empty",
+      "reset"
+    ],
+    "copy": true,
+    "keyboard": "skip, finding enter, focused panel, reset focus, source disclosure space, recovery disclosure enter",
+    "overflow": false,
+    "page_errors": [],
+    "external_requests": [],
+    "axe": {
+      "version": "4.13.0",
+      "violations": [],
+      "incomplete": []
+    }
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "js": false,
+    "all_four_panels_visible": true,
+    "source_roundtrips": [
+      "B001",
+      "B002",
+      "B003",
+      "H001"
+    ],
+    "install_anchor": true,
+    "overflow": false
+  }
+]

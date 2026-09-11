@@ -1,46 +1,47 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="brand/logomark-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="brand/logomark-light.svg">
-  <img src="brand/logomark-light.svg" alt="Engineering Board logomark" width="88" height="88">
+  <source media="(prefers-color-scheme: dark)" srcset="brand/wordmark-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="brand/wordmark-light.svg">
+  <img src="brand/wordmark-light.svg" alt="engineering board" width="400">
 </picture>
 
-# Engineering Board
+**Connect findings. Inspect the evidence.**
 
-**Repository pattern memory that helps an engineering agent find a root cause.**
+Repository memory for engineering agents.
 
-_The board is the database._
+_The board is the memory. Markdown is the record._
 
-[![Website](https://img.shields.io/badge/website-ghostlygawd.github.io-E6A94E.svg)](https://ghostlygawd.github.io/engineering-board/)
+[![Website](https://img.shields.io/badge/website-ghostlygawd.github.io-34343A.svg)](https://ghostlygawd.github.io/engineering-board/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.14.0-E6A94E.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.14.0-34343A.svg)](CHANGELOG.md)
 [![tests](https://img.shields.io/github/actions/workflow/status/GhostlyGawd/engineering-board/test.yml?label=tests)](https://github.com/GhostlyGawd/engineering-board/actions/workflows/test.yml)
 [![Codex plugin](https://img.shields.io/badge/Codex-plugin-171719.svg)](https://developers.openai.com/codex/plugins)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-171719.svg)](https://code.claude.com/docs/en/plugin-marketplaces)
 [![MCP](https://img.shields.io/badge/MCP-server-171719.svg)](mcp-server/README.md)
 [![GitHub stars](https://img.shields.io/github/stars/GhostlyGawd/engineering-board)](https://github.com/GhostlyGawd/engineering-board/stargazers)
-[![Last release](https://img.shields.io/github/release-date/GhostlyGawd/engineering-board?label=last%20release&color=E6A94E)](https://github.com/GhostlyGawd/engineering-board/releases)
+[![Last release](https://img.shields.io/github/release-date/GhostlyGawd/engineering-board?label=last%20release&color=34343A)](https://github.com/GhostlyGawd/engineering-board/releases)
 
-<img src="docs/assets/pattern-intelligence-demo.png" alt="Three synthetic findings connect to cluster C001 and one proposed root-cause hypothesis." width="720">
+<img src="docs/assets/pattern-intelligence-demo.png" alt="A labeled synthetic investigation with three findings and one proposed explanation, with evidence, an alternative and a falsifier." width="900">
 
-_Run `/board-demo` to make this synthetic example._
+[Explore the example](https://ghostlygawd.github.io/engineering-board/#example) · [Start with Codex](https://ghostlygawd.github.io/engineering-board/#install) · [Open the real project board](https://ghostlygawd.github.io/engineering-board/board.html)
+
+<details>
+<summary>Validation evidence and real project board</summary>
 
 <img src="docs/assets/milestone-b-pattern-pipeline.svg" alt="The Milestone B validation shows stable pattern P001 and cluster c-a4609c958c398d90." width="720">
 
-_This visual shows real deterministic fixture output for the pattern pipeline._
+_This visual shows deterministic fixture output for the pattern pipeline._
 
 <img src="docs/assets/milestone-c-root-cause-intelligence.svg" alt="The Milestone C validation shows cluster rank, hypothesis states, and negative memory." width="720">
 
-_This visual shows real deterministic fixture output for root-cause memory._
-
 <img src="docs/assets/milestone-d-context-outcome-intelligence.svg" alt="The Milestone D validation shows context retrieval, explicit fix outcomes, and outcome-aware Learning confidence." width="720">
 
-_This visual shows the tested context-to-outcome memory loop._
+_These visuals retain their recorded validation facts; they are not current product-effect claims._
 
-<img src="docs/assets/board-screenshot.png" alt="The repository board has search, filters, and four Kanban columns." width="720">
+<img src="docs/assets/board-screenshot.png" alt="The real repository board with entry search, filters and investigation context." width="900">
 
-_This repository uses its own Engineering Board._
+</details>
 
 </div>
 

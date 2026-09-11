@@ -1,0 +1,224 @@
+- banner
+  - StaticText "engineering"
+  - StaticText "·"
+  - StaticText "board"
+  - navigation "Primary" [ref=e1]
+    - link "Why" [ref=e14]
+    - link "Compare" [ref=e15]
+    - link "Install" [ref=e16]
+    - link "Docs" [ref=e17]
+    - link "Live board" [ref=e18]
+    - link "GitHub" [ref=e19]
+    - button "Toggle color theme" [ref=e20]
+      - StaticText "Theme"
+- main
+  - region "Find a shared root cause across different findings." [ref=e2]
+    - paragraph
+      - StaticText "CODEX PLUGIN, CLAUDE CODE PLUGIN, AND MODEL CONTEXT PROTOCOL SERVER"
+    - heading "Find a shared root cause across different findings." [level=1, ref=e21]
+    - paragraph
+      - strong
+        - StaticText "The board is the memory."
+      - StaticText " The agent receives relevant systemic evidence before a fix and returns the verified outcome after the fix."
+    - paragraph
+      - StaticText "Use Engineering Board when an engineering agent must learn across sessions and domains. The product does not require a database, service, or daemon."
+    - link "Install — free & MIT" [ref=e22]
+    - link "See a live board it runs" [ref=e23]
+    - figure "Pattern-intelligence demo result"
+      - image "Three synthetic findings across hooks, board-view, and MCP connect into deterministic cluster C001 and a separate proposed root-cause hypothesis with cited evidence, an alternative explanation, and a falsifier."
+      - Figcaption
+        - StaticText "Real output from the contained "
+        - code
+          - StaticText "/board-demo"
+        - StaticText " sample · correlation remains separate from confirmation"
+    - figure "Milestone C lifecycle validation"
+      - image "Sanitized automated fixture showing 15 passed checks for deterministic cluster ranking, evidence-cited H001 lifecycle, rejected-claim memory, split and merge lineage, stale-plan refusal, offline parity, and escaped read-only rendering."
+      - Figcaption
+        - StaticText "Real deterministic fixture output · 15 lifecycle checks · 2026-07-28"
+    - figure "Milestone D lifecycle validation"
+      - image "Sanitized automated fixture showing 11 passed checks for deterministic context retrieval, explicit fix outcomes, outcome-aware Learning confidence, value evidence, and rebuild equivalence."
+      - Figcaption
+        - StaticText "Real deterministic fixture output · context before a fix · evidence after a fix · 2026-07-28"
+    - paragraph
+      - StaticText "The project uses its "
+      - link "public board" [ref=e33]
+      - StaticText ". The project has "
+      - link "CI tests" [ref=e34]
+      - StaticText ", no runtime package dependency, and an MIT license. The server is on the "
+      - link "MCP Registry" [ref=e35]
+      - StaticText "."
+  - region "Product differences" [ref=e3]
+    - heading "Product differences" [level=2, ref=e24]
+    - paragraph
+      - StaticText "A single chat can hide recurrence. Engineering Board retrieves the common signal before an agent chooses another local correction. A cluster does not prove causation."
+    - heading "Systemic context before and after a fix" [level=3, ref=e25]
+    - paragraph
+      - StaticText "Task, path, and entry signals retrieve relevant clusters, hypotheses, negative memory, and Learnings. Each result includes a bounded canonical summary, its epistemic state, why it surfaced, and source references. PM summaries also surface medium/high-confidence Learnings matched to entries promoted in that pass."
+    - paragraph
+      - StaticText "Context → pattern evidence → root-cause choice → matched Learning"
+    - heading "Memory that learns from outcomes" [level=3, ref=e26]
+    - paragraph
+      - StaticText "An explicit fix result updates H### history. A separate preview can revise L### outcome state and confidence. A failed fix can weaken or contest earlier memory."
+    - paragraph
+      - StaticText "Fix outcome → H### history → L### confidence"
+    - heading "Claims for parallel agents" [level=3, ref=e27]
+    - paragraph
+      - StaticText "An atomic claim prevents two Worker agents from changing the same entry at the same time."
+    - paragraph
+      - StaticText "board-claim-acquire.sh"
+    - heading "Falsifiable verification" [level=3, ref=e28]
+    - paragraph
+      - StaticText "Any suitable workflow can test a selected explanation. The optional TDD, review, and validation loop is one source of outcome evidence."
+    - paragraph
+      - StaticText "held · failed · partial · inconclusive"
+    - heading "Stable pattern memory" [level=3, ref=e29]
+    - paragraph
+      - StaticText "A canonical P### identifier keeps a cluster stable after a label change. Preview and apply operations keep each correction explicit."
+    - paragraph
+      - StaticText "Markdown evidence, P### identity, and graph provenance"
+    - heading "Use Claude Code Tasks and Engineering Board" [level=3, ref=e30]
+    - paragraph
+      - StaticText "Native Tasks store personal task state in "
+      - code
+        - StaticText "~/.claude/tasks/"
+      - StaticText ". Engineering Board stores shared and reviewable project memory in the repository."
+  - region "Product comparison" [ref=e4]
+    - heading "Product comparison" [level=2, ref=e31]
+    - paragraph
+      - StaticText "This comparison uses observations from 2026-07-10. Each competitor name links to its source repository."
+    - table
+      - rowgroup
+        - row
+          - columnheader "Tool" [ref=e87]
+          - columnheader "State is PR-reviewable markdown in your repo" [ref=e88]
+          - columnheader "Durable memory" [ref=e89]
+          - columnheader "Evidence-linked cross-domain pattern intelligence" [ref=e90]
+          - columnheader "Atomic claim-locking" [ref=e91]
+          - columnheader "Passive per-turn capture" [ref=e92]
+          - columnheader "Published team-visible board" [ref=e93]
+      - row
+        - cell "engineering-board" [ref=e44]
+        - cell "Yes" [ref=e45]
+        - cell "Yes" [ref=e46]
+        - cell "Yes" [ref=e47]
+        - cell "Yes" [ref=e48]
+        - cell "Yes" [ref=e49]
+        - cell "Yes" [ref=e50]
+      - row
+        - cell "beads · ~25k★" [ref=e51]
+          - link "beads" [ref=e94]
+          - StaticText " · ~25k★"
+        - cell "Partial" [ref=e52]
+        - cell "Yes" [ref=e53]
+        - cell "Partial" [ref=e54]
+        - cell "Yes" [ref=e55]
+        - cell "Partial" [ref=e56]
+        - cell "No" [ref=e57]
+      - row
+        - cell "Backlog.md · ~6k★" [ref=e58]
+          - link "Backlog.md" [ref=e95]
+          - StaticText " · ~6k★"
+        - cell "Yes" [ref=e59]
+        - cell "No" [ref=e60]
+        - cell "No" [ref=e61]
+        - cell "Partial" [ref=e62]
+        - cell "No" [ref=e63]
+        - cell "Yes" [ref=e64]
+      - row
+        - cell "Task Master · ~27.8k★" [ref=e65]
+          - link "Task Master" [ref=e96]
+          - StaticText " · ~27.8k★"
+        - cell "Partial" [ref=e66]
+        - cell "No" [ref=e67]
+        - cell "No" [ref=e68]
+        - cell "Partial" [ref=e69]
+        - cell "No" [ref=e70]
+        - cell "No" [ref=e71]
+      - row
+        - cell "Claude Code native Tasks" [ref=e72]
+        - cell "No" [ref=e73]
+        - cell "Partial" [ref=e74]
+        - cell "No" [ref=e75]
+        - cell "No" [ref=e76]
+        - cell "No" [ref=e77]
+        - cell "Partial" [ref=e78]
+      - row
+        - cell "claude-mem" [ref=e79]
+          - link "claude-mem" [ref=e97]
+        - cell "No" [ref=e80]
+        - cell "Yes" [ref=e81]
+        - cell "Partial" [ref=e82]
+        - cell "No" [ref=e83]
+        - cell "Yes" [ref=e84]
+        - cell "No" [ref=e85]
+    - paragraph
+      - link "beads" [ref=e36]
+      - StaticText " has mature memory and claim features. "
+      - link "Backlog.md" [ref=e37]
+      - StaticText " has a detailed task model. "
+      - link "Task Master" [ref=e38]
+      - StaticText " converts a product requirements document into tasks. Engineering Board has a different primary function. It uses reviewable engineering evidence to show cross-domain patterns."
+    - figure
+      - image "Screenshot of this repo's real rendered board: a search input, type/priority/status filter chips, and kanban columns — to do, review, validate, done — populated with entry cards."
+      - Figcaption
+        - StaticText "the real thing — this repo's own board, as "
+        - code
+          - StaticText "/board-view"
+        - StaticText " renders it · "
+        - link "open it live" [ref=e86]
+  - region "Install Engineering Board" [ref=e5]
+    - heading "Install Engineering Board" [level=2, ref=e32]
+    - paragraph
+      - StaticText "Codex, Claude Code, and standalone MCP clients use one canonical Markdown board format. The project uses the MIT license."
+    - paragraph
+      - StaticText "CODEX PLUGIN"
+    - generic
+      - code
+        - StaticText "codex plugin marketplace add GhostlyGawd/engineering-board\ncodex plugin add engineering-board@engineering-board\n\n# then start a new Codex session"
+      - button "Copy code to clipboard" [ref=e39]
+        - StaticText "Copy"
+    - paragraph
+      - StaticText "The plugin supplies five skills and starts only the 19-tool Engineering Board MCP server. Pure repository-memory reads can run without a per-call prompt; write-capable tools remain approval-gated. It does not require another model-provider account."
+    - paragraph
+      - StaticText "CLAUDE CODE PLUGIN"
+    - generic
+      - code
+        - StaticText "/plugin marketplace add GhostlyGawd/engineering-board\n/plugin install engineering-board\n\n# then, in a project:\n/board-setup\n\n# optional contained first win:\n/board-demo"
+      - button "Copy code to clipboard" [ref=e40]
+        - StaticText "Copy"
+    - paragraph
+      - StaticText "The plugin also registers the MCP server through "
+      - code
+        - StaticText ".mcp.json"
+      - StaticText "."
+    - paragraph
+      - StaticText "MCP SERVER FOR AN MCP CLIENT"
+    - generic
+      - code
+        - StaticText "# one line from PyPI\nclaude mcp add engineering-board -- uvx engineering-board-mcp\n\n# fallback — run from a clone:\ngit clone https://github.com/GhostlyGawd/engineering-board\nclaude mcp add engineering-board -- \\\n  python3 \"$(pwd)/engineering-board/mcp-server/engineering_board_mcp.py\"\n\n# Claude Desktop: claude_desktop_config.json\n\"mcpServers\": {\n  \"engineering-board\": {\n    \"command\": \"uvx\",\n    \"args\": [\"engineering-board-mcp\"]\n  }\n}"
+      - button "Copy code to clipboard" [ref=e41]
+        - StaticText "Copy"
+    - paragraph
+      - StaticText "The Python server has no package dependency. It provides 19 tools through standard input and output. Read the "
+      - link "client setup procedures" [ref=e42]
+      - StaticText "."
+    - paragraph
+      - StaticText "An uninstall operation does not remove the Markdown board. The system treats scratch content as untrusted data. Read the "
+      - link "security policy" [ref=e43]
+      - StaticText "."
+- contentinfo
+  - StaticText "Built in the open by "
+  - link "@GhostlyGawd" [ref=e6]
+  - StaticText " · a solo, MIT-licensed project · "
+  - link "LICENSE" [ref=e7]
+  - link "Repository" [ref=e8]
+  - StaticText " · "
+  - link "Live board" [ref=e9]
+  - StaticText " · "
+  - link "Releases" [ref=e10]
+  - StaticText " · "
+  - link "MCP Registry" [ref=e11]
+  - StaticText " · "
+  - link "Architecture" [ref=e12]
+  - StaticText " · "
+  - link "Changelog" [ref=e13]

@@ -1,0 +1,59 @@
+  [PASS] emits a self-contained HTML document
+  [PASS] column present: To do
+  [PASS] column present: Review
+  [PASS] column present: Validate
+  [PASS] column present: Done
+  [PASS] renders real entry ids (B001 todo, B003 done)
+  [PASS] untrusted title is HTML-escaped (no markup injection)
+  [PASS] escaped entity present for the crafted title
+  [PASS] learnings panel header present
+  [PASS] learning L001 rendered as a panel card
+  [PASS] learning title rendered
+  [PASS] learning confidence + recurrence surfaced
+  [PASS] Learning outcome state and confidence basis surfaced
+  [PASS] canonical outcome-value strip surfaced
+  [PASS] Q/O lane header no longer lists Learnings
+  [PASS] blocked badge uses semantic danger token
+  [PASS] Graphite: source tokens, embedded font, landmarks, contrast and offline assets
+  [PASS] Graphite: script-only fallback renders entries without asset requests
+  [PASS] Graphite: missing optional font falls back without a dangling URL
+  [PASS] Graphite: demo shares exact self-contained brand styles and preserves evidence states
+  [PASS] card id links to its entry file (relative)
+  [PASS] --link-base prefixes card links
+  [PASS] Done column collapses beyond 10 (details/summary)
+  [PASS] --stamp adds a freshness footer
+  [PASS] default output has no stamp
+  [PASS] print styles present
+  [PASS] output is byte-deterministic (safe to commit)
+  [PASS] write mode creates board.html
+  [PASS] C4: controls markup present and hidden in static HTML
+  [PASS] C4: search input present
+  [PASS] C4: type/priority/status filter chips present
+  [PASS] C4: embedded JS block present
+  [PASS] C4: '/' focuses search (keydown handler)
+  [PASS] C4: cards carry data-type/data-priority/data-status
+  [PASS] C4: cards carry lowercase searchable text (id + title)
+  [PASS] C4: empty-state message present (hidden by default)
+  [PASS] C4: data-search escapes untrusted title text
+  [PASS] C7: parent badge rendered on a parent-carrying card
+  [PASS] C7: no parent badge without parent frontmatter
+  [PASS] C12: stats panel header present
+  [PASS] C12: per-type bug counts correct
+  [PASS] C12: per-type feature counts correct
+  [PASS] C12: learnings total correct
+  [PASS] C12: top pattern tags among open entries surfaced
+  [PASS] C12: coordination panel header present
+  [PASS] C12: coordination empty states (no _claims / log / registry)
+  [PASS] C12: render survives runtime artifacts present
+  [PASS] C12: current claim shows entry id + owner
+  [PASS] C12: claim owner content is HTML-escaped
+  [PASS] C12: valid reclaim line rendered (entry id + time)
+  [PASS] C12: malformed reclaimed.log line skipped, not fatal
+  [PASS] C12: active worker rendered (mode + session)
+  [PASS] C12: garbled owner.txt + registry degrade gracefully (render still ok)
+  [PASS] C12: garbled registry falls back to empty state
+  [PASS] C12: byte-deterministic with claims/reclaims/workers present
+
+================================================================
+board-view: 55 pass, 0 fail
+================================================================

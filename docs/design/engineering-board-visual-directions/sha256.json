@@ -1,0 +1,14 @@
+{
+  "docs/design/engineering-board-visual-directions/a-continuity-v2.png": "7fd605f23acc054b4a3a06ac9cea57a97dcd8db8dcb572ae1c1efebfc0af3108",
+  "docs/design/engineering-board-visual-directions/a-continuity.png": "6228035eb90ca4c1f201db28a91f0f3cbc6dd66535c2b9b4161b47f12d2a0934",
+  "docs/design/engineering-board-visual-directions/b-sourcebook-v2.png": "1021ab6b5bad967bc99199b60c0554f5b490cad091f7f4141b1feb3d6fc4f817",
+  "docs/design/engineering-board-visual-directions/b-sourcebook.png": "6d95ad5c4d7aa223a4231e37445246e23c1f141e81551bf78cc70b5c63feec51",
+  "docs/design/engineering-board-visual-directions/c-trace.png": "70a9323a5fedc47440cab53ad3a0f77eded6e91cf63d60d900743cd879688ecd",
+  "docs/design/engineering-board-visual-directions/directions.md": "d059e5dec69ee429362d0b494c254df6676f0c14b1f5c27e31701ea626629a35",
+  "docs/design/engineering-board-visual-directions/pattern-research.md": "1f0cf95161070049bffdf253daa63be9874cb4487526421780c6654306c2d785",
+  "docs/design/engineering-board-visual-directions/prompts.json": "6bae304ac8ef68bc85645092ee888c93cfe89b2153d716df7f8e47d2d68be719",
+  "docs/design/engineering-board-visual-directions/refero-styles.md": "63852f9f6a73c22da3eae96813af4e19a2853e98a6287e076ff72f5c8d7d6de1",
+  "docs/design/engineering-board-visual-directions/refinement-prompts.json": "3edc56ec3d3b49b17c9f9e5fed18a09d88ed688d9f47a205d620063979f99691",
+  "docs/design/engineering-board-visual-directions/style-searches.json": "f08ed4e3aba1b029609bb3807dc6bd783a328a1f93e4088ceddb46faaa41bc52",
+  "docs/evidence/2026-09-10-visual-options-review.md": "61230e09fcc748e1f26777cb73812168f06d9eeb7f3951085820afccca686a49"
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "file": "fonts/manrope-latin-wght-normal.woff2",
+    "source": "https://registry.npmjs.org/@fontsource-variable/manrope/-/manrope-5.3.0.tgz",
+    "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
+  },
+  {
+    "file": "fonts/OFL-Manrope.txt",
+    "source": "https://registry.npmjs.org/@fontsource-variable/manrope/-/manrope-5.3.0.tgz",
+    "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30"
+  },
+  {
+    "file": "icons/file-text.svg",
+    "source": "https://registry.npmjs.org/@tabler/icons/-/icons-3.46.0.tgz",
+    "sha256": "12e8c1a05fe3c14fb9f44e98145afa96c14ee0d9dddfdd69b75c53c31486cae8"
+  },
+  {
+    "file": "icons/arrow-left.svg",
+    "source": "https://registry.npmjs.org/@tabler/icons/-/icons-3.46.0.tgz",
+    "sha256": "cca229008bada786cf2f052b5374047478562cb3de0ca1fe7b2a3db61882a2c0"
+  },
+  {
+    "file": "icons/arrow-up-right.svg",
+    "source": "https://registry.npmjs.org/@tabler/icons/-/icons-3.46.0.tgz",
+    "sha256": "450ff3ea98d6ccad96032d09e89c8d91b0b332e1dcc05e437ae8093916d5e005"
+  },
+  {
+    "file": "icons/chevron-right.svg",
+    "source": "https://registry.npmjs.org/@tabler/icons/-/icons-3.46.0.tgz",
+    "sha256": "0142561fc2fd1b6a18b2cb0c08959b6037643aecf6adc6612aefe16ec4f39f0f"
+  },
+  {
+    "file": "icons/copy.svg",
+    "source": "https://registry.npmjs.org/@tabler/icons/-/icons-3.46.0.tgz",
+    "sha256": "01da13d33d6163f37ee81f397e567832068d836af0307118156370716357be07"
+  },
+  {
+    "file": "icons/search.svg",
+    "source": "https://registry.npmjs.org/@tabler/icons/-/icons-3.46.0.tgz",
+    "sha256": "57e054b6c1508be40d5eba1ea434b702f5ff55dca04e28e5e3f22472c2f6176d"
+  },
+  {
+    "file": "icons/sun.svg",
+    "source": "https://registry.npmjs.org/@tabler/icons/-/icons-3.46.0.tgz",
+    "sha256": "1753d34d4c09f4a0e32afbb417defeded055a88f8ac33963556570a53a76dfa9"
+  },
+  {
+    "file": "icons/moon.svg",
+    "source": "https://registry.npmjs.org/@tabler/icons/-/icons-3.46.0.tgz",
+    "sha256": "57372c0f83966692ec9c8dfea4c28503df2d5a260825d24a230fab86bcbb3bdb"
+  },
+  {
+    "file": "icons/x.svg",
+    "source": "https://registry.npmjs.org/@tabler/icons/-/icons-3.46.0.tgz",
+    "sha256": "445e1b53563ad7e089f94dee923c2ef3444c63d45294a733687471a76a3c3b8d"
+  },
+  {
+    "file": "icons/LICENSE-Tabler.txt",
+    "source": "https://registry.npmjs.org/@tabler/icons/-/icons-3.46.0.tgz",
+    "sha256": "b740a1d46122672da62833e97f7e7c8a13fa85cbc7445b584b297cc00dde93db"
+  }
+]
