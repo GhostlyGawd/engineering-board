@@ -945,8 +945,8 @@ HEAD="${HEAD/__EB_CHROME_STYLES__/${EB_VIEW_CHROME_CSS}}"
 HEAD="${HEAD}
 ${EB_VIEW_HEADER}"
 read -r -d '' VIEW_INTRO <<'HTML' || true
-<div class="view-note"><p><strong>Static board · Read-only.</strong> Open an entry ID to inspect its Markdown source. Regenerate with <code>/board-view</code> after the board changes.</p></div>
 <main id="main">
+<div class="view-note"><p><strong>Static board · Read-only.</strong> Open an entry ID to inspect its Markdown source. Regenerate with <code>/board-view</code> after the board changes.</p></div>
 HTML
 HEAD="${HEAD}
 ${VIEW_INTRO}"
