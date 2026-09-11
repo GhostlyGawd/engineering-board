@@ -1,0 +1,14 @@
+{
+  "scope": "Existing connected Codex MCP tools, disposable directory; no new client/plugin install",
+  "root": "/tmp/eb-graphite-mcp.HiDevC",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"project\": \"example\",\n  \"board_dir\": \"engineering-board/example\",\n  \"affects_prefix\": \".\",\n  \"created\": [\n    \"engineering-board/BOARD-ROUTER.md\",\n    \"engineering-board/example/bugs/.gitkeep\",\n    \"engineering-board/example/features/.gitkeep\",\n    \"engineering-board/example/questions/.gitkeep\",\n    \"engineering-board/example/observations/.gitkeep\",\n    \"engineering-board/example/learnings/.gitkeep\",\n    \"engineering-board/example/hypotheses/.gitkeep\",\n    \"engineering-board/example/BOARD.md\",\n    \"engineering-board/example/ARCHIVE.md\",\n    \"AGENTS.md\"\n  ],\n  \"existed\": []\n}"
+      }
+    ],
+    "isError": false
+  },
+  "project_list_verified": true
+}

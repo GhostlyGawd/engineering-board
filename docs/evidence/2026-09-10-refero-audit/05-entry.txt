@@ -1,0 +1,27 @@
+- heading "404" [level=1, ref=e1]
+- paragraph
+  - strong
+    - StaticText "File not found"
+- paragraph
+  - StaticText "The site configured at this address does not contain the requested file."
+- paragraph
+  - StaticText "If this is your site, make sure that the filename case matches the URL as well as any file permissions."
+  - LineBreak "\n"
+  - StaticText "For root URLs (like "
+  - code
+    - StaticText "http://example.com/"
+  - StaticText ") you must provide an "
+  - code
+    - StaticText "index.html"
+  - StaticText " file."
+- paragraph
+  - link "Read the full documentation" [ref=e3]
+  - StaticText " for more information about using "
+  - strong
+    - StaticText "GitHub Pages"
+  - StaticText "."
+- generic
+  - link "GitHub Status" [ref=e4]
+  - StaticText " — "
+  - link "@githubstatus" [ref=e5]
+- link [ref=e2]

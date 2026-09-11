@@ -1,0 +1,14 @@
+{
+  "result": "passed",
+  "checks": [
+    "Desktop page, headline and local font render",
+    "Codex handoff and truthful copy feedback",
+    "Search, selection, B002 source, return to selected finding",
+    "No-results feedback and reset recovery",
+    "Hypothesis uncertainty hierarchy and light theme",
+    "Mobile six pages fit viewport; selection to source works",
+    "No-JavaScript baseline and sources; no external requests",
+    "No page JavaScript exceptions"
+  ],
+  "page_errors": []
+}

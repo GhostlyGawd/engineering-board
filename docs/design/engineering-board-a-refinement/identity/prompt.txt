@@ -1,0 +1,23 @@
+Use case: ui-mockup / brand typography exploration. Make ONE premium visual identity and typography specimen for Engineering Board, using the attached Graphite sheet as the approved palette and product context ONLY. This is not another full website screen. It is a precise design presentation to examine the wordmark and typography closely, with a small application preview. Landscape 4:3, 1448x1086 or higher. Flat crisp artwork, no devices, perspective, mock photographed stationery or texture.
+
+PROBLEM: Current "Engineering Board" wordmark looks like generic bold UI text beside three generic gray bars. Develop a more authored TYPOGRAPHIC identity. Keep the exact product name; no new slogan except text below. Work in dark achromatic graphite #08090A, surfaces #141516, white #F7F8F8, secondary #D0D6E0, thin rules #34343A. NO ORANGE, GREEN, BLUE, GOLD, colored accents, glow or decorative gradients. Premium through optical typography and spacing. No decorative serif word swaps.
+
+PRIMARY TYPOGRAPHIC INFLUENCE: LogoArchive's compact Suisse International-like grotesk 500, legible tightly composed forms; secondary Cron influence is strong weight contrast ONLY in large wordmark specimens. The wordmark should be a carefully drawn compact neo-grotesk, slightly narrow with clean square-cut terminals, confident broad counters, subtly distinctive double-storey g, deliberate kerning and tight balanced word spacing. Avoid rounded bubbly terminals, generic default Arial Bold, extreme extended/wide letters, hairline weight, faux futuristic cuts or stencil gaps. Do not print source company names. No font licensing claim.
+
+COMPOSITION:
+Small upper left caption "ENGINEERING BOARD / IDENTITY STUDY". Upper right "Graphite · refined".
+TOP roughly 38%: dramatic large LEFT-ALIGNED stacked lowercase wordmark exactly
+"engineering"
+"board"
+with tight leading, around 100px equivalent, weight 600-650 visually, not ultra-black. The first word longer and second word shorter; do NOT stretch board to match widths. Beside it on right, at smaller scale, a HORIZONTAL application lockup "engineering board" around 34px, same distinctive lettering. Caption "Compact lockup" below, and beneath a tiny 24px app-header-scale lockup, to prove it retains personality when small. Plenty of breathing room.
+Do NOT place a generic icon before every wordmark. Make typography carry the identity. At far right optional isolated small mark study: a balanced flat geometric emblem built from two columns of compact horizontal cards with ONE shared bridge card crossing a narrow gutter; compact geometry like an editorial printer's sign, monochrome. No decorative abstract bars, cube, hexagon, shield, robot or circuit board. Its caption "Secondary mark" makes clear the wordmark is primary.
+MIDDLE: one thin horizontal separator. Left two-thirds has a type specimen:
+small label "DISPLAY"
+"Connect findings."
+"Inspect the evidence."
+in a beautifully composed medium-weight 52-60px neo-grotesk from the same visual family, calmer and lighter than the wordmark. Right third has
+label "READING"
+"Repository memory for engineering agents."
+and below an example paragraph "Inspect the findings, their sources, and the evidence behind a proposed root cause." set in highly readable neutral sans 17px regular, generous line-height. Under it mono label "H001 / PROPOSED", 13px. Show deliberate distinction among brand, display, body, metadata.
+BOTTOM roughly 28%: a wide slim REALISTIC APPLICATION STRIP in Graphite. Header at left uses refined compact horizontal wordmark, navigation at right "Example   Install   Docs". Below header, a two-pane crop from A's evidence view: left small list "B001   Worker skips a review-ready entry" and "B002   Board shows the wrong lane"; right title "Lifecycle rules differ across adapters." small textual neutral badge "Proposed hypothesis", label "Synthetic example · Read-only", and sentence "No outcome recorded." Source action "Open source record". This is a CROP for typography demonstration, not full content replacement; don't cram the entire old screen. One tiny footer line "Identity concept — typography and proportions, not production artwork."
+Everything should feel authored, sharp, typographically sophisticated, restrained and premium. Optical spacing and crafted lettering matter more than ornament. Keep text accurate and comfortably legible, no duplicate giant labels. 

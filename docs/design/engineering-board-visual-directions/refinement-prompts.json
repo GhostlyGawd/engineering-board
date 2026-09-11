@@ -1,0 +1,15 @@
+{
+  "tool": "built-in image_gen edit",
+  "edits": [
+    {
+      "key": "a-continuity-v2",
+      "path": "/Users/rhenmcleod/engineering-board-dogfood/docs/design/engineering-board-visual-directions/a-continuity.png",
+      "prompt": "Edit this concept sheet with four precise corrections, preserving its size, all typography, all exact copy, layout, and every other detail. 1) Replace BOTH upper and lower H-like gold logos with the actual Engineering Board card mark: two small neutral dark-gray horizontal rounded cards stacked on left, one neutral gray horizontal card lower on right, very thin vertical gutter line between columns, ONE short amber horizontal card crossing the gutter midway up. The settled cards are neutral, never gold pillars. Flat solid fills. Keep logo modest, same occupied area. 2) Both 'Proposed hypothesis' badges must be neutral pale gray with dark text, never amber; upper hypothesis panel is white with neutral gray border. Remove decorative lightbulb icon. 3) Add visible label 'Synthetic example' just above the UPPER three-findings relationship diagram, so it is clear that landing preview also depicts synthetic evidence. Do not remove lower Synthetic example label. 4) Make ALL fills flat solid, no gradients or paper texture; only amber primary CTA, the single crossing card in each logo, and selected finding border use amber. Preserve the warm paper #FAF9F5 canvas, original readable text, source/back links and complete evidence/alternative/falsifier/no-outcome. Everything else unchanged."
+    },
+    {
+      "key": "b-sourcebook-v2",
+      "path": "/Users/rhenmcleod/engineering-board-dogfood/docs/design/engineering-board-visual-directions/b-sourcebook.png",
+      "prompt": "Edit this Sourcebook concept sheet with exactly two changes. Preserve size, composition, all exact text, typography, source syntax colors, spacing, buttons and every other detail. 1) Replace the top-left outlined CUBE logo with a small monochrome Engineering Board card mark: two small black/gray horizontal rounded cards stacked on left; one gray horizontal card lower on right; very thin vertical gutter between columns; one dark horizontal card crossing the gutter midway up. No cube, hexagon, perspective, or 3D. Small flat mark with neutral colors only. 2) Add the readable label 'Synthetic example' in the UPPER left source-code card header beside 'hypotheses/H001.md' or immediately above the card. It must be clear the top landing illustration is synthetic. Retain the large lower Synthetic example and Read-only labels. Leave all other content and visual details unchanged."
+    }
+  ]
+}
