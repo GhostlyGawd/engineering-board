@@ -258,7 +258,7 @@ The page maintains a centered, max-width contained layout rather than full-bleed
 
 ## Agent Prompt Guide
 
-Quick Color Reference: 
+Quick Color Reference:
 text: #ffffff
 background: #000000
 border: #ffffff
