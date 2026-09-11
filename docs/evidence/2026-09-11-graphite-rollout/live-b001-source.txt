@@ -1,0 +1,702 @@
+- generic
+  - link "Skip to content" [ref=e1]
+  - banner
+    - heading "Navigation Menu" [level=2, ref=e4]
+    - generic
+      - link "Homepage" [ref=e6]
+      - navigation "Global" [ref=e9]
+        - list
+          - listitem [level=1]
+            - generic
+              - button "Platform" [expanded=false, ref=e53]
+          - listitem [level=1]
+            - generic
+              - button "Solutions" [expanded=false, ref=e54]
+          - listitem [level=1]
+            - generic
+              - button "Resources" [expanded=false, ref=e55]
+          - listitem [level=1]
+            - generic
+              - button "Open Source" [expanded=false, ref=e56]
+          - listitem [level=1]
+            - generic
+              - button "Enterprise" [expanded=false, ref=e57]
+          - listitem [level=1]
+            - link "Pricing" [ref=e43]
+      - button "Search or jump to, type / to search" [expanded=false, ref=e10]
+        - StaticText "Search"
+      - link "Sign in" [ref=e29]
+        - StaticText "Sign in"
+      - link "Sign up" [ref=e11]
+        - StaticText "Sign up"
+      - button "Appearance settings" [ref=e12]
+- main
+  - generic
+    - link "GhostlyGawd" [ref=e2]
+    - StaticText "/"
+    - strong
+      - link "engineering-board" [ref=e5]
+    - StaticText "Public"
+    - list
+      - listitem [level=1]
+        - link "Sponsor @GhostlyGawd" [ref=e13]
+          - StaticText "Sponsor"
+      - listitem [level=1]
+        - link "You must be signed in to change notification settings" [ref=e14]
+          - StaticText "Notifications"
+      - listitem [level=1]
+        - link "Fork 0" [ref=e15]
+          - StaticText "Fork "
+          - StaticText "0"
+      - listitem [level=1]
+        - link "You must be signed in to star a repository" [ref=e16]
+          - StaticText " Star "
+          - StaticText "0"
+    - navigation "Repository" [ref=e3]
+      - list
+        - listitem [level=1]
+          - link "Code" [ref=e17]
+            - StaticText "Code"
+        - listitem [level=1]
+          - link "Issues" [ref=e18]
+            - StaticText "Issues"
+        - listitem [level=1]
+          - link "Pull requests 1" [ref=e19]
+            - StaticText "Pull requests"
+            - StaticText "1"
+        - listitem [level=1]
+          - link "Discussions" [ref=e20]
+            - StaticText "Discussions"
+        - listitem [level=1]
+          - link "Actions" [ref=e21]
+            - StaticText "Actions"
+        - listitem [level=1]
+          - link "Projects" [ref=e22]
+            - StaticText "Projects"
+        - listitem [level=1]
+          - link "Security and quality" [ref=e23]
+            - StaticText "Security and quality"
+        - listitem [level=1]
+          - link "Insights" [ref=e24]
+            - StaticText "Insights"
+  - generic [ref=e7] focusable [tabindex]
+    - generic
+      - generic
+        - heading "Collapse file tree" [level=2, ref=e34]
+          - button "Collapse file tree" [expanded=true, ref=e44]
+        - heading "Files" [level=2, ref=e35]
+        - button "main branch" [expanded=false, ref=e36]
+          - StaticText "main"
+        - generic
+          - button "Search this repository ( forward slash )" [ref=e45]
+        - generic [ref=e37] clickable [onclick]
+          - combobox "Go to file" [expanded=false, ref=e46]
+        - generic
+          - generic [ref=e47] clickable [onclick]
+            - navigation "File Tree Navigation" [ref=e58]
+              - tree "Files"
+                - treeitem ".agents" [level=1, expanded=false, ref=e91]
+                  - generic [ref=e143] clickable [cursor:pointer]
+                    - generic [ref=e195] clickable [cursor:pointer, onclick]
+                    - generic
+                      - StaticText ".agents"
+                - treeitem ".claude-plugin" [level=1, expanded=false, ref=e92]
+                  - generic [ref=e144] clickable [cursor:pointer]
+                    - generic [ref=e196] clickable [cursor:pointer, onclick]
+                    - generic
+                      - StaticText ".claude-plugin"
+                - treeitem ".codex-plugin" [level=1, expanded=false, ref=e93]
+                  - generic [ref=e145] clickable [cursor:pointer]
+                    - generic [ref=e197] clickable [cursor:pointer, onclick]
+                    - generic
+                      - StaticText ".codex-plugin"
+                - treeitem ".github" [level=1, expanded=false, ref=e94]
+                  - generic [ref=e146] clickable [cursor:pointer]
+                    - generic [ref=e198] clickable [cursor:pointer, onclick]
+                    - generic
+                      - StaticText ".github"
+                - treeitem ".goal" [level=1, expanded=false, ref=e95]
+                  - generic [ref=e147] clickable [cursor:pointer]
+                    - generic [ref=e199] clickable [cursor:pointer, onclick]
+                    - generic
+                      - StaticText ".goal"
+                - treeitem ".omc" [level=1, expanded=false, ref=e96]
+                  - generic [ref=e148] clickable [cursor:pointer]
+                    - generic [ref=e200] clickable [cursor:pointer, onclick]
+                    - generic
+                      - StaticText ".omc"
+                - treeitem "agents" [level=1, expanded=false, ref=e97]
+                  - generic [ref=e149] clickable [cursor:pointer]
+                    - generic [ref=e201] clickable [cursor:pointer, onclick]
+                    - generic
+                      - StaticText "agents"
+                - treeitem "brand" [level=1, expanded=false, ref=e98]
+                  - generic [ref=e150] clickable [cursor:pointer]
+                    - generic [ref=e202] clickable [cursor:pointer, onclick]
+                    - generic
+                      - StaticText "brand"
+                - treeitem "commands" [level=1, expanded=false, ref=e99]
+                  - generic [ref=e151] clickable [cursor:pointer]
+                    - generic [ref=e203] clickable [cursor:pointer, onclick]
+                    - generic
+                      - StaticText "commands"
+                - treeitem "docs" [level=1, expanded=false, ref=e100]
+                  - generic [ref=e152] clickable [cursor:pointer]
+                    - generic [ref=e204] clickable [cursor:pointer, onclick]
+                    - generic
+                      - StaticText "docs"
+                - treeitem "engineering-board" [level=1, expanded=true, ref=e101]
+                  - generic [ref=e153] clickable [cursor:pointer]
+                    - generic [ref=e205] clickable [cursor:pointer, onclick]
+                    - generic
+                      - StaticText "engineering-board"
+                  - group "engineering-board"
+                    - treeitem "capability-lab" [level=2, expanded=false, ref=e206]
+                      - generic [ref=e212] clickable [cursor:pointer]
+                        - generic [ref=e216] clickable [cursor:pointer, onclick]
+                        - generic
+                          - StaticText "capability-lab"
+                    - treeitem "eb-self" [level=2, expanded=true, ref=e207]
+                      - generic [ref=e213] clickable [cursor:pointer]
+                        - generic [ref=e217] clickable [cursor:pointer, onclick]
+                        - generic
+                          - StaticText "eb-self"
+                      - group "eb-self"
+                        - treeitem "bugs" [level=3, expanded=true, ref=e218]
+                          - generic [ref=e228] clickable [cursor:pointer]
+                            - generic [ref=e238] clickable [cursor:pointer, onclick]
+                            - generic
+                              - StaticText "bugs"
+                          - group "bugs"
+                            - treeitem ".gitkeep" [level=4, ref=e239]
+                              - generic [ref=e318] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText ".gitkeep"
+                            - treeitem "B001-sessionstart-on2-blockedby-loop-exceeds-10s-time.md" [level=4, ref=e240]
+                              - generic [ref=e319] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B001-sessionstart-on2-blockedby-loop-exceeds-10s-time.md"
+                            - treeitem "B002-injection-reject-blocklist-is-trivially-bypassab.md" [level=4, ref=e241]
+                              - generic [ref=e320] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B002-injection-reject-blocklist-is-trivially-bypassab.md"
+                            - treeitem "B003-adversarialbenign-fixtures-are-dead-code-archite.md" [level=4, ref=e242]
+                              - generic [ref=e321] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B003-adversarialbenign-fixtures-are-dead-code-archite.md"
+                            - treeitem "B004-permission-allowlist-does-not-cover-the-scripts-.md" [level=4, ref=e243]
+                              - generic [ref=e322] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B004-permission-allowlist-does-not-cover-the-scripts-.md"
+                            - treeitem "B005-first-captured-finding-is-invisible--buried-in-s.md" [level=4, ref=e244]
+                              - generic [ref=e323] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B005-first-captured-finding-is-invisible--buried-in-s.md"
+                            - treeitem "B006-advancing-one-entry-through-tdd-review-validate-.md" [level=4, ref=e245]
+                              - generic [ref=e324] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B006-advancing-one-entry-through-tdd-review-validate-.md"
+                            - treeitem "B007-validator-success-is-a-dead-end-the-board-does-n.md" [level=4, ref=e246]
+                              - generic [ref=e325] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B007-validator-success-is-a-dead-end-the-board-does-n.md"
+                            - treeitem "B008-corrupttruncated-session-modejson-silently-un-pa.md" [level=4, ref=e247]
+                              - generic [ref=e326] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B008-corrupttruncated-session-modejson-silently-un-pa.md"
+                            - treeitem "B009-consolidator-silently-no-ops-findings-lost-when-.md" [level=4, ref=e248]
+                              - generic [ref=e327] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B009-consolidator-silently-no-ops-findings-lost-when-.md"
+                            - treeitem "B010-empty-board-renders-a-broken-two-line-open-count.md" [level=4, ref=e249]
+                              - generic [ref=e328] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B010-empty-board-renders-a-broken-two-line-open-count.md"
+                            - treeitem "B011-architecturemd-is-stale-for-120-version-header-m.md" [level=4, ref=e250]
+                              - generic [ref=e329] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B011-architecturemd-is-stale-for-120-version-header-m.md"
+                            - treeitem "B012-changelog-120-link-points-to-an-unpushed-rc-tag-.md" [level=4, ref=e251]
+                              - generic [ref=e330] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B012-changelog-120-link-points-to-an-unpushed-rc-tag-.md"
+                            - treeitem "B013-readme-uses-emoji-violating-brandmd-no-emoji-in-.md" [level=4, ref=e252]
+                              - generic [ref=e331] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B013-readme-uses-emoji-violating-brandmd-no-emoji-in-.md"
+                            - treeitem "B014-two-implementations-of-scratch-live-promotion-wi.md" [level=4, ref=e253]
+                              - generic [ref=e332] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B014-two-implementations-of-scratch-live-promotion-wi.md"
+                            - treeitem "B015-internal-milestone-jargon-m22c-leaks-into-user-f.md" [level=4, ref=e254]
+                              - generic [ref=e333] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B015-internal-milestone-jargon-m22c-leaks-into-user-f.md"
+                            - treeitem "B016-version-sprawl-across-surfaces-no-authoritative-.md" [level=4, ref=e255]
+                              - generic [ref=e334] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B016-version-sprawl-across-surfaces-no-authoritative-.md"
+                            - treeitem "B017-board-triage-says-five-rules-but-defines-six.md" [level=4, ref=e256]
+                              - generic [ref=e335] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B017-board-triage-says-five-rules-but-defines-six.md"
+                            - treeitem "B018-board-resolve-contradicts-itself-on-which-steps-.md" [level=4, ref=e257]
+                              - generic [ref=e336] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B018-board-resolve-contradicts-itself-on-which-steps-.md"
+                            - treeitem "B019-pattern-recurrence-threshold-is-inconsistent-2-v.md" [level=4, ref=e258]
+                              - generic [ref=e337] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B019-pattern-recurrence-threshold-is-inconsistent-2-v.md"
+                            - treeitem "B020-board-migrate-is-two-unrelated-operations-under-.md" [level=4, ref=e259]
+                              - generic [ref=e338] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B020-board-migrate-is-two-unrelated-operations-under-.md"
+                            - treeitem "B021-code-reviewer-name-collides-with-code-review-and.md" [level=4, ref=e260]
+                              - generic [ref=e339] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B021-code-reviewer-name-collides-with-code-review-and.md"
+                            - treeitem "B022-nothingtotest--nothingtoreview-still-advance-the.md" [level=4, ref=e261]
+                              - generic [ref=e340] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B022-nothingtotest--nothingtoreview-still-advance-the.md"
+                            - treeitem "B023-index-check-invariant-defeated-by-resolve-in-place.md" [level=4, ref=e262]
+                              - generic [ref=e341] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B023-index-check-invariant-defeated-by-resolve-in-place.md"
+                            - treeitem "B024-mcp-path-traversal-via-project-name-writes-fil.md" [level=4, ref=e263]
+                              - generic [ref=e342] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B024-mcp-path-traversal-via-project-name-writes-fil.md"
+                            - treeitem "B025-reject-filter-bypassed-by-a-politeadverb-lead-.md" [level=4, ref=e264]
+                              - generic [ref=e343] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B025-reject-filter-bypassed-by-a-politeadverb-lead-.md"
+                            - treeitem "B026-mcp-captured-scratch-findings-are-silently-des.md" [level=4, ref=e265]
+                              - generic [ref=e344] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B026-mcp-captured-scratch-findings-are-silently-des.md"
+                            - treeitem "B027-readme-quickstart-dead-ends-at-board-init-capt.md" [level=4, ref=e266]
+                              - generic [ref=e345] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B027-readme-quickstart-dead-ends-at-board-init-capt.md"
+                            - treeitem "B028-mcp-serializefrontmatter-does-not-escape-newli.md" [level=4, ref=e267]
+                              - generic [ref=e346] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B028-mcp-serializefrontmatter-does-not-escape-newli.md"
+                            - treeitem "B029-claim-acquire-self-deletes-its-lock-on-a-sessi.md" [level=4, ref=e268]
+                              - generic [ref=e347] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B029-claim-acquire-self-deletes-its-lock-on-a-sessi.md"
+                            - treeitem "B030-permission-install-delivery-is-a-6-step-copy-p.md" [level=4, ref=e269]
+                              - generic [ref=e348] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B030-permission-install-delivery-is-a-6-step-copy-p.md"
+                            - treeitem "B031-stale-suitefile-counts-across-readme-and-archi.md" [level=4, ref=e270]
+                              - generic [ref=e349] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B031-stale-suitefile-counts-across-readme-and-archi.md"
+                            - treeitem "B032-changelog-unreleased-fixture-arithmetic-reads-.md" [level=4, ref=e271]
+                              - generic [ref=e350] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B032-changelog-unreleased-fixture-arithmetic-reads-.md"
+                            - treeitem "B033-worker-start-unsupported-discipline-error-leak.md" [level=4, ref=e272]
+                              - generic [ref=e351] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B033-worker-start-unsupported-discipline-error-leak.md"
+                            - treeitem "B034-mcp-entryid-path-traversal-in-boardclaimboar.md" [level=4, ref=e273]
+                              - generic [ref=e352] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B034-mcp-entryid-path-traversal-in-boardclaimboar.md"
+                            - treeitem "B035-mcp-bulk-tools-bypass-router-row-containment.md" [level=4, ref=e274]
+                              - generic [ref=e353] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B035-mcp-bulk-tools-bypass-router-row-containment.md"
+                            - treeitem "B036-mcp-appendsection-headingbody-not-newline-fl.md" [level=4, ref=e275]
+                              - generic [ref=e354] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B036-mcp-appendsection-headingbody-not-newline-fl.md"
+                            - treeitem "B037-reject-filter-bypassed-by-markdown-listblock.md" [level=4, ref=e276]
+                              - generic [ref=e355] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B037-reject-filter-bypassed-by-markdown-listblock.md"
+                            - treeitem "B038-mcp-affectsprefix-injects-a-board-router-row.md" [level=4, ref=e277]
+                              - generic [ref=e356] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B038-mcp-affectsprefix-injects-a-board-router-row.md"
+                            - treeitem "B039-mcp-boardinit-follows-symlinks-to-write-scaf.md" [level=4, ref=e278]
+                              - generic [ref=e357] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B039-mcp-boardinit-follows-symlinks-to-write-scaf.md"
+                            - treeitem "B040-mcp-boardcapturefinding-titlekind-not-flatte.md" [level=4, ref=e279]
+                              - generic [ref=e358] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B040-mcp-boardcapturefinding-titlekind-not-flatte.md"
+                            - treeitem "B041-rfc-0002-stale-command-count--missing-board-.md" [level=4, ref=e280]
+                              - generic [ref=e359] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B041-rfc-0002-stale-command-count--missing-board-.md"
+                            - treeitem "B042-landing-page-did-not-surface-board-view-and-.md" [level=4, ref=e281]
+                              - generic [ref=e360] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B042-landing-page-did-not-surface-board-view-and-.md"
+                            - treeitem "B043-reject-filter-bypassed-by-unicode-bullets-ma.md" [level=4, ref=e282]
+                              - generic [ref=e361] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B043-reject-filter-bypassed-by-unicode-bullets-ma.md"
+                            - treeitem "B044-mcp-boardcapturefinding-evidence-field-injec.md" [level=4, ref=e283]
+                              - generic [ref=e362] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B044-mcp-boardcapturefinding-evidence-field-injec.md"
+                            - treeitem "B045-changelog-reject-filter-count-drift.md" [level=4, ref=e284]
+                              - generic [ref=e363] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B045-changelog-reject-filter-count-drift.md"
+                            - treeitem "B046-permission-rules-emitted-without-tool-wrapper.md" [level=4, ref=e285]
+                              - generic [ref=e364] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B046-permission-rules-emitted-without-tool-wrapper.md"
+                            - treeitem "B047-worker-to-pm-refusal-hint-points-to-dead-end.md" [level=4, ref=e286]
+                              - generic [ref=e365] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B047-worker-to-pm-refusal-hint-points-to-dead-end.md"
+                            - treeitem "B048-reject-filter-bypassed-by-adverb-fronted-imp.md" [level=4, ref=e287]
+                              - generic [ref=e366] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B048-reject-filter-bypassed-by-adverb-fronted-imp.md"
+                            - treeitem "B049-changelog-boardview-entry-omits-14-suite-bump.md" [level=4, ref=e288]
+                              - generic [ref=e367] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B049-changelog-boardview-entry-omits-14-suite-bump.md"
+                            - treeitem "B050-board-view-absent-from-quickstart-first-valu.md" [level=4, ref=e289]
+                              - generic [ref=e368] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B050-board-view-absent-from-quickstart-first-valu.md"
+                            - treeitem "B051-reject-filter-line-separator-folding-incomple.md" [level=4, ref=e290]
+                              - generic [ref=e369] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B051-reject-filter-line-separator-folding-incomple.md"
+                            - treeitem "B052-consolidate-promotion-writer-flattens-only-e.md" [level=4, ref=e291]
+                              - generic [ref=e370] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B052-consolidate-promotion-writer-flattens-only-e.md"
+                            - treeitem "B053-reject-filter-misses-non-ascii-sentence-term.md" [level=4, ref=e292]
+                              - generic [ref=e371] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B053-reject-filter-misses-non-ascii-sentence-term.md"
+                            - treeitem "B054-mcp-capture-evidence-split-misses-cr-ff-nel.md" [level=4, ref=e293]
+                              - generic [ref=e372] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B054-mcp-capture-evidence-split-misses-cr-ff-nel.md"
+                            - treeitem "B055-readme-board-view-link-points-at-raw-html.md" [level=4, ref=e294]
+                              - generic [ref=e373] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B055-readme-board-view-link-points-at-raw-html.md"
+                            - treeitem "B056-reject-terminator-fold-incomplete-arabic-armen.md" [level=4, ref=e295]
+                              - generic [ref=e374] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B056-reject-terminator-fold-incomplete-arabic-armen.md"
+                            - treeitem "B057-count-scratch-findings-undercounts-multi-find.md" [level=4, ref=e296]
+                              - generic [ref=e375] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B057-count-scratch-findings-undercounts-multi-find.md"
+                            - treeitem "B058-reject-invisible-strip-incomplete-cf-class.md" [level=4, ref=e297]
+                              - generic [ref=e376] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B058-reject-invisible-strip-incomplete-cf-class.md"
+                            - treeitem "B059-reject-skip-run-misses-ordered-list-markers.md" [level=4, ref=e298]
+                              - generic [ref=e377] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B059-reject-skip-run-misses-ordered-list-markers.md"
+                            - treeitem "B060-slash-directive-bypassed-by-punct-abutment.md" [level=4, ref=e299]
+                              - generic [ref=e378] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B060-slash-directive-bypassed-by-punct-abutment.md"
+                            - treeitem "B061-reject-filter-strips-tag-chars-but-promotes-.md" [level=4, ref=e300]
+                              - generic [ref=e379] clickable [cursor:pointer]
+                                - generic
+                                  - StaticText "B061-reject-filter-strips-tag-chars-but-promotes-.md"
+                            - treeitem [level=4, ref=e301]
+                              - generic [ref=e380] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e302]
+                              - generic [ref=e381] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e303]
+                              - generic [ref=e382] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e304]
+                              - generic [ref=e383] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e305]
+                              - generic [ref=e384] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e306]
+                              - generic [ref=e385] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e307]
+                              - generic [ref=e386] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e308]
+                              - generic [ref=e387] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e309]
+                              - generic [ref=e388] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e310]
+                              - generic [ref=e389] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e311]
+                              - generic [ref=e390] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e312]
+                              - generic [ref=e391] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e313]
+                              - generic [ref=e392] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e314]
+                              - generic [ref=e393] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e315]
+                              - generic [ref=e394] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e316]
+                              - generic [ref=e395] clickable [cursor:pointer]
+                            - treeitem [level=4, ref=e317]
+                              - generic [ref=e396] clickable [cursor:pointer]
+                        - treeitem [level=3, expanded=false, ref=e219]
+                          - generic [ref=e229] clickable [cursor:pointer]
+                        - treeitem [level=3, expanded=false, ref=e220]
+                          - generic [ref=e230] clickable [cursor:pointer]
+                        - treeitem [level=3, expanded=false, ref=e221]
+                          - generic [ref=e231] clickable [cursor:pointer]
+                        - treeitem [level=3, expanded=false, ref=e222]
+                          - generic [ref=e232] clickable [cursor:pointer]
+                        - treeitem [level=3, ref=e223]
+                          - generic [ref=e233] clickable [cursor:pointer]
+                        - treeitem [level=3, ref=e224]
+                          - generic [ref=e234] clickable [cursor:pointer]
+                        - treeitem [level=3, ref=e225]
+                          - generic [ref=e235] clickable [cursor:pointer]
+                        - treeitem [level=3, ref=e226]
+                          - generic [ref=e236] clickable [cursor:pointer]
+                        - treeitem [level=3, ref=e227]
+                          - generic [ref=e237] clickable [cursor:pointer]
+                    - treeitem [level=2, expanded=false, ref=e208]
+                      - generic [ref=e214] clickable [cursor:pointer]
+                    - treeitem [level=2, ref=e209]
+                      - generic [ref=e215] clickable [cursor:pointer]
+                - treeitem [level=1, expanded=false, ref=e102]
+                  - generic [ref=e154] clickable [cursor:pointer]
+                - treeitem [level=1, expanded=false, ref=e103]
+                  - generic [ref=e155] clickable [cursor:pointer]
+                - treeitem [level=1, expanded=false, ref=e104]
+                  - generic [ref=e156] clickable [cursor:pointer]
+                - treeitem [level=1, expanded=false, ref=e105]
+                  - generic [ref=e157] clickable [cursor:pointer]
+                - treeitem [level=1, expanded=false, ref=e106]
+                  - generic [ref=e158] clickable [cursor:pointer]
+                - treeitem [level=1, expanded=false, ref=e107]
+                  - generic [ref=e159] clickable [cursor:pointer]
+                - treeitem [level=1, expanded=false, ref=e108]
+                  - generic [ref=e160] clickable [cursor:pointer]
+                - treeitem [level=1, expanded=false, ref=e109]
+                  - generic [ref=e161] clickable [cursor:pointer]
+                - treeitem [level=1, expanded=false, ref=e110]
+                  - generic [ref=e162] clickable [cursor:pointer]
+                - treeitem [level=1, expanded=false, ref=e111]
+                  - generic [ref=e163] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e112]
+                  - generic [ref=e164] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e113]
+                  - generic [ref=e165] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e114]
+                  - generic [ref=e166] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e115]
+                  - generic [ref=e167] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e116]
+                  - generic [ref=e168] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e117]
+                  - generic [ref=e169] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e118]
+                  - generic [ref=e170] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e119]
+                  - generic [ref=e171] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e120]
+                  - generic [ref=e172] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e121]
+                  - generic [ref=e173] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e122]
+                  - generic [ref=e174] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e123]
+                  - generic [ref=e175] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e124]
+                  - generic [ref=e176] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e125]
+                  - generic [ref=e177] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e126]
+                  - generic [ref=e178] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e127]
+                  - generic [ref=e179] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e128]
+                  - generic [ref=e180] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e129]
+                  - generic [ref=e181] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e130]
+                  - generic [ref=e182] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e131]
+                  - generic [ref=e183] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e132]
+                  - generic [ref=e184] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e133]
+                  - generic [ref=e185] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e134]
+                  - generic [ref=e186] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e135]
+                  - generic [ref=e187] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e136]
+                  - generic [ref=e188] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e137]
+                  - generic [ref=e189] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e138]
+                  - generic [ref=e190] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e139]
+                  - generic [ref=e191] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e140]
+                  - generic [ref=e192] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e141]
+                  - generic [ref=e193] clickable [cursor:pointer]
+                - treeitem [level=1, ref=e142]
+                  - generic [ref=e194] clickable [cursor:pointer]
+      - slider "Draggable pane splitter" [ref=e38]: 320
+  - generic [ref=e8] focusable [tabindex]
+    - navigation "Breadcrumbs" [ref=e30]
+      - heading "Breadcrumbs" [level=2, ref=e39]
+      - list
+        - listitem [level=1]
+          - link "engineering-board" [ref=e59]
+        - listitem [level=1]
+          - link "engineering-board" [ref=e60]
+        - listitem [level=1]
+          - link "eb-self" [ref=e61]
+        - listitem [level=1]
+          - link "bugs" [ref=e62]
+    - heading "B001-sessionstart-on2-blockedby-loop-exceeds-10s-time.md" [level=1, ref=e40]
+    - button "Copy path" [ref=e31]
+    - button "More file actions" [expanded=false, ref=e32]
+    - heading "Latest commit" [level=2, ref=e25]
+    - heading "History" [level=2, ref=e26]
+    - link "History" [ref=e27]
+      - StaticText "History"
+    - generic
+      - generic
+        - heading "File metadata and controls" [level=2, ref=e41]
+        - list "File view"
+          - listitem [level=1]
+            - button "Preview" [ref=e63]
+              - StaticText "Preview"
+          - listitem [level=1]
+            - button "Code" [ref=e64]
+              - StaticText "Code"
+          - listitem [level=1]
+            - button "Blame" [ref=e65]
+              - StaticText "Blame"
+        - StaticText "30 lines (26 loc) · 1.64 KB"
+        - link "Raw" [ref=e48]
+          - StaticText "Raw"
+        - generic
+          - button "Copy raw file" [ref=e49]
+        - generic
+          - button "Download raw file" [ref=e50]
+        - generic
+          - button "You must be signed in to make or propose changes" [disabled, ref=e51]
+        - generic
+          - button "More edit options" [expanded=false, ref=e52]
+        - button "Outline" [ref=e42]
+    - region "B001-sessionstart-on2-blockedby-loop-exceeds-10s-time.md" [ref=e28]
+      - generic [ref=e33] clickable [onclick]
+        - article
+          - table
+            - row
+              - rowheader "id" [ref=e74]
+              - cell "B001" [ref=e75]
+            - row
+              - rowheader "type" [ref=e76]
+              - cell "bug" [ref=e77]
+            - row
+              - rowheader "title" [ref=e78]
+              - cell "SessionStart O(n^2) blocked_by loop exceeds 10s timeout on large boards" [ref=e79]
+            - row
+              - rowheader "discovered" [ref=e80]
+              - cell "2026-07-04" [ref=e81]
+            - row
+              - rowheader "status" [ref=e82]
+              - cell "resolved" [ref=e83]
+            - row
+              - rowheader "priority" [ref=e84]
+              - cell "P1" [ref=e85]
+            - row
+              - rowheader "affects" [ref=e86]
+              - cell "hooks/scripts/board-session-start.sh" [ref=e87]
+            - row
+              - rowheader "needs" [ref=e88]
+              - cell "tdd" [ref=e89]
+            - row
+              - rowheader "pattern" [ref=e90]
+              - cell
+                - table
+                  - row
+                    - cell "o-n-squared" [ref=e210]
+                      - StaticText "o-n-squared"
+                    - cell "hook-latency" [ref=e211]
+                      - StaticText "hook-latency"
+          - generic
+            - heading "Done when" [level=2, ref=e66]
+            - link "Permalink: Done when" [ref=e67]
+          - list
+            - listitem [level=1]
+              - ListMarker "• "
+              - StaticText "The \"Blocking relationships\" section is computed in a single "
+              - code
+                - StaticText "python3"
+              - StaticText " pass over frontmatter (like the learnings block), not a shell loop of "
+              - code
+                - StaticText "grep -rl"
+              - StaticText " per unique blocker."
+            - listitem [level=1]
+              - ListMarker "• "
+              - StaticText "A board of 1200 entries with distinct "
+              - code
+                - StaticText "blocked_by"
+              - StaticText " relationships renders SessionStart well under the 10s "
+              - code
+                - StaticText "hooks.json"
+              - StaticText " timeout."
+            - listitem [level=1]
+              - ListMarker "• "
+              - StaticText "A perf regression test (or documented measurement in "
+              - code
+                - StaticText ".goal/evidence/loop/"
+              - StaticText ") records the before/after wall time."
+          - generic
+            - heading "Observed behavior" [level=2, ref=e68]
+            - link "Permalink: Observed behavior" [ref=e69]
+          - paragraph
+            - StaticText "Measured (Track A red-team): 300 entries=2.15s, 800=7.97s, "
+            - strong
+              - StaticText "1200=15.05s → exceeds the 10s SessionStart timeout"
+            - StaticText "; control (1200 entries, no "
+            - code
+              - StaticText "blocked_by"
+            - StaticText ")=0.06s. The board summary is silently truncated/lost past ~900-1000 entries — exactly the \"mature board\" the product targets."
+          - generic
+            - heading "Root cause" [level=2, ref=e70]
+            - link "Permalink: Root cause" [ref=e71]
+          - paragraph
+            - code
+              - StaticText "board-session-start.sh:61-72"
+            - StaticText " runs "
+            - code
+              - StaticText "grep -rl \"${line}\" \"${BOARD_DIR}\""
+            - StaticText " once per unique "
+            - code
+              - StaticText "blocked_by:"
+            - StaticText " line → O(unique_blockers × files)."
+          - generic
+            - heading "Resolution (C1, PR C1c)" [level=2, ref=e72]
+            - link "Permalink: Resolution (C1, PR C1c)" [ref=e73]
+          - paragraph
+            - StaticText "The blocked_by dependency map now computes in a single python3 pass over entry frontmatter (walks the board once, skips _sessions/_archive/_claims), replacing the per-blocker "
+            - code
+              - StaticText "grep -rl"
+            - StaticText " full-tree scan. Measured: 1200 entries 15.05s -> 0.10s; 2000 entries = 0.14s (linear). Evidence: .goal/evidence/loop/C1c-session-start-perf.txt. New suite tests/session-start/automated.sh (T4) fails if a 1200-entry board takes"
+          - blockquote
+            - paragraph
+              - StaticText "= 10s. Also fixes the prior head -1 quirk that mis-attributed identical blocked_by lines."
+- alert

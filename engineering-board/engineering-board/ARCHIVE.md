@@ -1,6 +1,11 @@
 # engineering-board — Archive
 
 Resolved entries. Newest at the top.
+- F012 | Roll out the approved Graphite identity to the website viewer and brand assets | resolved: 2026-09-11
+- F014 | Apply Graphite wordmark styling to the real generated board viewer | resolved: 2026-09-11
+- F013 | Promote Graphite prototype into the public website with working example sources | resolved: 2026-09-11
+- B017 | Live landing page dark theme fails automated contrast and keyboard scroll checks | resolved: 2026-09-11
+- B016 | Public board entry link leads to GitHub Pages 404 | resolved: 2026-09-11
 - F006 | Build the free-only Codex design canary fixture pack | resolved: 2026-09-09
 - Q002 | Which Codex design plugins should enter a canary evaluation? | resolved: 2026-09-09
 - F005 | Expose a read-only hypothesis-detail route from retrieved H records | resolved: 2026-09-09
