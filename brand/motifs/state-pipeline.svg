@@ -4,7 +4,7 @@
   <style>
     .ln{stroke:currentColor;opacity:.24}.node{fill:none;stroke:currentColor;opacity:.5;stroke-width:1.5}
     .lbl{fill:currentColor;font-family:ui-sans-serif,system-ui,sans-serif;font-size:12px;font-weight:500}
-    .acc{fill:#9A5B00}.accs{stroke:#9A5B00;opacity:1}
+    .acc{fill:currentColor}.accs{stroke:currentColor;opacity:1}
   </style>
   <line class="ln" x1="52"  y1="26" x2="150" y2="26" stroke-width="1.5"/>
   <line class="ln" x1="200" y1="26" x2="298" y2="26" stroke-width="1.5"/>
@@ -16,5 +16,5 @@
   <text class="lbl" x="26"  y="58" text-anchor="middle">tdd</text>
   <text class="lbl" x="176" y="58" text-anchor="middle">review</text>
   <text class="lbl" x="324" y="58" text-anchor="middle">validate</text>
-  <text class="lbl" x="404" y="58" text-anchor="middle" fill="#9A5B00">resolved</text>
+  <text class="lbl" x="404" y="58" text-anchor="middle" fill="currentColor">resolved</text>
 </svg>

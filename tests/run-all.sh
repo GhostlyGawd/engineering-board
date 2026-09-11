@@ -46,6 +46,7 @@ SUITES=(
   "reject-filter|bash tests/security/reject-filter.sh"
   "session-start|bash tests/session-start/automated.sh"
   "prompt-guard|bash tests/prompt-guard/automated.sh"
+  "site|bash tests/site/automated.sh"
   "view|bash tests/view/automated.sh"
   "mcp-server|bash mcp-server/run-tests.sh"
 )

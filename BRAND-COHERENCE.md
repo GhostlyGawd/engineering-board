@@ -1,5 +1,10 @@
 # Brand Coherence Audit
 
+> Historical audit of the superseded amber/card-mark identity. The owner approved
+> Graphite and a wordmark-only identity on 2026-09-11; see BRAND.md and the dated
+> Graphite rollout evidence for current design and verification.
+
+
 > **Update — fixes applied (v1.6.0).** F2 **applied** — the `how-it-works.svg`
 > header gradient is removed (solid ink); no gradient remains in any shipped SVG.
 > F1 (full diagram palette repaint) and F3–F6 (radius/stroke DNA, favicon reduction,

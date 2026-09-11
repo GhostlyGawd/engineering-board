@@ -9,6 +9,22 @@ increases.
 
 ## [Unreleased]
 
+### Changed
+
+- The website, read-only board viewer, README and brand assets now use the
+  approved Graphite palette, locally stored Manrope type, and wordmark-only
+  identity. Both themes preserve explicit evidence and hypothesis states.
+- The public introduction includes a labeled, navigable synthetic investigation
+  and a Codex initialization handoff with source records and recovery guidance.
+
+### Fixed
+
+- Pages staging now generates the real board from canonical repository entries
+  with absolute GitHub source links, preventing stale relative entry links
+  from opening 404 pages. Only public site files enter the publication artifact.
+- Website and viewer controls have readable metadata, keyboard focus, accessible
+  landmarks, and usable mobile layouts. Shared tokens prevent palette drift.
+
 ## [1.14.0] — 2026-09-09
 
 ### Added
