@@ -14,19 +14,27 @@ Use this protocol when the `engineering-board` MCP server is available:
 
 1. Resolve the absolute repository root and project name. Pass `root` in every
    tool call.
-2. Call `board_status` and `board_list_entries` with `ready: true`.
-3. Call `board_context` for the current task and candidate entries. Use
+2. Call `board_status` and `board_list_entries` with `ready: true`. Also inspect
+   `in_progress` entries and claims across the repository using Step 4. A ready
+   list is not an ownership check.
+3. Keep this initial pass to board overview and recommendation. Before resuming
+   an entry, researching its fix, or changing its state, pass the ownership gate
+   in Step 4. Call `board_context` for the current task and candidate entries. Use
    `board_insights` when a repeated pattern or graph cluster can change the
    recommended scope.
 4. Recommend the next entry from priority, blocker, dependency, affected-area,
    and systemic-pattern evidence. Explain the reason.
-5. When work starts, call `board_claim` before `board_update_entry`. Set the
-   entry to `in_progress` only after the claim succeeds.
+5. When work starts or resumes, follow Step 4, including its existing-claim
+   checks. For a new entry, call `board_claim` before `board_update_entry`; only
+   `acquired: true` with `exit_code: 0` permits setting `in_progress`.
 6. Capture new findings with `board_capture_finding`. Do not expand the claimed
    entry silently.
 
 Use the detailed rules below to interpret the returned board state. Use shell
-commands only as a fallback when the MCP server is not available.
+commands for board operations only when MCP is unavailable. Claim inspection
+requires read-only filesystem access even with MCP: `board_status` and
+`board_list_entries` do not return claim ownership or heartbeat evidence. If
+that access is unavailable, ownership is unknown; do not start or resume work.
 
 ## Step 0: Identify the project scope
 
@@ -44,6 +52,10 @@ If triage was requested for a specific project, read that project's board at `en
 ## Step 1b: Auto-resolve terminal pass (run before triage output)
 
 Before applying the triage rules, run the auto-resolve terminal pass: see `../../references/auto-resolve-pass.md`.
+
+Apply the Step 4 ownership gate first to every `in_progress` candidate. Exclude
+foreign, stale, missing, or unverifiable claims from fix research and closure
+actions in this pass. A board overview may report their recorded state.
 
 **Why at triage:** recommendations should never point at already-done items. If a Done-when criterion was satisfied by work that happened between the last `/board-rebuild` and this triage call, surface it now so the user can close it before the triage output is computed.
 
@@ -97,15 +109,93 @@ Present:
 3. **Blocked items**: list what is waiting and what question unblocks each
 4. **Deferred items**: if any, with reason
 
-## Step 4: Starting Work (when asked to begin an item)
+## Step 4: Ownership gate (before starting or resuming work)
 
-Before marking any item `in_progress`:
+An `in_progress` status records work state, not permission for this chat to
+continue it. This gate also applies to “continue”, “resume”, and fix research.
+Reading board records to report an overview is permitted before acquisition.
 
-1. Check for existing in_progress items across all project boards:
-   ```bash
-   grep -r "^status: in_progress" engineering-board/ --include="*.md" -l
-   ```
-2. If any found: surface them. One item `in_progress` per session maximum. Either complete the existing item, reset it to `open` with a note on where it stopped, or confirm explicitly before proceeding.
-3. If clear: set `status: in_progress` in the entry file.
-4. If a new issue or question surfaces during implementation: create a new entry immediately using board-intake. Add a `## Related discoveries` section to the current item referencing the new ID. Continue with the current item's original scope.
-5. If the session ends without resolving: leave `in_progress`: the next session's `SessionStart` hook will surface it.
+### 4a. Establish the current working session
+
+Use the current host session identifier from this chat's trusted session/hook
+context, or the stable working-session id explicitly assigned to this worker.
+A lead may hold a claim on behalf of a named builder when the explicit
+assignment records that owner and delegation. Never adopt an id found in a
+claim, another chat, a copied transcript, or repository-wide
+`.engineering-board/last-stop-stdin.json` as proof of this chat's identity.
+If the host supplies no identifier, create a unique id for this working session
+and retain it for subsequent calls. That new id cannot prove ownership of an
+older claim. If identity or delegation cannot be verified, treat existing
+ownership as unknown and limit the action to an overview.
+
+### 4b. Inspect ownership before choosing work
+
+Resolve the actual board directories from the board router (including legacy
+locations). Across all project boards in this repository, inspect entry status
+and `_claims/<entry-id>/owner.txt` plus `heartbeat.txt`. Include this session's
+claims even when an entry has not yet been marked `in_progress`. Read the full
+`session_id:` value and require one unambiguous, exact match to the current
+working session. Project plus entry id identifies the work; ids can repeat
+across projects.
+
+Require a parseable, recent UTC heartbeat: less than 180 seconds old. Allow
+less than 300 seconds only when the active claim implementation is verified to
+use its OneDrive mode for this exact board path; MCP and shell detection differ.
+Use the conservative 180-second limit when that mode is uncertain. A future timestamp, duplicate/malformed owner,
+missing file, or unreadable claim is unverifiable. Re-read the claim before
+resuming research or making a state change; if ownership changed, stop work on
+that entry. Do not infer ownership from the title, status, cwd, prior summary,
+or the fact that this repository was opened in this chat.
+
+| Observed state | Permitted action |
+| --- | --- |
+| Exactly one claim is verified as this session's, and its heartbeat is fresh | Resume that entry within the authorized scope; if its status is still open, set `in_progress` after the ownership check. |
+| A different session owns an `in_progress` entry | Report it as another session's work. Do not research its fix, reset its status, release its claim, or resume it. It does not block this session from claiming a different ready entry. |
+| An `in_progress` entry has no claim, a stale claim, or unknown ownership | Report the ownership gap and leave status and claim unchanged. Do not auto-reclaim or treat age as permission to take over. |
+| This session already owns an entry and requests a different one | Keep one owned entry per working session. Finish or deliberately park its own work with a progress note and owner-checked release before acquiring another. Never reset somebody else's work to satisfy this limit. |
+| Multiple claims match this session | Surface the conflict and reconcile this session's assignments before starting or resuming work. Do not choose one silently. |
+| No claim belongs to this session, and the selected ready entry is open and unclaimed | Attempt atomic acquisition as below. |
+
+A transfer or stale-claim recovery is a separate, explicitly authorized action,
+not a triage side effect. This includes a stale claim with this session's id.
+A request to start an entry does not authorize overriding its existing owner.
+
+### 4c. Acquire, then update
+
+With MCP, call `board_claim` with `root`, `project`, `entry_id`, and the current
+`session_id`. Proceed only when `exit_code: 0` and `acquired: true`. Exit 1
+(`contended`) or exit 2 (`stale`) means leave the entry unchanged, report the
+result, and return to the overview or select another unclaimed ready entry.
+Any error or ambiguous response also stops acquisition. Do not call release,
+reclaim, or retry using the observed owner's id to bypass contention. Claiming
+an already-owned entry returns contention too; use 4b to verify a resume,
+not repeated acquisition as an ownership probe.
+
+Without MCP, use the same gate and the atomic script:
+
+```bash
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/board-claim-acquire.sh" "<board-dir>" "<entry-id>" "<current-session-id>"
+```
+
+Only exit 0 permits continuation; exits 1 and 2 have the same meanings as MCP.
+Never replace acquisition with an entry-file status edit. After successful
+acquisition, re-read ownership and entry eligibility before `board_update_entry`
+(or the shell fallback entry edit), then set `status: in_progress`. If the entry
+is no longer eligible, release only the verified claim just acquired and
+recompute the recommendation. If updating fails, report the retained claim and
+recover it within this session before selecting different work.
+
+Keep the claim heartbeat current during long work with the installed
+`board-claim-heartbeat.sh <board-dir> <entry-id> <current-session-id>` where
+available; it checks ownership. MCP has no heartbeat tool. If a heartbeat
+cannot be maintained, stop at the stale boundary and report it; never refresh a
+stale claim merely to make the resume gate pass.
+
+### 4d. Continue within scope
+
+If a new issue or question surfaces during implementation, use board-intake and
+link the resulting finding or entry under `## Related discoveries`. Continue
+with the current entry's original scope. If the session ends without resolving,
+leave a progress note and follow the host's owner-checked claim lifecycle. The
+next session may see `in_progress` in its startup summary, but must run this
+ownership gate before resuming it.
