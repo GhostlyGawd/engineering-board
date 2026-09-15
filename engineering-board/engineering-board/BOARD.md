@@ -4,9 +4,7 @@ Live index of open items. Resolved items move to ARCHIVE.md.
 
 ## Open
 
-- B010 P2 | [Board triage resumes another chat's in-progress entry without verifying claim ownership](bugs/B010-board-triage-resumes-another-chat-s-in-progress-entry-withou.md) (in_progress)
-- B011 P2 | [Board Intake misses a confirmed workflow bug after the agent acknowledges it](bugs/B011-board-intake-misses-a-confirmed-workflow-bug-after-the-agent.md) (in_progress)
-- F018 P2 | [Versioned release delivery for the triage ownership and intake capture fixes](features/F018-versioned-release-delivery-for-the-triage-ownership-and-inta.md) ⊘ B010, B011
+- F018 P2 | [Versioned release delivery for the triage ownership and intake capture fixes](features/F018-versioned-release-delivery-for-the-triage-ownership-and-inta.md)
 - O001 | [Independent workflow-pilot preflight exposed label leakage and evidence-retention mismatches before live launch](observations/O001-independent-workflow-pilot-preflight-exposed-label-leakage-a.md)
 - O002 | [Hypotheses retrieved by board_context are not readable through board_get_entry in installed 1.13.5](observations/O002-hypotheses-retrieved-by-board-context-are-not-readable-throu.md)
 - O003 | [Wheel build emits deprecation warnings for legacy license metadata](observations/O003-wheel-build-emits-deprecation-warnings-for-legacy-license-me.md)

@@ -1,6 +1,9 @@
 # engineering-board — Archive
 
 Resolved entries. Newest at the top.
+- B020 | Workflow contract test registration passes the repository root as a unittest selector | resolved: 2026-09-15
+- B011 | Board Intake misses a confirmed workflow bug after the agent acknowledges it | resolved: 2026-09-15
+- B010 | Board triage resumes another chat's in-progress entry without verifying claim ownership | resolved: 2026-09-15
 - F012 | Roll out the approved Graphite identity to the website viewer and brand assets | resolved: 2026-09-11
 - F014 | Apply Graphite wordmark styling to the real generated board viewer | resolved: 2026-09-11
 - F013 | Promote Graphite prototype into the public website with working example sources | resolved: 2026-09-11

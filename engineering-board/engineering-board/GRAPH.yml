@@ -1,15 +1,24 @@
 {
   "schema_version": "3",
-  "generated_at": "2026-09-09T16:53:44Z",
-  "source_fingerprint": "31895e3549400ebb81f300920e78133b5027825b6ddecbfd6cd7875a6228ccfc",
-  "build_mode": "full",
+  "generated_at": "2026-09-15T04:53:52Z",
+  "source_fingerprint": "dd8be2285d0032ec32eda9c9065a7686cf25d0fdd9ee0b07d2a3bd654c465fb7",
+  "build_mode": "incremental",
   "project": "engineering-board",
   "entries_analyzed": {
-    "open": 3,
+    "open": 5,
     "archived": 0,
-    "total": 3
+    "total": 5
   },
   "nodes": {
+    "F018": {
+      "type": "feature",
+      "title": "Versioned release delivery for the triage ownership and intake capture fixes",
+      "source": "features/F018-versioned-release-delivery-for-the-triage-ownership-and-inta.md",
+      "priority": "P2",
+      "status": "open",
+      "affects": "skills/",
+      "discovered": "2026-09-15"
+    },
     "O001": {
       "type": "observation",
       "title": "Independent workflow-pilot preflight exposed label leakage and evidence-retention mismatches before live launch",
@@ -29,6 +38,13 @@
       "title": "Wheel build emits deprecation warnings for legacy license metadata",
       "source": "observations/O003-wheel-build-emits-deprecation-warnings-for-legacy-license-me.md",
       "affects": "mcp-server/pyproject.toml",
+      "discovered": "2026-09-09"
+    },
+    "O004": {
+      "type": "observation",
+      "title": "Codex design tooling needs lane-specific evaluation rather than one plugin leaderboard",
+      "source": "observations/O004-codex-design-tooling-needs-lane-specific-evaluation-rather-t.md",
+      "affects": "docs/evidence/2026-09-09-codex-design-plugin-landscape.md",
       "discovered": "2026-09-09"
     }
   },
@@ -81,7 +97,9 @@
       }
     ],
     "isolated": [
-      "O001"
+      "F018",
+      "O001",
+      "O004"
     ],
     "cross_cluster_bridges": []
   },
@@ -102,12 +120,22 @@
     },
     {
       "type": "isolated-node",
+      "node": "F018"
+    },
+    {
+      "type": "isolated-node",
       "node": "O001"
+    },
+    {
+      "type": "isolated-node",
+      "node": "O004"
     }
   ],
   "read_order": [
     "C001",
-    "O001"
+    "F018",
+    "O001",
+    "O004"
   ],
   "drill_in": {
     "C001": [
