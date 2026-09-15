@@ -19,6 +19,13 @@ increases.
 
 ### Fixed
 
+- Board triage now checks current-session claim ownership before resuming work
+  and leaves other sessions' entries unchanged when ownership is foreign,
+  stale, or unknown.
+- Board intake now captures an acknowledged workflow defect before ending the
+  turn, including mistakes made during read-only work, while preserving
+  separate authorization for canonical promotion.
+
 - Pages staging now generates the real board from canonical repository entries
   with absolute GitHub source links, preventing stale relative entry links
   from opening 404 pages. Only public site files enter the publication artifact.
