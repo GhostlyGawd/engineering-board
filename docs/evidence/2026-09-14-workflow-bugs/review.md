@@ -38,3 +38,9 @@ Manual adversarial walkthrough covered ambiguous identity/routing, cross-project
 PASS for the scoped source correction. No correction requested and no remaining blocker within review scope.
 
 This establishes instruction clarity and compatibility with existing tool contracts. Executable tests do not measure whether an agent follows the prose. Full-suite/CI results remain lead delivery checks. Installed release behavior and improved real-world compliance are not established. Lead records CI, integration, and delivery before resolution.
+
+## Integration recheck
+
+Independent workflow_verifier rechecked 34e5a9798f932d04c63f85894636d8b8d548a6f3 after the first full run exposed B020: run-all appends a repository-root argument, which direct unittest entrypoints interpreted as a selector. All 23 original suites passed in that run; the two new registrations failed.
+
+The correction adds a shell wrapper that accepts the root, quotes paths, and propagates failures with set -e. From /tmp the reviewer ran `PYTHONDONTWRITEBYTECODE=1 bash /tmp/eb-workflow-bugs-20260914/tests/workflow-contracts.sh /tmp/eb-workflow-bugs-20260914`: exit 0, claim test and all five intake tests pass. Verdict PASS, no remaining correction blocker. Earlier product-skill review still applies. Full-suite and CI remain separate lead checks.
