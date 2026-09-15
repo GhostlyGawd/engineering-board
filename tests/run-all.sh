@@ -28,6 +28,8 @@ ROOT="${1:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 SUITES=(
   "orchestration|bash tests/orchestration/automated.sh"
   "claims|bash tests/claims/automated.sh"
+  "triage-ownership|python3 tests/triage-ownership/test_claim_contract.py"
+  "intake-contract|python3 tests/b011-intake-contract.py"
   "smoke|bash tests/smoke/automated.sh"
   "scratch-append|bash tests/scratch/append.sh"
   "paths|bash tests/paths/resolution-order.sh"
