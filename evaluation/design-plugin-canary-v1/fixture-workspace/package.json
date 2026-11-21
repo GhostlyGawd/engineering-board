@@ -23,6 +23,6 @@
     "@types/react-dom": "19.1.9",
     "axe-core": "4.13.0",
     "pa11y": "10.0.0",
-    "storybook": "10.6.0"
+    "storybook": "10.6.3"
   }
 }
